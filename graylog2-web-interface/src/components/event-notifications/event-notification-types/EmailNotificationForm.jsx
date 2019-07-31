@@ -37,6 +37,7 @@ Last messages accounting for this alert:
 class EmailNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     users: PropTypes.array.isRequired,
   };
@@ -75,7 +76,7 @@ class EmailNotificationForm extends React.Component {
   };
 
   render() {
-    const { config, users } = this.props;
+    const { config, users, validation } = this.props;
 
     return (
       <React.Fragment>
@@ -83,7 +84,8 @@ class EmailNotificationForm extends React.Component {
                name="sender"
                label="Sender"
                type="text"
-               help="The email address that should be used as the notification sender."
+               bsStyle={validation.errors.sender ? 'error' : null}
+               help={validation.errors.sender || 'The email address that should be used as the notification sender.'}
                value={config.sender || ''}
                onChange={this.handleChange}
                required />
@@ -91,21 +93,26 @@ class EmailNotificationForm extends React.Component {
                name="subject"
                label="Subject"
                type="text"
-               help="The subject that should be used for the email notification."
+               bsStyle={validation.errors.subject ? 'error' : null}
+               help={validation.errors.subject || 'The subject that should be used for the email notification.'}
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
-        <FormGroup id="notification-user-recipients">
+        <FormGroup controlId="notification-user-recipients"
+                   validationState={validation.errors.recipients ? 'error' : null}>
           <ControlLabel>User recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="notification-user-recipients"
                        value={Array.isArray(config.user_recipients) ? config.user_recipients.join(',') : ''}
                        placeholder="Select user(s)..."
                        options={this.formatUsers(users)}
                        onChange={this.handleRecipientsChange('user_recipients')} />
-          <HelpBlock>Select Graylog users that will receive this Notification.</HelpBlock>
+          <HelpBlock>
+            {validation.errors.recipients || 'Select Graylog users that will receive this Notification.'}
+          </HelpBlock>
         </FormGroup>
 
-        <FormGroup id="notification-email-recipients">
+        <FormGroup controlId="notification-email-recipients"
+                   validationState={validation.errors.recipients ? 'error' : null}>
           <ControlLabel>Email recipient(s) <small className="text-muted">(Optional)</small></ControlLabel>
           <MultiSelect id="notification-email-recipients"
                        value={Array.isArray(config.email_recipients) ? config.email_recipients.join(',') : ''}
@@ -114,16 +121,21 @@ class EmailNotificationForm extends React.Component {
                        options={[]}
                        onChange={this.handleRecipientsChange('email_recipients')}
                        allowCreate />
-          <HelpBlock>Add email addresses that will receive this Notification.</HelpBlock>
+          <HelpBlock>
+            {validation.errors.recipients || 'Add email addresses that will receive this Notification.'}
+          </HelpBlock>
         </FormGroup>
-        <FormGroup controlId="notification-body-template">
+        <FormGroup controlId="notification-body-template"
+                   validationState={validation.errors.body_template ? 'error' : null}>
           <ControlLabel>Body Template</ControlLabel>
           <SourceCodeEditor id="notification-body-template"
                             mode="text"
                             theme="light"
                             value={config.body_template || ''}
                             onChange={this.handleBodyTemplateChange} />
-          <HelpBlock>The template that will be used to generate the email body.</HelpBlock>
+          <HelpBlock>
+            {validation.errors.body_template || 'The template that will be used to generate the email body.'}
+          </HelpBlock>
         </FormGroup>
       </React.Fragment>
     );

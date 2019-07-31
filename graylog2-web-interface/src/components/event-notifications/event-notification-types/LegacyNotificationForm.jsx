@@ -10,6 +10,7 @@ import styles from './LegacyNotificationForm.css';
 class LegacyNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     legacyTypes: PropTypes.object.isRequired,
   };
@@ -91,14 +92,15 @@ class LegacyNotificationForm extends React.Component {
   }
 
   render() {
-    const { config, legacyTypes } = this.props;
+    const { config, legacyTypes, validation } = this.props;
     const callbackType = config.callback_type;
     const typeData = legacyTypes[callbackType];
 
     return (
       <React.Fragment>
         <fieldset>
-          <FormGroup controlId="notification-legacy-select">
+          <FormGroup controlId="notification-legacy-select"
+                     validationState={validation.errors.callback_type ? 'error' : null}>
             <ControlLabel>Choose Legacy Notification</ControlLabel>
             <Select id="notification-legacy-select"
                     matchProp="label"
@@ -106,7 +108,9 @@ class LegacyNotificationForm extends React.Component {
                     onChange={this.handleSelectNotificationChange}
                     options={this.formatLegacyTypes(legacyTypes)}
                     value={callbackType} />
-            <HelpBlock>Select a Legacy Notification to use on this Event Definition.</HelpBlock>
+            <HelpBlock>
+              {validation.errors.callback_type || 'Select a Legacy Notification to use on this Event Definition.'}
+            </HelpBlock>
           </FormGroup>
         </fieldset>
 

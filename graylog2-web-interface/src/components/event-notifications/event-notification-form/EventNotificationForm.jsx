@@ -12,6 +12,7 @@ class EventNotificationForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     notification: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     formId: PropTypes.string,
     embedded: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -61,13 +62,14 @@ class EventNotificationForm extends React.Component {
   };
 
   render() {
-    const { action, embedded, formId, notification, onCancel } = this.props;
+    const { action, embedded, formId, notification, onCancel, validation } = this.props;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
         config: notification.config,
         onChange: this.handleConfigChange,
+        validation: validation,
       })
       : null;
 
@@ -79,7 +81,8 @@ class EventNotificationForm extends React.Component {
                    name="title"
                    label="Title"
                    type="text"
-                   help="Title for this Notification."
+                   bsStyle={validation.errors.title ? 'error' : null}
+                   help={validation.errors.title || 'Title for this Notification.'}
                    value={notification.title}
                    onChange={this.handleChange}
                    required />
@@ -93,7 +96,7 @@ class EventNotificationForm extends React.Component {
                    onChange={this.handleChange}
                    rows={2} />
 
-            <FormGroup controlId="notification-type">
+            <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
               <ControlLabel>Notification Type</ControlLabel>
               <Select id="notification-type"
                       options={this.formattedEventNotificationTypes()}
@@ -101,7 +104,9 @@ class EventNotificationForm extends React.Component {
                       onChange={this.handleTypeChange}
                       clearable={false}
                       required />
-              <HelpBlock>Choose the type of Notification to create.</HelpBlock>
+              <HelpBlock>
+                {validation.errors.config || 'Choose the type of Notification to create.'}
+              </HelpBlock>
             </FormGroup>
 
             {notificationFormComponent}
