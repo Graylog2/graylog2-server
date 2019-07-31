@@ -3,7 +3,6 @@ package org.graylog.events.contentpack.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.events.contentpack.entities.AutoValue_EventNotificationHandlerConfigEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 

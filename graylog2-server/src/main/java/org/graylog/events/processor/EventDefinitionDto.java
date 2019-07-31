@@ -23,11 +23,18 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog2.contentpacks.ContentPackAble;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -38,7 +45,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition {
+public abstract class EventDefinitionDto implements EventDefinition, ContentPackAble<EventDefinitionDto> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -173,4 +180,25 @@ public abstract class EventDefinitionDto implements EventDefinition {
             return dto;
         }
     }
+
+    public Object toContentPackEntity() {
+        EventDefinitionDto eventDefinition = this;
+        final EventProcessorConfig config = eventDefinition.config();
+        final EventProcessorConfigEntity eventProcessorConfigEntity = (EventProcessorConfigEntity) config.toContentPackEntity();
+
+        return EventDefinitionEntity.builder()
+            .title(ValueReference.of(eventDefinition.title()))
+            .description(ValueReference.of(eventDefinition.description()))
+            .priority(ValueReference.of(eventDefinition.priority()))
+            .alert(ValueReference.of(eventDefinition.alert()))
+            .config(eventProcessorConfigEntity)
+            .notifications(eventDefinition.notifications())
+            .notificationSettings(eventDefinition.notificationSettings())
+            .fieldSpec(eventDefinition.fieldSpec())
+            .keySpec(eventDefinition.keySpec())
+            .storage(eventDefinition.storage())
+            .build();
+    }
+
+
 }

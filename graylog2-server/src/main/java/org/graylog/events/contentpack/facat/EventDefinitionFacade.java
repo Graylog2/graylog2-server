@@ -53,32 +53,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(EventDefinition eventDefinition, EntityDescriptorIds entityDescriptorIds) {
-        final AggregationEventProcessorConfig config = (AggregationEventProcessorConfig) eventDefinition.config();
-        final AggregationEventProcessorConfigEntity aggregationEventProcessorConfigEntity = AggregationEventProcessorConfigEntity.builder()
-            .type(config.type())
-            .query(ValueReference.of(config.query()))
-            .streams(config.streams()) // TODO?
-            .groupBy(config.groupBy())
-            .series(config.series())
-            .conditions(config.conditions().orElse(null))
-            .executeEveryMs(ValueReference.of(config.executeEveryMs()))
-            .searchWithinMs(ValueReference.of(config.searchWithinMs()))
-            .build();
-
-        final EventDefinitionEntity entity = EventDefinitionEntity.builder()
-                .title(ValueReference.of(eventDefinition.title()))
-                .description(ValueReference.of(eventDefinition.description()))
-                .priority(ValueReference.of(eventDefinition.priority()))
-                .alert(ValueReference.of(eventDefinition.alert()))
-                .config(aggregationEventProcessorConfigEntity)
-                .notifications(eventDefinition.notifications())
-                .notificationSettings(eventDefinition.notificationSettings())
-                .fieldSpec(eventDefinition.fieldSpec())
-                .keySpec(eventDefinition.keySpec())
-                .storage(eventDefinition.storage())
-                .build();
-
+    Entity exportNativeEntity(EventDefinitionDto eventDefinition, EntityDescriptorIds entityDescriptorIds) {
+        final EventDefinitionEntity entity = (EventDefinitionEntity) eventDefinition.toContentPackEntity();
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return EntityV1.builder()
@@ -127,6 +103,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                 .executeEveryMs(eventProcessorConfigEntity.executeEveryMs().asLong(parameters))
                 .searchWithinMs(eventProcessorConfigEntity.searchWithinMs().asLong(parameters))
                 .build();
+
         final EventDefinitionDto eventDefinition = EventDefinitionDto.builder()
                 .title(eventDefinitionEntity.title().asString(parameters))
                 .description(eventDefinitionEntity.description().asString(parameters))

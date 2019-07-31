@@ -100,6 +100,11 @@ public abstract class TestEventProcessorConfig implements EventProcessorConfig {
     }
 
     @Override
+    public Object toContentPackEntity() {
+        return null;
+    }
+
+    @Override
     public ValidationResult validate() {
         return new ValidationResult();
     }
