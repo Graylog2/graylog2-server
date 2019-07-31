@@ -14,6 +14,11 @@ class LegacyNotificationForm extends React.Component {
     legacyTypes: PropTypes.object.isRequired,
   };
 
+  static defaultConfig = {
+    callback_type: '',
+    configuration: {},
+  };
+
   propagateMultiChange = (newValues) => {
     const { config, onChange } = this.props;
     const nextConfig = Object.assign({}, config, newValues);
