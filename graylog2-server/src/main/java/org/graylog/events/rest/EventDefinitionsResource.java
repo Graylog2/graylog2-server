@@ -117,7 +117,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(EventDefinitionDto dto) {
-        final ValidationResult result = dto.config().validate();
+        final ValidationResult result = dto.validate();
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -134,7 +134,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
 
-        final ValidationResult result = dto.config().validate();
+        final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
