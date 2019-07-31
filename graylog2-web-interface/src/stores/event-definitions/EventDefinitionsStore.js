@@ -120,8 +120,10 @@ const EventDefinitionsStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
           'Could not save Event Definition');
+        }
       },
     );
     EventDefinitionsActions.create.promise(promise);
@@ -138,8 +140,10 @@ const EventDefinitionsStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        UserNotification.error(`Updating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not update Event Definition');
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Updating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
+            'Could not update Event Definition');
+        }
       },
     );
     EventDefinitionsActions.update.promise(promise);
