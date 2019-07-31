@@ -127,7 +127,7 @@ public class MoreIndices {
             if (!failedItems.isEmpty()) {
                 LOG.error("Failed to index {} events: {}", eventsWithContext.size(), result.getErrorMessage());
             }
-            LOG.info("Index: Bulk indexed {} events, failures: {}", result.getItems().size(), failedItems.size());
+            LOG.debug("Index: Bulk indexed {} events, failures: {}", result.getItems().size(), failedItems.size());
         } catch (IOException e) {
             LOG.error("Failed to index {} events", eventsWithContext.size(), e);
         }
