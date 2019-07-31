@@ -20,12 +20,21 @@ import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
+import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * Job scheduler specific bindings.
  */
 public class JobSchedulerModule extends PluginModule {
+    @Override
+    public Set<? extends PluginConfigBean> getConfigBeans() {
+        return Collections.singleton(new JobSchedulerConfiguration());
+    }
+
     @Override
     protected void configure() {
         bind(JobSchedulerService.class).asEagerSingleton();

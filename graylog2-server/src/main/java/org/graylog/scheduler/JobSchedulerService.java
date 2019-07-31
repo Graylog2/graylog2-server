@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.worker.JobWorkerPool;
@@ -23,9 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class JobSchedulerService extends AbstractExecutionThreadService {
@@ -36,16 +37,19 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
     private final JobSchedulerClock clock;
     private final JobWorkerPool workerPool;
     private final CountDownLatch shutdownLatch = new CountDownLatch(1);
+    private final Duration loopSleepDuration;
 
     @Inject
     public JobSchedulerService(JobExecutionEngine.Factory engineFactory,
                                JobWorkerPool.Factory workerPoolFactory,
                                JobSchedulerConfig schedulerConfig,
-                               JobSchedulerClock clock) {
+                               JobSchedulerClock clock,
+                               @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
         this.workerPool = workerPoolFactory.create("system", schedulerConfig.numberOfWorkerThreads());
         this.jobExecutionEngine = engineFactory.create(workerPool);
         this.schedulerConfig = schedulerConfig;
         this.clock = clock;
+        this.loopSleepDuration = loopSleepDuration;
     }
 
     @Override
@@ -56,7 +60,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                 try {
                     if (!jobExecutionEngine.execute() && isRunning()) {
                         // We wait because there are either no free worker threads or no runnable triggers
-                        clock.sleepUninterruptibly(1, TimeUnit.SECONDS); // TODO: Duration should be configurable
+                        clock.sleepUninterruptibly(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
                     }
                 } catch (Exception e) {
                     LOG.error("Error running job execution engine", e);
