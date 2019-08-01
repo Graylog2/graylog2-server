@@ -15,21 +15,36 @@ class LegacyNotificationSummary extends React.Component {
     const { notification, legacyTypes } = this.props;
     const configurationValues = notification.config.configuration;
     const callbackType = notification.config.callback_type;
-    const typeConfiguration = legacyTypes[callbackType].configuration;
+    const typeData = legacyTypes[callbackType];
 
-    const summaryFields = Object.entries(typeConfiguration).map(([key, value]) => {
-      return (
-        <tr key={key}>
-          <td>{value.human_name}</td>
-          <td>{configurationValues[key]}</td>
+    let content;
+    if (typeData) {
+      const typeConfiguration = typeData.configuration;
+
+      content = Object.entries(typeConfiguration)
+        .map(([key, value]) => {
+          return (
+            <tr key={key}>
+              <td>{value.human_name}</td>
+              <td>{configurationValues[key]}</td>
+            </tr>
+          );
+        });
+    } else {
+      content = (
+        <tr className="danger">
+          <td>Type</td>
+          <td>
+            Unknown legacy alarm callback type: <strong>{callbackType}</strong> Please make sure the plugin is installed.
+          </td>
         </tr>
       );
-    });
+    }
 
     return (
       <CommonNotificationSummary {...this.props}>
         <React.Fragment>
-          {summaryFields}
+          {content}
         </React.Fragment>
       </CommonNotificationSummary>
     );
