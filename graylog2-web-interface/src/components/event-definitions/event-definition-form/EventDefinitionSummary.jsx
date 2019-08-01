@@ -20,6 +20,21 @@ class EventDefinitionSummary extends React.Component {
     validation: PropTypes.object.isRequired,
   };
 
+  state = {
+    showValidation: false,
+  };
+
+  componentDidUpdate() {
+    this.showValidation();
+  }
+
+  showValidation = () => {
+    const { showValidation } = this.state;
+    if (!showValidation) {
+      this.setState({ showValidation: true });
+    }
+  };
+
   renderDetails = (eventDefinition) => {
     return (
       <React.Fragment>
@@ -172,12 +187,13 @@ class EventDefinitionSummary extends React.Component {
 
   render() {
     const { eventDefinition, validation } = this.props;
+    const { showValidation } = this.state;
 
     return (
       <Row className={styles.eventSummary}>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
-          <EventDefinitionValidationSummary validation={validation} />
+          {showValidation && <EventDefinitionValidationSummary validation={validation} />}
           <Row>
             <Col md={5}>
               {this.renderDetails(eventDefinition)}

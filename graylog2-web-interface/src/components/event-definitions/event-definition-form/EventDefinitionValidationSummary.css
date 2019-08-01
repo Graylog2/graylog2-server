@@ -1,9 +1,0 @@
-:local(.validationSummary) h4 {
-    font-size: 16px;
-    margin-bottom: 0.5em;
-}
-
-:local(.validationSummary) ul {
-    list-style: disc;
-    margin: 0.5em 0;
-}
