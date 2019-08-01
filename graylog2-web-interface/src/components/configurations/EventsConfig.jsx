@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import { Button, FormGroup, HelpBlock } from 'react-bootstrap';
 import { BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
@@ -38,12 +37,12 @@ const EventsConfig = createReactClass({
   getInitialState() {
     const { config } = this.props;
     return {
-      config: ObjectUtils.clone(config),
+      config: config,
     };
   },
 
   componentWillReceiveProps(newProps) {
-    this.setState({ config: ObjectUtils.clone(newProps.config) });
+    this.setState({ config: newProps.config });
   },
 
   _openModal() {
@@ -96,21 +95,13 @@ const EventsConfig = createReactClass({
     return milliseconds >= 0;
   },
 
-  _onBacklogUpdate(key) {
-    return (value) => {
-      const { config } = this.state;
-      const update = ObjectUtils.clone(config);
-      if (typeof value === 'object') {
-        update[key] = FormUtils.getValueFromInput(value.target);
-      } else {
-        update[key] = value;
-      }
-      this.setState({ config: update });
-    };
+  _onBacklogUpdate(event) {
+    const value = FormUtils.getValueFromInput(event.target);
+    this._propagateChanges('events_notification_default_backlog', value);
   },
 
   _titleCase(str) {
-    return lodash.startCase(lodash.toLower(str));
+    return lodash.capitalize(str);
   },
 
   render() {
@@ -144,30 +135,28 @@ const EventsConfig = createReactClass({
             <FormGroup controlId="search-timeout-field">
               <TimeUnitInput label="Search Timeout"
                              update={this._onSearchTimeoutUpdate}
-                             defaultEnabled={eventsSearchTimeout.duration !== 0}
                              value={eventsSearchTimeout.duration}
                              unit={eventsSearchTimeout.unit}
                              units={TIME_UNITS}
                              required />
               <HelpBlock>
-                Amount of time after which an Elasticsearch query is interrupted.
+                Amount of time after which an Elasticsearch query is interrupted. (Minimum timeout is 1s)
               </HelpBlock>
             </FormGroup>
             <FormGroup controlId="notifications-retry-field">
               <TimeUnitInput label="Notifications retry period"
                              update={this._onRetryPeriodUpdate}
-                             defaultEnabled={eventsNotificationRetryPeriod.duration !== 0}
                              value={eventsNotificationRetryPeriod.duration}
                              unit={eventsNotificationRetryPeriod.unit}
                              units={TIME_UNITS}
                              required />
               <HelpBlock>
-                Amount of time after which a failed notification is resend.
+                Amount of time after which a failed notification is resend. (Minimum is 0 or immediate retry)
               </HelpBlock>
             </FormGroup>
             <Input id="notification-backlog-field"
                    type="number"
-                   onChange={this._onBacklogUpdate('events_notification_default_backlog')}
+                   onChange={this._onBacklogUpdate}
                    label="Default notifications backlog size"
                    help="Amount of log messages included in a notification by default."
                    value={eventsNotificationDefaultBacklog}
