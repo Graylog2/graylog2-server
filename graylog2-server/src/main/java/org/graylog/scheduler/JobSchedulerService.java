@@ -79,8 +79,14 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
         LOG.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
         serverStatus.awaitRunning(() -> LOG.debug("Server entered RUNNING state, starting scheduler loop"));
 
-        if (schedulerConfig.canRun()) {
+        if (schedulerConfig.canStart()) {
             while (isRunning()) {
+                if (!schedulerConfig.canExecute()) {
+                    LOG.info("Couldn't execute next scheduler loop iteration. Waiting and trying again.");
+                    clock.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                    continue;
+                }
+
                 LOG.debug("Starting scheduler loop iteration");
                 try {
                     if (!jobExecutionEngine.execute() && isRunning()) {

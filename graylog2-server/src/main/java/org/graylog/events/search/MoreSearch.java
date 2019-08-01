@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
@@ -89,7 +90,7 @@ public class MoreSearch {
         this.allowLeadingWildcardSearches = configuration.isAllowLeadingWildcardSearches();
     }
 
-    public Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
+    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
         // We support an empty streams list and return all affected indices in that case.
@@ -248,13 +249,15 @@ public class MoreSearch {
         }
     }
 
-    public static String buildStreamFilter(Set<String> streams) {
+    @VisibleForTesting
+    static String buildStreamFilter(Set<String> streams) {
         checkArgument(streams != null, "streams parameter cannot be null");
         checkArgument(!streams.isEmpty(), "streams parameter cannot be empty");
 
-        return streams.stream()
-                .map(String::trim)
-                .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
-                .collect(Collectors.joining(" OR "));
+        final String streamFilter = streams.stream()
+            .map(String::trim)
+            .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
+            .collect(Collectors.joining(" OR "));
+        return "(" + streamFilter + ")";
     }
 }

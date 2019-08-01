@@ -93,6 +93,8 @@ const TimeUnitInput = createReactClass({
     wrapperClassName: PropTypes.string,
     /** Specifies if the input should render a checkbox. Use this if the enabled state is controlled by another input */
     hideCheckbox: PropTypes.bool,
+    /** Align unit dropdown menu to the right. */
+    pullRight: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -109,6 +111,7 @@ const TimeUnitInput = createReactClass({
       labelClassName: undefined,
       wrapperClassName: undefined,
       hideCheckbox: false,
+      pullRight: false,
     };
   },
 
@@ -176,7 +179,7 @@ const TimeUnitInput = createReactClass({
 
   render() {
     const { unitOptions } = this.state;
-    const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox } = this.props;
+    const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
 
     const options = unitOptions.map((o) => {
       return (
@@ -203,6 +206,7 @@ const TimeUnitInput = createReactClass({
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
+                            pullRight={pullRight}
                             title={unitOptions.filter(o => o.value === unit)[0].label}
                             disabled={!this._isChecked()}>
               {options}

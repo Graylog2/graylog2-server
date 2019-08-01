@@ -46,6 +46,7 @@ public class EventTest {
                 .timerangeStart(now)
                 .timerangeEnd(now.minusHours(1))
                 .streams(ImmutableSet.of("000000000000000000000002"))
+                .sourceStreams(ImmutableSet.of("000000000000000000000001"))
                 .message("Test message")
                 .source("source")
                 .keyTuple(keyTuple)
@@ -65,6 +66,7 @@ public class EventTest {
             assertThat(event.getTimerangeStart()).isEqualTo(now);
             assertThat(event.getTimerangeEnd()).isEqualTo(now.minusHours(1));
             assertThat(event.getStreams()).isEqualTo(ImmutableSet.of("000000000000000000000002"));
+            assertThat(event.getSourceStreams()).isEqualTo(ImmutableSet.of("000000000000000000000001"));
             assertThat(event.getMessage()).isEqualTo("Test message");
             assertThat(event.getSource()).isEqualTo("source");
             assertThat(event.getKeyTuple()).isEqualTo(keyTuple);
