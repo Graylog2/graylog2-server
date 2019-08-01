@@ -38,7 +38,7 @@ class HttpNotificationForm extends React.Component {
                label="URL"
                type="text"
                bsStyle={validation.errors.url ? 'error' : null}
-               help={validation.errors.url || 'The URL to POST to when an Event occurs.'}
+               help={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                value={config.url || ''}
                onChange={this.handleChange}
                required />

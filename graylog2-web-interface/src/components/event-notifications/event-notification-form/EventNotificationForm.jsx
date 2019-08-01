@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -82,7 +83,7 @@ class EventNotificationForm extends React.Component {
                    label="Title"
                    type="text"
                    bsStyle={validation.errors.title ? 'error' : null}
-                   help={validation.errors.title || 'Title for this Notification.'}
+                   help={lodash.get(validation, 'errors.title[0]', 'Title for this Notification.')}
                    value={notification.title}
                    onChange={this.handleChange}
                    required />
@@ -105,7 +106,7 @@ class EventNotificationForm extends React.Component {
                       clearable={false}
                       required />
               <HelpBlock>
-                {validation.errors.config || 'Choose the type of Notification to create.'}
+                {lodash.get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}
               </HelpBlock>
             </FormGroup>
 

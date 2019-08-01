@@ -85,7 +85,7 @@ class EmailNotificationForm extends React.Component {
                label="Sender"
                type="text"
                bsStyle={validation.errors.sender ? 'error' : null}
-               help={validation.errors.sender || 'The email address that should be used as the notification sender.'}
+               help={lodash.get(validation, 'errors.sender[0]', 'The email address that should be used as the notification sender.')}
                value={config.sender || ''}
                onChange={this.handleChange}
                required />
@@ -94,7 +94,7 @@ class EmailNotificationForm extends React.Component {
                label="Subject"
                type="text"
                bsStyle={validation.errors.subject ? 'error' : null}
-               help={validation.errors.subject || 'The subject that should be used for the email notification.'}
+               help={lodash.get(validation, 'errors.subject[0]', 'The subject that should be used for the email notification.')}
                value={config.subject || ''}
                onChange={this.handleChange}
                required />
@@ -107,7 +107,7 @@ class EmailNotificationForm extends React.Component {
                        options={this.formatUsers(users)}
                        onChange={this.handleRecipientsChange('user_recipients')} />
           <HelpBlock>
-            {validation.errors.recipients || 'Select Graylog users that will receive this Notification.'}
+            {lodash.get(validation, 'errors.recipients[0]', 'Select Graylog users that will receive this Notification.')}
           </HelpBlock>
         </FormGroup>
 
@@ -122,7 +122,7 @@ class EmailNotificationForm extends React.Component {
                        onChange={this.handleRecipientsChange('email_recipients')}
                        allowCreate />
           <HelpBlock>
-            {validation.errors.recipients || 'Add email addresses that will receive this Notification.'}
+            {lodash.get(validation, 'errors.recipients[0]', 'Add email addresses that will receive this Notification.')}
           </HelpBlock>
         </FormGroup>
         <FormGroup controlId="notification-body-template"
@@ -134,7 +134,7 @@ class EmailNotificationForm extends React.Component {
                             value={config.body_template || ''}
                             onChange={this.handleBodyTemplateChange} />
           <HelpBlock>
-            {validation.errors.body_template || 'The template that will be used to generate the email body.'}
+            {lodash.get(validation, 'errors.body_template[0]', 'The template that will be used to generate the email body.')}
           </HelpBlock>
         </FormGroup>
       </React.Fragment>

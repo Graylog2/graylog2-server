@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
@@ -109,7 +110,7 @@ class LegacyNotificationForm extends React.Component {
                     options={this.formatLegacyTypes(legacyTypes)}
                     value={callbackType} />
             <HelpBlock>
-              {validation.errors.callback_type || 'Select a Legacy Notification to use on this Event Definition.'}
+              {lodash.get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
             </HelpBlock>
           </FormGroup>
         </fieldset>
