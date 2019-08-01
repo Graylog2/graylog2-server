@@ -122,7 +122,7 @@ const EventDefinitionsStore = Reflux.createStore({
       (error) => {
         if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
           UserNotification.error(`Creating Event Definition "${eventDefinition.title}" failed with status: ${error}`,
-          'Could not save Event Definition');
+            'Could not save Event Definition');
         }
       },
     );
