@@ -40,13 +40,18 @@ public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     }
 
     @Override
-    public boolean canRun() {
+    public boolean canStart() {
         try {
             return nodeService.byNodeId(nodeId).isMaster();
         } catch (NodeNotFoundException e) {
             LOG.error("Couldn't find current node <{}> in the database", nodeId.toString(), e);
             return false;
         }
+    }
+
+    @Override
+    public boolean canExecute() {
+        return true;
     }
 
     @Override
