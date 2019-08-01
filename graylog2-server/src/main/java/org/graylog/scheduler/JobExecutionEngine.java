@@ -73,9 +73,9 @@ public class JobExecutionEngine {
     private void cleanup() {
         // The cleanup should only run once before starting job processing to avoid damaging any state.
         if (shouldCleanup.getAndSet(false)) {
-            final int releasedTrigger = jobTriggerService.forceReleaseOwnedTriggers();
-            if (releasedTrigger > 0) {
-                LOG.warn("Force-released {} stale job trigger after an unclean job scheduler shutdown", releasedTrigger);
+            final int releasedTriggers = jobTriggerService.forceReleaseOwnedTriggers();
+            if (releasedTriggers > 0) {
+                LOG.warn("Force-released {} stale job triggers after an unclean job scheduler shutdown", releasedTriggers);
             }
         }
     }
