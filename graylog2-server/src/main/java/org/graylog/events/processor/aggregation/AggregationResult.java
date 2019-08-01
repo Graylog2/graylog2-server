@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = AggregationResult.Builder.class)
@@ -32,6 +33,8 @@ public abstract class AggregationResult {
     public abstract AbsoluteRange effectiveTimerange();
 
     public abstract long totalAggregatedMessages();
+
+    public abstract Set<String> sourceStreams();
 
     public static Builder builder() {
         return Builder.create();
@@ -51,6 +54,8 @@ public abstract class AggregationResult {
         public abstract Builder effectiveTimerange(AbsoluteRange effectiveTimerange);
 
         public abstract Builder totalAggregatedMessages(long total);
+
+        public abstract Builder sourceStreams(Set<String> sourceStreams);
 
         public abstract AggregationResult build();
     }

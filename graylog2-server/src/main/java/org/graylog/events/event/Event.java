@@ -57,6 +57,12 @@ public interface Event {
 
     void removeStream(String stream);
 
+    ImmutableSet<String> getSourceStreams();
+
+    void addSourceStream(String sourceStream);
+
+    void removeSourceStream(String sourceStream);
+
     String getMessage();
 
     void setMessage(String message);
@@ -92,6 +98,7 @@ public interface Event {
         event.setProcessingTimestamp(from.processingTimestamp());
         event.setKeyTuple(from.keyTuple());
         from.streams().forEach(event::addStream);
+        from.sourceStreams().forEach(event::addSourceStream);
         event.setFields(from.fields());
         event.setPriority(from.priority());
 
