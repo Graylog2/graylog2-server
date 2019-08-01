@@ -115,11 +115,11 @@ const AppRouter = () => {
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
-            <Route path={Routes.ALERTS.LIST} component={AlertsPage} />
-            <Route path={Routes.ALERTS.CONDITIONS} component={AlertConditionsPage} />
-            <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
-            <Route path={Routes.ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
-            <Route path={Routes.ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+            <Route path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
+            <Route path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
+            <Route path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
+            <Route path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
+            <Route path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
             <Route path={Routes.NEXT_ALERTS.LIST} component={EventsPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
             <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />

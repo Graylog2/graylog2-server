@@ -131,7 +131,7 @@ const ShowAlertPage = createReactClass({
 
             <span>
               <ButtonToolbar>
-                <LinkContainer to={Routes.ALERTS.LIST}>
+                <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
                   <Button bsStyle="info" className="active">Alerts</Button>
                 </LinkContainer>
                 <OverlayElement overlay={conditionDetailsTooltip}

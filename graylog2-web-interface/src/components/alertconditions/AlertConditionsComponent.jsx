@@ -56,7 +56,7 @@ const AlertConditionsComponent = createReactClass({
     return (
       <div>
         <div className="pull-right">
-          <LinkContainer to={Routes.ALERTS.NEW_CONDITION}>
+          <LinkContainer to={Routes.LEGACY_ALERTS.NEW_CONDITION}>
             <Button bsStyle="success">Add new condition</Button>
           </LinkContainer>
         </div>

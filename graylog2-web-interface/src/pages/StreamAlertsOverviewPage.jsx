@@ -53,13 +53,13 @@ class StreamAlertsOverviewPage extends React.Component {
               <LinkContainer to={Routes.STREAMS}>
                 <Button bsStyle="info">Streams</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.LIST}>
+              <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
                 <Button bsStyle="info">All Alerts</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
+              <LinkContainer to={Routes.LEGACY_ALERTS.CONDITIONS}>
                 <Button bsStyle="info">All Conditions</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
+              <LinkContainer to={Routes.LEGACY_ALERTS.NOTIFICATIONS}>
                 <Button bsStyle="info">All Notifications</Button>
               </LinkContainer>
             </ButtonToolbar>

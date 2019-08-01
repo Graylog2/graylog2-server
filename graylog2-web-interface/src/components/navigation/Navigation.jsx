@@ -98,7 +98,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             <NavItem>Streams</NavItem>
           </LinkContainer>
 
-          <LinkContainer to={Routes.ALERTS.LIST}>
+          <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
             <NavItem>Alerts</NavItem>
           </LinkContainer>
 

@@ -46,12 +46,12 @@ const Routes = {
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
-  ALERTS: {
-    LIST: '/alerts',
-    CONDITIONS: '/alerts/conditions',
-    NEW_CONDITION: '/alerts/conditions/new',
-    NOTIFICATIONS: '/alerts/notifications',
-    NEW_NOTIFICATION: '/alerts/notifications/new',
+  LEGACY_ALERTS: {
+    LIST: '/legacy/alerts',
+    CONDITIONS: '/legacy/alerts/conditions',
+    NEW_CONDITION: '/legacy/alerts/conditions/new',
+    NOTIFICATIONS: '/legacy/alerts/notifications',
+    NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
   },
   NEXT_ALERTS: {
     LIST: '/next/alerts',
@@ -201,10 +201,10 @@ const Routes = {
   stream_alerts: streamId => `/streams/${streamId}/alerts`,
 
   legacy_stream_search: streamId => `/streams/${streamId}/messages`,
-  show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
-  show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: streamId => `${Routes.ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: streamId => `${Routes.ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
+  show_alert: alertId => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
+  show_alert_condition: (streamId, conditionId) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
+  new_alert_condition_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
+  new_alert_notification_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
 
