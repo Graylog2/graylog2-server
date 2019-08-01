@@ -14,6 +14,7 @@ PluginStore.register(new PluginManifest({}, {
       formComponent: TemplateFieldValueProviderForm,
       summaryComponent: TemplateFieldValueProviderSummary,
       defaultConfig: TemplateFieldValueProviderForm.defaultConfig,
+      requiredFields: TemplateFieldValueProviderForm.requiredFields,
     },
     {
       type: LookupTableFieldValueProviderForm.type,
@@ -21,6 +22,7 @@ PluginStore.register(new PluginManifest({}, {
       formComponent: LookupTableFieldValueProviderFormContainer,
       summaryComponent: LookupTableFieldValueProviderSummary,
       defaultConfig: LookupTableFieldValueProviderForm.defaultConfig,
+      requiredFields: LookupTableFieldValueProviderForm.requiredFields,
     },
   ],
 }));

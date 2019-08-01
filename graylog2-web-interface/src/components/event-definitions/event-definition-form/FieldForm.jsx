@@ -13,6 +13,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
@@ -21,6 +22,11 @@ import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHel
 import FormsUtils from 'util/FormsUtils';
 
 import commonStyles from '../common/commonStyles.css';
+
+const requiredFields = [
+  'fieldName',
+  'config.providers[0].type',
+];
 
 class FieldForm extends React.Component {
   static propTypes = {
@@ -42,9 +48,10 @@ class FieldForm extends React.Component {
 
     this.state = {
       fieldName: props.fieldName,
-      config: Object.assign({}, props.config, { data_type: 'string' }),
+      config: Object.assign({}, { data_type: 'string', providers: [] }, props.config),
       isKey: keyIndex >= 0,
       keyPosition: keyIndex >= 0 ? keyIndex + 1 : props.keys.length + 1,
+      validation: { errors: {} },
     };
   }
 
@@ -55,10 +62,47 @@ class FieldForm extends React.Component {
     return PluginStore.exports('fieldValueProviders').find(edt => edt.type === type) || {};
   };
 
+  getConfigProviderType = (config, defaultValue) => {
+    return lodash.get(config, 'providers[0].type', defaultValue);
+  };
+
+  validate = () => {
+    const { config } = this.state;
+    const errors = {};
+
+    const providerType = this.getConfigProviderType(config);
+    let pluginRequiredFields = [];
+    if (providerType) {
+      const providerPlugin = this.getProviderPlugin(providerType);
+      pluginRequiredFields = providerPlugin.requiredFields;
+    }
+
+    requiredFields.forEach((requiredField) => {
+      if (!lodash.get(this.state, requiredField)) {
+        errors[requiredField] = 'Field cannot be empty.';
+      }
+    });
+
+    pluginRequiredFields.forEach((requiredField) => {
+      if (!lodash.get(config, `providers[0].${requiredField}`)) {
+        errors[requiredField] = 'Field cannot be empty.';
+      }
+    });
+
+    const errorNumber = Object.keys(errors).length;
+    if (errorNumber > 0) {
+      this.setState({ validation: { errors: errors } });
+    }
+
+    return errorNumber === 0;
+  };
+
   handleSubmit = () => {
-    const { fieldName: prevFieldName, onChange } = this.props;
-    const { fieldName, config, isKey, keyPosition } = this.state;
-    onChange(prevFieldName, fieldName, config, isKey, keyPosition - 1);
+    if (this.validate()) {
+      const { fieldName: prevFieldName, onChange } = this.props;
+      const { fieldName, config, isKey, keyPosition } = this.state;
+      onChange(prevFieldName, fieldName, config, isKey, keyPosition - 1);
+    }
   };
 
   handleFieldNameChange = (event) => {
@@ -94,17 +138,20 @@ class FieldForm extends React.Component {
   };
 
   renderFieldValueProviderForm = () => {
-    const { fieldName, config } = this.state;
-    if (!config.providers || !Array.isArray(config.providers)) {
+    const { fieldName, config, validation } = this.state;
+
+    const providerType = this.getConfigProviderType(config);
+    if (!providerType) {
       return null;
     }
 
-    const providerPlugin = this.getProviderPlugin(config.providers[0].type);
+    const providerPlugin = this.getProviderPlugin(providerType);
     return (providerPlugin.formComponent
       ? React.createElement(providerPlugin.formComponent, {
         fieldName: fieldName,
         config: config,
         onChange: this.handleConfigChange,
+        validation: validation,
       })
       : <div>Selected provider is not available.</div>
     );
@@ -117,7 +164,7 @@ class FieldForm extends React.Component {
 
   render() {
     const { fieldName: prevFieldName, onCancel } = this.props;
-    const { fieldName, isKey, keyPosition, config } = this.state;
+    const { fieldName, isKey, keyPosition, config, validation } = this.state;
 
     return (
       <Row>
@@ -132,7 +179,8 @@ class FieldForm extends React.Component {
                  type="text"
                  value={fieldName}
                  onChange={this.handleFieldNameChange}
-                 help="Name for this Field."
+                 bsStyle={validation.errors.fieldName ? 'error' : null}
+                 help={validation.errors.fieldName || 'Name for this Field.'}
                  required />
 
           <FormGroup>
@@ -161,16 +209,19 @@ class FieldForm extends React.Component {
             <FormControl.Static>String</FormControl.Static>
           </FormGroup>
 
-          <FormGroup controlId="event-field-provider">
+          <FormGroup controlId="event-field-provider"
+                     validationState={validation.errors['config.providers[0].type'] ? 'error' : null}>
             <ControlLabel>Set Value From</ControlLabel>
             <Select name="event-field-provider"
                     placeholder="Select Value Source"
                     onChange={this.handleProviderTypeChange}
                     options={this.formatFieldValueProviders()}
-                    value={Array.isArray(config.providers) ? config.providers[0].type : ''}
+                    value={this.getConfigProviderType(config, '')}
                     matchProp="label"
                     required />
-            <HelpBlock>Select a source for the value of this Field.</HelpBlock>
+            <HelpBlock>
+              {validation.errors['config.providers[0].type'] || 'Select a source for the value of this Field.'}
+            </HelpBlock>
           </FormGroup>
         </Col>
 

@@ -12,6 +12,7 @@ import TemplateFieldValueProviderPreview from './TemplateFieldValueProviderPrevi
 class TemplateFieldValueProviderForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -20,6 +21,10 @@ class TemplateFieldValueProviderForm extends React.Component {
   static defaultConfig = {
     template: '',
   };
+
+  static requiredFields = [
+    'template',
+  ];
 
   handleChange = (event) => {
     const { config, onChange } = this.props;
@@ -32,7 +37,7 @@ class TemplateFieldValueProviderForm extends React.Component {
   };
 
   render() {
-    const { config } = this.props;
+    const { config, validation } = this.props;
     const provider = config.providers.find(p => p.type === TemplateFieldValueProviderForm.type);
 
     const helpText = (
@@ -54,7 +59,8 @@ class TemplateFieldValueProviderForm extends React.Component {
                  label="Template"
                  onChange={this.handleChange}
                  value={provider.template || ''}
-                 help={helpText} />
+                 bsStyle={validation.errors.template ? 'error' : null}
+                 help={validation.errors.template || helpText} />
 
           <FormGroup>
             <Checkbox id="lookup-message-require-values"
