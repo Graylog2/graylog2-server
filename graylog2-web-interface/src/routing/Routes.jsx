@@ -53,17 +53,17 @@ const Routes = {
     NOTIFICATIONS: '/legacy/alerts/notifications',
     NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
   },
-  NEXT_ALERTS: {
-    LIST: '/next/alerts',
+  ALERTS: {
+    LIST: '/alerts',
     DEFINITIONS: {
-      LIST: '/next/alerts/definitions',
-      CREATE: '/next/alerts/definitions/new',
-      edit: definitionId => `/next/alerts/definitions/${definitionId}`,
+      LIST: '/alerts/definitions',
+      CREATE: '/alerts/definitions/new',
+      edit: definitionId => `/alerts/definitions/${definitionId}`,
     },
     NOTIFICATIONS: {
-      LIST: '/next/alerts/notifications',
-      CREATE: '/next/alerts/notifications/new',
-      edit: notificationId => `/next/alerts/notifications/${notificationId}`,
+      LIST: '/alerts/notifications',
+      CREATE: '/alerts/notifications/new',
+      edit: notificationId => `/alerts/notifications/${notificationId}`,
     },
   },
   SOURCES: '/sources',

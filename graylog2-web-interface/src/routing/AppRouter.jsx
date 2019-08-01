@@ -120,13 +120,13 @@ const AppRouter = () => {
             <Route path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
             <Route path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
             <Route path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
-            <Route path={Routes.NEXT_ALERTS.LIST} component={EventsPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
-            <Route path={Routes.NEXT_ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
-            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
-            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
-            <Route path={Routes.NEXT_ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
+            <Route path={Routes.ALERTS.LIST} component={EventsPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage} />

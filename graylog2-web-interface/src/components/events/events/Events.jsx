@@ -99,7 +99,7 @@ class Events extends React.Component {
           <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
           <td>
             {eventDefinitionContext ? (
-              <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
+              <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
                 {eventDefinitionContext.title}
               </Link>
             ) : (
@@ -128,7 +128,7 @@ class Events extends React.Component {
               Create Event Definitions that are able to search, aggregate or correlate Messages and other
               Events, allowing you to record significant Events in Graylog and alert on them.
             </p>
-            <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
               <Button bsStyle="success">Get Started!</Button>
             </LinkContainer>
           </EmptyEntity>

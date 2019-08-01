@@ -90,7 +90,7 @@ class EventDefinitionFormContainer extends React.Component {
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
         .then(
-          () => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST),
+          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
           (errorResponse) => {
             const { body } = errorResponse.additional;
             if (errorResponse.status === 400 && body && body.failed) {
@@ -101,7 +101,7 @@ class EventDefinitionFormContainer extends React.Component {
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
         .then(
-          () => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST),
+          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
           (errorResponse) => {
             const { body } = errorResponse.additional;
             if (errorResponse.status === 400 && body && body.failed) {

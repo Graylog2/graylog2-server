@@ -62,7 +62,7 @@ class NotificationsForm extends React.Component {
       <Row>
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
-            <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} target="_blank">
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
               <Button bsStyle="link" bsSize="small">Manage Notifications <i className="fa fa-external-link" /></Button>
             </LinkContainer>
           </span>
