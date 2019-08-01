@@ -18,6 +18,7 @@ export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 class FilterForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
@@ -46,7 +47,7 @@ class FilterForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, streams } = this.props;
+    const { eventDefinition, streams, validation } = this.props;
     const formattedStreams = streams
       .map(stream => ({ label: stream.title, value: stream.id }))
       .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
@@ -76,22 +77,28 @@ class FilterForm extends React.Component {
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
 
-        <FormGroup controlId="search-within">
+        <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
           <TimeUnitInput label="Search within the last"
                          update={this.handleTimeRangeChange('search_within_ms')}
                          value={searchWithin.duration}
                          unit={searchWithin.unit}
                          units={TIME_UNITS}
                          required />
+          {validation.errors.search_within_ms && (
+            <HelpBlock>{lodash.get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
+          )}
         </FormGroup>
 
-        <FormGroup controlId="execute-every">
+        <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
           <TimeUnitInput label="Execute search every"
                          update={this.handleTimeRangeChange('execute_every_ms')}
                          value={executeEvery.duration}
                          unit={executeEvery.unit}
                          units={TIME_UNITS}
                          required />
+          {validation.errors.execute_every_ms && (
+            <HelpBlock>{lodash.get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+          )}
         </FormGroup>
       </fieldset>
     );

@@ -53,6 +53,9 @@ class EventDefinitionFormContainer extends React.Component {
 
     this.state = {
       eventDefinition: props.eventDefinition,
+      validation: {
+        errors: {},
+      },
     };
   }
 
@@ -86,16 +89,32 @@ class EventDefinitionFormContainer extends React.Component {
 
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
-        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
+        .then(
+          () => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST),
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+            }
+          },
+        );
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
+        .then(
+          () => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST),
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+            }
+          },
+        );
     }
   };
 
   render() {
     const { action, entityTypes, notifications } = this.props;
-    const { eventDefinition } = this.state;
+    const { eventDefinition, validation } = this.state;
     const isLoading = !entityTypes || !notifications.all;
 
     if (isLoading) {
@@ -105,6 +124,7 @@ class EventDefinitionFormContainer extends React.Component {
     return (
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
+                           validation={validation}
                            entityTypes={entityTypes}
                            notifications={notifications.all}
                            onChange={this.handleChange}

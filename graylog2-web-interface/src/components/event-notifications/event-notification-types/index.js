@@ -5,6 +5,7 @@ import EmailNotificationForm from './EmailNotificationForm';
 import EmailNotificationSummary from './EmailNotificationSummary';
 import HttpNotificationForm from './HttpNotificationForm';
 import HttpNotificationSummary from './HttpNotificationSummary';
+import LegacyNotificationForm from './LegacyNotificationForm';
 import LegacyNotificationFormContainer from './LegacyNotificationFormContainer';
 import LegacyNotificationSummaryContainer from './LegacyNotificationSummaryContainer';
 
@@ -29,6 +30,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Legacy Alarm Callbacks',
       formComponent: LegacyNotificationFormContainer,
       summaryComponent: LegacyNotificationSummaryContainer,
+      defaultConfig: LegacyNotificationForm.defaultConfig,
     },
   ],
 }));

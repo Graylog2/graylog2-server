@@ -29,6 +29,7 @@ const initialAggregationConfig = {
 class FilterAggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     allFieldTypes: PropTypes.array.isRequired,
     entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
@@ -96,13 +97,16 @@ class FilterAggregationForm extends React.Component {
 
   render() {
     const { conditionType } = this.state;
-    const { allFieldTypes, entityTypes, eventDefinition, streams } = this.props;
+    const { allFieldTypes, entityTypes, eventDefinition, streams, validation } = this.props;
 
     return (
       <React.Fragment>
         <Row>
           <Col md={7} lg={6}>
-            <FilterForm eventDefinition={eventDefinition} streams={streams} onChange={this.propagateChange} />
+            <FilterForm eventDefinition={eventDefinition}
+                        validation={validation}
+                        streams={streams}
+                        onChange={this.propagateChange} />
 
             <FormGroup>
               <ControlLabel>Create Events for Definition if...</ControlLabel>
@@ -130,6 +134,7 @@ class FilterAggregationForm extends React.Component {
           <Row>
             <Col md={12}>
               <AggregationForm eventDefinition={eventDefinition}
+                               validation={validation}
                                allFieldTypes={allFieldTypes}
                                aggregationFunctions={entityTypes.aggregation_functions}
                                onChange={this.propagateChange} />

@@ -8,6 +8,7 @@ import FormsUtils from 'util/FormsUtils';
 class HttpNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -28,7 +29,7 @@ class HttpNotificationForm extends React.Component {
   };
 
   render() {
-    const { config } = this.props;
+    const { config, validation } = this.props;
 
     return (
       <React.Fragment>
@@ -36,7 +37,8 @@ class HttpNotificationForm extends React.Component {
                name="url"
                label="URL"
                type="text"
-               help="The URL to POST to when an Event occurs."
+               bsStyle={validation.errors.url ? 'error' : null}
+               help={lodash.get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
                value={config.url || ''}
                onChange={this.handleChange}
                required />

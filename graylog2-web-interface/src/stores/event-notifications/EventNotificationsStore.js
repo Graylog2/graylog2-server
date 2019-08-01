@@ -116,8 +116,10 @@ const EventNotificationsStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        UserNotification.error(`Creating Notification "${notification.title}" failed with status: ${error}`,
-          'Could not save Notification');
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Creating Notification "${notification.title}" failed with status: ${error}`,
+            'Could not save Notification');
+        }
       },
     );
     EventNotificationsActions.create.promise(promise);
@@ -132,8 +134,10 @@ const EventNotificationsStore = Reflux.createStore({
         return response;
       },
       (error) => {
-        UserNotification.error(`Updating Notification "${notification.title}" failed with status: ${error}`,
-          'Could not update Notification');
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          UserNotification.error(`Updating Notification "${notification.title}" failed with status: ${error}`,
+            'Could not update Notification');
+        }
       },
     );
     EventNotificationsActions.update.promise(promise);

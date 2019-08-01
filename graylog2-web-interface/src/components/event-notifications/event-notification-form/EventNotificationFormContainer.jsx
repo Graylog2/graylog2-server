@@ -42,6 +42,9 @@ class EventNotificationFormContainer extends React.Component {
 
     this.state = {
       notification: props.notification,
+      validation: {
+        errors: {},
+      },
     };
   }
 
@@ -65,18 +68,34 @@ class EventNotificationFormContainer extends React.Component {
     let promise;
     if (action === 'create') {
       promise = EventNotificationsActions.create(notification);
-      promise.then(() => {
-        if (!embedded) {
-          history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
-        }
-      });
+      promise.then(
+        () => {
+          if (!embedded) {
+            history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+          }
+        },
+        (errorResponse) => {
+          const { body } = errorResponse.additional;
+          if (errorResponse.status === 400 && body && body.failed) {
+            this.setState({ validation: body });
+          }
+        },
+      );
     } else {
       promise = EventNotificationsActions.update(notification.id, notification);
-      promise.then(() => {
-        if (!embedded) {
-          history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
-        }
-      });
+      promise.then(
+        () => {
+          if (!embedded) {
+            history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+          }
+        },
+        (errorResponse) => {
+          const { body } = errorResponse.additional;
+          if (errorResponse.status === 400 && body && body.failed) {
+            this.setState({ validation: body });
+          }
+        },
+      );
     }
 
     onSubmit(promise);
@@ -84,11 +103,12 @@ class EventNotificationFormContainer extends React.Component {
 
   render() {
     const { action, embedded, formId } = this.props;
-    const { notification } = this.state;
+    const { notification, validation } = this.state;
 
     return (
       <EventNotificationForm action={action}
                              notification={notification}
+                             validation={validation}
                              formId={formId}
                              embedded={embedded}
                              onChange={this.handleChange}

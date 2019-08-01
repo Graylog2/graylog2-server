@@ -27,6 +27,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.plugin.rest.ValidationResult;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
@@ -92,6 +93,26 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
+    }
+
+    @JsonIgnore
+    public ValidationResult validate() {
+        final ValidationResult validation = new ValidationResult();
+
+        if (sender().isEmpty()) {
+            validation.addError(FIELD_SENDER, "Email Notification sender cannot be empty.");
+        }
+        if (subject().isEmpty()) {
+            validation.addError(FIELD_SUBJECT, "Email Notification subject cannot be empty.");
+        }
+        if (bodyTemplate().isEmpty()) {
+            validation.addError(FIELD_BODY_TEMPLATE, "Email Notification body template cannot be empty.");
+        }
+        if (emailRecipients().isEmpty() && userRecipients().isEmpty()) {
+            validation.addError("recipients", "Email Notification must have email recipients or user recipients.");
+        }
+
+        return validation;
     }
 
     @AutoValue.Builder

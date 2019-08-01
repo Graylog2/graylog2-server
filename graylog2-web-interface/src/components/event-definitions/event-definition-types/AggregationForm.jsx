@@ -16,6 +16,7 @@ import commonStyles from '../common/commonStyles.css';
 class AggregationForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     allFieldTypes: PropTypes.array.isRequired,
     aggregationFunctions: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -107,7 +108,7 @@ class AggregationForm extends React.Component {
   };
 
   render() {
-    const { allFieldTypes, aggregationFunctions, eventDefinition } = this.props;
+    const { allFieldTypes, aggregationFunctions, eventDefinition, validation } = this.props;
     const formattedFields = this.formatFields(allFieldTypes);
     const series = this.getSeries(eventDefinition.config) || {};
     const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
@@ -144,7 +145,7 @@ class AggregationForm extends React.Component {
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
         <Row className="row-sm">
           <Col md={6}>
-            <FormGroup controlId="aggregation-function">
+            <FormGroup controlId="aggregation-function" validationState={validation.errors.series ? 'error' : null}>
               <ControlLabel>If</ControlLabel>
               <Row className="row-sm">
                 <Col md={6}>
@@ -165,10 +166,13 @@ class AggregationForm extends React.Component {
                           allowCreate />
                 </Col>
               </Row>
+              {validation.errors.series && (
+                <HelpBlock>{lodash.get(validation, 'errors.series[0]')}</HelpBlock>
+              )}
             </FormGroup>
           </Col>
           <Col md={3}>
-            <FormGroup controlId="aggregation-condition">
+            <FormGroup controlId="aggregation-condition" validationState={validation.errors.conditions ? 'error' : null}>
               <ControlLabel>Is</ControlLabel>
               <Select id="aggregation-condition"
                       matchProp="label"
@@ -182,6 +186,9 @@ class AggregationForm extends React.Component {
                         { label: '=', value: '==' },
                       ]}
                       value={expressionResults.operator} />
+              {validation.errors.conditions && (
+                <HelpBlock>{lodash.get(validation, 'errors.conditions[0]')}</HelpBlock>
+              )}
             </FormGroup>
           </Col>
           <Col md={3}>
@@ -190,6 +197,8 @@ class AggregationForm extends React.Component {
                    label="Threshold"
                    type="number"
                    value={lodash.defaultTo(expressionResults.value, 0)}
+                   bsStyle={validation.errors.conditions ? 'error' : null}
+                   help={lodash.get(validation, 'errors.conditions[0]', null)}
                    onChange={this.handleExpressionThresholdChange} />
           </Col>
 

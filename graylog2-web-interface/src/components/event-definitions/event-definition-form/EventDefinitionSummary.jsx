@@ -8,6 +8,7 @@ import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 
 import styles from './EventDefinitionSummary.css';
 import commonStyles from '../common/commonStyles.css';
@@ -16,6 +17,22 @@ class EventDefinitionSummary extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
+    validation: PropTypes.object.isRequired,
+  };
+
+  state = {
+    showValidation: false,
+  };
+
+  componentDidUpdate() {
+    this.showValidation();
+  }
+
+  showValidation = () => {
+    const { showValidation } = this.state;
+    if (!showValidation) {
+      this.setState({ showValidation: true });
+    }
   };
 
   renderDetails = (eventDefinition) => {
@@ -169,11 +186,14 @@ class EventDefinitionSummary extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { eventDefinition, validation } = this.props;
+    const { showValidation } = this.state;
+
     return (
       <Row className={styles.eventSummary}>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Summary</h2>
+          {showValidation && <EventDefinitionValidationSummary validation={validation} />}
           <Row>
             <Col md={5}>
               {this.renderDetails(eventDefinition)}

@@ -32,6 +32,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -112,15 +113,19 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public NotificationDto create(NotificationDto dto) {
-        return resourceHandler.create(dto);
+    public Response create(NotificationDto dto) {
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+        return Response.ok().entity(resourceHandler.create(dto)).build();
     }
 
     @PUT
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
-    public NotificationDto update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
+    public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                                   NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         dbNotificationService.get(notificationId)
@@ -130,7 +135,12 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             throw new BadRequestException("Notification IDs don't match");
         }
 
-        return resourceHandler.update(dto);
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        return Response.ok().entity(resourceHandler.update(dto)).build();
     }
 
     @DELETE
