@@ -22,10 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
 @AutoValue
@@ -67,5 +69,12 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         public abstract Builder url(String url);
 
         public abstract HTTPEventNotificationConfig build();
+    }
+
+    @Override
+    public Object toContentPackEntity() {
+       return HttpEventNotificationConfigEntity.builder()
+           .url(ValueReference.of(url()))
+           .build();
     }
 }

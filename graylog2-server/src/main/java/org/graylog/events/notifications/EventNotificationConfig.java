@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.events.event.EventDto;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.contentpacks.ContentPackable;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -29,7 +30,7 @@ import org.graylog2.plugin.rest.ValidationResult;
         property = EventNotificationConfig.TYPE_FIELD,
         visible = true,
         defaultImpl = EventNotificationConfig.FallbackNotificationConfig.class)
-public interface EventNotificationConfig {
+public interface EventNotificationConfig extends ContentPackable<EventNotificationConfig> {
     String FIELD_NOTIFICATION_ID = "notification_id";
     String TYPE_FIELD = "type";
 
@@ -60,6 +61,11 @@ public interface EventNotificationConfig {
 
         @Override
         public JobTriggerData toJobTriggerData(EventDto dto) {
+            return null;
+        }
+
+        @Override
+        public Object toContentPackEntity() {
             return null;
         }
     }

@@ -21,6 +21,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.NotificationEntity;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,7 +33,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonDeserialize(builder = NotificationDto.Builder.class)
-public abstract class NotificationDto {
+public abstract class NotificationDto implements ContentPackable {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -97,4 +101,13 @@ public abstract class NotificationDto {
         public abstract NotificationDto build();
     }
 
+    @Override
+    public Object toContentPackEntity() {
+        final EventNotificationConfigEntity config = (EventNotificationConfigEntity) config().toContentPackEntity();
+        return NotificationEntity.builder()
+            .description(ValueReference.of(description()))
+            .title(ValueReference.of(title()))
+            .config(config)
+            .build();
+    }
 }

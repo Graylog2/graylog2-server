@@ -22,10 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.Map;
@@ -80,5 +82,13 @@ public abstract class LegacyAlarmCallbackEventNotificationConfig implements Even
         public abstract Builder configuration(Map<String, Object> configuration);
 
         public abstract LegacyAlarmCallbackEventNotificationConfig build();
+    }
+
+    @Override
+    public Object toContentPackEntity() {
+        return LegacyAlarmCallbackEventNotificationConfigEntity.builder()
+            .callbackType(ValueReference.of(callbackType()))
+            .configuration(configuration())
+            .build();
     }
 }
