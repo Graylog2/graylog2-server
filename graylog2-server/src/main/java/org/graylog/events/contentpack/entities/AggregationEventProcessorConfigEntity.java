@@ -6,12 +6,16 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
+import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationSeries;
+import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
@@ -86,5 +90,19 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder executeEveryMs(ValueReference executeEveryMs);
 
         public abstract AggregationEventProcessorConfigEntity build();
+    }
+
+    @Override
+    public EventProcessorConfig toNativeEntity(Map<String, ValueReference> parameters) {
+        return AggregationEventProcessorConfig.builder()
+            .type(type())
+            .query(query().asString(parameters))
+            .streams(streams())
+            .groupBy(groupBy())
+            .series(series())
+            .conditions(conditions().orElse(null))
+            .executeEveryMs(executeEveryMs().asLong(parameters))
+            .searchWithinMs(searchWithinMs().asLong(parameters))
+            .build();
     }
 }

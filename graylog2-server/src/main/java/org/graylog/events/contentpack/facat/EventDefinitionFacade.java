@@ -92,30 +92,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                                  Map<EntityDescriptor, Object> natvieEntities) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
-        final AggregationEventProcessorConfigEntity eventProcessorConfigEntity = (AggregationEventProcessorConfigEntity) eventDefinitionEntity.config();
-        final AggregationEventProcessorConfig aggregationEventProcessorConfig = AggregationEventProcessorConfig.builder()
-                .type(eventProcessorConfigEntity.type())
-                .query(eventProcessorConfigEntity.query().asString(parameters))
-                .streams(eventProcessorConfigEntity.streams())
-                .groupBy(eventProcessorConfigEntity.groupBy())
-                .series(eventProcessorConfigEntity.series())
-                .conditions(eventProcessorConfigEntity.conditions().orElse(null))
-                .executeEveryMs(eventProcessorConfigEntity.executeEveryMs().asLong(parameters))
-                .searchWithinMs(eventProcessorConfigEntity.searchWithinMs().asLong(parameters))
-                .build();
-
-        final EventDefinitionDto eventDefinition = EventDefinitionDto.builder()
-                .title(eventDefinitionEntity.title().asString(parameters))
-                .description(eventDefinitionEntity.description().asString(parameters))
-                .priority(eventDefinitionEntity.priority().asInteger(parameters))
-                .alert(eventDefinitionEntity.alert().asBoolean(parameters))
-                .config(aggregationEventProcessorConfig)
-                .fieldSpec(eventDefinitionEntity.fieldSpec())
-                .keySpec(eventDefinitionEntity.keySpec())
-                .notificationSettings(eventDefinitionEntity.notificationSettings())
-                .notifications(eventDefinitionEntity.notifications())
-                .storage(eventDefinitionEntity.storage())
-                .build();
+        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters);
         final EventDefinitionDto savedDto = eventDefinitionHandler.create(eventDefinition);
         return NativeEntity.create(entity.id(), savedDto.id(), TYPE, savedDto.title(), savedDto);
     }

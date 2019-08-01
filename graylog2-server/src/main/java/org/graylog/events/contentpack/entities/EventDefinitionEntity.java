@@ -9,13 +9,17 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
+import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
+import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
+import java.util.Map;
+
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionEntity.Builder.class)
-public abstract class EventDefinitionEntity {
+public abstract class EventDefinitionEntity implements NativeEntityConverter<EventDefinitionDto> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_PRIORITY = "priority";
@@ -101,5 +105,21 @@ public abstract class EventDefinitionEntity {
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
 
         public abstract EventDefinitionEntity build();
+    }
+
+    @Override
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters) {
+         return EventDefinitionDto.builder()
+            .title(title().asString(parameters))
+            .description(description().asString(parameters))
+            .priority(priority().asInteger(parameters))
+            .alert(alert().asBoolean(parameters))
+            .config(config().toNativeEntity(parameters))
+            .fieldSpec(fieldSpec())
+            .keySpec(keySpec())
+            .notificationSettings(notificationSettings())
+            .notifications(notifications())
+            .storage(storage())
+            .build();
     }
 }

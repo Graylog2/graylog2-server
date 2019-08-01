@@ -18,6 +18,7 @@ package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.events.audit.EventsAuditEventTypes;
+import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.facat.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
@@ -81,6 +82,9 @@ public class EventsModule extends PluginModule {
 
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);
+
+        registerJacksonSubtype( AggregationEventProcessorConfigEntity.class,
+            AggregationEventProcessorConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,
