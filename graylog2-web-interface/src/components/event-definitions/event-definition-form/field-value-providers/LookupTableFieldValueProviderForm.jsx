@@ -17,6 +17,11 @@ class LookupTableFieldValueProviderForm extends React.Component {
 
   static type = 'lookup-v1';
 
+  static defaultConfig = {
+    table_name: '',
+    key_field: '',
+  };
+
   formatMessageFields = lodash.memoize(
     (fieldTypes) => {
       return fieldTypes

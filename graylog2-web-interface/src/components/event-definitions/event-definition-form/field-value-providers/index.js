@@ -13,12 +13,14 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Template',
       formComponent: TemplateFieldValueProviderForm,
       summaryComponent: TemplateFieldValueProviderSummary,
+      defaultConfig: TemplateFieldValueProviderForm.defaultConfig,
     },
     {
       type: LookupTableFieldValueProviderForm.type,
       displayName: 'Lookup Table',
       formComponent: LookupTableFieldValueProviderFormContainer,
       summaryComponent: LookupTableFieldValueProviderSummary,
+      defaultConfig: LookupTableFieldValueProviderForm.defaultConfig,
     },
   ],
 }));

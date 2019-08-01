@@ -17,6 +17,10 @@ class TemplateFieldValueProviderForm extends React.Component {
 
   static type = 'template-v1';
 
+  static defaultConfig = {
+    template: '',
+  };
+
   handleChange = (event) => {
     const { config, onChange } = this.props;
     const { name } = event.target;
