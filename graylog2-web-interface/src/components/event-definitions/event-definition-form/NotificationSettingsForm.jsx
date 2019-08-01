@@ -15,6 +15,7 @@ const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 class NotificationSettingsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    defaults: PropTypes.object.isRequired,
     onSettingsChange: PropTypes.func.isRequired,
   };
 
@@ -22,7 +23,7 @@ class NotificationSettingsForm extends React.Component {
     super(props);
 
     const { backlog_size: backlogSize } = props.eventDefinition.notification_settings;
-    const defaultBacklogSize = props.eventDefinition.notification_settings.default_backlog_size;
+    const defaultBacklogSize = props.defaults.default_backlog_size;
     const effectiveBacklogSize = lodash.defaultTo(backlogSize, defaultBacklogSize);
 
     this.state = {

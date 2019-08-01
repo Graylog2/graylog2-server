@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
@@ -73,7 +72,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final String searchOwner;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
-    private final EventsConfiguration eventsConfiguration;
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -87,7 +86,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.searchOwner = searchOwner;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
-        this.eventsConfiguration = configProvider.get();
+        this.configurationProvider = configProvider;
     }
 
     private String metricName(AggregationSeries series) {
@@ -285,7 +284,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         try {
             Uninterruptibles.getUninterruptibly(
                 searchJob.getResultFuture(),
-                eventsConfiguration.eventsSearchTimeout().toStandardDuration().getMillis(),
+                getSearchTimeoutConfig(),
                 TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             // TODO: Throw EventProcessorExecutionException instead
@@ -400,5 +399,15 @@ public class PivotAggregationSearch implements AggregationSearch {
         return OrFilter.builder()
                 .filters(streamFilters)
                 .build();
+    }
+
+    private long getSearchTimeoutConfig() {
+        long result = 0;
+        try {
+            result = configurationProvider.get().eventsSearchTimeout();
+        } catch (Exception e) {
+            LOG.error("Failed to fetch events configuration", e);
+        }
+        return result;
     }
 }

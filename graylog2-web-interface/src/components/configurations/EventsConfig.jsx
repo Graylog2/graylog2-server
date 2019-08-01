@@ -1,19 +1,26 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button } from 'react-bootstrap';
+import { Button, FormGroup, HelpBlock } from 'react-bootstrap';
 import { BootstrapModalForm } from 'components/bootstrap';
-import { IfPermitted, ISODurationInput } from 'components/common';
+import { IfPermitted, TimeUnitInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
+import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
+import lodash from 'lodash';
+import moment from 'moment';
+
+const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const EventsConfig = createReactClass({
   displayName: 'EventsConfig',
 
   propTypes: {
     config: PropTypes.shape({
-      events_search_timeout: PropTypes.string,
+      events_search_timeout: PropTypes.number,
+      events_notification_retry_period: PropTypes.number,
+      events_notification_default_backlog: PropTypes.number,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -21,8 +28,8 @@ const EventsConfig = createReactClass({
   getDefaultProps() {
     return {
       config: {
-        events_search_timeout: 'PT1M',
-        events_notification_retry_period: 'PT5M',
+        events_search_timeout: 60000,
+        events_notification_retry_period: 300000,
         events_notification_default_backlog: 50,
       },
     };
@@ -60,17 +67,25 @@ const EventsConfig = createReactClass({
     });
   },
 
-  _onUpdate(field) {
-    return (value) => {
-      const { config } = this.state;
-      const update = ObjectUtils.clone(config);
-      if (typeof value === 'object') {
-        update[field] = FormUtils.getValueFromInput(value.target);
-      } else {
-        update[field] = value;
-      }
-      this.setState({ config: update });
-    };
+  _propagateChanges(key, value) {
+    const { config } = this.state;
+    const nextConfig = lodash.cloneDeep(config);
+    nextConfig[key] = value;
+    this.setState({ config: nextConfig });
+  },
+
+  _onSearchTimeoutUpdate(nextValue, nextUnit, enabled) {
+    const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+    if (this._searchTimeoutValidator(durationInMs)) {
+      this._propagateChanges('events_search_timeout', durationInMs);
+    }
+  },
+
+  _onRetryPeriodUpdate(nextValue, nextUnit, enabled) {
+    const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+    if (this._notificationsRetryValidator(durationInMs)) {
+      this._propagateChanges('events_notification_retry_period', durationInMs);
+    }
   },
 
   _searchTimeoutValidator(milliseconds) {
@@ -81,10 +96,27 @@ const EventsConfig = createReactClass({
     return milliseconds >= 0;
   },
 
+  _onBacklogUpdate(key) {
+    return (value) => {
+      const { config } = this.state;
+      const update = ObjectUtils.clone(config);
+      if (typeof value === 'object') {
+        update[key] = FormUtils.getValueFromInput(value.target);
+      } else {
+        update[key] = value;
+      }
+      this.setState({ config: update });
+    };
+  },
+
+  _titleCase(str) {
+    return lodash.startCase(lodash.toLower(str));
+  },
+
   render() {
     const { config } = this.state;
-    const eventsSearchTimeout = config.events_search_timeout;
-    const eventsNotificationRetryPeriod = config.events_notification_retry_period;
+    const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
+    const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
     const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
     return (
       <div>
@@ -92,9 +124,9 @@ const EventsConfig = createReactClass({
 
         <dl className="deflist">
           <dt>Search Timeout:</dt>
-          <dd>{eventsSearchTimeout}</dd>
+          <dd>{eventsSearchTimeout.duration} {this._titleCase(eventsSearchTimeout.unit)}</dd>
           <dt>Notification Retry:</dt>
-          <dd>{eventsNotificationRetryPeriod}</dd>
+          <dd>{eventsNotificationRetryPeriod.duration} {this._titleCase(eventsNotificationRetryPeriod.unit)}</dd>
           <dt>Notification Backlog:</dt>
           <dd>{eventsNotificationDefaultBacklog}</dd>
         </dl>
@@ -109,25 +141,33 @@ const EventsConfig = createReactClass({
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
-            <ISODurationInput id="search-timeout-field"
-                              duration={eventsSearchTimeout}
-                              update={this._onUpdate('events_search_timeout')}
-                              label="Search Timeout (as ISO8601 Duration)"
-                              help="Amount of time after which an Elasticsearch query is interrupted."
-                              validator={this._searchTimeoutValidator}
-                              errorText="invalid (min: 1 second)"
-                              required />
-            <ISODurationInput id="notifications-retry-field"
-                              duration={eventsNotificationRetryPeriod}
-                              update={this._onUpdate('events_notification_retry_period')}
-                              label="Notifications retry period (as ISO8601 Duration)"
-                              help="Amount of time after which a failed notification is resend."
-                              validator={this._notificationsRetryValidator}
-                              errorText="invalid (min: 0 second)"
-                              required />
+            <FormGroup controlId="search-timeout-field">
+              <TimeUnitInput label="Search Timeout"
+                             update={this._onSearchTimeoutUpdate}
+                             defaultEnabled={eventsSearchTimeout.duration !== 0}
+                             value={eventsSearchTimeout.duration}
+                             unit={eventsSearchTimeout.unit}
+                             units={TIME_UNITS}
+                             required />
+              <HelpBlock>
+                Amount of time after which an Elasticsearch query is interrupted.
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup controlId="notifications-retry-field">
+              <TimeUnitInput label="Notifications retry period"
+                             update={this._onRetryPeriodUpdate}
+                             defaultEnabled={eventsNotificationRetryPeriod.duration !== 0}
+                             value={eventsNotificationRetryPeriod.duration}
+                             unit={eventsNotificationRetryPeriod.unit}
+                             units={TIME_UNITS}
+                             required />
+              <HelpBlock>
+                Amount of time after which a failed notification is resend.
+              </HelpBlock>
+            </FormGroup>
             <Input id="notification-backlog-field"
                    type="number"
-                   onChange={this._onUpdate('events_notification_default_backlog')}
+                   onChange={this._onBacklogUpdate('events_notification_default_backlog')}
                    label="Default notifications backlog size"
                    help="Amount of log messages included in a notification by default."
                    value={eventsNotificationDefaultBacklog}

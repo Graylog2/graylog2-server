@@ -128,7 +128,8 @@ class EventDefinitionFormContainer extends React.Component {
     if (isLoading) {
       return <Spinner text="Loading Event information..." />;
     }
-    eventDefinition.notification_settings.default_backlog_size = eventsClusterConfig.events_notification_default_backlog;
+
+    const defaults = { default_backlog_size: eventsClusterConfig.events_notification_default_backlog };
 
     return (
       <EventDefinitionForm action={action}
@@ -136,6 +137,7 @@ class EventDefinitionFormContainer extends React.Component {
                            validation={validation}
                            entityTypes={entityTypes}
                            notifications={notifications.all}
+                           defaults={defaults}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
                            onSubmit={this.handleSubmit} />

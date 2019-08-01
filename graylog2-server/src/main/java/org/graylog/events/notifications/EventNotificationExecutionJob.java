@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
@@ -60,7 +59,7 @@ public class EventNotificationExecutionJob implements Job {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBNotificationGracePeriodService notificationGracePeriodService;
     private final Map<String, EventNotification.Factory> eventNotificationFactories;
-    private final EventsConfiguration eventsConfiguration;
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public EventNotificationExecutionJob(@Assisted JobDefinitionDto jobDefinition,
@@ -74,7 +73,7 @@ public class EventNotificationExecutionJob implements Job {
         this.eventDefinitionService = eventDefinitionService;
         this.notificationGracePeriodService = notificationGracePeriodService;
         this.eventNotificationFactories = eventNotificationFactories;
-        this.eventsConfiguration = configurationProvider.get();
+        this.configurationProvider = configurationProvider;
     }
 
     @Override
@@ -130,15 +129,16 @@ public class EventNotificationExecutionJob implements Job {
         try {
             eventNotification.execute(notificationContext);
         } catch (TemporaryEventNotificationException e) {
+            final long retryPeriod = getNotificationsRetryConfig();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed to execute notification, retrying in %d minutes - <%s/%s/%s>",
-                            eventsConfiguration.eventNotificationsRetry().toStandardDuration().getStandardMinutes(),
+                            retryPeriod,
                             notification.id(),
                             notification.title(),
                             notification.config().type()),
                     trigger,
                     ctx.jobTriggerUpdates().retryIn(
-                        eventsConfiguration.eventNotificationsRetry().toStandardDuration().getStandardMinutes(),
+                        retryPeriod,
                         TimeUnit.MINUTES),
                     e);
         } catch (PermanentEventNotificationException e) {
@@ -274,5 +274,15 @@ public class EventNotificationExecutionJob implements Job {
             LOG.error("Couldn't find notification with ID <{}>.", jobConfig.notificationId());
         }
         return false;
+    }
+
+    private long getNotificationsRetryConfig() {
+        long result = 0;
+        try {
+            result = configurationProvider.get().eventNotificationsRetry();
+        } catch (Exception e) {
+            LOG.error("Failed to fetch events configuration", e);
+        }
+        return result;
     }
 }

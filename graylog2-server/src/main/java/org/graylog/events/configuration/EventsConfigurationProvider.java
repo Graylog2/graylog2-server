@@ -42,6 +42,6 @@ private static final EventsConfiguration DEFAULT_CONFIG = EventsConfiguration.bu
     public Optional<EventsConfiguration> getEventsConfig() {
         final EventsConfiguration dto = clusterConfigService.get(EventsConfiguration.class);
 
-        return dto != null ? Optional.of(dto) : Optional.empty();
+        return dto != null ? Optional.ofNullable(dto) : Optional.empty();
     }
 }

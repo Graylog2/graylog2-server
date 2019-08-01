@@ -17,7 +17,6 @@
 package org.graylog.events.notifications;
 
 import com.google.common.collect.ImmutableList;
-import org.graylog.events.configuration.EventsConfiguration;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.MessageSummary;
@@ -30,13 +29,13 @@ public class EventNotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(EventNotificationService.class);
 
     private final EventBacklogService eventBacklogService;
-    private final EventsConfiguration eventsConfiguration;
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public EventNotificationService(EventBacklogService eventBacklogService,
                                     EventsConfigurationProvider configurationProvider) {
         this.eventBacklogService = eventBacklogService;
-        this.eventsConfiguration = configurationProvider.get();
+        this.configurationProvider = configurationProvider;
     }
 
     public ImmutableList<MessageSummary> getBacklogForEvent(EventNotificationContext ctx) {
@@ -49,12 +48,22 @@ public class EventNotificationService {
                 }
                 backlog = eventBacklogService.getMessagesForEvent(ctx.event(), backlogSize);
             } else {
-                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), eventsConfiguration.eventNotificationsBacklog());
+                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), getNotificationsBacklogConfig());
             }
         } catch (NotFoundException e) {
             LOG.error("Failed to fetch backlog for event {}", ctx.event().id());
             return ImmutableList.of();
         }
         return backlog;
+    }
+
+    private long getNotificationsBacklogConfig() {
+        long result = 0;
+        try {
+            result = configurationProvider.get().eventNotificationsBacklog();
+        } catch (Exception e) {
+            LOG.error("Failed to fetch events configuration", e);
+        }
+        return result;
     }
 }
