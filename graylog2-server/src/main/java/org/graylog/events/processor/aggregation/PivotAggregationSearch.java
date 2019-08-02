@@ -284,7 +284,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         try {
             Uninterruptibles.getUninterruptibly(
                 searchJob.getResultFuture(),
-                getSearchTimeoutConfig(),
+                configurationProvider.get().eventsSearchTimeout(),
                 TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             // TODO: Throw EventProcessorExecutionException instead
@@ -399,15 +399,5 @@ public class PivotAggregationSearch implements AggregationSearch {
         return OrFilter.builder()
                 .filters(streamFilters)
                 .build();
-    }
-
-    private long getSearchTimeoutConfig() {
-        long result = 0;
-        try {
-            result = configurationProvider.get().eventsSearchTimeout();
-        } catch (Exception e) {
-            LOG.error("Failed to fetch events configuration", e);
-        }
-        return result;
     }
 }

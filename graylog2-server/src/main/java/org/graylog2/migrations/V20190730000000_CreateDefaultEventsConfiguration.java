@@ -46,13 +46,13 @@ public class V20190730000000_CreateDefaultEventsConfiguration extends Migration 
 
     @Override
     public void upgrade() {
-        final Optional<EventsConfiguration> config = configProvider.getEventsConfig();
+        final Optional<EventsConfiguration> config = configProvider.loadFromDatabase();
         if (config.isPresent()) {
             LOG.debug("Found events configuration, no migration necessary.");
             return;
         }
         try {
-            final EventsConfiguration defaultConfig = configProvider.get();
+            final EventsConfiguration defaultConfig = configProvider.getDefaultConfig();
             clusterConfigService.write(defaultConfig);
             LOG.debug("Create default events configuration: {}", defaultConfig);
         } catch (Exception e) {

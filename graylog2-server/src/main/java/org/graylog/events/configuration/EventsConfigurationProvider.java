@@ -17,6 +17,8 @@
 package org.graylog.events.configuration;
 
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -24,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 public class EventsConfigurationProvider implements Provider<EventsConfiguration> {
-private static final EventsConfiguration DEFAULT_CONFIG = EventsConfiguration.builder().build();
+    private static final Logger LOG = LoggerFactory.getLogger(EventsConfigurationProvider.class);
 
     private final ClusterConfigService clusterConfigService;
 
@@ -35,13 +37,20 @@ private static final EventsConfiguration DEFAULT_CONFIG = EventsConfiguration.bu
 
     @Override
     public EventsConfiguration get() {
-        return getEventsConfig().orElse(DEFAULT_CONFIG);
+        return loadFromDatabase().orElse(getDefaultConfig());
+    }
+
+    public EventsConfiguration getDefaultConfig() {
+        return EventsConfiguration.builder().build();
     }
 
     @NotNull
-    public Optional<EventsConfiguration> getEventsConfig() {
-        final EventsConfiguration dto = clusterConfigService.get(EventsConfiguration.class);
-
-        return dto != null ? Optional.ofNullable(dto) : Optional.empty();
+    public Optional<EventsConfiguration> loadFromDatabase() {
+        try {
+            return Optional.ofNullable(clusterConfigService.get(EventsConfiguration.class));
+        } catch (Exception e) {
+            LOG.error("Failed to fetch events configuration from database", e);
+            return Optional.empty();
+        }
     }
 }

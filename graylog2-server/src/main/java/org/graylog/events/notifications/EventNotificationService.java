@@ -48,22 +48,12 @@ public class EventNotificationService {
                 }
                 backlog = eventBacklogService.getMessagesForEvent(ctx.event(), backlogSize);
             } else {
-                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), getNotificationsBacklogConfig());
+                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), configurationProvider.get().eventNotificationsBacklog());
             }
         } catch (NotFoundException e) {
             LOG.error("Failed to fetch backlog for event {}", ctx.event().id());
             return ImmutableList.of();
         }
         return backlog;
-    }
-
-    private long getNotificationsBacklogConfig() {
-        long result = 0;
-        try {
-            result = configurationProvider.get().eventNotificationsBacklog();
-        } catch (Exception e) {
-            LOG.error("Failed to fetch events configuration", e);
-        }
-        return result;
     }
 }

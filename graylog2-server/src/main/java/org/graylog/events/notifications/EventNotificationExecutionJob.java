@@ -129,18 +129,15 @@ public class EventNotificationExecutionJob implements Job {
         try {
             eventNotification.execute(notificationContext);
         } catch (TemporaryEventNotificationException e) {
-            final long retryPeriod = getNotificationsRetryConfig();
+            final long retryPeriod = configurationProvider.get().eventNotificationsRetry();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed to execute notification, retrying in %d minutes - <%s/%s/%s>",
-                            retryPeriod,
+                            TimeUnit.MILLISECONDS.toMinutes(retryPeriod),
                             notification.id(),
                             notification.title(),
                             notification.config().type()),
                     trigger,
-                    ctx.jobTriggerUpdates().retryIn(
-                        retryPeriod,
-                        TimeUnit.MINUTES),
-                    e);
+                    ctx.jobTriggerUpdates().retryIn(retryPeriod, TimeUnit.MILLISECONDS), e);
         } catch (PermanentEventNotificationException e) {
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed permanently to execute notification, giving up - <%s/%s/%s>",
@@ -274,15 +271,5 @@ public class EventNotificationExecutionJob implements Job {
             LOG.error("Couldn't find notification with ID <{}>.", jobConfig.notificationId());
         }
         return false;
-    }
-
-    private long getNotificationsRetryConfig() {
-        long result = 0;
-        try {
-            result = configurationProvider.get().eventNotificationsRetry();
-        } catch (Exception e) {
-            LOG.error("Failed to fetch events configuration", e);
-        }
-        return result;
     }
 }
