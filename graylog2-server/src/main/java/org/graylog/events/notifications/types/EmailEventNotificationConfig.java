@@ -97,6 +97,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
     }
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();

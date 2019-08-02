@@ -46,6 +46,10 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
     }
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();

@@ -19,7 +19,12 @@ package org.graylog.events;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.HttpEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.LegacyAlarmCallbackEventNotificationConfigEntity;
 import org.graylog.events.contentpack.facade.EventDefinitionFacade;
+import org.graylog.events.contentpack.facade.NotificationFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -79,12 +84,19 @@ public class EventsModule extends PluginModule {
         addPeriodical(EventNotificationStatusCleanUp.class);
 
         addEntityFacade(ModelTypes.EVENT_DEFINITION_V1, EventDefinitionFacade.class);
+        addEntityFacade(ModelTypes.NOTIFICATION_V1, NotificationFacade.class);
 
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);
 
         registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
             AggregationEventProcessorConfigEntity.TYPE_NAME);
+        registerJacksonSubtype(HttpEventNotificationConfigEntity.class,
+            HttpEventNotificationConfigEntity.TYPE_NAME);
+        registerJacksonSubtype(EmailEventNotificationConfigEntity.class,
+            EmailEventNotificationConfigEntity.TYPE_NAME);
+        registerJacksonSubtype(LegacyAlarmCallbackEventNotificationConfigEntity.class,
+            LegacyAlarmCallbackEventNotificationConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,

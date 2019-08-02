@@ -20,11 +20,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.notifications.NotificationDto;
+import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+
+import java.util.Map;
 
 @AutoValue
 @JsonDeserialize(builder = NotificationEntity.Builder.class)
-public abstract class NotificationEntity {
+public abstract class NotificationEntity implements NativeEntityConverter<NotificationDto> {
 
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -63,5 +67,14 @@ public abstract class NotificationEntity {
         public abstract Builder config(EventNotificationConfigEntity config);
 
         public abstract NotificationEntity build();
+    }
+
+    @Override
+    public NotificationDto toNativeEntity(Map<String, ValueReference> parameters) {
+        return NotificationDto.builder()
+            .description(description().asString(parameters))
+            .title(title().asString(parameters))
+            .config(config().toNativeEntity(parameters))
+            .build();
     }
 }

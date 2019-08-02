@@ -39,6 +39,7 @@ import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NotificationFacade implements EntityFacade<NotificationDto> {
 
@@ -75,26 +76,46 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
 
     @Override
     public NativeEntity<NotificationDto> createNativeEntity(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities, String username) {
-        return null;
+        if (entity instanceof EntityV1) {
+            return decode((EntityV1) entity, parameters, nativeEntities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private NativeEntity<NotificationDto> decode(EntityV1 entityV1,
+                                                 Map<String, ValueReference> parameters,
+                                                 Map<EntityDescriptor, Object> nativeEntities) {
+        final NotificationEntity entity = objectMapper.convertValue(entityV1.data(), NotificationEntity.class);
+        final NotificationDto notificationDto = entity.toNativeEntity(parameters);
+        final NotificationDto savedDto = notificationService.save(notificationDto);
+        return NativeEntity.create(entityV1.id(), savedDto.id(), ModelTypes.NOTIFICATION_V1, savedDto.title(), savedDto);
     }
 
     @Override
     public Optional<NativeEntity<NotificationDto>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
-        return Optional.empty();
+        final Optional<NotificationDto> notificationDto = notificationService.get(nativeEntityDescriptor.id().id());
+        return notificationDto.map(notification -> NativeEntity.create(nativeEntityDescriptor, notification));
     }
 
     @Override
     public void delete(NotificationDto nativeEntity) {
-
+        notificationService.delete(nativeEntity.id());
     }
 
     @Override
     public EntityExcerpt createExcerpt(NotificationDto nativeEntity) {
-        return null;
+        return EntityExcerpt.builder()
+            .id(ModelId.of(nativeEntity.id()))
+            .type(ModelTypes.NOTIFICATION_V1)
+            .title(nativeEntity.title())
+            .build();
     }
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return null;
+        return notificationService.streamAll()
+            .map(this::createExcerpt)
+            .collect(Collectors.toSet());
     }
 }
