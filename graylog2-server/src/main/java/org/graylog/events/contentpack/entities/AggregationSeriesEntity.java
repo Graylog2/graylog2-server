@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.events.contentpack.entities.AutoValue_AggregationSeriesEntity;
 import org.graylog.events.processor.aggregation.AggregationFunction;
 
 import javax.annotation.Nullable;

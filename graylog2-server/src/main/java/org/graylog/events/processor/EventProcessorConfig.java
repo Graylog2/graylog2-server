@@ -19,9 +19,10 @@ package org.graylog.events.processor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
-import org.graylog2.contentpacks.ContentPackAble;
+import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.plugin.rest.ValidationResult;
 
 import java.util.Optional;
@@ -32,7 +33,7 @@ import java.util.Optional;
         property = EventProcessorConfig.TYPE_FIELD,
         visible = true,
         defaultImpl = EventProcessorConfig.FallbackConfig.class)
-public interface EventProcessorConfig extends ContentPackAble<EventProcessorConfig> {
+public interface EventProcessorConfig extends ContentPackable<EventProcessorConfigEntity> {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)
@@ -71,8 +72,8 @@ public interface EventProcessorConfig extends ContentPackAble<EventProcessorConf
         }
 
         @Override
-        public Object toContentPackEntity() {
-            return null;
+        public EventProcessorConfigEntity toContentPackEntity() {
+            throw new UnsupportedOperationException();
         }
     }
 }

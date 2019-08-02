@@ -17,7 +17,6 @@
 package org.graylog.events.contentpack.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog2.contentpacks.NativeEntityConverter;

@@ -16,6 +16,6 @@
  */
 package org.graylog2.contentpacks;
 
-public interface ContentPackAble<T> {
-    Object toContentPackEntity();
+public interface ContentPackable<T> {
+    T toContentPackEntity();
 }

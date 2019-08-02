@@ -28,7 +28,6 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
-import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;

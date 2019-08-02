@@ -14,19 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.events.contentpack.facat;
+package org.graylog.events.contentpack.facade;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
-import org.graylog.events.contentpack.entities.AggregationSeriesEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
-import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
-import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -42,9 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.swing.text.html.Option;
 
-import java.util.EventListener;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -69,8 +63,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     @VisibleForTesting
-    Entity exportNativeEntity(EventDefinitionDto eventDefinition, EntityDescriptorIds entityDescriptorIds) {
-        final EventDefinitionEntity entity = (EventDefinitionEntity) eventDefinition.toContentPackEntity();
+    private Entity exportNativeEntity(EventDefinitionDto eventDefinition, EntityDescriptorIds entityDescriptorIds) {
+        final EventDefinitionEntity entity = eventDefinition.toContentPackEntity();
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return EntityV1.builder()

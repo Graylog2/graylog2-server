@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
@@ -140,11 +141,11 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     @Override
-    public Object toContentPackEntity() {
+    public EventProcessorConfigEntity toContentPackEntity() {
         return AggregationEventProcessorConfigEntity.builder()
             .type(type())
             .query(ValueReference.of(query()))
-            .streams(streams()) // TODO?
+            .streams(streams())
             .groupBy(groupBy())
             .series(series())
             .conditions(conditions().orElse(null))
