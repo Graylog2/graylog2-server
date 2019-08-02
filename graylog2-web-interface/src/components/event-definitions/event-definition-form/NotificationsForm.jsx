@@ -17,6 +17,7 @@ class NotificationsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
+    defaults: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -47,7 +48,7 @@ class NotificationsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, notifications, onChange } = this.props;
+    const { eventDefinition, notifications, defaults, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
 
     if (showAddNotificationForm) {
@@ -62,7 +63,7 @@ class NotificationsForm extends React.Component {
       <Row>
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
-            <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST} target="_blank">
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
               <Button bsStyle="link" bsSize="small">Manage Notifications <i className="fa fa-external-link" /></Button>
             </LinkContainer>
           </span>
@@ -75,6 +76,7 @@ class NotificationsForm extends React.Component {
         </Col>
         <Col md={4} lg={3} mdOffset={1} className={styles.notificationSettings}>
           <NotificationSettingsForm eventDefinition={eventDefinition}
+                                    defaults={defaults}
                                     onSettingsChange={onChange} />
         </Col>
       </Row>

@@ -56,7 +56,10 @@ class FilterAggregationSummary extends React.Component {
             <dt>Group by Field(s)</dt>
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
-            <dd><em>{series[0].function}({series[0].field})</em> {expressionResults.operator} {expressionResults.value}</dd>
+            <dd>
+              {series[0] ? <em>{series[0].function}({series[0].field})</em> : <span>No series selected</span>}
+              {' '}{expressionResults.operator} {expressionResults.value}
+            </dd>
           </React.Fragment>
         )}
       </dl>

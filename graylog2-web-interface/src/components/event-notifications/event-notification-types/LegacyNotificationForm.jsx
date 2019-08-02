@@ -1,17 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import { Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
 
-import styles from './LegacyNotificationForm.css';
+import commonStyles from './LegacyNotificationCommonStyles.css';
 
 class LegacyNotificationForm extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     legacyTypes: PropTypes.object.isRequired,
+  };
+
+  static defaultConfig = {
+    callback_type: '',
+    configuration: {},
   };
 
   propagateMultiChange = (newValues) => {
@@ -78,7 +85,7 @@ class LegacyNotificationForm extends React.Component {
   }
 
   render() {
-    const { config, legacyTypes } = this.props;
+    const { config, legacyTypes, validation } = this.props;
     const callbackType = config.callback_type;
     const typeData = legacyTypes[callbackType];
 
@@ -87,7 +94,7 @@ class LegacyNotificationForm extends React.Component {
       content = this.renderNotificationForm(config, typeData);
     } else if (callbackType) {
       content = (
-        <Alert bsStyle="danger" className={styles.legacyNotificationAlert}>
+        <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
           Unknown legacy alarm callback type: <strong>{callbackType}</strong> Please make sure the plugin is installed.
         </Alert>
       );
@@ -96,7 +103,8 @@ class LegacyNotificationForm extends React.Component {
     return (
       <React.Fragment>
         <fieldset>
-          <FormGroup controlId="notification-legacy-select">
+          <FormGroup controlId="notification-legacy-select"
+                     validationState={validation.errors.callback_type ? 'error' : null}>
             <ControlLabel>Choose Legacy Notification</ControlLabel>
             <Select id="notification-legacy-select"
                     matchProp="label"
@@ -104,11 +112,13 @@ class LegacyNotificationForm extends React.Component {
                     onChange={this.handleSelectNotificationChange}
                     options={this.formatLegacyTypes(legacyTypes)}
                     value={callbackType} />
-            <HelpBlock>Select a Legacy Notification to use on this Event Definition.</HelpBlock>
+            <HelpBlock>
+              {lodash.get(validation, 'errors.callback_type[0]', 'Select a Legacy Notification to use on this Event Definition.')}
+            </HelpBlock>
           </FormGroup>
         </fieldset>
 
-        <Alert bsStyle="danger" className={styles.legacyNotificationAlert}>
+        <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
           Legacy alarm callbacks are deprecated. Please switch to the new notification types as soon as possible!
         </Alert>
 

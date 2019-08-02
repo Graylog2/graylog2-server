@@ -17,9 +17,11 @@
 package org.graylog.events.notifications;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -53,6 +55,23 @@ public abstract class NotificationDto {
     }
 
     public abstract Builder toBuilder();
+
+    @JsonIgnore
+    public ValidationResult validate() {
+        final ValidationResult validation = new ValidationResult();
+
+        if (title().isEmpty()) {
+            validation.addError(FIELD_TITLE, "Notification title cannot be empty.");
+        }
+
+        try {
+            validation.addAll(config().validate());
+        } catch (UnsupportedOperationException e) {
+            validation.addError(FIELD_CONFIG, "Notification config type cannot be empty.");
+        }
+
+        return validation;
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {

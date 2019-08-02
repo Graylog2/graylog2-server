@@ -34,7 +34,7 @@ const AlertsPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.LIST} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.LIST} />
             </span>
           </PageHeader>
 

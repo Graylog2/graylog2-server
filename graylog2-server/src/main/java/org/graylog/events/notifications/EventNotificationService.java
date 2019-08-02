@@ -17,6 +17,7 @@
 package org.graylog.events.notifications;
 
 import com.google.common.collect.ImmutableList;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.MessageSummary;
 import org.slf4j.Logger;
@@ -28,10 +29,13 @@ public class EventNotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(EventNotificationService.class);
 
     private final EventBacklogService eventBacklogService;
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
-    public EventNotificationService(EventBacklogService eventBacklogService) {
+    public EventNotificationService(EventBacklogService eventBacklogService,
+                                    EventsConfigurationProvider configurationProvider) {
         this.eventBacklogService = eventBacklogService;
+        this.configurationProvider = configurationProvider;
     }
 
     public ImmutableList<MessageSummary> getBacklogForEvent(EventNotificationContext ctx) {
@@ -44,7 +48,7 @@ public class EventNotificationService {
                 }
                 backlog = eventBacklogService.getMessagesForEvent(ctx.event(), backlogSize);
             } else {
-                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), 50);
+                backlog = eventBacklogService.getMessagesForEvent(ctx.event(), configurationProvider.get().eventNotificationsBacklog());
             }
         } catch (NotFoundException e) {
             LOG.error("Failed to fetch backlog for event {}", ctx.event().id());

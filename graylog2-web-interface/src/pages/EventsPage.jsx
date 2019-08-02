@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
@@ -10,16 +11,21 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
 class EventsPage extends React.Component {
-  static propTypes = {};
+  static propTypes = {
+    location: PropTypes.object.isRequired,
+  };
 
   render() {
+    const { location } = this.props;
+    const filteredSourceStream = location.query.stream_id;
+
     return (
-      <DocumentTitle title="Events">
+      <DocumentTitle title="Alerts & Events">
         <span>
-          <PageHeader title="Events">
+          <PageHeader title="Alerts & Events">
             <span>
-              Events are generated when Event Definitions you define are satisfied. Alerts also trigger
-              Notifications, being meant to capture relevant Events that may require your attention.
+              Define Events through different conditions. Add Notifications to Events that require your attention
+              to create Alerts.
             </span>
 
             <span>
@@ -29,13 +35,13 @@ class EventsPage extends React.Component {
             </span>
 
             <ButtonToolbar>
-              <LinkContainer to={Routes.NEXT_ALERTS.LIST}>
-                <Button bsStyle="info" className="active">Events</Button>
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info" className="active">Alerts & Events</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
                 <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST}>
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
                 <Button bsStyle="info">Notifications</Button>
               </LinkContainer>
             </ButtonToolbar>
@@ -43,7 +49,7 @@ class EventsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventsContainer />
+              <EventsContainer key={filteredSourceStream} streamId={filteredSourceStream} />
             </Col>
           </Row>
         </span>

@@ -53,7 +53,10 @@ public abstract class ValueReference implements Reference {
     public Double asDouble(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case DOUBLE:
-                return Double.class.cast(value());
+                if (value() instanceof Number) {
+                    return ((Number)value()).doubleValue();
+                }
+                throw new IllegalStateException("Expected value reference of type DOUBLE but got " + value().getClass());
             case PARAMETER:
                 return asType(parameters, Double.class);
             default:
@@ -64,7 +67,10 @@ public abstract class ValueReference implements Reference {
     public Float asFloat(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case FLOAT:
-                return Float.class.cast(value());
+                if (value() instanceof Number) {
+                    return ((Number)value()).floatValue();
+                }
+                throw new IllegalStateException("Expected value reference of type FLOAT but got " + value().getClass());
             case PARAMETER:
                 return asType(parameters, Float.class);
             default:
@@ -86,7 +92,10 @@ public abstract class ValueReference implements Reference {
     public Long asLong(Map<String, ValueReference> parameters) {
         switch (valueType()) {
             case LONG:
-                return Long.class.cast(value());
+                if (value() instanceof Number) {
+                    return ((Number)value()).longValue();
+                }
+                throw new IllegalStateException("Expected value reference of type LONG but got " + value().getClass());
             case PARAMETER:
                 return asType(parameters, Long.class);
             default:

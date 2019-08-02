@@ -26,6 +26,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.plugin.rest.ValidationResult;
 
 @AutoValue
 @JsonTypeName(HTTPEventNotificationConfig.TYPE_NAME)
@@ -41,6 +42,17 @@ public abstract class HTTPEventNotificationConfig implements EventNotificationCo
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
+    }
+
+    @JsonIgnore
+    public ValidationResult validate() {
+        final ValidationResult validation = new ValidationResult();
+
+        if (url().isEmpty()) {
+            validation.addError(FIELD_URL, "HTTP Notification url cannot be empty.");
+        }
+
+        return validation;
     }
 
     @AutoValue.Builder

@@ -29,7 +29,7 @@ class EventNotifications extends React.Component {
               Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
               to integrate Graylog Alerts with an external alerting system you use.
             </p>
-            <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.CREATE}>
+            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
               <Button bsStyle="success">Get Started!</Button>
             </LinkContainer>
           </EmptyEntity>
@@ -51,7 +51,7 @@ class EventNotifications extends React.Component {
     return notifications.map((notification) => {
       const actions = (
         <React.Fragment>
-          <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.edit(notification.id)}>
+          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
             <Button bsStyle="info">Edit</Button>
           </LinkContainer>
           <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
@@ -84,7 +84,7 @@ class EventNotifications extends React.Component {
         <Row>
           <Col md={12}>
             <div className="pull-right">
-              <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.CREATE}>
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
                 <Button bsStyle="success">Create Notification</Button>
               </LinkContainer>
             </div>

@@ -18,6 +18,7 @@ import {} from 'components/event-notifications/event-notification-types';
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+const { ConfigurationActions } = CombinedProvider.get('Configuration');
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
@@ -39,7 +40,8 @@ class EventDefinitionFormContainer extends React.Component {
       key_spec: [],
       notification_settings: {
         grace_period_ms: 0,
-        backlog_size: 0,
+        // Defaults to system setting for notification backlog size
+        backlog_size: null,
       },
       notifications: [],
       alert: false,
@@ -53,15 +55,24 @@ class EventDefinitionFormContainer extends React.Component {
 
     this.state = {
       eventDefinition: props.eventDefinition,
+      validation: {
+        errors: {},
+      },
+      eventsClusterConfig: undefined,
     };
   }
 
   componentDidMount() {
+    this.fetchClusterConfig();
     this.fetchNotifications();
   }
 
   fetchNotifications = () => {
     EventNotificationsActions.listAll();
+  };
+
+  fetchClusterConfig = () => {
+    ConfigurationActions.listEventsClusterConfig().then(config => this.setState({ eventsClusterConfig: config }));
   };
 
   handleChange = (key, value) => {
@@ -86,27 +97,47 @@ class EventDefinitionFormContainer extends React.Component {
 
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
-        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
+        .then(
+          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+            }
+          },
+        );
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(() => history.push(Routes.NEXT_ALERTS.DEFINITIONS.LIST));
+        .then(
+          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
+          (errorResponse) => {
+            const { body } = errorResponse.additional;
+            if (errorResponse.status === 400 && body && body.failed) {
+              this.setState({ validation: body });
+            }
+          },
+        );
     }
   };
 
   render() {
     const { action, entityTypes, notifications } = this.props;
-    const { eventDefinition } = this.state;
-    const isLoading = !entityTypes || !notifications.all;
+    const { eventDefinition, eventsClusterConfig, validation } = this.state;
+    const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 
     if (isLoading) {
       return <Spinner text="Loading Event information..." />;
     }
 
+    const defaults = { default_backlog_size: eventsClusterConfig.events_notification_default_backlog };
+
     return (
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
+                           validation={validation}
                            entityTypes={entityTypes}
                            notifications={notifications.all}
+                           defaults={defaults}
                            onChange={this.handleChange}
                            onCancel={this.handleCancel}
                            onSubmit={this.handleSubmit} />

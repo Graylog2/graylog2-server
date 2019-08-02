@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.events.event.EventDto;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.plugin.rest.ValidationResult;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -43,9 +44,17 @@ public interface EventNotificationConfig {
     @JsonIgnore
     JobTriggerData toJobTriggerData(EventDto dto);
 
+    @JsonIgnore
+    ValidationResult validate();
+
     class FallbackNotificationConfig implements EventNotificationConfig {
         @Override
         public String type() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public ValidationResult validate() {
             throw new UnsupportedOperationException();
         }
 

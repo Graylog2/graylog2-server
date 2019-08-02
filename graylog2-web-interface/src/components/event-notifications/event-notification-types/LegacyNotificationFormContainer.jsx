@@ -13,6 +13,7 @@ const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.
 class LegacyNotificationFormContainer extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     notifications: PropTypes.object.isRequired,
   };

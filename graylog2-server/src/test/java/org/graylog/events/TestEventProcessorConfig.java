@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
@@ -97,6 +98,11 @@ public abstract class TestEventProcessorConfig implements EventProcessorConfig {
         public abstract Builder executeEveryMs(long executeEveryMs);
 
         public abstract TestEventProcessorConfig build();
+    }
+
+    @Override
+    public EventProcessorConfigEntity toContentPackEntity() {
+        return null;
     }
 
     @Override

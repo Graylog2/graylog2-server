@@ -48,7 +48,7 @@ const EditAlertConditionPage = createReactClass({
   },
 
   _handleDelete() {
-    history.push(Routes.ALERTS.CONDITIONS);
+    history.push(Routes.LEGACY_ALERTS.CONDITIONS);
   },
 
   _isLoading() {
@@ -79,7 +79,7 @@ const EditAlertConditionPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 

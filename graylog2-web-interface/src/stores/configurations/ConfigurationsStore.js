@@ -48,6 +48,15 @@ const ConfigurationsStore = Reflux.createStore({
     ConfigurationActions.listMessageProcessorsConfig.promise(promise);
   },
 
+  listEventsClusterConfig() {
+    const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
+      this.trigger({ eventsClusterConfig: response });
+      return response;
+    });
+
+    ConfigurationActions.listEventsClusterConfig.promise(promise);
+  },
+
   update(configType, config) {
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 

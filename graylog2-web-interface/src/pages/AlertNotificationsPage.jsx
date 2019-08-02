@@ -31,7 +31,7 @@ const AlertNotificationsPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.NOTIFICATIONS} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.NOTIFICATIONS} />
             </span>
           </PageHeader>
 

@@ -38,7 +38,7 @@ class EventDefinitions extends React.Component {
               Create Event Definitions that are able to search, aggregate or correlate Messages and other
               Events, allowing you to record significant Events in Graylog and alert on them.
             </p>
-            <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
               <Button bsStyle="success">Get Started!</Button>
             </LinkContainer>
           </EmptyEntity>
@@ -85,7 +85,7 @@ class EventDefinitions extends React.Component {
     const items = eventDefinitions.map((definition) => {
       const actions = (
         <React.Fragment key={`actions-${definition.id}`}>
-          <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.edit(definition.id)}>
+          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(definition.id)}>
             <Button bsStyle="info">Edit</Button>
           </LinkContainer>
           <DropdownButton id="more-dropdown" title="More" pullRight>
@@ -111,7 +111,7 @@ class EventDefinitions extends React.Component {
         <Row>
           <Col md={12}>
             <div className="pull-right">
-              <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.CREATE}>
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
                 <Button bsStyle="success">Create Event Definition</Button>
               </LinkContainer>
             </div>

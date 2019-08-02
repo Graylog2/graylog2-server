@@ -16,6 +16,7 @@ const priorityOptions = lodash.map(EventDefinitionPriorityEnum.properties, (valu
 class EventDetailsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -31,7 +32,7 @@ class EventDetailsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { eventDefinition, validation } = this.props;
 
     return (
       <Row>
@@ -42,7 +43,8 @@ class EventDetailsForm extends React.Component {
                    name="title"
                    label="Title"
                    type="text"
-                   help="Title for this Event Definition, Events and Alerts created from it."
+                   bsStyle={validation.errors.title ? 'error' : null}
+                   help={lodash.get(validation, 'errors.title[0]', 'Title for this Event Definition, Events and Alerts created from it.')}
                    value={eventDefinition.title}
                    onChange={this.handleChange}
                    required />

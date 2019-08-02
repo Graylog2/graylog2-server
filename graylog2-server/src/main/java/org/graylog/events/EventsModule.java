@@ -18,6 +18,8 @@ package org.graylog.events;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.events.audit.EventsAuditEventTypes;
+import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
+import org.graylog.events.contentpack.facade.EventDefinitionFacade;
 import org.graylog.events.fields.EventFieldSpecEngine;
 import org.graylog.events.fields.providers.LookupTableFieldValueProvider;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
@@ -46,6 +48,7 @@ import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -75,8 +78,13 @@ public class EventsModule extends PluginModule {
 
         addPeriodical(EventNotificationStatusCleanUp.class);
 
+        addEntityFacade(ModelTypes.EVENT_DEFINITION_V1, EventDefinitionFacade.class);
+
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);
+
+        registerJacksonSubtype(AggregationEventProcessorConfigEntity.class,
+            AggregationEventProcessorConfigEntity.TYPE_NAME);
 
         addEventProcessor(AggregationEventProcessorConfig.TYPE_NAME,
                 AggregationEventProcessor.class,

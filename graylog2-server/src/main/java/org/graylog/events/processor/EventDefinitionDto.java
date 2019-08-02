@@ -17,28 +17,36 @@
 package org.graylog.events.processor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition {
+public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -103,6 +111,35 @@ public abstract class EventDefinitionDto implements EventDefinition {
     }
 
     public abstract Builder toBuilder();
+
+    @JsonIgnore
+    public ValidationResult validate() {
+        final ValidationResult validation = new ValidationResult();
+
+        if (title().isEmpty()) {
+            validation.addError(FIELD_TITLE, "Event Definition title cannot be empty.");
+        }
+
+        try {
+            validation.addAll(config().validate());
+        } catch (UnsupportedOperationException e) {
+            validation.addError(FIELD_CONFIG, "Event Definition config type cannot be empty.");
+        }
+
+        for (Map.Entry<String, EventFieldSpec> fieldSpecEntry : fieldSpec().entrySet()) {
+            final String fieldName = fieldSpecEntry.getKey();
+            if (!Message.validKey(fieldName)) {
+                validation.addError(FIELD_FIELD_SPEC,
+                    "Event Definition field_spec contains invalid message field \"" + fieldName + "\"");
+            }
+        }
+
+        if (keySpec().stream().anyMatch(key -> !fieldSpec().containsKey(key))) {
+            validation.addError(FIELD_KEY_SPEC, "Event Definition key_spec can only contain fields defined in field_spec.");
+        }
+
+        return validation;
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -172,5 +209,23 @@ public abstract class EventDefinitionDto implements EventDefinition {
 
             return dto;
         }
+    }
+
+    public EventDefinitionEntity toContentPackEntity() {
+        final EventProcessorConfig config = config();
+        final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity();
+
+        return EventDefinitionEntity.builder()
+            .title(ValueReference.of(title()))
+            .description(ValueReference.of(description()))
+            .priority(ValueReference.of(priority()))
+            .alert(ValueReference.of(alert()))
+            .config(eventProcessorConfigEntity)
+            .notifications(notifications())
+            .notificationSettings(notificationSettings())
+            .fieldSpec(fieldSpec())
+            .keySpec(keySpec())
+            .storage(storage())
+            .build();
     }
 }

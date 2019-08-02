@@ -19,8 +19,10 @@ class EventDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     entityTypes: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
+    defaults: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
@@ -94,7 +96,7 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, eventDefinition, notifications, onChange } = this.props;
+    const { action, entityTypes, eventDefinition, notifications, onChange, validation, defaults } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -103,6 +105,7 @@ class EventDefinitionForm extends React.Component {
       entityTypes,
       eventDefinition,
       onChange,
+      validation,
     };
 
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
@@ -126,13 +129,16 @@ class EventDefinitionForm extends React.Component {
       {
         key: STEP_KEYS[3],
         title: 'Notifications',
-        component: <NotificationsForm {...defaultStepProps} notifications={notifications} />,
+        component: <NotificationsForm {...defaultStepProps} notifications={notifications} defaults={defaults} />,
       },
       {
         key: STEP_KEYS[4],
         title: 'Summary',
         component: (
-          <EventDefinitionSummary action={action} eventDefinition={eventDefinition} notifications={notifications} />
+          <EventDefinitionSummary action={action}
+                                  eventDefinition={eventDefinition}
+                                  notifications={notifications}
+                                  validation={validation} />
         ),
       },
     ];

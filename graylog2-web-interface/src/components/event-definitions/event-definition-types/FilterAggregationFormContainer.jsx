@@ -14,6 +14,7 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 class FilterAggregationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']).isRequired,
+    validation: PropTypes.object.isRequired,
     eventDefinition: PropTypes.object.isRequired,
     fieldTypes: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
