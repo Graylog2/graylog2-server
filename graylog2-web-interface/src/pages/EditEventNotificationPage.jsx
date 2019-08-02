@@ -61,7 +61,7 @@ class EditEventDefinitionPage extends React.Component {
 
             <ButtonToolbar>
               <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info">Events</Button>
+                <Button bsStyle="info">Alerts & Events</Button>
               </LinkContainer>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
                 <Button bsStyle="info">Event Definitions</Button>

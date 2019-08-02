@@ -14,9 +14,9 @@ class EventsPage extends React.Component {
 
   render() {
     return (
-      <DocumentTitle title="Events">
+      <DocumentTitle title="Alerts & Events">
         <span>
-          <PageHeader title="Events">
+          <PageHeader title="Alerts & Events">
             <span>
               Events are generated when Event Definitions you define are satisfied. Alerts also trigger
               Notifications, being meant to capture relevant Events that may require your attention.
@@ -30,7 +30,7 @@ class EventsPage extends React.Component {
 
             <ButtonToolbar>
               <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info" className="active">Events</Button>
+                <Button bsStyle="info" className="active">Alerts & Events</Button>
               </LinkContainer>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
                 <Button bsStyle="info">Event Definitions</Button>
