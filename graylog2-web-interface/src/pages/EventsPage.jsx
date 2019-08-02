@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
@@ -10,9 +11,14 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 
 class EventsPage extends React.Component {
-  static propTypes = {};
+  static propTypes = {
+    location: PropTypes.object.isRequired,
+  };
 
   render() {
+    const { location } = this.props;
+    const filteredSourceStream = location.query.stream_id;
+
     return (
       <DocumentTitle title="Alerts & Events">
         <span>
@@ -43,7 +49,7 @@ class EventsPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventsContainer />
+              <EventsContainer key={filteredSourceStream} streamId={filteredSourceStream} />
             </Col>
           </Row>
         </span>

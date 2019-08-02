@@ -198,7 +198,7 @@ const Routes = {
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  stream_alerts: streamId => `/streams/${streamId}/alerts`,
+  stream_alerts: streamId => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: streamId => `/streams/${streamId}/messages`,
   show_alert: alertId => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
