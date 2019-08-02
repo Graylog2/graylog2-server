@@ -48,6 +48,7 @@ import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -77,7 +78,7 @@ public class EventsModule extends PluginModule {
 
         addPeriodical(EventNotificationStatusCleanUp.class);
 
-        addEntityFacade(EventDefinitionFacade.TYPE, EventDefinitionFacade.class);
+        addEntityFacade(ModelTypes.EVENT_DEFINITION_V1, EventDefinitionFacade.class);
 
         addMigration(V20190722150700_LegacyAlertConditionMigration.class);
         addAuditEventTypes(EventsAuditEventTypes.class);

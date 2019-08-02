@@ -30,4 +30,5 @@ public interface ModelTypes {
     ModelType PIPELINE_RULE_V1 = ModelType.of("pipeline_rule", "1");
     ModelType ROOT = ModelType.of("virtual-root", "1");
     ModelType STREAM_V1 = ModelType.of("stream", "1");
+    ModelType EVENT_DEFINITION_V1 = ModelType.of("event_definition", "1");
 }

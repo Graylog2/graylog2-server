@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -47,8 +48,6 @@ import java.util.stream.Collectors;
 public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(EventDefinitionFacade.class);
 
-    public static final ModelType TYPE = ModelType.of("event_definition", "1");
-
     private final ObjectMapper objectMapper;
     private final EventDefinitionHandler eventDefinitionHandler;
     private final DBEventDefinitionService eventDefinitionService;
@@ -68,8 +67,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return EntityV1.builder()
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(eventDefinition.id(), TYPE)))
-                .type(TYPE)
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(eventDefinition.id(), ModelTypes.EVENT_DEFINITION_V1)))
+                .type(ModelTypes.EVENT_DEFINITION_V1)
                 .data(data)
                 .build();
     }
@@ -104,7 +103,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                 EventDefinitionEntity.class);
         final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters);
         final EventDefinitionDto savedDto = eventDefinitionHandler.create(eventDefinition);
-        return NativeEntity.create(entity.id(), savedDto.id(), TYPE, savedDto.title(), savedDto);
+        return NativeEntity.create(entity.id(), savedDto.id(), ModelTypes.EVENT_DEFINITION_V1, savedDto.title(), savedDto);
     }
 
     @Override
@@ -124,7 +123,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     public EntityExcerpt createExcerpt(EventDefinitionDto nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
-                .type(TYPE)
+                .type(ModelTypes.EVENT_DEFINITION_V1)
                 .title(nativeEntity.title())
                 .build();
     }
