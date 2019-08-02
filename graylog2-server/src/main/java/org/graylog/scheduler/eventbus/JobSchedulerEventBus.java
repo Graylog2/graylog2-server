@@ -28,16 +28,14 @@ import static com.codahale.metrics.MetricRegistry.name;
  * Subscribers must ensure that the callback method is fast or put expensive work into an executor or queue.
  */
 public class JobSchedulerEventBus extends EventBus {
-    private static final String METRICS_PREFIX = "job-scheduler-eventbus";
-
     private final Counter registrationsCount;
     private final Timer postTimer;
 
     @SuppressWarnings("WeakerAccess")
     public JobSchedulerEventBus(String name, MetricRegistry metricRegistry) {
         super(name);
-        this.registrationsCount = metricRegistry.counter(name(METRICS_PREFIX, name, "registrations"));
-        this.postTimer = metricRegistry.timer(name(METRICS_PREFIX, name, "posts"));
+        this.registrationsCount = metricRegistry.counter(name(getClass(), name, "registrations"));
+        this.postTimer = metricRegistry.timer(name(getClass(), name, "posts"));
     }
 
     @Override
