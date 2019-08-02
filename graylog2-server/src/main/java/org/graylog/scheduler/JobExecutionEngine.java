@@ -17,6 +17,8 @@
 package org.graylog.scheduler;
 
 import com.google.inject.assistedinject.Assisted;
+import org.graylog.scheduler.eventbus.JobCompletedEvent;
+import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -40,6 +42,7 @@ public class JobExecutionEngine {
 
     private final DBJobTriggerService jobTriggerService;
     private final DBJobDefinitionService jobDefinitionService;
+    private final JobSchedulerEventBus eventBus;
     private final JobScheduleStrategies scheduleStrategies;
     private final JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
     private final Map<String, Job.Factory> jobFactory;
@@ -51,12 +54,14 @@ public class JobExecutionEngine {
     @Inject
     public JobExecutionEngine(DBJobTriggerService jobTriggerService,
                               DBJobDefinitionService jobDefinitionService,
+                              JobSchedulerEventBus eventBus,
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               Map<String, Job.Factory> jobFactory,
                               @Assisted JobWorkerPool workerPool) {
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
+        this.eventBus = eventBus;
         this.scheduleStrategies = scheduleStrategies;
         this.jobTriggerUpdatesFactory = jobTriggerUpdatesFactory;
         this.jobFactory = jobFactory;
@@ -136,6 +141,8 @@ public class JobExecutionEngine {
             final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(5);
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
             jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
+        } finally {
+            eventBus.post(JobCompletedEvent.INSTANCE);
         }
     }
 

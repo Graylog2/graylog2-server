@@ -25,6 +25,7 @@ import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.events.EventsModule;
+import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
@@ -111,6 +112,7 @@ public class Server extends ServerBootstrap {
     private final PipelineConfig pipelineConfiguration = new PipelineConfig();
     private final ViewsConfig viewsConfiguration = new ViewsConfig();
     private final ProcessingStatusConfig processingStatusConfig = new ProcessingStatusConfig();
+    private final JobSchedulerConfiguration jobSchedulerConfiguration = new JobSchedulerConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -177,7 +179,8 @@ public class Server extends ServerBootstrap {
                 nettyTransportConfiguration,
                 pipelineConfiguration,
                 viewsConfiguration,
-                processingStatusConfig);
+                processingStatusConfig,
+                jobSchedulerConfiguration);
     }
 
     @Override

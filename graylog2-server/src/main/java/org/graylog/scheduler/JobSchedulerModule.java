@@ -20,6 +20,8 @@ import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
+import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
+import org.graylog.scheduler.eventbus.JobSchedulerEventBusProvider;
 import org.graylog2.plugin.PluginModule;
 
 /**
@@ -30,6 +32,7 @@ public class JobSchedulerModule extends PluginModule {
     protected void configure() {
         bind(JobSchedulerService.class).asEagerSingleton();
         bind(JobSchedulerClock.class).toInstance(JobSchedulerSystemClock.INSTANCE);
+        bind(JobSchedulerEventBus.class).toProvider(JobSchedulerEventBusProvider.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), JobSchedulerConfig.class)
                 .setDefault().to(DefaultJobSchedulerConfig.class);
