@@ -91,7 +91,7 @@ public class AlertScannerThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return true;
+        return configuration.isEnableLegacyAlerts();
     }
 
     @Override
