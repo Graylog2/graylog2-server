@@ -23,10 +23,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
 import javax.validation.constraints.NotBlank;
@@ -95,6 +98,10 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         return EventNotificationExecutionJob.Data.builder().eventDto(dto).build();
     }
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @JsonIgnore
     public ValidationResult validate() {
         final ValidationResult validation = new ValidationResult();
@@ -144,5 +151,16 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         public abstract Builder userRecipients(Set<String> userRecipients);
 
         public abstract EmailEventNotificationConfig build();
+    }
+
+    @Override
+    public EventNotificationConfigEntity toContentPackEntity() {
+        return EmailEventNotificationConfigEntity.builder()
+            .sender(ValueReference.of(sender()))
+            .subject(ValueReference.of(subject()))
+            .bodyTemplate(ValueReference.of(bodyTemplate()))
+            .emailRecipients(emailRecipients())
+            .userRecipients(userRecipients())
+            .build();
     }
 }
