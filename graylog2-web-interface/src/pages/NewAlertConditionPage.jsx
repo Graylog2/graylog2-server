@@ -40,7 +40,7 @@ const NewAlertConditionPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 

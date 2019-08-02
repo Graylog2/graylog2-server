@@ -17,10 +17,21 @@ class EventsContainer extends React.Component {
   static propTypes = {
     events: PropTypes.object.isRequired,
     eventDefinitions: PropTypes.object.isRequired,
+    streamId: PropTypes.string,
+  };
+
+  static defaultProps = {
+    streamId: '',
   };
 
   componentDidMount() {
-    this.fetchEvents({});
+    const { streamId } = this.props;
+    const params = {};
+    if (streamId) {
+      params.query = `source_streams:${streamId}`;
+    }
+
+    this.fetchEvents(params);
     this.fetchEventDefinitions();
   }
 

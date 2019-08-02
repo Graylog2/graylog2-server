@@ -26,13 +26,13 @@ class EventNotificationsPage extends React.Component {
             </span>
 
             <ButtonToolbar>
-              <LinkContainer to={Routes.NEXT_ALERTS.LIST}>
-                <Button bsStyle="info">Events</Button>
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info">Alerts & Events</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.NEXT_ALERTS.DEFINITIONS.LIST}>
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
                 <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.NEXT_ALERTS.NOTIFICATIONS.LIST}>
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
                 <Button bsStyle="info" className="active">Notifications</Button>
               </LinkContainer>
             </ButtonToolbar>

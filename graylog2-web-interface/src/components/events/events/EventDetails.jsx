@@ -59,7 +59,7 @@ class EventDetails extends React.Component {
             <dt>Event Definition</dt>
             <dd>
               {eventDefinitionContext ? (
-                <Link to={Routes.NEXT_ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
+                <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
                   {eventDefinitionContext.title}
                 </Link>
               ) : (

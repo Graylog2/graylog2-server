@@ -71,7 +71,7 @@ class EventNotificationFormContainer extends React.Component {
       promise.then(
         () => {
           if (!embedded) {
-            history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
           }
         },
         (errorResponse) => {
@@ -86,7 +86,7 @@ class EventNotificationFormContainer extends React.Component {
       promise.then(
         () => {
           if (!embedded) {
-            history.push(Routes.NEXT_ALERTS.NOTIFICATIONS.LIST);
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
           }
         },
         (errorResponse) => {

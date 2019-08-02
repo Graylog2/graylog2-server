@@ -46,24 +46,24 @@ const Routes = {
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
+  LEGACY_ALERTS: {
+    LIST: '/legacy/alerts',
+    CONDITIONS: '/legacy/alerts/conditions',
+    NEW_CONDITION: '/legacy/alerts/conditions/new',
+    NOTIFICATIONS: '/legacy/alerts/notifications',
+    NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
+  },
   ALERTS: {
     LIST: '/alerts',
-    CONDITIONS: '/alerts/conditions',
-    NEW_CONDITION: '/alerts/conditions/new',
-    NOTIFICATIONS: '/alerts/notifications',
-    NEW_NOTIFICATION: '/alerts/notifications/new',
-  },
-  NEXT_ALERTS: {
-    LIST: '/next/alerts',
     DEFINITIONS: {
-      LIST: '/next/alerts/definitions',
-      CREATE: '/next/alerts/definitions/new',
-      edit: definitionId => `/next/alerts/definitions/${definitionId}`,
+      LIST: '/alerts/definitions',
+      CREATE: '/alerts/definitions/new',
+      edit: definitionId => `/alerts/definitions/${definitionId}`,
     },
     NOTIFICATIONS: {
-      LIST: '/next/alerts/notifications',
-      CREATE: '/next/alerts/notifications/new',
-      edit: notificationId => `/next/alerts/notifications/${notificationId}`,
+      LIST: '/alerts/notifications',
+      CREATE: '/alerts/notifications/new',
+      edit: notificationId => `/alerts/notifications/${notificationId}`,
     },
   },
   SOURCES: '/sources',
@@ -198,13 +198,13 @@ const Routes = {
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  stream_alerts: streamId => `/streams/${streamId}/alerts`,
+  stream_alerts: streamId => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: streamId => `/streams/${streamId}/messages`,
-  show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
-  show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: streamId => `${Routes.ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: streamId => `${Routes.ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
+  show_alert: alertId => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
+  show_alert_condition: (streamId, conditionId) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
+  new_alert_condition_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
+  new_alert_notification_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
 

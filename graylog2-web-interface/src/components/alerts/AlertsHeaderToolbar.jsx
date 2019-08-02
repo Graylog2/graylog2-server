@@ -19,14 +19,14 @@ class AlertsHeaderToolbar extends React.Component {
 
     return (
       <ButtonToolbar>
-        <LinkContainer to={Routes.ALERTS.LIST}>
-          <Button bsStyle="info" className={this._isActive(active, Routes.ALERTS.LIST)}>Alerts</Button>
+        <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
+          <Button bsStyle="info" className={this._isActive(active, Routes.LEGACY_ALERTS.LIST)}>Alerts</Button>
         </LinkContainer>
-        <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-          <Button bsStyle="info" className={this._isActive(active, Routes.ALERTS.CONDITIONS)}>Conditions</Button>
+        <LinkContainer to={Routes.LEGACY_ALERTS.CONDITIONS}>
+          <Button bsStyle="info" className={this._isActive(active, Routes.LEGACY_ALERTS.CONDITIONS)}>Conditions</Button>
         </LinkContainer>
-        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-          <Button bsStyle="info" className={this._isActive(active, Routes.ALERTS.NOTIFICATIONS)}>Notifications</Button>
+        <LinkContainer to={Routes.LEGACY_ALERTS.NOTIFICATIONS}>
+          <Button bsStyle="info" className={this._isActive(active, Routes.LEGACY_ALERTS.NOTIFICATIONS)}>Notifications</Button>
         </LinkContainer>
       </ButtonToolbar>
     );
