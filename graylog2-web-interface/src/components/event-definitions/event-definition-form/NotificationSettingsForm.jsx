@@ -15,6 +15,7 @@ const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 class NotificationSettingsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    defaults: PropTypes.object.isRequired,
     onSettingsChange: PropTypes.func.isRequired,
   };
 
@@ -22,11 +23,12 @@ class NotificationSettingsForm extends React.Component {
     super(props);
 
     const { backlog_size: backlogSize } = props.eventDefinition.notification_settings;
-    const effectiveBacklogSize = lodash.defaultTo(backlogSize, 0);
+    const defaultBacklogSize = props.defaults.default_backlog_size;
+    const effectiveBacklogSize = lodash.defaultTo(backlogSize, defaultBacklogSize);
 
     this.state = {
       lastEnabledGracePeriod: undefined,
-      isBacklogSizeEnabled: effectiveBacklogSize > 0,
+      isBacklogSizeEnabled: (backlogSize === null ? false : (effectiveBacklogSize > 0)),
       backlogSize: effectiveBacklogSize,
     };
   }
