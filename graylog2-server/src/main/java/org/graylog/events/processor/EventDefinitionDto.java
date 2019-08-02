@@ -24,11 +24,15 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
@@ -42,7 +46,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
-public abstract class EventDefinitionDto implements EventDefinition {
+public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
@@ -205,5 +209,23 @@ public abstract class EventDefinitionDto implements EventDefinition {
 
             return dto;
         }
+    }
+
+    public EventDefinitionEntity toContentPackEntity() {
+        final EventProcessorConfig config = config();
+        final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity();
+
+        return EventDefinitionEntity.builder()
+            .title(ValueReference.of(title()))
+            .description(ValueReference.of(description()))
+            .priority(ValueReference.of(priority()))
+            .alert(ValueReference.of(alert()))
+            .config(eventProcessorConfigEntity)
+            .notifications(notifications())
+            .notificationSettings(notificationSettings())
+            .fieldSpec(fieldSpec())
+            .keySpec(keySpec())
+            .storage(storage())
+            .build();
     }
 }

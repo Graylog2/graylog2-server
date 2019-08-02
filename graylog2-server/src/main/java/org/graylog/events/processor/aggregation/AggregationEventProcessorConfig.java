@@ -22,12 +22,15 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
@@ -162,5 +165,19 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         }
 
         return validationResult;
+    }
+
+    @Override
+    public EventProcessorConfigEntity toContentPackEntity() {
+        return AggregationEventProcessorConfigEntity.builder()
+            .type(type())
+            .query(ValueReference.of(query()))
+            .streams(streams())
+            .groupBy(groupBy())
+            .series(series())
+            .conditions(conditions().orElse(null))
+            .executeEveryMs(ValueReference.of(executeEveryMs()))
+            .searchWithinMs(ValueReference.of(searchWithinMs()))
+            .build();
     }
 }
