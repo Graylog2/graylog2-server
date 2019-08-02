@@ -35,8 +35,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 @Singleton
 public class JobSchedulerService extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(JobSchedulerService.class);
@@ -142,8 +140,6 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
 
         @VisibleForTesting
         InterruptibleSleeper(Semaphore semaphore) {
-            // Semaphores with more than one permit would break the assumptions of the implementation
-            checkArgument(semaphore.availablePermits() == 1, "Semaphore must only have 1 permit");
             this.semaphore = semaphore;
         }
 
@@ -156,20 +152,19 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
          * @throws InterruptedException if the thread gets interrupted
          */
         public boolean sleep(long duration, TimeUnit unit) throws InterruptedException {
-            // First try to acquire the one permit we allow
-            semaphore.tryAcquire();
-            // Now try to acquire another permit. This won't work except #interrupt() got called in the meantime.
+            // First we have to drain all available permits because interrupt() might get called very often and thus
+            // there might be a lot of permits.
+            semaphore.drainPermits();
+            // Now try to acquire a permit. This won't work except #interrupt() got called in the meantime.
             // It waits for the given duration, basically emulating a sleep.
-            final boolean acquired = semaphore.tryAcquire(duration, unit);
-            // Always release so we can start with a clean slate when sleep is called again
-            semaphore.release();
-            return !acquired;
+            return !semaphore.tryAcquire(duration, unit);
         }
 
         /**
          * Interrupt a {@link #sleep(long, TimeUnit)} call so it unblocks.
          */
         public void interrupt() {
+            // Attention: this will increase available permits every time it's called.
             semaphore.release();
         }
     }
