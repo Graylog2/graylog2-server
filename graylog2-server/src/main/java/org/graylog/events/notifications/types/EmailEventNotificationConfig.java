@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.events.contentpack.entities.EmailEventNotificationConfigEntity;
+import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
@@ -153,7 +154,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     }
 
     @Override
-    public Object toContentPackEntity() {
+    public EventNotificationConfigEntity toContentPackEntity() {
         return EmailEventNotificationConfigEntity.builder()
             .sender(ValueReference.of(sender()))
             .subject(ValueReference.of(subject()))

@@ -103,7 +103,7 @@ public abstract class NotificationDto implements ContentPackable {
 
     @Override
     public Object toContentPackEntity() {
-        final EventNotificationConfigEntity config = (EventNotificationConfigEntity) config().toContentPackEntity();
+        final EventNotificationConfigEntity config = config().toContentPackEntity();
         return NotificationEntity.builder()
             .description(ValueReference.of(description()))
             .title(ValueReference.of(title()))
