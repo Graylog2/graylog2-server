@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Alert } from 'react-bootstrap';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
+import commonStyles from './LegacyNotificationCommonStyles.css';
 
 class LegacyNotificationSummary extends React.Component {
   static propTypes = {
@@ -35,18 +37,27 @@ class LegacyNotificationSummary extends React.Component {
         <tr className="danger">
           <td>Type</td>
           <td>
-            Unknown legacy alarm callback type: <strong>{callbackType}</strong> Please make sure the plugin is installed.
+            Unknown legacy alarm callback type: <code>{callbackType}</code>.
+            Please make sure the plugin is installed.
           </td>
         </tr>
       );
     }
 
     return (
-      <CommonNotificationSummary {...this.props}>
-        <React.Fragment>
-          {content}
-        </React.Fragment>
-      </CommonNotificationSummary>
+      <React.Fragment>
+        {!typeData && (
+          <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
+            Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>,
+            please ensure the plugin is installed.
+          </Alert>
+        )}
+        <CommonNotificationSummary {...this.props}>
+          <React.Fragment>
+            {content}
+          </React.Fragment>
+        </CommonNotificationSummary>
+      </React.Fragment>
     );
   }
 }
