@@ -25,8 +25,9 @@ import org.graylog.events.event.Event;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.event.EventWithContext;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.jackson.TypeReferences;
+import org.graylog2.plugin.database.Persisted;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,9 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
@@ -46,22 +50,30 @@ import static org.joda.time.DateTimeZone.UTC;
 @Singleton
 public class MoreIndices {
     private static final Logger LOG = LoggerFactory.getLogger(MoreIndices.class);
-    private static final String EVENTS_INDEX_PREFIX = "gl-events";
-    private static final String EVENTS_WRITE_INDEX_ALIAS = EVENTS_INDEX_PREFIX + MongoIndexSet.SEPARATOR + MongoIndexSet.DEFLECTOR_SUFFIX;
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
+    private final StreamService streamService;
 
     @Inject
-    public MoreIndices(JestClient jestClient, ObjectMapper objectMapper) {
+    public MoreIndices(JestClient jestClient, ObjectMapper objectMapper, StreamService streamService) {
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
+        this.streamService = streamService;
     }
 
     public void bulkIndex(List<EventWithContext> eventsWithContext) {
         if (eventsWithContext.isEmpty()) {
             return;
         }
+
+        // Pre-load all write index targets of all events to avoid looking them up for every event when building the bulk request
+        final Set<String> streamIds = eventsWithContext.stream()
+            .map(EventWithContext::event)
+            .flatMap(event -> event.getStreams().stream())
+            .collect(Collectors.toSet());
+        final Map<String, String> streamIndices = streamService.loadByIds(streamIds).stream()
+            .collect(Collectors.toMap(Persisted::getId, stream -> stream.getIndexSet().getWriteIndexAlias()));
 
         final Bulk.Builder bulk = new Bulk.Builder();
         for (final EventWithContext eventWithContext : eventsWithContext) {
@@ -80,11 +92,32 @@ public class MoreIndices {
                 source.put(EventDto.FIELD_TIMERANGE_END, buildElasticSearchTimeFormat(event.getTimerangeEnd().withZone(UTC)));
             }
 
-            bulk.addAction(new Index.Builder(source)
-                    .index(EVENTS_WRITE_INDEX_ALIAS) // TODO: Get write index alias from index set
+            // We cannot index events that don't have any stream set
+            if (event.getStreams().isEmpty()) {
+                throw new IllegalStateException("Event streams cannot be empty");
+            }
+
+            // Collect a set of indices for the event to avoid writing to the same index set twice if
+            // multiple streams use the same index set.
+            final Set<String> indices = event.getStreams().stream()
+                .map(streamId -> {
+                    final String index = streamIndices.get(streamId);
+                    if (index == null) {
+                        LOG.warn("Couldn't find index set of stream <{}> for event <{}> (definition: {}/{})", streamId,
+                            event.getId(), event.getEventDefinitionType(), event.getEventDefinitionId());
+                    }
+                    return index;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+            for (final String index : indices) {
+                bulk.addAction(new Index.Builder(source)
+                    .index(index)
                     .type(IndexMapping.TYPE_MESSAGE)
                     .id(event.getId())
                     .build());
+            }
         }
 
         try {
@@ -94,7 +127,7 @@ public class MoreIndices {
             if (!failedItems.isEmpty()) {
                 LOG.error("Failed to index {} events: {}", eventsWithContext.size(), result.getErrorMessage());
             }
-            LOG.info("Index: Bulk indexed {} events, failures: {}", result.getItems().size(), failedItems.size());
+            LOG.debug("Index: Bulk indexed {} events, failures: {}", result.getItems().size(), failedItems.size());
         } catch (IOException e) {
             LOG.error("Failed to index {} events", eventsWithContext.size(), e);
         }

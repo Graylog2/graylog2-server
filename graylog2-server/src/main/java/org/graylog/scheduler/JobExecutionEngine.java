@@ -49,6 +49,7 @@ public class JobExecutionEngine {
     private final JobWorkerPool workerPool;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
+    private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
 
     @Inject
     public JobExecutionEngine(DBJobTriggerService jobTriggerService,
@@ -74,6 +75,16 @@ public class JobExecutionEngine {
         isRunning.set(false);
     }
 
+    private void cleanup() {
+        // The cleanup should only run once before starting job processing to avoid damaging any state.
+        if (shouldCleanup.getAndSet(false)) {
+            final int releasedTriggers = jobTriggerService.forceReleaseOwnedTriggers();
+            if (releasedTriggers > 0) {
+                LOG.warn("Force-released {} stale job triggers after an unclean job scheduler shutdown", releasedTriggers);
+            }
+        }
+    }
+
     /**
      * Execute the engine. This will try to lock a trigger and execute the job if there are free slots in the
      * worker pool and the engine is not shutting down.
@@ -81,6 +92,12 @@ public class JobExecutionEngine {
      * @return true if a job trigger has been locked and the related job has been triggered, false otherwise
      */
     public boolean execute() {
+        // Cleanup stale scheduler state *before* processing any triggers for the first time.
+        // This is a no-op after the first invocation.
+        if (shouldCleanup.get()) {
+            cleanup();
+        }
+
         // We want to avoid a call to the database if there are no free slots in the pool or the engine is shutting down
         if (isRunning.get() && workerPool.hasFreeSlots()) {
             final Optional<JobTriggerDto> triggerOptional = jobTriggerService.nextRunnableTrigger();

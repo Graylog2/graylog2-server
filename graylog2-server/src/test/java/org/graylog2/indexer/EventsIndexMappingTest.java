@@ -107,6 +107,7 @@ public class EventsIndexMappingTest {
         at.jsonPathAsString("$.mappings.message.properties.timerange_end.type").isEqualTo("date");
         at.jsonPathAsString("$.mappings.message.properties.timerange_end.format").isEqualTo("yyyy-MM-dd HH:mm:ss.SSS");
         at.jsonPathAsString("$.mappings.message.properties.streams.type").isEqualTo("keyword");
+        at.jsonPathAsString("$.mappings.message.properties.source_streams.type").isEqualTo("keyword");
         at.jsonPathAsString("$.mappings.message.properties.message.type").isEqualTo("text");
         at.jsonPathAsString("$.mappings.message.properties.message.analyzer").isEqualTo("standard");
         at.jsonPathAsBoolean("$.mappings.message.properties.message.norms").isFalse();

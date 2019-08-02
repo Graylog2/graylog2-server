@@ -82,6 +82,12 @@ class EventsContainer extends React.Component {
     });
   };
 
+  handleSearchReload = (callback = () => {}) => {
+    const { events } = this.props;
+    const promise = this.fetchEvents(events.parameters);
+    promise.finally(callback);
+  };
+
   render() {
     const { events, eventDefinitions } = this.props;
     const isLoading = !events.events || !eventDefinitions.eventDefinitions;
@@ -99,7 +105,8 @@ class EventsContainer extends React.Component {
               onQueryChange={this.handleQueryChange}
               onPageChange={this.handlePageChange}
               onAlertFilterChange={this.handleAlertFilterChange}
-              onTimeRangeChange={this.handleTimeRangeChange} />
+              onTimeRangeChange={this.handleTimeRangeChange}
+              onSearchReload={this.handleSearchReload} />
     );
   }
 }

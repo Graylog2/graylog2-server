@@ -42,7 +42,9 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static java.util.Comparator.comparing;
@@ -54,7 +56,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DBJobTriggerServiceTest {
-    private static final String NODE_ID = "abc-123";
+    private static final String NODE_ID = "node-1";
 
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
@@ -701,4 +703,24 @@ public class DBJobTriggerServiceTest {
 
     }
 
+    @Test
+    @UsingDataSet(locations = "stale-job-triggers.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void forceReleaseOwnedTriggers() {
+        final Set<String> triggerIds = dbJobTriggerService.all().stream()
+            .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+            .map(JobTriggerDto::id)
+            .collect(Collectors.toSet());
+
+        assertThat(triggerIds).containsOnly("54e3deadbeefdeadbeef0001", "54e3deadbeefdeadbeef0002", "54e3deadbeefdeadbeef0004");
+
+        assertThat(dbJobTriggerService.forceReleaseOwnedTriggers()).isEqualTo(2);
+
+        final Set<String> newTriggerIds = dbJobTriggerService.all().stream()
+            .filter(dto -> JobTriggerStatus.RUNNING.equals(dto.status()))
+            .map(JobTriggerDto::id)
+            .collect(Collectors.toSet());
+
+        // Running triggers not owned by this node should not be released
+        assertThat(newTriggerIds).containsOnly("54e3deadbeefdeadbeef0002");
+    }
 }
