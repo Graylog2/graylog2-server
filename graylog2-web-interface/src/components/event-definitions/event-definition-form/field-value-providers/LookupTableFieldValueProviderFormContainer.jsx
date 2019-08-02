@@ -12,6 +12,7 @@ const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupT
 class LookupTableFieldValueProviderFormContainer extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     fieldTypes: PropTypes.object.isRequired,
     lookupTables: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,

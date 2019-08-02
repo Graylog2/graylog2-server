@@ -17,6 +17,7 @@
 package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
+import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -61,7 +62,13 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(config, parameters, "test", searchJobService, queryEngine);
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+            config,
+            parameters,
+            "test",
+            searchJobService,
+            queryEngine,
+            EventsConfigurationTestProvider.create());
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -144,7 +151,13 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(config, parameters, "test", searchJobService, queryEngine);
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+            config,
+            parameters,
+            "test",
+            searchJobService,
+            queryEngine,
+            EventsConfigurationTestProvider.create());
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -199,7 +212,13 @@ public class PivotAggregationSearchTest {
                 .batchSize(500)
                 .build();
 
-        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(config, parameters, "test", searchJobService, queryEngine);
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+            config,
+            parameters,
+            "test",
+            searchJobService,
+            queryEngine,
+            EventsConfigurationTestProvider.create());
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")

@@ -14,6 +14,7 @@ import styles from './EventConditionForm.css';
 class EventConditionForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -68,7 +69,7 @@ class EventConditionForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { eventDefinition, validation } = this.props;
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
 
     const eventDefinitionTypeComponent = eventDefinitionType.formComponent
@@ -88,7 +89,7 @@ class EventConditionForm extends React.Component {
             Conditions, making it possible to build powerful Conditions based on others.
           </p>
 
-          <FormGroup controlId="event-definition-priority">
+          <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
             <ControlLabel>Condition Type</ControlLabel>
             <Select placeholder="Select a Condition Type"
                     options={this.formattedEventDefinitionTypes()}
@@ -96,7 +97,9 @@ class EventConditionForm extends React.Component {
                     onChange={this.handleEventDefinitionTypeChange}
                     clearable={false}
                     required />
-            <HelpBlock>Choose the type of Condition for this Event.</HelpBlock>
+            <HelpBlock>
+              {lodash.get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
+            </HelpBlock>
           </FormGroup>
         </Col>
 

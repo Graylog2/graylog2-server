@@ -90,7 +90,7 @@ public class AggregationEventProcessorTest {
                 .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
                 .config(AggregationEventProcessorConfig.builder()
                         .query("")
-                        .streams(ImmutableSet.of())
+                        .streams(ImmutableSet.of("stream-2"))
                         .groupBy(ImmutableList.of("group_field_one", "group_field_two"))
                         .series(ImmutableList.of())
                         .conditions(null)
@@ -108,6 +108,7 @@ public class AggregationEventProcessorTest {
         final AggregationResult result = AggregationResult.builder()
                 .effectiveTimerange(timerange)
                 .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
                                 .key(ImmutableList.of("one", "two"))
@@ -155,6 +156,8 @@ public class AggregationEventProcessorTest {
             assertThat(event.getEventTimestamp()).isEqualTo(timerange.to());
             assertThat(event.getTimerangeStart()).isEqualTo(timerange.from());
             assertThat(event.getTimerangeEnd()).isEqualTo(timerange.to());
+            // Should only contain the streams that have been configured in event definition
+            assertThat(event.getSourceStreams()).containsOnly("stream-2");
 
             final Message message = eventWithContext.messageContext().orElse(null);
 
@@ -217,6 +220,7 @@ public class AggregationEventProcessorTest {
         final AggregationResult result = AggregationResult.builder()
                 .effectiveTimerange(timerange)
                 .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2", "stream-3"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
                                 .key(ImmutableList.of("one", "two"))
@@ -279,6 +283,8 @@ public class AggregationEventProcessorTest {
             assertThat(event.getEventTimestamp()).isEqualTo(timerange.to());
             assertThat(event.getTimerangeStart()).isEqualTo(timerange.from());
             assertThat(event.getTimerangeEnd()).isEqualTo(timerange.to());
+            // Should contain all streams because when config.streams is empty, we search in all streams
+            assertThat(event.getSourceStreams()).containsOnly("stream-1", "stream-2", "stream-3");
 
             final Message message = eventWithContext.messageContext().orElse(null);
 

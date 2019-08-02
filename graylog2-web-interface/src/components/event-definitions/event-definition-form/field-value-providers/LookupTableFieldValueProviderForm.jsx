@@ -11,11 +11,22 @@ class LookupTableFieldValueProviderForm extends React.Component {
   static propTypes = {
     allFieldTypes: PropTypes.array.isRequired,
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     lookupTables: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
   static type = 'lookup-v1';
+
+  static defaultConfig = {
+    table_name: '',
+    key_field: '',
+  };
+
+  static requiredFields = [
+    'table_name',
+    'key_field',
+  ];
 
   formatMessageFields = lodash.memoize(
     (fieldTypes) => {
@@ -56,13 +67,13 @@ class LookupTableFieldValueProviderForm extends React.Component {
   };
 
   render() {
-    const { allFieldTypes, config, lookupTables } = this.props;
+    const { allFieldTypes, config, lookupTables, validation } = this.props;
     const provider = config.providers.find(p => p.type === LookupTableFieldValueProviderForm.type);
 
     return (
       <Row className="row-sm">
         <Col md={7} lg={6}>
-          <FormGroup controlId="lookup-provider-table">
+          <FormGroup controlId="lookup-provider-table" validationState={validation.errors.table_name ? 'error' : null}>
             <ControlLabel>Select Lookup Table</ControlLabel>
             <Select name="event-field-table-name"
                     placeholder="Select Lookup Table"
@@ -71,10 +82,12 @@ class LookupTableFieldValueProviderForm extends React.Component {
                     value={provider.table_name}
                     matchProp="label"
                     required />
-            <HelpBlock>Select the Lookup Table Graylog should use to get the value.</HelpBlock>
+            <HelpBlock>
+              {validation.errors.table_name || 'Select the Lookup Table Graylog should use to get the value.'}
+            </HelpBlock>
           </FormGroup>
 
-          <FormGroup controlId="lookup-provider-table">
+          <FormGroup controlId="lookup-provider-table" validationState={validation.errors.key_field ? 'error' : null}>
             <ControlLabel>Lookup Table Key Field</ControlLabel>
             <Select name="lookup-provider-key"
                     placeholder="Select Field"
@@ -84,7 +97,9 @@ class LookupTableFieldValueProviderForm extends React.Component {
                     matchProp="label"
                     allowCreate
                     required />
-            <HelpBlock>Message Field name whose value will be used as Lookup Table Key.</HelpBlock>
+            <HelpBlock>
+              {validation.errors.key_field || 'Message Field name whose value will be used as Lookup Table Key.'}
+            </HelpBlock>
           </FormGroup>
         </Col>
       </Row>

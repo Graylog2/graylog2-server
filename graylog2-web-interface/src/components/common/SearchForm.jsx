@@ -42,9 +42,9 @@ class SearchForm extends React.Component {
     /** bsStyle for search button. */
     searchBsStyle: PropTypes.string,
     /** Text to display in the search button. */
-    searchButtonLabel: PropTypes.string,
+    searchButtonLabel: PropTypes.node,
     /** Text to display in the reset button. */
-    resetButtonLabel: PropTypes.string,
+    resetButtonLabel: PropTypes.node,
     /**
      * Text to display in the search button while the search is loading. This
      * will only be used if `useLoadingState` is true.

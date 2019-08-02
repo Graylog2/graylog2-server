@@ -333,6 +333,28 @@ public class DBJobTriggerService {
     }
 
     /**
+     * <strong>WARNING:</strong> This should <em>only</em> be called before the job scheduler is started! Calling this
+     * while the scheduler is running might result in data corruption or inconsistencies!
+     * <p></p>
+     * This method will release all triggers that are locked by the calling node. It should be called before starting
+     * the scheduler service on the current node to release all triggers that might be in a stale
+     * {@link JobTriggerStatus#RUNNING RUNNING} status after an unclean JVM or Graylog server shutdown.
+     *
+     * @return number of released triggers
+     */
+    public int forceReleaseOwnedTriggers() {
+        final DBQuery.Query query = DBQuery.and(
+            // Only select trigger for force release which are owned by the calling node
+            DBQuery.is(FIELD_LOCK_OWNER, nodeId),
+            DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
+        );
+        final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
+            .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
+
+        return db.updateMulti(query, update).getN();
+    }
+
+    /**
      * Mark the given trigger as defective to make sure it will not be scheduled anymore.
      *
      * @param trigger trigger that should be marked as defective

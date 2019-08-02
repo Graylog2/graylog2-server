@@ -80,6 +80,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     @Override
     public Optional<EventProcessorSchedulerConfig> toJobSchedulerConfig(EventDefinition eventDefinition, JobSchedulerClock clock) {
         final DateTime now = clock.nowUTC();
@@ -135,9 +137,34 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public abstract AggregationEventProcessorConfig build();
     }
 
+    private boolean isConditionsEmpty() {
+        return !conditions().isPresent() || !conditions().get().expression().isPresent();
+    }
+
     @Override
     public ValidationResult validate() {
-        return new ValidationResult();
+        final ValidationResult validationResult = new ValidationResult();
+
+        if (searchWithinMs() <= 0) {
+            validationResult.addError(FIELD_SEARCH_WITHIN_MS,
+                "Filter & Aggregation search_within_ms must be greater than 0.");
+        }
+        if (executeEveryMs() <= 0) {
+            validationResult.addError(FIELD_EXECUTE_EVERY_MS,
+                "Filter & Aggregation execute_every_ms must be greater than 0.");
+        }
+        if (!groupBy().isEmpty() && (series().isEmpty() || isConditionsEmpty())) {
+            validationResult.addError(FIELD_SERIES, "Aggregation with group_by must also contain series");
+            validationResult.addError(FIELD_CONDITIONS, "Aggregation with group_by must also contain conditions");
+        }
+        if (series().isEmpty() && !isConditionsEmpty()) {
+            validationResult.addError(FIELD_SERIES, "Aggregation with conditions must also contain series");
+        }
+        if (!series().isEmpty() && isConditionsEmpty()) {
+            validationResult.addError(FIELD_CONDITIONS, "Aggregation with series must also contain conditions");
+        }
+
+        return validationResult;
     }
 
     @Override

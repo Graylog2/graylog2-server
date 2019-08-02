@@ -42,6 +42,7 @@ public class EventImpl implements Event {
     private DateTime timerangeStart;
     private DateTime timerangeEnd;
     private ImmutableSet<String> streams = ImmutableSet.of();
+    private ImmutableSet<String> sourceStreams = ImmutableSet.of();
     private String message;
     private String source;
     private ImmutableList<String> keyTuple = ImmutableList.of();
@@ -154,6 +155,26 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public ImmutableSet<String> getSourceStreams() {
+        return sourceStreams;
+    }
+
+    @Override
+    public void addSourceStream(String sourceStream) {
+        this.sourceStreams = ImmutableSet.<String>builder()
+            .addAll(sourceStreams)
+            .add(sourceStream)
+            .build();
+    }
+
+    @Override
+    public void removeSourceStream(String sourceStream) {
+        this.sourceStreams = ImmutableSet.<String>builder()
+            .addAll(sourceStreams.stream().filter(s -> !s.equals(sourceStream)).collect(Collectors.toSet()))
+            .build();
+    }
+
+    @Override
     public String getMessage() {
         return message;
     }
@@ -240,6 +261,7 @@ public class EventImpl implements Event {
                 .timerangeStart(getTimerangeStart())
                 .timerangeEnd(getTimerangeEnd())
                 .streams(getStreams())
+                .sourceStreams(getSourceStreams())
                 .message(getMessage())
                 .source(getSource())
                 .keyTuple(getKeyTuple())
@@ -266,6 +288,7 @@ public class EventImpl implements Event {
                 Objects.equals(timerangeStart, event.timerangeStart) &&
                 Objects.equals(timerangeEnd, event.timerangeEnd) &&
                 Objects.equals(streams, event.streams) &&
+                Objects.equals(sourceStreams, event.sourceStreams) &&
                 Objects.equals(message, event.message) &&
                 Objects.equals(source, event.source) &&
                 Objects.equals(keyTuple, event.keyTuple) &&
@@ -274,7 +297,7 @@ public class EventImpl implements Event {
 
     @Override
     public int hashCode() {
-        return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp, processingTimestamp, timerangeStart, timerangeEnd, streams, message, source, keyTuple, priority, alert, fields);
+        return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp, processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source, keyTuple, priority, alert, fields);
     }
 
     @Override
@@ -289,6 +312,7 @@ public class EventImpl implements Event {
                 .add("timerangeStart", timerangeStart)
                 .add("timerangeEnd", timerangeEnd)
                 .add("streams", streams)
+                .add("sourceStreams", sourceStreams)
                 .add("message", message)
                 .add("source", source)
                 .add("keyTuple", keyTuple)

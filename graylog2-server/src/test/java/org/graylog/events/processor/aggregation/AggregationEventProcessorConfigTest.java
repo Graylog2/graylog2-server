@@ -18,20 +18,25 @@ package org.graylog.events.processor.aggregation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
+import org.graylog.events.conditions.Expr;
+import org.graylog.events.conditions.Expression;
 import org.graylog.events.fields.providers.TemplateFieldValueProvider;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -43,6 +48,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -104,5 +111,129 @@ public class AggregationEventProcessorConfigTest {
                 assertThat(config.unit()).isEqualTo(TimeUnit.MILLISECONDS);
             });
         });
+    }
+
+    private AggregationEventProcessorConfig getConfig() {
+        return AggregationEventProcessorConfig.builder()
+            .query("")
+            .streams(new HashSet<>())
+            .groupBy(new ArrayList<>())
+            .series(new ArrayList<>())
+            .searchWithinMs(1)
+            .executeEveryMs(1)
+            .build();
+    }
+
+    private AggregationConditions getConditions() {
+        final Expression<Boolean> expression = Expr.Greater.create(Expr.NumberReference.create("foo"),
+            Expr.NumberValue.create(42.0));
+        return AggregationConditions.builder()
+            .expression(expression)
+            .build();
+    }
+
+    private AggregationSeries getSeries() {
+        return AggregationSeries.builder()
+            .id("123")
+            .field("foo")
+            .function(AggregationFunction.AVG)
+            .build();
+    }
+
+    @Test
+    public void testValidateWithInvalidTimeRange() {
+        final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
+            .searchWithinMs(-1)
+            .build();
+
+        final ValidationResult validationResult1 = invalidConfig1.validate();
+        assertThat(validationResult1.failed()).isTrue();
+        assertThat(validationResult1.getErrors()).containsOnlyKeys("search_within_ms");
+
+        final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
+            .searchWithinMs(0)
+            .build();
+
+        final ValidationResult validationResult2 = invalidConfig2.validate();
+        assertThat(validationResult2.failed()).isTrue();
+        assertThat(validationResult2.getErrors()).containsOnlyKeys("search_within_ms");
+    }
+
+    @Test
+    public void testValidateWithInvalidExecutionTime() {
+        final AggregationEventProcessorConfig invalidConfig1 = getConfig().toBuilder()
+            .executeEveryMs(-1)
+            .build();
+
+        final ValidationResult validationResult1 = invalidConfig1.validate();
+        assertThat(validationResult1.failed()).isTrue();
+        assertThat(validationResult1.getErrors()).containsOnlyKeys("execute_every_ms");
+
+        final AggregationEventProcessorConfig invalidConfig2 = invalidConfig1.toBuilder()
+            .executeEveryMs(0)
+            .build();
+
+        final ValidationResult validationResult2 = invalidConfig2.validate();
+        assertThat(validationResult2.failed()).isTrue();
+        assertThat(validationResult2.getErrors()).containsOnlyKeys("execute_every_ms");
+    }
+
+    @Test
+    public void testValidateWithIncompleteAggregationOptions() {
+        AggregationEventProcessorConfig invalidConfig = getConfig().toBuilder()
+            .groupBy(ImmutableList.of("foo"))
+            .build();
+
+        ValidationResult validationResult = invalidConfig.validate();
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsOnlyKeys("series", "conditions");
+
+        invalidConfig = getConfig().toBuilder()
+            .series(ImmutableList.of(this.getSeries()))
+            .build();
+
+        validationResult = invalidConfig.validate();
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsOnlyKeys("conditions");
+
+        invalidConfig = getConfig().toBuilder()
+            .conditions(this.getConditions())
+            .build();
+
+        validationResult = invalidConfig.validate();
+        assertThat(validationResult.failed()).isTrue();
+        assertThat(validationResult.getErrors()).containsOnlyKeys("series");
+    }
+
+    @Test
+    public void testValidConfiguration() {
+        final ValidationResult validationResult = getConfig().validate();
+        assertThat(validationResult.failed()).isFalse();
+        assertThat(validationResult.getErrors().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testValidFilterConfiguration() {
+        final AggregationEventProcessorConfig config = getConfig().toBuilder()
+            .query("foo")
+            .streams(ImmutableSet.of("1", "2"))
+            .build();
+
+        final ValidationResult validationResult = config.validate();
+        assertThat(validationResult.failed()).isFalse();
+        assertThat(validationResult.getErrors().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testValidAggregationConfiguration() {
+        final AggregationEventProcessorConfig config = getConfig().toBuilder()
+            .groupBy(ImmutableList.of("bar"))
+            .series(ImmutableList.of(this.getSeries()))
+            .conditions(this.getConditions())
+            .build();
+
+        final ValidationResult validationResult = config.validate();
+        assertThat(validationResult.failed()).isFalse();
+        assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
 }

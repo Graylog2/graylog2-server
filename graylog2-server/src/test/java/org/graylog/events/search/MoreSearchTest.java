@@ -29,9 +29,9 @@ public class MoreSearchTest {
         final String filter2 = MoreSearch.buildStreamFilter(ImmutableSet.of(" stream-1 ", "stream-2"));
         final String filter3 = MoreSearch.buildStreamFilter(ImmutableSet.of("stream-1"));
 
-        assertThat(filter1).isEqualTo("streams:stream-1 OR streams:stream-2 OR streams:stream-3");
-        assertThat(filter2).isEqualTo("streams:stream-1 OR streams:stream-2");
-        assertThat(filter3).isEqualTo("streams:stream-1");
+        assertThat(filter1).isEqualTo("(streams:stream-1 OR streams:stream-2 OR streams:stream-3)");
+        assertThat(filter2).isEqualTo("(streams:stream-1 OR streams:stream-2)");
+        assertThat(filter3).isEqualTo("(streams:stream-1)");
 
         assertThatThrownBy(() -> MoreSearch.buildStreamFilter(null))
                 .isInstanceOf(IllegalArgumentException.class)

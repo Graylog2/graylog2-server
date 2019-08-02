@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, OverlayTrigger, Row } from 'react-bootstrap';
+import { Alert, Button, Col, OverlayTrigger, Row } from 'react-bootstrap';
 
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 import FieldForm from './FieldForm';
@@ -15,6 +15,7 @@ import commonStyles from '../common/commonStyles.css';
 class FieldsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -60,7 +61,7 @@ class FieldsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition } = this.props;
+    const { eventDefinition, validation } = this.props;
     const { editField, showFieldForm } = this.state;
 
     if (showFieldForm) {
@@ -73,10 +74,27 @@ class FieldsForm extends React.Component {
       );
     }
 
+    const fieldErrors = lodash.get(validation, 'errors.field_spec', []);
+    const keyErrors = lodash.get(validation, 'errors.key_spec', []);
+    const errors = [...fieldErrors, ...keyErrors];
+
     return (
       <Row>
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Fields</h2>
+
+          {errors.length > 0 && (
+            <Alert bsStyle="danger" className={commonStyles.validationSummary}>
+              <h4>Fields with errors</h4>
+              <p>Please correct the following errors before saving this Event Definition:</p>
+              <ul>
+                {errors.map((error) => {
+                  return <li key={error}>{error}</li>;
+                })}
+              </ul>
+            </Alert>
+          )}
+
           {Object.keys(eventDefinition.field_spec).length > 0 && (
             <dl>
               <dt>
@@ -91,6 +109,7 @@ class FieldsForm extends React.Component {
             </dl>
           )}
           <FieldsList fields={eventDefinition.field_spec}
+                      validation={validation}
                       keys={eventDefinition.key_spec}
                       onAddFieldClick={this.toggleFieldForm}
                       onEditFieldClick={this.toggleFieldForm}

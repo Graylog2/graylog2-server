@@ -16,6 +16,7 @@ class EmailNotificationFormContainer extends React.Component {
   static propTypes = {
     currentUser: PropTypes.object.isRequired,
     config: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 

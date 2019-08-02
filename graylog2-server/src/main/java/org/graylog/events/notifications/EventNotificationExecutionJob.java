@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -58,21 +59,21 @@ public class EventNotificationExecutionJob implements Job {
     private final DBEventDefinitionService eventDefinitionService;
     private final DBNotificationGracePeriodService notificationGracePeriodService;
     private final Map<String, EventNotification.Factory> eventNotificationFactories;
-    private final long retryTimeInMinutes;
-
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public EventNotificationExecutionJob(@Assisted JobDefinitionDto jobDefinition,
                                          DBNotificationService dbNotificationService,
                                          DBEventDefinitionService eventDefinitionService,
                                          DBNotificationGracePeriodService notificationGracePeriodService,
-                                         Map<String, EventNotification.Factory> eventNotificationFactories) {
+                                         Map<String, EventNotification.Factory> eventNotificationFactories,
+                                         EventsConfigurationProvider configurationProvider) {
         this.jobConfig = (Config) jobDefinition.config();
         this.notificationService = dbNotificationService;
         this.eventDefinitionService = eventDefinitionService;
         this.notificationGracePeriodService = notificationGracePeriodService;
         this.eventNotificationFactories = eventNotificationFactories;
-        this.retryTimeInMinutes = 1L; // TODO: Make retry time configurable in the plugin settings
+        this.configurationProvider = configurationProvider;
     }
 
     @Override
@@ -128,15 +129,15 @@ public class EventNotificationExecutionJob implements Job {
         try {
             eventNotification.execute(notificationContext);
         } catch (TemporaryEventNotificationException e) {
+            final long retryPeriod = configurationProvider.get().eventNotificationsRetry();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed to execute notification, retrying in %d minutes - <%s/%s/%s>",
-                            retryTimeInMinutes,
+                            TimeUnit.MILLISECONDS.toMinutes(retryPeriod),
                             notification.id(),
                             notification.title(),
                             notification.config().type()),
                     trigger,
-                    ctx.jobTriggerUpdates().retryIn(retryTimeInMinutes, TimeUnit.MINUTES),
-                    e);
+                    ctx.jobTriggerUpdates().retryIn(retryPeriod, TimeUnit.MILLISECONDS), e);
         } catch (PermanentEventNotificationException e) {
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed permanently to execute notification, giving up - <%s/%s/%s>",

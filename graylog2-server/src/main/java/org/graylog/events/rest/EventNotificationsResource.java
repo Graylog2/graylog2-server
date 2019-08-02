@@ -21,20 +21,24 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -90,13 +94,17 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
-        return PaginatedResponse.create("notifications", dbNotificationService.getAllPaginated(searchQuery, "title", page, perPage), query);
+        final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
+            return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
+        }, "title", page, perPage);
+        return PaginatedResponse.create("notifications", result, query);
     }
 
     @GET
     @Path("/{notificationId}")
     @ApiOperation("Get a notification")
     public NotificationDto get(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
     }
@@ -104,16 +112,22 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @POST
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
-    public NotificationDto create(NotificationDto dto) {
-        return resourceHandler.create(dto);
+    @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
+    public Response create(NotificationDto dto) {
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+        return Response.ok().entity(resourceHandler.create(dto)).build();
     }
 
     @PUT
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
-    public NotificationDto update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
+    public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                                   NotificationDto dto) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
 
@@ -121,7 +135,12 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             throw new BadRequestException("Notification IDs don't match");
         }
 
-        return resourceHandler.update(dto);
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        return Response.ok().entity(resourceHandler.update(dto)).build();
     }
 
     @DELETE
@@ -129,6 +148,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
         resourceHandler.delete(notificationId);
     }
 

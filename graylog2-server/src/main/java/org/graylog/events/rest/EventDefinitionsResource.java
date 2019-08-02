@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -32,6 +33,7 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorParametersWithTimerange;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -39,6 +41,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -93,13 +96,17 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
-        return PaginatedResponse.create("event_definitions", dbService.getAllPaginated(searchQuery, "title", page, perPage), query);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
+            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
+            }, "title", page, perPage);
+        return PaginatedResponse.create("event_definitions", result, query);
     }
 
     @GET
     @Path("{definitionId}")
     @ApiOperation("Get an event definition")
     public EventDefinitionDto get(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
     }
@@ -108,8 +115,9 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Create new event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(EventDefinitionDto dto) {
-        final ValidationResult result = dto.config().validate();
+        final ValidationResult result = dto.validate();
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
@@ -122,10 +130,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                            EventDefinitionDto dto) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
 
-        final ValidationResult result = dto.config().validate();
+        final ValidationResult result = dto.validate();
         if (!definitionId.equals(dto.id())) {
             result.addError("id", "Event definition IDs don't match");
         }
@@ -141,6 +150,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Delete event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
     public void delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
         eventDefinitionHandler.delete(definitionId);
     }
 
@@ -150,6 +160,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_EXECUTE)
     public void execute(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                         @ApiParam(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
+        checkPermission(RestPermissions.EVENT_DEFINITIONS_EXECUTE, definitionId);
         if (parameters instanceof EventProcessorParametersWithTimerange.FallbackParameters) {
             throw new BadRequestException("Unknown parameters type");
         }
@@ -165,6 +176,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/validate")
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate an event definition")
+    @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validate(@ApiParam(name = "JSON body", required = true)
                                      @Valid @NotNull EventDefinitionDto toValidate) {
         return toValidate.config().validate();

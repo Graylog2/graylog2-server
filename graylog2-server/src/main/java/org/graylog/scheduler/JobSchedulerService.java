@@ -50,8 +50,14 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
 
     @Override
     protected void run() throws Exception {
-        if (schedulerConfig.canRun()) {
+        if (schedulerConfig.canStart()) {
             while (isRunning()) {
+                if (!schedulerConfig.canExecute()) {
+                    LOG.info("Couldn't execute next scheduler loop iteration. Waiting and trying again.");
+                    clock.sleepUninterruptibly(1, TimeUnit.SECONDS);
+                    continue;
+                }
+
                 LOG.debug("Starting scheduler loop iteration");
                 try {
                     if (!jobExecutionEngine.execute() && isRunning()) {

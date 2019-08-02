@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -40,6 +41,7 @@ public abstract class EventDto {
     public static final String FIELD_TIMERANGE_START = "timerange_start";
     public static final String FIELD_TIMERANGE_END = "timerange_end";
     private static final String FIELD_STREAMS = "streams";
+    private static final String FIELD_SOURCE_STREAMS = "source_streams";
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_SOURCE = "source";
     private static final String FIELD_KEY_TUPLE = "key_tuple";
@@ -75,6 +77,9 @@ public abstract class EventDto {
     @JsonProperty(FIELD_STREAMS)
     public abstract Set<String> streams();
 
+    @JsonProperty(FIELD_SOURCE_STREAMS)
+    public abstract Set<String> sourceStreams();
+
     @JsonProperty(FIELD_MESSAGE)
     public abstract String message();
 
@@ -107,7 +112,7 @@ public abstract class EventDto {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventDto.Builder();
+            return new AutoValue_EventDto.Builder().sourceStreams(ImmutableSet.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -136,6 +141,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);
+
+        @JsonProperty(FIELD_SOURCE_STREAMS)
+        public abstract Builder sourceStreams(Set<String> sourceStreams);
 
         @JsonProperty(FIELD_MESSAGE)
         public abstract Builder message(String message);

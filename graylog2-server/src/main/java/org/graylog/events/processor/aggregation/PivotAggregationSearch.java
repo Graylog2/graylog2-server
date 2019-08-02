@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -39,6 +40,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,25 +63,30 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     private static final String QUERY_ID = "query-1";
     private static final String PIVOT_ID = "pivot-1";
+    private static final String STREAMS_QUERY_ID = "streams-query-1";
+    private static final String STREAMS_PIVOT_ID = "streams-pivot-1";
+    private static final String STREAMS_PIVOT_COUNT_ID = "streams-pivot-count-1";
 
     private final AggregationEventProcessorConfig config;
     private final AggregationEventProcessorParameters parameters;
     private final String searchOwner;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
-    private final long timeout = 60000; // TODO: Make search timeout configurable
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
                                   @Assisted AggregationEventProcessorParameters parameters,
                                   @Assisted String searchOwner,
                                   SearchJobService searchJobService,
-                                  QueryEngine queryEngine) {
+                                  QueryEngine queryEngine,
+                                  EventsConfigurationProvider configProvider) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
+        this.configurationProvider = configProvider;
     }
 
     private String metricName(AggregationSeries series) {
@@ -91,10 +98,14 @@ public class PivotAggregationSearch implements AggregationSearch {
     public AggregationResult doSearch() {
         final SearchJob searchJob = getSearchJob(parameters, searchOwner);
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
+        final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
 
-        final Set<SearchError> errors = firstNonNull(queryResult.errors(), Collections.emptySet());
+        final Set<SearchError> aggregationErrors = firstNonNull(queryResult.errors(), Collections.emptySet());
+        final Set<SearchError> streamErrors = firstNonNull(streamQueryResult.errors(), Collections.emptySet());
 
-        if (!errors.isEmpty()) {
+        if (!aggregationErrors.isEmpty() || !streamErrors.isEmpty()) {
+            final Set<SearchError> errors = aggregationErrors.isEmpty() ? streamErrors : aggregationErrors;
+
             LOG.error("Aggregation search resulted in {} errors", errors.size());
             errors.forEach(error -> {
                 if (error instanceof QueryError) {
@@ -111,12 +122,23 @@ public class PivotAggregationSearch implements AggregationSearch {
         }
 
         final PivotResult pivotResult = (PivotResult) queryResult.searchTypes().get(PIVOT_ID);
+        final PivotResult streamsResult = (PivotResult) streamQueryResult.searchTypes().get(STREAMS_PIVOT_ID);
 
         return AggregationResult.builder()
                 .keyResults(extractValues(pivotResult))
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
+                .sourceStreams(extractSourceStreams(streamsResult))
                 .build();
+    }
+
+    private ImmutableSet<String> extractSourceStreams(PivotResult pivotResult) {
+        return pivotResult.rows().stream()
+            // "non-leaf" values can show up when the "rollup" feature is enabled in the pivot search type
+            .filter(row -> "leaf".equals(row.source()))
+            // We can just take the first key value because we only group by "streams"
+            .map(row -> row.key().get(0))
+            .collect(ImmutableSet.toImmutableSet());
     }
 
     @VisibleForTesting
@@ -256,11 +278,14 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username) {
         final Search search = Search.builder()
-                .queries(ImmutableSet.of(getQuery(parameters)))
+                .queries(ImmutableSet.of(getAggregationQuery(parameters), getSourceStreamsQuery(parameters)))
                 .build();
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
         try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
+            Uninterruptibles.getUninterruptibly(
+                searchJob.getResultFuture(),
+                configurationProvider.get().eventsSearchTimeout(),
+                TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             // TODO: Throw EventProcessorExecutionException instead
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
@@ -275,7 +300,43 @@ public class PivotAggregationSearch implements AggregationSearch {
         return searchJob;
     }
 
-    private Query getQuery(AggregationEventProcessorParameters parameters) {
+    /**
+     * Returns the query to compute the sources streams for the aggregation.
+     *
+     * @param parameters processor parameters
+     * @return source streams query
+     */
+    private Query getSourceStreamsQuery(AggregationEventProcessorParameters parameters) {
+        final Pivot pivot = Pivot.builder()
+            .id(STREAMS_PIVOT_ID)
+            .rollup(true)
+            .rowGroups(ImmutableList.of(Values.builder().limit(Integer.MAX_VALUE).field("streams").build()))
+            .series(ImmutableList.of(Count.builder().id(STREAMS_PIVOT_COUNT_ID).build()))
+            .build();
+
+        final Set<SearchType> searchTypes = Collections.singleton(pivot);
+        final Query.Builder queryBuilder = Query.builder()
+            .id(STREAMS_QUERY_ID)
+            .searchTypes(searchTypes)
+            .query(ElasticsearchQueryString.builder().queryString(config.query()).build())
+            .timerange(parameters.timerange());
+
+        // Streams in parameters should override the ones in the config
+        final Set<String> streams = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+
+        if (!streams.isEmpty()) {
+            queryBuilder.filter(filteringForStreamIds(streams));
+        }
+
+        return queryBuilder.build();
+    }
+
+    /**
+     * Returns the
+     * @param parameters
+     * @return
+     */
+    private Query getAggregationQuery(AggregationEventProcessorParameters parameters) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
