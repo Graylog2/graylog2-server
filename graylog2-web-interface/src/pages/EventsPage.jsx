@@ -18,8 +18,8 @@ class EventsPage extends React.Component {
         <span>
           <PageHeader title="Alerts & Events">
             <span>
-              Events are generated when Event Definitions you define are satisfied. Alerts also trigger
-              Notifications, being meant to capture relevant Events that may require your attention.
+              Define Events through different conditions. Add Notifications to Events that require your attention
+              to create Alerts.
             </span>
 
             <span>
