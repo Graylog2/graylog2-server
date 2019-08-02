@@ -92,6 +92,8 @@ public class JobSchedulerService extends AbstractExecutionThreadService {
                                 loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
                         }
                     }
+                } catch (InterruptedException e) {
+                    LOG.debug("Received interrupted exception", e);
                 } catch (Exception e) {
                     LOG.error("Error running job execution engine", e);
                 }
