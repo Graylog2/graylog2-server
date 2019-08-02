@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
 
 import { Spinner } from 'components/common';
 
