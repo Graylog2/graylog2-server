@@ -156,6 +156,9 @@ class Events extends React.Component {
       return this.renderEmptyContent();
     }
 
+    const filter = parameters.filter.alerts;
+    const entity = (filter === 'only' ? 'Alerts' : (filter === 'exclude' ? 'Events' : 'Alerts & Events'));
+
     return (
       <React.Fragment>
         <Row>
@@ -174,7 +177,7 @@ class Events extends React.Component {
                            totalItems={totalEvents}
                            onChange={onPageChange}>
               {eventList.length === 0 ? (
-                <Alert bsStyle="info">No Events found for the current search criteria.</Alert>
+                <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
               ) : (
                 <Table id="events-table" className={styles.eventsTable}>
                   <thead>
