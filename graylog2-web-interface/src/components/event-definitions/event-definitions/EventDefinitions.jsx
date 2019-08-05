@@ -8,7 +8,15 @@ import {} from 'moment-duration-format';
 
 import Routes from 'routing/Routes';
 
-import { EmptyEntity, EntityList, EntityListItem, PaginatedList, Pluralize, SearchForm } from 'components/common';
+import {
+  EmptyEntity,
+  EntityList,
+  EntityListItem,
+  IfPermitted,
+  PaginatedList,
+  Pluralize,
+  SearchForm,
+} from 'components/common';
 
 import styles from './EventDefinitions.css';
 
@@ -38,9 +46,11 @@ class EventDefinitions extends React.Component {
               Create Event Definitions that are able to search, aggregate or correlate Messages and other
               Events, allowing you to record significant Events in Graylog and alert on them.
             </p>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
+            <IfPermitted permissions="eventdefinitions:create">
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                <Button bsStyle="success">Get Started!</Button>
+              </LinkContainer>
+            </IfPermitted>
           </EmptyEntity>
         </Col>
       </Row>
@@ -85,12 +95,16 @@ class EventDefinitions extends React.Component {
     const items = eventDefinitions.map((definition) => {
       const actions = (
         <React.Fragment key={`actions-${definition.id}`}>
-          <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(definition.id)}>
-            <Button bsStyle="info">Edit</Button>
-          </LinkContainer>
-          <DropdownButton id="more-dropdown" title="More" pullRight>
-            <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
-          </DropdownButton>
+          <IfPermitted permissions="eventdefinitions:edit">
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(definition.id)}>
+              <Button bsStyle="info">Edit</Button>
+            </LinkContainer>
+          </IfPermitted>
+          <IfPermitted permissions="eventdefinitions:delete">
+            <DropdownButton id="more-dropdown" title="More" pullRight>
+              <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
+            </DropdownButton>
+          </IfPermitted>
         </React.Fragment>
       );
 
@@ -110,11 +124,13 @@ class EventDefinitions extends React.Component {
       <React.Fragment>
         <Row>
           <Col md={12}>
-            <div className="pull-right">
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                <Button bsStyle="success">Create Event Definition</Button>
-              </LinkContainer>
-            </div>
+            <IfPermitted permissions="eventdefinitions:create">
+              <div className="pull-right">
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                  <Button bsStyle="success">Create Event Definition</Button>
+                </LinkContainer>
+              </div>
+            </IfPermitted>
           </Col>
         </Row>
         <Row>

@@ -31,9 +31,11 @@ class CreateEventDefinitionPage extends React.Component {
               <LinkContainer to={Routes.ALERTS.LIST}>
                 <Button bsStyle="info">Alerts & Events</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
+              <IfPermitted permissions="eventdefinitions:read">
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+                  <Button bsStyle="info">Event Definitions</Button>
+                </LinkContainer>
+              </IfPermitted>
               <IfPermitted permissions="eventnotifications:read">
                 <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
                   <Button bsStyle="info">Notifications</Button>
