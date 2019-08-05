@@ -4,7 +4,7 @@ import { Button, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { EmptyEntity, EntityList, EntityListItem, PaginatedList, SearchForm } from 'components/common';
+import { EmptyEntity, EntityList, EntityListItem, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 
 import Routes from 'routing/Routes';
 
@@ -29,9 +29,11 @@ class EventNotifications extends React.Component {
               Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications
               to integrate Graylog Alerts with an external alerting system you use.
             </p>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
+            <IfPermitted permissions="eventnotifications:create">
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                <Button bsStyle="success">Get Started!</Button>
+              </LinkContainer>
+            </IfPermitted>
           </EmptyEntity>
         </Col>
       </Row>
@@ -52,11 +54,15 @@ class EventNotifications extends React.Component {
       const actions = (
         <React.Fragment>
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
-            <Button bsStyle="info">Edit</Button>
+            <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
+              <Button bsStyle="info">Edit</Button>
+            </IfPermitted>
           </LinkContainer>
-          <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
-            <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
-          </DropdownButton>
+          <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
+            <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
+              <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
+            </DropdownButton>
+          </IfPermitted>
         </React.Fragment>
       );
 
@@ -83,11 +89,13 @@ class EventNotifications extends React.Component {
       <React.Fragment>
         <Row>
           <Col md={12}>
-            <div className="pull-right">
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                <Button bsStyle="success">Create Notification</Button>
-              </LinkContainer>
-            </div>
+            <IfPermitted permissions="eventnotifications:create">
+              <div className="pull-right">
+                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                  <Button bsStyle="success">Create Notification</Button>
+                </LinkContainer>
+              </div>
+            </IfPermitted>
           </Col>
         </Row>
         <Row>
