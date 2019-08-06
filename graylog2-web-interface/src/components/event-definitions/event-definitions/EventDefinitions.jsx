@@ -95,12 +95,12 @@ class EventDefinitions extends React.Component {
     const items = eventDefinitions.map((definition) => {
       const actions = (
         <React.Fragment key={`actions-${definition.id}`}>
-          <IfPermitted permissions="eventdefinitions:edit">
+          <IfPermitted permissions={`eventdefinitions:edit:${definition.id}`}>
             <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(definition.id)}>
               <Button bsStyle="info">Edit</Button>
             </LinkContainer>
           </IfPermitted>
-          <IfPermitted permissions="eventdefinitions:delete">
+          <IfPermitted permissions={`eventdefinitions:delete:${definition.id}`}>
             <DropdownButton id="more-dropdown" title="More" pullRight>
               <MenuItem onClick={onDelete(definition)}>Delete</MenuItem>
             </DropdownButton>
