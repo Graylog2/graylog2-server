@@ -25,7 +25,7 @@ class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
-    currentUser: PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
     onEventDefinitionChange: PropTypes.func,

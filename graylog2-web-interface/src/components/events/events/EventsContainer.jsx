@@ -18,6 +18,7 @@ class EventsContainer extends React.Component {
   static propTypes = {
     events: PropTypes.object.isRequired,
     eventDefinitions: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     streamId: PropTypes.string,
   };
 

@@ -32,7 +32,7 @@ class FieldForm extends React.Component {
   static propTypes = {
     fieldName: PropTypes.string,
     config: PropTypes.object,
-    currentUser: PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
     keys: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
