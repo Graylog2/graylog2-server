@@ -293,6 +293,11 @@ const LdapComponent = createReactClass({
                disabled={disabled} />
       );
 
+    const additionalDefaultGroups = this.state.ldapSettings.additional_default_groups;
+    const additionalDefaultGroupsString = Array.isArray(additionalDefaultGroups)
+      ? additionalDefaultGroups.join(',')
+      : additionalDefaultGroups;
+
     return (
       <Row>
         <Col lg={8}>
@@ -529,7 +534,7 @@ const LdapComponent = createReactClass({
                      help={help.ADDITIONAL_GROUPS}>
                 <MultiSelect options={rolesOptions}
                              disabled={disabled}
-                             value={this.state.ldapSettings.additional_default_groups}
+                             value={additionalDefaultGroupsString}
                              onChange={roles => this._setAdditionalDefaultGroups(roles)}
                              placeholder="Choose additional roles..." />
               </Input>
