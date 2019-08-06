@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
@@ -7,11 +8,27 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
+import PermissionsMixin from 'util/PermissionsMixin';
+import history from 'util/History';
 
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
 class CreateEventDefinitionPage extends React.Component {
+  static propTypes = {
+    currentUser: PropTypes.object.isRequired,
+  };
+
   render() {
+    const { currentUser } = this.props;
+
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
+      history.push(Routes.NOTFOUND);
+    }
+
     return (
       <DocumentTitle title="New Notification">
         <span>
@@ -55,4 +72,8 @@ class CreateEventDefinitionPage extends React.Component {
   }
 }
 
-export default CreateEventDefinitionPage;
+export default connect(CreateEventDefinitionPage, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+
