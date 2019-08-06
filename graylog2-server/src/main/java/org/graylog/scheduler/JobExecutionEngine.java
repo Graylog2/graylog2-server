@@ -17,7 +17,6 @@
 package org.graylog.scheduler;
 
 import com.codahale.metrics.Counter;
-import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
@@ -32,13 +31,14 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The job execution engine checks runnable triggers and starts job execution in the given worker pool.
  */
 public class JobExecutionEngine {
+
+
     public interface Factory {
         JobExecutionEngine create(JobWorkerPool workerPool);
     }
@@ -53,13 +53,12 @@ public class JobExecutionEngine {
     private final Map<String, Job.Factory> jobFactory;
     private final JobWorkerPool workerPool;
     private final MetricRegistry metricRegistry;
-    private final String METRICS_EXECUTION_SUCCESSFUL = "execution_successful";
-    private final String METRICS_EXECUTION_FAILED = "execution_failed";
-    private final String METRICS_EXECUTION_TIME = "execution_time";
+    private Counter execution_successful;
+    private Counter execution_failed;
+    private Timer execution_time;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
-    private final Map<String, Metric> jobMetrics = new ConcurrentHashMap<>();
 
     @Inject
     public JobExecutionEngine(DBJobTriggerService jobTriggerService,
@@ -142,7 +141,7 @@ public class JobExecutionEngine {
                 throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().type());
             }
 
-            ((Timer) jobMetrics.get(METRICS_EXECUTION_TIME)).time(() -> executeJob(trigger, jobDefinition, job));
+            execution_time.time(() -> executeJob(trigger, jobDefinition, job));
         } catch (IllegalStateException e) {
             // The trigger cannot be handled because of a permanent error so we mark the trigger as defective
             LOG.error("Couldn't handle trigger due to a permanent error {} - trigger won't be retried", trigger.id(), e);
@@ -167,10 +166,10 @@ public class JobExecutionEngine {
             final JobTriggerUpdate triggerUpdate = job.execute(JobExecutionContext.create(trigger, jobDefinition, jobTriggerUpdatesFactory.create(trigger), isRunning));
 
             if (triggerUpdate == null) {
-                ((Counter) jobMetrics.get(METRICS_EXECUTION_FAILED)).inc();
+                execution_failed.inc();
                 throw new IllegalStateException("Job#execute() must not return null - this is a bug in the job class");
             }
-            ((Counter) jobMetrics.get(METRICS_EXECUTION_SUCCESSFUL)).inc();
+            execution_successful.inc();
 
             LOG.trace("Update trigger: trigger={} update={}", trigger.id(), triggerUpdate);
             if (!jobTriggerService.releaseTrigger(trigger, triggerUpdate)) {
@@ -178,13 +177,13 @@ public class JobExecutionEngine {
             }
         } catch (JobExecutionException e) {
             LOG.error("Job execution error - trigger={} job={}", trigger.id(), jobDefinition.id(), e);
-            ((Counter) jobMetrics.get(METRICS_EXECUTION_FAILED)).inc();
+            execution_failed.inc();
 
             if (!jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate())) {
                 LOG.error("Couldn't release trigger {}", trigger.id());
             }
         } catch (Exception e) {
-            ((Counter) jobMetrics.get(METRICS_EXECUTION_FAILED)).inc();
+            execution_failed.inc();
             // This is an unhandled job execution error so we mark the trigger as defective
             LOG.error("Unhandled job execution error - trigger={} job={}", trigger.id(), jobDefinition.id(), e);
 
@@ -199,12 +198,8 @@ public class JobExecutionEngine {
     }
 
     private void setupMetrics() {
-        jobMetrics.put(METRICS_EXECUTION_SUCCESSFUL,
-                 metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful")));
-        jobMetrics.put(METRICS_EXECUTION_FAILED,
-                 metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed")));
-        jobMetrics.put(METRICS_EXECUTION_TIME,
-                metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time")));
-
+        execution_successful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
+        execution_failed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
+        execution_time = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
     }
 }
