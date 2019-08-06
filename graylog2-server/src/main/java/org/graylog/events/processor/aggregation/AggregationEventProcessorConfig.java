@@ -81,6 +81,8 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @Override
     public Set<String> requiredPermissions() {
+        // When there are no streams the event processor will search in all streams so we need to require the
+        // generic stream permission.
         if (streams().isEmpty()) {
             return Collections.singleton(RestPermissions.STREAMS_READ);
         }
