@@ -38,6 +38,7 @@ public abstract class ViewStateDTO {
     static final String FIELD_WIDGET_MAPPING = "widget_mapping";
     static final String FIELD_WIDGET_POSITIONS = "positions";
     static final String FIELD_FORMATTING = "formatting";
+    static final String FIELD_DISPLAY_MODE_SETTINGS = "display_mode_settings";
 
     @JsonProperty(FIELD_SELECTED_FIELDS)
     public abstract Set<String> fields();
@@ -61,6 +62,9 @@ public abstract class ViewStateDTO {
     @JsonProperty(FIELD_FORMATTING)
     @Nullable
     public abstract FormattingSettings formatting();
+
+    @JsonProperty(FIELD_DISPLAY_MODE_SETTINGS)
+    public abstract DisplayModeSettings displayModeSettings();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -86,11 +90,16 @@ public abstract class ViewStateDTO {
         @JsonProperty(FIELD_FORMATTING)
         public abstract Builder formatting(FormattingSettings formattingSettings);
 
+        @JsonProperty(FIELD_DISPLAY_MODE_SETTINGS)
+        public abstract Builder displayModeSettings(DisplayModeSettings displayModeSettings);
+
         public abstract ViewStateDTO build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ViewStateDTO.Builder().titles(Collections.emptyMap());
+            return new AutoValue_ViewStateDTO.Builder()
+                    .titles(Collections.emptyMap())
+                    .displayModeSettings(DisplayModeSettings.empty());
         }
     }
 }
