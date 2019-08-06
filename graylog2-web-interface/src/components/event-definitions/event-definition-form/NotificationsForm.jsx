@@ -5,6 +5,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
+import PermissionsMixin from 'util/PermissionsMixin';
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -13,11 +16,14 @@ import NotificationList from './NotificationList';
 import styles from './NotificationsForm.css';
 import commonStyles from '../common/commonStyles.css';
 
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
 class NotificationsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     defaults: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -48,14 +54,27 @@ class NotificationsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, notifications, defaults, onChange } = this.props;
+    const { eventDefinition, notifications, defaults, currentUser, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
+
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:read')) {
+      return (
+        <Row>
+          <Col md={6} lg={5}>
+            <p>No Notifications found.</p>
+          </Col>
+        </Row>
+      );
+    }
 
     if (showAddNotificationForm) {
       return (
         <AddNotificationForm notifications={notifications}
                              onChange={this.handleAssignNotification}
-                             onCancel={this.toggleAddNotificationForm} />
+                             onCancel={this.toggleAddNotificationForm}
+                             hasCreationPermissions={
+                               PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')
+                             } />
       );
     }
 
@@ -84,4 +103,10 @@ class NotificationsForm extends React.Component {
   }
 }
 
-export default NotificationsForm;
+export default connect(NotificationsForm, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));
