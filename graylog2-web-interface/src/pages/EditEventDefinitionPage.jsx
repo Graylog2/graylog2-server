@@ -8,15 +8,22 @@ import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
+import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import PermissionsMixin from 'util/PermissionsMixin';
+import history from 'util/History';
 
 const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   state = {
@@ -24,13 +31,21 @@ class EditEventDefinitionPage extends React.Component {
   };
 
   componentDidMount() {
-    const { params } = this.props;
-    EventDefinitionsActions.get(params.definitionId)
-      .then(eventDefinition => this.setState({ eventDefinition: eventDefinition }));
+    const { params, currentUser } = this.props;
+
+    if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
+      EventDefinitionsActions.get(params.definitionId)
+        .then(eventDefinition => this.setState({ eventDefinition: eventDefinition }));
+    }
   }
 
   render() {
+    const { params, currentUser } = this.props;
     const { eventDefinition } = this.state;
+
+    if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
+      history.push(Routes.NOTFOUND);
+    }
 
     if (!eventDefinition) {
       return (
@@ -86,4 +101,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default EditEventDefinitionPage;
+export default connect(EditEventDefinitionPage, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));
