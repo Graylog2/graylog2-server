@@ -111,7 +111,7 @@ public class MoreSearch extends Searches {
      * @param permittedSourceStreams permitted source streams
      * @return the result
      */
-    // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams.
+    // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
     //       We also cannot use the new search code at the moment because it doesn't do pagination.
     Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, PermittedStreams permittedSourceStreams) {
         checkArgument(parameters != null, "parameters cannot be null");
