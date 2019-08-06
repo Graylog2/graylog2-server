@@ -97,7 +97,6 @@ const ExtendedSearchPage = createReactClass({
         <WindowLeaveMessage route={route} />
         <HeaderElements />
         <Row id="main-row">
-          <QueryBar />
           <SearchBarWithStatus onExecute={this._refreshIfNotUndeclared} />
 
           <QueryBarElements />
