@@ -8,7 +8,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import { Input, InputWrapper } from 'components/bootstrap';
 import { FormGroup, ControlLabel } from 'react-bootstrap';
-import { MultiSelect, Spinner } from 'components/common';
+import { MultiSelect, Select, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -510,12 +510,11 @@ const LdapComponent = createReactClass({
                      wrapperClassName="col-sm-9"
                      label="Default User Role"
                      help={help.defaultGroup(this._onShowGroups)}>
-                <MultiSelect options={rolesOptions}
-                             disabled={disabled}
-                             multi={false}
-                             value={this.state.ldapSettings.default_group}
-                             onChange={role => this._setSetting('default_group', role)}
-                             placeholder="Choose a default role" />
+                <Select options={rolesOptions}
+                        disabled={disabled}
+                        value={this.state.ldapSettings.default_group}
+                        onChange={role => this._setSetting('default_group', role)}
+                        placeholder="Choose a default role" />
               </Input>
 
               <Row>
