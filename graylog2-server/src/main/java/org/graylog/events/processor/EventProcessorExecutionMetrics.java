@@ -39,83 +39,55 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import org.graylog2.shared.metrics.MetricUtils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-@Singleton
-public class EventProcessorExecutionMetrics {
-    private final MetricRegistry metricRegistry;
-    private final Map<String, Metric> metrics = new ConcurrentHashMap<>();
+public abstract class EventProcessorExecutionMetrics {
 
     private enum Fields {
-        EXECUTION_COUNT("COUNTER"),
-        EXECUTION_SUCCESSFUL("COUNTER"),
-        EXECUTION_EXCEPTION("COUNTER"),
-        EXECUTION_TIME("TIMER"),
-        EVENTS_CREATED("METER");
+        EXECUTION_COUNT(new Counter()),
+        EXECUTION_SUCCESSFUL(new Counter()),
+        EXECUTION_EXCEPTION(new Counter()),
+        EXECUTION_TIME(new Timer()),
+        EVENTS_CREATED(new Meter());
 
-        private final String type;
-        Fields(String type) {
+        private final Metric type;
+        Fields(Metric type) {
             this.type = type;
         }
-        private String getType() {
-            return type;
-        }
-    }
-    @Inject
-    public EventProcessorExecutionMetrics(MetricRegistry metricRegistry) {
-        this.metricRegistry = metricRegistry;
     }
 
-    public void registerEventProcessor(EventProcessor eventProcessor, String definitionId) {
+    static void registerEventProcessor(MetricRegistry metricRegistry, EventProcessor eventProcessor, String definitionId) {
         for (Fields field: Fields.values() ) {
             final String name = getNameforField(eventProcessor, definitionId, field);
-            switch (field.type) {
-                case "COUNTER":
-                    metrics.computeIfAbsent(name, k -> metricRegistry.counter(name));
-                    break;
-                case "TIMER":
-                    metrics.computeIfAbsent(name, k -> metricRegistry.timer(name));
-                    break;
-                case "METER":
-                    metrics.computeIfAbsent(name, k -> metricRegistry.meter(name));
-                    break;
-            }
+            MetricUtils.safelyRegister(metricRegistry, name, field.type);
         }
     }
-    public void recordExecutionTime(EventProcessor eventProcessor, String definitionId, long time, TimeUnit unit) throws Exception {
+    static void recordExecutionTime(MetricRegistry registry, EventProcessor eventProcessor, String definitionId, long time, TimeUnit unit) throws Exception {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_TIME);
-        this.metrics.computeIfAbsent(name, k -> metricRegistry.timer(name));
-        ((Timer) metrics.get(name)).update(time, unit);
+        MetricUtils.getOrRegister(registry, name, new Timer()).update(time, unit);
     }
 
-    public void recordExecutions(EventProcessor eventProcessor, String definitionId) {
+    static void recordExecutions(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_COUNT);
-        this.metrics.computeIfAbsent(name, k -> metricRegistry.counter(name));
-        ((Counter) metrics.get(name)).inc();
+        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
     }
-    public void recordSuccess(EventProcessor eventProcessor, String definitionId) {
+    static void recordSuccess(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_SUCCESSFUL);
-        this.metrics.computeIfAbsent(name, k -> metricRegistry.counter(name));
-        ((Counter) metrics.get(name)).inc();
+        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
     }
-    public void recordException(EventProcessor eventProcessor, String definitionId) {
+    static void recordException(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_EXCEPTION);
-        this.metrics.computeIfAbsent(name, k -> metricRegistry.counter(name));
-        ((Counter) metrics.get(name)).inc();
+        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
     }
-    public void recordCreatedEvents(EventProcessor eventProcessor, String definitionId, int count) {
+    static void recordCreatedEvents(MetricRegistry registry, EventProcessor eventProcessor, String definitionId, int count) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EVENTS_CREATED);
-        this.metrics.computeIfAbsent(name, k -> metricRegistry.meter(name));
-        ((Meter) metrics.get(name)).mark(count);
+        MetricUtils.getOrRegister(registry, name, new Meter()).mark(count);
     }
 
-    private String getNameforField(EventProcessor eventProcessor, String definitionId, Fields field) {
+    private static String getNameforField(EventProcessor eventProcessor, String definitionId, Fields field) {
         return MetricRegistry.name(eventProcessor.getClass(), definitionId, field.toString().toLowerCase(Locale.ROOT));
     }
 }

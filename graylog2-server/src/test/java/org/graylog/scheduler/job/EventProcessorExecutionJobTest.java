@@ -93,7 +93,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -152,7 +152,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -221,7 +221,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -291,7 +291,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -356,7 +356,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -414,7 +414,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")
@@ -471,7 +471,7 @@ public class EventProcessorExecutionJobTest {
                         .build())
                 .build();
 
-        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, metrics, jobDefinition);
+        final EventProcessorExecutionJob job = new EventProcessorExecutionJob(jobScheduleStrategies, clock, eventProcessorEngine, jobDefinition);
 
         final JobTriggerDto trigger = JobTriggerDto.builderWithClock(clock)
                 .id("trigger-1")

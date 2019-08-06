@@ -16,6 +16,8 @@
  */
 package org.graylog.events.processor;
 
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Stopwatch;
 import org.graylog.events.event.EventProcessorEventFactory;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.fields.EventFieldSpecEngine;
@@ -45,7 +47,7 @@ public class EventProcessorEngine {
     private final EventNotificationHandler notificationHandler;
     private final EventStorageHandlerEngine storageHandlerEngine;
     private final Provider<EventProcessorEventFactory> eventFactoryProvider;
-    private final EventProcessorExecutionMetrics metrics;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public EventProcessorEngine(Map<String, EventProcessor.Factory> eventProcessorFactories,
@@ -54,14 +56,14 @@ public class EventProcessorEngine {
                                 EventNotificationHandler notificationHandler,
                                 EventStorageHandlerEngine storageHandlerEngine,
                                 Provider<EventProcessorEventFactory> eventFactoryProvider,
-                                EventProcessorExecutionMetrics metrics) {
+                                MetricRegistry metricRegistry) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
         this.notificationHandler = notificationHandler;
         this.storageHandlerEngine = storageHandlerEngine;
         this.eventFactoryProvider = eventFactoryProvider;
-        this.metrics = metrics;
+        this.metricRegistry = metricRegistry;
     }
 
     private EventDefinition getEventDefinition(String id) throws EventProcessorException {
@@ -83,21 +85,22 @@ public class EventProcessorEngine {
         final EventProcessor eventProcessor = factory.create(definition);
         final EventConsumer<List<EventWithContext>> eventConsumer = eventsWithContext -> emitEvents(eventProcessor, definition, eventsWithContext);
 
-        metrics.registerEventProcessor(eventProcessor, definitionId);
+        EventProcessorExecutionMetrics.registerEventProcessor(metricRegistry, eventProcessor, definitionId);
         try {
-            metrics.recordExecutions(eventProcessor, definitionId);
-            final long execution_start = System.nanoTime();
-
+            EventProcessorExecutionMetrics.recordExecutions(metricRegistry, eventProcessor, definitionId);
+            // Manually time this, so we don't record executions that throw an Exception
+            final Stopwatch stopwatch = Stopwatch.createStarted();
             eventProcessor.createEvents(eventFactoryProvider.get(), parameters, eventConsumer);
+            stopwatch.stop();
 
-            metrics.recordExecutionTime(eventProcessor, definitionId, System.nanoTime() - execution_start, TimeUnit.NANOSECONDS);
-            metrics.recordSuccess(eventProcessor, definitionId);
+            EventProcessorExecutionMetrics.recordExecutionTime(metricRegistry, eventProcessor, definitionId, stopwatch.elapsed().getNano(), TimeUnit.NANOSECONDS);
+            EventProcessorExecutionMetrics.recordSuccess(metricRegistry, eventProcessor, definitionId);
         } catch (EventProcessorException e) {
-            metrics.recordException(eventProcessor, definitionId);
+            EventProcessorExecutionMetrics.recordException(metricRegistry, eventProcessor, definitionId);
             // We can just re-throw the exception because we already got an EventProcessorException
             throw e;
         } catch (Exception e) {
-            metrics.recordException(eventProcessor, definitionId);
+            EventProcessorExecutionMetrics.recordException(metricRegistry, eventProcessor, definitionId);
             LOG.error("Caught an unhandled exception while executing event processor <{}/{}/{}> - Make sure to modify the event processor to throw only EventProcessorExecutionException so we get more context!",
                     definition.config().type(), definition.title(), definition.id(), e);
             // Since we don't know what kind of error this is, we play safe and make this a temporary error.
@@ -109,7 +112,7 @@ public class EventProcessorEngine {
         if (eventsWithContext.isEmpty()) {
             return;
         }
-        metrics.recordCreatedEvents(eventProcessor, eventDefinition.id(), eventsWithContext.size());
+        EventProcessorExecutionMetrics.recordCreatedEvents(metricRegistry, eventProcessor, eventDefinition.id(), eventsWithContext.size());
         try {
             // Field spec needs to be executed first to make sure all fields are set before executing the handlers
             fieldSpecEngine.execute(eventsWithContext, eventDefinition.fieldSpec());

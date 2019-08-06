@@ -187,6 +187,20 @@ public class MetricUtils {
         }
     }
 
+    public static <T extends Metric> T getOrRegister(MetricRegistry metricRegistry, String name, T newMetric) {
+        final Metric metric = metricRegistry.getMetrics().get(name);
+        if (metric != null) {
+            //noinspection unchecked
+            return (T) metric;
+        }
+        try {
+            return metricRegistry.register(name, newMetric);
+        } catch (IllegalArgumentException ignored) {
+            //noinspection unchecked
+            return (T) metricRegistry.getMetrics().get(name);
+        }
+    }
+
     public static void safelyRegisterAll(MetricRegistry metricRegistry, MetricSet metrics) throws IllegalArgumentException {
         try {
             metricRegistry.registerAll(metrics);
