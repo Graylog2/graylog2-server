@@ -10,7 +10,6 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
@@ -64,9 +63,4 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
 export default connect(LookupTableFieldValueProviderFormContainer, {
   fieldTypes: FieldTypesStore,
   lookupTables: LookupTablesStore,
-  currentUser: CurrentUserStore,
-},
-({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+});

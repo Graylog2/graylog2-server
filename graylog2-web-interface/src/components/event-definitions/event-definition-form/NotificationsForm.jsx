@@ -6,8 +6,6 @@ import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
-import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -15,8 +13,6 @@ import NotificationList from './NotificationList';
 
 import styles from './NotificationsForm.css';
 import commonStyles from '../common/commonStyles.css';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class NotificationsForm extends React.Component {
   static propTypes = {
@@ -103,10 +99,4 @@ class NotificationsForm extends React.Component {
   }
 }
 
-export default connect(NotificationsForm, {
-  currentUser: CurrentUserStore,
-},
-({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+export default NotificationsForm;

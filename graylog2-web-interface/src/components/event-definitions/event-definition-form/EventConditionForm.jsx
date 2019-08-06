@@ -14,6 +14,7 @@ import styles from './EventConditionForm.css';
 class EventConditionForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };

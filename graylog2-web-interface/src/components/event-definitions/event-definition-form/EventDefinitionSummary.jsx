@@ -8,16 +8,11 @@ import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
-
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 
 import styles from './EventDefinitionSummary.css';
 import commonStyles from '../common/commonStyles.css';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EventDefinitionSummary extends React.Component {
   static propTypes = {
@@ -66,9 +61,13 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderCondition = (config) => {
+    const { currentUser } = this.props;
     const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
-      ? React.createElement(conditionPlugin.summaryComponent, { config: config })
+      ? React.createElement(conditionPlugin.summaryComponent, {
+        config: config,
+        currentUser: currentUser,
+      })
       : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
 
@@ -81,6 +80,7 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderField = (fieldName, config, keys) => {
+    const { currentUser } = this.props;
     if (!config.providers || config.providers.length === 0) {
       return <span key={fieldName}>No field value provider configured.</span>;
     }
@@ -92,6 +92,7 @@ class EventDefinitionSummary extends React.Component {
         config: config,
         keys: keys,
         key: fieldName,
+        currentUser: currentUser,
       })
       : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
     );
@@ -229,7 +230,4 @@ class EventDefinitionSummary extends React.Component {
   }
 }
 
-export default connect(EventDefinitionSummary, {
-  currentUser: CurrentUserStore,
-},
-({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default EventDefinitionSummary;

@@ -19,11 +19,13 @@ const { EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
 const { AvailableEventDefinitionTypesStore } = CombinedProvider.get('AvailableEventDefinitionTypes');
 const { EventNotificationsStore, EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EventDefinitionFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object,
+    currentUser: PropTypes.object,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
     onEventDefinitionChange: PropTypes.func,
@@ -121,7 +123,7 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, notifications } = this.props;
+    const { action, entityTypes, notifications, currentUser } = this.props;
     const { eventDefinition, eventsClusterConfig, validation } = this.state;
     const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 
@@ -134,6 +136,7 @@ class EventDefinitionFormContainer extends React.Component {
     return (
       <EventDefinitionForm action={action}
                            eventDefinition={eventDefinition}
+                           currentUser={currentUser}
                            validation={validation}
                            entityTypes={entityTypes}
                            notifications={notifications.all}
@@ -148,4 +151,9 @@ class EventDefinitionFormContainer extends React.Component {
 export default connect(EventDefinitionFormContainer, {
   entityTypes: AvailableEventDefinitionTypesStore,
   notifications: EventNotificationsStore,
-});
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));

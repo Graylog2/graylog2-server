@@ -5,12 +5,8 @@ import lodash from 'lodash';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 import PermissionsMixin from 'util/PermissionsMixin';
-import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 
 import { TIME_UNITS } from './FilterForm';
-
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class FilterAggregationSummary extends React.Component {
   static propTypes = {
@@ -76,7 +72,4 @@ class FilterAggregationSummary extends React.Component {
   }
 }
 
-export default connect(FilterAggregationSummary, {
-  currentUser: CurrentUserStore,
-},
-({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default FilterAggregationSummary;
