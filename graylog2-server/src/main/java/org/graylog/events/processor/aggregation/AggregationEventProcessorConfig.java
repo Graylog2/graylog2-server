@@ -33,6 +33,7 @@ import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
@@ -75,6 +77,13 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
+
+    @Override
+    public Set<String> requiredPermissions() {
+        return streams().stream()
+            .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
+            .collect(Collectors.toSet());
+    }
 
     public static Builder builder() {
         return Builder.create();

@@ -14,7 +14,7 @@
       "config": {
         "type": "aggregation-v1",
         "query": "application_name:sshd AND Failed",
-        "streams": [],
+        "streams": ["stream-a", "stream-b"],
         "group_by": [],
         "series": [],
         "conditions": {
