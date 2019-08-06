@@ -45,6 +45,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 @Singleton
 public class EventProcessorExecutionMetrics {
@@ -56,14 +57,14 @@ public class EventProcessorExecutionMetrics {
     }
 
     private enum Fields {
-        EXECUTION_COUNT(new Counter()),
-        EXECUTION_SUCCESSFUL(new Counter()),
-        EXECUTION_EXCEPTION(new Counter()),
-        EXECUTION_TIME(new Timer()),
-        EVENTS_CREATED(new Meter());
+        EXECUTION_COUNT(Counter::new),
+        EXECUTION_SUCCESSFUL(Counter::new),
+        EXECUTION_EXCEPTION(Counter::new),
+        EXECUTION_TIME(Timer::new),
+        EVENTS_CREATED(Meter::new);
 
-        private final Metric type;
-        Fields(Metric type) {
+        private final Supplier<Metric> type;
+        Fields(Supplier<Metric> type) {
             this.type = type;
         }
     }
@@ -71,7 +72,7 @@ public class EventProcessorExecutionMetrics {
     void registerEventProcessor(EventProcessor eventProcessor, String definitionId) {
         for (Fields field: Fields.values() ) {
             final String name = getNameforField(eventProcessor, definitionId, field);
-            MetricUtils.safelyRegister(metricRegistry, name, field.type);
+            MetricUtils.safelyRegister(metricRegistry, name, field.type.get());
         }
     }
     void recordExecutionTime(EventProcessor eventProcessor, String definitionId, long time, TimeUnit unit) throws Exception {
