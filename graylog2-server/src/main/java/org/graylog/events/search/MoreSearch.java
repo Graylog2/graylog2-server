@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import io.searchbox.client.JestClient;
@@ -28,6 +29,7 @@ import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog2.Configuration;
@@ -42,6 +44,7 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -55,6 +58,7 @@ import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +66,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -95,6 +100,77 @@ public class MoreSearch extends Searches {
         this.scrollResultFactory = scrollResultFactory;
         this.jestClient = jestClient;
         this.allowLeadingWildcardSearches = configuration.isAllowLeadingWildcardSearches();
+    }
+
+    /**
+     * Executes an events search for the given parameters.
+     *
+     * @param parameters             event search parameters
+     * @param filterString           filter string
+     * @param eventStreams           event streams to search in
+     * @param permittedSourceStreams permitted source streams
+     * @return the result
+     */
+    // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams.
+    //       We also cannot use the new search code at the moment because it doesn't do pagination.
+    Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, PermittedStreams permittedSourceStreams) {
+        checkArgument(parameters != null, "parameters cannot be null");
+        checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
+        checkArgument(permittedSourceStreams != null, "permittedSourceStreams cannot be null");
+
+        final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
+        final Sorting sorting = new Sorting(parameters.sortBy(), sortDirection);
+        final String queryString = parameters.query().trim();
+        final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
+
+        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
+            matchAllQuery() :
+            queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
+
+        final BoolQueryBuilder filter = boolQuery()
+            .filter(query)
+            .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
+            .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(parameters.timerange())));
+
+        if (!isNullOrEmpty(filterString)) {
+            filter.filter(queryStringQuery(filterString));
+        }
+
+        if (!permittedSourceStreams.allStreamsPermitted()) {
+            filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, permittedSourceStreams.streams()));
+        }
+
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+            .query(filter)
+            .from((parameters.page() - 1) * parameters.perPage())
+            .size(parameters.perPage())
+            .sort(sorting.getField(), sorting.asElastic());
+
+        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
+            .addType(IndexMapping.TYPE_MESSAGE)
+            .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
+            .allowNoIndices(false)
+            .ignoreUnavailable(false);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
+            LOG.debug("Execute search: {}", searchBuilder.build().toString());
+        }
+
+        final SearchResult searchResult = wrapInMultiSearch(searchBuilder.build(), () -> "Unable to perform search query");
+
+        @SuppressWarnings("unchecked")
+        final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
+            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))
+            .collect(Collectors.toList());
+
+        return Result.builder()
+            .results(hits)
+            .resultsCount(searchResult.getTotal())
+            .duration(tookMsFromSearchResult(searchResult))
+            .usedIndexNames(affectedIndices)
+            .executedQuery(searchSourceBuilder.toString())
+            .build();
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -241,5 +317,51 @@ public class MoreSearch extends Searches {
             .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
             .collect(Collectors.joining(" OR "));
         return "(" + streamFilter + ")";
+    }
+
+    @AutoValue
+    public static abstract class Result {
+        public abstract List<ResultMessage> results();
+
+        public abstract long resultsCount();
+
+        public abstract long duration();
+
+        public abstract Set<String> usedIndexNames();
+
+        public abstract String executedQuery();
+
+        public static Builder builder() {
+            return new AutoValue_MoreSearch_Result.Builder();
+        }
+
+        @AutoValue.Builder
+        public abstract static class Builder {
+            public abstract Builder results(List<ResultMessage> results);
+
+            public abstract Builder resultsCount(long resultsCount);
+
+            public abstract Builder duration(long duration);
+
+            public abstract Builder usedIndexNames(Set<String> usedIndexNames);
+
+            public abstract Builder executedQuery(String executedQuery);
+
+            public abstract Result build();
+        }
+    }
+
+    @AutoValue
+    public static abstract class PermittedStreams {
+        public abstract Set<String> streams();
+        public abstract boolean allStreamsPermitted();
+
+        public static PermittedStreams of(Set<String> streams) {
+            return new AutoValue_MoreSearch_PermittedStreams(streams, false);
+        }
+
+        public static PermittedStreams all() {
+            return new AutoValue_MoreSearch_PermittedStreams(Collections.emptySet(), true);
+        }
     }
 }
