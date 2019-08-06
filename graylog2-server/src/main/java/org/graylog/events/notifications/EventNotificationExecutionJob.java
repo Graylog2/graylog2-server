@@ -102,6 +102,8 @@ public class EventNotificationExecutionJob implements Job {
                     trigger,
                     ctx.jobTriggerUpdates().scheduleNextExecution());
         }
+        final EventNotification eventNotification = eventNotificationFactory.create();
+        metrics.registerEventNotification(eventNotification, notification);
 
         try {
             optionalEventDefinition = Optional.ofNullable(getEventDefinition(eventDto));
@@ -124,17 +126,16 @@ public class EventNotificationExecutionJob implements Job {
         updateTriggerStatus(eventDto, gracePeriodInMS);
         if (inGrace(eventDto, gracePeriodInMS)) {
             LOG.debug("Notification <{}> triggered but it's in grace period.", jobConfig.notificationId());
-            metrics.markInGrace();
+            metrics.markInGrace(eventNotification, notification);
             return ctx.jobTriggerUpdates().scheduleNextExecution();
         }
 
-        final EventNotification eventNotification = eventNotificationFactory.create();
         try {
-            metrics.markExecution();
+            metrics.markExecution(eventNotification, notification);
             eventNotification.execute(notificationContext);
-            metrics.markSuccess();
+            metrics.markSuccess(eventNotification, notification);
         } catch (TemporaryEventNotificationException e) {
-            metrics.markFailedTemporarily();
+            metrics.markFailedTemporarily(eventNotification, notification);
             final long retryPeriod = configurationProvider.get().eventNotificationsRetry();
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed to execute notification, retrying in %d minutes - <%s/%s/%s>",
@@ -145,7 +146,7 @@ public class EventNotificationExecutionJob implements Job {
                     trigger,
                     ctx.jobTriggerUpdates().retryIn(retryPeriod, TimeUnit.MILLISECONDS), e);
         } catch (PermanentEventNotificationException e) {
-            metrics.markFailedPermanently();
+            metrics.markFailedPermanently(eventNotification, notification);
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Failed permanently to execute notification, giving up - <%s/%s/%s>",
                             notification.id(),
@@ -155,7 +156,7 @@ public class EventNotificationExecutionJob implements Job {
                     ctx.jobTriggerUpdates().scheduleNextExecution(),
                     e);
         } catch (EventNotificationException e) {
-            metrics.markFailed();
+            metrics.markFailed(eventNotification, notification);
             throw new JobExecutionException(
                     String.format(Locale.ROOT, "Notification failed to execute - <%s/%s/%s>",
                             notification.id(),
