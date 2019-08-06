@@ -16,7 +16,6 @@
  */
 package org.graylog.events.processor;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Stopwatch;
 import org.graylog.events.event.EventProcessorEventFactory;
 import org.graylog.events.event.EventWithContext;
@@ -56,7 +55,7 @@ public class EventProcessorEngine {
                                 EventNotificationHandler notificationHandler,
                                 EventStorageHandlerEngine storageHandlerEngine,
                                 Provider<EventProcessorEventFactory> eventFactoryProvider,
-                                MetricRegistry metricRegistry, EventProcessorExecutionMetrics metrics) {
+                                EventProcessorExecutionMetrics metrics) {
         this.dbService = dbService;
         this.eventProcessorFactories = eventProcessorFactories;
         this.fieldSpecEngine = fieldSpecEngine;
@@ -93,7 +92,7 @@ public class EventProcessorEngine {
             eventProcessor.createEvents(eventFactoryProvider.get(), parameters, eventConsumer);
             stopwatch.stop();
 
-            metrics.recordExecutionTime(eventProcessor, definitionId, stopwatch.elapsed().getNano(), TimeUnit.NANOSECONDS);
+            metrics.recordExecutionTime(eventProcessor, definitionId, stopwatch.elapsed());
             metrics.recordSuccess(eventProcessor, definitionId);
         } catch (EventProcessorException e) {
             metrics.recordException(eventProcessor, definitionId);

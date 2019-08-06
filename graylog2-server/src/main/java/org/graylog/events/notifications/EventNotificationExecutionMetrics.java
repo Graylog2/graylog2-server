@@ -45,7 +45,7 @@ public class EventNotificationExecutionMetrics {
     }
 
     void registerEventNotification(EventNotification eventNotification, NotificationDto notification) {
-        for (Fields field: Fields.values() ) {
+        for (Fields field : Fields.values()) {
             final String name = getNameforField(eventNotification, notification, field);
             MetricUtils.safelyRegister(metricRegistry, getNameforField(eventNotification, notification, field), new Meter());
         }
@@ -54,18 +54,23 @@ public class EventNotificationExecutionMetrics {
     void markExecution(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.TOTAL).mark();
     }
+
     void markSuccess(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.SUCCESSFUL).mark();
     }
+
     void markInGrace(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.IN_GRACE_PERIOD).mark();
     }
+
     void markFailedTemporarily(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.FAILED_TEMPORARILY).mark();
     }
+
     void markFailedPermanently(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.FAILED_PERMANENTLY).mark();
     }
+
     void markFailed(EventNotification eventNotification, NotificationDto notification) {
         getMeterforField(eventNotification, notification, Fields.FAILED_OTHER).mark();
     }
@@ -73,6 +78,7 @@ public class EventNotificationExecutionMetrics {
     private String getNameforField(EventNotification eventNotification, NotificationDto notification, Fields field) {
         return MetricRegistry.name(eventNotification.getClass(), notification.id(), PREFIX, field.toString().toLowerCase(Locale.ROOT));
     }
+
     private Meter getMeterforField(EventNotification eventNotification, NotificationDto notification, Fields field) {
         return MetricUtils.getOrRegister(metricRegistry, getNameforField(eventNotification, notification, field), new Meter());
     }
