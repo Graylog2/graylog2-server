@@ -23,6 +23,8 @@ import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 
+import java.util.Set;
+
 public interface EventDefinition {
     String id();
 
@@ -45,4 +47,8 @@ public interface EventDefinition {
     ImmutableList<EventNotificationHandler.Config> notifications();
 
     ImmutableList<EventStorageHandler.Config> storage();
+
+    default Set<String> requiredPermissions() {
+        return config().requiredPermissions();
+    }
 }
