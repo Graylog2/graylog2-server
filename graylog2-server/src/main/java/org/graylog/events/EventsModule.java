@@ -41,6 +41,7 @@ import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
 import org.graylog.events.periodicals.EventNotificationStatusCleanUp;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.events.processor.EventProcessorExecutionMetrics;
 import org.graylog.events.processor.aggregation.AggregationEventProcessor;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
@@ -73,6 +74,7 @@ public class EventsModule extends PluginModule {
         bind(EventFieldSpecEngine.class).asEagerSingleton();
         bind(MoreIndices.class).asEagerSingleton();
         bind(NotificationGracePeriodService.class).asEagerSingleton();
+        bind(EventProcessorExecutionMetrics.class).asEagerSingleton();
         bind(EventNotificationExecutionMetrics.class).asEagerSingleton();
 
         install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));

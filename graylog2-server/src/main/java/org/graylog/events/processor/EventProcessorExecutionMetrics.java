@@ -41,10 +41,19 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.shared.metrics.MetricUtils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-public abstract class EventProcessorExecutionMetrics {
+@Singleton
+public class EventProcessorExecutionMetrics {
+    private final MetricRegistry metricRegistry;
+
+    @Inject
+    public EventProcessorExecutionMetrics(MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+    }
 
     private enum Fields {
         EXECUTION_COUNT(new Counter()),
@@ -59,32 +68,32 @@ public abstract class EventProcessorExecutionMetrics {
         }
     }
 
-    static void registerEventProcessor(MetricRegistry metricRegistry, EventProcessor eventProcessor, String definitionId) {
+    void registerEventProcessor(EventProcessor eventProcessor, String definitionId) {
         for (Fields field: Fields.values() ) {
             final String name = getNameforField(eventProcessor, definitionId, field);
             MetricUtils.safelyRegister(metricRegistry, name, field.type);
         }
     }
-    static void recordExecutionTime(MetricRegistry registry, EventProcessor eventProcessor, String definitionId, long time, TimeUnit unit) throws Exception {
+    void recordExecutionTime(EventProcessor eventProcessor, String definitionId, long time, TimeUnit unit) throws Exception {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_TIME);
-        MetricUtils.getOrRegister(registry, name, new Timer()).update(time, unit);
+        MetricUtils.getOrRegister(metricRegistry, name, new Timer()).update(time, unit);
     }
 
-    static void recordExecutions(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
+    void recordExecutions(EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_COUNT);
-        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
+        MetricUtils.getOrRegister(metricRegistry, name, new Counter()).inc();
     }
-    static void recordSuccess(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
+    void recordSuccess(EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_SUCCESSFUL);
-        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
+        MetricUtils.getOrRegister(metricRegistry, name, new Counter()).inc();
     }
-    static void recordException(MetricRegistry registry, EventProcessor eventProcessor, String definitionId) {
+    void recordException(EventProcessor eventProcessor, String definitionId) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EXECUTION_EXCEPTION);
-        MetricUtils.getOrRegister(registry, name, new Counter()).inc();
+        MetricUtils.getOrRegister(metricRegistry, name, new Counter()).inc();
     }
-    static void recordCreatedEvents(MetricRegistry registry, EventProcessor eventProcessor, String definitionId, int count) {
+    void recordCreatedEvents(EventProcessor eventProcessor, String definitionId, int count) {
         final String name = getNameforField(eventProcessor, definitionId, Fields.EVENTS_CREATED);
-        MetricUtils.getOrRegister(registry, name, new Meter()).mark(count);
+        MetricUtils.getOrRegister(metricRegistry, name, new Meter()).mark(count);
     }
 
     private static String getNameforField(EventProcessor eventProcessor, String definitionId, Fields field) {
