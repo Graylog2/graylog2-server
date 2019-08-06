@@ -7,8 +7,6 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
-import { IfPermitted } from 'components/common';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
