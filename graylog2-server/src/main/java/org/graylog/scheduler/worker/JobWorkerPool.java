@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler.worker;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
@@ -49,7 +50,6 @@ public class JobWorkerPool implements GracefulShutdownHook {
 
     private static final Logger LOG = LoggerFactory.getLogger(JobWorkerPool.class);
     private static final String NAME_PREFIX = "job-worker-pool";
-    private static final String THREAD_FACTORY_NAME = NAME_PREFIX + "-thread-factory";
     private static final String EXECUTOR_NAME = NAME_PREFIX + "-executor";
     private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9\\-]+");
 
@@ -69,6 +69,7 @@ public class JobWorkerPool implements GracefulShutdownHook {
         this.executor = buildExecutor(name, poolSize, metricRegistry);
         this.slots = new Semaphore(poolSize, true);
 
+        registerMetrics(metricRegistry, poolSize);
         gracefulShutdownService.register(this);
     }
 
@@ -162,10 +163,20 @@ public class JobWorkerPool implements GracefulShutdownHook {
                 .setNameFormat(NAME_PREFIX + "[" + name + "]-%d")
                 .setUncaughtExceptionHandler((t, e) -> LOG.error("Unhandled exception", e))
                 .build();
-        final InstrumentedThreadFactory itf = new InstrumentedThreadFactory(threadFactory, metricRegistry, name(THREAD_FACTORY_NAME, name));
+        final InstrumentedThreadFactory itf = new InstrumentedThreadFactory(threadFactory, metricRegistry, name(JobWorkerPool.class, name));
         final SynchronousQueue<Runnable> workQueue = new SynchronousQueue<>();
 
         final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, poolSize, 60L, TimeUnit.SECONDS, workQueue, itf);
         return new InstrumentedExecutorService(executor, metricRegistry, name(EXECUTOR_NAME, name));
+    }
+
+    private void registerMetrics(MetricRegistry metricRegistry, int poolSize) {
+        metricRegistry.register(MetricRegistry.name(this.getClass(), "waiting_for_slots"),
+                (Gauge<Integer>) () -> slots.getQueueLength());
+        metricRegistry.register(MetricRegistry.name(this.getClass(), "free_slots"),
+                (Gauge<Integer>) () -> freeSlots());
+        metricRegistry.register(MetricRegistry.name(this.getClass(), "total_slots"),
+                (Gauge<Integer>) () -> poolSize);
+
     }
 }
