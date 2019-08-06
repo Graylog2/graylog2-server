@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
@@ -66,7 +67,7 @@ public abstract class LegacyAlarmCallbackEventNotificationConfigEntity implement
     }
 
     @Override
-    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return LegacyAlarmCallbackEventNotificationConfig.builder()
             .callbackType(callbackType().asString(parameters))
             .configuration(configuration())

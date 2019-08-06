@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
+import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
@@ -32,6 +33,7 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -211,9 +213,13 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         }
     }
 
-    public EventDefinitionEntity toContentPackEntity() {
+    public EventDefinitionEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final EventProcessorConfig config = config();
-        final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity();
+        final EventProcessorConfigEntity eventProcessorConfigEntity = config.toContentPackEntity(entityDescriptorIds);
+        final ImmutableList<EventNotificationHandlerConfigEntity> notificationList = ImmutableList.copyOf(
+            notifications().stream()
+                .map(notification -> notification.toContentPackEntity(entityDescriptorIds))
+                .collect(Collectors.toList()));
 
         return EventDefinitionEntity.builder()
             .title(ValueReference.of(title()))
@@ -221,7 +227,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             .priority(ValueReference.of(priority()))
             .alert(ValueReference.of(alert()))
             .config(eventProcessorConfigEntity)
-            .notifications(notifications())
+            .notifications(notificationList)
             .notificationSettings(notificationSettings())
             .fieldSpec(fieldSpec())
             .keySpec(keySpec())

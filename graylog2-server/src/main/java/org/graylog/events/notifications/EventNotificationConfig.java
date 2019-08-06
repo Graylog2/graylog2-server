@@ -23,6 +23,7 @@ import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
 
 @JsonTypeInfo(
@@ -66,7 +67,7 @@ public interface EventNotificationConfig extends ContentPackable<EventNotificati
         }
 
         @Override
-        public EventNotificationConfigEntity toContentPackEntity() {
+        public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
             return null;
         }
     }

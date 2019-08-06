@@ -17,5 +17,5 @@
 package org.graylog2.contentpacks;
 
 public interface ContentPackable<T> {
-    T toContentPackEntity();
+    T toContentPackEntity(EntityDescriptorIds entityDescriptorIds);
 }

@@ -16,10 +16,11 @@
  */
 package org.graylog2.contentpacks;
 
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
 
 public interface NativeEntityConverter<T> {
-    T toNativeEntity(Map<String, ValueReference> parameters);
+    T toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities);
 }

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -91,7 +92,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     }
 
     @Override
-    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return EmailEventNotificationConfig.builder()
             .sender(sender().asString(parameters))
             .subject(subject().asString(parameters))

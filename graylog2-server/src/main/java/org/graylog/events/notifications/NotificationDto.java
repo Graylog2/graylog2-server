@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.contentpack.entities.NotificationEntity;
 import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.mongojack.Id;
@@ -102,8 +103,8 @@ public abstract class NotificationDto implements ContentPackable {
     }
 
     @Override
-    public Object toContentPackEntity() {
-        final EventNotificationConfigEntity config = config().toContentPackEntity();
+    public Object toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final EventNotificationConfigEntity config = config().toContentPackEntity(entityDescriptorIds);
         return NotificationEntity.builder()
             .description(ValueReference.of(description()))
             .title(ValueReference.of(title()))

@@ -23,14 +23,17 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.events.fields.EventFieldSpec;
+import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionEntity.Builder.class)
@@ -71,7 +74,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract EventNotificationSettings notificationSettings();
 
     @JsonProperty(FIELD_NOTIFICATIONS)
-    public abstract ImmutableList<EventNotificationHandler.Config> notifications();
+    public abstract ImmutableList<EventNotificationHandlerConfigEntity> notifications();
 
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
@@ -114,7 +117,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
         public abstract Builder notificationSettings(EventNotificationSettings notificationSettings);
 
         @JsonProperty(FIELD_NOTIFICATIONS)
-        public abstract Builder notifications(ImmutableList<EventNotificationHandler.Config> notifications);
+        public abstract Builder notifications(ImmutableList<EventNotificationHandlerConfigEntity> notifications);
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
@@ -123,17 +126,22 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     }
 
     @Override
-    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> natvieEntities) {
+        final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
+            notifications().stream()
+            .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
+            .collect(Collectors.toList())
+        );
          return EventDefinitionDto.builder()
             .title(title().asString(parameters))
             .description(description().asString(parameters))
             .priority(priority().asInteger(parameters))
             .alert(alert().asBoolean(parameters))
-            .config(config().toNativeEntity(parameters))
+            .config(config().toNativeEntity(parameters, natvieEntities))
             .fieldSpec(fieldSpec())
             .keySpec(keySpec())
             .notificationSettings(notificationSettings())
-            .notifications(notifications())
+            .notifications(notificationList)
             .storage(storage())
             .build();
     }

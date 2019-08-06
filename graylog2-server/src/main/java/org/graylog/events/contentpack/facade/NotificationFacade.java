@@ -64,7 +64,7 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
             return Optional.empty();
         }
 
-        final NotificationEntity entity = (NotificationEntity) notificationDto.get().toContentPackEntity();
+        final NotificationEntity entity = (NotificationEntity) notificationDto.get().toContentPackEntity(entityDescriptorIds);
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return Optional.of(
             EntityV1.builder()
@@ -87,7 +87,7 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
                                                  Map<String, ValueReference> parameters,
                                                  Map<EntityDescriptor, Object> nativeEntities) {
         final NotificationEntity entity = objectMapper.convertValue(entityV1.data(), NotificationEntity.class);
-        final NotificationDto notificationDto = entity.toNativeEntity(parameters);
+        final NotificationDto notificationDto = entity.toNativeEntity(parameters, nativeEntities);
         final NotificationDto savedDto = notificationService.save(notificationDto);
         return NativeEntity.create(entityV1.id(), savedDto.id(), ModelTypes.NOTIFICATION_V1, savedDto.title(), savedDto);
     }

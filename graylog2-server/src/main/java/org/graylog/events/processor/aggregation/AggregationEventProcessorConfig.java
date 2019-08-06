@@ -30,6 +30,8 @@ import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
@@ -168,11 +171,16 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     @Override
-    public EventProcessorConfigEntity toContentPackEntity() {
+    public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final ImmutableSet<String> streamRefs = ImmutableSet.copyOf(streams().stream()
+            .map(streamId -> entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toSet()));
         return AggregationEventProcessorConfigEntity.builder()
             .type(type())
             .query(ValueReference.of(query()))
-            .streams(streams())
+            .streams(streamRefs)
             .groupBy(groupBy())
             .series(series())
             .conditions(conditions().orElse(null))
