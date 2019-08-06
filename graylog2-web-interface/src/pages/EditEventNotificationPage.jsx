@@ -9,14 +9,21 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
+import PermissionsMixin from 'util/PermissionsMixin';
+import history from 'util/History';
 
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+const { isPermitted } = PermissionsMixin;
 
 class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   state = {
@@ -24,13 +31,21 @@ class EditEventDefinitionPage extends React.Component {
   };
 
   componentDidMount() {
-    const { params } = this.props;
-    EventNotificationsActions.get(params.notificationId)
-      .then(notification => this.setState({ notification: notification }));
+    const { params, currentUser } = this.props;
+
+    if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.definitionId}`)) {
+      EventNotificationsActions.get(params.notificationId)
+        .then(notification => this.setState({ notification: notification }));
+    }
   }
 
   render() {
     const { notification } = this.state;
+    const { params, currentUser } = this.props;
+
+    if (!isPermitted(currentUser.permissions, `eventnotifications:edit:${params.definitionId}`)) {
+      history.push(Routes.NOTFOUND);
+    }
 
     if (!notification) {
       return (
@@ -87,4 +102,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default EditEventDefinitionPage;
+export default connect(EditEventDefinitionPage, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));
