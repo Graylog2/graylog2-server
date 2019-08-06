@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -55,15 +55,45 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         this.viewRequirementsFactory = viewRequirementsFactory;
     }
 
-    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
-                                                  Predicate<ViewDTO> filter, String order,
+    private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
+                                                  Predicate<ViewDTO> filter,
+                                                  String order,
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter, getSortBuilder(order, sortField), page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage)));
+    }
+
+    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
+                                                  Predicate<ViewDTO> filter,
+                                                  String order,
+                                                  String sortField,
+                                                  int page,
+                                                  int perPage) {
+        return searchPaginated(query.toDBQuery(), filter, order, sortField, page, perPage);
+    }
+
+     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
+                                                        SearchQuery query,
+                                                        Predicate<ViewDTO> filter,
+                                                        String order,
+                                                        String sortField,
+                                                        int page,
+                                                        int perPage) {
+        return searchPaginated(
+                DBQuery.and(
+                        DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
+                        query.toDBQuery()
+                ),
+                filter,
+                order,
+                sortField,
+                page,
+                perPage
+        );
     }
 
     public void saveDefault(ViewDTO dto) {
