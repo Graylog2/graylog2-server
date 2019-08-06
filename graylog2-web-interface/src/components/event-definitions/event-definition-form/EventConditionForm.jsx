@@ -14,6 +14,8 @@ import styles from './EventConditionForm.css';
 class EventConditionForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/no-unused-prop-types
+    currentUser: PropTypes.object.isRequired, // Prop is passed down to pluggable entities
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };

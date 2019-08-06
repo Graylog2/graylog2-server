@@ -32,6 +32,7 @@ class FieldForm extends React.Component {
   static propTypes = {
     fieldName: PropTypes.string,
     config: PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
     keys: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
@@ -139,6 +140,7 @@ class FieldForm extends React.Component {
 
   renderFieldValueProviderForm = () => {
     const { fieldName, config, validation } = this.state;
+    const { currentUser } = this.props;
 
     const providerType = this.getConfigProviderType(config);
     if (!providerType) {
@@ -152,6 +154,7 @@ class FieldForm extends React.Component {
         config: config,
         onChange: this.handleConfigChange,
         validation: validation,
+        currentUser: currentUser,
       })
       : <div>Selected provider is not available.</div>
     );

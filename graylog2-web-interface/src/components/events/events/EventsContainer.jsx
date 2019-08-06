@@ -12,11 +12,13 @@ import {} from 'components/event-definitions/event-definition-types';
 
 const { EventsStore, EventsActions } = CombinedProvider.get('Events');
 const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class EventsContainer extends React.Component {
   static propTypes = {
     events: PropTypes.object.isRequired,
     eventDefinitions: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     streamId: PropTypes.string,
   };
 
@@ -100,7 +102,7 @@ class EventsContainer extends React.Component {
   };
 
   render() {
-    const { events, eventDefinitions } = this.props;
+    const { events, eventDefinitions, currentUser } = this.props;
     const isLoading = !events.events || !eventDefinitions.eventDefinitions;
 
     if (isLoading) {
@@ -111,6 +113,7 @@ class EventsContainer extends React.Component {
       <Events events={events.events}
               parameters={events.parameters}
               totalEvents={events.totalEvents}
+              currentUser={currentUser}
               totalEventDefinitions={eventDefinitions.pagination.grandTotal}
               context={events.context}
               onQueryChange={this.handleQueryChange}
@@ -125,4 +128,9 @@ class EventsContainer extends React.Component {
 export default connect(EventsContainer, {
   events: EventsStore,
   eventDefinitions: EventDefinitionsStore,
-});
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));

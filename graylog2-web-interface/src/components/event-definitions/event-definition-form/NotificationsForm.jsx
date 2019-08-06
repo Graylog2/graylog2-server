@@ -5,6 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
 import Routes from 'routing/Routes';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 import AddNotificationForm from './AddNotificationForm';
 import NotificationSettingsForm from './NotificationSettingsForm';
@@ -18,6 +19,7 @@ class NotificationsForm extends React.Component {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     defaults: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
@@ -48,14 +50,27 @@ class NotificationsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, notifications, defaults, onChange } = this.props;
+    const { eventDefinition, notifications, defaults, currentUser, onChange } = this.props;
     const { showAddNotificationForm } = this.state;
+
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:read')) {
+      return (
+        <Row>
+          <Col md={6} lg={5}>
+            <p>No Notifications found.</p>
+          </Col>
+        </Row>
+      );
+    }
 
     if (showAddNotificationForm) {
       return (
         <AddNotificationForm notifications={notifications}
                              onChange={this.handleAssignNotification}
-                             onCancel={this.toggleAddNotificationForm} />
+                             onCancel={this.toggleAddNotificationForm}
+                             hasCreationPermissions={
+                               PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')
+                             } />
       );
     }
 
