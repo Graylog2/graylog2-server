@@ -8,14 +8,24 @@ import Search from 'views/logic/search/Search';
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 
+import PermissionsMixin from 'util/PermissionsMixin';
+
 import FilterPreview from './FilterPreview';
 
 const { FilterPreviewStore, FilterPreviewActions } = CombinedProvider.get('FilterPreview');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+const PREVIEW_PERMISSIONS = [
+  'streams:read',
+  'extendedsearch:create',
+  'extendedsearch:use',
+];
 
 class FilterPreviewContainer extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     filterPreview: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   state = {
@@ -24,6 +34,11 @@ class FilterPreviewContainer extends React.Component {
   };
 
   fetchSearch = lodash.debounce((config) => {
+    const { currentUser } = this.props;
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+      return;
+    }
+
     const { queryId, searchTypeId } = this.state;
 
     const formattedStreams = config.streams.map(stream => ({ type: 'stream', id: stream }));
@@ -66,7 +81,7 @@ class FilterPreviewContainer extends React.Component {
   }
 
   render() {
-    const { eventDefinition, filterPreview } = this.props;
+    const { eventDefinition, filterPreview, currentUser } = this.props;
     const { queryId, searchTypeId } = this.state;
     const isLoading = !filterPreview.result || !filterPreview.result.forId(queryId);
     let searchResult;
@@ -78,9 +93,12 @@ class FilterPreviewContainer extends React.Component {
       errors = filterPreview.result.errors; // result may not always be set, so I can't use destructuring
     }
 
+    const isPermittedToSeePreview = PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS);
+
     return (
       <FilterPreview eventDefinition={eventDefinition}
                      isFetchingData={isLoading}
+                     displayPreview={isPermittedToSeePreview}
                      searchResult={searchResult}
                      errors={errors} />
     );
@@ -89,4 +107,9 @@ class FilterPreviewContainer extends React.Component {
 
 export default connect(FilterPreviewContainer, {
   filterPreview: FilterPreviewStore,
-});
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));
