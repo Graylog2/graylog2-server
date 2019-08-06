@@ -105,7 +105,7 @@ public class LegacyAlertConditionMigratorTest {
 
         this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
-        this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, jobTriggerService));
+        this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService));
         this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, CHECK_INTERVAL);
     }
 
