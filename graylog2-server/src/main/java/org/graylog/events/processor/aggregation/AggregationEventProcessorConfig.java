@@ -37,6 +37,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -80,6 +81,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @Override
     public Set<String> requiredPermissions() {
+        if (streams().isEmpty()) {
+            return Collections.singleton(RestPermissions.STREAMS_READ);
+        }
         return streams().stream()
             .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
             .collect(Collectors.toSet());
