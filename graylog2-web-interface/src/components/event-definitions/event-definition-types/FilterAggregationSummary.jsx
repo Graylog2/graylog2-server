@@ -4,12 +4,18 @@ import lodash from 'lodash';
 
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
+import PermissionsMixin from 'util/PermissionsMixin';
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import { TIME_UNITS } from './FilterForm';
+
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class FilterAggregationSummary extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   getConditionType = (config) => {
@@ -21,7 +27,7 @@ class FilterAggregationSummary extends React.Component {
   };
 
   render() {
-    const { config } = this.props;
+    const { config, currentUser } = this.props;
     const {
       query,
       streams,
@@ -39,6 +45,9 @@ class FilterAggregationSummary extends React.Component {
 
     const expressionResults = AggregationExpressionParser.parseExpression(conditions);
 
+    const effectiveStreams = PermissionsMixin.isPermitted(currentUser.permissions, 'streams:read')
+      ? streams : [];
+
     return (
       <dl>
         <dt>Type</dt>
@@ -46,7 +55,7 @@ class FilterAggregationSummary extends React.Component {
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
         <dt>Streams</dt>
-        <dd>{streams && streams.length > 0 ? streams.join(', ') : 'No streams selected'}</dd>
+        <dd>{effectiveStreams && effectiveStreams.length > 0 ? effectiveStreams.join(', ') : 'No streams selected'}</dd>
         <dt>Search within</dt>
         <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
         <dt>Execute search every</dt>
@@ -67,4 +76,7 @@ class FilterAggregationSummary extends React.Component {
   }
 }
 
-export default FilterAggregationSummary;
+export default connect(FilterAggregationSummary, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));

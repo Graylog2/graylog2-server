@@ -7,17 +7,26 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
+import { IfPermitted } from 'components/common';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
+
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 
 import styles from './EventDefinitionSummary.css';
 import commonStyles from '../common/commonStyles.css';
 
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
 class EventDefinitionSummary extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     validation: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   state = {
@@ -170,10 +179,16 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderNotifications = (definitionNotifications, notificationSettings) => {
+    const { currentUser } = this.props;
+
+    const effectiveDefinitionNotifications = PermissionsMixin.isPermitted(currentUser.permissions,
+      'eventnotifications:read')
+      ? definitionNotifications : [];
+
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {definitionNotifications.length === 0
+        {effectiveDefinitionNotifications.length === 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
           : (
             <React.Fragment>
@@ -216,4 +231,7 @@ class EventDefinitionSummary extends React.Component {
   }
 }
 
-export default EventDefinitionSummary;
+export default connect(EventDefinitionSummary, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));
