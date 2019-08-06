@@ -1,13 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Col, Row } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
+import PermissionsMixin from 'util/PermissionsMixin';
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+const LOOKUP_PERMISSIONS = [
+  'lookuptables:read',
+];
 
 class LookupTableFieldValueProviderFormContainer extends React.Component {
   static propTypes = {
@@ -15,15 +22,32 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
     validation: PropTypes.object.isRequired,
     fieldTypes: PropTypes.object.isRequired,
     lookupTables: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
+    const { currentUser } = this.props;
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+      return;
+    }
+
     LookupTablesActions.searchPaginated(1, 0, undefined, false);
   }
 
   render() {
-    const { lookupTables, fieldTypes, ...otherProps } = this.props;
+    const { lookupTables, fieldTypes, currentUser, ...otherProps } = this.props;
+
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+      return (
+        <Row>
+          <Col md={6} lg={5}>
+            <p>No Lookup Tables found.</p>
+          </Col>
+        </Row>
+      );
+    }
+
     const isLoading = typeof fieldTypes.all !== 'object' || !lookupTables.tables;
     if (isLoading) {
       return <Spinner text="Loading Field Provider information..." />;
@@ -40,4 +64,9 @@ class LookupTableFieldValueProviderFormContainer extends React.Component {
 export default connect(LookupTableFieldValueProviderFormContainer, {
   fieldTypes: FieldTypesStore,
   lookupTables: LookupTablesStore,
-});
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));
