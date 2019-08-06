@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
 import io.searchbox.client.JestClient;
@@ -28,16 +29,19 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -55,7 +59,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -68,7 +71,7 @@ import static org.elasticsearch.index.query.QueryBuilders.termsQuery;
 /**
  * This class contains search helper for the events system.
  */
-public class MoreSearch {
+public class MoreSearch extends Searches {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearch.class);
 
     private final StreamService streamService;
@@ -79,10 +82,14 @@ public class MoreSearch {
 
     @Inject
     public MoreSearch(StreamService streamService,
+                      Indices indices,
                       IndexRangeService indexRangeService,
+                      IndexSetRegistry indexSetRegistry,
+                      MetricRegistry metricRegistry,
                       ScrollResult.Factory scrollResultFactory,
                       JestClient jestClient,
                       Configuration configuration) {
+        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;
@@ -222,31 +229,6 @@ public class MoreSearch {
          * @param continueScrolling the boolean that can be set to {@code false} to stop the scroll query
          */
         void call(List<ResultMessage> messages, AtomicBoolean continueScrolling) throws EventProcessorException;
-    }
-
-    // TODO: Once IndexRangeContainsOneOfStreams got merged into master, make its constructor public and use that one
-    //       instead of duplicating the class here.
-    public static class IndexRangeContainsOneOfStreams implements Predicate<IndexRange> {
-        private final Set<IndexSet> validIndexSets;
-        private final Set<String> validStreamIds;
-
-        IndexRangeContainsOneOfStreams(Set<Stream> validStreams) {
-            this.validStreamIds = validStreams.stream().map(Stream::getId).collect(Collectors.toSet());
-            this.validIndexSets = validStreams.stream().map(Stream::getIndexSet).collect(Collectors.toSet());
-        }
-
-        @Override
-        public boolean test(IndexRange indexRange) {
-            if (validIndexSets.isEmpty() && validStreamIds.isEmpty()) {
-                return false;
-            }
-            // If index range is incomplete, check the prefix against the valid index sets.
-            if (indexRange.streamIds() == null) {
-                return validIndexSets.stream().anyMatch(indexSet -> indexSet.isManagedIndex(indexRange.indexName()));
-            }
-            // Otherwise check if the index range contains any of the valid stream ids.
-            return !Collections.disjoint(indexRange.streamIds(), validStreamIds);
-        }
     }
 
     @VisibleForTesting

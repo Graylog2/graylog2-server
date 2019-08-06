@@ -30,7 +30,7 @@ public class IndexRangeContainsOneOfStreams implements Predicate<IndexRange> {
     private final Set<IndexSet> validIndexSets;
     private final Set<String> validStreamIds;
 
-    IndexRangeContainsOneOfStreams(Set<Stream> validStreams) {
+    public IndexRangeContainsOneOfStreams(Set<Stream> validStreams) {
         this.validStreamIds = validStreams.stream().map(Stream::getId).collect(Collectors.toSet());
         this.validIndexSets = validStreams.stream().map(Stream::getIndexSet).collect(Collectors.toSet());
     }
