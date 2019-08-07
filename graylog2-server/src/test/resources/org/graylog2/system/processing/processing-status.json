@@ -7,7 +7,7 @@
       "node_id": "abc-123",
       "node_lifecycle_status": "RUNNING",
       "updated_at": {
-        "$date": "2019-01-01T00:03:00.000Z"
+        "$date": "2019-01-01T00:01:00.000Z"
       },
       "receive_times": {
         "ingest": {
@@ -32,7 +32,7 @@
       },
       "node_id": "abc-456",
       "updated_at": {
-        "$date": "2019-01-01T01:03:00.000Z"
+        "$date": "2019-01-01T02:01:00.000Z"
       },
       "receive_times": {
         "ingest": {
@@ -53,7 +53,7 @@
       "node_id": "abc-789",
       "node_lifecycle_status": "STARTING",
       "updated_at": {
-        "$date": "2019-01-01T02:03:00.000Z"
+        "$date": "2019-01-01T01:01:00.000Z"
       },
       "receive_times": {
         "ingest": {

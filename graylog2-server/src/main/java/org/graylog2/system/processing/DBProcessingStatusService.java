@@ -16,13 +16,13 @@
  */
 package org.graylog2.system.processing;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -33,10 +33,9 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Manages the database collection for processing status.
@@ -45,22 +44,26 @@ public class DBProcessingStatusService {
     private static final String COLLECTION_NAME = "processing_status";
 
     private final String nodeId;
-    private final NodeService nodeService;
+    private final JobSchedulerClock clock;
+    private final Duration excludeThreshold;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
                                      NodeId nodeId,
-                                     NodeService nodeService,
+                                     JobSchedulerClock clock,
+                                     @Named(ProcessingStatusConfig.EXCLUDE_THRESHOLD) Duration excludeThreshold,
                                      MongoJackObjectMapperProvider mapper) {
         this.nodeId = nodeId.toString();
-        this.nodeService = nodeService;
+        this.clock = clock;
+        this.excludeThreshold = excludeThreshold;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
                 mapper.get());
 
         db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
+        db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_UPDATED_AT, 1));
     }
 
     /**
@@ -92,14 +95,13 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
+        final DateTime excludeTimestamp = clock.nowUTC().minus(excludeThreshold.toMilliseconds());
 
-        // We only check the min indexed timestamp for all active nodes to make sure we don't look at old status entries
-        final Set<String> activeNodes = nodeService.allActive().values()
-                .stream()
-                .map(Node::getNodeId)
-                .collect(Collectors.toSet());
+        final DBQuery.Query query = DBQuery.and(
+                // Exclude nodes which haven't been updated recently
+                DBQuery.greaterThan(ProcessingStatusDto.FIELD_UPDATED_AT, excludeTimestamp)
+        );
 
-        final DBQuery.Query query = DBQuery.in(ProcessingStatusDto.FIELD_NODE_ID, activeNodes);
         // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
         // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
         // to return the timestamp of the slowest one.

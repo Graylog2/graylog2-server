@@ -23,13 +23,22 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 
 public class ProcessingStatusConfig {
-    public static final String PERSIST_INTERVAL = "processing_status_persist_interval";
+    private static final String PREFIX = "processing_status_";
+    public static final String PERSIST_INTERVAL = PREFIX + "persist_interval";
+    public static final String EXCLUDE_THRESHOLD = PREFIX + "exclude_threshold";
 
     @Parameter(value = PERSIST_INTERVAL, validators = {PositiveDurationValidator.class, Minimum1SecondValidator.class})
     private Duration processingStatusPersistInterval = Duration.seconds(1);
 
+    @Parameter(value = EXCLUDE_THRESHOLD, validators = {PositiveDurationValidator.class, Minimum1SecondValidator.class})
+    private Duration excludeThreshold = Duration.minutes(1);
+
     public Duration getProcessingStatusPersistInterval() {
         return processingStatusPersistInterval;
+    }
+
+    public Duration getExcludeThreshold() {
+        return excludeThreshold;
     }
 
     public static class Minimum1SecondValidator implements Validator<Duration> {
