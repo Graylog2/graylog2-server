@@ -147,10 +147,10 @@ public class EventsSearchService {
         }
 
         return streamService.loadAll().stream()
-            .map(Persisted::getId)
-            // Select all streams the user is NOT permitted to access
-            .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
-            .collect(Collectors.toSet());
+                .map(Persisted::getId)
+                // Select all streams the user is NOT permitted to access
+                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                .collect(Collectors.toSet());
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
