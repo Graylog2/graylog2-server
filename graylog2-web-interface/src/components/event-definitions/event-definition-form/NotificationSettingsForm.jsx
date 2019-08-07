@@ -57,11 +57,11 @@ class NotificationSettingsForm extends React.Component {
     this.setState(stateUpdate);
   };
 
-  handleChange = (event) => {
+  handleBacklogSizeChange = (event) => {
     const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
+    const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     this.setState({ [lodash.camelCase(name)]: value });
-    this.propagateChanges(name, value);
+    this.propagateChanges(name, lodash.max([Number(value), 0]));
   };
 
   toggleBacklogSize = () => {
@@ -112,7 +112,7 @@ class NotificationSettingsForm extends React.Component {
               <FormControl type="number"
                            id="backlog_size"
                            name="backlog_size"
-                           onChange={this.handleChange}
+                           onChange={this.handleBacklogSizeChange}
                            value={backlogSize}
                            disabled={!isBacklogSizeEnabled} />
             </InputGroup>
