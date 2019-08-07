@@ -86,42 +86,35 @@ class EventNotifications extends React.Component {
     }
 
     return (
-      <React.Fragment>
-        <Row>
-          <Col md={12}>
+      <Row>
+        <Col md={12}>
+          <SearchForm query={query}
+                      onSearch={onQueryChange}
+                      onReset={onQueryChange}
+                      searchButtonLabel="Find"
+                      placeholder="Find Notifications"
+                      wrapperClass={styles.inline}
+                      queryWidth={200}
+                      topMargin={0}
+                      useLoadingState>
             <IfPermitted permissions="eventnotifications:create">
-              <div className="pull-right">
-                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-                  <Button bsStyle="success">Create Notification</Button>
-                </LinkContainer>
-              </div>
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
+                <Button bsStyle="success" className={styles.createButton}>Create Notification</Button>
+              </LinkContainer>
             </IfPermitted>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            <SearchForm query={query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        searchButtonLabel="Find"
-                        placeholder="Find Notifications"
-                        wrapperClass={styles.inline}
-                        queryWidth={200}
-                        topMargin={0}
-                        useLoadingState />
+          </SearchForm>
 
-            <PaginatedList activePage={pagination.page}
-                           pageSize={pagination.pageSize}
-                           pageSizes={[10, 25, 50]}
-                           totalItems={pagination.total}
-                           onChange={onPageChange}>
-              <div className={styles.notificationList}>
-                <EntityList items={this.formatNotification(notifications)} />
-              </div>
-            </PaginatedList>
-          </Col>
-        </Row>
-      </React.Fragment>
+          <PaginatedList activePage={pagination.page}
+                         pageSize={pagination.pageSize}
+                         pageSizes={[10, 25, 50]}
+                         totalItems={pagination.total}
+                         onChange={onPageChange}>
+            <div className={styles.notificationList}>
+              <EntityList items={this.formatNotification(notifications)} />
+            </div>
+          </PaginatedList>
+        </Col>
+      </Row>
     );
   }
 }

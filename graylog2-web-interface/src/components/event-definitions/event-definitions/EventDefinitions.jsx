@@ -121,42 +121,35 @@ class EventDefinitions extends React.Component {
     });
 
     return (
-      <React.Fragment>
-        <Row>
-          <Col md={12}>
+      <Row>
+        <Col md={12}>
+          <SearchForm query={query}
+                      onSearch={onQueryChange}
+                      onReset={onQueryChange}
+                      searchButtonLabel="Find"
+                      placeholder="Find Event Definitions"
+                      wrapperClass={styles.inline}
+                      queryWidth={200}
+                      topMargin={0}
+                      useLoadingState>
             <IfPermitted permissions="eventdefinitions:create">
-              <div className="pull-right">
-                <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                  <Button bsStyle="success">Create Event Definition</Button>
-                </LinkContainer>
-              </div>
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                <Button bsStyle="success" className={styles.createButton}>Create Event Definition</Button>
+              </LinkContainer>
             </IfPermitted>
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            <SearchForm query={query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        searchButtonLabel="Find"
-                        placeholder="Find Event Definitions"
-                        wrapperClass={styles.inline}
-                        queryWidth={200}
-                        topMargin={0}
-                        useLoadingState />
+          </SearchForm>
 
-            <PaginatedList activePage={pagination.page}
-                           pageSize={pagination.pageSize}
-                           pageSizes={[10, 25, 50]}
-                           totalItems={pagination.total}
-                           onChange={onPageChange}>
-              <div className={styles.definitionList}>
-                <EntityList items={items} />
-              </div>
-            </PaginatedList>
-          </Col>
-        </Row>
-      </React.Fragment>
+          <PaginatedList activePage={pagination.page}
+                         pageSize={pagination.pageSize}
+                         pageSizes={[10, 25, 50]}
+                         totalItems={pagination.total}
+                         onChange={onPageChange}>
+            <div className={styles.definitionList}>
+              <EntityList items={items} />
+            </div>
+          </PaginatedList>
+        </Col>
+      </Row>
     );
   }
 }
