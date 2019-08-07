@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -153,25 +152,18 @@ public abstract class PaginatedDbService<DTO> {
                                                                      DBSort.SortBuilder sort,
                                                                      int page,
                                                                      int perPage) {
-        final AtomicInteger total = new AtomicInteger(0);
+        final long total = streamQueryWithSort(query, sort).filter(filter).count();
 
-        try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
-            // First created a filtered stream
-            final Stream<DTO> dtoStream = cursor
-                    .filter(filter)
-                    .peek(dto -> total.incrementAndGet());
-
-            // Then use that filtered stream and only collect the entries according to page and perPage
-            Stream<DTO> resultStream = Stream.of(dtoStream).flatMap(stream -> stream);
-            if (perPage > 0) {
-                resultStream = resultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
-            }
-
-            final long grandTotal = db.count();
-
-            return new PaginatedList<>(resultStream.collect(Collectors.toList()), total.get(), page, perPage, grandTotal);
+        // Then use that filtered stream and only collect the entries according to page and perPage
+        Stream<DTO> resultStream = streamQueryWithSort(query, sort).filter(filter);
+        if (perPage > 0) {
+            resultStream = resultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
         }
-    }
+
+        final long grandTotal = db.count();
+
+        return new PaginatedList<>(resultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
+}
 
     /**
      * Returns an unordered stream of all entries in the database.
