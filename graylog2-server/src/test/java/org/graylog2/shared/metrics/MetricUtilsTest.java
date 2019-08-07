@@ -64,6 +64,17 @@ public class MetricUtilsTest {
     }
 
     @Test
+    public void getOrRegister() {
+        final MetricRegistry metricRegistry = new MetricRegistry();
+
+        final Counter newMetric1 = new Counter();
+        final Counter newMetric2 = new Counter();
+
+        assertThat(MetricUtils.getOrRegister(metricRegistry, "test1", newMetric1)).isEqualTo(newMetric1);
+        assertThat(MetricUtils.getOrRegister(metricRegistry, "test1", newMetric2)).isEqualTo(newMetric1);
+    }
+
+    @Test
     public void mapSupportsCounter() {
         final Counter counter = new Counter();
         counter.inc(23L);

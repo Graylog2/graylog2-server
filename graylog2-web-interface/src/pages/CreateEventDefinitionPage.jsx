@@ -1,16 +1,27 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
+import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
+import PermissionsMixin from 'util/PermissionsMixin';
+import history from 'util/History';
+
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 class CreateEventDefinitionPage extends React.Component {
+  static propTypes = {
+    currentUser: PropTypes.object.isRequired,
+  };
+
   state = {
     eventDefinitionTitle: undefined,
   };
@@ -25,6 +36,12 @@ class CreateEventDefinitionPage extends React.Component {
   render() {
     const { eventDefinitionTitle } = this.state;
     const pageTitle = eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition';
+
+    const { currentUser } = this.props;
+
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
+      history.push(Routes.NOTFOUND);
+    }
 
     return (
       <DocumentTitle title={pageTitle}>
@@ -44,12 +61,16 @@ class CreateEventDefinitionPage extends React.Component {
               <LinkContainer to={Routes.ALERTS.LIST}>
                 <Button bsStyle="info">Alerts & Events</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info">Notifications</Button>
-              </LinkContainer>
+              <IfPermitted permissions="eventdefinitions:read">
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+                  <Button bsStyle="info">Event Definitions</Button>
+                </LinkContainer>
+              </IfPermitted>
+              <IfPermitted permissions="eventnotifications:read">
+                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
+                  <Button bsStyle="info">Notifications</Button>
+                </LinkContainer>
+              </IfPermitted>
             </ButtonToolbar>
           </PageHeader>
 
@@ -64,4 +85,7 @@ class CreateEventDefinitionPage extends React.Component {
   }
 }
 
-export default CreateEventDefinitionPage;
+export default connect(CreateEventDefinitionPage, {
+  currentUser: CurrentUserStore,
+},
+({ currentUser }) => ({ currentUser: currentUser.currentUser }));

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { Select } from 'components/common';
-import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import EventNotificationFormContainer
+  from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -12,6 +13,11 @@ class AddNotificationForm extends React.Component {
     notifications: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+    hasCreationPermissions: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    hasCreationPermissions: false,
   };
 
   state = {
@@ -40,8 +46,14 @@ class AddNotificationForm extends React.Component {
   };
 
   formatNotifications = (notifications) => {
+    const { hasCreationPermissions } = this.props;
     const formattedNotifications = notifications.map(n => ({ label: n.title, value: n.id }));
-    formattedNotifications.unshift({ label: 'Create New Notification...', value: 'create' });
+    if (hasCreationPermissions) {
+      formattedNotifications.unshift({
+        label: 'Create New Notification...',
+        value: 'create',
+      });
+    }
     return formattedNotifications;
   };
 

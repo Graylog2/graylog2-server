@@ -5,10 +5,11 @@ import { Alert, Button, Col, Label, OverlayTrigger, Row, Table, Tooltip } from '
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { EmptyEntity, PaginatedList, Timestamp } from 'components/common';
+import { EmptyEntity, IfPermitted, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
@@ -21,6 +22,7 @@ class Events extends React.Component {
   static propTypes = {
     events: PropTypes.array.isRequired,
     parameters: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     totalEvents: PropTypes.number.isRequired,
     totalEventDefinitions: PropTypes.number.isRequired,
     context: PropTypes.object.isRequired,
@@ -77,8 +79,21 @@ class Events extends React.Component {
     );
   };
 
+  renderLinkToEventDefinition = (event, eventDefinitionContext) => {
+    const { currentUser } = this.props;
+
+    if (!eventDefinitionContext) {
+      return <em>{event.event_definition_id}</em>;
+    }
+
+    return PermissionsMixin.isPermitted(currentUser.permissions,
+      `eventdefinitions:edit:${eventDefinitionContext.id}`)
+      ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
+      : eventDefinitionContext.title;
+  };
+
   renderEvent = (event) => {
-    const { context } = this.props;
+    const { context, currentUser } = this.props;
     const { expanded } = this.state;
     const eventDefinitionContext = context.event_definitions[event.event_definition_id];
 
@@ -98,20 +113,14 @@ class Events extends React.Component {
           <td>{event.key || <em>none</em>}</td>
           <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
           <td>
-            {eventDefinitionContext ? (
-              <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-                {eventDefinitionContext.title}
-              </Link>
-            ) : (
-              <em>{event.event_definition_id}</em>
-            )}
+            {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
           </td>
           <td><Timestamp dateTime={event.timestamp} format={DateTime.Formats.DATETIME} /></td>
         </tr>
         {expanded.includes(event.id) && (
           <tr className={styles.expandedRow}>
             <td colSpan={HEADERS.length + 1}>
-              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} />
+              <EventDetails event={event} eventDefinitionContext={eventDefinitionContext} currentUser={currentUser} />
             </td>
           </tr>
         )}
@@ -128,9 +137,11 @@ class Events extends React.Component {
               Create Event Definitions that are able to search, aggregate or correlate Messages and other
               Events, allowing you to record significant Events in Graylog and alert on them.
             </p>
-            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-              <Button bsStyle="success">Get Started!</Button>
-            </LinkContainer>
+            <IfPermitted permissions="eventdefinitions:create">
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+                <Button bsStyle="success">Get Started!</Button>
+              </LinkContainer>
+            </IfPermitted>
           </EmptyEntity>
         </Col>
       </Row>

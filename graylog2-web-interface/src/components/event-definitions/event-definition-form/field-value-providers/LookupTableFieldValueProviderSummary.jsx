@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { IfPermitted } from 'components/common';
+
 import CommonFieldValueProviderSummary from './CommonFieldValueProviderSummary';
 
 class LookupTableFieldValueProviderSummary extends React.Component {
@@ -16,20 +18,22 @@ class LookupTableFieldValueProviderSummary extends React.Component {
 
     return (
       <CommonFieldValueProviderSummary {...this.props}>
-        <React.Fragment>
-          <tr>
-            <td>Value source</td>
-            <td>Lookup Table</td>
-          </tr>
-          <tr>
-            <td>Lookup Table</td>
-            <td>{provider.table_name}</td>
-          </tr>
-          <tr>
-            <td>Lookup Table Key Field</td>
-            <td>{provider.key_field}</td>
-          </tr>
-        </React.Fragment>
+        <IfPermitted permissions="lookuptables:read">
+          <React.Fragment>
+            <tr>
+              <td>Value source</td>
+              <td>Lookup Table</td>
+            </tr>
+            <tr>
+              <td>Lookup Table</td>
+              <td>{provider.table_name}</td>
+            </tr>
+            <tr>
+              <td>Lookup Table Key Field</td>
+              <td>{provider.key_field}</td>
+            </tr>
+          </React.Fragment>
+        </IfPermitted>
       </CommonFieldValueProviderSummary>
     );
   }

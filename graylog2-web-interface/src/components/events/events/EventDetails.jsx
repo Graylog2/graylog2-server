@@ -7,6 +7,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 
@@ -14,6 +15,7 @@ class EventDetails extends React.Component {
   static propTypes = {
     event: PropTypes.object.isRequired,
     eventDefinitionContext: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   getConditionPlugin = (type) => {
@@ -38,6 +40,19 @@ class EventDetails extends React.Component {
     );
   };
 
+  renderLinkToEventDefinition = (event, eventDefinitionContext) => {
+    const { currentUser } = this.props;
+
+    if (!eventDefinitionContext) {
+      return <em>{event.event_definition_id}</em>;
+    }
+
+    return PermissionsMixin.isPermitted(currentUser.permissions,
+      `eventdefinitions:edit:${eventDefinitionContext.id}`)
+      ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
+      : eventDefinitionContext.title;
+  };
+
   render() {
     const { event, eventDefinitionContext } = this.props;
     const plugin = this.getConditionPlugin(event.event_definition_type);
@@ -58,13 +73,7 @@ class EventDetails extends React.Component {
             </dd>
             <dt>Event Definition</dt>
             <dd>
-              {eventDefinitionContext ? (
-                <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>
-                  {eventDefinitionContext.title}
-                </Link>
-              ) : (
-                <em>{event.event_definition_id}</em>
-              )}
+              {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
               &emsp;
               ({plugin.displayName || event.event_definition_type})
             </dd>
