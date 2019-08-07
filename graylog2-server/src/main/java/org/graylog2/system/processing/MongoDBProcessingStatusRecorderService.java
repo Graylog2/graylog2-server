@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
 
     private final DBProcessingStatusService dbService;
     private final EventBus eventBus;
+    private final ServerStatus serverStatus;
     private final Duration persistInterval;
     private final ScheduledExecutorService scheduler;
     private final AtomicBoolean inShutdown = new AtomicBoolean(false);
@@ -56,10 +58,12 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     @Inject
     public MongoDBProcessingStatusRecorderService(DBProcessingStatusService dbService,
                                                   EventBus eventBus,
+                                                  ServerStatus serverStatus,
                                                   @Named(ProcessingStatusConfig.PERSIST_INTERVAL) Duration persistInterval,
                                                   @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.dbService = dbService;
         this.eventBus = eventBus;
+        this.serverStatus = serverStatus;
         this.persistInterval = persistInterval;
         this.scheduler = scheduler;
     }
@@ -117,6 +121,11 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
         } catch (Exception e) {
             LOG.error("Couldn't persist processing status", e);
         }
+    }
+
+    @Override
+    public Lifecycle getNodeLifecycleStatus() {
+        return serverStatus.getLifecycle();
     }
 
     @Override

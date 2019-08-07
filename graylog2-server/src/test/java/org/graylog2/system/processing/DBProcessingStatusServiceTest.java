@@ -25,6 +25,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -86,6 +87,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.id()).isEqualTo("54e3deadbeefdeadbeef0000");
             assertThat(dto.nodeId()).isEqualTo("abc-123");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
+            assertThat(dto.nodeLifecycleStatus()).isEqualTo(Lifecycle.RUNNING);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:03:00.000Z"));
@@ -98,6 +100,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.id()).isEqualTo("54e3deadbeefdeadbeef0001");
             assertThat(dto.nodeId()).isEqualTo("abc-456");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
+            assertThat(dto.nodeLifecycleStatus()).isEqualTo(Lifecycle.RUNNING);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
@@ -110,6 +113,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.id()).isEqualTo("54e3deadbeefdeadbeef0002");
             assertThat(dto.nodeId()).isEqualTo("abc-789");
             assertThat(dto.updatedAt()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
+            assertThat(dto.nodeLifecycleStatus()).isEqualTo(Lifecycle.STARTING);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:03:00.000Z"));
@@ -133,6 +137,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.id()).isNotBlank();
             assertThat(dto.nodeId()).isEqualTo(NODE_ID);
             assertThat(dto.updatedAt()).isEqualByComparingTo(now);
+            assertThat(dto.nodeLifecycleStatus()).isEqualTo(Lifecycle.RUNNING);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(now);
@@ -155,6 +160,7 @@ public class DBProcessingStatusServiceTest {
             assertThat(dto.id()).isNotBlank();
             assertThat(dto.nodeId()).isEqualTo(NODE_ID);
             assertThat(dto.updatedAt()).isEqualByComparingTo(tomorrow);
+            assertThat(dto.nodeLifecycleStatus()).isEqualTo(Lifecycle.RUNNING);
 
             assertThat(dto.receiveTimes()).satisfies(receiveTimes -> {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(tomorrow);

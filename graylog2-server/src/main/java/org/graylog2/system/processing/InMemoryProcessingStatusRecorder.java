@@ -16,6 +16,7 @@
  */
 package org.graylog2.system.processing;
 
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 
 import javax.inject.Singleton;
@@ -31,6 +32,11 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+
+    @Override
+    public Lifecycle getNodeLifecycleStatus() {
+        return Lifecycle.RUNNING;
+    }
 
     @Override
     public DateTime getIngestReceiveTime() {

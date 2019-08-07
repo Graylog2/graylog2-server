@@ -5,6 +5,7 @@
         "$oid": "54e3deadbeefdeadbeef0000"
       },
       "node_id": "abc-123",
+      "node_lifecycle_status": "RUNNING",
       "updated_at": {
         "$date": "2019-01-01T00:03:00.000Z"
       },
@@ -45,6 +46,7 @@
         "$oid": "54e3deadbeefdeadbeef0002"
       },
       "node_id": "abc-789",
+      "node_lifecycle_status": "STARTING",
       "updated_at": {
         "$date": "2019-01-01T02:03:00.000Z"
       },

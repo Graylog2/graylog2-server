@@ -16,6 +16,7 @@
  */
 package org.graylog2.system.processing;
 
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 
 /**
@@ -51,4 +52,11 @@ public interface ProcessingStatusRecorder {
     void updatePostIndexingReceiveTime(DateTime newTimestamp);
 
     DateTime getPostIndexingReceiveTime();
+
+    /**
+     * Returns the node {@link Lifecycle} status for the node.
+     *
+     * @return the node lifecycle status
+     */
+    Lifecycle getNodeLifecycleStatus();
 }
