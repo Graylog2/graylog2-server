@@ -16,12 +16,16 @@
  */
 package org.graylog2.system.processing;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.shared.journal.KafkaJournal;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static org.joda.time.DateTimeZone.UTC;
 
 @Singleton
@@ -42,6 +47,9 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDBProcessingStatusRecorderService.class);
 
     private static final DateTime DEFAULT_RECEIVE_TIME = new DateTime(0L, UTC);
+    private static final String READ_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.METER_READ_MESSAGES);
+    private static final String WRITTEN_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.METER_WRITTEN_MESSAGES);
+    private static final String UNCOMMITTED_MESSAGES_METRIC = name(KafkaJournal.class.getName(), KafkaJournal.GAUGE_UNCOMMITTED_MESSAGES);
 
     private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(DEFAULT_RECEIVE_TIME);
@@ -50,6 +58,7 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     private final DBProcessingStatusService dbService;
     private final EventBus eventBus;
     private final ServerStatus serverStatus;
+    private final MetricRegistry metricRegistry;
     private final Duration persistInterval;
     private final ScheduledExecutorService scheduler;
     private final AtomicBoolean inShutdown = new AtomicBoolean(false);
@@ -59,11 +68,13 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     public MongoDBProcessingStatusRecorderService(DBProcessingStatusService dbService,
                                                   EventBus eventBus,
                                                   ServerStatus serverStatus,
+                                                  MetricRegistry metricRegistry,
                                                   @Named(ProcessingStatusConfig.PERSIST_INTERVAL) Duration persistInterval,
                                                   @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.dbService = dbService;
         this.eventBus = eventBus;
         this.serverStatus = serverStatus;
+        this.metricRegistry = metricRegistry;
         this.persistInterval = persistInterval;
         this.scheduler = scheduler;
     }
@@ -141,6 +152,36 @@ public class MongoDBProcessingStatusRecorderService extends AbstractIdleService 
     @Override
     public DateTime getPostIndexingReceiveTime() {
         return postIndexReceiveTime.get();
+    }
+
+    @Override
+    public long getJournalInfoUncommittedEntries() {
+        //noinspection unchecked
+        final Gauge<Long> gauge = (Gauge<Long>) metricRegistry
+                .getGauges((name, metric) -> UNCOMMITTED_MESSAGES_METRIC.equals(name))
+                .get(UNCOMMITTED_MESSAGES_METRIC);
+        if (gauge != null) {
+            return gauge.getValue();
+        }
+        return 0;
+    }
+
+    @Override
+    public double getJournalInfoReadMessages1mRate() {
+        return getJournalInfoMeter1mRate(READ_MESSAGES_METRIC);
+    }
+
+    @Override
+    public double getJournalInfoWrittenMessages1mRate() {
+        return getJournalInfoMeter1mRate(WRITTEN_MESSAGES_METRIC);
+    }
+
+    private double getJournalInfoMeter1mRate(String metricName) {
+        final Meter meter = metricRegistry.getMeters((name, metric) -> metricName.equals(name)).get(metricName);
+        if (meter != null) {
+            return meter.getOneMinuteRate();
+        }
+        return 0;
     }
 
     @Override

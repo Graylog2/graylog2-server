@@ -59,4 +59,10 @@ public interface ProcessingStatusRecorder {
      * @return the node lifecycle status
      */
     Lifecycle getNodeLifecycleStatus();
+
+    long getJournalInfoUncommittedEntries();
+
+    double getJournalInfoReadMessages1mRate();
+
+    double getJournalInfoWrittenMessages1mRate();
 }

@@ -19,6 +19,11 @@
         "post_indexing": {
           "$date": "2019-01-01T00:01:00.000Z"
         }
+      },
+      "input_journal": {
+        "uncommitted_entries": 0,
+        "read_messages_1m_rate": 12,
+        "written_messages_1m_rate": 12
       }
     },
     {
@@ -60,6 +65,11 @@
         "post_indexing": {
           "$date": "2019-01-01T01:01:00.000Z"
         }
+      },
+      "input_journal": {
+        "uncommitted_entries": 42,
+        "read_messages_1m_rate": 2,
+        "written_messages_1m_rate": 4
       }
     }
   ]

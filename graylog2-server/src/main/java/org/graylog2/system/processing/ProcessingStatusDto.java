@@ -35,6 +35,7 @@ public abstract class ProcessingStatusDto {
     static final String FIELD_NODE_LIFECYCLE_STATUS = "node_lifecycle_status";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_RECEIVE_TIMES = "receive_times";
+    static final String FIELD_INPUT_JOURNAL = "input_journal";
 
     @Id
     @ObjectId
@@ -54,6 +55,9 @@ public abstract class ProcessingStatusDto {
     @JsonProperty(FIELD_RECEIVE_TIMES)
     public abstract ReceiveTimes receiveTimes();
 
+    @JsonProperty(FIELD_INPUT_JOURNAL)
+    public abstract JournalInfo inputJournal();
+
     public static ProcessingStatusDto of(String nodeId, ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt) {
         return builder()
                 .nodeId(nodeId)
@@ -63,6 +67,11 @@ public abstract class ProcessingStatusDto {
                         .ingest(processingStatusRecorder.getIngestReceiveTime())
                         .postProcessing(processingStatusRecorder.getPostProcessingReceiveTime())
                         .postIndexing(processingStatusRecorder.getPostIndexingReceiveTime())
+                        .build())
+                .inputJournal(JournalInfo.builder()
+                        .uncommittedEntries(processingStatusRecorder.getJournalInfoUncommittedEntries())
+                        .readMessages1mRate(processingStatusRecorder.getJournalInfoReadMessages1mRate())
+                        .writtenMessages1mRate(processingStatusRecorder.getJournalInfoWrittenMessages1mRate())
                         .build())
                 .build();
     }
@@ -78,9 +87,10 @@ public abstract class ProcessingStatusDto {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ProcessingStatusDto.Builder()
-                    // 3.1.0-beta/rc setups didn't have the lifecycle status so we need to have a default for them.
-                    // TODO: The lifecycle status default can be removed at some point after 3.1.0
-                    .nodeLifecycleStatus(Lifecycle.RUNNING);
+                    // 3.1.0-beta/rc setups didn't have the lifecycle status and journal info so we need to have a default for them.
+                    // TODO: The lifecycle status and journal info defaults can be removed at some point after 3.1.0
+                    .nodeLifecycleStatus(Lifecycle.RUNNING)
+                    .inputJournal(JournalInfo.builder().build());
         }
 
         @Id
@@ -99,6 +109,9 @@ public abstract class ProcessingStatusDto {
 
         @JsonProperty(FIELD_RECEIVE_TIMES)
         public abstract Builder receiveTimes(ReceiveTimes receiveTimes);
+
+        @JsonProperty(FIELD_INPUT_JOURNAL)
+        public abstract Builder inputJournal(JournalInfo inputJournal);
 
         public abstract ProcessingStatusDto build();
     }
@@ -140,6 +153,49 @@ public abstract class ProcessingStatusDto {
             public abstract Builder postIndexing(DateTime timestamp);
 
             public abstract ReceiveTimes build();
+        }
+    }
+
+    @AutoValue
+    @JsonDeserialize(builder = JournalInfo.Builder.class)
+    public static abstract class JournalInfo {
+        private static final String FIELD_UNCOMMITTED_ENTRIES = "uncommitted_entries";
+        private static final String FIELD_READ_MESSAGES_1M_RATE = "read_messages_1m_rate";
+        private static final String FIELD_WRITTEN_MESSAGES_1M_RATE = "written_messages_1m_rate";
+
+        @JsonProperty(FIELD_UNCOMMITTED_ENTRIES)
+        public abstract long uncommittedEntries();
+
+        @JsonProperty(FIELD_READ_MESSAGES_1M_RATE)
+        public abstract double readMessages1mRate();
+
+        @JsonProperty(FIELD_WRITTEN_MESSAGES_1M_RATE)
+        public abstract double writtenMessages1mRate();
+
+        public static Builder builder() {
+            return Builder.create();
+        }
+
+        @AutoValue.Builder
+        public abstract static class Builder {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_ProcessingStatusDto_JournalInfo.Builder()
+                        .uncommittedEntries(0)
+                        .readMessages1mRate(0d)
+                        .writtenMessages1mRate(0d);
+            }
+
+            @JsonProperty(FIELD_UNCOMMITTED_ENTRIES)
+            public abstract Builder uncommittedEntries(long uncommittedEntries);
+
+            @JsonProperty(FIELD_READ_MESSAGES_1M_RATE)
+            public abstract Builder readMessages1mRate(double readMessages1mRate);
+
+            @JsonProperty(FIELD_WRITTEN_MESSAGES_1M_RATE)
+            public abstract Builder writtenMessages1mRate(double writtenMessages1mRate);
+
+            public abstract JournalInfo build();
         }
     }
 }

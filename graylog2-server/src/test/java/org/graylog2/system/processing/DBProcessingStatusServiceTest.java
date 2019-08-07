@@ -94,6 +94,12 @@ public class DBProcessingStatusServiceTest {
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
             });
+
+            assertThat(dto.inputJournal()).satisfies(inputJournal -> {
+                assertThat(inputJournal.uncommittedEntries()).isEqualTo(0);
+                assertThat(inputJournal.readMessages1mRate()).isEqualTo(12.0d);
+                assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(12.0d);
+            });
         });
 
         assertThat(dbService.all().get(1)).satisfies(dto -> {
@@ -106,6 +112,12 @@ public class DBProcessingStatusServiceTest {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:03:00.000Z"));
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:01:00.000Z"));
+            });
+
+            assertThat(dto.inputJournal()).satisfies(inputJournal -> {
+                assertThat(inputJournal.uncommittedEntries()).isEqualTo(0);
+                assertThat(inputJournal.readMessages1mRate()).isEqualTo(0);
+                assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(0);
             });
         });
 
@@ -120,6 +132,12 @@ public class DBProcessingStatusServiceTest {
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(DateTime.parse("2019-01-01T02:02:00.000Z"));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
             });
+
+            assertThat(dto.inputJournal()).satisfies(inputJournal -> {
+                assertThat(inputJournal.uncommittedEntries()).isEqualTo(42);
+                assertThat(inputJournal.readMessages1mRate()).isEqualTo(2.0d);
+                assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(4.0d);
+            });
         });
     }
 
@@ -133,6 +151,10 @@ public class DBProcessingStatusServiceTest {
         statusRecorder.updatePostProcessingReceiveTime(now.minusSeconds(1));
         statusRecorder.updatePostIndexingReceiveTime(now.minusSeconds(2));
 
+        statusRecorder.uncommittedMessages.set(123);
+        statusRecorder.readMessages1m.set(1);
+        statusRecorder.writtenMessages1m.set(2);
+
         assertThat(dbService.save(statusRecorder, now)).satisfies(dto -> {
             assertThat(dto.id()).isNotBlank();
             assertThat(dto.nodeId()).isEqualTo(NODE_ID);
@@ -143,6 +165,12 @@ public class DBProcessingStatusServiceTest {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(now);
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(now.minusSeconds(1));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(now.minusSeconds(2));
+            });
+
+            assertThat(dto.inputJournal()).satisfies(inputJournal -> {
+                assertThat(inputJournal.uncommittedEntries()).isEqualTo(123);
+                assertThat(inputJournal.readMessages1mRate()).isEqualTo(1.0d);
+                assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(2.0d);
             });
         });
 
@@ -166,6 +194,12 @@ public class DBProcessingStatusServiceTest {
                 assertThat(receiveTimes.ingest()).isEqualByComparingTo(tomorrow);
                 assertThat(receiveTimes.postProcessing()).isEqualByComparingTo(tomorrow.minusSeconds(1));
                 assertThat(receiveTimes.postIndexing()).isEqualByComparingTo(tomorrow.minusSeconds(2));
+            });
+
+            assertThat(dto.inputJournal()).satisfies(inputJournal -> {
+                assertThat(inputJournal.uncommittedEntries()).isEqualTo(123);
+                assertThat(inputJournal.readMessages1mRate()).isEqualTo(1.0d);
+                assertThat(inputJournal.writtenMessages1mRate()).isEqualTo(2.0d);
             });
         });
 
