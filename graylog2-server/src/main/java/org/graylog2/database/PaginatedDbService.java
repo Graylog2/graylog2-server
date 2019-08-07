@@ -152,9 +152,10 @@ public abstract class PaginatedDbService<DTO> {
                                                                      DBSort.SortBuilder sort,
                                                                      int page,
                                                                      int perPage) {
+        // Calculate the total amount of items matching the query/filter, but before pagination
         final long total = streamQueryWithSort(query, sort).filter(filter).count();
 
-        // Then use that filtered stream and only collect the entries according to page and perPage
+        // Then create another filtered stream and only collect the entries according to page and perPage
         Stream<DTO> resultStream = streamQueryWithSort(query, sort).filter(filter);
         if (perPage > 0) {
             resultStream = resultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
