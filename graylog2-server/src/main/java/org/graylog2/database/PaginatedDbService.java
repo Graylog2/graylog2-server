@@ -153,17 +153,22 @@ public abstract class PaginatedDbService<DTO> {
                                                                      int page,
                                                                      int perPage) {
         // Calculate the total amount of items matching the query/filter, but before pagination
-        final long total = streamQueryWithSort(query, sort).filter(filter).count();
-
-        // Then create another filtered stream and only collect the entries according to page and perPage
-        Stream<DTO> resultStream = streamQueryWithSort(query, sort).filter(filter);
-        if (perPage > 0) {
-            resultStream = resultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
+        final long total;
+        try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
+            total = cursor.filter(filter).count();
         }
 
-        final long grandTotal = db.count();
+        // Then create another filtered stream and only collect the entries according to page and perPage
+        try (final Stream<DTO> resultStream = streamQueryWithSort(query, sort)) {
+            Stream<DTO> filteredResultStream = resultStream.filter(filter);
+            if (perPage > 0) {
+                filteredResultStream = filteredResultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
+            }
 
-        return new PaginatedList<>(resultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
+            final long grandTotal = db.count();
+
+            return new PaginatedList<>(filteredResultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
+        }
 }
 
     /**
