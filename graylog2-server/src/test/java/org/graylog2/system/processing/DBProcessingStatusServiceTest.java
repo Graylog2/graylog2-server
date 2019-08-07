@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
@@ -36,6 +37,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mongojack.DBQuery;
+import org.mongojack.JacksonDBCollection;
+
+import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,7 +63,8 @@ public class DBProcessingStatusServiceTest {
 
     private DBProcessingStatusService dbService;
     private JobSchedulerTestClock clock;
-    private Duration excludeThreshold;
+    private Duration updateThreshold;
+    private JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Before
     public void setUp() throws Exception {
@@ -68,8 +74,12 @@ public class DBProcessingStatusServiceTest {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
-        excludeThreshold = spy(Duration.minutes(1));
-        dbService = new DBProcessingStatusService(mongoRule.getMongoConnection(), nodeId, clock, excludeThreshold, mapperProvider);
+        updateThreshold = spy(Duration.minutes(1));
+        dbService = new DBProcessingStatusService(mongoRule.getMongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider);
+        db = JacksonDBCollection.wrap(mongoRule.getMongoConnection().getDatabase().getCollection(DBProcessingStatusService.COLLECTION_NAME),
+                ProcessingStatusDto.class,
+                ObjectId.class,
+                mapperProvider.get());
     }
 
     @Test
@@ -217,11 +227,11 @@ public class DBProcessingStatusServiceTest {
         when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
 
         // The exclude threshold is big enough to include all three nodes. So abc-123 has the earliest indexed timestamp
-        when(excludeThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());
         assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
 
         // The exclude threshold is only including nodes abc-456 and abc-789. So abc-789 has the earliest indexed timestamp
-        when(excludeThreshold.toMilliseconds()).thenReturn(Duration.hours(2).toMilliseconds());
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(2).toMilliseconds());
         assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:01:00.000Z"));
     }
 
@@ -237,5 +247,22 @@ public class DBProcessingStatusServiceTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void earliestPostIndexingTimestampWithoutData() {
         assertThat(dbService.earliestPostIndexingTimestamp()).isNotPresent();
+    }
+
+    @Test
+    @UsingDataSet(locations = "processing-status-node-selection-test.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void selectionQuery() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:03:00.000Z"));
+
+        final DBQuery.Query query1 = DBProcessingStatusService.getDataSelectionQuery(clock, Duration.hours(1), 1.0);
+
+        assertThat(db.find(query1).toArray().stream().map(ProcessingStatusDto::nodeId).collect(Collectors.toSet()))
+                .containsOnly("abc-123", "abc-456", "abc-678");
+
+        // With a higher journal write threshold there should only be two node IDs
+        final DBQuery.Query query2 = DBProcessingStatusService.getDataSelectionQuery(clock, Duration.hours(1), 2.0);
+
+        assertThat(db.find(query2).toArray().stream().map(ProcessingStatusDto::nodeId).collect(Collectors.toSet()))
+                .containsOnly("abc-123", "abc-456");
     }
 }

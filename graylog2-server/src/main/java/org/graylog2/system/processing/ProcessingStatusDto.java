@@ -159,9 +159,9 @@ public abstract class ProcessingStatusDto {
     @AutoValue
     @JsonDeserialize(builder = JournalInfo.Builder.class)
     public static abstract class JournalInfo {
-        private static final String FIELD_UNCOMMITTED_ENTRIES = "uncommitted_entries";
+        static final String FIELD_UNCOMMITTED_ENTRIES = "uncommitted_entries";
         private static final String FIELD_READ_MESSAGES_1M_RATE = "read_messages_1m_rate";
-        private static final String FIELD_WRITTEN_MESSAGES_1M_RATE = "written_messages_1m_rate";
+        static final String FIELD_WRITTEN_MESSAGES_1M_RATE = "written_messages_1m_rate";
 
         @JsonProperty(FIELD_UNCOMMITTED_ENTRIES)
         public abstract long uncommittedEntries();

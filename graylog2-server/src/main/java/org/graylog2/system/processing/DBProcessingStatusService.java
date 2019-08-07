@@ -37,33 +37,42 @@ import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
 
+import static org.graylog2.system.processing.ProcessingStatusDto.FIELD_UPDATED_AT;
+
 /**
  * Manages the database collection for processing status.
  */
 public class DBProcessingStatusService {
-    private static final String COLLECTION_NAME = "processing_status";
+    static final String COLLECTION_NAME = "processing_status";
+    private static final String FIELD_WRITTEN_MESSAGES_1M = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_WRITTEN_MESSAGES_1M_RATE;
+    private static final String FIELD_UNCOMMITTED_ENTRIES = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_UNCOMMITTED_ENTRIES;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
-    private final Duration excludeThreshold;
+    private final Duration updateThreshold;
+    private final double journalWriteRateThreshold;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
                                      NodeId nodeId,
                                      JobSchedulerClock clock,
-                                     @Named(ProcessingStatusConfig.EXCLUDE_THRESHOLD) Duration excludeThreshold,
+                                     @Named(ProcessingStatusConfig.UPDATE_THRESHOLD) Duration updateThreshold,
+                                     @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,
                                      MongoJackObjectMapperProvider mapper) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
-        this.excludeThreshold = excludeThreshold;
+        this.updateThreshold = updateThreshold;
+        this.journalWriteRateThreshold = ((Number) journalWriteRateThreshold).doubleValue();
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
                 mapper.get());
 
         db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
-        db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_UPDATED_AT, 1));
+        db.createIndex(new BasicDBObject(FIELD_UPDATED_AT, 1)
+                .append(FIELD_UNCOMMITTED_ENTRIES, 1)
+                .append(FIELD_WRITTEN_MESSAGES_1M, 1));
     }
 
     /**
@@ -95,12 +104,7 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
-        final DateTime excludeTimestamp = clock.nowUTC().minus(excludeThreshold.toMilliseconds());
-
-        final DBQuery.Query query = DBQuery.and(
-                // Exclude nodes which haven't been updated recently
-                DBQuery.greaterThan(ProcessingStatusDto.FIELD_UPDATED_AT, excludeTimestamp)
-        );
+        final DBQuery.Query query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
 
         // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
         // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
@@ -111,6 +115,25 @@ public class DBProcessingStatusService {
             }
             return Optional.empty();
         }
+    }
+
+    // This has been put into a static method to simplify testing the processing status selection
+    @VisibleForTesting
+    static DBQuery.Query getDataSelectionQuery(JobSchedulerClock clock, Duration updateThreshold, double journalWriteRateThreshold) {
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+
+        return DBQuery.and(
+                // Only select processing status for a node ...
+                // ... that has been updated recently
+                DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp),
+                // ... and either ...
+                DBQuery.or(
+                        // ... received a certain amount of messages in the last minute
+                        DBQuery.greaterThanEquals(FIELD_WRITTEN_MESSAGES_1M, journalWriteRateThreshold),
+                        // ... or has messages left in the journal
+                        DBQuery.greaterThanEquals(FIELD_UNCOMMITTED_ENTRIES, 1L)
+                )
+        );
     }
 
     /**
