@@ -16,11 +16,20 @@
  */
 package org.graylog2.contentpacks;
 
+import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
 
 public interface NativeEntityConverter<T> {
     T toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities);
+    default void resolveForInstallation(EntityV1 entity,
+                                        Map<String, ValueReference> parameters,
+                                        Map<EntityDescriptor, Entity> entities,
+                                        MutableGraph<Entity> graph) {
+
+    }
 }

@@ -23,16 +23,11 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
-import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
-import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
-import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.notifications.DBNotificationService;
-import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
-import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
@@ -44,8 +39,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -118,10 +110,10 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     private NativeEntity<EventDefinitionDto> decode(EntityV1 entity,
                                                  Map<String, ValueReference> parameters,
-                                                 Map<EntityDescriptor, Object> natvieEntities) {
+                                                 Map<EntityDescriptor, Object> nativeEntities) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
-        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, natvieEntities);
+        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
         final EventDefinitionDto savedDto = eventDefinitionHandler.create(eventDefinition);
         return NativeEntity.create(entity.id(), savedDto.id(), ModelTypes.EVENT_DEFINITION_V1, savedDto.title(), savedDto);
     }
@@ -167,49 +159,9 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         }
 
         //noinspection OptionalGetWithoutIsPresent
-        resolveNotifications(entityDescriptor, eventDefinition.get(), mutableGraph);
-        resolveStreams(entityDescriptor, eventDefinition.get(), mutableGraph);
+        eventDefinition.get().resolveNativeEntity(entityDescriptor, mutableGraph);
 
         return ImmutableGraph.copyOf(mutableGraph);
-    }
-
-    private void resolveNotifications(EntityDescriptor entityDescriptor,
-                                      EventDefinitionDto eventDefinition,
-                                      MutableGraph<EntityDescriptor> mutableGraph) {
-        eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId)
-            .forEach(id -> {
-                notificationService.get(id).ifPresent(notification -> {
-                    final EntityDescriptor depNotification = EntityDescriptor.builder()
-                        .id(ModelId.of(notification.id()))
-                        .type(ModelTypes.NOTIFICATION_V1)
-                        .build();
-                    mutableGraph.putEdge(entityDescriptor, depNotification);
-                });
-            });
-    }
-
-    private void resolveStreams(EntityDescriptor entityDescriptor,
-                                EventDefinitionDto eventDefinition,
-                                MutableGraph<EntityDescriptor> mutableGraph) {
-        if(eventDefinition.config() instanceof AggregationEventProcessorConfig) {
-            AggregationEventProcessorConfig config = (AggregationEventProcessorConfig) eventDefinition.config();
-            config.streams().stream().map(streamId -> {
-                try {
-                    return Optional.of(streamService.load(streamId));
-                } catch (NotFoundException e) {
-                    LOG.debug("Couldn't find stream for {}.", entityDescriptor, e);
-                    return Optional.empty();
-                }
-            }).filter(Optional::isPresent).map(Optional::get)
-                .forEach(streamObj -> {
-                    final Stream stream = (Stream) streamObj;
-                    final EntityDescriptor depStream = EntityDescriptor.builder()
-                        .id(ModelId.of(stream.getId()))
-                        .type(ModelTypes.STREAM_V1)
-                        .build();
-                    mutableGraph.putEdge(entityDescriptor, depStream);
-                });
-        }
     }
 
     @Override
@@ -226,42 +178,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         graph.addNode(entity);
 
         final EventDefinitionEntity eventDefinition = objectMapper.convertValue(entity.data(), EventDefinitionEntity.class);
-        resolveNotificationsForInstallation(entity, eventDefinition, parameters, entities, graph);
-        resolveStreamsForInstallation(entity, eventDefinition, parameters, entities, graph);
+        eventDefinition.resolveForInstallation(entity, parameters, entities, graph);
 
         return ImmutableGraph.copyOf(graph);
-    }
-
-    private void resolveNotificationsForInstallation(EntityV1 entity,
-                                      EventDefinitionEntity eventDefinitionEntity,
-                                      Map<String, ValueReference> parameters,
-                                      Map<EntityDescriptor, Entity> entities,
-                                      MutableGraph<Entity> graph) {
-        eventDefinitionEntity.notifications().stream()
-            .map(EventNotificationHandlerConfigEntity::notificationId)
-            .map(valueReference -> valueReference.asString(parameters))
-            .map(ModelId::of)
-            .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.NOTIFICATION_V1))
-            .map(entities::get)
-            .filter(Objects::nonNull)
-            .forEach(notification -> graph.putEdge(entity, notification));
-    }
-
-    private void resolveStreamsForInstallation(EntityV1 entity,
-                                                     EventDefinitionEntity eventDefinitionEntity,
-                                                     Map<String, ValueReference> parameters,
-                                                     Map<EntityDescriptor, Entity> entities,
-                                                     MutableGraph<Entity> graph) {
-        EventProcessorConfigEntity config = eventDefinitionEntity.config();
-
-        if (config instanceof AggregationEventProcessorConfigEntity) {
-            AggregationEventProcessorConfigEntity configEntity = (AggregationEventProcessorConfigEntity) config;
-            configEntity.streams().stream()
-                .map(ModelId::of)
-                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
-                .map(entities::get)
-                .filter(Objects::nonNull)
-                .forEach(stream -> graph.putEdge(entity, stream));
-        }
     }
 }

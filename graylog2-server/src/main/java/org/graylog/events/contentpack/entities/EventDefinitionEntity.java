@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationHandler;
@@ -29,10 +30,15 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @AutoValue
@@ -144,5 +150,19 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
             .notifications(notificationList)
             .storage(storage())
             .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
+        notifications().stream()
+            .map(EventNotificationHandlerConfigEntity::notificationId)
+            .map(valueReference -> valueReference.asString(parameters))
+            .map(ModelId::of)
+            .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.NOTIFICATION_V1))
+            .map(entities::get)
+            .filter(Objects::nonNull)
+            .forEach(notification -> graph.putEdge(entity, notification));
+
+        config().resolveForInstallation(entity, parameters, entities, graph);
     }
 }

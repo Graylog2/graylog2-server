@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
@@ -34,6 +35,9 @@ import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -233,5 +237,18 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
             .keySpec(keySpec())
             .storage(storage())
             .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        notifications().stream().map(EventNotificationHandler.Config::notificationId)
+            .forEach(id -> {
+                    final EntityDescriptor depNotification = EntityDescriptor.builder()
+                        .id(ModelId.of(id))
+                        .type(ModelTypes.NOTIFICATION_V1)
+                        .build();
+                    mutableGraph.putEdge(entityDescriptor, depNotification);
+                });
+        config().resolveNativeEntity(entityDescriptor, mutableGraph);
     }
 }
