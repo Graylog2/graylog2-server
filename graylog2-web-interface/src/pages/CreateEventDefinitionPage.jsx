@@ -20,6 +20,7 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 class CreateEventDefinitionPage extends React.Component {
   static propTypes = {
     currentUser: PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
   };
 
   state = {
@@ -37,7 +38,7 @@ class CreateEventDefinitionPage extends React.Component {
     const { eventDefinitionTitle } = this.state;
     const pageTitle = eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition';
 
-    const { currentUser } = this.props;
+    const { currentUser, route } = this.props;
 
     if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
       history.push(Routes.NOTFOUND);
@@ -76,7 +77,9 @@ class CreateEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="create" onEventDefinitionChange={this.handleEventDefinitionChange} />
+              <EventDefinitionFormContainer action="create"
+                                            onEventDefinitionChange={this.handleEventDefinitionChange}
+                                            route={route} />
             </Col>
           </Row>
         </span>

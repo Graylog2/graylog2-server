@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import { withRouter } from 'react-router';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
@@ -9,7 +10,7 @@ import connect from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { Spinner } from 'components/common';
+import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import EventDefinitionForm from './EventDefinitionForm';
 // Import built-in plugins
 import {} from 'components/event-definitions/event-definition-types';
@@ -28,6 +29,7 @@ class EventDefinitionFormContainer extends React.Component {
     currentUser: PropTypes.object.isRequired,
     entityTypes: PropTypes.object,
     notifications: PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
     onEventDefinitionChange: PropTypes.func,
   };
 
@@ -61,6 +63,7 @@ class EventDefinitionFormContainer extends React.Component {
         errors: {},
       },
       eventsClusterConfig: undefined,
+      isDirty: false,
     };
   }
 
@@ -83,14 +86,12 @@ class EventDefinitionFormContainer extends React.Component {
       nextEventDefinition[key] = value;
       const { onEventDefinitionChange } = this.props;
       onEventDefinitionChange(nextEventDefinition);
-      return { eventDefinition: nextEventDefinition };
+      return { eventDefinition: nextEventDefinition, isDirty: true };
     });
   };
 
   handleCancel = () => {
-    if (window.confirm('Do you really want to abandon this page and lose your changes? This action cannot be undone.')) {
-      history.goBack();
-    }
+    history.push(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
   handleSubmit = () => {
@@ -100,7 +101,7 @@ class EventDefinitionFormContainer extends React.Component {
     if (action === 'create') {
       EventDefinitionsActions.create(eventDefinition)
         .then(
-          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
+          () => this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST)),
           (errorResponse) => {
             const { body } = errorResponse.additional;
             if (errorResponse.status === 400 && body && body.failed) {
@@ -111,7 +112,7 @@ class EventDefinitionFormContainer extends React.Component {
     } else {
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
         .then(
-          () => history.push(Routes.ALERTS.DEFINITIONS.LIST),
+          () => this.setState({ isDirty: false }, () => history.push(Routes.ALERTS.DEFINITIONS.LIST)),
           (errorResponse) => {
             const { body } = errorResponse.additional;
             if (errorResponse.status === 400 && body && body.failed) {
@@ -123,8 +124,8 @@ class EventDefinitionFormContainer extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, notifications, currentUser } = this.props;
-    const { eventDefinition, eventsClusterConfig, validation } = this.state;
+    const { action, entityTypes, notifications, currentUser, route } = this.props;
+    const { isDirty, eventDefinition, eventsClusterConfig, validation } = this.state;
     const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
 
     if (isLoading) {
@@ -134,21 +135,27 @@ class EventDefinitionFormContainer extends React.Component {
     const defaults = { default_backlog_size: eventsClusterConfig.events_notification_default_backlog };
 
     return (
-      <EventDefinitionForm action={action}
-                           eventDefinition={eventDefinition}
-                           currentUser={currentUser}
-                           validation={validation}
-                           entityTypes={entityTypes}
-                           notifications={notifications.all}
-                           defaults={defaults}
-                           onChange={this.handleChange}
-                           onCancel={this.handleCancel}
-                           onSubmit={this.handleSubmit} />
+      <React.Fragment>
+        {isDirty && (
+          <ConfirmLeaveDialog route={route}
+                              question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+        )}
+        <EventDefinitionForm action={action}
+                             eventDefinition={eventDefinition}
+                             currentUser={currentUser}
+                             validation={validation}
+                             entityTypes={entityTypes}
+                             notifications={notifications.all}
+                             defaults={defaults}
+                             onChange={this.handleChange}
+                             onCancel={this.handleCancel}
+                             onSubmit={this.handleSubmit} />
+      </React.Fragment>
     );
   }
 }
 
-export default connect(EventDefinitionFormContainer, {
+export default connect(withRouter(EventDefinitionFormContainer), {
   entityTypes: AvailableEventDefinitionTypesStore,
   notifications: EventNotificationsStore,
   currentUser: CurrentUserStore,
