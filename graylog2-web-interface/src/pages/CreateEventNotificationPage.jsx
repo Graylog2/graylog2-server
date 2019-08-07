@@ -20,10 +20,11 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 class CreateEventDefinitionPage extends React.Component {
   static propTypes = {
     currentUser: PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
   };
 
   render() {
-    const { currentUser } = this.props;
+    const { currentUser, route } = this.props;
 
     if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
       history.push(Routes.NOTFOUND);
@@ -63,7 +64,7 @@ class CreateEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventNotificationFormContainer action="create" />
+              <EventNotificationFormContainer action="create" route={route} />
             </Col>
           </Row>
         </span>
