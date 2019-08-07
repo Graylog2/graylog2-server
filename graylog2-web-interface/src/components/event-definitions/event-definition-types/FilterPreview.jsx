@@ -23,9 +23,9 @@ class FilterPreview extends React.Component {
   };
 
   renderMessages = (messages) => {
-    return messages.map(({ message }) => {
+    return messages.map(({ index, message }) => {
       return (
-        <tr key={message._id}>
+        <tr key={`${index}-${message._id}`}>
           <td>{message.timestamp}</td>
           <td>{message.message}</td>
         </tr>
