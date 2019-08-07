@@ -108,15 +108,15 @@ public class MoreSearch extends Searches {
      * @param parameters             event search parameters
      * @param filterString           filter string
      * @param eventStreams           event streams to search in
-     * @param permittedSourceStreams permitted source streams
+     * @param forbiddenSourceStreams forbidden source streams
      * @return the result
      */
     // TODO: We cannot use Searches#search() at the moment because that method cannot handle multiple streams. (because of Searches#extractStreamId())
     //       We also cannot use the new search code at the moment because it doesn't do pagination.
-    Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, PermittedStreams permittedSourceStreams) {
+    Result eventSearch(EventsSearchParameters parameters, String filterString, Set<String> eventStreams, Set<String> forbiddenSourceStreams) {
         checkArgument(parameters != null, "parameters cannot be null");
         checkArgument(!eventStreams.isEmpty(), "eventStreams cannot be empty");
-        checkArgument(permittedSourceStreams != null, "permittedSourceStreams cannot be null");
+        checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
 
         final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
         final Sorting sorting = new Sorting(parameters.sortBy(), sortDirection);
@@ -136,8 +136,10 @@ public class MoreSearch extends Searches {
             filter.filter(queryStringQuery(filterString));
         }
 
-        if (!permittedSourceStreams.allStreamsPermitted()) {
-            filter.filter(termsQuery(EventDto.FIELD_SOURCE_STREAMS, permittedSourceStreams.streams()));
+        if (!forbiddenSourceStreams.isEmpty()) {
+            // If an event has any stream in "source_streams" that the calling search user is not allowed to access,
+            // the event must not be in the search result.
+            filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -347,21 +349,6 @@ public class MoreSearch extends Searches {
             public abstract Builder executedQuery(String executedQuery);
 
             public abstract Result build();
-        }
-    }
-
-    @AutoValue
-    public static abstract class PermittedStreams {
-        public abstract Set<String> streams();
-
-        public abstract boolean allStreamsPermitted();
-
-        public static PermittedStreams of(Set<String> streams) {
-            return new AutoValue_MoreSearch_PermittedStreams(streams, false);
-        }
-
-        public static PermittedStreams all() {
-            return new AutoValue_MoreSearch_PermittedStreams(Collections.emptySet(), true);
         }
     }
 }

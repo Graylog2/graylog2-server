@@ -92,7 +92,7 @@ public class EventsSearchService {
 
         final String filter = String.join(" AND ", filterBuilder.build());
         final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
-        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, permittedSourceStreams(subject));
+        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
         final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
@@ -139,19 +139,18 @@ public class EventsSearchService {
     // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
     //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
     //       most probably not more efficient.
-    private MoreSearch.PermittedStreams permittedSourceStreams(Subject subject) {
+    private Set<String> forbiddenSourceStreams(Subject subject) {
         // Users with the generic streams:read permission can read all streams so we don't need to check every single
         // stream here and can take a short cut.
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
-            return MoreSearch.PermittedStreams.all();
+            return Collections.emptySet();
         }
 
-        final Set<String> permittedStreams = streamService.loadAll().stream()
+        return streamService.loadAll().stream()
             .map(Persisted::getId)
-            .filter(streamId -> subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+            // Select all streams the user is NOT permitted to access
+            .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
             .collect(Collectors.toSet());
-
-        return MoreSearch.PermittedStreams.of(permittedStreams);
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {
