@@ -124,13 +124,13 @@ public class MoreSearch extends Searches {
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
         final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*")) ?
-            matchAllQuery() :
-            queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
+                matchAllQuery() :
+                queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
 
         final BoolQueryBuilder filter = boolQuery()
-            .filter(query)
-            .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-            .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(parameters.timerange())));
+                .filter(query)
+                .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
+                .filter(requireNonNull(IndexHelper.getTimestampRangeFilter(parameters.timerange())));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -141,16 +141,16 @@ public class MoreSearch extends Searches {
         }
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .query(filter)
-            .from((parameters.page() - 1) * parameters.perPage())
-            .size(parameters.perPage())
-            .sort(sorting.getField(), sorting.asElastic());
+                .query(filter)
+                .from((parameters.page() - 1) * parameters.perPage())
+                .size(parameters.perPage())
+                .sort(sorting.getField(), sorting.asElastic());
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-            .addType(IndexMapping.TYPE_MESSAGE)
-            .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
-            .allowNoIndices(false)
-            .ignoreUnavailable(false);
+                .addType(IndexMapping.TYPE_MESSAGE)
+                .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
+                .allowNoIndices(false)
+                .ignoreUnavailable(false);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
@@ -159,18 +159,17 @@ public class MoreSearch extends Searches {
 
         final SearchResult searchResult = wrapInMultiSearch(searchBuilder.build(), () -> "Unable to perform search query");
 
-        @SuppressWarnings("unchecked")
-        final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
-            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))
-            .collect(Collectors.toList());
+        @SuppressWarnings("unchecked") final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
+                .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))
+                .collect(Collectors.toList());
 
         return Result.builder()
-            .results(hits)
-            .resultsCount(searchResult.getTotal())
-            .duration(tookMsFromSearchResult(searchResult))
-            .usedIndexNames(affectedIndices)
-            .executedQuery(searchSourceBuilder.toString())
-            .build();
+                .results(hits)
+                .resultsCount(searchResult.getTotal())
+                .duration(tookMsFromSearchResult(searchResult))
+                .usedIndexNames(affectedIndices)
+                .executedQuery(searchSourceBuilder.toString())
+                .build();
     }
 
     private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
@@ -199,8 +198,8 @@ public class MoreSearch extends Searches {
      * {@code continueScrolling} boolean to {@code false} from the {@link ScrollCallback}.
      * <p></p>
      * TODO: Elasticsearch has a default limit of 500 concurrent scrolls. Every caller of this method should check
-     *       if there is capacity to create a new scroll request. This can be done by using the ES nodes stats API.
-     *       See: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#scroll-search-context
+     * if there is capacity to create a new scroll request. This can be done by using the ES nodes stats API.
+     * See: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-scroll.html#scroll-search-context
      *
      * @param queryString    the search query string
      * @param streams        the set of streams to search in
@@ -313,9 +312,9 @@ public class MoreSearch extends Searches {
         checkArgument(!streams.isEmpty(), "streams parameter cannot be empty");
 
         final String streamFilter = streams.stream()
-            .map(String::trim)
-            .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
-            .collect(Collectors.joining(" OR "));
+                .map(String::trim)
+                .map(stream -> String.format(Locale.ENGLISH, "streams:%s", stream))
+                .collect(Collectors.joining(" OR "));
         return "(" + streamFilter + ")";
     }
 
@@ -354,6 +353,7 @@ public class MoreSearch extends Searches {
     @AutoValue
     public static abstract class PermittedStreams {
         public abstract Set<String> streams();
+
         public abstract boolean allStreamsPermitted();
 
         public static PermittedStreams of(Set<String> streams) {
