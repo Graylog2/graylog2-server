@@ -23,6 +23,24 @@ class FilterForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  formatStreamIds = lodash.memoize(
+    (streamIds) => {
+      const { streams } = this.props;
+
+      return streamIds
+        .map(streamId => streams.find(s => s.id === streamId) || streamId)
+        .map((streamOrId) => {
+          const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+          return {
+            label: stream.title,
+            value: stream.id,
+          };
+        })
+        .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
+    },
+    streamIds => streamIds.join('-'),
+  );
+
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
@@ -51,14 +69,7 @@ class FilterForm extends React.Component {
 
     // Ensure deleted streams are still displayed in select
     const allStreamIds = lodash.union(streams.map(s => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
-
-    const formattedStreams = allStreamIds
-      .map(streamId => streams.find(s => s.id === streamId) || streamId)
-      .map((streamOrId) => {
-        const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
-        return { label: stream.title, value: stream.id };
-      })
-      .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
+    const formattedStreams = this.formatStreamIds(allStreamIds);
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
