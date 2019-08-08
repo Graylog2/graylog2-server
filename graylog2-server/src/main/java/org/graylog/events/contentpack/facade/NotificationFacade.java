@@ -67,11 +67,11 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
         final NotificationEntity entity = (NotificationEntity) notificationDto.get().toContentPackEntity(entityDescriptorIds);
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return Optional.of(
-            EntityV1.builder()
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(notificationDto.get().id(), ModelTypes.NOTIFICATION_V1)))
-                .type(ModelTypes.NOTIFICATION_V1)
-                .data(data)
-                .build());
+                EntityV1.builder()
+                        .id(ModelId.of(entityDescriptorIds.getOrThrow(notificationDto.get().id(), ModelTypes.NOTIFICATION_V1)))
+                        .type(ModelTypes.NOTIFICATION_V1)
+                        .data(data)
+                        .build());
     }
 
     @Override
@@ -106,16 +106,16 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
     @Override
     public EntityExcerpt createExcerpt(NotificationDto nativeEntity) {
         return EntityExcerpt.builder()
-            .id(ModelId.of(nativeEntity.id()))
-            .type(ModelTypes.NOTIFICATION_V1)
-            .title(nativeEntity.title())
-            .build();
+                .id(ModelId.of(nativeEntity.id()))
+                .type(ModelTypes.NOTIFICATION_V1)
+                .title(nativeEntity.title())
+                .build();
     }
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return notificationService.streamAll()
-            .map(this::createExcerpt)
-            .collect(Collectors.toSet());
+                .map(this::createExcerpt)
+                .collect(Collectors.toSet());
     }
 }

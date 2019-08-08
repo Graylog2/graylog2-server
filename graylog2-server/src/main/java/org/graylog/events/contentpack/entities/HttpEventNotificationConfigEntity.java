@@ -62,7 +62,7 @@ public abstract class HttpEventNotificationConfigEntity implements EventNotifica
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return HTTPEventNotificationConfig.builder()
-            .url(url().asString(parameters))
-            .build();
+                .url(url().asString(parameters))
+                .build();
     }
 }

@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -89,9 +88,9 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public NativeEntity<EventDefinitionDto> createNativeEntity(Entity entity,
-                                                            Map<String, ValueReference> parameters,
-                                                            Map<EntityDescriptor, Object> nativeEntities,
-                                                            String username) {
+                                                               Map<String, ValueReference> parameters,
+                                                               Map<EntityDescriptor, Object> nativeEntities,
+                                                               String username) {
         if (entity instanceof EntityV1) {
             return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
@@ -100,8 +99,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     private NativeEntity<EventDefinitionDto> decode(EntityV1 entity,
-                                                 Map<String, ValueReference> parameters,
-                                                 Map<EntityDescriptor, Object> nativeEntities) {
+                                                    Map<String, ValueReference> parameters,
+                                                    Map<EntityDescriptor, Object> nativeEntities) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
         final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
@@ -157,7 +156,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public Graph<Entity> resolveForInstallation(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities) {
-        if(entity instanceof EntityV1) {
+        if (entity instanceof EntityV1) {
             return resolveForInstallationV1((EntityV1) entity, parameters, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());

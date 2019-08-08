@@ -66,7 +66,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
-                .type(TYPE_NAME);
+                    .type(TYPE_NAME);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -90,11 +90,11 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return EmailEventNotificationConfig.builder()
-            .sender(sender().asString(parameters))
-            .subject(subject().asString(parameters))
-            .bodyTemplate(bodyTemplate().asString())
-            .emailRecipients(emailRecipients())
-            .userRecipients(userRecipients())
-            .build();
+                .sender(sender().asString(parameters))
+                .subject(subject().asString(parameters))
+                .bodyTemplate(bodyTemplate().asString())
+                .emailRecipients(emailRecipients())
+                .userRecipients(userRecipients())
+                .build();
     }
 }

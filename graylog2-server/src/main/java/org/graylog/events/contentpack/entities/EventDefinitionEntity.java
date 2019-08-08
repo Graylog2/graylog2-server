@@ -133,34 +133,34 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     @Override
     public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> natvieEntities) {
         final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
-            notifications().stream()
-            .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
-            .collect(Collectors.toList())
+                notifications().stream()
+                        .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
+                        .collect(Collectors.toList())
         );
-         return EventDefinitionDto.builder()
-            .title(title().asString(parameters))
-            .description(description().asString(parameters))
-            .priority(priority().asInteger(parameters))
-            .alert(alert().asBoolean(parameters))
-            .config(config().toNativeEntity(parameters, natvieEntities))
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .notificationSettings(notificationSettings())
-            .notifications(notificationList)
-            .storage(storage())
-            .build();
+        return EventDefinitionDto.builder()
+                .title(title().asString(parameters))
+                .description(description().asString(parameters))
+                .priority(priority().asInteger(parameters))
+                .alert(alert().asBoolean(parameters))
+                .config(config().toNativeEntity(parameters, natvieEntities))
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .notificationSettings(notificationSettings())
+                .notifications(notificationList)
+                .storage(storage())
+                .build();
     }
 
     @Override
     public void resolveForInstallation(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
         notifications().stream()
-            .map(EventNotificationHandlerConfigEntity::notificationId)
-            .map(valueReference -> valueReference.asString(parameters))
-            .map(ModelId::of)
-            .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.NOTIFICATION_V1))
-            .map(entities::get)
-            .filter(Objects::nonNull)
-            .forEach(notification -> graph.putEdge(entity, notification));
+                .map(EventNotificationHandlerConfigEntity::notificationId)
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.NOTIFICATION_V1))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(notification -> graph.putEdge(entity, notification));
 
         config().resolveForInstallation(entity, parameters, entities, graph);
     }

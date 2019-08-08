@@ -87,6 +87,6 @@ public abstract class EventNotificationHandlerConfigEntity implements NativeEnti
         }
 
         return configBuilder.notificationParameters(notificationParameters().orElse(null))
-            .build();
+                .build();
     }
 }

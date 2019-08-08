@@ -53,7 +53,7 @@ public abstract class LegacyAlarmCallbackEventNotificationConfigEntity implement
         @JsonCreator
         public static Builder create() {
             return new AutoValue_LegacyAlarmCallbackEventNotificationConfigEntity.Builder()
-                .type(TYPE_NAME);
+                    .type(TYPE_NAME);
         }
 
         @JsonProperty(FIELD_CALLBACK_TYPE)
@@ -69,8 +69,8 @@ public abstract class LegacyAlarmCallbackEventNotificationConfigEntity implement
     @Override
     public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return LegacyAlarmCallbackEventNotificationConfig.builder()
-            .callbackType(callbackType().asString(parameters))
-            .configuration(configuration())
-            .build();
+                .callbackType(callbackType().asString(parameters))
+                .configuration(configuration())
+                .build();
     }
 }

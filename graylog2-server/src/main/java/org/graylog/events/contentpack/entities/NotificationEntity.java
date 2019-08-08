@@ -73,9 +73,9 @@ public abstract class NotificationEntity implements NativeEntityConverter<Notifi
     @Override
     public NotificationDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return NotificationDto.builder()
-            .description(description().asString(parameters))
-            .title(title().asString(parameters))
-            .config(config().toNativeEntity(parameters, nativeEntities))
-            .build();
+                .description(description().asString(parameters))
+                .title(title().asString(parameters))
+                .config(config().toNativeEntity(parameters, nativeEntities))
+                .build();
     }
 }
