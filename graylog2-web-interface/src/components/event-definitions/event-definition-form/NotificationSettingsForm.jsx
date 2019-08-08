@@ -22,12 +22,15 @@ class NotificationSettingsForm extends React.Component {
   constructor(props) {
     super(props);
 
-    const { backlog_size: backlogSize } = props.eventDefinition.notification_settings;
+    const { backlog_size: backlogSize, grace_period_ms: gracePeriodMs } = props.eventDefinition.notification_settings;
+
+    const gracePeriod = extractDurationAndUnit(gracePeriodMs, TIME_UNITS);
     const defaultBacklogSize = props.defaults.default_backlog_size;
     const effectiveBacklogSize = lodash.defaultTo(backlogSize, defaultBacklogSize);
 
     this.state = {
-      lastEnabledGracePeriod: undefined,
+      gracePeriodDuration: gracePeriod.duration,
+      gracePeriodUnit: gracePeriod.unit,
       isBacklogSizeEnabled: (backlogSize === null ? false : (effectiveBacklogSize > 0)),
       backlogSize: effectiveBacklogSize,
     };
@@ -41,27 +44,16 @@ class NotificationSettingsForm extends React.Component {
   };
 
   handleGracePeriodChange = (nextValue, nextUnit, enabled) => {
-    const durationInMs = enabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+    const durationInMs = enabled ? moment.duration(lodash.max([nextValue, 0]), nextUnit).asMilliseconds() : 0;
     this.propagateChanges('grace_period_ms', durationInMs);
-
-    // Update last enabled grace period in state to display, to display the previous value when input is disabled.
-    const stateUpdate = {};
-    if (enabled) {
-      stateUpdate.lastEnabledGracePeriod = undefined;
-    } else {
-      stateUpdate.lastEnabledGracePeriod = {
-        duration: nextValue,
-        unit: nextUnit,
-      };
-    }
-    this.setState(stateUpdate);
+    this.setState({ gracePeriodDuration: nextValue, gracePeriodUnit: nextUnit });
   };
 
-  handleChange = (event) => {
+  handleBacklogSizeChange = (event) => {
     const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
+    const value = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     this.setState({ [lodash.camelCase(name)]: value });
-    this.propagateChanges(name, value);
+    this.propagateChanges(name, lodash.max([Number(value), 0]));
   };
 
   toggleBacklogSize = () => {
@@ -72,16 +64,11 @@ class NotificationSettingsForm extends React.Component {
 
   render() {
     const { eventDefinition } = this.props;
-    const { lastEnabledGracePeriod, isBacklogSizeEnabled, backlogSize } = this.state;
+    const { gracePeriodDuration, gracePeriodUnit, isBacklogSizeEnabled, backlogSize } = this.state;
 
     if (eventDefinition.notifications.length === 0) {
       return null;
     }
-
-    // Display old grace period to avoid input resetting to null when input is disabled.
-    const gracePeriod = (lastEnabledGracePeriod === undefined
-      ? extractDurationAndUnit(eventDefinition.notification_settings.grace_period_ms, TIME_UNITS)
-      : lastEnabledGracePeriod);
 
     return (
       <React.Fragment>
@@ -90,10 +77,11 @@ class NotificationSettingsForm extends React.Component {
           <FormGroup controlId="grace-period">
             <TimeUnitInput label="Grace Period"
                            update={this.handleGracePeriodChange}
-                           defaultEnabled={gracePeriod.duration !== 0}
-                           value={gracePeriod.duration}
-                           unit={gracePeriod.unit}
-                           units={TIME_UNITS} />
+                           defaultEnabled={gracePeriodDuration !== 0}
+                           value={gracePeriodDuration}
+                           unit={gracePeriodUnit}
+                           units={TIME_UNITS}
+                           clearable />
             <HelpBlock>
               Time to wait after a Notification is sent, to send another Notification.
               Events with keys have different grace periods for each key.
@@ -112,7 +100,7 @@ class NotificationSettingsForm extends React.Component {
               <FormControl type="number"
                            id="backlog_size"
                            name="backlog_size"
-                           onChange={this.handleChange}
+                           onChange={this.handleBacklogSizeChange}
                            value={backlogSize}
                            disabled={!isBacklogSizeEnabled} />
             </InputGroup>

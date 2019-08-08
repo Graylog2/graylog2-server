@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
+import { ConfirmLeaveDialog } from 'components/common';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
@@ -22,6 +23,8 @@ class EventNotificationFormContainer extends React.Component {
     embedded: PropTypes.bool,
     /** Controls the ID of the form, so it can be controlled externally */
     formId: PropTypes.string,
+    /** Route needed for ConfirmLeaveDialog to work. This is not needed when embedded in another form. */
+    route: PropTypes.object,
     onSubmit: PropTypes.func,
   };
 
@@ -34,6 +37,7 @@ class EventNotificationFormContainer extends React.Component {
     },
     embedded: false,
     formId: undefined,
+    route: undefined,
     onSubmit: () => {},
   };
 
@@ -45,6 +49,7 @@ class EventNotificationFormContainer extends React.Component {
       validation: {
         errors: {},
       },
+      isDirty: false,
     };
   }
 
@@ -52,13 +57,11 @@ class EventNotificationFormContainer extends React.Component {
     const { notification } = this.state;
     const nextNotification = lodash.cloneDeep(notification);
     nextNotification[key] = value;
-    this.setState({ notification: nextNotification });
+    this.setState({ notification: nextNotification, isDirty: true });
   };
 
   handleCancel = () => {
-    if (window.confirm('Do you really want to abandon this page and lose your changes? This action cannot be undone.')) {
-      history.goBack();
-    }
+    history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
   };
 
   handleSubmit = () => {
@@ -70,9 +73,11 @@ class EventNotificationFormContainer extends React.Component {
       promise = EventNotificationsActions.create(notification);
       promise.then(
         () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
+          this.setState({ isDirty: false }, () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          });
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;
@@ -85,9 +90,11 @@ class EventNotificationFormContainer extends React.Component {
       promise = EventNotificationsActions.update(notification.id, notification);
       promise.then(
         () => {
-          if (!embedded) {
-            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-          }
+          this.setState({ isDirty: false }, () => {
+            if (!embedded) {
+              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+            }
+          });
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;
@@ -102,18 +109,24 @@ class EventNotificationFormContainer extends React.Component {
   };
 
   render() {
-    const { action, embedded, formId } = this.props;
-    const { notification, validation } = this.state;
+    const { action, embedded, formId, route } = this.props;
+    const { notification, validation, isDirty } = this.state;
 
     return (
-      <EventNotificationForm action={action}
-                             notification={notification}
-                             validation={validation}
-                             formId={formId}
-                             embedded={embedded}
-                             onChange={this.handleChange}
-                             onCancel={this.handleCancel}
-                             onSubmit={this.handleSubmit} />
+      <React.Fragment>
+        {!embedded && isDirty && (
+          <ConfirmLeaveDialog route={route}
+                              question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
+        )}
+        <EventNotificationForm action={action}
+                               notification={notification}
+                               validation={validation}
+                               formId={formId}
+                               embedded={embedded}
+                               onChange={this.handleChange}
+                               onCancel={this.handleCancel}
+                               onSubmit={this.handleSubmit} />
+      </React.Fragment>
     );
   }
 }

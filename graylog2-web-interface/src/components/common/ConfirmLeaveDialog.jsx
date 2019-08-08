@@ -5,7 +5,7 @@ import { withRouter } from 'react-router';
 import AppConfig from 'util/AppConfig';
 
 /**
- * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to naviage away, refresh, or in any way unload the component.
+ * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to navigate away, refresh, or in any way unload the component.
  */
 const ConfirmLeaveDialog = ({ question, router, route }) => {
   const handleLeavePage = (e) => {

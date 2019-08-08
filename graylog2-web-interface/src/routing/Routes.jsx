@@ -58,12 +58,12 @@ const Routes = {
     DEFINITIONS: {
       LIST: '/alerts/definitions',
       CREATE: '/alerts/definitions/new',
-      edit: definitionId => `/alerts/definitions/${definitionId}`,
+      edit: definitionId => `/alerts/definitions/${definitionId}/edit`,
     },
     NOTIFICATIONS: {
       LIST: '/alerts/notifications',
       CREATE: '/alerts/notifications/new',
-      edit: notificationId => `/alerts/notifications/${notificationId}`,
+      edit: notificationId => `/alerts/notifications/${notificationId}/edit`,
     },
   },
   SOURCES: '/sources',

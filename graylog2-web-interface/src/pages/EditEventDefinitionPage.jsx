@@ -24,6 +24,7 @@ class EditEventDefinitionPage extends React.Component {
   static propTypes = {
     params: PropTypes.object.isRequired,
     currentUser: PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
   };
 
   state = {
@@ -40,7 +41,7 @@ class EditEventDefinitionPage extends React.Component {
   }
 
   render() {
-    const { params, currentUser } = this.props;
+    const { params, currentUser, route } = this.props;
     const { eventDefinition } = this.state;
 
     if (!isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -92,7 +93,7 @@ class EditEventDefinitionPage extends React.Component {
 
           <Row className="content">
             <Col md={12}>
-              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+              <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} route={route} />
             </Col>
           </Row>
         </span>

@@ -68,7 +68,7 @@ class FieldForm extends React.Component {
   };
 
   validate = () => {
-    const { config } = this.state;
+    const { isKey, keyPosition, config } = this.state;
     const errors = {};
 
     const providerType = this.getConfigProviderType(config);
@@ -83,6 +83,10 @@ class FieldForm extends React.Component {
         errors[requiredField] = 'Field cannot be empty.';
       }
     });
+
+    if (isKey && (!lodash.isNumber(keyPosition) || Number(keyPosition) < 1)) {
+      errors.key_position = 'Field must be a positive number.';
+    }
 
     pluginRequiredFields.forEach((requiredField) => {
       if (!lodash.get(config, `providers[0].${requiredField}`)) {
@@ -129,7 +133,7 @@ class FieldForm extends React.Component {
   };
 
   handleKeySortChange = (event) => {
-    const nextPosition = FormsUtils.getValueFromInput(event.target);
+    const nextPosition = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
     this.setState({ keyPosition: nextPosition });
   };
 
@@ -186,7 +190,7 @@ class FieldForm extends React.Component {
                  help={validation.errors.fieldName || 'Name for this Field.'}
                  required />
 
-          <FormGroup>
+          <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
               Use Field as Event Key&emsp;
               <OverlayTrigger placement="right" trigger="click" overlay={<EventKeyHelpPopover id="key-popover" />}>
@@ -204,7 +208,9 @@ class FieldForm extends React.Component {
                            onChange={this.handleKeySortChange}
                            disabled={!isKey} />
             </InputGroup>
-            <HelpBlock>Indicates if this Field should be a Key and its order.</HelpBlock>
+            <HelpBlock>
+              {validation.errors.key_position || 'Indicates if this Field should be a Key and its order.'}
+            </HelpBlock>
           </FormGroup>
 
           <FormGroup>

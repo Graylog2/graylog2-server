@@ -35,6 +35,17 @@ class AggregationForm extends React.Component {
     fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
   );
 
+  constructor(props) {
+    super(props);
+
+    const expressionResults = AggregationExpressionParser.parseExpression(props.eventDefinition.config.conditions);
+
+    this.state = {
+      thresholdOperator: expressionResults.operator,
+      thresholdValue: lodash.defaultTo(expressionResults.value, 0),
+    };
+  }
+
   formatFunctions = (functions) => {
     return functions
       .sort(naturalSort)
@@ -95,23 +106,25 @@ class AggregationForm extends React.Component {
 
     const nextExpression = AggregationExpressionParser.generateExpression(series.id, nextOperator, value);
     this.propagateConfigChange('conditions', nextExpression);
+    this.setState({ thresholdOperator: nextOperator });
   };
 
   handleExpressionThresholdChange = (event) => {
     const { eventDefinition } = this.props;
     const series = this.getOrCreateSeries(eventDefinition.config);
     const { operator } = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
-    const nextThreshold = FormsUtils.getValueFromInput(event.target);
+    const nextThreshold = event.target.value === '' ? '' : FormsUtils.getValueFromInput(event.target);
 
-    const nextExpression = AggregationExpressionParser.generateExpression(series.id, operator, nextThreshold);
+    const nextExpression = AggregationExpressionParser.generateExpression(series.id, operator, Number(nextThreshold));
     this.propagateConfigChange('conditions', nextExpression);
+    this.setState({ thresholdValue: nextThreshold });
   };
 
   render() {
     const { allFieldTypes, aggregationFunctions, eventDefinition, validation } = this.props;
+    const { thresholdOperator, thresholdValue } = this.state;
     const formattedFields = this.formatFields(allFieldTypes);
     const series = this.getSeries(eventDefinition.config) || {};
-    const expressionResults = AggregationExpressionParser.parseExpression(eventDefinition.config.conditions);
 
     return (
       <fieldset>
@@ -185,7 +198,7 @@ class AggregationForm extends React.Component {
                         { label: '>=', value: '>=' },
                         { label: '=', value: '==' },
                       ]}
-                      value={expressionResults.operator} />
+                      value={thresholdOperator} />
               {validation.errors.conditions && (
                 <HelpBlock>{lodash.get(validation, 'errors.conditions[0]')}</HelpBlock>
               )}
@@ -196,7 +209,7 @@ class AggregationForm extends React.Component {
                    name="threshold"
                    label="Threshold"
                    type="number"
-                   value={lodash.defaultTo(expressionResults.value, 0)}
+                   value={thresholdValue}
                    bsStyle={validation.errors.conditions ? 'error' : null}
                    help={lodash.get(validation, 'errors.conditions[0]', null)}
                    onChange={this.handleExpressionThresholdChange} />

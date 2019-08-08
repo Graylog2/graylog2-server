@@ -23,6 +23,39 @@ class FilterForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
+  formatStreamIds = lodash.memoize(
+    (streamIds) => {
+      const { streams } = this.props;
+
+      return streamIds
+        .map(streamId => streams.find(s => s.id === streamId) || streamId)
+        .map((streamOrId) => {
+          const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+          return {
+            label: stream.title,
+            value: stream.id,
+          };
+        })
+        .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
+    },
+    streamIds => streamIds.join('-'),
+  );
+
+  constructor(props) {
+    super(props);
+
+    const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = props.eventDefinition.config;
+    const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
+    const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
+
+    this.state = {
+      searchWithinMsDuration: searchWithin.duration,
+      searchWithinMsUnit: searchWithin.unit,
+      executeEveryMsDuration: executeEvery.duration,
+      executeEveryMsUnit: executeEvery.unit,
+    };
+  }
+
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = lodash.cloneDeep(eventDefinition.config);
@@ -41,19 +74,24 @@ class FilterForm extends React.Component {
 
   handleTimeRangeChange = (fieldName) => {
     return (nextValue, nextUnit) => {
-      const durationInMs = moment.duration(nextValue, nextUnit).asMilliseconds();
+      const durationInMs = moment.duration(lodash.max([nextValue, 1]), nextUnit).asMilliseconds();
       this.propagateChange(fieldName, durationInMs);
+
+      const stateFieldName = lodash.camelCase(fieldName);
+      this.setState({
+        [`${stateFieldName}Duration`]: nextValue,
+        [`${stateFieldName}Unit`]: nextUnit,
+      });
     };
   };
 
   render() {
     const { eventDefinition, streams, validation } = this.props;
-    const formattedStreams = streams
-      .map(stream => ({ label: stream.title, value: stream.id }))
-      .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
+    const { searchWithinMsDuration, searchWithinMsUnit, executeEveryMsDuration, executeEveryMsUnit } = this.state;
 
-    const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
-    const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
+    // Ensure deleted streams are still displayed in select
+    const allStreamIds = lodash.union(streams.map(s => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
+    const formattedStreams = this.formatStreamIds(allStreamIds);
 
     return (
       <fieldset>
@@ -80,9 +118,10 @@ class FilterForm extends React.Component {
         <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
           <TimeUnitInput label="Search within the last"
                          update={this.handleTimeRangeChange('search_within_ms')}
-                         value={searchWithin.duration}
-                         unit={searchWithin.unit}
+                         value={searchWithinMsDuration}
+                         unit={searchWithinMsUnit}
                          units={TIME_UNITS}
+                         clearable
                          required />
           {validation.errors.search_within_ms && (
             <HelpBlock>{lodash.get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
@@ -92,9 +131,10 @@ class FilterForm extends React.Component {
         <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
           <TimeUnitInput label="Execute search every"
                          update={this.handleTimeRangeChange('execute_every_ms')}
-                         value={executeEvery.duration}
-                         unit={executeEvery.unit}
+                         value={executeEveryMsDuration}
+                         unit={executeEveryMsUnit}
                          units={TIME_UNITS}
+                         clearable
                          required />
           {validation.errors.execute_every_ms && (
             <HelpBlock>{lodash.get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
