@@ -42,9 +42,9 @@ import java.util.Set;
 public abstract class EmailEventNotificationConfig implements EventNotificationConfig {
     public static final String TYPE_NAME = "email-notification-v1";
 
-    public static final String DEFAULT_SENDER = "graylog@example.org";
-    public static final String DEFAULT_SUBJECT = "Graylog event notification: ${event_definition_title}";
-    public static final String DEFAULT_BODY_TEMPLATE = "--- [Event Definition] ---------------------------\n" +
+    private static final String DEFAULT_SENDER = "graylog@example.org";
+    static final String DEFAULT_SUBJECT = "Graylog event notification: ${event_definition_title}";
+    static final String DEFAULT_BODY_TEMPLATE = "--- [Event Definition] ---------------------------\n" +
             "Title:       ${event_definition_title}\n" +
             "Description: ${event_definition_description}\n" +
             "Type:        ${event_definition_type}\n" +

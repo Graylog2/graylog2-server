@@ -24,7 +24,6 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
-import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
@@ -39,7 +38,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,21 +54,14 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final ObjectMapper objectMapper;
     private final EventDefinitionHandler eventDefinitionHandler;
     private final DBEventDefinitionService eventDefinitionService;
-    private final DBNotificationService notificationService;
-
-    private StreamService streamService;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
                                  EventDefinitionHandler eventDefinitionHandler,
-                                 DBEventDefinitionService eventDefinitionService,
-                                 StreamService streamService,
-                                 DBNotificationService notificationService) {
+                                 DBEventDefinitionService eventDefinitionService) {
         this.objectMapper = objectMapper;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.eventDefinitionService = eventDefinitionService;
-        this.notificationService = notificationService;
-        this.streamService = streamService;
     }
 
     @VisibleForTesting

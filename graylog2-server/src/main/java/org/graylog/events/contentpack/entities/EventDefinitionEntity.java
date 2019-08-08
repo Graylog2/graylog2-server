@@ -24,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.fields.EventFieldSpec;
-import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
