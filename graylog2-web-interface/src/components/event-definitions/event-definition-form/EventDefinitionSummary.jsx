@@ -7,6 +7,7 @@ import moment from 'moment';
 import {} from 'moment-duration-format';
 import naturalSort from 'javascript-natural-sort';
 
+import PermissionsMixin from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
 
@@ -18,6 +19,7 @@ class EventDefinitionSummary extends React.Component {
     eventDefinition: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
     validation: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   state = {
@@ -59,9 +61,13 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderCondition = (config) => {
+    const { currentUser } = this.props;
     const conditionPlugin = this.getPlugin('eventDefinitionTypes', config.type);
     const component = (conditionPlugin.summaryComponent
-      ? React.createElement(conditionPlugin.summaryComponent, { config: config })
+      ? React.createElement(conditionPlugin.summaryComponent, {
+        config: config,
+        currentUser: currentUser,
+      })
       : <p>Condition plugin <em>{config.type}</em> does not provide a summary.</p>
     );
 
@@ -74,6 +80,7 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderField = (fieldName, config, keys) => {
+    const { currentUser } = this.props;
     if (!config.providers || config.providers.length === 0) {
       return <span key={fieldName}>No field value provider configured.</span>;
     }
@@ -85,6 +92,7 @@ class EventDefinitionSummary extends React.Component {
         config: config,
         keys: keys,
         key: fieldName,
+        currentUser: currentUser,
       })
       : <p key={fieldName}>Provider plugin <em>{provider.type}</em> does not provide a summary.</p>
     );
@@ -170,10 +178,16 @@ class EventDefinitionSummary extends React.Component {
   };
 
   renderNotifications = (definitionNotifications, notificationSettings) => {
+    const { currentUser } = this.props;
+
+    const effectiveDefinitionNotifications = PermissionsMixin.isPermitted(currentUser.permissions,
+      'eventnotifications:read')
+      ? definitionNotifications : [];
+
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Notifications</h3>
-        {definitionNotifications.length === 0
+        {effectiveDefinitionNotifications.length === 0
           ? <p>This Event is not configured to trigger any Notifications.</p>
           : (
             <React.Fragment>

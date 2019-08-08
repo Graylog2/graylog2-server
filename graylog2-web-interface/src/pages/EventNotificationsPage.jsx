@@ -2,7 +2,7 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
 
@@ -29,12 +29,16 @@ class EventNotificationsPage extends React.Component {
               <LinkContainer to={Routes.ALERTS.LIST}>
                 <Button bsStyle="info">Alerts & Events</Button>
               </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                <Button bsStyle="info">Event Definitions</Button>
-              </LinkContainer>
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                <Button bsStyle="info" className="active">Notifications</Button>
-              </LinkContainer>
+              <IfPermitted permissions="eventdefinitions:read">
+                <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+                  <Button bsStyle="info">Event Definitions</Button>
+                </LinkContainer>
+              </IfPermitted>
+              <IfPermitted permissions="eventnotifications:read">
+                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
+                  <Button bsStyle="info" className="active">Notifications</Button>
+                </LinkContainer>
+              </IfPermitted>
             </ButtonToolbar>
           </PageHeader>
 

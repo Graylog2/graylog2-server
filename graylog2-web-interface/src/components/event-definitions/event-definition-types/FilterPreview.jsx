@@ -12,12 +12,14 @@ class FilterPreview extends React.Component {
     searchResult: PropTypes.object,
     errors: PropTypes.array,
     isFetchingData: PropTypes.bool,
+    displayPreview: PropTypes.bool,
   };
 
   static defaultProps = {
     searchResult: {},
     errors: [],
     isFetchingData: false,
+    displayPreview: false,
   };
 
   renderMessages = (messages) => {
@@ -52,11 +54,12 @@ class FilterPreview extends React.Component {
   };
 
   render() {
-    const { isFetchingData, searchResult, errors } = this.props;
+    const { isFetchingData, searchResult, errors, displayPreview } = this.props;
 
     return (
       <React.Fragment>
         <HelpPanel collapsible
+                   defaultExpanded={!displayPreview}
                    title="How many Events will Filter & Aggregation create?">
           <p>
             The Filter & Aggregation Condition will generate different number of Events, depending on how it is
@@ -75,14 +78,16 @@ class FilterPreview extends React.Component {
           </ul>
         </HelpPanel>
 
-        <Panel className={styles.filterPreview} header={<h3>Filter Preview</h3>}>
-          {errors.length > 0 ? (
-            <p className="text-danger">{errors[0].description}</p>
-          ) : (
-            isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult)
-          )
-          }
-        </Panel>
+        {displayPreview && (
+          <Panel className={styles.filterPreview} header={<h3>Filter Preview</h3>}>
+            {errors.length > 0 ? (
+              <p className="text-danger">{errors[0].description}</p>
+            ) : (
+              isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult)
+            )
+            }
+          </Panel>
+        )}
       </React.Fragment>
     );
   }

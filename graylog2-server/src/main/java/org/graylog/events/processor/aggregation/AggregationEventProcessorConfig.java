@@ -38,9 +38,11 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -81,6 +83,18 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
     public abstract long executeEveryMs();
+
+    @Override
+    public Set<String> requiredPermissions() {
+        // When there are no streams the event processor will search in all streams so we need to require the
+        // generic stream permission.
+        if (streams().isEmpty()) {
+            return Collections.singleton(RestPermissions.STREAMS_READ);
+        }
+        return streams().stream()
+            .map(streamId -> String.join(":", RestPermissions.STREAMS_READ, streamId))
+            .collect(Collectors.toSet());
+    }
 
     public static Builder builder() {
         return Builder.create();

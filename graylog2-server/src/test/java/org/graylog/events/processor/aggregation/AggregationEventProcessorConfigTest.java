@@ -236,4 +236,20 @@ public class AggregationEventProcessorConfigTest {
         assertThat(validationResult.failed()).isFalse();
         assertThat(validationResult.getErrors().size()).isEqualTo(0);
     }
+
+    @Test
+    @UsingDataSet(locations = "aggregation-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void requiredPermissions() {
+        assertThat(dbService.get("54e3deadbeefdeadbeefaffe")).get().satisfies(definition -> {
+            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read:stream-a", "streams:read:stream-b");
+        });
+    }
+
+    @Test
+    @UsingDataSet(locations = "aggregation-processors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void requiredPermissionsWithEmptyStreams() {
+        assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition -> {
+            assertThat(definition.config().requiredPermissions()).containsOnly("streams:read");
+        });
+    }
 }

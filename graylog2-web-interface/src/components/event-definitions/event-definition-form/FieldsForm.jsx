@@ -15,6 +15,7 @@ import commonStyles from '../common/commonStyles.css';
 class FieldsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
@@ -61,7 +62,7 @@ class FieldsForm extends React.Component {
   };
 
   render() {
-    const { eventDefinition, validation } = this.props;
+    const { eventDefinition, validation, currentUser } = this.props;
     const { editField, showFieldForm } = this.state;
 
     if (showFieldForm) {
@@ -69,6 +70,7 @@ class FieldsForm extends React.Component {
         <FieldForm keys={eventDefinition.key_spec}
                    fieldName={editField}
                    config={editField ? eventDefinition.field_spec[editField] : undefined}
+                   currentUser={currentUser}
                    onChange={this.addCustomField}
                    onCancel={this.toggleFieldForm} />
       );

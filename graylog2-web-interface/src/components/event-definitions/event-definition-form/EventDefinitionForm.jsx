@@ -19,6 +19,7 @@ class EventDefinitionForm extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
     eventDefinition: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     entityTypes: PropTypes.object.isRequired,
     notifications: PropTypes.array.isRequired,
@@ -96,7 +97,16 @@ class EventDefinitionForm extends React.Component {
   };
 
   render() {
-    const { action, entityTypes, eventDefinition, notifications, onChange, validation, defaults } = this.props;
+    const {
+      action,
+      entityTypes,
+      eventDefinition,
+      notifications,
+      onChange,
+      validation,
+      defaults,
+      currentUser,
+    } = this.props;
     const { activeStep } = this.state;
 
     const defaultStepProps = {
@@ -106,6 +116,7 @@ class EventDefinitionForm extends React.Component {
       eventDefinition,
       onChange,
       validation,
+      currentUser,
     };
 
     const eventDefinitionType = this.getConditionPlugin(eventDefinition.config.type);
@@ -137,6 +148,7 @@ class EventDefinitionForm extends React.Component {
         component: (
           <EventDefinitionSummary action={action}
                                   eventDefinition={eventDefinition}
+                                  currentUser={currentUser}
                                   notifications={notifications}
                                   validation={validation} />
         ),

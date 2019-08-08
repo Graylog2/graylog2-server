@@ -16,15 +16,20 @@
  */
 package org.graylog.events.processor;
 
+import com.google.common.collect.ImmutableList;
+import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.search.SearchQuery;
+import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 
 public class DBEventDefinitionService extends PaginatedDbService<EventDefinitionDto> {
@@ -56,5 +61,18 @@ public class DBEventDefinitionService extends PaginatedDbService<EventDefinition
             LOG.error("Couldn't delete event processor state for <{}>", id, e);
         }
         return super.delete(id);
+    }
+
+    /**
+     * Returns the list of event definitions that is using the given notification ID.
+     *
+     * @param notificationId the notification ID
+     * @return the event definitions with the given notification ID
+     */
+    public List<EventDefinitionDto> getByNotificationId(String notificationId) {
+        final String field = String.format(Locale.US, "%s.%s",
+            EventDefinitionDto.FIELD_NOTIFICATIONS,
+            EventNotificationConfig.FIELD_NOTIFICATION_ID);
+        return ImmutableList.copyOf((db.find(DBQuery.is(field, notificationId)).iterator()));
     }
 }
