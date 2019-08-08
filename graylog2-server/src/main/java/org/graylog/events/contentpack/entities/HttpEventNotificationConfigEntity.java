@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.types.HTTPEventNotificationConfig;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
@@ -59,9 +60,9 @@ public abstract class HttpEventNotificationConfigEntity implements EventNotifica
     }
 
     @Override
-    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return HTTPEventNotificationConfig.builder()
-            .url(url().asString(parameters))
-            .build();
+                .url(url().asString(parameters))
+                .build();
     }
 }

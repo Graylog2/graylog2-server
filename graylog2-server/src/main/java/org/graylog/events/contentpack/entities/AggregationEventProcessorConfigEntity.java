@@ -22,16 +22,26 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationSeries;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.streams.Stream;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfigEntity.TYPE_NAME)
@@ -108,16 +118,41 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     }
 
     @Override
-    public EventProcessorConfig toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventProcessorConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final ImmutableSet<String> streamSet = ImmutableSet.copyOf(
+                streams().stream()
+                        .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
+                        .map(nativeEntities::get)
+                        .map(object -> {
+                            if (object == null) {
+                                throw new ContentPackException("Missing Stream for event definition");
+                            } else if (object instanceof Stream) {
+                                Stream stream = (Stream) object;
+                                return stream.getId();
+                            } else {
+                                throw new ContentPackException("Invalid type for stream Stream for event definition: " + object.getClass());
+                            }
+                        }).collect(Collectors.toSet())
+        );
         return AggregationEventProcessorConfig.builder()
-            .type(type())
-            .query(query().asString(parameters))
-            .streams(streams())
-            .groupBy(groupBy())
-            .series(series())
-            .conditions(conditions().orElse(null))
-            .executeEveryMs(executeEveryMs().asLong(parameters))
-            .searchWithinMs(searchWithinMs().asLong(parameters))
-            .build();
+                .type(type())
+                .query(query().asString(parameters))
+                .streams(streamSet)
+                .groupBy(groupBy())
+                .series(series())
+                .conditions(conditions().orElse(null))
+                .executeEveryMs(executeEveryMs().asLong(parameters))
+                .searchWithinMs(searchWithinMs().asLong(parameters))
+                .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
+        streams().stream()
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(stream -> graph.putEdge(entity, stream));
     }
 }

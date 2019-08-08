@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.events.contentpack.entities.EventNotificationHandlerConfigEntity;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.EventDefinition;
@@ -28,6 +29,11 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +101,7 @@ public class EventNotificationHandler {
 
     @AutoValue
     @JsonDeserialize(builder = Config.Builder.class)
-    public static abstract class Config {
+    public static abstract class Config implements ContentPackable<EventNotificationHandlerConfigEntity> {
         private static final String FIELD_NOTIFICATION_ID = EventNotificationConfig.FIELD_NOTIFICATION_ID;
         private static final String FIELD_NOTIFICATION_PARAMETERS = "notification_parameters";
 
@@ -126,6 +132,22 @@ public class EventNotificationHandler {
             public abstract Builder notificationParameters(@Nullable NotificationParameters notificationParameters);
 
             public abstract Config build();
+        }
+
+        @Override
+        public EventNotificationHandlerConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+            final Optional<String> optionalNotification = entityDescriptorIds.get(notificationId(), ModelTypes.NOTIFICATION_V1);
+            if (optionalNotification.isPresent()) {
+                final String notificationId = optionalNotification.get();
+                return EventNotificationHandlerConfigEntity.builder()
+                    .notificationId(ValueReference.of(notificationId))
+                    .notificationParameters(notificationParameters().orElse(null))
+                    .build();
+            }
+
+            return EventNotificationHandlerConfigEntity.builder()
+                .notificationParameters(notificationParameters().orElse(null))
+                .build();
         }
     }
 }

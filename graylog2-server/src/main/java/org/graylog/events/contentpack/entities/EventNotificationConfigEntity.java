@@ -22,10 +22,10 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog2.contentpacks.NativeEntityConverter;
 
 @JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXISTING_PROPERTY,
-    property = org.graylog.events.notifications.EventNotificationConfig.TYPE_FIELD,
-    visible = true)
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = org.graylog.events.notifications.EventNotificationConfig.TYPE_FIELD,
+        visible = true)
 public interface EventNotificationConfigEntity extends NativeEntityConverter<EventNotificationConfig> {
     String TYPE_FIELD = "type";
 

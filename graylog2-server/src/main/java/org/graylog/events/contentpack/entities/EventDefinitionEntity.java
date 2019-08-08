@@ -22,15 +22,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = EventDefinitionEntity.Builder.class)
@@ -71,7 +79,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     public abstract EventNotificationSettings notificationSettings();
 
     @JsonProperty(FIELD_NOTIFICATIONS)
-    public abstract ImmutableList<EventNotificationHandler.Config> notifications();
+    public abstract ImmutableList<EventNotificationHandlerConfigEntity> notifications();
 
     @JsonProperty(FIELD_STORAGE)
     public abstract ImmutableList<EventStorageHandler.Config> storage();
@@ -114,7 +122,7 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
         public abstract Builder notificationSettings(EventNotificationSettings notificationSettings);
 
         @JsonProperty(FIELD_NOTIFICATIONS)
-        public abstract Builder notifications(ImmutableList<EventNotificationHandler.Config> notifications);
+        public abstract Builder notifications(ImmutableList<EventNotificationHandlerConfigEntity> notifications);
 
         @JsonProperty(FIELD_STORAGE)
         public abstract Builder storage(ImmutableList<EventStorageHandler.Config> storage);
@@ -123,18 +131,37 @@ public abstract class EventDefinitionEntity implements NativeEntityConverter<Eve
     }
 
     @Override
-    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters) {
-         return EventDefinitionDto.builder()
-            .title(title().asString(parameters))
-            .description(description().asString(parameters))
-            .priority(priority().asInteger(parameters))
-            .alert(alert().asBoolean(parameters))
-            .config(config().toNativeEntity(parameters))
-            .fieldSpec(fieldSpec())
-            .keySpec(keySpec())
-            .notificationSettings(notificationSettings())
-            .notifications(notifications())
-            .storage(storage())
-            .build();
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> natvieEntities) {
+        final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
+                notifications().stream()
+                        .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
+                        .collect(Collectors.toList())
+        );
+        return EventDefinitionDto.builder()
+                .title(title().asString(parameters))
+                .description(description().asString(parameters))
+                .priority(priority().asInteger(parameters))
+                .alert(alert().asBoolean(parameters))
+                .config(config().toNativeEntity(parameters, natvieEntities))
+                .fieldSpec(fieldSpec())
+                .keySpec(keySpec())
+                .notificationSettings(notificationSettings())
+                .notifications(notificationList)
+                .storage(storage())
+                .build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
+        notifications().stream()
+                .map(EventNotificationHandlerConfigEntity::notificationId)
+                .map(valueReference -> valueReference.asString(parameters))
+                .map(ModelId::of)
+                .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.NOTIFICATION_V1))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(notification -> graph.putEdge(entity, notification));
+
+        config().resolveForInstallation(entity, parameters, entities, graph);
     }
 }

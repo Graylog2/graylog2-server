@@ -19,6 +19,10 @@ package org.graylog.events.contentpack.facade;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventDefinitionEntity;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -26,7 +30,6 @@ import org.graylog.events.processor.EventDefinitionHandler;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -39,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,7 +65,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @VisibleForTesting
     private Entity exportNativeEntity(EventDefinitionDto eventDefinition, EntityDescriptorIds entityDescriptorIds) {
-        final EventDefinitionEntity entity = eventDefinition.toContentPackEntity();
+        final EventDefinitionEntity entity = eventDefinition.toContentPackEntity(entityDescriptorIds);
 
         final JsonNode data = objectMapper.convertValue(entity, JsonNode.class);
         return EntityV1.builder()
@@ -86,9 +88,9 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public NativeEntity<EventDefinitionDto> createNativeEntity(Entity entity,
-                                                            Map<String, ValueReference> parameters,
-                                                            Map<EntityDescriptor, Object> nativeEntities,
-                                                            String username) {
+                                                               Map<String, ValueReference> parameters,
+                                                               Map<EntityDescriptor, Object> nativeEntities,
+                                                               String username) {
         if (entity instanceof EntityV1) {
             return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
@@ -97,11 +99,11 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     private NativeEntity<EventDefinitionDto> decode(EntityV1 entity,
-                                                 Map<String, ValueReference> parameters,
-                                                 Map<EntityDescriptor, Object> natvieEntities) {
+                                                    Map<String, ValueReference> parameters,
+                                                    Map<EntityDescriptor, Object> nativeEntities) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
-        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters);
+        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
         final EventDefinitionDto savedDto = eventDefinitionHandler.create(eventDefinition);
         return NativeEntity.create(entity.id(), savedDto.id(), ModelTypes.EVENT_DEFINITION_V1, savedDto.title(), savedDto);
     }
@@ -133,5 +135,41 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         return eventDefinitionService.streamAll()
                 .map(this::createExcerpt)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        final Optional<EventDefinitionDto> eventDefinition = eventDefinitionService.get(modelId.id());
+        if (!eventDefinition.isPresent()) {
+            LOG.debug("Couldn't find event definition {}", entityDescriptor);
+        }
+
+        //noinspection OptionalGetWithoutIsPresent
+        eventDefinition.get().resolveNativeEntity(entityDescriptor, mutableGraph);
+
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveForInstallationV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveForInstallationV1(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> graph = GraphBuilder.directed().build();
+        graph.addNode(entity);
+
+        final EventDefinitionEntity eventDefinition = objectMapper.convertValue(entity.data(), EventDefinitionEntity.class);
+        eventDefinition.resolveForInstallation(entity, parameters, entities, graph);
+
+        return ImmutableGraph.copyOf(graph);
     }
 }

@@ -22,12 +22,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.types.EmailEventNotificationConfig;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotBlank;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +66,7 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
         @JsonCreator
         public static Builder create() {
             return new AutoValue_EmailEventNotificationConfigEntity.Builder()
-                .type(TYPE_NAME);
+                    .type(TYPE_NAME);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -91,13 +88,13 @@ public abstract class EmailEventNotificationConfigEntity implements EventNotific
     }
 
     @Override
-    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters) {
+    public EventNotificationConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return EmailEventNotificationConfig.builder()
-            .sender(sender().asString(parameters))
-            .subject(subject().asString(parameters))
-            .bodyTemplate(bodyTemplate().asString())
-            .emailRecipients(emailRecipients())
-            .userRecipients(userRecipients())
-            .build();
+                .sender(sender().asString(parameters))
+                .subject(subject().asString(parameters))
+                .bodyTemplate(bodyTemplate().asString())
+                .emailRecipients(emailRecipients())
+                .userRecipients(userRecipients())
+                .build();
     }
 }

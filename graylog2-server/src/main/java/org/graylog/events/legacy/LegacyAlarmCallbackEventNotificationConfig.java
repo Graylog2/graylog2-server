@@ -28,6 +28,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.scheduler.JobTriggerData;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.rest.ValidationResult;
 
@@ -86,7 +87,7 @@ public abstract class LegacyAlarmCallbackEventNotificationConfig implements Even
     }
 
     @Override
-    public EventNotificationConfigEntity toContentPackEntity() {
+    public EventNotificationConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return LegacyAlarmCallbackEventNotificationConfigEntity.builder()
             .callbackType(ValueReference.of(callbackType()))
             .configuration(configuration())

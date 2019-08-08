@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
@@ -30,6 +31,10 @@ import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -183,16 +188,32 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     }
 
     @Override
-    public EventProcessorConfigEntity toContentPackEntity() {
+    public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final ImmutableSet<String> streamRefs = ImmutableSet.copyOf(streams().stream()
+            .map(streamId -> entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toSet()));
         return AggregationEventProcessorConfigEntity.builder()
             .type(type())
             .query(ValueReference.of(query()))
-            .streams(streams())
+            .streams(streamRefs)
             .groupBy(groupBy())
             .series(series())
             .conditions(conditions().orElse(null))
             .executeEveryMs(ValueReference.of(executeEveryMs()))
             .searchWithinMs(ValueReference.of(searchWithinMs()))
             .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        streams().forEach(streamId -> {
+                final EntityDescriptor depStream = EntityDescriptor.builder()
+                    .id(ModelId.of(streamId))
+                    .type(ModelTypes.STREAM_V1)
+                    .build();
+                mutableGraph.putEdge(entityDescriptor, depStream);
+            });
     }
 }
