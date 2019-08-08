@@ -95,6 +95,8 @@ const TimeUnitInput = createReactClass({
     hideCheckbox: PropTypes.bool,
     /** Align unit dropdown menu to the right. */
     pullRight: PropTypes.bool,
+    /** Lets the user clear the numeric input. */
+    clearable: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -112,6 +114,7 @@ const TimeUnitInput = createReactClass({
       wrapperClassName: undefined,
       hideCheckbox: false,
       pullRight: false,
+      clearable: false,
     };
   },
 
@@ -131,8 +134,8 @@ const TimeUnitInput = createReactClass({
   },
 
   _getEffectiveValue() {
-    const { defaultValue, value } = this.props;
-    return lodash.defaultTo(value, defaultValue);
+    const { defaultValue, value, clearable } = this.props;
+    return clearable ? value : lodash.defaultTo(value, defaultValue);
   },
 
   _getUnitOptions(units) {
@@ -168,8 +171,13 @@ const TimeUnitInput = createReactClass({
   },
 
   _onUpdate(e) {
-    const { defaultValue } = this.props;
-    const value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
+    const { defaultValue, clearable } = this.props;
+    let value;
+    if (clearable) {
+      value = FormsUtils.getValueFromInput(e.target);
+    } else {
+      value = lodash.defaultTo(FormsUtils.getValueFromInput(e.target), defaultValue);
+    }
     this._propagateInput({ value: value });
   },
 
@@ -203,7 +211,7 @@ const TimeUnitInput = createReactClass({
         <InputWrapper className={wrapperClassName}>
           <InputGroup>
             {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={this._getEffectiveValue()} />
+            <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={lodash.defaultTo(this._getEffectiveValue(), '')} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             pullRight={pullRight}
