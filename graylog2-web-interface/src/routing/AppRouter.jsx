@@ -23,7 +23,6 @@ import {
   CreateEventNotificationPage,
   CreateExtractorsPage,
   CreateUsersPage,
-  DashboardsPage,
   DelegatedSearchPage,
   EditAlertConditionPage,
   EditEventDefinitionPage,
@@ -127,8 +126,6 @@ const AppRouter = () => {
             <Route path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-            <Route path={Routes.DASHBOARDS} component={DashboardsPage} />
-            <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage} />
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />
             <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
