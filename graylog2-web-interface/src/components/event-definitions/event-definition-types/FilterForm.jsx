@@ -48,8 +48,16 @@ class FilterForm extends React.Component {
 
   render() {
     const { eventDefinition, streams, validation } = this.props;
-    const formattedStreams = streams
-      .map(stream => ({ label: stream.title, value: stream.id }))
+
+    // Ensure deleted streams are still displayed in select
+    const allStreamIds = lodash.union(streams.map(s => s.id), lodash.defaultTo(eventDefinition.config.streams, []));
+
+    const formattedStreams = allStreamIds
+      .map(streamId => streams.find(s => s.id === streamId) || streamId)
+      .map((streamOrId) => {
+        const stream = (typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId });
+        return { label: stream.title, value: stream.id };
+      })
       .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label));
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
