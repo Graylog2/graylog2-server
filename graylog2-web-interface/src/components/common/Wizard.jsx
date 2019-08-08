@@ -214,7 +214,14 @@ class Wizard extends React.Component {
 
   render() {
     const { steps, horizontal, containerClassName, children } = this.props;
-    const leftComponentCols = children ? 7 : 12; // Use all available width if no preview will be rendered
+    let leftComponentCols;
+
+    if (children) {
+      leftComponentCols = 7;
+    } else {
+      leftComponentCols = horizontal ? 12 : 10;
+    }
+
     const rightComponentCols = horizontal ? 5 : 3; // If horizontal, use more space for this component
     return (
       <Row className={containerClassName}>
