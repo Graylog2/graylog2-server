@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.configuration.EventsConfigurationProvider;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -45,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.InternalServerErrorException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -73,17 +74,20 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
+    private final EventDefinition eventDefinition;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
                                   @Assisted AggregationEventProcessorParameters parameters,
                                   @Assisted String searchOwner,
+                                  @Assisted EventDefinition eventDefinition,
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
+        this.eventDefinition = eventDefinition;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
@@ -95,7 +99,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     }
 
     @Override
-    public AggregationResult doSearch() {
+    public AggregationResult doSearch() throws EventProcessorException {
         final SearchJob searchJob = getSearchJob(parameters, searchOwner);
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
         final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
@@ -116,9 +120,12 @@ public class PivotAggregationSearch implements AggregationSearch {
                     LOG.error("Aggregation search returned an error: {}", error);
                 }
             });
-            // TODO: Throw a meaningful exception (or return a result object that contains the error) here to make
-            //       sure it doesn't look like it's all working
-            return null;
+
+            if (errors.size() > 1) {
+                throw new EventProcessorException("Pivot search failed with multiple errors.", true, eventDefinition);
+            } else {
+                throw new EventProcessorException(errors.iterator().next().description(), true, eventDefinition);
+            }
         }
 
         final PivotResult pivotResult = (PivotResult) queryResult.searchTypes().get(PIVOT_ID);
@@ -276,7 +283,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username) {
+    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username) throws EventProcessorException {
         final Search search = Search.builder()
                 .queries(ImmutableSet.of(getAggregationQuery(parameters), getSourceStreamsQuery(parameters)))
                 .build();
@@ -287,14 +294,11 @@ public class PivotAggregationSearch implements AggregationSearch {
                 configurationProvider.get().eventsSearchTimeout(),
                 TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
-            // TODO: Throw EventProcessorExecutionException instead
-            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
+            throw new EventProcessorException("Error executing search job: " + e.getMessage(), true, eventDefinition, e);
         } catch (TimeoutException e) {
-            // TODO: Throw EventProcessorExecutionException instead
-            throw new InternalServerErrorException("Timeout while executing search job");
+            throw new EventProcessorException("Timeout while executing search job.", false, eventDefinition, e);
         } catch (Exception e) {
-            // TODO: Throw EventProcessorExecutionException instead
-            throw e;
+            throw new EventProcessorException("Unhandled exception in search job.", true, eventDefinition, e);
         }
 
         return searchJob;

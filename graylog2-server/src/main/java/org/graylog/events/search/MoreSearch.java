@@ -56,6 +56,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -174,7 +175,7 @@ public class MoreSearch extends Searches {
                 .build();
     }
 
-    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
+    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) throws NotFoundException {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
         // We support an empty streams list and return all affected indices in that case.
@@ -209,7 +210,7 @@ public class MoreSearch extends Searches {
      * @param batchSize      the number of documents to retrieve at once
      * @param resultCallback the callback that gets executed for each batch
      */
-    public void scrollQuery(String queryString, Set<String> streams, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
+    public void scrollQuery(String queryString, Set<String> streams, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException, NotFoundException {
         final String scrollTime = "1m"; // TODO: Does scroll time need to be configurable?
 
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
@@ -282,16 +283,15 @@ public class MoreSearch extends Searches {
         }
     }
 
-    private Set<Stream> loadStreams(Set<String> streamIds) {
+    private Set<Stream> loadStreams(Set<String> streamIds) throws NotFoundException {
         // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
         // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        return streamIds.stream().map(streamId -> {
-            try {
-                return streamService.load(streamId);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toSet());
+        Set<Stream> set = new HashSet<>();
+        for (String streamId : streamIds) {
+            Stream load = streamService.load(streamId);
+            set.add(load);
+        }
+        return set;
     }
 
     /**

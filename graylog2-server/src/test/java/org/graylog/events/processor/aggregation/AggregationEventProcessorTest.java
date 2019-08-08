@@ -338,7 +338,7 @@ public class AggregationEventProcessorTest {
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)
         );
-        verify(searchFactory, never()).create(eq(config), eq(parameters), any(String.class));
+        verify(searchFactory, never()).create(eq(config), eq(parameters), any(String.class), eq(eventDefinitionDto));
     }
 
     @Test
@@ -398,7 +398,7 @@ public class AggregationEventProcessorTest {
                 .isInstanceOf(EventProcessorPreconditionException.class);
 
         verify(stateService, never()).setState(any(String.class), any(DateTime.class), any(DateTime.class));
-        verify(searchFactory, never()).create(any(), any(), any());
+        verify(searchFactory, never()).create(any(), any(), any(), any());
         verify(moreSearch, never()).scrollQuery(
                 eq(config.query()),
                 eq(config.streams()),

@@ -18,6 +18,7 @@ package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.EventsConfigurationTestProvider;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -41,6 +42,8 @@ public class PivotAggregationSearchTest {
     private SearchJobService searchJobService;
     @Mock
     private QueryEngine queryEngine;
+    @Mock
+    private EventDefinition eventDefinition;
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
@@ -66,6 +69,7 @@ public class PivotAggregationSearchTest {
             config,
             parameters,
             "test",
+            eventDefinition,
             searchJobService,
             queryEngine,
             EventsConfigurationTestProvider.create());
@@ -155,6 +159,7 @@ public class PivotAggregationSearchTest {
             config,
             parameters,
             "test",
+            eventDefinition,
             searchJobService,
             queryEngine,
             EventsConfigurationTestProvider.create());
@@ -216,6 +221,7 @@ public class PivotAggregationSearchTest {
             config,
             parameters,
             "test",
+            eventDefinition,
             searchJobService,
             queryEngine,
             EventsConfigurationTestProvider.create());
