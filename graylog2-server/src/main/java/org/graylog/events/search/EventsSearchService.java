@@ -16,27 +16,21 @@
  */
 package org.graylog.events.search;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.searches.Searches;
-import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -47,29 +41,23 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 import static org.joda.time.DateTimeZone.UTC;
 
 public class EventsSearchService {
-    private static final Logger LOG = LoggerFactory.getLogger(EventsSearchService.class);
-
-    // TODO: This needs the system events stream once it exists
-    private static final Set<String> STREAM_FILTER = Stream.of(org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID)
-            .map(id -> String.join(":", Message.FIELD_STREAMS, id))
-            .collect(Collectors.toSet());
-
-    private final Searches searches;
+    private final MoreSearch moreSearch;
     private final StreamService streamService;
     private final DBEventDefinitionService eventDefinitionService;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public EventsSearchService(Searches searches,
+    public EventsSearchService(MoreSearch moreSearch,
                                StreamService streamService,
                                DBEventDefinitionService eventDefinitionService,
                                ObjectMapper objectMapper) {
-        this.searches = searches;
+        this.moreSearch = moreSearch;
         this.streamService = streamService;
         this.eventDefinitionService = eventDefinitionService;
         this.objectMapper = objectMapper;
@@ -79,11 +67,8 @@ public class EventsSearchService {
         return String.format(Locale.ROOT, "%s:%s", EventDto.FIELD_EVENT_DEFINITION_ID, id);
     }
 
-    public EventsSearchResult search(EventsSearchParameters parameters) {
-        final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
+    public EventsSearchResult search(EventsSearchParameters parameters, Subject subject) {
         final ImmutableSet.Builder<String> filterBuilder = ImmutableSet.builder();
-
-        filterBuilder.addAll(STREAM_FILTER);
 
         if (!parameters.filter().eventDefinitions().isEmpty()) {
             final String eventDefinitionFilter = parameters.filter().eventDefinitions().stream()
@@ -105,28 +90,14 @@ public class EventsSearchService {
                 break;
         }
 
-        final SearchResult result = searches.search(SearchesConfig.builder()
-                .query(parameters.query())
-                .range(parameters.timerange())
-                .filter(String.join(" AND ", filterBuilder.build()))
-                .sorting(new Sorting(parameters.sortBy(), sortDirection))
-                .offset((parameters.page() - 1) * parameters.perPage())
-                .limit(parameters.perPage())
-                .build());
-
-        if (LOG.isDebugEnabled()) {
-            try {
-                LOG.debug("Search query\n{}", result.getBuiltQuery());
-                LOG.debug("Search result\n{}", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
-            } catch (JsonProcessingException e) {
-                LOG.error("Couldn't serialize search result", e);
-            }
-        }
+        final String filter = String.join(" AND ", filterBuilder.build());
+        final ImmutableSet<String> eventStreams = ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, forbiddenSourceStreams(subject));
 
         final ImmutableSet.Builder<String> eventDefinitionIdsBuilder = ImmutableSet.builder();
         final ImmutableSet.Builder<String> streamIdsBuilder = ImmutableSet.builder();
 
-        final List<EventsSearchResult.Event> events = result.getResults().stream()
+        final List<EventsSearchResult.Event> events = result.results().stream()
                 .map(resultMsg -> {
                     final Message message = resultMsg.getMessage();
 
@@ -157,12 +128,29 @@ public class EventsSearchService {
 
         return EventsSearchResult.builder()
                 .parameters(parameters)
-                .totalEvents(result.getTotalResults())
-                .duration(result.tookMs())
+                .totalEvents(result.resultsCount())
+                .duration(result.duration())
                 .events(events)
-                .usedIndices(result.getUsedIndices().stream().map(IndexRange::indexName).collect(Collectors.toSet()))
+                .usedIndices(result.usedIndexNames())
                 .context(context)
                 .build();
+    }
+
+    // TODO: Loading all streams for a user is not very efficient. Not sure if we can find an alternative that is
+    //       more efficient. Doing a separate ES query to get all source streams that would be in the result is
+    //       most probably not more efficient.
+    private Set<String> forbiddenSourceStreams(Subject subject) {
+        // Users with the generic streams:read permission can read all streams so we don't need to check every single
+        // stream here and can take a short cut.
+        if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
+            return Collections.emptySet();
+        }
+
+        return streamService.loadAll().stream()
+                .map(Persisted::getId)
+                // Select all streams the user is NOT permitted to access
+                .filter(streamId -> !subject.isPermitted(String.join(":", RestPermissions.STREAMS_READ, streamId)))
+                .collect(Collectors.toSet());
     }
 
     private Map<String, EventsSearchResult.ContextEntity> lookupStreams(Set<String> streams) {

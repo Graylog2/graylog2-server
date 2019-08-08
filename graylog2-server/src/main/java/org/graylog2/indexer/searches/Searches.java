@@ -806,7 +806,7 @@ public class Searches {
         return standardSearchRequest(query, limit, offset, range, filter, sort, true);
     }
 
-    private long tookMsFromSearchResult(JestResult searchResult) {
+    protected long tookMsFromSearchResult(JestResult searchResult) {
         final JsonNode tookMs = searchResult.getJsonObject().path("took");
         if (tookMs.isNumber()) {
             return tookMs.asLong();
@@ -934,7 +934,7 @@ public class Searches {
         return indices.build();
     }
 
-    private io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
+    protected io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
         final MultiSearch multiSearch = new MultiSearch.Builder(search).build();
         final MultiSearchResult multiSearchResult = JestUtils.execute(jestClient, multiSearch, errorMessage);
 

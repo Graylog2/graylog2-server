@@ -51,8 +51,6 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @ApiOperation("Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsSearchResult search(EventsSearchParameters request) {
-        final EventsSearchResult result = searchService.search(request);
-
-        return result;
+        return searchService.search(request, getSubject());
     }
 }

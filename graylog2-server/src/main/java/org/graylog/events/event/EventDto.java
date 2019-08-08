@@ -40,8 +40,8 @@ public abstract class EventDto {
     public static final String FIELD_PROCESSING_TIMESTAMP = "timestamp_processing";
     public static final String FIELD_TIMERANGE_START = "timerange_start";
     public static final String FIELD_TIMERANGE_END = "timerange_end";
-    private static final String FIELD_STREAMS = "streams";
-    private static final String FIELD_SOURCE_STREAMS = "source_streams";
+    public static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_SOURCE_STREAMS = "source_streams";
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_SOURCE = "source";
     private static final String FIELD_KEY_TUPLE = "key_tuple";
