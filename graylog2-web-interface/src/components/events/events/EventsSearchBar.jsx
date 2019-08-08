@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, ButtonGroup, ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import moment from 'moment';
+import lodash from 'lodash';
 
 import { SearchForm, TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
@@ -23,14 +24,23 @@ class EventsSearchBar extends React.Component {
     onSearchReload: PropTypes.func.isRequired,
   };
 
-  state = {
-    isReloadingResults: false,
-  };
+  constructor(props) {
+    super(props);
+
+    const timerangeDuration = extractDurationAndUnit(props.parameters.timerange.range * 1000, TIME_UNITS);
+
+    this.state = {
+      isReloadingResults: false,
+      timeRangeDuration: timerangeDuration.duration,
+      timeRangeUnit: timerangeDuration.unit,
+    };
+  }
 
   updateSearchTimeRange = (nextValue, nextUnit) => {
     const { onTimeRangeChange } = this.props;
-    const durationInSeconds = moment.duration(nextValue, nextUnit).asSeconds();
+    const durationInSeconds = moment.duration(lodash.max([nextValue, 1]), nextUnit).asSeconds();
     onTimeRangeChange('relative', durationInSeconds);
+    this.setState({ timeRangeDuration: nextValue, timeRangeUnit: nextUnit });
   };
 
   handlePageSizeChange = (event) => {
@@ -50,10 +60,9 @@ class EventsSearchBar extends React.Component {
 
   render() {
     const { parameters, pageSize, pageSizes, onQueryChange, onAlertFilterChange } = this.props;
-    const { isReloadingResults } = this.state;
+    const { isReloadingResults, timeRangeUnit, timeRangeDuration } = this.state;
 
     const filterAlerts = parameters.filter.alerts;
-    const timerangeDuration = extractDurationAndUnit(parameters.timerange.range * 1000, TIME_UNITS);
 
     return (
       <div className={styles.eventsSearchBar}>
@@ -76,8 +85,9 @@ class EventsSearchBar extends React.Component {
           <TimeUnitInput id="event-timerange-selector"
                          update={this.updateSearchTimeRange}
                          units={TIME_UNITS}
-                         unit={timerangeDuration.unit}
-                         value={timerangeDuration.duration}
+                         unit={timeRangeUnit}
+                         value={timeRangeDuration}
+                         clearable
                          pullRight
                          required />
         </div>
