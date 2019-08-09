@@ -19,6 +19,7 @@ package org.graylog.events.contentpack.facade;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
@@ -31,6 +32,8 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.constraints.Constraint;
+import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -38,6 +41,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.PluginMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,12 +57,15 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final ObjectMapper objectMapper;
     private final EventDefinitionHandler eventDefinitionHandler;
     private final DBEventDefinitionService eventDefinitionService;
+    private final Set<PluginMetaData> pluginMetaData;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
                                  EventDefinitionHandler eventDefinitionHandler,
+                                 Set<PluginMetaData> pluginMetaData,
                                  DBEventDefinitionService eventDefinitionService) {
         this.objectMapper = objectMapper;
+        this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.eventDefinitionService = eventDefinitionService;
     }
@@ -71,6 +78,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
         return EntityV1.builder()
                 .id(ModelId.of(entityDescriptorIds.getOrThrow(eventDefinition.id(), ModelTypes.EVENT_DEFINITION_V1)))
                 .type(ModelTypes.EVENT_DEFINITION_V1)
+                .constraints(versionConstraints(eventDefinition))
                 .data(data)
                 .build();
     }
@@ -84,6 +92,15 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
             return Optional.empty();
         }
         return Optional.of(exportNativeEntity(eventDefinition.get(), entityDescriptorIds));
+    }
+
+    private ImmutableSet<Constraint> versionConstraints(EventDefinitionDto eventDefinitionDto) {
+        // The report facade is in the enterprise plugin so we need to add a constraint for that
+        final String packageName = eventDefinitionDto.config().getPackageName();
+        return pluginMetaData.stream()
+                .filter(metaData -> packageName.equals(metaData.getClass().getCanonicalName()))
+                .map(PluginVersionConstraint::of)
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override

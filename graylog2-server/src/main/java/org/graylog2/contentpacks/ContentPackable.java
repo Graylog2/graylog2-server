@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 
@@ -23,5 +24,10 @@ public interface ContentPackable<T> {
     T toContentPackEntity(EntityDescriptorIds entityDescriptorIds);
     default void resolveNativeEntity(EntityDescriptor entityDescriptor,
                                      MutableGraph<EntityDescriptor> mutableGraph) {
+    }
+
+    @JsonIgnore
+    default String getPackageName() {
+        return this.getClass().getPackage().getName();
     }
 }
