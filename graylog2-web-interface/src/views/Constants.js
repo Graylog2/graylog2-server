@@ -11,6 +11,7 @@ export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red']).mode('lch').colors(40);
 
 export const dashboardsPath = '/dashboards';
+export const newDashboardsPath = '/dashboards/new';
 export const extendedSearchPath = '/extendedsearch';
 export const viewsPath = '/views';
 export const showViewsPath = `${dashboardsPath}/:viewId`;
