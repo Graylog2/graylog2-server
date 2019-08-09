@@ -27,7 +27,7 @@ public interface ContentPackable<T> {
     }
 
     @JsonIgnore
-    default String getPackageName() {
+    default String getContentPackPluginPackage() {
         return this.getClass().getPackage().getName();
     }
 }

@@ -95,8 +95,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     }
 
     private ImmutableSet<Constraint> versionConstraints(EventDefinitionDto eventDefinitionDto) {
-        // The report facade is in the enterprise plugin so we need to add a constraint for that
-        final String packageName = eventDefinitionDto.config().getPackageName();
+        final String packageName = eventDefinitionDto.config().getContentPackPluginPackage();
         return pluginMetaData.stream()
                 .filter(metaData -> packageName.equals(metaData.getClass().getCanonicalName()))
                 .map(PluginVersionConstraint::of)
