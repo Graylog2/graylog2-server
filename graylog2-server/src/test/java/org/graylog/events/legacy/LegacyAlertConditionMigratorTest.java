@@ -32,13 +32,13 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
 import org.graylog.events.processor.aggregation.AggregationFunction;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
-import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -112,8 +112,8 @@ public class LegacyAlertConditionMigratorTest {
     @Test
     @UsingDataSet(locations = "legacy-alert-conditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void run() {
-        final int migratedConditions = 9;
-        final int migratedCallbacks = 3;
+        final int migratedConditions = 10;
+        final int migratedCallbacks = 4;
 
         assertThat(migrator.run(Collections.emptySet(), Collections.emptySet())).satisfies(result -> {
             assertThat(result.completedAlertConditions()).containsOnly(
@@ -125,12 +125,14 @@ public class LegacyAlertConditionMigratorTest {
                     "00000000-0000-0000-0000-000000000006",
                     "00000000-0000-0000-0000-000000000007",
                     "00000000-0000-0000-0000-000000000008",
-                    "00000000-0000-0000-0000-000000000009"
+                    "00000000-0000-0000-0000-000000000009",
+                    "00000000-0000-0000-0000-000000000010"
             );
             assertThat(result.completedAlarmCallbacks()).containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002",
-                    "54e3deadbeefdeadbeef0003"
+                    "54e3deadbeefdeadbeef0003",
+                    "54e3deadbeefdeadbeef0004"
             );
         });
 
@@ -153,6 +155,20 @@ public class LegacyAlertConditionMigratorTest {
         assertThat(httpNotification.description()).isEqualTo("Migrated legacy alarm callback");
         assertThat(httpNotification.config()).isInstanceOf(LegacyAlarmCallbackEventNotificationConfig.class);
         assertThat((LegacyAlarmCallbackEventNotificationConfig) httpNotification.config()).satisfies(config -> {
+            assertThat(config.callbackType()).isEqualTo("org.graylog2.alarmcallbacks.HTTPAlarmCallback");
+            assertThat(config.configuration().get("url")).isEqualTo("http://localhost:11000/");
+        });
+
+        final NotificationDto httpNotificationWithoutTitle = notificationService.streamAll()
+                .filter(n -> n.title().equals("Untitled"))
+                .findFirst()
+                .orElse(null);
+
+        assertThat(httpNotificationWithoutTitle).isNotNull();
+        assertThat(httpNotificationWithoutTitle.title()).isEqualTo("Untitled");
+        assertThat(httpNotificationWithoutTitle.description()).isEqualTo("Migrated legacy alarm callback");
+        assertThat(httpNotificationWithoutTitle.config()).isInstanceOf(LegacyAlarmCallbackEventNotificationConfig.class);
+        assertThat((LegacyAlarmCallbackEventNotificationConfig) httpNotificationWithoutTitle.config()).satisfies(config -> {
             assertThat(config.callbackType()).isEqualTo("org.graylog2.alarmcallbacks.HTTPAlarmCallback");
             assertThat(config.configuration().get("url")).isEqualTo("http://localhost:11000/");
         });
@@ -211,9 +227,9 @@ public class LegacyAlertConditionMigratorTest {
                     assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(120000);
                     assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(10);
 
-                    assertThat(eventDefinition.notifications()).hasSize(1);
-                    assertThat(eventDefinition.notifications().get(0).notificationId())
-                            .isEqualTo(httpNotification.id());
+                    assertThat(eventDefinition.notifications()).hasSize(2);
+                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
+                            .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
 
                     assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
                         assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
@@ -249,9 +265,9 @@ public class LegacyAlertConditionMigratorTest {
                     assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
                     assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
 
-                    assertThat(eventDefinition.notifications()).hasSize(1);
-                    assertThat(eventDefinition.notifications().get(0).notificationId())
-                            .isEqualTo(httpNotification.id());
+                    assertThat(eventDefinition.notifications()).hasSize(2);
+                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toList()))
+                            .containsOnly(httpNotification.id(), httpNotificationWithoutTitle.id());
 
                     assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
                         assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0001");
@@ -528,13 +544,51 @@ public class LegacyAlertConditionMigratorTest {
                         });
                     });
                 });
+
+        assertThat(eventDefinitionService.streamAll().filter(ed -> ed.title().equals("Untitled")).findFirst())
+                .get()
+                .satisfies(eventDefinition -> {
+                    assertThat(eventDefinition.alert()).isTrue();
+                    assertThat(eventDefinition.priority()).isEqualTo(2);
+                    assertThat(eventDefinition.keySpec()).isEmpty();
+                    assertThat(eventDefinition.notificationSettings().gracePeriodMs()).isEqualTo(0);
+                    assertThat(eventDefinition.notificationSettings().backlogSize()).isEqualTo(0);
+
+                    assertThat(eventDefinition.notifications()).hasSize(2);
+                    assertThat(eventDefinition.notifications().stream().map(EventNotificationHandler.Config::notificationId).collect(Collectors.toSet()))
+                            .containsOnly(emailNotification.id(), slackNotification.id());
+
+                    assertThat((AggregationEventProcessorConfig) eventDefinition.config()).satisfies(config -> {
+                        assertThat(config.streams()).containsExactly("54e3deadbeefdeadbeef0003");
+                        assertThat(config.query()).isEqualTo("test_field_3:\"foo\" AND foo:bar");
+                        assertThat(config.groupBy()).isEmpty();
+                        assertThat(config.searchWithinMs()).isEqualTo(CHECK_INTERVAL * 1000);
+                        assertThat(config.executeEveryMs()).isEqualTo(CHECK_INTERVAL * 1000);
+
+                        assertThat(config.series()).hasSize(1);
+                        assertThat(config.series().get(0).id()).isNotBlank();
+                        assertThat(config.series().get(0).function()).isEqualTo(AggregationFunction.COUNT);
+                        assertThat(config.series().get(0).field()).isNotPresent();
+
+                        assertThat(config.conditions()).get().satisfies(conditions -> {
+                            assertThat(conditions.expression()).get().satisfies(expression -> {
+                                assertThat(expression).isInstanceOf(Expr.Greater.class);
+
+                                final Expr.Greater greater = (Expr.Greater) expression;
+
+                                assertThat(greater.left()).isEqualTo(Expr.NumberReference.create(config.series().get(0).id()));
+                                assertThat(greater.right()).isEqualTo(Expr.NumberValue.create(0));
+                            });
+                        });
+                    });
+                });
     }
 
     @Test
     @UsingDataSet(locations = "legacy-alert-conditions.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void runWithMigrationStatus() {
-        final int migratedConditions = 8; // Only 8 because we pass one migrated condition in
-        final int migratedCallbacks = 2;  // Only 2 because we pass one migrated callback in
+        final int migratedConditions = 9; // Only 8 because we pass one migrated condition in
+        final int migratedCallbacks = 3;  // Only 2 because we pass one migrated callback in
 
         assertThat(migrator.run(Collections.singleton("00000000-0000-0000-0000-000000000002"), Collections.singleton("54e3deadbeefdeadbeef0001"))).satisfies(result -> {
             assertThat(result.completedAlertConditions()).containsOnly(
@@ -546,12 +600,14 @@ public class LegacyAlertConditionMigratorTest {
                     "00000000-0000-0000-0000-000000000006",
                     "00000000-0000-0000-0000-000000000007",
                     "00000000-0000-0000-0000-000000000008",
-                    "00000000-0000-0000-0000-000000000009"
+                    "00000000-0000-0000-0000-000000000009",
+                    "00000000-0000-0000-0000-000000000010"
             );
             assertThat(result.completedAlarmCallbacks()).containsOnly(
                     "54e3deadbeefdeadbeef0001",
                     "54e3deadbeefdeadbeef0002",
-                    "54e3deadbeefdeadbeef0003"
+                    "54e3deadbeefdeadbeef0003",
+                    "54e3deadbeefdeadbeef0004"
             );
         });
 
