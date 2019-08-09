@@ -86,7 +86,6 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
       <WindowLeaveMessage route={route} />
       <HeaderElements />
       <Row id="main-row">
-        <QueryBar />
         <IfDashboard>
           <QueryBar />
         </IfDashboard>
