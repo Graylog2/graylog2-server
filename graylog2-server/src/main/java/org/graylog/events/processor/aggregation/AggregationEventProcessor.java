@@ -154,7 +154,7 @@ public class AggregationEventProcessor implements EventProcessor {
             try {
                 moreSearch.scrollQuery(config.query(), config.streams(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
             } catch (NotFoundException e) {
-                throw new EventProcessorException("Couldn't find one or more streams.", true, eventDefinition, e);
+                throw new EventProcessorException("Failed to load all streams.", false, eventDefinition, e);
             }
         }
 
@@ -197,7 +197,7 @@ public class AggregationEventProcessor implements EventProcessor {
         try {
             moreSearch.scrollQuery(config.query(), streams, parameters.timerange(), parameters.batchSize(), callback);
         } catch(NotFoundException e) {
-            throw new EventProcessorException("Couldn't find one or more streams.", true, eventDefinition, e);
+            throw new EventProcessorException("Failed to load all streams.", false, eventDefinition, e);
         }
     }
 

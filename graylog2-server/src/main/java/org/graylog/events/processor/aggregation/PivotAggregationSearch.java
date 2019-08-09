@@ -122,9 +122,9 @@ public class PivotAggregationSearch implements AggregationSearch {
             });
 
             if (errors.size() > 1) {
-                throw new EventProcessorException("Pivot search failed with multiple errors.", true, eventDefinition);
+                throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
             } else {
-                throw new EventProcessorException(errors.iterator().next().description(), true, eventDefinition);
+                throw new EventProcessorException(errors.iterator().next().description(), false, eventDefinition);
             }
         }
 
@@ -294,11 +294,11 @@ public class PivotAggregationSearch implements AggregationSearch {
                 configurationProvider.get().eventsSearchTimeout(),
                 TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
-            throw new EventProcessorException("Error executing search job: " + e.getMessage(), true, eventDefinition, e);
+            throw new EventProcessorException("Error executing search job: " + e.getMessage(), false, eventDefinition, e);
         } catch (TimeoutException e) {
             throw new EventProcessorException("Timeout while executing search job.", false, eventDefinition, e);
         } catch (Exception e) {
-            throw new EventProcessorException("Unhandled exception in search job.", true, eventDefinition, e);
+            throw new EventProcessorException("Unhandled exception in search job.", false, eventDefinition, e);
         }
 
         return searchJob;
