@@ -59,7 +59,8 @@ import OperatorCompletion from 'views/components/searchbar/completions/OperatorC
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import type { ValueActionHandlerConditionProps } from 'views/logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from 'views/logic/fieldactions/FieldActionHandler';
-import { dashboardsPath, extendedSearchPath, showViewsPath, viewsPath } from 'views/Constants';
+import { dashboardsPath, extendedSearchPath, newDashboardsPath, showViewsPath, viewsPath } from 'views/Constants';
+import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from './pages/StreamSearchPage';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
@@ -80,6 +81,7 @@ export default {
   routes: [
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
+    { path: newDashboardsPath, component: NewDashboardPage },
     { path: showViewsPath, component: ShowViewPage },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
     { path: dashboardsPath, component: DashboardsPage },
