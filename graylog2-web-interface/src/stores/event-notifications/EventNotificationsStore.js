@@ -104,6 +104,12 @@ const EventNotificationsStore = Reflux.createStore({
 
   get(notificationId) {
     const promise = fetch('GET', this.eventNotificationsUrl({ segments: [notificationId] }));
+    promise.catch((error) => {
+      if (error.status === 404) {
+        UserNotification.error(`Unable to find Event Notification with id <${notificationId}>, please ensure it wasn't deleted.`,
+          'Could not retrieve Event Notification');
+      }
+    });
     EventNotificationsActions.get.promise(promise);
   },
 

@@ -102,6 +102,12 @@ const EventDefinitionsStore = Reflux.createStore({
 
   get(eventDefinitionId) {
     const promise = fetch('GET', this.eventDefinitionsUrl({ segments: [eventDefinitionId] }));
+    promise.catch((error) => {
+      if (error.status === 404) {
+        UserNotification.error(`Unable to find Event Definition with id <${eventDefinitionId}>, please ensure it wasn't deleted.`,
+          'Could not retrieve Event Definition');
+      }
+    });
     EventDefinitionsActions.get.promise(promise);
   },
 
