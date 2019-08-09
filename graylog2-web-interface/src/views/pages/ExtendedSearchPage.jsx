@@ -6,7 +6,6 @@ import { Row } from 'react-bootstrap';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import QueryBar from 'views/components/QueryBar';
 import SearchBarWithStatus from 'views/components/SearchBarWithStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
