@@ -188,7 +188,7 @@ public class LegacyAlertConditionMigrator {
                 .build();
 
         final NotificationDto dto = NotificationDto.builder()
-                .title(title)
+                .title(firstNonNull(title, "Untitled"))
                 .description("Migrated legacy alarm callback")
                 .config(config)
                 .build();
@@ -416,7 +416,7 @@ public class LegacyAlertConditionMigrator {
                     .collect(ImmutableList.toImmutableList());
 
             return EventDefinitionDto.builder()
-                    .title(title)
+                    .title(firstNonNull(title, "Untitled"))
                     .description("Migrated message count alert condition")
                     .config(config)
                     .alert(true)

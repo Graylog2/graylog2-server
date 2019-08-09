@@ -213,6 +213,22 @@
           "created_at": {
             "$date": "2019-01-01T00:00:00.000Z"
           }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000010",
+          "type" : "field_content_value",
+          "parameters" : {
+            "backlog" : 0,
+            "repeat_notifications" : false,
+            "field" : "test_field_3",
+            "query" : "foo:bar",
+            "grace" : 0,
+            "value" : "foo"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
         }
       ],
       "description" : "A test stream.",
@@ -290,6 +306,20 @@
         "$date": "2019-01-01T00:00:00.000Z"
       },
       "creator_user_id" : "jane"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0004"
+      },
+      "stream_id" : "54e3deadbeefdeadbeef0001",
+      "type" : "org.graylog2.alarmcallbacks.HTTPAlarmCallback",
+      "configuration" : {
+        "url" : "http://localhost:11000/"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin"
     }
   ]
 }
