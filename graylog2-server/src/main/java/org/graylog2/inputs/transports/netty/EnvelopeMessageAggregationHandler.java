@@ -59,4 +59,10 @@ public class EnvelopeMessageAggregationHandler extends SimpleChannelInboundHandl
             LOG.debug("Message chunk was not valid and discarded.");
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable e) throws Exception {
+        LOG.error("Caught exception while decoding type of GELF packet: {}", e.getMessage());
+        invalidChunksMeter.mark();
+    }
 }
