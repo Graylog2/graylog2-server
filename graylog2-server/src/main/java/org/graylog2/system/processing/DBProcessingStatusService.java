@@ -16,13 +16,13 @@
  */
 package org.graylog2.system.processing;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -33,34 +33,46 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import static org.graylog2.system.processing.ProcessingStatusDto.FIELD_UPDATED_AT;
 
 /**
  * Manages the database collection for processing status.
  */
 public class DBProcessingStatusService {
-    private static final String COLLECTION_NAME = "processing_status";
+    static final String COLLECTION_NAME = "processing_status";
+    private static final String FIELD_WRITTEN_MESSAGES_1M = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_WRITTEN_MESSAGES_1M_RATE;
+    private static final String FIELD_UNCOMMITTED_ENTRIES = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_UNCOMMITTED_ENTRIES;
 
     private final String nodeId;
-    private final NodeService nodeService;
+    private final JobSchedulerClock clock;
+    private final Duration updateThreshold;
+    private final double journalWriteRateThreshold;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
                                      NodeId nodeId,
-                                     NodeService nodeService,
+                                     JobSchedulerClock clock,
+                                     @Named(ProcessingStatusConfig.UPDATE_THRESHOLD) Duration updateThreshold,
+                                     @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,
                                      MongoJackObjectMapperProvider mapper) {
         this.nodeId = nodeId.toString();
-        this.nodeService = nodeService;
+        this.clock = clock;
+        this.updateThreshold = updateThreshold;
+        this.journalWriteRateThreshold = ((Number) journalWriteRateThreshold).doubleValue();
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
                 mapper.get());
 
         db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
+        db.createIndex(new BasicDBObject(FIELD_UPDATED_AT, 1)
+                .append(FIELD_UNCOMMITTED_ENTRIES, 1)
+                .append(FIELD_WRITTEN_MESSAGES_1M, 1));
     }
 
     /**
@@ -92,14 +104,8 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
+        final DBQuery.Query query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
 
-        // We only check the min indexed timestamp for all active nodes to make sure we don't look at old status entries
-        final Set<String> activeNodes = nodeService.allActive().values()
-                .stream()
-                .map(Node::getNodeId)
-                .collect(Collectors.toSet());
-
-        final DBQuery.Query query = DBQuery.in(ProcessingStatusDto.FIELD_NODE_ID, activeNodes);
         // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
         // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
         // to return the timestamp of the slowest one.
@@ -109,6 +115,25 @@ public class DBProcessingStatusService {
             }
             return Optional.empty();
         }
+    }
+
+    // This has been put into a static method to simplify testing the processing status selection
+    @VisibleForTesting
+    static DBQuery.Query getDataSelectionQuery(JobSchedulerClock clock, Duration updateThreshold, double journalWriteRateThreshold) {
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+
+        return DBQuery.and(
+                // Only select processing status for a node ...
+                // ... that has been updated recently
+                DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp),
+                // ... and either ...
+                DBQuery.or(
+                        // ... received a certain amount of messages in the last minute
+                        DBQuery.greaterThanEquals(FIELD_WRITTEN_MESSAGES_1M, journalWriteRateThreshold),
+                        // ... or has messages left in the journal
+                        DBQuery.greaterThanEquals(FIELD_UNCOMMITTED_ENTRIES, 1L)
+                )
+        );
     }
 
     /**

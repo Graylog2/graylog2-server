@@ -16,9 +16,13 @@
  */
 package org.graylog2.system.processing;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.AtomicDouble;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
 
 import javax.inject.Singleton;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.joda.time.DateTimeZone.UTC;
@@ -31,6 +35,18 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     private final AtomicReference<DateTime> ingestReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postProcessingReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
     private final AtomicReference<DateTime> postIndexReceiveTime = new AtomicReference<>(new DateTime(0L, UTC));
+
+    @VisibleForTesting
+    final AtomicLong uncommittedMessages = new AtomicLong(0);
+    @VisibleForTesting
+    final AtomicDouble readMessages1m = new AtomicDouble(0);
+    @VisibleForTesting
+    final AtomicDouble writtenMessages1m = new AtomicDouble(0);
+
+    @Override
+    public Lifecycle getNodeLifecycleStatus() {
+        return Lifecycle.RUNNING;
+    }
 
     @Override
     public DateTime getIngestReceiveTime() {
@@ -45,6 +61,21 @@ public class InMemoryProcessingStatusRecorder implements ProcessingStatusRecorde
     @Override
     public DateTime getPostIndexingReceiveTime() {
         return postIndexReceiveTime.get();
+    }
+
+    @Override
+    public long getJournalInfoUncommittedEntries() {
+        return uncommittedMessages.get();
+    }
+
+    @Override
+    public double getJournalInfoReadMessages1mRate() {
+        return readMessages1m.get();
+    }
+
+    @Override
+    public double getJournalInfoWrittenMessages1mRate() {
+        return writtenMessages1m.get();
     }
 
     @Override

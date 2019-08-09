@@ -66,6 +66,8 @@ public class EventProcessorDependencyCheck {
      * @return true if messages up to the given latestTimestamp have already been indexed, false otherwise
      */
     public boolean hasMessagesIndexedUpTo(DateTime latestTimestamp) {
+        // If there is no timestamp returned, there is no node in the cluster that is processing any messages.
+        // In that case we return false because there is nothing to process.
         return processingStatusService.earliestPostIndexingTimestamp()
                 .map(latestPostIndexTimestamp -> latestPostIndexTimestamp.isAfter(latestTimestamp) || latestPostIndexTimestamp.isEqual(latestTimestamp))
                 .orElse(false);
