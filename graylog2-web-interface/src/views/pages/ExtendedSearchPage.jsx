@@ -25,6 +25,7 @@ import QueryBarElements from 'views/components/QueryBarElements';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
@@ -85,6 +86,10 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
       <WindowLeaveMessage route={route} />
       <HeaderElements />
       <Row id="main-row">
+        <QueryBar />
+        <IfDashboard>
+          <QueryBar />
+        </IfDashboard>
         <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
 
         <QueryBarElements />
