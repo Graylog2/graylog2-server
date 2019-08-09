@@ -29,6 +29,7 @@ import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
+import IfDashboard from '../dashboard/IfDashboard';
 
 type Props = {
   id: string,
@@ -187,9 +188,11 @@ class Widget extends React.Component<Props, State> {
                             hideDragHandle
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
+                <IfDashboard>
+                  <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                    <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                  </WidgetFilterMenu>
+                </IfDashboard>
               </WidgetHeader>
               <EditComponent config={config}
                              fields={fields}
@@ -215,10 +218,12 @@ class Widget extends React.Component<Props, State> {
                                        widgetType={widget.type}
                                        onStretch={onPositionsChange}
                                        position={position} />
-              {' '}
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
+              <IfDashboard>
+                {' '}
+                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                </WidgetFilterMenu>
+              </IfDashboard>
               {' '}
               <WidgetActionDropdown>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
