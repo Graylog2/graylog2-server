@@ -54,8 +54,11 @@ class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       computationTimeRange: PropTypes.object,
       config: PropTypes.object.isRequired,
+      filter: PropTypes.string,
     }).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
@@ -168,6 +171,7 @@ class Widget extends React.Component<Props, State> {
     return <LoadingWidget />;
   };
 
+  // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
     const { editing } = this.state;
