@@ -1,6 +1,5 @@
 // @flow strict
-import * as React from 'react';
-import createReactClass from 'create-react-class';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
 import * as Immutable from 'immutable';
@@ -35,77 +34,72 @@ type Props = {
   searchRefreshHooks: Array<SearchRefreshCondition>,
 };
 
-const ExtendedSearchPage = createReactClass({
-  displayName: 'ExtendedSearchPage',
+const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
+  if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
+    return true;
+  }
+  return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
+};
 
-  propTypes: {
-    executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
-    route: PropTypes.object.isRequired,
-    searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
-  },
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
+  return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
+    if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
+      FieldTypesActions.all();
+      return SearchActions.execute(executionState);
+    }
+    return Promise.reject(searchMetadata);
+  });
+};
 
-  componentDidMount() {
+const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
+  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
+  useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
     FieldTypesActions.all();
     const { view } = ViewStore.getInitialState();
-    this._refreshIfNotUndeclared(view).then(() => {
-      this.storeListenersUnsubscribes = this.storeListenersUnsubscribes
+    let storeListenersUnsubscribes = Immutable.List();
+    refreshIfNotUndeclared(view).then(() => {
+      storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(() => {
           const { view: currentView } = ViewStore.getInitialState();
-          this._refreshIfNotUndeclared(currentView);
+          refreshIfNotUndeclared(currentView);
         }))
-        .push(ViewActions.search.completed.listen(this._refreshIfNotUndeclared));
+        .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    }, () => {});
+    }, () => {
+    });
 
     StreamsActions.refresh();
-  },
 
-  componentWillUnmount() {
-    style.unuse();
-    this.storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
-  },
+    // Returning cleanup function used when unmounting
+    return () => {
+      style.unuse();
+      storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
+    };
+  }, []);
 
-  storeListenersUnsubscribes: Immutable.List(),
+  return (
+    <React.Fragment>
+      <WindowLeaveMessage route={route} />
+      <HeaderElements />
+      <Row id="main-row">
+        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
 
-  _searchRefreshConditionChain(state: SearchRefreshConditionArguments) {
-    const { searchRefreshHooks } = this.props;
-    if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
-      return true;
-    }
-    return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
-  },
+        <QueryBarElements />
 
-  _refreshIfNotUndeclared(view) {
-    const { executionState } = this.props;
-    return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
-      if (this._searchRefreshConditionChain({ view, searchMetadata, executionState })) {
-        FieldTypesActions.all();
-        return SearchActions.execute(executionState);
-      }
-      return Promise.reject(searchMetadata);
-    });
-  },
+        <SearchResult />
+      </Row>
+    </React.Fragment>
+  );
+};
 
-  render() {
-    const { route } = this.props;
-    return (
-      <React.Fragment>
-        <WindowLeaveMessage route={route} />
-        <HeaderElements />
-        <Row id="main-row">
-          <SearchBarWithStatus onExecute={this._refreshIfNotUndeclared} />
-
-          <QueryBarElements />
-
-          <SearchResult />
-        </Row>
-      </React.Fragment>
-    );
-  },
-});
+ExtendedSearchPage.propTypes = {
+  executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
+  route: PropTypes.object.isRequired,
+  searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
+};
 
 const ExtendedSearchPageWithExecutionState = connect(ExtendedSearchPage, { executionState: SearchExecutionStateStore });
 
