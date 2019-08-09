@@ -264,8 +264,7 @@ defaultExport.pluginRoute = (routeKey) => {
   });
   const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
   if (!route) {
-    // eslint-disable-next-line no-console
-    console.error(`Could not find plugin route '${routeKey}'.`);
+    throw new Error(`Could not find plugin route '${routeKey}'.`);
   }
 
   return route;
