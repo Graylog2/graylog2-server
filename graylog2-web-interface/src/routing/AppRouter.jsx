@@ -62,7 +62,6 @@ import {
   RulesPage,
   ShowAlertPage,
   ShowContentPackPage,
-  ShowDashboardPage,
   ShowMessagePage,
   ShowMetricsPage,
   ShowNodePage,
