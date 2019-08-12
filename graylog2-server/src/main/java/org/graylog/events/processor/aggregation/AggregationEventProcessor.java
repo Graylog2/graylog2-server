@@ -39,7 +39,6 @@ import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.search.MoreSearch;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -151,11 +150,7 @@ public class AggregationEventProcessor implements EventProcessor {
                 messageConsumer.accept(summaries);
             };
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            try {
-                moreSearch.scrollQuery(config.query(), config.streams(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
-            } catch (NotFoundException e) {
-                throw new EventProcessorException("Failed to load all streams.", false, eventDefinition, e);
-            }
+            moreSearch.scrollQuery(config.query(), config.streams(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
 
     }
@@ -194,11 +189,7 @@ public class AggregationEventProcessor implements EventProcessor {
             eventsConsumer.accept(eventsWithContext.build());
         };
 
-        try {
-            moreSearch.scrollQuery(config.query(), streams, parameters.timerange(), parameters.batchSize(), callback);
-        } catch(NotFoundException e) {
-            throw new EventProcessorException("Failed to load all streams.", false, eventDefinition, e);
-        }
+        moreSearch.scrollQuery(config.query(), streams, parameters.timerange(), parameters.batchSize(), callback);
     }
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,

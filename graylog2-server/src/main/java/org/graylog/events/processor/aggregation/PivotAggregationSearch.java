@@ -24,6 +24,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -43,6 +44,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +77,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
     private final EventDefinition eventDefinition;
+    private final MoreSearch moreSearch;
 
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
@@ -83,7 +86,8 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   @Assisted EventDefinition eventDefinition,
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
-                                  EventsConfigurationProvider configProvider) {
+                                  EventsConfigurationProvider configProvider,
+                                  MoreSearch moreSearch) {
         this.config = config;
         this.parameters = parameters;
         this.searchOwner = searchOwner;
@@ -91,6 +95,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
+        this.moreSearch = moreSearch;
     }
 
     private String metricName(AggregationSeries series) {
@@ -325,9 +330,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             .query(ElasticsearchQueryString.builder().queryString(config.query()).build())
             .timerange(parameters.timerange());
 
-        // Streams in parameters should override the ones in the config
-        final Set<String> streams = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
-
+        final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
             queryBuilder.filter(filteringForStreamIds(streams));
         }
@@ -386,9 +389,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .query(ElasticsearchQueryString.builder().queryString(config.query()).build())
                 .timerange(parameters.timerange());
 
-        // Streams in parameters should override the ones in the config
-        final Set<String> streams = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
-
+        final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
             queryBuilder.filter(filteringForStreamIds(streams));
         }
@@ -403,5 +404,23 @@ public class PivotAggregationSearch implements AggregationSearch {
         return OrFilter.builder()
                 .filters(streamFilters)
                 .build();
+    }
+
+    private Set<String> getStreams(AggregationEventProcessorParameters parameters) {
+        // Streams in parameters should override the ones in the config
+        Set<String> streamIds = parameters.streams().isEmpty() ? config.streams() : parameters.streams();
+        final Set<String> existingStreams = moreSearch.loadStreams(streamIds).stream()
+                .map(Stream::getId)
+                .collect(toSet());
+        final Set<String> nonExistingStreams = streamIds.stream()
+                .filter(stream -> !existingStreams.contains(stream))
+                .collect(toSet());
+        if (nonExistingStreams.size() != 0) {
+            LOG.debug("Removing non-existing streams <{}> from event definition <{}>/<{}>",
+                    nonExistingStreams,
+                    eventDefinition.id(),
+                    eventDefinition.title());
+        }
+        return existingStreams;
     }
 }

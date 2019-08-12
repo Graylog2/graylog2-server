@@ -175,7 +175,7 @@ public class MoreSearch extends Searches {
                 .build();
     }
 
-    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) throws NotFoundException {
+    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
         // We support an empty streams list and return all affected indices in that case.
@@ -210,7 +210,7 @@ public class MoreSearch extends Searches {
      * @param batchSize      the number of documents to retrieve at once
      * @param resultCallback the callback that gets executed for each batch
      */
-    public void scrollQuery(String queryString, Set<String> streams, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException, NotFoundException {
+    public void scrollQuery(String queryString, Set<String> streams, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
         final String scrollTime = "1m"; // TODO: Does scroll time need to be configurable?
 
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
@@ -283,15 +283,19 @@ public class MoreSearch extends Searches {
         }
     }
 
-    private Set<Stream> loadStreams(Set<String> streamIds) throws NotFoundException {
+    public Set<Stream> loadStreams(Set<String> streamIds) {
         // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
         // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        Set<Stream> set = new HashSet<>();
+        Set<Stream> streams = new HashSet<>();
         for (String streamId : streamIds) {
-            Stream load = streamService.load(streamId);
-            set.add(load);
+            try {
+                Stream load = streamService.load(streamId);
+                streams.add(load);
+            } catch (NotFoundException e) {
+                LOG.debug("Failed to load stream <{}>", streamId);
+            }
         }
-        return set;
+        return streams;
     }
 
     /**
