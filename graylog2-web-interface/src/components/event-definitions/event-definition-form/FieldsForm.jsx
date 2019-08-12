@@ -106,7 +106,7 @@ class FieldsForm extends React.Component {
               <dt>
                 Keys
                 <OverlayTrigger placement="right"
-                                trigger="click"
+                                trigger={['click', 'hover']}
                                 overlay={<EventKeyHelpPopover id="key-header-popover" />}>
                   <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
                 </OverlayTrigger>
