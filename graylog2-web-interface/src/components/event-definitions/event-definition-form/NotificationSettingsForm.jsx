@@ -83,8 +83,9 @@ class NotificationSettingsForm extends React.Component {
                            units={TIME_UNITS}
                            clearable />
             <HelpBlock>
-              Time to wait after a Notification is sent, to send another Notification.
-              Events with keys have different grace periods for each key.
+              Graylog sends Notifications for Alerts every time they occur. Set a Grace Period to control how long
+              Graylog should wait before sending Notifications again. Note that Events with keys will have a Grace
+              Period for each different key value.
             </HelpBlock>
           </FormGroup>
 

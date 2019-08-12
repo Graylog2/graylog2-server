@@ -144,10 +144,12 @@ class AggregationForm extends React.Component {
                            value={lodash.defaultTo(eventDefinition.config.group_by, []).join(',')}
                            allowCreate />
               <HelpBlock>
-                Select Fields Graylog should use to group messages.{' '}
-                <b>Example:</b> Set <code>username</code> as Group by Field to create groups of messages with
-                identical <code>username</code> values. That way you can set a condition that will be computed for
-                each group with the same <code>username</code>.
+                Select Fields that Graylog should use to group Filter results when they have identical values.
+                {' '}<b>Example:</b><br />
+                Assuming you created a Filter with all failed log-in attempts in your network, Graylog could alert you
+                when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by
+                Field and Graylog will alert you <em>for each <code>username</code></em> with more than 5 failed
+                log-in attempts.
               </HelpBlock>
             </FormGroup>
           </Col>
