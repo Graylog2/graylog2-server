@@ -24,6 +24,7 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
+import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -67,7 +68,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -100,6 +100,8 @@ public class StreamCatalogTest {
     private NotificationService notificationService;
     @Mock
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    @Mock
+    private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     private StreamFacade facade;
 
     @Before
@@ -122,7 +124,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, new HashSet<>(), indexSetService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, alertService, alarmCallbackConfigurationService, legacyAlertConditionMigration, indexSetService);
     }
 
     @Test

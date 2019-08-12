@@ -19,12 +19,12 @@ package org.graylog2.contentpacks.facades;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.bson.types.ObjectId;
+import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
@@ -33,8 +33,6 @@ import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.constraints.Constraint;
-import org.graylog2.contentpacks.model.constraints.PluginVersionConstraint;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -49,7 +47,6 @@ import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
@@ -67,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,7 +85,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final StreamRuleService streamRuleService;
     private final AlertService streamAlertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    private final Set<PluginMetaData> pluginMetaData;
+    private final V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration;
     private final IndexSetService indexSetService;
 
     @Inject
@@ -96,14 +94,14 @@ public class StreamFacade implements EntityFacade<Stream> {
                         StreamRuleService streamRuleService,
                         AlertService streamAlertService,
                         AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                        Set<PluginMetaData> pluginMetaData,
+                        V20190722150700_LegacyAlertConditionMigration legacyAlertsMigration,
                         IndexSetService indexSetService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamAlertService = streamAlertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
-        this.pluginMetaData = pluginMetaData;
+        this.legacyAlertsMigration = legacyAlertsMigration;
         this.indexSetService = indexSetService;
     }
 
@@ -111,13 +109,6 @@ public class StreamFacade implements EntityFacade<Stream> {
     Entity exportNativeEntity(Stream stream, EntityDescriptorIds entityDescriptorIds) {
         final List<StreamRuleEntity> streamRules = stream.getStreamRules().stream()
                 .map(this::encodeStreamRule)
-                .collect(Collectors.toList());
-        final List<AlertCondition> alertConditions = streamService.getAlertConditions(stream);
-        final List<StreamAlertConditionEntity> streamAlertConditions = alertConditions.stream()
-                .map(this::encodeStreamAlertCondition)
-                .collect(Collectors.toList());
-        final List<StreamAlarmCallbackEntity> streamAlarmCallbacks = alarmCallbackConfigurationService.getForStream(stream).stream()
-                .map(this::encodeStreamAlarmCallback)
                 .collect(Collectors.toList());
         final Set<ValueReference> outputIds = stream.getOutputs().stream()
                 .map(output -> entityDescriptorIds.getOrThrow(output.getId(), ModelTypes.OUTPUT_V1))
@@ -129,8 +120,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 ValueReference.of(stream.getDisabled()),
                 ValueReference.of(stream.getMatchingType()),
                 streamRules,
-                streamAlertConditions,
-                streamAlarmCallbacks,
+                Collections.emptyList(), // Kept for backwards compatibility
+                Collections.emptyList(), // Kept for backwards compatibility
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
                 ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
@@ -139,24 +130,8 @@ public class StreamFacade implements EntityFacade<Stream> {
         return EntityV1.builder()
                 .id(ModelId.of(entityDescriptorIds.getOrThrow(stream.getId(), ModelTypes.STREAM_V1)))
                 .type(ModelTypes.STREAM_V1)
-                .constraints(versionConstraints(streamAlarmCallbacks, alertConditions))
                 .data(data)
                 .build();
-    }
-
-    private ImmutableSet<Constraint> versionConstraints(List<StreamAlarmCallbackEntity> alarmCallbacks,
-                                                        List<AlertCondition> streamAlertConditions) {
-        // Try to collect plugin dependencies by looking that the package names of the alarm callbacks/conditions and
-        // the loaded plugins
-        final java.util.stream.Stream<String> concat = java.util.stream.Stream.concat(
-                alarmCallbacks.stream().map(StreamAlarmCallbackEntity::type),
-                streamAlertConditions.stream().map(condition -> condition.getClass().getCanonicalName())
-
-        );
-        return concat.flatMap(packageName -> pluginMetaData.stream()
-                .filter(metaData -> packageName.startsWith(metaData.getClass().getPackage().getName()))
-                .map(PluginVersionConstraint::of))
-                .collect(ImmutableSet.toImmutableSet());
     }
 
     private StreamRuleEntity encodeStreamRule(StreamRule streamRule) {
@@ -166,21 +141,6 @@ public class StreamFacade implements EntityFacade<Stream> {
                 ValueReference.of(nullToEmpty(streamRule.getValue())), // Rule value can be null!
                 ValueReference.of(streamRule.getInverted()),
                 ValueReference.of(nullToEmpty(streamRule.getDescription()))); // Rule description can be null!
-    }
-
-    private StreamAlertConditionEntity encodeStreamAlertCondition(AlertCondition alertCondition) {
-        return StreamAlertConditionEntity.create(
-                alertCondition.getType(),
-                ValueReference.of(alertCondition.getTitle()),
-                ReferenceMapUtils.toReferenceMap(alertCondition.getParameters()));
-    }
-
-    private StreamAlarmCallbackEntity encodeStreamAlarmCallback(AlarmCallbackConfiguration alarmCallback) {
-        return StreamAlarmCallbackEntity.create(
-                alarmCallback.getType(),
-                ValueReference.of(alarmCallback.getTitle()),
-                alarmCallback.getStreamId(),
-                ReferenceMapUtils.toReferenceMap(alarmCallback.getConfiguration()));
     }
 
     @Override
@@ -213,6 +173,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(streamRuleEntity -> createStreamRuleRequest(streamRuleEntity, parameters))
                 .map(request -> streamRuleService.create(DUMMY_STREAM_ID, request))
                 .collect(Collectors.toList());
+        // TODO: The creation of legacy alert conditions should be avoided and a new event definition should be created instead
         final List<AlertCondition> alertConditions = streamEntity.alertConditions().stream()
                 .map(alertCondition -> createStreamAlertConditionRequest(alertCondition, parameters))
                 .map(request -> {
@@ -223,6 +184,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                     }
                 })
                 .collect(Collectors.toList());
+        // TODO: The creation of legacy alarm callback should be avoided and a new event notification should be created instead
         final List<AlarmCallbackConfiguration> alarmCallbacks = streamEntity.alarmCallbacks().stream()
                 .map(alarmCallback -> createStreamAlarmCallbackRequest(alarmCallback, parameters))
                 .map(request -> alarmCallbackConfigurationService.create(stream.getId(), request, username))
@@ -250,6 +212,16 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
+
+        if (!alertConditions.isEmpty() || !alarmCallbacks.isEmpty()) {
+            // Migrated newly created legacy alert conditions and alarm callbacks to the new events system
+            // TODO: Remove migration call once we updated the above code to directly create event definitions and notifications
+            try {
+                legacyAlertsMigration.upgrade();
+            } catch (Exception e) {
+                LOG.error("Couldn't run migration for newly created legacy alert conditions and/or alarm callbacks", e);
+            }
+        }
 
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }
