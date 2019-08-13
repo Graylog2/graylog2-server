@@ -14,90 +14,118 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.simulator;
+package org.graylog.plugins.pipelineprocessor.processors.listeners;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
-import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.metrics.MetricUtils;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
-class SimulatorInterpreterListener implements InterpreterListener {
-    private final PipelineInterpreterTracer executionTrace;
+import static com.codahale.metrics.MetricRegistry.name;
 
-    SimulatorInterpreterListener(PipelineInterpreterTracer executionTrace) {
-        this.executionTrace = executionTrace;
+/**
+ * This interpreter listener maintains timer metrics for rules.
+ */
+public class RuleMetricsListener implements InterpreterListener {
+    public enum Type {
+        EXECUTE, EVALUATE
+    }
+
+    private final MetricRegistry metricRegistry;
+    private final Map<String, Timer.Context> evaluateTimers = new HashMap<>();
+    private final Map<String, Timer.Context> executeTimers = new HashMap<>();
+
+    public RuleMetricsListener(MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+    }
+
+    public static String getMetricName(String ruleId, Type type) {
+        return name(Rule.class, ruleId, "trace", type.toString().toLowerCase(Locale.US), "duration");
+    }
+
+    private void startTimer(Rule rule, Type type, Map<String, Timer.Context> timers) {
+        if (rule.id() != null) {
+            final Timer timer = MetricUtils.getOrRegister(metricRegistry, getMetricName(rule.id(), type), new Timer());
+            timers.put(rule.id(), timer.time());
+        }
+    }
+
+    private void stopTimer(Rule rule, Map<String, Timer.Context> timers) {
+        if (rule.id() != null) {
+            final Timer.Context timer = timers.get(rule.id());
+            if (timer != null) {
+                timer.stop();
+            }
+        }
     }
 
     @Override
     public void startProcessing() {
-        executionTrace.startProcessing("Starting message processing");
     }
 
     @Override
     public void finishProcessing() {
-        executionTrace.finishProcessing("Finished message processing");
     }
 
     @Override
     public void processStreams(Message message, Set<Pipeline> pipelines, Set<String> streams) {
-        executionTrace.addTrace("Message " + message.getId() + " running " + pipelines + " for streams " + streams);
     }
 
     @Override
     public void enterStage(Stage stage) {
-        executionTrace.addTrace("Enter " + stage);
     }
 
     @Override
     public void exitStage(Stage stage) {
-        executionTrace.addTrace("Exit " + stage);
     }
 
     @Override
     public void evaluateRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Evaluate " + rule + " in " + pipeline);
+        startTimer(rule, Type.EVALUATE, evaluateTimers);
     }
 
     @Override
     public void failEvaluateRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Failed evaluation " + rule + " in " + pipeline);
+        stopTimer(rule, evaluateTimers);
     }
 
     @Override
     public void satisfyRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Evaluation satisfied " + rule + " in " + pipeline);
+        stopTimer(rule, evaluateTimers);
     }
 
     @Override
     public void dissatisfyRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Evaluation not satisfied " + rule + " in " + pipeline);
+        stopTimer(rule, evaluateTimers);
     }
 
     @Override
     public void executeRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Execute " + rule + " in " + pipeline);
+        startTimer(rule, Type.EXECUTE, executeTimers);
     }
 
     @Override
     public void finishExecuteRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Finished execution " + rule + " in " + pipeline);
+        stopTimer(rule, executeTimers);
     }
 
     @Override
     public void failExecuteRule(Rule rule, Pipeline pipeline) {
-        executionTrace.addTrace("Failed execution " + rule + " in " + pipeline);
     }
 
     @Override
     public void continuePipelineExecution(Pipeline pipeline, Stage stage) {
-        executionTrace.addTrace("Completed " + stage + " for " + pipeline + ", continuing to next stage");
     }
 
     @Override
     public void stopPipelineExecution(Pipeline pipeline, Stage stage) {
-        executionTrace.addTrace("Completed " + stage + " for " + pipeline + ", NOT continuing to next stage");
     }
 }
