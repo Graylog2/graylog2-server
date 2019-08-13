@@ -10,6 +10,7 @@ import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -25,12 +26,14 @@ class AggregationForm extends React.Component {
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
   formatFields = lodash.memoize(
     (fieldTypes) => {
-      return fieldTypes.map((fieldType) => {
-        return {
-          label: `${fieldType.name} – ${fieldType.value.type.type}`,
-          value: fieldType.name,
-        };
-      });
+      return fieldTypes
+        .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
+        .map((fieldType) => {
+          return {
+            label: `${fieldType.name} – ${fieldType.value.type.type}`,
+            value: fieldType.name,
+          };
+        });
     },
     fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
   );
