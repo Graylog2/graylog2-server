@@ -100,7 +100,7 @@ class FieldsList extends React.Component {
       return (
         <React.Fragment>
           <p>
-            This Event does not have any Custom Fields yet.
+            This Event does not have any custom Fields yet.
           </p>
           {addCustomFieldButton}
         </React.Fragment>
