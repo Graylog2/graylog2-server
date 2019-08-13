@@ -178,10 +178,12 @@ public class EmailSender {
                 new ArrayList<>(notificationConfig.emailRecipients())
         );
 
+        if (!emailConfig.isEnabled()) {
+            LOG.debug("Email transport is not enabled in server configuration file!");
+            return;
+        }
+
         if (emailRecipients.isEmpty()) {
-            if (!emailConfig.isEnabled()) {
-                LOG.debug("Email transport is not enabled in server configuration file!");
-            }
             LOG.debug("Cannot send emails: empty recipient list.");
             return;
         }
