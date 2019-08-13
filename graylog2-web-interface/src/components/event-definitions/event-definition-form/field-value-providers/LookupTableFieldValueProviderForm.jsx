@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import lodash from 'lodash';
-import naturalSort from 'javascript-natural-sort';
 
 import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 class LookupTableFieldValueProviderForm extends React.Component {
   static propTypes = {
@@ -31,7 +31,7 @@ class LookupTableFieldValueProviderForm extends React.Component {
   formatMessageFields = lodash.memoize(
     (fieldTypes) => {
       return fieldTypes
-        .sort((ftA, ftB) => naturalSort(ftA.name, ftB.name))
+        .sort((ftA, ftB) => naturalSortIgnoreCase(ftA.name, ftB.name))
         .map((fieldType) => {
           return {
             label: `${fieldType.name} – ${fieldType.value.type.type}`,
@@ -63,7 +63,9 @@ class LookupTableFieldValueProviderForm extends React.Component {
   };
 
   formatLookupTables = (lookupTables) => {
-    return lookupTables.map(table => ({ label: table.title, value: table.name }));
+    return lookupTables
+      .sort((lt1, lt2) => naturalSortIgnoreCase(lt1.title, lt2.title))
+      .map(table => ({ label: table.title, value: table.name }));
   };
 
   render() {
