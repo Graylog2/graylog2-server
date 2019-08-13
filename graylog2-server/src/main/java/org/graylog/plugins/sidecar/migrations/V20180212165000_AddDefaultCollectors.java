@@ -253,6 +253,27 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "</Route>\n" +
                         "\n"
         );
+        ensureCollector(
+                "filebeat",
+                "svc",
+                "windows",
+                "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe",
+                "-c \"%s\"",
+                "test config -c \"%s\"",
+                beatsPreambel +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: C:\\Program Files\\Graylog\\sidecar\\cache\\filebeat\\data\n" +
+                        "  logs: C:\\Program Files\\Graylog\\sidecar\\logs\n" +
+                        "tags:\n" +
+                        " - windows\n" +
+                        "filebeat.inputs:\n" +
+                        "  type: log\n" +
+                        "  enabled: true\n" +
+                        "  paths:\n" +
+                        "    - C:\\logs\\log.log\n"
+        );
     }
 
     private void removeConfigPath() {
