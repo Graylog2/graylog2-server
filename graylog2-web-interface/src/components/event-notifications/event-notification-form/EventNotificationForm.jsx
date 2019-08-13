@@ -83,7 +83,7 @@ class EventNotificationForm extends React.Component {
                    label="Title"
                    type="text"
                    bsStyle={validation.errors.title ? 'error' : null}
-                   help={lodash.get(validation, 'errors.title[0]', 'Title for this Notification.')}
+                   help={lodash.get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
                    value={notification.title}
                    onChange={this.handleChange}
                    required />

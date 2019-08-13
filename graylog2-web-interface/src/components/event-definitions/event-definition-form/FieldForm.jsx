@@ -193,7 +193,9 @@ class FieldForm extends React.Component {
           <FormGroup validationState={validation.errors.key_position ? 'error' : null}>
             <ControlLabel>
               Use Field as Event Key&emsp;
-              <OverlayTrigger placement="right" trigger="click" overlay={<EventKeyHelpPopover id="key-popover" />}>
+              <OverlayTrigger placement="right"
+                              trigger={['click', 'focus']}
+                              overlay={<EventKeyHelpPopover id="key-popover" />}>
                 <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
               </OverlayTrigger>
             </ControlLabel>

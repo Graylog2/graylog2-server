@@ -82,7 +82,10 @@ class NotificationsForm extends React.Component {
               <Button bsStyle="link" bsSize="small">Manage Notifications <i className="fa fa-external-link" /></Button>
             </LinkContainer>
           </span>
-          <h2 className={commonStyles.title}>Notifications</h2>
+          <h2 className={commonStyles.title}>Notifications <small>(optional)</small></h2>
+          <p>
+            Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.
+          </p>
 
           <NotificationList eventDefinition={eventDefinition}
                             notifications={notifications}

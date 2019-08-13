@@ -83,7 +83,11 @@ class FieldsForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <h2 className={commonStyles.title}>Event Fields</h2>
+          <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
+          <p>
+            Include additional information in Events generated from this Event Definition by adding custom Fields. That
+            can help you search Events or having more context when receiving Notifications.
+          </p>
 
           {errors.length > 0 && (
             <Alert bsStyle="danger" className={commonStyles.validationSummary}>
@@ -102,7 +106,7 @@ class FieldsForm extends React.Component {
               <dt>
                 Keys
                 <OverlayTrigger placement="right"
-                                trigger="click"
+                                trigger={['click', 'hover']}
                                 overlay={<EventKeyHelpPopover id="key-header-popover" />}>
                   <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
                 </OverlayTrigger>

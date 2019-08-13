@@ -78,7 +78,10 @@ class AddNotificationForm extends React.Component {
                       onChange={this.handleSelectNotificationChange}
                       options={this.formatNotifications(notifications)}
                       value={selectedNotification} />
-              <HelpBlock>Select a Notification to use on this Event Definition or create a new Notification.</HelpBlock>
+              <HelpBlock>
+                Select a Notification to use on Alerts of this kind or create a new Notification that you can
+                later use in other Alerts.
+              </HelpBlock>
             </FormGroup>
 
             {displayNewNotificationForm && (
