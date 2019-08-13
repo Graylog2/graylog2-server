@@ -105,8 +105,6 @@ public class AggregationEventProcessor implements EventProcessor {
 
         LOG.debug("Creating events for config={} parameters={}", config, parameters);
 
-        // TODO: This needs error handling!
-
         // The absence of a series indicates that the user doesn't want to do an aggregation but create events from
         // a simple search query. (one message -> one event)
         if (config.series().isEmpty()) {
@@ -197,11 +195,11 @@ public class AggregationEventProcessor implements EventProcessor {
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                   EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
         final String owner = "event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id();
-        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner);
+        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner, eventDefinition);
         final AggregationResult result = search.doSearch();
 
         if (result.keyResults().isEmpty()) {
-            LOG.debug("Empty result set");
+            LOG.debug("Aggregated search returned empty result set.");
             return;
         }
 

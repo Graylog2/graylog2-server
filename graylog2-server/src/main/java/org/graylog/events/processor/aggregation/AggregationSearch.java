@@ -16,12 +16,16 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventProcessorException;
+
 public interface AggregationSearch {
     interface Factory {
         AggregationSearch create(AggregationEventProcessorConfig config,
                                  AggregationEventProcessorParameters parameters,
-                                 String searchOwner);
+                                 String searchOwner,
+                                 EventDefinition eventDefinition);
     }
 
-    AggregationResult doSearch();
+    AggregationResult doSearch() throws EventProcessorException;
 }

@@ -56,6 +56,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -282,16 +283,19 @@ public class MoreSearch extends Searches {
         }
     }
 
-    private Set<Stream> loadStreams(Set<String> streamIds) {
+    public Set<Stream> loadStreams(Set<String> streamIds) {
         // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
         // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        return streamIds.stream().map(streamId -> {
+        Set<Stream> streams = new HashSet<>();
+        for (String streamId : streamIds) {
             try {
-                return streamService.load(streamId);
+                Stream load = streamService.load(streamId);
+                streams.add(load);
             } catch (NotFoundException e) {
-                throw new RuntimeException(e);
+                LOG.debug("Failed to load stream <{}>", streamId);
             }
-        }).collect(Collectors.toSet());
+        }
+        return streams;
     }
 
     /**

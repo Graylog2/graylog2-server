@@ -18,6 +18,8 @@ package org.graylog.events.processor.aggregation;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.events.EventsConfigurationTestProvider;
+import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -41,6 +43,10 @@ public class PivotAggregationSearchTest {
     private SearchJobService searchJobService;
     @Mock
     private QueryEngine queryEngine;
+    @Mock
+    private EventDefinition eventDefinition;
+    @Mock
+    private MoreSearch moreSearch;
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
@@ -63,12 +69,14 @@ public class PivotAggregationSearchTest {
                 .build();
 
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-            config,
-            parameters,
-            "test",
-            searchJobService,
-            queryEngine,
-            EventsConfigurationTestProvider.create());
+                config,
+                parameters,
+                "test",
+                eventDefinition,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -152,12 +160,14 @@ public class PivotAggregationSearchTest {
                 .build();
 
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-            config,
-            parameters,
-            "test",
-            searchJobService,
-            queryEngine,
-            EventsConfigurationTestProvider.create());
+                config,
+                parameters,
+                "test",
+                eventDefinition,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
@@ -213,12 +223,14 @@ public class PivotAggregationSearchTest {
                 .build();
 
         final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
-            config,
-            parameters,
-            "test",
-            searchJobService,
-            queryEngine,
-            EventsConfigurationTestProvider.create());
+                config,
+                parameters,
+                "test",
+                eventDefinition,
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch);
 
         final PivotResult pivotResult = PivotResult.builder()
                 .id("test")
