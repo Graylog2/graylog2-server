@@ -85,7 +85,7 @@ class FieldsForm extends React.Component {
         <Col md={12}>
           <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
           <p>
-            Include additional information in Events generated from this Event Definition by adding Custom Fields. That
+            Include additional information in Events generated from this Event Definition by adding custom Fields. That
             can help you search Events or having more context when receiving Notifications.
           </p>
 
