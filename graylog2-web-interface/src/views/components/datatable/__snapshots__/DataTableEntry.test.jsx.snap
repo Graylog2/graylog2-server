@@ -160,7 +160,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -271,7 +271,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -365,7 +365,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -494,7 +494,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -579,7 +579,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -690,7 +690,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -784,7 +784,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -913,7 +913,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -1010,7 +1010,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -1139,7 +1139,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -1227,7 +1227,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -1338,7 +1338,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -1435,7 +1435,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -1564,7 +1564,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -1661,7 +1661,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -1790,7 +1790,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -1878,7 +1878,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -1989,7 +1989,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}
@@ -2086,7 +2086,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                     <OverlayDropdown
                       menuContainer={<body />}
                       onToggle={[Function]}
-                      placement="right"
+                      placement="bottom"
                       show={false}
                       toggle={
                         <TypeSpecificValue
@@ -2215,7 +2215,7 @@ exports[`DataTableEntry does not fail without types 1`] = `
                         container={<body />}
                         containerPadding={10}
                         onHide={[Function]}
-                        placement="right"
+                        placement="bottom"
                         rootClose={true}
                         shouldUpdatePosition={true}
                         show={false}

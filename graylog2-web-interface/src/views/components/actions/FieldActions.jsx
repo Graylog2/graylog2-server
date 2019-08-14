@@ -106,7 +106,7 @@ class FieldActions extends React.Component<Props, State> {
     return (
       <OverlayDropdown show={open}
                        toggle={wrappedElement}
-                       placement="right"
+                       placement="bottom"
                        onToggle={this._onMenuToggle}
                        menuContainer={menuContainer}>
         <div style={{ marginBottom: '10px' }}>
