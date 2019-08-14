@@ -168,8 +168,8 @@ public class EventDefinitionFacadeTest {
                 .groupBy(ImmutableList.of("project"))
                 .series(ImmutableList.of(serie))
                 .conditions(condition)
-                .executeEveryMs(ValueReference.of(122200000L))
-                .searchWithinMs(ValueReference.of(1231312123L))
+                .executeEveryMs(122200000L)
+                .searchWithinMs(1231312123L)
                 .build();
 
         final EventDefinitionEntity eventDefinitionEntity = EventDefinitionEntity.builder()
