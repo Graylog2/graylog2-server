@@ -67,6 +67,7 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -213,7 +214,7 @@ public class EventDefinitionFacadeTest {
         final JobDefinitionDto jobDefinitionDto = mock(JobDefinitionDto.class);
         final JobTriggerDto jobTriggerDto = mock(JobTriggerDto.class);
         when(jobDefinitionDto.id()).thenReturn("job-123123");
-        when(jobSchedulerClock.nowUTC()).thenReturn(DateTime.now());
+        when(jobSchedulerClock.nowUTC()).thenReturn(DateTime.now(DateTimeZone.UTC));
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
 
