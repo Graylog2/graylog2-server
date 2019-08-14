@@ -87,7 +87,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class EventDefinitionFacadTest {
+public class EventDefinitionFacadeTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
 
@@ -276,7 +276,6 @@ public class EventDefinitionFacadTest {
 
         final Optional<EventDefinitionDto> eventDefinitionDto = eventDefinitionService.get(
                 "5d4032513d2746703d1467f6");
-        when(eventDefinitionService.delete("5d4032513d2746703d1467f6")).thenReturn(1);
         assertThat(eventDefinitionDto).isPresent();
         facade.delete(eventDefinitionDto.get());
 
