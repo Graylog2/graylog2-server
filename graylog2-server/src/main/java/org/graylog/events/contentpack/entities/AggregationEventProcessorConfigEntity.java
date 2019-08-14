@@ -73,10 +73,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public abstract Optional<AggregationConditions> conditions();
 
     @JsonProperty(FIELD_SEARCH_WITHIN_MS)
-    public abstract ValueReference searchWithinMs();
+    public abstract long searchWithinMs();
 
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
-    public abstract ValueReference executeEveryMs();
+    public abstract long executeEveryMs();
 
     public static Builder builder() {
         return Builder.create();
@@ -109,10 +109,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder conditions(@Nullable AggregationConditions conditions);
 
         @JsonProperty(FIELD_SEARCH_WITHIN_MS)
-        public abstract Builder searchWithinMs(ValueReference searchWithinMs);
+        public abstract Builder searchWithinMs(long searchWithinMs);
 
         @JsonProperty(FIELD_EXECUTE_EVERY_MS)
-        public abstract Builder executeEveryMs(ValueReference executeEveryMs);
+        public abstract Builder executeEveryMs(long executeEveryMs);
 
         public abstract AggregationEventProcessorConfigEntity build();
     }
@@ -143,8 +143,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .groupBy(groupBy())
                 .series(series())
                 .conditions(conditions().orElse(null))
-                .executeEveryMs(executeEveryMs().asLong(parameters))
-                .searchWithinMs(searchWithinMs().asLong(parameters))
+                .executeEveryMs(executeEveryMs())
+                .searchWithinMs(searchWithinMs())
                 .build();
     }
 
