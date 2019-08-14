@@ -416,7 +416,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .filter(stream -> !existingStreams.contains(stream))
                 .collect(toSet());
         if (nonExistingStreams.size() != 0) {
-            LOG.debug("Removing non-existing streams <{}> from event definition <{}>/<{}>",
+            LOG.warn("Removing non-existing streams <{}> from event definition <{}>/<{}>",
                     nonExistingStreams,
                     eventDefinition.id(),
                     eventDefinition.title());
