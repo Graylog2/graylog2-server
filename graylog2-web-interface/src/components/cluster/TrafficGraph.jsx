@@ -5,7 +5,6 @@ import HistogramVisualization from 'components/visualizations/HistogramVisualiza
 import _ from 'lodash';
 import moment from 'moment';
 import crossfilter from 'crossfilter';
-import numeral from 'numeral';
 import DateTime from 'logic/datetimes/DateTime';
 import NumberUtils from 'util/NumberUtils';
 
