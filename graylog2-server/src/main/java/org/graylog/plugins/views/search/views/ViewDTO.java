@@ -38,7 +38,13 @@ import java.util.Set;
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
 public abstract class ViewDTO {
+    public enum Type {
+        SEARCH,
+        DASHBOARD
+    }
+
     public static final String FIELD_ID = "id";
+    public static final String FIELD_TYPE = "type";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_SUMMARY = "summary";
     public static final String FIELD_DESCRIPTION = "description";
@@ -57,6 +63,9 @@ public abstract class ViewDTO {
     @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
+
+    @JsonProperty(FIELD_TYPE)
+    public abstract Type type();
 
     @JsonProperty(FIELD_TITLE)
     @NotBlank
@@ -104,6 +113,9 @@ public abstract class ViewDTO {
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
 
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(Type type);
+
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 
@@ -143,6 +155,7 @@ public abstract class ViewDTO {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
+                    .type(Type.DASHBOARD)
                     .summary("")
                     .description("")
                     .properties(ImmutableSet.of())
