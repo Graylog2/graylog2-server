@@ -18,6 +18,7 @@ package org.graylog.events.contentpack.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.events.notifications.EventNotificationConfig;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AutoValue
+@JsonTypeName(EmailEventNotificationConfigEntity.TYPE_NAME)
 @JsonDeserialize(builder = EmailEventNotificationConfigEntity.Builder.class)
 public abstract class EmailEventNotificationConfigEntity implements EventNotificationConfigEntity {
 

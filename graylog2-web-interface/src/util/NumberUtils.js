@@ -42,7 +42,7 @@ const NumberUtils = {
 
     let formattedNumber;
     try {
-      formattedNumber = numeral(this.normalizeNumber(number)).format('0.0b');
+      formattedNumber = numeral(this.normalizeNumber(number)).format('0.0ib');
     } catch (e) {
       formattedNumber = number;
     }

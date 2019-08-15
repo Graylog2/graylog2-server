@@ -73,10 +73,10 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
     public abstract Optional<AggregationConditions> conditions();
 
     @JsonProperty(FIELD_SEARCH_WITHIN_MS)
-    public abstract ValueReference searchWithinMs();
+    public abstract long searchWithinMs();
 
     @JsonProperty(FIELD_EXECUTE_EVERY_MS)
-    public abstract ValueReference executeEveryMs();
+    public abstract long executeEveryMs();
 
     public static Builder builder() {
         return Builder.create();
@@ -109,16 +109,17 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
         public abstract Builder conditions(@Nullable AggregationConditions conditions);
 
         @JsonProperty(FIELD_SEARCH_WITHIN_MS)
-        public abstract Builder searchWithinMs(ValueReference searchWithinMs);
+        public abstract Builder searchWithinMs(long searchWithinMs);
 
         @JsonProperty(FIELD_EXECUTE_EVERY_MS)
-        public abstract Builder executeEveryMs(ValueReference executeEveryMs);
+        public abstract Builder executeEveryMs(long executeEveryMs);
 
         public abstract AggregationEventProcessorConfigEntity build();
     }
 
     @Override
-    public EventProcessorConfig toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+    public EventProcessorConfig toNativeEntity(Map<String, ValueReference> parameters,
+                                               Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableSet<String> streamSet = ImmutableSet.copyOf(
                 streams().stream()
                         .map(id -> EntityDescriptor.create(id, ModelTypes.STREAM_V1))
@@ -130,7 +131,8 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                                 Stream stream = (Stream) object;
                                 return stream.getId();
                             } else {
-                                throw new ContentPackException("Invalid type for stream Stream for event definition: " + object.getClass());
+                                throw new ContentPackException(
+                                        "Invalid type for stream Stream for event definition: " + object.getClass());
                             }
                         }).collect(Collectors.toSet())
         );
@@ -141,13 +143,16 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .groupBy(groupBy())
                 .series(series())
                 .conditions(conditions().orElse(null))
-                .executeEveryMs(executeEveryMs().asLong(parameters))
-                .searchWithinMs(searchWithinMs().asLong(parameters))
+                .executeEveryMs(executeEveryMs())
+                .searchWithinMs(searchWithinMs())
                 .build();
     }
 
     @Override
-    public void resolveForInstallation(EntityV1 entity, Map<String, ValueReference> parameters, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor,Entity> entities,
+                                       MutableGraph<Entity> graph) {
         streams().stream()
                 .map(ModelId::of)
                 .map(modelId -> EntityDescriptor.create(modelId, ModelTypes.STREAM_V1))
