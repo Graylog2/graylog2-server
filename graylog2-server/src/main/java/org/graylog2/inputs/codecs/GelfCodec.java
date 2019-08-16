@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -45,11 +46,13 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
 @Codec(name = "gelf", displayName = "GELF")
-public class GelfCodec extends AbstractCodec {
+public class GelfCodec extends AbstractCodec implements MultiMessageCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
     private static final String CK_DECOMPRESS_SIZE_LIMIT = "decompress_size_limit";
     private static final int DEFAULT_DECOMPRESS_SIZE_LIMIT = 8388608;
@@ -117,21 +120,35 @@ public class GelfCodec extends AbstractCodec {
 
     @Nullable
     @Override
-    public Message decode(@Nonnull final RawMessage rawMessage) {
+    public Collection<Message> decodeMessages(@Nonnull RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
         final String json = gelfMessage.getJSON(decompressSizeLimit);
+        final JsonNode node = decodeJson(json);
+        ArrayList<Message> messages = new ArrayList<>();
 
+        if (node.isArray()) {
+            for (int i=0;i<node.size();i++) {
+                messages.add(decodeOne(node.get(i), rawMessage, i));
+            }
+        } else {
+            messages.add(decodeOne(node, rawMessage, 0));
+        }
+        return null;
+    }
+
+    private JsonNode decodeJson(final String json) {
         final JsonNode node;
-
         try {
             node = objectMapper.readTree(json);
         } catch (final Exception e) {
             log.error("Could not parse JSON, first 400 characters: " +
-                              StringUtils.abbreviate(json, 403), e);
+                StringUtils.abbreviate(json, 403), e);
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
-
-        validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
+        return node;
+    }
+    private Message decodeOne(final JsonNode node, @Nonnull RawMessage rawMessage, int position) {
+        validateGELFMessage(node, rawMessage.getId(), position, rawMessage.getRemoteAddress());
 
         // Timestamp.
         final double messageTimestamp = timestampValue(node);
@@ -144,9 +161,9 @@ public class GelfCodec extends AbstractCodec {
         }
 
         final Message message = new Message(
-                stringValue(node, "short_message"),
-                stringValue(node, "host"),
-                timestamp
+            stringValue(node, "short_message"),
+            stringValue(node, "host"),
+            timestamp
         );
 
         message.addField(Message.FIELD_FULL_MESSAGE, stringValue(node, "full_message"));
@@ -223,12 +240,23 @@ public class GelfCodec extends AbstractCodec {
 
             message.addField(key, fieldValue);
         }
-
         return message;
     }
+    @Nullable
+    @Override
+    public Message decode(@Nonnull final RawMessage rawMessage) {
+        final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
+        final String json = gelfMessage.getJSON(decompressSizeLimit);
+        final JsonNode node = decodeJson(json);
 
-    private void validateGELFMessage(JsonNode jsonNode, UUID id, ResolvableInetSocketAddress remoteAddress) {
-        final String prefix = "GELF message <" + id + "> " + (remoteAddress == null ? "" : "(received from <" + remoteAddress + ">) ");
+        return decodeOne(node, rawMessage, 0);
+    }
+
+    private void validateGELFMessage(JsonNode jsonNode, UUID id,
+                                     int position, ResolvableInetSocketAddress remoteAddress) {
+        final String prefix =
+            "GELF message <" + id + (position > 0 ? "#" + position : "") +"> " + (remoteAddress == null ? "" :
+            "(received from <" + remoteAddress + ">) ");
 
         final JsonNode hostNode = jsonNode.path("host");
         if (hostNode.isMissingNode()) {
@@ -273,6 +301,7 @@ public class GelfCodec extends AbstractCodec {
     public CodecAggregator getAggregator() {
         return aggregator;
     }
+
 
     @FactoryClass
     public interface Factory extends AbstractCodec.Factory<GelfCodec> {
