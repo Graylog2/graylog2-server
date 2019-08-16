@@ -89,23 +89,25 @@ const FieldStatistics = createReactClass({
     if (this.isMounted) {
       this.setState({ statsLoadPending: statsLoadPending.set(field, true) });
       const promise = FieldStatisticsStore.getFieldStatistics(field);
-      promise.then((statistics) => {
-        this.setState({
-          fieldStatistics: fieldStatistics.set(field, statistics),
-          statsLoadPending: statsLoadPending.set(field, false),
-        });
-      }).catch((error) => {
-        // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
-        if (error.additional && error.additional.status === 400) {
+      promise.then(
+        (statistics) => {
           this.setState({
-            fieldStatistics: fieldStatistics.delete(field),
+            fieldStatistics: fieldStatistics.set(field, statistics),
             statsLoadPending: statsLoadPending.delete(field),
           });
-        } else {
-          UserNotification.error(`Loading field statistics failed with status: ${error}`,
-            'Could not load field statistics');
-        }
-      });
+        },
+        (error) => {
+          // If the field has no statistics to display, remove it from the set of fields
+          if (error.additional && error.additional.status === 400) {
+            this.setState({ fieldStatistics: fieldStatistics.delete(field) });
+          } else {
+            UserNotification.error(`Loading field statistics failed with status: ${error}`,
+              'Could not load field statistics');
+          }
+          // Reset loading state for the field after failure
+          this.setState({ statsLoadPending: statsLoadPending.delete(field) });
+        },
+      );
     }
   },
 
