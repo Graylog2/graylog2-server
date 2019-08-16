@@ -203,7 +203,10 @@ const FieldStatistics = createReactClass({
               <Button bsSize="small" onClick={() => this._resetStatus()}><Icon name="close" /></Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Field Statistics</h1>
+          <h1>
+            Field Statistics{' '}
+            {!statsLoadPending.isEmpty() && <Icon name="spinner" spin />}
+          </h1>
 
           <div className="table-responsive">
             <table className="table table-striped table-bordered table-hover table-condensed">
