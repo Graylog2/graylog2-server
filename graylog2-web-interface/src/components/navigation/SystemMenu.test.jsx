@@ -1,9 +1,16 @@
 import React from 'react';
 import { mount } from 'enzyme';
+import AppConfig from '../../util/AppConfig';
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
-const containsLink = (wrapper, title) => expect(findLink(wrapper, title)).toHaveLength(1);
+const containsLink = (wrapper, title, length = 1) => expect(findLink(wrapper, title)).toHaveLength(length);
 const containsAllLinks = (wrapper, titles) => titles.forEach(title => containsLink(wrapper, title));
+
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  gl2ServerUrl: jest.fn(() => undefined),
+  gl2DevMode: jest.fn(() => false),
+}));
 
 describe('SystemMenu', () => {
   let currentUser;
@@ -18,6 +25,7 @@ describe('SystemMenu', () => {
     exports = {};
     const PluginStore = { exports: jest.fn(key => exports[key] || []) };
     jest.doMock('graylog-web-plugin/plugin', () => ({ PluginStore }));
+    AppConfig.gl2AppPathPrefix = jest.fn(() => '');
   });
   describe('uses correct permissions:', () => {
     let SystemMenu;
@@ -71,6 +79,16 @@ describe('SystemMenu', () => {
       const wrapper = mount(<SystemMenu location={{ pathname: '/' }} />);
       containsLink(wrapper, 'Audit Log');
       containsLink(wrapper, 'Licenses');
+    });
+    it('does not include plugin item in system navigation if required permissions are not present', () => {
+      currentUser.permissions = [];
+      const wrapper = mount(<SystemMenu location={{ pathname: '/' }} />);
+      expect(findLink(wrapper, 'Licenses')).not.toExist();
+    });
+    it('prefixes plugin path with current application path prefix', () => {
+      AppConfig.gl2AppPathPrefix = jest.fn(() => '/my/fancy/prefix');
+      const wrapper = mount(<SystemMenu location={{ pathname: '/' }} />);
+      expect(findLink(wrapper, 'Audit Log')).toHaveProp('path', '/my/fancy/prefix/system/auditlog');
     });
   });
 
