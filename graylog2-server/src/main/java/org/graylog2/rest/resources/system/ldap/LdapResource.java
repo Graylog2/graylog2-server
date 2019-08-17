@@ -31,8 +31,10 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.ldap.requests.LdapSettingsRequest;
+import org.graylog2.rest.models.system.ldap.requests.LdapSystemPasswordValidationRequest;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.models.system.ldap.responses.LdapSettingsResponse;
+import org.graylog2.rest.models.system.ldap.responses.LdapSystemPasswordValidationResponse;
 import org.graylog2.rest.models.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
@@ -76,14 +78,17 @@ import static org.apache.shiro.authz.annotation.Logical.OR;
 public class LdapResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(LdapResource.class);
 
-    @Inject
     private LdapSettingsService ldapSettingsService;
-
-    @Inject
     private LdapSettingsImpl.Factory ldapSettingsFactory;
+    private LdapConnector ldapConnector;
 
     @Inject
-    private LdapConnector ldapConnector;
+    public LdapResource(LdapSettingsService ldapSettingsService, LdapSettingsImpl.Factory ldapSettingsFactory,
+                        LdapConnector ldapConnector) {
+        this.ldapSettingsService = ldapSettingsService;
+        this.ldapSettingsFactory = ldapSettingsFactory;
+        this.ldapConnector = ldapConnector;
+    }
 
     @GET
     @Timed
@@ -325,6 +330,29 @@ public class LdapResource extends RestResource {
         } catch (IOException | LdapException e) {
             LOG.error("Unable to retrieve available LDAP groups", e);
             throw new InternalServerErrorException("Unable to retrieve available LDAP groups", e);
+        }
+    }
+
+    @POST
+    @Timed
+    @ApiOperation(value = "Validates if system password matches", notes = "")
+    @RequiresPermissions(RestPermissions.LDAP_EDIT)
+    @Path("/validate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public LdapSystemPasswordValidationResponse validateSystemPassword(LdapSystemPasswordValidationRequest request)
+            throws BadRequestException {
+        final LdapSettings ldapSettings = ldapSettingsService.load();
+        if (ldapSettings == null) {
+            throw new BadRequestException("LDAP is not configured.");
+        } else if (!ldapSettings.isEnabled()) {
+            throw new BadRequestException("LDAP is disabled.");
+        } else {
+            if (ldapSettings.getSystemPassword().equals(request.systemPassword())) {
+                return LdapSystemPasswordValidationResponse.create(true);
+            } else {
+                return LdapSystemPasswordValidationResponse.create(false);
+            }
         }
     }
 }
