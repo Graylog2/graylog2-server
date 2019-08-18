@@ -59,6 +59,9 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_frequency", validator = PositiveDurationValidator.class)
     Duration discoveryFrequency = Duration.seconds(30L);
 
+    @Parameter(value = "elasticsearch_discovery_default_scheme")
+    String defaultSchemeForDiscoveredNodes = "http";
+
     @Parameter(value = "elasticsearch_compression_enabled")
     boolean compressionEnabled = false;
 
