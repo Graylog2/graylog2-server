@@ -340,6 +340,7 @@ public class LdapResource extends RestResource {
     @Path("/validate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.LDAP_SYSTEM_PASSWORD_VALIDATE)
     public LdapSystemPasswordValidationResponse validateSystemPassword(LdapSystemPasswordValidationRequest request)
             throws BadRequestException {
         final LdapSettings ldapSettings = ldapSettingsService.load();

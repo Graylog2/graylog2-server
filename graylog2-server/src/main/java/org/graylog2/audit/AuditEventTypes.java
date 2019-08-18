@@ -79,6 +79,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String LDAP_CONFIGURATION_DELETE = PREFIX + "ldap_configuration:delete";
     public static final String LDAP_CONFIGURATION_UPDATE = PREFIX + "ldap_configuration:update";
     public static final String LDAP_GROUP_MAPPING_UPDATE = PREFIX + "ldap_group_mapping:update";
+    public static final String LDAP_SYSTEM_PASSWORD_VALIDATE = PREFIX + "ldap_system_password:validate";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -205,6 +206,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(LDAP_CONFIGURATION_DELETE)
             .add(LDAP_CONFIGURATION_UPDATE)
             .add(LDAP_GROUP_MAPPING_UPDATE)
+            .add(LDAP_SYSTEM_PASSWORD_VALIDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)
