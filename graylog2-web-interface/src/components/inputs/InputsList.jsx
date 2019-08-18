@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
-import naturalSort from 'javascript-natural-sort';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
@@ -56,10 +56,10 @@ const InputsList = createReactClass({
     const { inputs } = state;
     const globalInputs = inputs
       .filter(input => input.global === true)
-      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
+      .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
     let localInputs = inputs
       .filter(input => input.global === false)
-      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
+      .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
 
     if (this.props.node) {
       localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
