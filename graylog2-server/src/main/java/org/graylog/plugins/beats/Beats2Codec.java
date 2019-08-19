@@ -70,13 +70,11 @@ public class Beats2Codec extends AbstractCodec {
         final JsonNode event;
         try {
             event = objectMapper.readTree(payload);
+            if (event == null) {
+                throw new IOException("null result");
+            }
         } catch (IOException e) {
             LOG.error("Couldn't decode raw message {}", rawMessage);
-            return null;
-        }
-
-        // Adhere to the legacy behaviour
-        if (event == null) {
             return null;
         }
 

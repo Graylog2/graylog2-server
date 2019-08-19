@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -127,6 +128,9 @@ public class GelfCodec extends AbstractCodec {
 
         try {
             node = objectMapper.readTree(json);
+            if (node == null) {
+                throw new IOException("null result");
+            }
         } catch (final Exception e) {
             log.error("Could not parse JSON, first 400 characters: " +
                               StringUtils.abbreviate(json, 403), e);
