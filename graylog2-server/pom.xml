@@ -962,7 +962,7 @@
                     <plugin>
                         <groupId>com.googlecode.maven-download-plugin</groupId>
                         <artifactId>download-maven-plugin</artifactId>
-                        <version>1.4.1</version>
+                        <version>${download-maven-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>install-headless-shell</id>
