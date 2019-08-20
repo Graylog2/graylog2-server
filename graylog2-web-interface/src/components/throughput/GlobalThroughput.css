@@ -53,6 +53,7 @@
   :local(.total-throughput__content),
   :local(.total-throughput) > a {
     height: auto;
+    display: block;
   }
 
   :local(.total-throughput__content)::before {
