@@ -19,7 +19,8 @@ package org.graylog2.alarmcallbacks;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
-import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -47,6 +48,7 @@ public class EmailAlarmCallbackTest {
     private NodeId nodeId = mock(NodeId.class);
     private EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
     private UserService userService = mock(UserService.class);
+    private EmailConfigurationService emailConfigurationService = mock(EmailConfigurationService.class);
     private EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);
     private org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
 
@@ -54,8 +56,9 @@ public class EmailAlarmCallbackTest {
 
     @Before
     public void setUp() throws Exception {
+        when(emailConfigurationService.load()).thenReturn(emailConfiguration);
         alarmCallback = new EmailAlarmCallback(alertSender, notificationService, nodeId, emailRecipientsFactory,
-                userService, emailConfiguration, graylogConfig);
+                userService, emailConfigurationService, graylogConfig);
     }
 
     @Test
@@ -81,7 +84,7 @@ public class EmailAlarmCallbackTest {
                 "email_receivers", Collections.emptyList()
         );
         final Configuration configuration = new Configuration(configMap);
-        when(emailConfiguration.getFromEmail()).thenReturn("default@sender.org");
+        when(emailConfiguration.fromEmail()).thenReturn("default@sender.org");
 
         alarmCallback.initialize(configuration);
         alarmCallback.checkConfiguration();
@@ -98,7 +101,7 @@ public class EmailAlarmCallbackTest {
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
 
-        when(emailConfiguration.getFromEmail()).thenReturn("");
+        when(emailConfiguration.fromEmail()).thenReturn("");
 
         expectedException.expect(ConfigurationException.class);
         expectedException.expectMessage("Sender or subject are missing or invalid.");

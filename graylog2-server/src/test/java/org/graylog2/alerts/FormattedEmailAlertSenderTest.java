@@ -17,7 +17,8 @@
 package org.graylog2.alerts;
 
 import com.floreysoft.jmte.Engine;
-import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -45,6 +46,10 @@ public class FormattedEmailAlertSenderTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
+    private EmailConfigurationService emailConfigurationService;
+    @Mock
+    private EmailConfiguration emailConfiguration;
+    @Mock
     private NotificationService mockNotificationService;
     @Mock
     private NodeId mockNodeId;
@@ -54,7 +59,8 @@ public class FormattedEmailAlertSenderTest {
 
     @Before
     public void setUp() throws Exception {
-        this.emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockNotificationService, mockNodeId, templateEngine);
+        when(emailConfigurationService.load()).thenReturn(emailConfiguration);
+        this.emailAlertSender = new FormattedEmailAlertSender(emailConfigurationService, mockNotificationService, mockNodeId, templateEngine);
     }
 
     @Test
@@ -120,13 +126,7 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void buildBodyContainsURLIfWebInterfaceURLIsSet() throws Exception {
-        final EmailConfiguration configuration = new EmailConfiguration() {
-            @Override
-            public URI getWebInterfaceUri() {
-                return URI.create("https://localhost");
-            }
-        };
-        this.emailAlertSender = new FormattedEmailAlertSender(configuration, mockNotificationService, mockNodeId, templateEngine);
+        when(emailConfiguration.webInterfaceUri()).thenReturn(URI.create("https://localhost"));
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -145,13 +145,7 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void buildBodyContainsInfoMessageIfWebInterfaceURLIsNotSet() throws Exception {
-        final EmailConfiguration configuration = new EmailConfiguration() {
-            @Override
-            public URI getWebInterfaceUri() {
-                return null;
-            }
-        };
-        this.emailAlertSender = new FormattedEmailAlertSender(configuration, mockNotificationService, mockNodeId, templateEngine);
+        when(emailConfiguration.webInterfaceUri()).thenReturn(null);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -170,13 +164,7 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void buildBodyContainsInfoMessageIfWebInterfaceURLIsIncomplete() throws Exception {
-        final EmailConfiguration configuration = new EmailConfiguration() {
-            @Override
-            public URI getWebInterfaceUri() {
-                return URI.create("");
-            }
-        };
-        this.emailAlertSender = new FormattedEmailAlertSender(configuration, mockNotificationService, mockNodeId, templateEngine);
+        when(emailConfiguration.webInterfaceUri()).thenReturn(URI.create(""));
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -195,7 +183,6 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void defaultBodyTemplateDoesNotShowBacklogIfBacklogIsEmpty() throws Exception {
-        FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockNotificationService, mockNodeId, templateEngine);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -216,7 +203,6 @@ public class FormattedEmailAlertSenderTest {
 
     @Test
     public void defaultBodyTemplateShowsBacklogIfBacklogIsNotEmpty() throws Exception {
-        FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockNotificationService, mockNodeId, templateEngine);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");

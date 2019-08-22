@@ -21,7 +21,8 @@ import com.google.common.collect.Lists;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
-import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -63,7 +64,7 @@ public class EmailAlarmCallback implements AlarmCallback {
     private final NodeId nodeId;
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final UserService userService;
-    private final EmailConfiguration emailConfiguration;
+    private final EmailConfigurationService emailConfigurationService;
     private Configuration configuration;
     private org.graylog2.Configuration graylogConfig;
 
@@ -73,14 +74,14 @@ public class EmailAlarmCallback implements AlarmCallback {
                               NodeId nodeId,
                               EmailRecipients.Factory emailRecipientsFactory,
                               UserService userService,
-                              EmailConfiguration emailConfiguration,
+                              EmailConfigurationService emailConfigurationService,
                               org.graylog2.Configuration graylogConfig) {
         this.alertSender = alertSender;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.userService = userService;
-        this.emailConfiguration = emailConfiguration;
+        this.emailConfigurationService = emailConfigurationService;
         this.graylogConfig = graylogConfig;
     }
 
@@ -88,9 +89,10 @@ public class EmailAlarmCallback implements AlarmCallback {
     public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException {
         // Send alerts.
         final EmailRecipients emailRecipients = this.getEmailRecipients();
+        final EmailConfiguration emailConfiguration = emailConfigurationService.load();
         if (emailRecipients.isEmpty()) {
-            if (!emailConfiguration.isEnabled()) {
-                throw new AlarmCallbackException("Email transport is not enabled in server configuration file!");
+            if (!emailConfiguration.enabled()) {
+                throw new AlarmCallbackException("Email transport is not enabled!");
             }
 
             LOG.info("Alarm callback has no email recipients, not sending any emails.");
@@ -239,7 +241,7 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     @Override
     public void checkConfiguration() throws ConfigurationException {
-        final boolean missingSender = isNullOrEmpty(configuration.getString("sender")) && isNullOrEmpty(emailConfiguration.getFromEmail());
+        final boolean missingSender = isNullOrEmpty(configuration.getString("sender")) && isNullOrEmpty(emailConfigurationService.load().fromEmail());
         if (missingSender || isNullOrEmpty(configuration.getString("subject"))) {
             throw new ConfigurationException("Sender or subject are missing or invalid.");
         }

@@ -33,7 +33,8 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.alerts.EmailRecipients;
-import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -56,7 +57,7 @@ public class EmailSender {
     private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
     private static final String UNKNOWN = "<unknown>";
 
-    private final EmailConfiguration emailConfig;
+    private final EmailConfigurationService emailConfigurationService;
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final EventBacklogService eventBacklogService;
     private final NotificationService notificationService;
@@ -66,7 +67,7 @@ public class EmailSender {
     private final Engine templateEngine;
 
     @Inject
-    public EmailSender(EmailConfiguration emailConfig,
+    public EmailSender(EmailConfigurationService emailConfigurationService,
                        EmailRecipients.Factory emailRecipientsFactory,
                        EventBacklogService eventBacklogService,
                        NotificationService notificationService,
@@ -74,7 +75,7 @@ public class EmailSender {
                        DBEventDefinitionService eventDefinitionService,
                        ObjectMapper objectMapper,
                        Engine templateEngine) {
-        this.emailConfig = requireNonNull(emailConfig, "emailConfig");
+        this.emailConfigurationService = requireNonNull(emailConfigurationService, "emailConfigurationService");
         this.emailRecipientsFactory = requireNonNull(emailRecipientsFactory, "emailRecipientsFactory");
         this.eventBacklogService = eventBacklogService;
         this.notificationService = requireNonNull(notificationService, "notificationService");
@@ -127,41 +128,41 @@ public class EmailSender {
         return objectMapper.convertValue(modelData, TypeReferences.MAP_STRING_OBJECT);
     }
 
-    private void sendEmail(EmailEventNotificationConfig config, String emailAddress, Map<String, Object> model) throws TransportConfigurationException, EmailException {
+    private void sendEmail(EmailConfiguration emailConfiguration, EmailEventNotificationConfig config, String emailAddress, Map<String, Object> model) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
-        if (!emailConfig.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
+        if (!emailConfiguration.enabled()) {
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         final Email email = new SimpleEmail();
         email.setCharset(EmailConstants.UTF_8);
 
-        if (isNullOrEmpty(emailConfig.getHostname())) {
+        if (isNullOrEmpty(emailConfiguration.hostname())) {
             throw new TransportConfigurationException("No hostname configured for email transport while trying to send notification email!");
         } else {
-            email.setHostName(emailConfig.getHostname());
+            email.setHostName(emailConfiguration.hostname());
         }
-        email.setSmtpPort(emailConfig.getPort());
+        email.setSmtpPort(emailConfiguration.port());
 
-        if (emailConfig.isUseSsl()) {
-            email.setSslSmtpPort(Integer.toString(emailConfig.getPort()));
+        if (emailConfiguration.useSsl()) {
+            email.setSslSmtpPort(Integer.toString(emailConfiguration.port()));
         }
 
-        if (emailConfig.isUseAuth()) {
+        if (emailConfiguration.useAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
-                    Strings.nullToEmpty(emailConfig.getUsername()),
-                    Strings.nullToEmpty(emailConfig.getPassword())
+                    Strings.nullToEmpty(emailConfiguration.username()),
+                    Strings.nullToEmpty(emailConfiguration.password())
             ));
         }
 
         if (isNullOrEmpty(config.sender())) {
-            email.setFrom(emailConfig.getFromEmail());
+            email.setFrom(emailConfiguration.fromEmail());
         } else {
             email.setFrom(config.sender());
         }
 
-        email.setSSLOnConnect(emailConfig.isUseSsl());
-        email.setStartTLSEnabled(emailConfig.isUseTls());
+        email.setSSLOnConnect(emailConfiguration.useSsl());
+        email.setStartTLSEnabled(emailConfiguration.useTls());
         email.setSubject(buildSubject(config, model));
         email.setMsg(buildBody(config, model));
         email.addTo(emailAddress);
@@ -171,19 +172,16 @@ public class EmailSender {
 
     // TODO: move EmailRecipients class to events code
     void sendEmails(EmailEventNotificationConfig notificationConfig, EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) throws TransportConfigurationException, EmailException, ConfigurationError {
-        if (!emailConfig.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
+        EmailConfiguration emailConfiguration = emailConfigurationService.load();
+        if (!emailConfiguration.enabled()) {
+            LOG.debug("Email transport is not enabled!");
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         final EmailRecipients emailRecipients = emailRecipientsFactory.create(
                 new ArrayList<>(notificationConfig.userRecipients()),
                 new ArrayList<>(notificationConfig.emailRecipients())
         );
-
-        if (!emailConfig.isEnabled()) {
-            LOG.debug("Email transport is not enabled in server configuration file!");
-            return;
-        }
 
         if (emailRecipients.isEmpty()) {
             LOG.debug("Cannot send emails: empty recipient list.");
@@ -204,7 +202,7 @@ public class EmailSender {
         final Map<String, Object> model = getModel(ctx, backlog);
 
         for (String email : recipientsSet) {
-            sendEmail(notificationConfig, email, model);
+            sendEmail(emailConfiguration, notificationConfig, email, model);
         }
     }
 

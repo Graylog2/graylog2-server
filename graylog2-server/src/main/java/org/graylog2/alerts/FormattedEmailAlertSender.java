@@ -24,7 +24,8 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
-import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfiguration;
+import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -74,19 +75,18 @@ public class FormattedEmailAlertSender implements AlertSender {
             "${end}" +
             "\n";
 
+    private final EmailConfigurationService emailConfigurationService;
     private final Engine templateEngine;
     private final NotificationService notificationService;
     private final NodeId nodeId;
     private Configuration pluginConfig;
 
-    private final EmailConfiguration configuration;
-
     @Inject
-    public FormattedEmailAlertSender(EmailConfiguration configuration,
+    public FormattedEmailAlertSender(EmailConfigurationService emailConfigurationService,
                                      NotificationService notificationService,
                                      NodeId nodeId,
                                      Engine templateEngine) {
-        this.configuration = requireNonNull(configuration, "configuration");
+        this.emailConfigurationService = requireNonNull(emailConfigurationService, "emailConfigurationService");
         this.notificationService = requireNonNull(notificationService, "notificationService");
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
@@ -125,10 +125,11 @@ public class FormattedEmailAlertSender implements AlertSender {
     }
 
     private Map<String, Object> getModel(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) {
+        final EmailConfiguration emailConfiguration = emailConfigurationService.load();
         Map<String, Object> model = new HashMap<>();
         model.put("stream", stream);
         model.put("check_result", checkResult);
-        model.put("stream_url", buildStreamDetailsURL(configuration.getWebInterfaceUri(), checkResult, stream));
+        model.put("stream_url", buildStreamDetailsURL(emailConfiguration.webInterfaceUri(), checkResult, stream));
         model.put("alertCondition", checkResult.getTriggeredCondition());
 
         final List<Message> messages = firstNonNull(backlog, Collections.<Message>emptyList());
@@ -162,38 +163,38 @@ public class FormattedEmailAlertSender implements AlertSender {
         sendEmails(stream, recipients, checkResult, null);
     }
 
-    private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
+    private void sendEmail(EmailConfiguration emailConfiguration, String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
-        if(!configuration.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
+        if(!emailConfiguration.enabled()) {
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         final Email email = new SimpleEmail();
         email.setCharset(EmailConstants.UTF_8);
 
-        if (isNullOrEmpty(configuration.getHostname())) {
+        if (isNullOrEmpty(emailConfiguration.hostname())) {
             throw new TransportConfigurationException("No hostname configured for email transport while trying to send alert email!");
         } else {
-            email.setHostName(configuration.getHostname());
+            email.setHostName(emailConfiguration.hostname());
         }
-        email.setSmtpPort(configuration.getPort());
-        if (configuration.isUseSsl()) {
-            email.setSslSmtpPort(Integer.toString(configuration.getPort()));
+        email.setSmtpPort(emailConfiguration.port());
+        if (emailConfiguration.useSsl()) {
+            email.setSslSmtpPort(Integer.toString(emailConfiguration.port()));
         }
 
-        if(configuration.isUseAuth()) {
+        if(emailConfiguration.useAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
-                Strings.nullToEmpty(configuration.getUsername()),
-                Strings.nullToEmpty(configuration.getPassword())
+                Strings.nullToEmpty(emailConfiguration.username()),
+                Strings.nullToEmpty(emailConfiguration.password())
             ));
         }
 
-        email.setSSLOnConnect(configuration.isUseSsl());
-        email.setStartTLSEnabled(configuration.isUseTls());
+        email.setSSLOnConnect(emailConfiguration.useSsl());
+        email.setStartTLSEnabled(emailConfiguration.useTls());
         if (pluginConfig != null && !isNullOrEmpty(pluginConfig.getString("sender"))) {
             email.setFrom(pluginConfig.getString("sender"));
         } else {
-            email.setFrom(configuration.getFromEmail());
+            email.setFrom(emailConfiguration.fromEmail());
         }
         email.setSubject(buildSubject(stream, checkResult, backlog));
         email.setMsg(buildBody(stream, checkResult, backlog));
@@ -204,8 +205,9 @@ public class FormattedEmailAlertSender implements AlertSender {
 
     @Override
     public void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
-        if(!configuration.isEnabled()) {
-            throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
+        final EmailConfiguration emailConfiguration = emailConfigurationService.load();
+        if(!emailConfiguration.enabled()) {
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         if (recipients == null || recipients.isEmpty()) {
@@ -224,7 +226,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         }
 
         for (String email : recipientsSet) {
-            sendEmail(email, stream, checkResult, backlog);
+            sendEmail(emailConfiguration, email, stream, checkResult, backlog);
         }
     }
 }
