@@ -23,6 +23,8 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
+import org.graylog2.email.configuration.EmailConfigurationService;
+import org.graylog2.email.configuration.EmailConfigurationServiceImpl;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -68,5 +70,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
         bind(LdapSettingsService.class).to(LdapSettingsServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
+        bind(EmailConfigurationService.class).to(EmailConfigurationServiceImpl.class);
     }
 }
