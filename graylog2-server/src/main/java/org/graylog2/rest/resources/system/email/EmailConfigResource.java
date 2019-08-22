@@ -22,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.email.configuration.EmailConfiguration;
 import org.graylog2.email.configuration.EmailConfigurationService;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -63,6 +65,7 @@ public class EmailConfigResource extends RestResource {
     @RequiresPermissions(RestPermissions.EMAIL_EDIT)
     @ApiOperation("Update the Email configuration")
     @Consumes(MediaType.APPLICATION_JSON)
+    @AuditEvent(type = AuditEventTypes.EMAIL_CONFIGURATION_UPDATE)
     public void updateEmailConfig(@ApiParam(name = "JSON body", required = true)
                                   @Valid @NotNull EmailConfiguration request) {
         emailConfigurationService.save(request);
