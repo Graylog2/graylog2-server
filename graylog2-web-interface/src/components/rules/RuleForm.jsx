@@ -99,9 +99,7 @@ class RuleForm extends React.Component {
     history.goBack();
   };
 
-  _saved = () => {
-    history.push(Routes.SYSTEM.PIPELINES.RULES);
-  };
+  _saved = () => {};
 
   _save = () => {
     const { parseErrors, rule } = this.state;
