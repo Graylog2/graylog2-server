@@ -34,6 +34,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.DateTimeException;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -407,5 +408,21 @@ public class GelfCodecTest {
         final Message message = codec.decode(rawMessage);
         assertThat(message).isNotNull();
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
+    }
+
+    @Test
+    public void decodeSucceedsWithCustomFieldAsArray() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"host\": \"example.org\","
+                + "\"timestamp\": \"1500646980.661\","
+                + "\"tags\": [\"tag1\",\"tag2\"]"
+                + "}";
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+
+        final Message message = codec.decode(rawMessage);
+        assertThat("tag2").isEqualTo((message.getFieldAs(List.class, "tags")).get(1));
+
     }
 }

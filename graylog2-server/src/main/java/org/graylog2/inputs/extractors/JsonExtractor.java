@@ -85,7 +85,7 @@ public class JsonExtractor extends Extractor {
 
         this.flatten = firstNonNull((Boolean) extractorConfig.get(CK_FLATTEN), false);
         this.listSeparator = firstNonNull((String) extractorConfig.get(CK_LIST_SEPARATOR), ", ");
-        this.keySeparator = firstNonNull((String) extractorConfig.get(CK_KEY_SEPARATOR), "_");
+        this.keySeparator = firstNonNull((String) extractorConfig.get(CK_KEY_SEPARATOR), ".");
         this.kvSeparator = firstNonNull((String) extractorConfig.get(CK_KV_SEPARATOR), "=");
         this.replaceKeyWhitespace = firstNonNull((Boolean) extractorConfig.get(CK_REPLACE_KEY_WHITESPACE), false);
         this.keyWhitespaceReplacement = firstNonNull((String) extractorConfig.get(CK_KEY_WHITESPACE_REPLACEMENT), "_");

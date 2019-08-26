@@ -409,9 +409,9 @@ public class MessageTest {
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
-        // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
-        assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
-                "dot", object.get("field_3"));
+        // Elasticsearch >=2.0 and < 5.0 does not allow "." in keys. Make sure we replace them before writing the message.
+        assertEquals("#toElasticsearchObject() should not replace \".\" in keys with a \"_\"",
+                "dot", object.get("field.3"));
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
