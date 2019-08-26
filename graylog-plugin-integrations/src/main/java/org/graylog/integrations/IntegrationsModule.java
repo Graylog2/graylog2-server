@@ -16,6 +16,7 @@
  */
 package org.graylog.integrations;
 
+import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.codecs.KinesisCloudWatchFlowLogCodec;
@@ -78,6 +79,8 @@ public class IntegrationsModule extends PluginModule {
          *
          * addConfigBeans();
          */
+
+        addAuditEventTypes(IntegrationsAuditEventTypes.class);
 
         // Palo Alto Networks
         LOG.debug("Registering message input: {}", PaloAltoTCPInput.NAME);

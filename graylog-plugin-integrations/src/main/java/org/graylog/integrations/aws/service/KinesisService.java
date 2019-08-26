@@ -496,7 +496,7 @@ public class KinesisService {
 
             final String roleArn = getRolePermissionsArn(iamClient, roleName);
             final String explanation = String.format("Success! The role [%s/%s] has been created.", roleName, roleArn);
-            return CreateRolePermissionResponse.create(explanation, roleArn);
+            return CreateRolePermissionResponse.create(explanation, roleArn, roleName);
 
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
