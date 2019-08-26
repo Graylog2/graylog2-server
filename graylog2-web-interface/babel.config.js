@@ -1,5 +1,9 @@
 module.exports = {
-  presets: [['@babel/env', { modules: 'cjs' }], '@babel/react', '@babel/flow'],
+  presets: [['@babel/env', {
+    modules: 'cjs',
+    useBuiltIns: 'entry',
+    corejs: '3.0.0',
+  }], '@babel/react', '@babel/flow'],
   plugins: [
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-proposal-class-properties',

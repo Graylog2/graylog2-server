@@ -42,7 +42,6 @@ const webpackConfig = {
   entry: {
     app: APP_PATH,
     builtins: [path.resolve(APP_PATH, 'injection', 'builtins.js')],
-    polyfill: ['@babel/polyfill'],
   },
   output: {
     path: BUILD_PATH,
@@ -102,13 +101,6 @@ const webpackConfig = {
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
       chunksSortMode: (c1, c2) => {
-        // Render the polyfill chunk first
-        if (c1.names[0] === 'polyfill') {
-          return -1;
-        }
-        if (c2.names[0] === 'polyfill') {
-          return 1;
-        }
         if (c1.names[0] === 'builtins') {
           return -1;
         }
