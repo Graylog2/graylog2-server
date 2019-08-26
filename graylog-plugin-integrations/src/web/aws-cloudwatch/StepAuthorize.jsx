@@ -4,10 +4,12 @@ import styled from 'styled-components';
 
 import { FormDataContext } from './context/FormData';
 import { ApiContext } from './context/Api';
+import { SidebarContext } from './context/Sidebar';
 
 import ValidatedInput from '../common/ValidatedInput';
 import MaskedInput from '../common/MaskedInput';
 import FormWrap from '../common/FormWrap';
+import Permissions from '../common/Permissions';
 import { renderOptions } from '../common/Options';
 import { ApiRoutes } from '../common/Routes';
 import useFetch from '../common/hooks/useFetch';
@@ -16,6 +18,7 @@ import formValidation from '../utils/formValidation';
 
 const StepAuthorize = ({ onChange, onSubmit }) => {
   const { formData } = useContext(FormDataContext);
+  const { clearSidebar, setSidebar } = useContext(SidebarContext);
   const { availableRegions, setRegions, setStreams } = useContext(ApiContext);
   const [formError, setFormError] = useState(null);
   const [fetchRegionsStatus] = useFetch(ApiRoutes.INTEGRATIONS.AWS.REGIONS, setRegions, 'GET');
@@ -58,6 +61,14 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
   const handleSubmit = () => {
     setStreamsFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAMS);
   };
+
+  useEffect(() => {
+    setSidebar(<Permissions />);
+
+    return () => {
+      clearSidebar();
+    };
+  }, []);
 
   return (
     <>

@@ -13,6 +13,7 @@ const Routes = {
 const ApiRoutes = {
   INTEGRATIONS: {
     AWS: {
+      PERMISSIONS: '/plugins/org.graylog.integrations/aws/permissions',
       REGIONS: '/plugins/org.graylog.integrations/aws/regions',
       CLOUDWATCH: {
         GROUPS: '/plugins/org.graylog.integrations/aws/cloudwatch/log_groups',
