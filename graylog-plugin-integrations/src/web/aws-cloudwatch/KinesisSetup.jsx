@@ -15,7 +15,7 @@ import { ApiContext } from './context/Api';
 
 import SetupModal from './auto-setup-steps/SetupModal';
 
-const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
+const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
   const { availableGroups, setGroups } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
@@ -31,19 +31,7 @@ const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
     { region: formData.awsCloudWatchAwsRegion.value },
   );
 
-  const { setStreams } = useContext(ApiContext);
-  const [fetchStreamsStatus, setStreamsFetch] = useFetch(
-    null,
-    (response) => {
-      setStreams(response);
-      toggleSetup();
-    },
-    'POST',
-    { region: formData.awsCloudWatchAwsRegion ? formData.awsCloudWatchAwsRegion.value : '' },
-  );
-
   useEffect(() => {
-    setStreamsFetch(null);
     if (groupNamesStatus.error) {
       setGroupNamesUrl(null);
 
@@ -68,7 +56,7 @@ const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
   }, [groupNamesStatus.error]);
 
   const handleAgreeSubmit = () => {
-    setStreamsFetch(ApiRoutes.INTEGRATIONS.AWS.KINESIS.STREAMS);
+    onSubmit();
   };
 
   const handleFormSubmit = () => {
@@ -88,14 +76,13 @@ const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
                 'awsCloudWatchKinesisStream',
                 'awsCloudWatchAwsGroupName',
               ], formData) || disabledForm}
-              loading={groupNamesStatus.loading || fetchStreamsStatus.loading}
+              loading={groupNamesStatus.loading}
               error={formError}
               title="Setup Kinesis Automatically"
               description="">
 
-      <p>Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the
-              following operations within your AWS account.
-              See <a target="_blank" rel="noopener noreferrer" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">Using CloudWatch Logs Subscription Filters</a> in the AWS documentation for more information.
+      <p>
+        Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the following operations within your AWS account. See <a target="_blank" rel="noopener noreferrer" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">Using CloudWatch Logs Subscription Filters</a> in the AWS documentation for more information.
       </p>
 
       <ol>
@@ -130,7 +117,7 @@ const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
         && (
         <BackButton onClick={toggleSetup}
                     type="button"
-                    className="btn btn-primary"
+                    className="btn btn-default"
                     disabled={disabledForm}>
           Back to Stream Selection
         </BackButton>
@@ -147,7 +134,7 @@ const KinesisSetup = ({ onChange, /* onSubmit, */ toggleSetup }) => {
 };
 
 KinesisSetup.propTypes = {
-  // onSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
   toggleSetup: PropTypes.func,
 };
