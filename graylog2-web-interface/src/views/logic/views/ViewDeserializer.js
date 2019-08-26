@@ -11,8 +11,5 @@ export default function ViewDeserializer(viewResponse: ViewJson): Promise<View> 
   return SearchActions.get(viewResponse.search_id)
     .then((search: SearchJson): Search => Search.fromJSON(search))
     .then((search: Search): View => view.toBuilder().search(search).build())
-    .then((v: View): View => {
-      ViewActions.load(v);
-      return v;
-    });
+    .then((v: View): Promise<View> => ViewActions.load(v).then(() => v));
 }
