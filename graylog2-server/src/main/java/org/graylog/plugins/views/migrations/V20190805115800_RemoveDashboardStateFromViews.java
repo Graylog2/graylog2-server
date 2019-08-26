@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
@@ -32,6 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Updates.unset;
@@ -39,6 +43,7 @@ import static com.mongodb.client.model.Updates.unset;
 public class V20190805115800_RemoveDashboardStateFromViews extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190805115800_RemoveDashboardStateFromViews.class);
     private static final String FIELD_DASHBOARD_STATE = "dashboard_state";
+    private static final String FIELD_ID = "_id";
 
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<Document> viewsCollection;
@@ -61,10 +66,14 @@ public class V20190805115800_RemoveDashboardStateFromViews extends Migration {
             return;
         }
 
+        final Set<String> legacyViewIds = StreamSupport.stream(viewsCollection.find(exists(FIELD_DASHBOARD_STATE)).spliterator(), false)
+                .map(doc -> doc.getObjectId(FIELD_ID))
+                .map(ObjectId::toString)
+                .collect(Collectors.toSet());
         final UpdateResult updateResult = viewsCollection.updateMany(exists(FIELD_DASHBOARD_STATE), unset(FIELD_DASHBOARD_STATE));
         LOG.debug("Migrated " + updateResult.getModifiedCount() + " views.");
 
-        clusterConfigService.write(MigrationCompleted.create(updateResult.getModifiedCount()));
+        clusterConfigService.write(MigrationCompleted.create(updateResult.getModifiedCount(), legacyViewIds));
     }
 
     @JsonAutoDetect
@@ -74,9 +83,13 @@ public class V20190805115800_RemoveDashboardStateFromViews extends Migration {
         @JsonProperty("modified_views_count")
         public abstract long modifiedViewsCount();
 
+        @JsonProperty("modified_view_ids")
+        public abstract Set<String> modifiedViewIds();
+
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty("modified_views_count") final long modifiedViews) {
-            return new AutoValue_V20190805115800_RemoveDashboardStateFromViews_MigrationCompleted(modifiedViews);
+        public static MigrationCompleted create(@JsonProperty("modified_views_count") final long modifiedViews,
+                                                @JsonProperty("modified_view_ids") final Set<String> modifiedViewIds) {
+            return new AutoValue_V20190805115800_RemoveDashboardStateFromViews_MigrationCompleted(modifiedViews, modifiedViewIds);
         }
     }
 }
