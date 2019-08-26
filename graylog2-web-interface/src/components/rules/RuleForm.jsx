@@ -100,7 +100,7 @@ class RuleForm extends React.Component {
   };
 
   _redirectToList = () => {
-    history.push(Routes.SYSTEM.PIPELINES.RULES)
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
   _doNothing = () => {};
