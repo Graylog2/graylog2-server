@@ -24,11 +24,7 @@
           "positions" : {}
         }
       },
-      "dashboard_state" : {
-        "widgets" : {},
-        "positions" : {}
-      },
-      "created_at" : { "$date" : "2018-07-03T09:48:03.389Z" }
+     "created_at" : { "$date" : "2018-07-03T09:48:03.389Z" }
     }
   ],
   "searches": [
