@@ -52,7 +52,6 @@ public abstract class ViewDTO {
     public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
-    public static final String FIELD_DASHBOARD_STATE = "dashboard_state";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
@@ -90,9 +89,6 @@ public abstract class ViewDTO {
 
     @JsonProperty(FIELD_STATE)
     public abstract Map<String, ViewStateDTO> state();
-
-    @JsonProperty(FIELD_DASHBOARD_STATE)
-    public abstract ViewDashboardStateDTO dashboardState();
 
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
@@ -149,9 +145,6 @@ public abstract class ViewDTO {
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
-        @JsonProperty(FIELD_DASHBOARD_STATE)
-        public abstract Builder dashboardState(ViewDashboardStateDTO dashboardState);
-
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
@@ -159,7 +152,6 @@ public abstract class ViewDTO {
                     .summary("")
                     .description("")
                     .properties(ImmutableSet.of())
-                    .dashboardState(ViewDashboardStateDTO.empty())
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
