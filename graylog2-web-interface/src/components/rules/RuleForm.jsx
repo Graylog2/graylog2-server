@@ -99,21 +99,29 @@ class RuleForm extends React.Component {
     history.goBack();
   };
 
-  _saved = () => {};
+  _redirectToList = () => {
+    history.push(Routes.SYSTEM.PIPELINES.RULES)
+  };
 
-  _save = () => {
+  _doNothing = () => {};
+
+  _save = (callback) => {
     const { parseErrors, rule } = this.state;
     const { onSave } = this.props;
 
     if (parseErrors.length === 0) {
-      onSave(rule, this._saved);
+      onSave(rule, callback);
     }
   };
 
   _submit = (event) => {
     event.preventDefault();
-    this._save();
+    this._save(this._redirectToList);
   };
+
+  _apply = () => {
+    this._save(this._doNothing);
+  }
 
   _formatPipelinesUsingRule = () => {
     const { usedInPipelines } = this.props;
@@ -185,7 +193,8 @@ class RuleForm extends React.Component {
         <Row>
           <Col md={12}>
             <div className="form-group">
-              <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+              <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save & Close</Button>
+              <Button type="button" bsStyle="info" style={{ marginRight: 10 }} onClick={this._apply}>Apply</Button>
               <Button type="button" onClick={this._goBack}>Cancel</Button>
             </div>
           </Col>
