@@ -23,9 +23,9 @@ const _filtersForQuery = (streams) => {
 
 export const QueryFiltersActions = singletonActions(
   'views.QueryFilters',
-  () => Reflux.createActions([
-    'streams',
-  ]),
+  () => Reflux.createActions({
+    streams: { asyncResult: true },
+  }),
 );
 
 export const QueryFiltersStore = singletonStore(
@@ -53,7 +53,9 @@ export const QueryFiltersStore = singletonStore(
     streams(queryId, streams) {
       const streamFilter = _filtersForQuery(streams);
       const newQuery = this.queries.get(queryId).toBuilder().filter(streamFilter).build();
-      QueriesActions.update(queryId, newQuery);
+      const promise = QueriesActions.update(queryId, newQuery);
+      QueryFiltersActions.streams.promise(promise);
+      return promise;
     },
 
     _state() {
