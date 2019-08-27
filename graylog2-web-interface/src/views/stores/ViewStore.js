@@ -7,7 +7,6 @@ import ViewGenerator from 'views/logic/views/ViewGenerator';
 import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import View from 'views/logic/views/View';
-import DashboardState from 'views/logic/views/DashboardState';
 import Search from 'views/logic/search/Search';
 import ViewState from 'views/logic/views/ViewState';
 import type { Properties } from 'views/logic/views/View';
@@ -119,11 +118,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
 
       QueriesActions.create.promise(promise);
-    },
-    dashboardState(newDashboardState: DashboardState) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().dashboardState(newDashboardState).build();
-      this._trigger();
     },
     description(newDescription: string) {
       this.dirty = true;
