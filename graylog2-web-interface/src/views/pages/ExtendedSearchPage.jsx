@@ -26,6 +26,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
+import QueryBar from 'views/components/QueryBar';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
