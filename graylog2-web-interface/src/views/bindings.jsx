@@ -1,4 +1,5 @@
 // @flow strict
+import Routes from 'routing/Routes';
 import * as Permissions from 'views/Permissions';
 
 import { MessageListHandler } from 'views/logic/searchtypes';
@@ -59,6 +60,7 @@ import requirementsProvided from './hooks/RequirementsProvided';
 import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
 import { extendedSearchPath, showViewsPath, viewsPath } from './Constants';
+import StreamSearchPage from './pages/StreamSearchPage';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -79,6 +81,7 @@ export default {
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage },
+    { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
   ],
   enterpriseWidgets: [
     {
