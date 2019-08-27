@@ -49,6 +49,7 @@ ErrorMessage.defaultProps = {
 const FormWrap = ({
   buttonContent,
   children,
+  className,
   disabled,
   description,
   error,
@@ -71,6 +72,7 @@ const FormWrap = ({
     <form onSubmit={prevent}
           autoComplete="off"
           noValidate
+          className={className}
           ref={formRef}>
 
       {title && ((typeof (title) === 'string') ? <h2>{title}</h2> : title)}
@@ -117,6 +119,7 @@ FormWrap.propTypes = {
     PropTypes.string,
     PropTypes.node,
   ]),
+  className: PropTypes.string,
 };
 
 FormWrap.defaultProps = {
@@ -127,6 +130,7 @@ FormWrap.defaultProps = {
   loading: false,
   onSubmit: () => {},
   title: null,
+  className: undefined,
 };
 
 const ErrorOutputStyle = createGlobalStyle`

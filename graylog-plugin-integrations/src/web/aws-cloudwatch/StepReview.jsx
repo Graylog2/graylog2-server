@@ -40,6 +40,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
     awsCloudWatchBatchSize,
     awsCloudWatchThrottleEnabled,
     awsCloudWatchAddFlowLogPrefix,
+    awsCloudWatchKinesisInputType,
   } = formData;
 
   const globalInputEnabled = awsCloudWatchGlobalInput && awsCloudWatchGlobalInput.value;
@@ -56,7 +57,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
       name: awsCloudWatchName.value,
       description: awsCloudWatchDescription ? awsCloudWatchDescription.value : '',
       region: awsCloudWatchAwsRegion.value,
-      aws_input_type: 'KINESIS_FLOW_LOGS',
+      aws_input_type: awsCloudWatchKinesisInputType ? awsCloudWatchKinesisInputType.value : 'KINESIS_RAW',
       stream_name: awsCloudWatchKinesisStream.value,
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       assume_role_arn: awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : '',
@@ -153,7 +154,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
         <Input id="awsCloudWatchLog"
                type="textarea"
                label=""
-               value={logData.message}
+               value={(logData && logData.message) || "We haven't received a response back from Amazon yet."}
                rows={10}
                disabled />
       </Container>

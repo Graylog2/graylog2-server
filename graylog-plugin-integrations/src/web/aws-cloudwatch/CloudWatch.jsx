@@ -89,7 +89,7 @@ const CloudWatch = ({ route }) => {
     {
       key: 'health-check',
       title: 'AWS CloudWatch Health Check',
-      component: (<StepHealthCheck onSubmit={handleSubmit} />),
+      component: (<StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />),
       disabled: isDisabledStep('health-check'),
     },
     {

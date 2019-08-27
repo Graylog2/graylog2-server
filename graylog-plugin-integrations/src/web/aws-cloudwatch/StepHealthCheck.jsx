@@ -8,13 +8,14 @@ import { Input } from 'components/bootstrap';
 import FormWrap from '../common/FormWrap';
 import useFetch from '../common/hooks/useFetch';
 import { ApiRoutes } from '../common/Routes';
+import Countdown from '../common/Countdown';
 
 import { ApiContext } from './context/Api';
 import { FormDataContext } from './context/FormData';
 import { SidebarContext } from './context/Sidebar';
-import Countdown from '../common/Countdown';
+import SkipHealthCheck from './auto-setup-steps/SkipHealthCheck';
 
-const StepHealthCheck = ({ onSubmit }) => {
+const StepHealthCheck = ({ onChange, onSubmit }) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const { clearSidebar } = useContext(SidebarContext);
@@ -24,6 +25,7 @@ const StepHealthCheck = ({ onSubmit }) => {
     null,
     (response) => {
       setLogData(response);
+      onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: response.type } });
     },
     'POST',
     {
@@ -66,7 +68,7 @@ const StepHealthCheck = ({ onSubmit }) => {
           <strong>Checking again in: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} /></strong>
 
           <Button type="button"
-                  bsStyle="primary"
+                  bsStyle="success"
                   bsSize="sm"
                   onClick={checkForLogs}
                   disabled={logDataProgress.loading}>
@@ -74,8 +76,11 @@ const StepHealthCheck = ({ onSubmit }) => {
           </Button>
         </CheckAgain>
 
-
         <p><em>Do not refresh your browser, we are continually checking for your logs and this page will automatically refresh when your logs are available.</em></p>
+
+        <div>
+          <SkipHealthCheck onSubmit={onSubmit} onChange={onChange} />
+        </div>
       </Panel>
     );
   }
@@ -84,21 +89,14 @@ const StepHealthCheck = ({ onSubmit }) => {
   const iconClass = unknownLog ? 'times' : 'check';
   const acknowledgment = unknownLog ? 'Drats!' : 'Awesome!';
   const bsStyle = unknownLog ? 'warning' : 'success';
-
-  let logType;
-
-  switch (logData.type) {
-    case 'KINESIS_FLOW_LOGS':
-      logType = 'a Flow Log';
-      break;
-
-    default:
-      logType = 'an unknown';
-      break;
-  }
+  const logType = unknownLog ? 'an unknown' : 'a Flow Log';
+  const handleSubmit = () => {
+    onSubmit();
+    onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: logData.type } });
+  };
 
   return (
-    <FormWrap onSubmit={onSubmit}
+    <FormWrap onSubmit={handleSubmit}
               buttonContent="Review &amp; Finalize"
               disabled={false}
               title="Create Kinesis Stream"
@@ -125,6 +123,7 @@ const StepHealthCheck = ({ onSubmit }) => {
 
 StepHealthCheck.propTypes = {
   onSubmit: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 const Notice = styled.span`
