@@ -44,7 +44,7 @@ import javax.inject.Inject;
  */
 public class AWSInput extends MessageInput {
 
-    public static final String NAME = "AWS";
+    public static final String NAME = "AWS Kinesis/CloudWatch";
     public static final String TYPE = "org.graylog.integrations.aws.inputs.AWSInput";
 
     public static final String CK_TITLE = "title";
