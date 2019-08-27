@@ -25,7 +25,6 @@ type ViewStoreState = {
 
 type ViewActionsType = RefluxActions<{
   create: () => Promise<ViewStoreState>,
-  dashboardState: (DashboardState) => Promise<void>,
   description: (string) => Promise<ViewStoreState>,
   load: (View) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
