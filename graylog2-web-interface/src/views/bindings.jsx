@@ -33,7 +33,7 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
+import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
 
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
@@ -54,12 +54,12 @@ import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 import UseInNewQueryHandler from 'views/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
-import FieldNameCompletion from './components/searchbar/completions/FieldNameCompletion';
-import OperatorCompletion from './components/searchbar/completions/OperatorCompletion';
-import requirementsProvided from './hooks/RequirementsProvided';
-import type { ValueActionHandlerConditionProps } from './logic/valueactions/ValueActionHandler';
-import type { FieldActionHandlerConditionProps } from './logic/fieldactions/FieldActionHandler';
-import { extendedSearchPath, showViewsPath, viewsPath } from './Constants';
+import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
+import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
+import requirementsProvided from 'views/hooks/RequirementsProvided';
+import type { ValueActionHandlerConditionProps } from 'views/logic/valueactions/ValueActionHandler';
+import type { FieldActionHandlerConditionProps } from 'views/logic/fieldactions/FieldActionHandler';
+import { dashboardsPath, extendedSearchPath, showViewsPath, viewsPath } from 'views/Constants';
 import StreamSearchPage from './pages/StreamSearchPage';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
@@ -82,6 +82,7 @@ export default {
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
+    { path: dashboardsPath, component: DashboardsPage },
   ],
   enterpriseWidgets: [
     {

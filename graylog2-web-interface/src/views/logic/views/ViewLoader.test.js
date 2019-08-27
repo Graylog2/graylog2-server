@@ -6,7 +6,6 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import Search from '../search/Search';
-import DashboardState from './DashboardState';
 import View from './View';
 import ViewLoader from './ViewLoader';
 
@@ -28,7 +27,6 @@ const viewJson = {
   search_id: 'foosearch',
   properties: {},
   state: {},
-  dashboard_state: { widgets: [], positions: [] },
   created_at: new Date('2019-05-24T12:34:04.993Z'),
   owner: 'admin',
   requires: {},
@@ -52,7 +50,6 @@ describe('ViewLoader', () => {
           .description('Foo')
           .properties({})
           .state(Immutable.Map())
-          .dashboardState(DashboardState.create())
           .createdAt(new Date('2019-05-24T12:34:04.993Z'))
           .owner('admin')
           .search(
