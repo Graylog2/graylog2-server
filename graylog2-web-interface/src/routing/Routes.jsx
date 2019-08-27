@@ -1,6 +1,7 @@
 import AppConfig from 'util/AppConfig';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
+import { extendedSearchPath, viewsPath } from 'views/Constants';
 
 const Routes = {
   STARTPAGE: '/',
@@ -118,10 +119,10 @@ const Routes = {
     },
   },
   VIEWS: {
-    LIST: '/views',
-    VIEWID: id => `/views/${id}`,
+    LIST: viewsPath,
+    VIEWID: id => `${viewsPath}/${id}`,
   },
-  EXTENDEDSEARCH: '/extendedsearch',
+  EXTENDEDSEARCH: extendedSearchPath,
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
