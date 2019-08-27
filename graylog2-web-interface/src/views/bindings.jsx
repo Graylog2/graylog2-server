@@ -73,7 +73,7 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 export default {
   pages: {
-    // search: { component: ExtendedSearchPage },
+    search: { component: NewSearchPage },
   },
   routes: [
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
