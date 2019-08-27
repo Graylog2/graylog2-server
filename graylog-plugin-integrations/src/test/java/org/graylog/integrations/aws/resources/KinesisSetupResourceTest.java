@@ -8,6 +8,7 @@ import org.graylog.integrations.aws.resources.responses.CreateRolePermissionResp
 import org.graylog.integrations.aws.resources.responses.KinesisNewStreamResponse;
 import org.graylog.integrations.aws.service.CloudWatchService;
 import org.graylog.integrations.aws.service.KinesisService;
+import org.graylog2.plugin.database.users.User;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +36,7 @@ import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 
+import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
@@ -79,14 +81,32 @@ public class KinesisSetupResourceTest {
     @Mock
     private KinesisClient kinesisClient = Mockito.mock(KinesisClient.class);
 
+    @Mock
+    private User currentUser;
+
+    /**
+     * Provide override getCurrentUser for test context since Principal is not established by default.
+     */
+    class KinesisSetupTestResource extends KinesisSetupResource {
+
+        KinesisSetupTestResource(CloudWatchService cloudWatchService, KinesisService kinesisService) {
+            super(cloudWatchService, kinesisService);
+        }
+
+        @Nullable
+        @Override
+        protected User getCurrentUser() {
+            return currentUser;
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
 
         // Set up services.
         cloudWatchService = new CloudWatchService(logsClientBuilder);
         kinesisService = new KinesisService(iamClientBuilder, kinesisClientBuilder, null, null);
-        setupResource = new KinesisSetupResource(cloudWatchService, kinesisService);
-
+        setupResource = new KinesisSetupTestResource(cloudWatchService, kinesisService);
 
         // Set up IAM client.
         when(iamClientBuilder.region(isA(Region.class))).thenReturn(iamClientBuilder);
@@ -127,13 +147,7 @@ public class KinesisSetupResourceTest {
     }
 
     @Test
-    public void testAll() throws InterruptedException {
-
-        // TODO: Remove before prod.
-        // Make test pass when mocking enabled.
-        if (setupResource.mockResponses) {
-            return;
-        }
+    public void testAll() {
 
         // Stream
         final KinesisNewStreamRequest request =
