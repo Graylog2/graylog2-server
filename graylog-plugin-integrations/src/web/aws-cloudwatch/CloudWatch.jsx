@@ -34,7 +34,6 @@ const CloudWatch = ({ route }) => {
   const [lastStep, setLastStep] = useState(false);
 
   const handleStepChange = (nextStep) => {
-    clearSidebar();
     setCurrentStep(nextStep);
   };
 
@@ -58,6 +57,7 @@ const CloudWatch = ({ route }) => {
   };
 
   const handleSubmit = () => {
+    clearSidebar();
     const nextStep = availableSteps.indexOf(currentStep) + 1;
 
     if (availableSteps[nextStep]) {

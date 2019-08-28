@@ -31,7 +31,6 @@ const StepReview = ({ onSubmit, onEditClick }) => {
   const { logData } = useContext(ApiContext);
   const {
     awsCloudWatchName,
-    awsCloudWatchDescription,
     awsCloudWatchAwsKey,
     awsCloudWatchAwsRegion,
     awsCloudWatchKinesisStream,
@@ -55,7 +54,6 @@ const StepReview = ({ onSubmit, onEditClick }) => {
     'POST',
     {
       name: awsCloudWatchName.value,
-      description: awsCloudWatchDescription ? awsCloudWatchDescription.value : '',
       region: awsCloudWatchAwsRegion.value,
       aws_input_type: awsCloudWatchKinesisInputType ? awsCloudWatchKinesisInputType.value : 'KINESIS_RAW',
       stream_name: awsCloudWatchKinesisStream.value,
@@ -95,15 +93,6 @@ const StepReview = ({ onSubmit, onEditClick }) => {
             <strong>Name</strong>
             <span>{awsCloudWatchName.value}</span>
           </li>
-          {
-            awsCloudWatchDescription
-            && (
-              <li>
-                <strong>Description</strong>
-                <span>{awsCloudWatchDescription.value || ''}</span>
-              </li>
-            )
-          }
           <li>
             <strong>AWS Key</strong>
             <span>{awsCloudWatchAwsKey.value}</span>

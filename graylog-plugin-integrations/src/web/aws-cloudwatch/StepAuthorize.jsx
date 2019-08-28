@@ -99,14 +99,6 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
                         autoComplete="off"
                         required />
 
-        <ValidatedInput id="awsCloudWatchDescription"
-                        type="textarea"
-                        label="Description"
-                        placeholder="Kinesis Input Description"
-                        onChange={onChange}
-                        fieldData={formData.awsCloudWatchDescription}
-                        rows={4} />
-
         <ValidatedInput id="awsCloudWatchAwsKey"
                         type="text"
                         label="AWS Access Key"

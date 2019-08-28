@@ -16,7 +16,7 @@ import { ApiContext } from './context/Api';
 import SetupModal from './auto-setup-steps/SetupModal';
 
 const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
-  const { availableGroups, setGroups } = useContext(ApiContext);
+  const { availableGroups, setGroups, clearLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const [disabledForm, setDisabledForm] = useState(false);
@@ -55,6 +55,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
   }, [groupNamesStatus.error]);
 
   const handleAgreeSubmit = () => {
+    clearLogData();
     onSubmit();
   };
 

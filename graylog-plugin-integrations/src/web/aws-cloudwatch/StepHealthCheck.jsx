@@ -12,13 +12,11 @@ import Countdown from '../common/Countdown';
 
 import { ApiContext } from './context/Api';
 import { FormDataContext } from './context/FormData';
-import { SidebarContext } from './context/Sidebar';
 import SkipHealthCheck from './auto-setup-steps/SkipHealthCheck';
 
 const StepHealthCheck = ({ onChange, onSubmit }) => {
   const { logData, setLogData } = useContext(ApiContext);
   const { formData } = useContext(FormDataContext);
-  const { clearSidebar } = useContext(SidebarContext);
   const [pauseCountdown, setPauseCountdown] = useState(false);
 
   const [logDataProgress, setLogDataUrl] = useFetch(
@@ -40,8 +38,6 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   };
 
   useEffect(() => {
-    clearSidebar();
-
     if (!logData) {
       checkForLogs();
     }

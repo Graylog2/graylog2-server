@@ -29,6 +29,10 @@ export const ApiProvider = ({ children }) => {
     });
   };
 
+  const clearLogData = () => {
+    setLogDataState(null);
+  };
+
   return (
     <ApiContext.Provider value={{
       availableStreams,
@@ -37,6 +41,7 @@ export const ApiProvider = ({ children }) => {
       setRegions,
       logData,
       setLogData,
+      clearLogData,
       availableGroups,
       setGroups,
     }}>

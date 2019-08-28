@@ -32,33 +32,38 @@ const FormAdvancedOptions = ({ onChange }) => {
              value="global-input"
              defaultChecked={awsCloudWatchGlobalInput ? awsCloudWatchGlobalInput.value : ''}
              onChange={onChange}
-             label="Global Input" />
+             label="Global Input"
+             help="Should this input start on all nodes" />
 
       <Input id="awsCloudWatchThrottleEnabled"
              type="checkbox"
              value="enable-throttling"
              defaultChecked={awsCloudWatchThrottleEnabled && awsCloudWatchThrottleEnabled.value}
              onChange={onChange}
-             label="Enable Throttling" />
+             label="Enable Throttling"
+             help="If enabled, no new messages will be read from this input until Graylog catches up with its message load. This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled." />
 
       <Input id="awsCloudWatchAddFlowLogPrefix"
              type="checkbox"
-             value="enable-throttling"
+             value="enable-logprefix"
              defaultChecked={awsCloudWatchAddFlowLogPrefix && awsCloudWatchAddFlowLogPrefix.value}
              onChange={onChange}
-             label="Add Flow Log field name prefix" />
+             label="Add Flow Log field name prefix"
+             help='Add field with the Flow Log prefix e. g. "src_addr" -> "flow_log_src_addr".' />
 
       <Input id="awsCloudWatchAssumeARN"
              type="text"
              value={awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : ''}
              onChange={onChange}
-             label="AWS assume role ARN" />
+             label="AWS assume role ARN"
+             help="Role ARN with required permissions (cross account access)" />
 
       <Input id="awsCloudWatchBatchSize"
              type="number"
              value={awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue}
              onChange={onChange}
-             label="Kinesis Record batch size" />
+             label="Kinesis Record batch size"
+             help="The number of Kinesis records to fetch at a time. Each record may be up to 1MB in size. The AWS default is 10,000. Enter a smaller value to process smaller chunks at a time." />
     </StyledAdditionalFields>
   );
 };
