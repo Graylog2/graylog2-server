@@ -6,6 +6,7 @@ import Search from 'views/logic/search/Search';
 
 const simpleView = (): View => View.builder()
   .id('foo')
+  .type(View.Type.Dashboard)
   .title('Foo')
   .summary('summary')
   .description('Foo')
