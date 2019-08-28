@@ -82,28 +82,28 @@ const StepReview = ({ onSubmit, onEditClick }) => {
 
   return (
     <FormWrap onSubmit={handleSubmit}
-              buttonContent="Complete CloudWatch Setup"
+              buttonContent="Complete Setup & Save Input"
               loading={fetchSubmitStatus.loading}
               error={formError}
               title="Final Review"
-              description="Check out everything below to make sure it&apos;s correct, then click the button below to complete your CloudWatch setup!">
+              description="Check out everything below to make sure it is correct, then click the button below to complete your CloudWatch setup!">
 
       <Container>
-        <Subheader>Setting up CloudWatch <small><EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>General Settings <small><EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor></small></Subheader>
         <ReviewItems>
           <li>
             <strong>Name</strong>
             <span>{awsCloudWatchName.value}</span>
           </li>
           {
-                awsCloudWatchDescription
-                && (
-                  <li>
-                    <strong>Description</strong>
-                    <span>{awsCloudWatchDescription.value || ''}</span>
-                  </li>
-                )
-              }
+            awsCloudWatchDescription
+            && (
+              <li>
+                <strong>Description</strong>
+                <span>{awsCloudWatchDescription.value || ''}</span>
+              </li>
+            )
+          }
           <li>
             <strong>AWS Key</strong>
             <span>{awsCloudWatchAwsKey.value}</span>
@@ -114,7 +114,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
           </li>
         </ReviewItems>
 
-        <Subheader>Setting up Kinesis <small><EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>Kinesis Settings <small><EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor></small></Subheader>
         <ReviewItems>
           <li>
             <strong>Stream</strong>
@@ -132,10 +132,10 @@ const StepReview = ({ onSubmit, onEditClick }) => {
             <strong>Record Batch Size</strong>
             <span>
               {
-                    awsCloudWatchBatchSize.value
-                      ? awsCloudWatchBatchSize.value
-                      : <Default value={awsCloudWatchBatchSize.defaultValue} />
-                  }
+                awsCloudWatchBatchSize.value
+                  ? awsCloudWatchBatchSize.value
+                  : <Default value={awsCloudWatchBatchSize.defaultValue} />
+              }
             </span>
           </li>
           <li>
@@ -149,7 +149,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
         </ReviewItems>
 
         <Subheader>Formatting <FormatIcon success><i className="fa fa-smile-o" /></FormatIcon></Subheader>
-        <p>Parsed as LogFlow, if you need a different type you&apos;ll need to setup a <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link>.</p>
+        <p>Parsed as Flow Log, if you need a different type you&apos;ll need to setup a <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link>.</p>
 
         <Input id="awsCloudWatchLog"
                type="textarea"

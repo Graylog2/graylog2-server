@@ -35,9 +35,9 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }) => {
         }
 
         {agreed && success && (
-        <Alert key="delayedLogs" variant="warning">
-          It may take up to ten minutes for the first messages to arrive in the Kinesis Stream. The Kinesis Health Check in the following step will not complete successfully until messages are present in the stream. Please see the official <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html" target="_blank" rel="noopener noreferrer">CloudWatch Subscriptions</a> documentation for more information.
-        </Alert>
+          <Alert key="delayedLogs" variant="warning">
+            It may take up to ten minutes for the first messages to arrive in the Kinesis stream. The Kinesis Health Check in the following step will not complete successfully until messages are present in the stream. Please see the official <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html" target="_blank" rel="noopener noreferrer">CloudWatch Subscriptions</a> documentation for more information.
+          </Alert>
         )}
       </Modal.Body>
 

@@ -16,7 +16,7 @@ const CloudWatchApp = ({ params: { step }, route }) => {
         <FormDataProvider>
           <SidebarProvider>
             <PageHeader title="AWS Integrations">
-              <span>Graylog can integrate and retrieve log messages from various AWS sources.</span>
+              <span>This feature retrieves log messages from various AWS sources.</span>
             </PageHeader>
 
             <CloudWatch wizardStep={step} route={route} />

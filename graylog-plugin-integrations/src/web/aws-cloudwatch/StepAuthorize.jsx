@@ -82,8 +82,8 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
                   'awsCloudWatchAwsRegion',
                 ], formData)}
                 error={formError}
-                title="Create Integration &amp; Authorize AWS"
-                description="Enter the following details to begin setting up the AWS CloudWatch/Kinesis integration. This integration allows Graylog to read messages directly from a Kinesis Stream. CloudWatch messages can optionally be forwarded to Kinesis VIA CloudWatch Subscriptions and then read by Graylog.">
+                title="Create Input &amp; Authorize AWS"
+                description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog.">
 
         {/* Fighting AutoComplete Forms */}
         <DisappearingInput id="name" type="text" />
@@ -94,23 +94,23 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
                         type="text"
                         fieldData={formData.awsCloudWatchName}
                         onChange={onChange}
-                        placeholder="CloudWatch Integration Name"
-                        label="Name of integration"
+                        placeholder="Kinesis Input Name"
+                        label="Name"
                         autoComplete="off"
                         required />
 
         <ValidatedInput id="awsCloudWatchDescription"
                         type="textarea"
-                        label="Integration description"
-                        placeholder="CloudWatch Integration Description"
+                        label="Description"
+                        placeholder="Kinesis Input Description"
                         onChange={onChange}
                         fieldData={formData.awsCloudWatchDescription}
                         rows={4} />
 
         <ValidatedInput id="awsCloudWatchAwsKey"
                         type="text"
-                        label="AWS Key"
-                        placeholder="CloudWatch Integration AWS Key"
+                        label="AWS Access Key"
+                        placeholder="AK****************"
                         onChange={onChange}
                         fieldData={formData.awsCloudWatchAwsKey}
                         autoComplete="off"
@@ -119,8 +119,8 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
                         required />
 
         <MaskedInput id="awsCloudWatchAwsSecret"
-                     label="AWS Secret"
-                     placeholder="CloudWatch Integration AWS Secret"
+                     label="AWS Secret Key"
+                     placeholder="***********"
                      onChange={onChange}
                      fieldData={formData.awsCloudWatchAwsSecret}
                      autoComplete="off"
@@ -132,8 +132,8 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
                         type="select"
                         fieldData={formData.awsCloudWatchAwsRegion}
                         onChange={onChange}
-                        label="Region"
-                        help="Provide the region you are running AWS Kinesis."
+                        label="AWS Region"
+                        help="The AWS Region where Kinesis is running."
                         disabled={fetchRegionsStatus.loading}
                         required>
           {renderOptions(availableRegions, 'Choose AWS Region', fetchRegionsStatus.loading)}

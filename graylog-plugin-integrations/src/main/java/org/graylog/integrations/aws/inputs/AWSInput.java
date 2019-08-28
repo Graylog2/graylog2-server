@@ -148,7 +148,7 @@ public class AWSInput extends MessageInput {
 
             request.addField(new TextField(
                     KinesisTransport.CK_KINESIS_STREAM_NAME,
-                    "Kinesis Stream name",
+                    "Kinesis Stream Name",
                     "",
                     "The name of the Kinesis stream that receives your messages. See README for instructions on how to connect messages to a Kinesis Stream.",
                     ConfigurationField.Optional.NOT_OPTIONAL));

@@ -37,10 +37,9 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
 
       const noGroups = /No CloudWatch log groups/g;
       if (groupNamesStatus.error.match(noGroups)) {
-        // TODO: Use real CloudWatch documentation link
         setFormError({
           full_message: groupNamesStatus.error,
-          nice_message: <span>We&apos;re unable to find any groups in your chosen region. Please try choosing a different region, or follow this <a href="/">CloudWatch documentation</a> to begin setting up your AWS CloudWatch account.</span>,
+          nice_message: <span>We&apos;re unable to find any groups in your chosen region. Please try selecting a different region.</span>,
         });
         setDisabledGroups(true);
       } else {
@@ -78,7 +77,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
               ], formData) || disabledForm}
               loading={groupNamesStatus.loading}
               error={formError}
-              title="Setup Kinesis Automatically"
+              title="Set Up Kinesis Automatically"
               description="">
 
       <p>
@@ -86,15 +85,15 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
       </p>
 
       <ol>
-        <li>Create a new Kinesis Stream with the specified name.</li>
+        <li>Create a new Kinesis stream with the specified name.</li>
         <li>Create the IAM role/policy needed to subscribe the Kinesis stream to the CloudWatch Log Group.</li>
-        <li>Subscribe the new Kinesis Stream to the Log Group.</li>
+        <li>Subscribe the new Kinesis stream to the Log Group.</li>
       </ol>
 
       <ValidatedInput id="awsCloudWatchKinesisStream"
                       type="text"
                       label="Kinesis Stream Name"
-                      placeholder="Create Stream Name"
+                      placeholder="Stream Name"
                       onChange={onChange}
                       fieldData={formData.awsCloudWatchKinesisStream}
                       disabled={disabledForm}
@@ -119,7 +118,7 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
                     type="button"
                     className="btn btn-default"
                     disabled={disabledForm}>
-          Back to Stream Selection
+          Back to stream Selection
         </BackButton>
         )}
 

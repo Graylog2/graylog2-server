@@ -37,10 +37,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
     setSidebar(
       <Panel bsStyle="info" header={<span>Don&apos;t see the stream you need?</span>}>
         <AutoSetupContent>
-          <p>
-            {/* TODO: Add documentation link */}
-            Have you performed the needed setup as described in the <a href="/">documentation</a>? At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log stream must contain at least a few log messages.
-          </p>
+          <p>At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log stream must contain at least a few log messages.</p>
 
           <p>
             Graylog also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log group of your choice. Please be aware that this option will create additional resources in your AWS environment that will incur billing charges.
@@ -64,7 +61,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
       setLogDataUrl(null);
       setFormError({
         full_message: logDataStatus.error,
-        nice_message: <span>We were unable to find any logs in this Kinesis Stream. Please choose a different stream.</span>,
+        nice_message: <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>,
       });
     }
   }, [logDataStatus.error]);
@@ -80,20 +77,27 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
                 loading={logDataStatus.loading}
                 error={formError}
                 disabled={formValidation.isFormValid(['awsCloudWatchKinesisStream'], formData)}
-                title="Choose Kinesis Stream"
+                title="Select Kinesis Stream"
                 description={(
-                  <p>Below is a list of all Kinesis Streams found within the specified AWS account. Please
-                    choose the Stream you would like us to read messages from, or follow the directions to begin <a href={Routes.INTEGRATIONS.AWS.CLOUDWATCH.step('kinesis-setup')}>CloudWatch Log Subscription</a> to feed messages into a new Kinesis Stream.
-                  </p>
-                  )}>
+                  <>
+                    <p>
+                      Below is a list of all Kinesis streams found within the specified AWS account.
+                    </p>
+                    <p>
+                      Please select the stream you would like to read messages from, or follow the directions set up&nbsp;
+                      <a href={Routes.INTEGRATIONS.AWS.CLOUDWATCH.step('kinesis-setup')}>CloudWatch Log Subscription</a>,
+                      which can forward messages into a new Kinesis stream.
+                    </p>
+                  </>
+                )}>
 
         <ValidatedInput id="awsCloudWatchKinesisStream"
                         type="select"
                         fieldData={formData.awsCloudWatchKinesisStream}
                         onChange={onChange}
-                        label="Choose Stream"
+                        label="Select Stream"
                         required>
-          {renderOptions(availableStreams, 'Choose Kinesis Stream')}
+          {renderOptions(availableStreams, 'Select Kinesis Stream')}
         </ValidatedInput>
 
         <FormAdvancedOptions onChange={onChange} />

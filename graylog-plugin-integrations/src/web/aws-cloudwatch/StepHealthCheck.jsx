@@ -100,15 +100,15 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
               buttonContent="Review &amp; Finalize"
               disabled={false}
               title="Create Kinesis Stream"
-              description={<p>We&apos;re going to attempt to parse a single log to help you out! If we&apos;re unable to, or you would like it parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!</p>}>
+              description={<p>We are going to attempt to parse a single log to help you out! If we are unable to, or you would like it parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!</p>}>
 
       <Panel bsStyle={bsStyle}
              header={(
                <Notice><i className={`fa fa-${iconClass} fa-2x`} />
                  <span>{acknowledgment} looks like <em>{logType}</em> log type.</span>
                </Notice>
-                  )}>
-        {unknownLog ? "Not to worry, we've parsed what we could and you can build Pipeline Rules to do the rest!" : "Take a look at what we've parsed so far and you can create Pipeline Rules to handle even more!"}
+             )}>
+        {unknownLog ? 'Not to worry, we have parsed what we could and you can build Pipeline Rules to do the rest!' : 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'}
       </Panel>
 
       <Input id="awsCloudWatchLog"

@@ -500,7 +500,7 @@ public class KinesisService {
 
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
-            final String responseMessage = String.format("Unable to automatically setup Kinesis role [%s] due to the " +
+            final String responseMessage = String.format("Unable to automatically set up Kinesis role [%s] due to the " +
                                                          "following error [%s]", roleName,
                                                          specificError);
             throw new BadRequestException(responseMessage);
