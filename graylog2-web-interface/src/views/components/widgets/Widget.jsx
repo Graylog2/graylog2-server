@@ -29,6 +29,7 @@ import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
+import IfDashboard from '../dashboard/IfDashboard';
 
 type Props = {
   id: string,
@@ -54,8 +55,11 @@ class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       computationTimeRange: PropTypes.object,
       config: PropTypes.object.isRequired,
+      filter: PropTypes.string,
     }).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
@@ -168,6 +172,7 @@ class Widget extends React.Component<Props, State> {
     return <LoadingWidget />;
   };
 
+  // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
     const { editing } = this.state;
@@ -183,9 +188,11 @@ class Widget extends React.Component<Props, State> {
                             hideDragHandle
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing}>
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
+                <IfDashboard>
+                  <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                    <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                  </WidgetFilterMenu>
+                </IfDashboard>
               </WidgetHeader>
               <EditComponent config={config}
                              fields={fields}
@@ -211,10 +218,12 @@ class Widget extends React.Component<Props, State> {
                                        widgetType={widget.type}
                                        onStretch={onPositionsChange}
                                        position={position} />
-              {' '}
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
+              <IfDashboard>
+                {' '}
+                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
+                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
+                </WidgetFilterMenu>
+              </IfDashboard>
               {' '}
               <WidgetActionDropdown>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>

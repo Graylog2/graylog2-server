@@ -14,8 +14,11 @@ export type PluginMetadata = {
 };
 export type Requirements = { [string]: PluginMetadata };
 
+export type ViewType = 'SEARCH' | 'DASHBOARD';
+
 type InternalState = {
   id: string,
+  type: ViewType,
   title: string,
   summary: string,
   description: string,
@@ -30,6 +33,7 @@ type InternalState = {
 export type WidgetMapping = Immutable.Map<string, string>;
 export type ViewJson = {
   id: string,
+  type: ViewType,
   title: string,
   summary: string,
   description: string,
@@ -42,9 +46,15 @@ export type ViewJson = {
 };
 
 export default class View {
+  static Type: { [string]: ViewType } = {
+    Search: 'SEARCH',
+    Dashboard: 'DASHBOARD',
+  };
+
   _value: InternalState;
 
   constructor(id: string,
+    type: ViewType,
     title: string,
     summary: string,
     description: string,
@@ -56,6 +66,7 @@ export default class View {
     requires: Requirements) {
     this._value = {
       id,
+      type,
       title,
       summary,
       description,
@@ -75,6 +86,10 @@ export default class View {
 
   get id(): string {
     return this._value.id;
+  }
+
+  get type(): ViewType {
+    return this._value.type;
   }
 
   get title(): string {
@@ -136,10 +151,11 @@ export default class View {
   }
 
   toJSON() {
-    const { id, title, summary, description, search, properties, state, createdAt, owner } = this._value;
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner } = this._value;
 
     return {
       id,
+      type,
       title,
       summary,
       description,
@@ -153,11 +169,12 @@ export default class View {
 
   static fromJSON(value: ViewJson): View {
     // eslint-disable-next-line camelcase
-    const { id, title, summary, description, properties, state, created_at, owner, requires } = value;
+    const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
     const viewState: Immutable.Map<QueryId, ViewState> = Immutable.Map(state).map(ViewState.fromJSON);
     return View.create()
       .toBuilder()
       .id(id)
+      .type(type)
       .title(title)
       .summary(summary)
       .description(description)
@@ -185,6 +202,10 @@ class Builder {
 
   id(value: string): Builder {
     return new Builder(this.value.set('id', value));
+  }
+
+  type(value: ViewType): Builder {
+    return new Builder(this.value.set('type', value));
   }
 
   newId(): Builder {
@@ -228,7 +249,7 @@ class Builder {
   }
 
   build(): View {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires } = this.value.toObject();
-    return new View(id, title, summary, description, search, properties, state, createdAt, owner, requires);
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires } = this.value.toObject();
+    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires);
   }
 }

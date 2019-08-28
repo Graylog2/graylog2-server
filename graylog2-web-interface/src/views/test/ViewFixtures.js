@@ -3,15 +3,14 @@
 import View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import DashboardState from '../logic/views/DashboardState';
 
 const simpleView = (): View => View.builder()
   .id('foo')
+  .type(View.Type.Dashboard)
   .title('Foo')
   .summary('summary')
   .description('Foo')
   .search(Search.create().toBuilder().id('foosearch').build())
-  .dashboardState(DashboardState.create())
   .properties({})
   .state({})
   .createdAt(new Date())
