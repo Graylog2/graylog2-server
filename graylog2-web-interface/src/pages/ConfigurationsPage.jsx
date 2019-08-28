@@ -13,6 +13,8 @@ import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
+import EmailConfig from 'components/configurations/EmailConfig';
+
 import {} from 'components/maps/configurations';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -26,6 +28,7 @@ const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcess
 const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
 const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+const EMAIL_CONFIG = 'org.graylog2.email.configuration.EmailConfiguration';
 
 class ConfigurationsPage extends React.Component {
   componentDidMount() {
@@ -35,6 +38,7 @@ class ConfigurationsPage extends React.Component {
     ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
     ConfigurationsActions.list(SIDECAR_CONFIG);
     ConfigurationsActions.list(EVENTS_CONFIG);
+    ConfigurationActions.list(EMAIL_CONFIG);
     if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
       ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
     }
@@ -109,11 +113,13 @@ class ConfigurationsPage extends React.Component {
     const sidecarConfig = this._getConfig(SIDECAR_CONFIG);
     const eventsConfig = this._getConfig(EVENTS_CONFIG);
     const urlWhiteListConfig = this._getConfig(URL_WHITELIST_CONFIG);
+    const emailConfig = this._getConfig(EMAIL_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
     let eventsConfigComponent;
     let urlWhiteListConfigComponent;
+    let emailConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -154,6 +160,15 @@ class ConfigurationsPage extends React.Component {
     } else {
       urlWhiteListConfigComponent = PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read']) ? <Spinner /> : null;
     }
+    if (emailConfig) {
+      emailConfigComponent = (
+        <EmailConfig config={emailConfig}
+                     updateConfig={this._onUpdate(EMAIL_CONFIG)} />
+      );
+    } else {
+      emailConfigComponent = (<Spinner />);
+    }
+
     const pluginConfigRows = this._pluginConfigRows();
 
     return (
@@ -180,6 +195,9 @@ class ConfigurationsPage extends React.Component {
             </Col>
             <Col md={6}>
               {urlWhiteListConfigComponent}
+            </Col>
+            <Col md={6}>
+              {emailConfigComponent}
             </Col>
             <Col md={6}>
               <DecoratorsConfig />
