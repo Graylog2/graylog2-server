@@ -8,10 +8,11 @@ import { Input } from 'components/bootstrap';
 
 import { FormDataContext } from './context/FormData';
 import { ApiContext } from './context/Api';
-import useFetch from '../common/hooks/useFetch';
 
+import useFetch from '../common/hooks/useFetch';
 import FormWrap from '../common/FormWrap';
 import { ApiRoutes } from '../common/Routes';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from '../common/constants';
 
 const Default = ({ value }) => {
   return (
@@ -55,7 +56,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
     {
       name: awsCloudWatchName.value,
       region: awsCloudWatchAwsRegion.value,
-      aws_input_type: awsCloudWatchKinesisInputType ? awsCloudWatchKinesisInputType.value : 'KINESIS_RAW',
+      aws_input_type: awsCloudWatchKinesisInputType ? awsCloudWatchKinesisInputType.value : DEFAULT_KINESIS_LOG_TYPE,
       stream_name: awsCloudWatchKinesisStream.value,
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
       assume_role_arn: awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : '',
@@ -80,14 +81,14 @@ const StepReview = ({ onSubmit, onEditClick }) => {
 
   return (
     <FormWrap onSubmit={handleSubmit}
-              buttonContent="Complete Setup & Save Input"
+              buttonContent="Complete CloudWatch Setup"
               loading={fetchSubmitStatus.loading}
               error={formError}
               title="Final Review"
-              description="Check out everything below to make sure it is correct, then click the button below to complete your CloudWatch setup!">
+              description="Check out everything below to make sure it&apos;s correct, then click the button below to complete your CloudWatch setup!">
 
       <Container>
-        <Subheader>General Settings <small><EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>Setting up CloudWatch <small><EditAnchor onClick={onEditClick('authorize')}>Edit</EditAnchor></small></Subheader>
         <ReviewItems>
           <li>
             <strong>Name</strong>
@@ -103,7 +104,7 @@ const StepReview = ({ onSubmit, onEditClick }) => {
           </li>
         </ReviewItems>
 
-        <Subheader>Kinesis Settings <small><EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor></small></Subheader>
+        <Subheader>Setting up Kinesis <small><EditAnchor onClick={onEditClick('kinesis-setup')}>Edit</EditAnchor></small></Subheader>
         <ReviewItems>
           <li>
             <strong>Stream</strong>
@@ -121,10 +122,10 @@ const StepReview = ({ onSubmit, onEditClick }) => {
             <strong>Record Batch Size</strong>
             <span>
               {
-                awsCloudWatchBatchSize.value
-                  ? awsCloudWatchBatchSize.value
-                  : <Default value={awsCloudWatchBatchSize.defaultValue} />
-              }
+                    awsCloudWatchBatchSize.value
+                      ? awsCloudWatchBatchSize.value
+                      : <Default value={awsCloudWatchBatchSize.defaultValue} />
+                  }
             </span>
           </li>
           <li>
@@ -137,8 +138,14 @@ const StepReview = ({ onSubmit, onEditClick }) => {
           </li>
         </ReviewItems>
 
-        <Subheader>Formatting <FormatIcon success><i className="fa fa-smile-o" /></FormatIcon></Subheader>
-        <p>Parsed as Flow Log, if you need a different type you&apos;ll need to setup a <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link>.</p>
+        <Subheader>Formatting</Subheader>
+        <ReviewItems>
+          <li>
+            <strong>Log Type</strong>
+            <span>{KINESIS_LOG_TYPES.find(type => type.value === awsCloudWatchKinesisInputType.value).label}</span>
+          </li>
+        </ReviewItems>
+        <p>If you need your logs parsed differently check out our <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rule</Link> for additional details and instructions.</p>
 
         <Input id="awsCloudWatchLog"
                type="textarea"
@@ -187,11 +194,6 @@ const ReviewItems = styled.ul`
       margin-right: 5px;
     }
   }
-`;
-
-const FormatIcon = styled.span`
-  color: ${props => (props.success ? '#00AE42' : '#AD0707')};
-  margin-left: 10px;
 `;
 
 const EditAnchor = styled.a`

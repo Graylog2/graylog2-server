@@ -9,6 +9,7 @@ import FormWrap from '../common/FormWrap';
 import useFetch from '../common/hooks/useFetch';
 import { ApiRoutes } from '../common/Routes';
 import Countdown from '../common/Countdown';
+import { DEFAULT_KINESIS_LOG_TYPE } from '../common/constants';
 
 import { ApiContext } from './context/Api';
 import { FormDataContext } from './context/FormData';
@@ -81,7 +82,7 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
     );
   }
 
-  const unknownLog = logData.type === 'KINESIS_RAW';
+  const unknownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
   const iconClass = unknownLog ? 'times' : 'check';
   const acknowledgment = unknownLog ? 'Drats!' : 'Awesome!';
   const bsStyle = unknownLog ? 'warning' : 'success';

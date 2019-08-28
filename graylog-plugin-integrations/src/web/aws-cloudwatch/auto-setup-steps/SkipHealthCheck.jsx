@@ -6,6 +6,7 @@ import FormWrap from '../../common/FormWrap';
 import AdditionalFields from '../../common/AdditionalFields';
 import { renderOptions } from '../../common/Options';
 import ValidatedInput from '../../common/ValidatedInput';
+import { KINESIS_LOG_TYPES } from '../../common/constants';
 
 import { FormDataContext } from '../context/FormData';
 
@@ -28,10 +29,7 @@ const SkipHealthCheck = ({ onChange, onSubmit }) => {
                         onChange={onChange}
                         label="Choose AWS Input Type"
                         required>
-          {renderOptions([
-            { value: 'KINESIS_FLOW_LOGS', label: 'Kinesis Flow Logs' },
-            { value: 'KINESIS_RAW', label: 'Kinesis Raw' },
-          ], 'Choose Log Type')}
+          {renderOptions(KINESIS_LOG_TYPES, 'Choose Log Type')}
         </ValidatedInput>
       </StyledFormWrap>
     </AdditionalFields>
