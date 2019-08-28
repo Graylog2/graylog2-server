@@ -35,7 +35,6 @@ import org.graylog.autovalue.WithBeanGetter;
 public abstract class AWSInputCreateRequest implements AWSRequest {
 
     private static final String NAME = "name";
-    private static final String DESCRIPTION = "description";
     private static final String AWS_MESSAGE_TYPE = "aws_input_type";
     private static final String STREAM_NAME = "stream_name";
     private static final String BATCH_SIZE = "batch_size";
@@ -46,9 +45,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonProperty(NAME)
     public abstract String name();
-
-    @JsonProperty(DESCRIPTION)
-    public abstract String description();
 
     @JsonProperty(AWS_MESSAGE_TYPE)
     public abstract String awsMessageType();
@@ -82,7 +78,6 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
     @JsonCreator
     public static AWSInputCreateRequest create(@JsonProperty(NAME) String name,
-                                               @JsonProperty(DESCRIPTION) String description,
                                                @JsonProperty(AWS_MESSAGE_TYPE) String awsMessageType,
                                                @JsonProperty(AWSRequest.AWS_ACCESS_KEY_ID) String awsAccessKey,
                                                @JsonProperty(AWSRequest.AWS_SECRET_ACCESS_KEY) String awsSecretKey,
@@ -93,7 +88,7 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
                                                @JsonProperty(GLOBAL) boolean global,
                                                @JsonProperty(THROTTLING_ALLOWED) boolean enableThrottling,
                                                @JsonProperty(ADD_FLOW_LOG_PREFIX) boolean addFlowLogPrefix) {
-        return new AutoValue_AWSInputCreateRequest(name, description, awsMessageType, awsAccessKey, awsSecretKey,
+        return new AutoValue_AWSInputCreateRequest(name, awsMessageType, awsAccessKey, awsSecretKey,
                                                    streamName, assumeRoleArn, region, batchSize, global,
                                                    enableThrottling, addFlowLogPrefix);
     }

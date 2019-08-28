@@ -48,7 +48,6 @@ public class AWSInput extends MessageInput {
     public static final String TYPE = "org.graylog.integrations.aws.inputs.AWSInput";
 
     public static final String CK_TITLE = "title";
-    public static final String CK_DESCRIPTION = "description";
     public static final String CK_GLOBAL = "global";
     public static final String CK_AWS_REGION = "aws_region";
     public static final String CK_ACCESS_KEY = "aws_access_key";

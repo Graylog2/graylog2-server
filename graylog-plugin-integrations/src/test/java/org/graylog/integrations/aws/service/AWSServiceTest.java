@@ -77,7 +77,6 @@ public class AWSServiceTest {
 
         AWSInputCreateRequest request =
                 AWSInputCreateRequest.create("AWS Input",
-                                             "An AWS Input",
                                              AWSMessageType.KINESIS_FLOW_LOGS.toString(),
                                              "a-key", "a-secret",
                                              "a-stream",
@@ -104,7 +103,6 @@ public class AWSServiceTest {
         assertEquals("KINESIS_FLOW_LOGS", input.configuration().get(AWSCodec.CK_AWS_MESSAGE_TYPE));
         assertEquals("a-key", input.configuration().get(AWSInput.CK_ACCESS_KEY));
         assertEquals("a-secret", input.configuration().get(AWSInput.CK_SECRET_KEY));
-        assertEquals("An AWS Input", input.configuration().get(AWSInput.CK_DESCRIPTION));
         assertEquals("us-east-1", input.configuration().get(AWSInput.CK_AWS_REGION));
         assertEquals("AWS Input", input.configuration().get(MessageInput.FIELD_TITLE));
         assertEquals("a-stream", input.configuration().get(KinesisTransport.CK_KINESIS_STREAM_NAME));
