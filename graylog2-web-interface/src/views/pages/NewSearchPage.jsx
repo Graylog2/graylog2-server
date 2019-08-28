@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
+import View from 'views/logic/views/View';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import ExtendedSearchPage from './ExtendedSearchPage';
 
 type Props = {
@@ -34,7 +36,11 @@ export default class NewSearchPage extends React.Component<Props, State> {
     const { loaded } = this.state;
     if (loaded) {
       const { route } = this.props;
-      return <ExtendedSearchPage route={route} />;
+      return (
+        <ViewTypeContext.Provider value={View.Type.Search}>
+          <ExtendedSearchPage route={route} />
+        </ViewTypeContext.Provider>
+      );
     }
     return <Spinner />;
   }

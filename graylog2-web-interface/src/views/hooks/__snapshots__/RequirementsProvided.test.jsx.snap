@@ -26,6 +26,7 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
         "state": undefined,
         "summary": undefined,
         "title": undefined,
+        "type": undefined,
       }
     }
   >

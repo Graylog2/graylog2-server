@@ -51,7 +51,7 @@ const DashboardsPage = ({ dashboards: { list, pagination } }: Props) => {
           </span>
 
           <span>
-            <LinkContainer to={Routes.EXTENDEDSEARCH}>
+            <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
               <Button bsStyle="success" bsSize="lg">Create new dashboard</Button>
             </LinkContainer>
           </span>
