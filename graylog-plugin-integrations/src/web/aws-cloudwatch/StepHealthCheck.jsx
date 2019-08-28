@@ -83,7 +83,7 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   }
 
   const unknownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
-  const iconClass = unknownLog ? 'times' : 'check';
+  const iconClass = unknownLog ? 'exclamation-triangle' : 'check';
   const acknowledgment = unknownLog ? 'Drats!' : 'Awesome!';
   const bsStyle = unknownLog ? 'warning' : 'success';
   const logType = unknownLog ? 'an unknown' : 'a Flow Log';
