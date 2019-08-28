@@ -151,10 +151,11 @@ export default class View {
   }
 
   toJSON() {
-    const { id, title, summary, description, search, properties, state, createdAt, owner } = this._value;
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner } = this._value;
 
     return {
       id,
+      type,
       title,
       summary,
       description,
