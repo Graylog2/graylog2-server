@@ -103,9 +103,7 @@ class RuleForm extends React.Component {
     history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
-  _doNothing = () => {};
-
-  _save = (callback) => {
+  _save = (callback = () => {}) => {
     const { parseErrors, rule } = this.state;
     const { onSave } = this.props;
 
@@ -120,7 +118,7 @@ class RuleForm extends React.Component {
   };
 
   _apply = () => {
-    this._save(this._doNothing);
+    this._save();
   }
 
   _formatPipelinesUsingRule = () => {
