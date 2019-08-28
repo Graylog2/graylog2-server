@@ -11,6 +11,7 @@ import org.graylog.autovalue.WithBeanGetter;
 public abstract class CreateRolePermissionResponse {
     private static final String RESULT = "result";
     private static final String ROLE_ARN = "role_arn";
+    private static final String ROLE_NAME = "role_name";
 
     @JsonProperty(RESULT)
     public abstract String result();
@@ -18,8 +19,12 @@ public abstract class CreateRolePermissionResponse {
     @JsonProperty(ROLE_ARN)
     public abstract String roleArn();
 
+    @JsonProperty(ROLE_NAME)
+    public abstract String roleName();
+
     public static CreateRolePermissionResponse create(@JsonProperty(RESULT) String result,
-                                                      @JsonProperty(ROLE_ARN) String roleArn) {
-        return new AutoValue_CreateRolePermissionResponse(result, roleArn);
+                                                      @JsonProperty(ROLE_ARN) String roleArn,
+                                                      @JsonProperty(ROLE_NAME) String roleName) {
+        return new AutoValue_CreateRolePermissionResponse(result, roleArn, roleName);
     }
 }

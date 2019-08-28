@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.integrations.audit.IntegrationsAuditEventTypes;
 import org.graylog.integrations.aws.AWSPermissions;
 import org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
@@ -21,8 +22,8 @@ import org.graylog.integrations.aws.resources.responses.StreamsResponse;
 import org.graylog.integrations.aws.service.AWSService;
 import org.graylog.integrations.aws.service.CloudWatchService;
 import org.graylog.integrations.aws.service.KinesisService;
-import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.resources.system.inputs.AbstractInputsResource;
@@ -107,6 +108,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Path("/cloudwatch/log_groups")
     @ApiOperation(value = "Get all available AWS CloudWatch log groups names for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
+    @NoAuditEvent("This does not change any data")
     public LogGroupsResponse getLogGroupNames(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl awsRequest) {
         return cloudWatchService.getLogGroupNames(awsRequest.region(), awsRequest.awsAccessKeyId(), awsRequest.awsSecretAccessKey());
     }
@@ -119,6 +121,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Path("/kinesis/streams")
     @ApiOperation(value = "Get all available Kinesis streams for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
+    @NoAuditEvent("This does not change any data")
     public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl awsRequest) throws ExecutionException {
         return kinesisService.getKinesisStreamNames(awsRequest.region(), awsRequest.awsAccessKeyId(), awsRequest.awsSecretAccessKey());
     }
@@ -134,6 +137,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
             response = KinesisHealthCheckResponse.class
     )
     @RequiresPermissions(AWSPermissions.AWS_READ)
+    @NoAuditEvent("This does not change any data")
     public Response kinesisHealthCheck(@ApiParam(name = "JSON body", required = true) @Valid @NotNull KinesisHealthCheckRequest heathCheckRequest) throws ExecutionException, IOException {
 
         KinesisHealthCheckResponse response = kinesisService.healthCheck(heathCheckRequest);
@@ -148,7 +152,7 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Path("/inputs")
     @ApiOperation(value = "Create a new AWS input.")
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
-    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
+    @AuditEvent(type = IntegrationsAuditEventTypes.KINESIS_INPUT_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull AWSInputCreateRequest saveRequest) throws Exception {
 
