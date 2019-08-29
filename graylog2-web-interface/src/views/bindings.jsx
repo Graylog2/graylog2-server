@@ -61,7 +61,8 @@ import type { ValueActionHandlerConditionProps } from 'views/logic/valueactions/
 import type { FieldActionHandlerConditionProps } from 'views/logic/fieldactions/FieldActionHandler';
 import { dashboardsPath, extendedSearchPath, newDashboardsPath, showViewsPath, viewsPath } from 'views/Constants';
 import NewDashboardPage from 'views/pages/NewDashboardPage';
-import StreamSearchPage from './pages/StreamSearchPage';
+import StreamSearchPage from 'views/pages/StreamSearchPage';
+import AppConfig from 'util/AppConfig';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -74,17 +75,31 @@ ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
 ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
+const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+
+const searchRoutes = enableNewSearch
+  ? [
+    { path: newDashboardsPath, component: NewDashboardPage },
+    { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
+    { path: dashboardsPath, component: DashboardsPage },
+  ]
+  : [];
+
+const searchPages = enableNewSearch
+  ? {
+    search: { component: NewSearchPage },
+  }
+  : {};
+
 export default {
   pages: {
-    search: { component: NewSearchPage },
+    ...searchPages,
   },
   routes: [
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
-    { path: newDashboardsPath, component: NewDashboardPage },
     { path: showViewsPath, component: ShowViewPage },
-    { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
-    { path: dashboardsPath, component: DashboardsPage },
+    ...searchRoutes,
   ],
   enterpriseWidgets: [
     {
