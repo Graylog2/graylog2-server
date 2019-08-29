@@ -93,8 +93,7 @@ class PaginatedList extends React.Component {
         {this.props.children}
 
         <div className="text-center">
-          <Pagination bsSize="small"
-                      items={numberPages}
+          <Pagination items={numberPages}
                       maxButtons={10}
                       activePage={this.state.currentPage}
                       onSelect={this._onChangePage}
