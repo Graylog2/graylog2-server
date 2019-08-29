@@ -174,13 +174,11 @@ public class NotificationResourceHandler {
     /**
      * Tests an notification definition by executing it with a dummy event.
      *
-     * @param notificationId the notification definition to test
+     * @param notificationDto the notification definition to test
      * @param userName the name of the user that triggered the test
      * @throws NotFoundException if the notification definition or the notification factory cannot be found
      */
-    public void test(String notificationId, String userName) throws NotFoundException {
-        final NotificationDto notificationDto =
-                notificationService.get(notificationId).orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+    public void test(NotificationDto notificationDto, String userName) throws NotFoundException {
         final EventNotification.Factory eventNotificationFactory = eventNotificationFactories.get(notificationDto.config().type());
         if (eventNotificationFactory == null) {
             throw new NotFoundException("Couldn't find factory for notification type <" + notificationDto.config().type() + ">");

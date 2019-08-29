@@ -166,11 +166,35 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             @ApiResponse(code = 500, message = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
-    public Response test(@ApiParam(name = "notificationId", value = "The event notificaiton id to send a test alert for.", required = true)
-                         @NotBlank String notificationId) {
-        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE, notificationId);
+    public Response test(@ApiParam(name = "notificationId", value = "The event notification id to send a test alert for.", required = true)
+                         @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
+        final NotificationDto notificationDto =
+                dbNotificationService.get(notificationId).orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
 
-        resourceHandler.test(notificationId, getSubject().getPrincipal().toString());
+        resourceHandler.test(notificationDto, getSubject().getPrincipal().toString());
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Timed
+    @Path("/test")
+    @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
+    @ApiOperation(value = "Send a test alert for a given event notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Event notification is invalid."),
+            @ApiResponse(code = 500, message = "Error while testing event notification")
+    })
+    @NoAuditEvent("only used to test event notifications")
+    public Response test(NotificationDto dto) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        resourceHandler.test(dto, getSubject().getPrincipal().toString());
 
         return Response.ok().build();
     }

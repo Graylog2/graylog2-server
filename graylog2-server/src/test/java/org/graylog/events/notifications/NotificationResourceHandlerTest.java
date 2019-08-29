@@ -77,7 +77,7 @@ public class NotificationResourceHandlerTest {
 
     @Test
     public void testExecution() throws EventNotificationException {
-        notificationResourceHandler.test("1234", "testUser");
+        notificationResourceHandler.test(getHttpNotification(), "testUser");
 
         ArgumentCaptor<EventNotificationContext> captor = ArgumentCaptor.forClass(EventNotificationContext.class);
         verify(eventNotification, times(1)).execute(captor.capture());
