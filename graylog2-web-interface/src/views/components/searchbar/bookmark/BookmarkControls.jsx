@@ -8,7 +8,6 @@ import BookmarkList from './BookmarkList';
 import styles from './BookmarkControls.css';
 
 type Props = {
-  views: any,
 };
 
 type State = {
@@ -56,7 +55,6 @@ class BookmarkControls extends React.Component<Props, State> {
   };
 
   render() {
-    const { views } = this.props;
     const { showForm, showList, newTitle } = this.state;
 
     const bookmarkForm = showForm && (
@@ -70,7 +68,6 @@ class BookmarkControls extends React.Component<Props, State> {
     const bookmarkList = showList && (
       <BookmarkList loadBookmark={this.loadBookmark}
                     toggleModal={this.toggleListModal}
-                    bookmarks={views}
                     target={this.listTarget} />
     );
 
