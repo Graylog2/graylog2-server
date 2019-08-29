@@ -12,12 +12,12 @@
 }
 
 :local(.badgeDanger) {
-    background-color: #FF6418 !important;
+    background-color: #FF3633 !important;
 
 }
 
 :local(.badgePrimary) {
-    background-color: #FF3633 !important;
+    background-color: #FF6418 !important;
 }
 
 :local(.badgeDefault) {

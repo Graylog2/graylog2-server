@@ -40,10 +40,14 @@ class PaginatedList extends React.Component {
     showPageSizeSelect: true,
   };
 
-  state = {
-    currentPage: this._defaultActivePage(),
-    pageSize: this._defaultPageSize(),
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      currentPage: props.activePage > 0 ? props.activePage : 1,
+      pageSize: props.pageSize,
+    };
+  }
 
   componentWillReceiveProps(nextProps) {
     const { pageSize, activePage } = this.props;
@@ -54,18 +58,6 @@ class PaginatedList extends React.Component {
     if (pageSize !== nextProps.pageSize) {
       this.setState({ pageSize: nextProps.pageSize });
     }
-  }
-
-  _defaultPageSize = () => {
-    const { pageSize } = this.props;
-
-    return pageSize;
-  };
-
-  _defaultActivePage = () => {
-    const { activePage } = this.props;
-
-    return activePage > 0 ? activePage : 1;
   }
 
   _onChangePageSize = (event) => {
