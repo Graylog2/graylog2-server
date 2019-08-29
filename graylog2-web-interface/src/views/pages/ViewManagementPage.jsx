@@ -21,6 +21,7 @@ const ViewManagementPage = createReactClass({
     return ViewManagementActions.search(query, page, perPage);
   },
 
+
   handleViewDelete(view) {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete "${view.title}"?`)) {

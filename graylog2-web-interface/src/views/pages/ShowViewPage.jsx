@@ -5,11 +5,14 @@ import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
 
+import View from 'views/logic/views/View';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
+
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -30,6 +33,7 @@ type State = {
   hookComponent: ?any,
   loaded: boolean,
 };
+
 
 class ShowViewPage extends React.Component<Props, State> {
   static propTypes = {
@@ -53,9 +57,16 @@ class ShowViewPage extends React.Component<Props, State> {
   };
 
   componentDidMount = () => {
-    const { location, params, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
+    const { params } = this.props;
     const { viewId } = params;
+
+    return this.loadView(viewId);
+  };
+
+  loadView = (viewId: string): Promise<?View> => {
+    const { location, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
     const { query } = location;
+
     return viewLoader(
       viewId,
       loadingViewHooks,
@@ -70,12 +81,10 @@ class ShowViewPage extends React.Component<Props, State> {
         }
         this.setState({ hookComponent: e });
       },
-    )
-      .then((results) => {
-        this.setState({ loaded: true });
-        return results;
-      })
-      .catch(e => e);
+    ).then((results) => {
+      this.setState({ loaded: true });
+      return results;
+    }).catch(e => e);
   };
 
   render() {
