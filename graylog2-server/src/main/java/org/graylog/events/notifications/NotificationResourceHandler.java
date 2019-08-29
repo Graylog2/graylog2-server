@@ -172,7 +172,7 @@ public class NotificationResourceHandler {
     }
 
     /**
-     * Tests an notification definition by executing it with a dummy event.
+     * Tests a notification definition by executing it with a dummy event.
      *
      * @param notificationDto the notification definition to test
      * @param userName the name of the user that triggered the test
