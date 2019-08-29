@@ -89,23 +89,23 @@ public class KinesisServiceTest {
 
         // Verify that an ACCEPT flow log us detected as a flow log.
         AWSLogMessage logMessage = new AWSLogMessage("2 123456789010 eni-abc123de 172.31.16.139 172.31.16.21 20641 22 6 20 4249 1418530010 1418530070 ACCEPT OK");
-        assertEquals(AWSMessageType.KINESIS_FLOW_LOGS, logMessage.detectLogMessageType());
+        assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, logMessage.detectLogMessageType(true));
 
         // Verify that an ACCEPT flow log us detected as a flow log.
         logMessage = new AWSLogMessage("2 123456789010 eni-abc123de 172.31.16.139 172.31.16.21 20641 22 6 20 4249 1418530010 1418530070 REJECT OK");
-        assertEquals(AWSMessageType.KINESIS_FLOW_LOGS, logMessage.detectLogMessageType());
+        assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, logMessage.detectLogMessageType(true));
 
         // Verify that a message with 14 spaces (instead of 13) is not identified as a flow log.
         logMessage = new AWSLogMessage("2 123456789010 eni-abc123de 172.31.16.139 172.31.16.21 20641 22 6 20 4249 1418530010 1418530070 REJECT OK ONE-MORE-WORD");
-        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType());
+        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType(false));
 
         // Verify that a message with 12 spaces (instead of 13) is not identified as a flow log.
         logMessage = new AWSLogMessage("2 123456789010 eni-abc123de 172.31.16.139 172.31.16.21 20641 22 6 20 4249 1418530010 1418530070 REJECT");
-        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType());
+        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType(false));
 
         // Verify that it's detected as unknown
         logMessage = new AWSLogMessage("haha this is not a real log message");
-        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType());
+        assertEquals(AWSMessageType.KINESIS_RAW, logMessage.detectLogMessageType(false));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class KinesisServiceTest {
         // The recordArrivalTime does not matter here, since the CloudWatch timestamp is used for the message instead.
         KinesisHealthCheckResponse response = executeHealthCheckTest(AWSTestingUtils.cloudWatchFlowLogPayload(),
                                                                      Instant.now()); // Arrival time does not matter for CloudWatch since CloudWatch timestamp is used.
-        assertEquals(AWSMessageType.KINESIS_FLOW_LOGS, response.inputType());
+        assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
         assertEquals(21, fields.size());
@@ -130,7 +130,7 @@ public class KinesisServiceTest {
         // The recordArrivalTime does not matter here, since the CloudWatch timestamp is used for the message instead.
         KinesisHealthCheckResponse response = executeHealthCheckTest(AWSTestingUtils.cloudWatchRawPayload(),
                                                                      Instant.now()); // Arrival time does not matter for CloudWatch since CloudWatch timestamp is used.
-        assertEquals(AWSMessageType.KINESIS_RAW, response.inputType());
+        assertEquals(AWSMessageType.KINESIS_CLOUDWATCH_RAW, response.inputType());
         Map<String, Object> fields = response.messageFields();
         assertEquals(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP, fields.get("timestamp"));
         assertEquals(7, fields.size());

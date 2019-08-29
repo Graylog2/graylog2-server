@@ -3,7 +3,6 @@ package org.graylog.integrations.aws;
 import org.graylog.integrations.aws.codecs.KinesisCloudWatchFlowLogCodec;
 import org.graylog.integrations.aws.codecs.KinesisRawLogCodec;
 import org.graylog.integrations.aws.transports.KinesisTransport;
-import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Identifies the type of input for a particular log source (eg. Cloud Watch or Kinesis) and
+ * Identifies the type of input for a particular log source (eg. CloudWatch or Kinesis) and
  * log format.
  *
  * This type will be saved with the input to indicate which transport and codec should be used.
@@ -23,11 +22,14 @@ public enum AWSMessageType {
      * A raw string stored in CloudWatch or Kinesis.
      */
     KINESIS_RAW(Source.KINESIS, "Kinesis Raw", KinesisRawLogCodec.NAME,
-                AbstractCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+                KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+
+    KINESIS_CLOUDWATCH_RAW(Source.KINESIS, "Kinesis CloudWatch Flow Log", KinesisRawLogCodec.NAME,
+                           KinesisRawLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
     // Flow Logs delivered to Kinesis via CloudWatch subscriptions.
-    KINESIS_FLOW_LOGS(Source.KINESIS, "Kinesis Flow Log", KinesisCloudWatchFlowLogCodec.NAME,
-                      KinesisCloudWatchFlowLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
+    KINESIS_CLOUDWATCH_FLOW_LOGS(Source.KINESIS, "Kinesis CloudWatch Raw", KinesisCloudWatchFlowLogCodec.NAME,
+                                 KinesisCloudWatchFlowLogCodec.Factory.class, KinesisTransport.NAME, KinesisTransport.Factory.class),
 
     UNKNOWN();
 

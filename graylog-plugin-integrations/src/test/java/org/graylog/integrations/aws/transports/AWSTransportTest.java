@@ -61,7 +61,7 @@ public class AWSTransportTest {
         });
 
         final HashMap<String, Object> configMap = new HashMap<>();
-        configMap.put(AWSCodec.CK_AWS_MESSAGE_TYPE, AWSMessageType.KINESIS_FLOW_LOGS.toString());
+        configMap.put(AWSCodec.CK_AWS_MESSAGE_TYPE, AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString());
         final Configuration configuration = new Configuration(configMap);
         awsTransport = new AWSTransport(configuration, serverEventBus, localRegistry, availableCodecs);
     }

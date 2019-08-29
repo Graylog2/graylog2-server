@@ -27,7 +27,7 @@ public abstract class CreateLogSubscriptionRequest implements AWSRequest {
     public abstract String awsSecretAccessKey();
 
     /**
-     * {@see <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">Cloud Watch Subscription Filter</a>},
+     * {@see <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">CloudWatch Subscription Filter</a>},
      *
      * @return
      */

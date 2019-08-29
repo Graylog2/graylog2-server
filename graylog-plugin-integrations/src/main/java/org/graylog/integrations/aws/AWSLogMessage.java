@@ -15,11 +15,17 @@ public class AWSLogMessage {
      * Detects the type of log message.
      *
      * @return A {@code Type} indicating the which kind of log message has been detected.
+     * @param compressed Indicates if the payload is compressed and probably from CloudWatch.
      */
-    public AWSMessageType detectLogMessageType() {
+    public AWSMessageType detectLogMessageType(boolean compressed) {
 
-        if (isFlowLog()) {
-            return AWSMessageType.KINESIS_FLOW_LOGS;
+        // Compressed messages are always from CloudWatch.
+        if (compressed) {
+            if (isFlowLog()) {
+                return AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS;
+            } else {
+                return AWSMessageType.KINESIS_CLOUDWATCH_RAW;
+            }
         }
 
         return AWSMessageType.KINESIS_RAW;

@@ -9,7 +9,7 @@ import FormWrap from '../common/FormWrap';
 import useFetch from '../common/hooks/useFetch';
 import { ApiRoutes } from '../common/Routes';
 import Countdown from '../common/Countdown';
-import { DEFAULT_KINESIS_LOG_TYPE } from '../common/constants';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from '../common/constants';
 
 import { ApiContext } from './context/Api';
 import { FormDataContext } from './context/FormData';
@@ -82,11 +82,12 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
     );
   }
 
-  const unknownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
-  const iconClass = unknownLog ? 'exclamation-triangle' : 'check';
-  const acknowledgment = unknownLog ? 'Drats!' : 'Awesome!';
-  const bsStyle = unknownLog ? 'warning' : 'success';
-  const logType = unknownLog ? 'an unknown' : 'a Flow Log';
+  const knownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
+  const iconClass = knownLog ? 'check' : 'exclamation-triangle';
+  const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
+  const bsStyle = knownLog ? 'success' : 'warning';
+  const logTypeLabel = KINESIS_LOG_TYPES.find(type => type.value === logData.type).label;
+  const logType = knownLog ? `a ${logTypeLabel}` : 'an unknown';
   const handleSubmit = () => {
     onSubmit();
     onChange({ target: { name: 'awsCloudWatchKinesisInputType', value: logData.type } });
@@ -102,15 +103,15 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
       <Panel bsStyle={bsStyle}
              header={(
                <Notice><i className={`fa fa-${iconClass} fa-2x`} />
-                 <span>{acknowledgment} looks like <em>{logType}</em> log type.</span>
+                 <span>{acknowledgment} looks like <em>{logType}</em> message type.</span>
                </Notice>
              )}>
-        {unknownLog ? 'Not to worry, we have parsed what we could and you can build Pipeline Rules to do the rest!' : 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'}
+        {knownLog ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!' : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
       </Panel>
 
       <Input id="awsCloudWatchLog"
              type="textarea"
-             label="Formatted CloudWatch Log"
+             label="Formatted Log Message"
              value={logData.message}
              rows={10}
              disabled />

@@ -155,13 +155,14 @@ public class KinesisService {
         // Select random record from list, and check if the payload is compressed
         Record record = selectRandomRecord(records);
         final byte[] payloadBytes = record.data().asByteArray();
-        if (isCompressed(payloadBytes)) {
+        final boolean compressed = isCompressed(payloadBytes);
+        if (compressed) {
             return handleCompressedMessages(request, payloadBytes);
         }
 
         // The best timestamp available is the approximate arrival time of the message to the Kinesis stream.
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
-        return detectAndParseMessage(new String(payloadBytes), timestamp, request.streamName(), "", "");
+        return detectAndParseMessage(new String(payloadBytes), timestamp, request.streamName(), "", "", compressed);
     }
 
     /**
@@ -246,7 +247,7 @@ public class KinesisService {
         CloudWatchLogEvent logEntry = logEntryOptional.get();
         DateTime timestamp = new DateTime(logEntry.timestamp(), DateTimeZone.UTC);
         return detectAndParseMessage(logEntry.message(), timestamp,
-                                     request.streamName(), data.logGroup(), data.logStream());
+                                     request.streamName(), data.logGroup(), data.logStream(), true);
     }
 
     /**
@@ -336,16 +337,17 @@ public class KinesisService {
      * @param kinesisStreamName The stream name.
      * @param logGroupName      The CloudWatch log group name.
      * @param logStreamName     The CloudWatch log stream name.
+     * @param compressed        Indicates if the payload is compressed and probably from CloudWatch.
      * @return A {@code KinesisHealthCheckResponse} with the fully parsed message and type.
      */
     private KinesisHealthCheckResponse detectAndParseMessage(String logMessage, DateTime timestamp, String kinesisStreamName,
-                                                             String logGroupName, String logStreamName) {
+                                                             String logGroupName, String logStreamName, boolean compressed) {
 
         LOG.debug("Attempting to detect the type of log message. message [{}] stream [{}] log group [{}].",
                   logMessage, kinesisStreamName, logGroupName);
 
         final AWSLogMessage awsLogMessage = new AWSLogMessage(logMessage);
-        AWSMessageType awsMessageType = awsLogMessage.detectLogMessageType();
+        AWSMessageType awsMessageType = awsLogMessage.detectLogMessageType(compressed);
 
         LOG.debug("The message is type [{}]", awsMessageType);
 

@@ -24,7 +24,7 @@ public class KinesisPayloadDecoderTest {
     public void setUp() {
 
         flowLogDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
-                                                   AWSMessageType.KINESIS_FLOW_LOGS,
+                                                   AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS,
                                                    "a-stream");
 
         rawDecoder = new KinesisPayloadDecoder(new ObjectMapperProvider().get(),
@@ -63,7 +63,7 @@ public class KinesisPayloadDecoderTest {
         // Verify that there are two flow logs present in the parsed result.
         Assert.assertEquals(2, logEntries.stream().filter(logEntry -> {
             final AWSLogMessage logMessage = new AWSLogMessage(logEntry.message());
-            return logMessage.detectLogMessageType() == AWSMessageType.KINESIS_RAW;
+            return logMessage.detectLogMessageType(true) == AWSMessageType.KINESIS_CLOUDWATCH_RAW;
         }).count());
 
         // Verify that both messages have to correct timestamp.
