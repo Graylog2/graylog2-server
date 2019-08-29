@@ -1,19 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Panel } from 'react-bootstrap';
+import { Modal, Panel } from 'react-bootstrap';
 
 import FormAdvancedOptions from './FormAdvancedOptions';
 import { FormDataContext } from './context/FormData';
 import { ApiContext } from './context/Api';
 import { SidebarContext } from './context/Sidebar';
-import useFetch from '../common/hooks/useFetch';
 
+import useFetch from '../common/hooks/useFetch';
 import FormWrap from '../common/FormWrap';
 import ValidatedInput from '../common/ValidatedInput';
 import Routes, { ApiRoutes } from '../common/Routes';
 import { renderOptions } from '../common/Options';
 import formValidation from '../utils/formValidation';
+
 
 const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
   const { formData } = useContext(FormDataContext);
@@ -72,6 +73,16 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
 
   return (
     <>
+      <LoadingModal show={logDataStatus.loading}
+                    backdrop="static"
+                    keyboard={false}
+                    bsSize="small">
+        <LoadingContent>
+          <i className="fa fa-spin fa-spinner" />
+          <LoadingMessage>This request may take a few moments.</LoadingMessage>
+        </LoadingContent>
+      </LoadingModal>
+
       <FormWrap onSubmit={handleSubmit}
                 buttonContent="Verify Stream &amp; Format"
                 loading={logDataStatus.loading}
@@ -119,6 +130,30 @@ KinesisStreams.defaultProps = {
 
 const AutoSetupContent = styled.div`
   margin-bottom: 9px;
+`;
+
+const LoadingModal = styled(Modal)`
+  > .modal-dialog {
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+`;
+
+const LoadingContent = styled(Modal.Body)`
+  text-align: center;
+
+  i.fa {
+    font-size: 48px;
+    color: #702785;
+  }
+`;
+
+const LoadingMessage = styled.p`
+  font-size: 16px;
+  font-weight: bold;
+  padding-top: 15px;
+  color: #A6AFBD;
 `;
 
 export default KinesisStreams;
