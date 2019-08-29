@@ -8,6 +8,7 @@ const EventNotificationsActions = Reflux.createActions({
   create: { asyncResult: true },
   update: { asyncResult: true },
   delete: { asyncResult: true },
+  test: { asyncResult: true },
 });
 
 export default EventNotificationsActions;

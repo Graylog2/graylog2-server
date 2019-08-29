@@ -16,6 +16,7 @@ const EventNotificationsStore = Reflux.createStore({
   allLegacyTypes: undefined,
   notifications: undefined,
   query: undefined,
+  testState: undefined,
   pagination: {
     count: undefined,
     page: undefined,
@@ -38,6 +39,7 @@ const EventNotificationsStore = Reflux.createStore({
       allLegacyTypes: this.allLegacyTypes,
       notifications: this.notifications,
       query: this.query,
+      testState: this.testState,
       pagination: this.pagination,
     };
   },
@@ -164,6 +166,32 @@ const EventNotificationsStore = Reflux.createStore({
     );
 
     EventNotificationsActions.delete.promise(promise);
+  },
+
+  test(notification) {
+    const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
+    this.testState = { running: true };
+    this.propagateChanges();
+
+    promise.then(
+      (response) => {
+        this.testState = { running: false };
+        this.propagateChanges();
+        UserNotification.success(`Notification "${notification.title}" was executed successfully.`,
+          'Notification Test Result');
+        return response;
+      },
+      (error) => {
+        this.testState = { running: false };
+        this.propagateChanges();
+        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
+          const errorMessage = error.responseMessage ? `error: ${error.responseMessage}` : 'unknown error';
+          UserNotification.error(`Notification "${notification.title} execution" failed with ${errorMessage}`,
+            'Notification Test Result');
+        }
+      },
+    );
+    EventNotificationsActions.test.promise(promise);
   },
 
   listAllLegacyTypes() {

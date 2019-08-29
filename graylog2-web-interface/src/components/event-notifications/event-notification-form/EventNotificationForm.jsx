@@ -3,11 +3,15 @@ import PropTypes from 'prop-types';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
 
-import { Select } from 'components/common';
+import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
+
+const { EventNotificationsStore } = CombinedProvider.get('EventNotifications');
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -19,6 +23,8 @@ class EventNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    onTest: PropTypes.func.isRequired,
+    testState: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
@@ -63,7 +69,7 @@ class EventNotificationForm extends React.Component {
   };
 
   render() {
-    const { action, embedded, formId, notification, onCancel, validation } = this.props;
+    const { action, embedded, formId, notification, onCancel, onTest, validation, testState } = this.props;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
@@ -73,6 +79,13 @@ class EventNotificationForm extends React.Component {
         validation: validation,
       })
       : null;
+
+    let testButtonDisabled = false;
+    let testButtonText = 'Test';
+    if (testState && testState.running) {
+      testButtonDisabled = true;
+      testButtonText = <Spinner text="Testing..." />;
+    }
 
     return (
       <Row>
@@ -116,6 +129,7 @@ class EventNotificationForm extends React.Component {
               <ButtonToolbar>
                 <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
                 <Button onClick={onCancel}>Cancel</Button>
+                <Button bsStyle="info" disabled={testButtonDisabled} onClick={() => onTest(notification)}> {testButtonText} </Button>
               </ButtonToolbar>
             )}
           </form>
@@ -125,4 +139,7 @@ class EventNotificationForm extends React.Component {
   }
 }
 
-export default EventNotificationForm;
+export default connect(EventNotificationForm, {
+  testState: EventNotificationsStore,
+},
+({ testState }) => ({ testState: testState.testState }));

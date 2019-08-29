@@ -108,6 +108,21 @@ class EventNotificationFormContainer extends React.Component {
     onSubmit(promise);
   };
 
+  handleTest = () => {
+    const { notification } = this.state;
+    const promise = EventNotificationsActions.test(notification);
+    promise.then(
+      () => {
+      },
+      (errorResponse) => {
+        const { body } = errorResponse.additional;
+        if (errorResponse.status === 400 && body && body.failed) {
+          this.setState({ validation: body });
+        }
+      },
+    );
+  };
+
   render() {
     const { action, embedded, formId, route } = this.props;
     const { notification, validation, isDirty } = this.state;
@@ -125,7 +140,8 @@ class EventNotificationFormContainer extends React.Component {
                                embedded={embedded}
                                onChange={this.handleChange}
                                onCancel={this.handleCancel}
-                               onSubmit={this.handleSubmit} />
+                               onSubmit={this.handleSubmit}
+                               onTest={this.handleTest} />
       </React.Fragment>
     );
   }
