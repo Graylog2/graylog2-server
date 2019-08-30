@@ -14,7 +14,7 @@ import AppRouter from 'routing/AppRouter';
 import viewsBindings from 'views/bindings';
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore(
-  'listen',
+  ['listen', () => jest.fn()],
   'get',
   ['getInitialState', () => ({
     currentUser: {
