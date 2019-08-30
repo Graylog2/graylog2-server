@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { ButtonToolbar, Modal } from 'react-bootstrap';
 
 import { DataTable } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import Spinner from 'components/common/Spinner';
-
 import ContentPackInstallationView from 'components/content-packs/ContentPackInstallView';
 
 class ContentPackInstallations extends React.Component {

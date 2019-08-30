@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Button, Panel } from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 

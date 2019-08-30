@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { ButtonToolbar, Col, ControlLabel, FormGroup, Row } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { MultiSelect, Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';

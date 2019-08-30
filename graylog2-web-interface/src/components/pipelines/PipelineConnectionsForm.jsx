@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
+import { ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 

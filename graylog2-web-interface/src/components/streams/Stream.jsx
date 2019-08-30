@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Tooltip } from 'react-bootstrap';
+import { Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button } from 'components/graylog';
 import { OverlayElement, Pluralize } from 'components/common';
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';

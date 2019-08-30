@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button, Panel } from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 

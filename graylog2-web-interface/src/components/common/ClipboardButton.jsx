@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import ClipboardJS from 'clipboard';
+
+import { Button } from 'components/graylog';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.

@@ -1,18 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Link } from 'react-router';
+import { Row, Col, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { Link } from 'react-router';
-import { Row, Col, Button, DropdownButton, MenuItem, Pagination, Modal, ButtonToolbar } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Button } from 'components/graylog';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
-
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ControlledTableList from 'components/common/ControlledTableList';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
-import ContentPacksListStyle from './ContentPacksList.css';
+
 import ContentPackInstall from './ContentPackInstall';
+import ContentPacksListStyle from './ContentPacksList.css';
 
 class ContentPacksList extends React.Component {
   static propTypes = {

@@ -1,11 +1,12 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
-import Routes from 'routing/Routes';
-
-import Spinner from 'components/common/Spinner';
-import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
+import { Row, Col, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { Button } from 'components/graylog';
+import Routes from 'routing/Routes';
+import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';

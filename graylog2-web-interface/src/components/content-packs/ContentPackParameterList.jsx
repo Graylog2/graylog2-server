@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { findIndex } from 'lodash';
+import { Modal, ButtonToolbar, Badge } from 'react-bootstrap';
 
-import { Button, Modal, ButtonToolbar, Badge } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { DataTable, SearchForm } from 'components/common';
 

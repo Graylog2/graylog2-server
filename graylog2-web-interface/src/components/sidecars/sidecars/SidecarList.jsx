@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Col, Row, Table } from 'react-bootstrap';
+import { Alert, Col, Row, Table } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { PaginatedList } from 'components/common';
-
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
-import SidecarRow from './SidecarRow';
 
+import SidecarRow from './SidecarRow';
 import style from './SidecarList.css';
 
 class SidecarList extends React.Component {

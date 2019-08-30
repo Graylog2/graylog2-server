@@ -1,15 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
+import StoreProvider from 'injection/StoreProvider';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
 
-import StoreProvider from 'injection/StoreProvider';
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import ExtractorExampleMessage from './ExtractorExampleMessage';

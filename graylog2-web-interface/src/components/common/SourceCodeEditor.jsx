@@ -3,13 +3,14 @@ import lodash from 'lodash';
 import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace-builds';
-import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import { ClipboardButton } from 'components/common';
+import { Button } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import style from './SourceCodeEditor.css';

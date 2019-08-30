@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
+import { Button } from 'components/graylog';
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
 

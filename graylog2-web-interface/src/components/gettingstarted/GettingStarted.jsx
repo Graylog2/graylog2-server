@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, Grid, Row, Col } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
+import { Grid, Row, Col } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');

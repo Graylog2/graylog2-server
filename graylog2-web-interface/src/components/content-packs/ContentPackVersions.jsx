@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
-import Routes from 'routing/Routes';
-import { DataTable } from 'components/common';
-import { Button, DropdownButton, ButtonToolbar, MenuItem, Modal } from 'react-bootstrap';
+import { DropdownButton, ButtonToolbar, MenuItem, Modal } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
+import { DataTable } from 'components/common';
+import Routes from 'routing/Routes';
+import { Button } from 'components/graylog';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 

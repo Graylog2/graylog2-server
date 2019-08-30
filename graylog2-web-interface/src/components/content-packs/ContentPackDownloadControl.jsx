@@ -3,7 +3,8 @@ import React from 'react';
 import URI from 'urijs';
 
 import ApiRoutes from 'routing/ApiRoutes';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';

@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 
 import QueryInput from '../searchbar/AsyncQueryInput';
 

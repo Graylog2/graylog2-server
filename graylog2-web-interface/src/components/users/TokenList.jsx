@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import { Row, Col, FormControl, ControlLabel, Checkbox, ButtonGroup } from 'react-bootstrap';
 
 import ClipboardButton from 'components/common/ClipboardButton';
-import { Row, Col, FormControl, ControlLabel, Button, Checkbox, ButtonGroup } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import TableList from 'components/common/TableList';
 import Spinner from 'components/common/Spinner';
+
 import TokenListStyle from './TokenList.css';
 
 class TokenList extends React.Component {

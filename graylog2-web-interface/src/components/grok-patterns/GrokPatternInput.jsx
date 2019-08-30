@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Row, Col, ListGroup, ListGroupItem } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { Row, Col, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 import GrokPatternInputStyle from './GrokPatternInput.css';
 

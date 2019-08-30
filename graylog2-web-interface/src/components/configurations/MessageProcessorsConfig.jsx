@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Alert, Table } from 'react-bootstrap';
+import { Alert, Table } from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
+
+import { Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted, SortableList } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
-import naturalSort from 'javascript-natural-sort';
 
 const MessageProcessorsConfig = createReactClass({
   displayName: 'MessageProcessorsConfig',
