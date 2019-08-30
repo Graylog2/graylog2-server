@@ -51,7 +51,6 @@ describe('Create a new view', () => {
 
     const button = await waitForElement(() => getAllByText('Create new view')[0]);
     fireEvent.click(button);
-    await waitForElement(() => getByText('Query#1'));
     await waitForElement(() => getByText('New View'));
   });
 
@@ -60,7 +59,6 @@ describe('Create a new view', () => {
 
     history.push(Routes.EXTENDEDSEARCH);
 
-    await waitForElement(() => getByText('Query#1'));
     await waitForElement(() => getByText('New View'));
   });
 });
