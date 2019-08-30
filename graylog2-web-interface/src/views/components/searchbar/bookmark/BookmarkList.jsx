@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
-import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';
-import type { PaginatedViews } from 'views/stores/ViewManagementStore';
+import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
+import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
 import { Popover, ListGroup, ListGroupItem, Button } from 'react-bootstrap';
 import { PaginatedList, SearchForm } from 'components/common';
@@ -12,7 +12,7 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
   toggleModal: () => void,
-  views: PaginatedViews,
+  views: SavedSearchesState,
   target: any,
 }
 
@@ -41,7 +41,7 @@ class BookmarkList extends React.Component<Props, State> {
 
   execSearch = () => {
     const { query, page, perPage } = this.state;
-    ViewManagementActions.search(query, page, perPage);
+    SavedSearchesActions.search(query, page, perPage);
   };
 
   handlePageChange = (page, perPage) => {
@@ -78,7 +78,7 @@ class BookmarkList extends React.Component<Props, State> {
       );
     });
 
-    const renderResult = (views && views.list && views.list.length) > 0
+    const renderResult = (views && views.list) && views.list.length > 0
       ? (<ListGroup>{bookmarkList}</ListGroup>)
       : (<span>No bookmarks found</span>);
 
@@ -109,4 +109,4 @@ class BookmarkList extends React.Component<Props, State> {
   }
 }
 
-export default connect(BookmarkList, { views: ViewManagementStore });
+export default connect(BookmarkList, { views: SavedSearchesStore });

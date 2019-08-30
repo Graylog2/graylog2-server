@@ -19,7 +19,7 @@ export type SavedSearchesState = {
   pagination: {
     total: number,
     page: number,
-    per_page: number,
+    perPage: number,
     count: number,
   },
 };
