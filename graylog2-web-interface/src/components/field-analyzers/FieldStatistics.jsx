@@ -3,8 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import StoreProvider from 'injection/StoreProvider';

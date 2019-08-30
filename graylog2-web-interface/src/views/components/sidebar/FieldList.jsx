@@ -4,11 +4,11 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual } from 'lodash';
-import { Button } from 'react-bootstrap';
 import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
+import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
 import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';

@@ -5,7 +5,7 @@ import createReactClass from 'create-react-class';
 import { cloneDeep, groupBy } from 'lodash';
 
 import Routes from 'routing/Routes';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import history from 'util/History';
 

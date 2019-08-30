@@ -2,7 +2,7 @@ import React from 'react';
 
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import style from './ContentPackUploadControls.css';

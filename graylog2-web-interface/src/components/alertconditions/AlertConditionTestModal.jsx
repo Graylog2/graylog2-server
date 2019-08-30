@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Modal } from 'react-bootstrap';
+import { Alert, Modal } from 'react-bootstrap';
 
 import { BootstrapModalWrapper } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import { Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import style from './AlertConditionTestModal.css';
 
 const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');

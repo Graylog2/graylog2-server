@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import history from 'util/History';
 

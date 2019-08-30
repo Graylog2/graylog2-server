@@ -4,8 +4,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';
 

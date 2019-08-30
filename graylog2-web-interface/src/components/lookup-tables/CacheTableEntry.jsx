@@ -3,8 +3,7 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button } from 'react-bootstrap';
-
+import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { ContentPackMarker } from 'components/common';

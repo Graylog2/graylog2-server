@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';

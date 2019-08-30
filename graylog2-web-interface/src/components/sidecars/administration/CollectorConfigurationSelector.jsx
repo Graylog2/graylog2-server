@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { SelectPopover } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';

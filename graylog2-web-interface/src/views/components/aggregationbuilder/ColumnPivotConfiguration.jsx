@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from 'react-bootstrap';
-
+import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 
 const ColumnPivotConfiguration = ({ onClose, onRollupChange, rollup }) => (

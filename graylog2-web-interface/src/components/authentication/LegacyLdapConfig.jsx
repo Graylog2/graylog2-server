@@ -1,7 +1,7 @@
 import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import LdapComponent from 'components/ldap/LdapComponent';
 import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
 

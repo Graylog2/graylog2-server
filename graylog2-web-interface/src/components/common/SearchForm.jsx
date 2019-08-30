@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Promise from 'bluebird';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import style from './SearchForm.css';

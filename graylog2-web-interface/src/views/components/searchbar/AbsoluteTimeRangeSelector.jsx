@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 import { DatePicker } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';

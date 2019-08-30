@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+
 import { Spinner } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 
 import { MapsActions, MapsStore } from 'stores/maps/MapsStore';
 import MapVisualization from 'components/maps/widgets/MapVisualization';

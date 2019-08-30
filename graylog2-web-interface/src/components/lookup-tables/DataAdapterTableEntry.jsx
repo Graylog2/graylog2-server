@@ -3,11 +3,10 @@ import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button } from 'react-bootstrap';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import { Button } from 'components/graylog';
 import { ErrorPopover } from 'components/lookup-tables';
 import { ContentPackMarker } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';

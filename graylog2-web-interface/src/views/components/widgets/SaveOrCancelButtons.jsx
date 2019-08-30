@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 
 type Props = {
   onCancel: () => void,
