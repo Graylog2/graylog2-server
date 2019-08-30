@@ -61,13 +61,7 @@ export default (Component, stores, mapProps = props => props) => {
         const cb = (v) => {
           const newState = {};
           newState[key] = v;
-          try {
-            this.setState(newState);
-          } catch (e) {
-            if (e.message !== 'Cannot read property \'body\' of null') {
-              throw e;
-            }
-          }
+          this.setState(newState);
         };
 
         this.listenTo(store, cb);
