@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { waitForElement, render, fireEvent } from '@testing-library/react';
+import { cleanup, waitForElement, render, fireEvent } from '@testing-library/react';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
@@ -41,6 +41,8 @@ describe('Create a new view', () => {
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, viewsBindings));
   });
+
+  afterEach(cleanup);
 
   it('using Views Page', async () => {
     const { getByText, getAllByText } = render(<AppRouter />);
