@@ -35,8 +35,6 @@ class BookmarkControls extends React.Component<Props, State> {
 
   formTarget: any;
 
-  listTarget: any;
-
   constructor(props: Props, context: ViewLoaderContextType) {
     super(props, context);
 
@@ -103,10 +101,10 @@ class BookmarkControls extends React.Component<Props, State> {
                     value={newTitle} />
     );
 
-    const bookmarkList = showList && (
+    const bookmarkList = (
       <BookmarkList loadBookmark={this.loadBookmark}
-                    toggleModal={this.toggleListModal}
-                    target={this.listTarget} />
+                    showModal={showList}
+                    toggleModal={this.toggleListModal} />
     );
 
     return (
@@ -125,7 +123,8 @@ class BookmarkControls extends React.Component<Props, State> {
             }}
           </ViewLoaderContext.Consumer>
           {bookmarkForm}
-          <Button onClick={this.toggleListModal} ref={(elem) => { this.listTarget = elem; }}>
+          <Button title="List of saved searches"
+                  onClick={this.toggleListModal} >
             <i className="fa fa-folder" />
           </Button>
           {bookmarkList}

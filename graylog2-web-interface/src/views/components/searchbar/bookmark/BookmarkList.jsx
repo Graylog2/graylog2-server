@@ -1,19 +1,19 @@
 // @flow strict
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
-import { Popover, ListGroup, ListGroupItem, Button } from 'react-bootstrap';
+import { Modal, ListGroup, ListGroupItem, Button } from 'react-bootstrap';
 import { PaginatedList, SearchForm } from 'components/common';
-import { Portal } from 'react-portal';
-import { Position } from 'react-overlays';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
   toggleModal: () => void,
+  showModal: boolean,
   views: SavedSearchesState,
-  target: any,
 }
 
 type State = {
@@ -24,6 +24,16 @@ type State = {
 }
 
 class BookmarkList extends React.Component<Props, State> {
+  static propTypes = {
+    toggleModal: PropTypes.func.isRequired,
+    showModal: PropTypes.bool.isRequired,
+    views: PropTypes.object,
+  };
+
+  static defaultProps = {
+    views: {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -64,7 +74,7 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   render() {
-    const { views, target, toggleModal } = this.props;
+    const { views, toggleModal, showModal } = this.props;
     const { total, page, perPage = 5 } = views.pagination;
     const { selectedBookmark } = this.state;
     const bookmarkList = (views.list || []).map((bookmark) => {
@@ -83,28 +93,31 @@ class BookmarkList extends React.Component<Props, State> {
       : (<span>No bookmarks found</span>);
 
     return (
-      <Portal>
-        <Position container={document.body}
-                  placement="left"
-                  target={target}>
-          <Popover title="Name of search" id="bookmark-popover">
-            <SearchForm onSearch={this.handleSearch}
-                        onReset={this.handleSearchReset} />
-            <PaginatedList onChange={this.handlePageChange}
-                           activePage={page}
-                           totalItems={total}
-                           pageSize={perPage}
-                           pageSizes={[5, 10, 15]}>
-              {renderResult}
-
-              <ViewLoaderContext.Consumer>
-                {({ loaderFunc }) => <Button disabled={!selectedBookmark} onClick={() => { this.onLoad(selectedBookmark, loaderFunc); }}>Load</Button> }
-              </ViewLoaderContext.Consumer>
-              <Button onClick={toggleModal}>Cancel</Button>
-            </PaginatedList>
-          </Popover>
-        </Position>
-      </Portal>
+      <Modal show={showModal}>
+        <Modal.Body>
+          <SearchForm onSearch={this.handleSearch}
+                      onReset={this.handleSearchReset} />
+          <PaginatedList onChange={this.handlePageChange}
+                         activePage={page}
+                         totalItems={total}
+                         pageSize={perPage}
+                         pageSizes={[5, 10, 15]}>
+            {renderResult}
+          </PaginatedList>
+        </Modal.Body>
+        <Modal.Footer>
+          <ViewLoaderContext.Consumer>
+            {({ loaderFunc }) => (
+              <Button disabled={!selectedBookmark}
+                      bsStyle="primary"
+                      onClick={() => { this.onLoad(selectedBookmark, loaderFunc); }}>
+                Load
+              </Button>
+            )}
+          </ViewLoaderContext.Consumer>
+          <Button onClick={toggleModal}>Cancel</Button>
+        </Modal.Footer>
+      </Modal>
     );
   }
 }
