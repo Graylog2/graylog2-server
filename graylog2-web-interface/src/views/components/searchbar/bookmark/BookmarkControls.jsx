@@ -7,7 +7,7 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
-import { ViewStore } from 'views/stores/ViewStore';
+import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
@@ -68,19 +68,40 @@ class BookmarkControls extends React.Component<Props, State> {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
 
+    if (!view.id) {
+      return;
+    }
+
     const newView = view.toBuilder()
       .title(newTitle)
       .type(View.Type.Search)
       .build();
 
-    if (view.id) {
-      ViewManagementActions.update(newView)
-        .then(this.toggleFormModal)
-        .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-        .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+    ViewManagementActions.update(newView)
+      .then(this.toggleFormModal)
+      .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
+      .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+  };
+
+  saveAsSearch = () => {
+    const { newTitle } = this.state;
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+
+    if (!newTitle || newTitle === '') {
       return;
     }
+
+    const newView = view.toBuilder()
+      .title(newTitle)
+      .type(View.Type.Search)
+      .build();
+
     ViewManagementActions.create(newView)
+      .then((savedView) => {
+        const { loaderFunc } = this.context;
+        loaderFunc(savedView.id);
+      })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
       .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
@@ -92,11 +113,15 @@ class BookmarkControls extends React.Component<Props, State> {
 
   render() {
     const { showForm, showList, newTitle } = this.state;
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
 
     const bookmarkForm = showForm && (
       <BookmarkForm onChangeTitle={this.onChangeTitle}
                     target={this.formTarget}
                     saveSearch={this.saveSearch}
+                    saveAsSearch={this.saveAsSearch}
+                    hideSave={!view.id}
                     toggleModal={this.toggleFormModal}
                     value={newTitle} />
     );

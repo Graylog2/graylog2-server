@@ -8,14 +8,25 @@ type Props = {
   // eslint-disable-next-line no-undef
   onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
   saveSearch: () => void,
+  saveAsSearch: () => void,
   toggleModal: () => void,
+  hideSave: boolean,
   value: string,
   target: any,
 }
 
 class BookmarkForm extends React.Component<Props> {
   render() {
-    const { onChangeTitle, saveSearch, toggleModal, value, target } = this.props;
+    const {
+      hideSave,
+      onChangeTitle,
+      saveSearch,
+      saveAsSearch,
+      toggleModal,
+      value,
+      target
+    } = this.props;
+    const disableSaveAs = !value || value === '';
     return (
       <Portal>
         <Position container={document.body}
@@ -30,7 +41,20 @@ class BookmarkForm extends React.Component<Props> {
                              placeholder="Enter title"
                              onChange={onChangeTitle} />
               </FormGroup>
-              <Button type="submit" onClick={saveSearch}>Save</Button>
+              {!hideSave
+              && (
+                <Button bsStyle="primary"
+                        type="submit"
+                        onClick={saveSearch}>
+                  Save
+                </Button>
+              )}
+              <Button disabled={disableSaveAs}
+                      bsStyle="info"
+                      type="submit"
+                      onClick={saveAsSearch}>
+                Create new
+              </Button>
               <Button onClick={toggleModal}>Cancel</Button>
             </form>
           </Popover>
