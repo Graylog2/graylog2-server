@@ -54,6 +54,14 @@ class NewSearchPage extends React.Component<Props, State> {
     ViewActions.create().then(() => this.setState({ loaded: true }));
   }
 
+  componentWillReceiveProps(nextProps: Props): any {
+    const { viewStoreState } = nextProps;
+    const { view } = viewStoreState;
+    if (!view.id || view.id === '') {
+      this.setState({ loadedView: view });
+    }
+  }
+
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks } = this.props;
     const { query } = location;

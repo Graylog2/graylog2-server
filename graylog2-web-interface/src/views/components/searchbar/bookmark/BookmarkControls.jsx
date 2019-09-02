@@ -111,6 +111,13 @@ class BookmarkControls extends React.Component<Props, State> {
     this.toggleListModal();
   };
 
+  deleteBookmark = (view) => {
+    return ViewManagementActions.delete(view)
+      .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
+      .then(ViewActions.create())
+      .catch(error => UserNotification.error(`Deleting view failed: ${error}`, 'Error!'));
+  };
+
   render() {
     const { showForm, showList, newTitle } = this.state;
     const { viewStoreState } = this.props;
@@ -128,6 +135,7 @@ class BookmarkControls extends React.Component<Props, State> {
 
     const bookmarkList = (
       <BookmarkList loadBookmark={this.loadBookmark}
+                    deleteBookmark={this.deleteBookmark}
                     showModal={showList}
                     toggleModal={this.toggleListModal} />
     );
@@ -137,7 +145,7 @@ class BookmarkControls extends React.Component<Props, State> {
         <ButtonGroup>
           <ViewLoaderContext.Consumer>
             {({ loadedView, dirty }) => {
-              const bookmarkStyle = loadedView ? 'fa-bookmark' : 'fa-bookmark-o';
+              const bookmarkStyle = (loadedView && loadedView.id) ? 'fa-bookmark' : 'fa-bookmark-o';
               const bookmarkColor = dirty ? '#ffc107' : '#007bff';
               const title = dirty ? 'Unsaved changes' : 'Saved search';
               return (
@@ -149,7 +157,7 @@ class BookmarkControls extends React.Component<Props, State> {
           </ViewLoaderContext.Consumer>
           {bookmarkForm}
           <Button title="List of saved searches"
-                  onClick={this.toggleListModal} >
+                  onClick={this.toggleListModal}>
             <i className="fa fa-folder" />
           </Button>
           {bookmarkList}

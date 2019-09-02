@@ -7,11 +7,13 @@ import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
 import { Modal, ListGroup, ListGroupItem, Button } from 'react-bootstrap';
 import { PaginatedList, SearchForm } from 'components/common';
+import View from 'views/logic/views/View';
 
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 type Props = {
   toggleModal: () => void,
+  deleteBookmark: (View) => Promise<View>,
   showModal: boolean,
   views: SavedSearchesState,
 }
@@ -26,12 +28,14 @@ type State = {
 class BookmarkList extends React.Component<Props, State> {
   static propTypes = {
     toggleModal: PropTypes.func.isRequired,
+    deleteBookmark: PropTypes.func,
     showModal: PropTypes.bool.isRequired,
     views: PropTypes.object,
   };
 
   static defaultProps = {
     views: {},
+    deleteBookmark: () => {},
   };
 
   constructor(props) {
@@ -71,6 +75,26 @@ class BookmarkList extends React.Component<Props, State> {
       return;
     }
     loadFunc(selectedBookmark);
+  };
+
+  handleConfirm = () => {
+  };
+
+  onDelete = (selectedBookmark) => {
+    const { views, deleteBookmark } = this.props;
+    const { list } = views;
+    if (list) {
+      const viewIndex = list.findIndex(v => v.id === selectedBookmark);
+      if (viewIndex < 0) {
+        return;
+      }
+
+      if (window.confirm(`You are about to delete saved search: "${list[viewIndex].title}". Are you sure?`)) {
+        deleteBookmark(list[viewIndex]).then(() => {
+          this.execSearch();
+        });
+      }
+    }
   };
 
   render() {
@@ -115,6 +139,7 @@ class BookmarkList extends React.Component<Props, State> {
               </Button>
             )}
           </ViewLoaderContext.Consumer>
+          <Button onClick={() => { this.onDelete(selectedBookmark); }}>Delete</Button>
           <Button onClick={toggleModal}>Cancel</Button>
         </Modal.Footer>
       </Modal>
