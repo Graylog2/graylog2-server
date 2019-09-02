@@ -9,8 +9,9 @@ type Props = {
   onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
   saveSearch: () => void,
   saveAsSearch: () => void,
+  disableCreateNew: boolean,
   toggleModal: () => void,
-  hideSave: boolean,
+  isCreateNew: boolean,
   value: string,
   target: any,
 }
@@ -18,15 +19,17 @@ type Props = {
 class BookmarkForm extends React.Component<Props> {
   render() {
     const {
-      hideSave,
+      isCreateNew,
+      disableCreateNew,
       onChangeTitle,
       saveSearch,
       saveAsSearch,
       toggleModal,
       value,
-      target
+      target,
     } = this.props;
-    const disableSaveAs = !value || value === '';
+    const disableSaveAs = !value || value === '' || disableCreateNew;
+    const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
     return (
       <Portal>
         <Position container={document.body}
@@ -41,7 +44,7 @@ class BookmarkForm extends React.Component<Props> {
                              placeholder="Enter title"
                              onChange={onChangeTitle} />
               </FormGroup>
-              {!hideSave
+              {!isCreateNew
               && (
                 <Button bsStyle="primary"
                         type="submit"
@@ -53,7 +56,7 @@ class BookmarkForm extends React.Component<Props> {
                       bsStyle="info"
                       type="submit"
                       onClick={saveAsSearch}>
-                Create new
+                {createNewTitle}
               </Button>
               <Button onClick={toggleModal}>Cancel</Button>
             </form>

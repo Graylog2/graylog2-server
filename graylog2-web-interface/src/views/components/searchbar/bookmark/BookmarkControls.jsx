@@ -99,9 +99,9 @@ class BookmarkControls extends React.Component<Props, State> {
       .build();
 
     ViewManagementActions.create(newView)
-      .then((savedView) => {
+      .then(() => {
         const { loaderFunc } = this.context;
-        loaderFunc(savedView.id);
+        loaderFunc(newView.id);
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
@@ -131,15 +131,6 @@ class BookmarkControls extends React.Component<Props, State> {
     const { viewStoreState } = this.props;
     const { view } = viewStoreState;
 
-    const bookmarkForm = showForm && (
-      <BookmarkForm onChangeTitle={this.onChangeTitle}
-                    target={this.formTarget}
-                    saveSearch={this.saveSearch}
-                    saveAsSearch={this.saveAsSearch}
-                    hideSave={!view.id}
-                    toggleModal={this.toggleFormModal}
-                    value={newTitle} />
-    );
 
     const bookmarkList = (
       <BookmarkList loadBookmark={this.loadBookmark}
@@ -151,22 +142,42 @@ class BookmarkControls extends React.Component<Props, State> {
     return (
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
-          <Button title="New search" onClick={ViewActions.create}>
-            <i className="fa fa-file-o" />
-          </Button>
           <ViewLoaderContext.Consumer>
             {({ loadedView, dirty }) => {
-              const bookmarkStyle = (loadedView && loadedView.id) ? 'fa-bookmark' : 'fa-bookmark-o';
+              const loaded = (loadedView && loadedView.id);
+              const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
               const bookmarkColor = dirty ? '#ffc107' : '#007bff';
-              const title = dirty ? 'Unsaved changes' : 'Saved search';
+              const disableReset = !(dirty || loaded);
+              let title: string;
+              if (dirty) {
+                title = 'Unsaved changes';
+              } else {
+                title = loaded ? 'Saved search' : 'Save search';
+              }
+
+              const bookmarkForm = showForm && (
+                <BookmarkForm onChangeTitle={this.onChangeTitle}
+                              target={this.formTarget}
+                              saveSearch={this.saveSearch}
+                              saveAsSearch={this.saveAsSearch}
+                              disableCreateNew={newTitle === view.title}
+                              isCreateNew={!view.id}
+                              toggleModal={this.toggleFormModal}
+                              value={newTitle} />
+              );
               return (
-                <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-                  <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
-                </Button>
+                <React.Fragment>
+                  <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
+                    <i className="fa fa-eraser" />
+                  </Button>
+                  <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
+                    <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+                  </Button>
+                  {bookmarkForm}
+                </React.Fragment>
               );
             }}
           </ViewLoaderContext.Consumer>
-          {bookmarkForm}
           <Button title="List of saved searches"
                   onClick={this.toggleListModal}>
             <i className="fa fa-folder-o" />
