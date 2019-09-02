@@ -93,6 +93,7 @@ class BookmarkControls extends React.Component<Props, State> {
     }
 
     const newView = view.toBuilder()
+      .newId()
       .title(newTitle)
       .type(View.Type.Search)
       .build();
@@ -104,7 +105,14 @@ class BookmarkControls extends React.Component<Props, State> {
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+      .catch((error) => {
+        const errMsg = (error
+          && error.additional
+          && error.additional.body
+          && error.additional.body.message) ? error.additional.body.message : error;
+
+        UserNotification.error(`Saving view failed: ${errMsg}`, 'Error!');
+      });
   };
 
   loadBookmark = () => {
@@ -143,6 +151,9 @@ class BookmarkControls extends React.Component<Props, State> {
     return (
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
+          <Button title="New search" onClick={ViewActions.create}>
+            <i className="fa fa-file-o" />
+          </Button>
           <ViewLoaderContext.Consumer>
             {({ loadedView, dirty }) => {
               const bookmarkStyle = (loadedView && loadedView.id) ? 'fa-bookmark' : 'fa-bookmark-o';
@@ -158,7 +169,7 @@ class BookmarkControls extends React.Component<Props, State> {
           {bookmarkForm}
           <Button title="List of saved searches"
                   onClick={this.toggleListModal}>
-            <i className="fa fa-folder" />
+            <i className="fa fa-folder-o" />
           </Button>
           {bookmarkList}
         </ButtonGroup>

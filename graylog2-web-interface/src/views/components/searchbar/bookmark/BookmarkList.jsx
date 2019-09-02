@@ -139,7 +139,10 @@ class BookmarkList extends React.Component<Props, State> {
               </Button>
             )}
           </ViewLoaderContext.Consumer>
-          <Button onClick={() => { this.onDelete(selectedBookmark); }}>Delete</Button>
+          <Button disabled={!selectedBookmark}
+                  onClick={() => { this.onDelete(selectedBookmark); }}>
+            Delete
+          </Button>
           <Button onClick={toggleModal}>Cancel</Button>
         </Modal.Footer>
       </Modal>
