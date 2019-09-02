@@ -1,4 +1,12 @@
 **************************
+Upgrading to Graylog 3.2.x
+**************************
+
+Notes for plugin authors:
+
+Prior to 3.2.0, it was possible to consume a special `OkHttpClient` instance which bypassed the configured proxy. It was consumed by injecting it using the ``@Named("systemHttpClient")`` annotation. Since the ``http_non_proxy_hosts`` configuration directive exists, which allows to blacklist hosts so access to them is bypassing the proxy, it is not required anymore and not used internally either. Therefore it is removed. We advise any plugin author aware of the usage of this functionality in the plugin to remove the ``@Named`` annotation so the generic client is used instead.
+
+**************************
 Upgrading to Graylog 3.3.x
 **************************
 
