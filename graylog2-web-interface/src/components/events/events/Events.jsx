@@ -169,7 +169,8 @@ class Events extends React.Component {
     }
 
     const filter = parameters.filter.alerts;
-    const entity = (filter === 'only' ? 'Alerts' : (filter === 'exclude' ? 'Events' : 'Alerts & Events'));
+    const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
+    const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     return (
       <React.Fragment>

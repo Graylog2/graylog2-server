@@ -22,11 +22,15 @@ class EditUsersPage extends React.Component {
   };
 
   componentDidMount() {
-    this._loadUser(this.props.params.username);
+    const { params } = this.props;
+
+    this._loadUser(params.username);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.params.username !== nextProps.params.username) {
+    const { params } = this.props;
+
+    if (params.username !== nextProps.params.username) {
       this._loadUser(nextProps.params.username);
     }
   }
@@ -38,18 +42,21 @@ class EditUsersPage extends React.Component {
   };
 
   _resetStartpage = () => {
+    // eslint-disable-next-line no-alert
     if (window.confirm('Are you sure you want to reset the start page?')) {
-      const { username } = this.props.params;
+      const { params: { username } } = this.props;
       StartpageStore.set(username).then(() => this._loadUser(username));
     }
   };
 
   render() {
-    if (!this.state.user) {
+    const { user } = this.state;
+    const { params } = this.props;
+
+    if (!user) {
       return <Spinner />;
     }
 
-    const { user } = this.state;
     let resetStartpageButton;
     if (!user.read_only && user.startpage !== null && Object.keys(user.startpage).length > 0) {
       resetStartpageButton = <Button bsStyle="info" onClick={this._resetStartpage}>Reset custom startpage</Button>;
@@ -57,16 +64,16 @@ class EditUsersPage extends React.Component {
 
     const userPreferencesButton = !user.read_only
       ? (
-        <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
+        <span id="react-user-preferences-button" data-user-name={params.username}>
           <UserPreferencesButton userName={user.username} />
         </span>
       )
       : null;
 
     return (
-      <DocumentTitle title={`Edit user ${this.props.params.username}`}>
+      <DocumentTitle title={`Edit user ${params.username}`}>
         <span>
-          <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>} subpage>
+          <PageHeader title={<span>Edit user <em>{params.username}</em></span>} subpage>
             <span>You can either change the details of a user here or set a new password.</span>
             {null}
             <div>
@@ -75,7 +82,7 @@ class EditUsersPage extends React.Component {
             </div>
           </PageHeader>
 
-          <UserForm user={this.state.user} />
+          <UserForm user={user} />
         </span>
       </DocumentTitle>
     );

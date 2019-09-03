@@ -13,24 +13,30 @@ const EditRole = createReactClass({
   displayName: 'EditRole',
 
   propTypes: {
-    initialRole: PropTypes.object,
+    initialRole: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
     cancelEdit: PropTypes.func.isRequired,
-    streams: PropTypes.object,
-    dashboards: PropTypes.object,
+    streams: PropTypes.object.isRequired,
+    dashboards: PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],
 
   getInitialState() {
-    let role = this.props.initialRole;
+    const { initialRole } = this.props;
+
+    let role = initialRole;
     if (role === null) {
       // for the create dialog
-      role = { name: null, description: null, permissions: [] };
+      role = {
+        name: null,
+        description: null,
+        permissions: [],
+      };
     }
     return {
-      role: role,
-      initialName: this._safeRoleName(this.props.initialRole),
+      role,
+      initialName: this._safeRoleName(initialRole),
     };
   },
 
@@ -45,13 +51,13 @@ const EditRole = createReactClass({
   _setName(ev) {
     const { role } = this.state;
     role.name = ev.target.value;
-    this.setState({ role: this.state.role });
+    this.setState({ role });
   },
 
   _setDescription(ev) {
     const { role } = this.state;
     role.description = ev.target.value;
-    this.setState({ role: this.state.role });
+    this.setState({ role });
   },
 
   _updatePermissions(addedPerms, deletedPerms) {
@@ -60,23 +66,31 @@ const EditRole = createReactClass({
       .subtract(deletedPerms)
       .union(addedPerms)
       .toJS();
-    this.setState({ role: role });
+    this.setState({ role });
   },
 
   _saveDisabled() {
-    return this.state.role === null || this.state.role.name === null || this.state.role.name === '' || this.state.role.permissions.length === 0;
+    const { role } = this.state;
+
+    return role === null || role.name === null || role.name === '' || role.permissions.length === 0;
   },
 
   _onSave() {
-    this.props.onSave(this.state.initialName, this.state.role);
+    const { onSave } = this.props;
+    const { initialName, role } = this.state;
+
+    onSave(initialName, role);
   },
 
   render() {
+    const { initialName, role } = this.state;
+    const { streams, dashboards, cancelEdit } = this.props;
+
     let titleText;
-    if (this.state.initialName === null) {
+    if (initialName === null) {
       titleText = 'Create a new role';
     } else {
-      titleText = `Edit role ${this.state.initialName}`;
+      titleText = `Edit role ${initialName}`;
     }
 
     const saveDisabled = this._saveDisabled();
@@ -98,28 +112,28 @@ const EditRole = createReactClass({
                    type="text"
                    label="Name"
                    onChange={this._setName}
-                   value={this.state.role.name}
+                   value={role.name}
                    required />
             <Input id="role-description"
                    type="text"
                    label="Description"
                    onChange={this._setDescription}
-                   value={this.state.role.description} />
+                   value={role.description} />
 
             <FormGroup>
               <ControlLabel>Permissions</ControlLabel>
               <HelpBlock>Select the permissions for this role</HelpBlock>
             </FormGroup>
-            <PermissionSelector streams={this.props.streams}
-                                dashboards={this.props.dashboards}
-                                permissions={Immutable.Set(this.state.role.permissions)}
+            <PermissionSelector streams={streams}
+                                dashboards={dashboards}
+                                permissions={Immutable.Set(role.permissions)}
                                 onChange={this._updatePermissions} />
             <hr />
             {saveDisabledAlert}
             <Button onClick={this._onSave} style={{ marginRight: 5 }} bsStyle="primary" disabled={saveDisabled}>
               Save
             </Button>
-            <Button onClick={this.props.cancelEdit}>Cancel</Button>
+            <Button onClick={cancelEdit}>Cancel</Button>
           </div>
         </Col>
       </Row>
