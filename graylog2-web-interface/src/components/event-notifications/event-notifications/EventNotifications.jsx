@@ -13,7 +13,6 @@ import {
   PaginatedList,
   SearchForm,
 } from 'components/common';
-
 import Routes from 'routing/Routes';
 
 import styles from './EventNotifications.css';

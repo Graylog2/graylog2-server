@@ -18,61 +18,57 @@ import EventNotificationFormContainer from 'components/event-notifications/event
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-class CreateEventDefinitionPage extends React.Component {
-  static propTypes = {
-    currentUser: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
-  };
+const CreateEventDefinitionPage = ({ currentUser, route }) => {
+  if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
+    history.push(Routes.NOTFOUND);
+  }
 
-  render() {
-    const { currentUser, route } = this.props;
-
-    if (!PermissionsMixin.isPermitted(currentUser.permissions, 'eventnotifications:create')) {
-      history.push(Routes.NOTFOUND);
-    }
-
-    return (
-      <DocumentTitle title="New Notification">
-        <span>
-          <PageHeader title="New Notification">
-            <span>
+  return (
+    <DocumentTitle title="New Notification">
+      <span>
+        <PageHeader title="New Notification">
+          <span>
               Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
               to you or to other systems you use for that purpose.
-            </span>
+          </span>
 
-            <span>
+          <span>
               Graylog&apos;s new Alerting system let you define more flexible and powerful rules. Learn more in the{' '}
-              <DocumentationLink page={DocsHelper.PAGES.ALERTS}
-                                 text="documentation" />
-            </span>
+            <DocumentationLink page={DocsHelper.PAGES.ALERTS}
+                               text="documentation" />
+          </span>
 
-            <ButtonToolbar>
-              <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info">Alerts & Events</Button>
+          <ButtonToolbar>
+            <LinkContainer to={Routes.ALERTS.LIST}>
+              <Button bsStyle="info">Alerts & Events</Button>
+            </LinkContainer>
+            <IfPermitted permissions="eventdefinitions:read">
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
+                <Button bsStyle="info">Event Definitions</Button>
               </LinkContainer>
-              <IfPermitted permissions="eventdefinitions:read">
-                <LinkContainer to={Routes.ALERTS.DEFINITIONS.LIST}>
-                  <Button bsStyle="info">Event Definitions</Button>
-                </LinkContainer>
-              </IfPermitted>
-              <IfPermitted permissions="eventnotifications:read">
-                <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
-                  <Button bsStyle="info">Notifications</Button>
-                </LinkContainer>
-              </IfPermitted>
-            </ButtonToolbar>
-          </PageHeader>
+            </IfPermitted>
+            <IfPermitted permissions="eventnotifications:read">
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST}>
+                <Button bsStyle="info">Notifications</Button>
+              </LinkContainer>
+            </IfPermitted>
+          </ButtonToolbar>
+        </PageHeader>
 
-          <Row className="content">
-            <Col md={12}>
-              <EventNotificationFormContainer action="create" route={route} />
-            </Col>
-          </Row>
-        </span>
-      </DocumentTitle>
-    );
-  }
-}
+        <Row className="content">
+          <Col md={12}>
+            <EventNotificationFormContainer action="create" route={route} />
+          </Col>
+        </Row>
+      </span>
+    </DocumentTitle>
+  );
+};
+
+CreateEventDefinitionPage.propTypes = {
+  currentUser: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired,
+};
 
 export default connect(CreateEventDefinitionPage, {
   currentUser: CurrentUserStore,

@@ -9,11 +9,11 @@ import { Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-import AuthProvidersConfig from './AuthProvidersConfig';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
 import StoreProvider from 'injection/StoreProvider';
+import AuthProvidersConfig from './AuthProvidersConfig';
 
 import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
 

@@ -2,13 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, FormGroup, ControlLabel } from 'react-bootstrap';
 import { Button } from 'components/graylog';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
 import { Input, InputWrapper } from 'components/bootstrap';
-import { FormGroup, ControlLabel } from 'react-bootstrap';
+
 import { MultiSelect, Select, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
