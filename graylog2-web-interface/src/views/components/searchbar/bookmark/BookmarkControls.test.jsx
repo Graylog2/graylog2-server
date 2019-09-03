@@ -20,7 +20,7 @@ describe('BookmarkControls', () => {
           .build(),
         dirty: false,
       };
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState}/>);
+      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
       expect(wrapper).toMatchSnapshot();
     });
 
@@ -39,7 +39,7 @@ describe('BookmarkControls', () => {
       };
       const wrapper = mount(
         <ViewLoaderContext.Provider value={{ loaderFunc: onLoad, dirty: true, loadedView: view }}>
-          <BookmarkControls viewStoreState={viewStoreState}/>
+          <BookmarkControls viewStoreState={viewStoreState} />
         </ViewLoaderContext.Provider>,
       );
       expect(wrapper).toMatchSnapshot();

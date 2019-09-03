@@ -86,6 +86,7 @@ class BookmarkList extends React.Component<Props, State> {
         return;
       }
 
+      // eslint-disable-next-line no-alert
       if (window.confirm(`You are about to delete saved search: "${list[viewIndex].title}". Are you sure?`)) {
         deleteBookmark(list[viewIndex]).then(() => {
           this.execSearch();

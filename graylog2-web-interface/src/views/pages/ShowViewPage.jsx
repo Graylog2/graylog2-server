@@ -12,8 +12,6 @@ import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
 
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-
 import ExtendedSearchPage from './ExtendedSearchPage';
 
 type Props = {
