@@ -24,30 +24,34 @@ class DataAdapterTableEntry extends React.Component {
   };
 
   _onDelete = () => {
+    const { adapter } = this.props;
+
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete data adapter "${this.props.adapter.title}"?`)) {
-      LookupTableDataAdaptersActions.delete(this.props.adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
+    if (window.confirm(`Are you sure you want to delete data adapter "${adapter.title}"?`)) {
+      LookupTableDataAdaptersActions.delete(adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
   };
 
   render() {
+    const { adapter, error } = this.props;
+
     return (
       <tbody>
         <tr>
           <td>
-            {this.props.error && <ErrorPopover errorText={this.props.error} title="Lookup table problem" placement="right" />}
-            <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.adapter.name)}>{this.props.adapter.title}</Link>
-            <ContentPackMarker contentPack={this.props.adapter.content_pack} marginLeft={5} />
+            {error && <ErrorPopover errorText={error} title="Lookup table problem" placement="right" />}
+            <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter.name)}>{adapter.title}</Link>
+            <ContentPackMarker contentPack={adapter.content_pack} marginLeft={5} />
           </td>
-          <td>{this.props.adapter.description}</td>
-          <td>{this.props.adapter.name}</td>
+          <td>{adapter.description}</td>
+          <td>{adapter.name}</td>
           <td>
-            <MetricContainer name={`org.graylog2.lookup.adapters.${this.props.adapter.id}.requests`}>
+            <MetricContainer name={`org.graylog2.lookup.adapters.${adapter.id}.requests`}>
               <CounterRate suffix="lookups/s" />
             </MetricContainer>
           </td>
           <td>
-            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(this.props.adapter.name)}>
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapter.name)}>
               <Button bsSize="xsmall" bsStyle="info">Edit</Button>
             </LinkContainer>
             &nbsp;

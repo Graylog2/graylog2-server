@@ -11,11 +11,10 @@ import { AddDecoratorButton, Decorator, DecoratorList } from 'components/search'
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratorsStore = StoreProvider.getStore('Decorators');
@@ -26,8 +25,8 @@ const DecoratorSidebar = createReactClass({
   displayName: 'DecoratorSidebar',
 
   propTypes: {
-    stream: PropTypes.string,
-    maximumHeight: PropTypes.number,
+    stream: PropTypes.string.isRequired,
+    maximumHeight: PropTypes.number.isRequired,
   },
 
   mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
@@ -44,7 +43,9 @@ const DecoratorSidebar = createReactClass({
   },
 
   componentDidUpdate(prevProps) {
-    if (this.props.maximumHeight !== prevProps.maximumHeight) {
+    const { maximumHeight } = this.props;
+
+    if (maximumHeight !== prevProps.maximumHeight) {
       this._updateHeight();
     }
   },
@@ -56,14 +57,16 @@ const DecoratorSidebar = createReactClass({
   MINIMUM_DECORATORS_HEIGHT: 50,
 
   _updateHeight() {
+    const { maximumHeight } = this.props;
     const decoratorsContainer = ReactDOM.findDOMNode(this.decoratorsContainer);
-    const maxHeight = this.props.maximumHeight - decoratorsContainer.getBoundingClientRect().top;
+    const maxHeight = maximumHeight - decoratorsContainer.getBoundingClientRect().top;
 
     this.setState({ maxDecoratorsHeight: Math.max(maxHeight, this.MINIMUM_DECORATORS_HEIGHT) });
   },
 
   _formatDecorator(decorator) {
-    const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+    const { types } = this.state;
+    const typeDefinition = types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
     return ({
       id: decorator.id,
       title: <Decorator key={`decorator-${decorator.id}`}
@@ -72,23 +75,26 @@ const DecoratorSidebar = createReactClass({
     });
   },
 
-  _updateOrder(decorators) {
-    decorators.forEach((item, idx) => {
-      const decorator = this.state.decorators.find(i => i.id === item.id);
+  _updateOrder(orderedDecorators) {
+    const { decorators } = this.state;
+    orderedDecorators.forEach((item, idx) => {
+      const decorator = decorators.find(i => i.id === item.id);
       decorator.order = idx;
       DecoratorsActions.update(decorator.id, decorator);
     });
   },
 
   render() {
-    if (!this.state.decorators) {
+    const { currentUser, decorators, maxDecoratorsHeight } = this.state;
+    const { stream } = this.props;
+    if (!decorators) {
       return <Spinner />;
     }
-    const decorators = this.state.decorators
-      .filter(decorator => (this.props.stream ? decorator.stream === this.props.stream : !decorator.stream))
+    const sortedDecorators = decorators
+      .filter(decorator => (stream ? decorator.stream === stream : !decorator.stream))
       .sort((d1, d2) => d1.order - d2.order);
-    const nextDecoratorOrder = decorators.length > 0 ? decorators[decorators.length - 1].order + 1 : 0;
-    const decoratorItems = decorators.map(this._formatDecorator);
+    const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[decorators.length - 1].order + 1 : 0;
+    const decoratorItems = sortedDecorators.map(this._formatDecorator);
     const popoverHelp = (
       <Popover id="decorators-help" className={DecoratorStyles.helpPopover}>
         <p className="description">
@@ -104,16 +110,16 @@ const DecoratorSidebar = createReactClass({
       </Popover>
     );
 
-    const editPermissions = this.isPermitted(this.state.currentUser.permissions, `decorators:edit:${this.props.stream}`);
+    const editPermissions = this.isPermitted(currentUser.permissions, `decorators:edit:${stream}`);
     return (
       <div>
-        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions} />
+        <AddDecoratorButton stream={stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions} />
         <div className={DecoratorStyles.helpLinkContainer}>
           <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
             <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
           </OverlayTrigger>
         </div>
-        <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
+        <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: maxDecoratorsHeight }}>
           <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} disableDragging={!editPermissions} />
         </div>
       </div>

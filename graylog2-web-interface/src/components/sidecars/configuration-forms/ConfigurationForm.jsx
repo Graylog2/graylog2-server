@@ -153,6 +153,7 @@ const ConfigurationForm = createReactClass({
 
     const nextFormData = lodash.cloneDeep(formData);
     nextFormData.collector_id = nextId;
+    // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
       // Wait for the promise to resolve and then update the whole formData state
       defaultTemplatePromise.then((defaultTemplate) => {
@@ -168,6 +169,7 @@ const ConfigurationForm = createReactClass({
     const { formData } = this.state;
 
     const nextFormData = lodash.cloneDeep(formData);
+    // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
       this._onTemplateChange(nextTemplate);
     }
