@@ -44,7 +44,7 @@ class BookmarkControls extends React.Component<Props, State> {
     this.state = {
       showForm: false,
       showList: false,
-      newTitle: view.title || '',
+      newTitle: (view && view.title) || '',
     };
   }
 

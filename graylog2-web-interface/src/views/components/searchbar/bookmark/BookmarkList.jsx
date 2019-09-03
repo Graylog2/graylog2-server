@@ -77,9 +77,6 @@ class BookmarkList extends React.Component<Props, State> {
     loadFunc(selectedBookmark);
   };
 
-  handleConfirm = () => {
-  };
-
   onDelete = (selectedBookmark) => {
     const { views, deleteBookmark } = this.props;
     const { list } = views;
