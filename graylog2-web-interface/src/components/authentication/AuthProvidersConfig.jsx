@@ -136,7 +136,7 @@ const AuthProvidersConfig = createReactClass({
     const { config } = this.state;
     const { descriptors } = this.props;
 
-    return ObjectUtils.clone(config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName, idx) => {
+    return ObjectUtils.clone(config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName) => {
       const enabled = config.disabled_realms.filter(disabledName => disabledName === realmName).length < 1;
       const realm = (descriptors[realmName] || { id: realmName, displayName: 'Unavailable' });
 

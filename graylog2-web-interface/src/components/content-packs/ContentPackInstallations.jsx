@@ -21,6 +21,9 @@ class ContentPackInstallations extends React.Component {
 
   rowFormatter = (item) => {
     let showModalRef;
+
+    const { onUninstall } = this.props;
+
     const closeShowModal = () => {
       showModalRef.close();
     };
@@ -54,7 +57,7 @@ class ContentPackInstallations extends React.Component {
             <ButtonToolbar>
               <Button bsStyle="primary"
                       bsSize="small"
-                      onClick={() => { this.props.onUninstall(item.content_pack_id, item._id); }}>
+                      onClick={() => { onUninstall(item.content_pack_id, item._id); }}>
                 Uninstall
               </Button>
               <Button bsStyle="info"
@@ -78,7 +81,9 @@ class ContentPackInstallations extends React.Component {
   };
 
   render() {
-    if (!this.props.installations) {
+    const { installations } = this.props;
+
+    if (!installations) {
       return (<Spinner />);
     }
 
@@ -89,7 +94,7 @@ class ContentPackInstallations extends React.Component {
                  headerCellFormatter={this.headerFormater}
                  sortByKey="comment"
                  dataRowFormatter={this.rowFormatter}
-                 rows={this.props.installations}
+                 rows={installations}
                  filterKeys={[]} />
     );
   }

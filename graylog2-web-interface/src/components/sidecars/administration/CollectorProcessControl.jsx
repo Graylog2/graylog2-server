@@ -33,11 +33,15 @@ const CollectorProcessControl = createReactClass({
   },
 
   confirmProcessAction(doneCallback) {
+    const { onProcessAction, selectedSidecarCollectorPairs } = this.props;
+    const { selectedAction } = this.state;
+
     const callback = () => {
       doneCallback();
       this.resetSelectedAction();
     };
-    this.props.onProcessAction(this.state.selectedAction, this.props.selectedSidecarCollectorPairs, callback);
+
+    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
   },
 
   cancelProcessAction() {

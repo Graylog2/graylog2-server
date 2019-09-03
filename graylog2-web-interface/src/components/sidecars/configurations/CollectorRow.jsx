@@ -20,18 +20,23 @@ const CollectorRow = createReactClass({
   },
 
   handleClone() {
-    this.props.onClone(this.props.collector);
+    const { onClone, collector } = this.props;
+
+    onClone(collector);
   },
 
   handleDelete() {
-    const { collector } = this.props;
+    const { onDelete, collector } = this.props;
+
+    // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to delete collector "${collector.name}". Are you sure?`)) {
-      this.props.onDelete(collector);
+      onDelete(collector);
     }
   },
 
   render() {
-    const { collector } = this.props;
+    const { collector, validateCollector, onClone } = this.props;
+
     return (
       <tr>
         <td>
@@ -47,8 +52,8 @@ const CollectorRow = createReactClass({
             </LinkContainer>
             <DropdownButton id={`more-actions-${collector.id}`} title="More actions" bsSize="xsmall" pullRight>
               <CopyCollectorModal collector={collector}
-                                  validateCollector={this.props.validateCollector}
-                                  copyCollector={this.props.onClone} />
+                                  validateCollector={validateCollector}
+                                  copyCollector={onClone} />
               <MenuItem divider />
               <MenuItem onSelect={this.handleDelete}>Delete</MenuItem>
             </DropdownButton>

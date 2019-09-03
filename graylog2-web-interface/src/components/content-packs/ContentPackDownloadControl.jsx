@@ -24,8 +24,10 @@ class ContentPackDownloadControl extends React.Component {
   }
 
   _getDownloadUrl() {
+    const { contentPackId, revision } = this.props;
+
     const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.ContentPacksController.downloadRev(this.props.contentPackId, this.props.revision).url,
+      ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url,
     ));
 
     if (URLUtils.areCredentialsInURLSupported()) {
@@ -58,9 +60,8 @@ class ContentPackDownloadControl extends React.Component {
         <Modal.Body>
           <p>{infoText}</p>
           <p>
-            <a href={this._getDownloadUrl()} target="_blank">
-              <i className="fa fa-cloud-download" />&nbsp;
-              Download
+            <a href={this._getDownloadUrl()} target="_blank" rel="noopener noreferrer">
+              <i className="fa fa-cloud-download" />{' '}Download
             </a>
           </p>
         </Modal.Body>

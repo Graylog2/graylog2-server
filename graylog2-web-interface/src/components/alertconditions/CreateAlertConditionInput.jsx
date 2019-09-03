@@ -62,16 +62,18 @@ const CreateAlertConditionInput = createReactClass({
   },
 
   _onStreamChange(nextStream) {
-    this.setState({ selectedStream: this._findStream(this.state.streams, nextStream) });
+    const { streams } = this.state;
+    this.setState({ selectedStream: this._findStream(streams, nextStream) });
   },
 
   _onSubmit(data) {
-    if (!this.state.selectedStream) {
+    const { selectedStream } = this.state;
+    if (!selectedStream) {
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlertConditionsActions.save(this.state.selectedStream.id, data).then(() => {
-      history.push(Routes.stream_alerts(this.state.selectedStream.id));
+    AlertConditionsActions.save(selectedStream.id, data).then(() => {
+      history.push(Routes.stream_alerts(selectedStream.id));
     });
   },
 
@@ -84,11 +86,12 @@ const CreateAlertConditionInput = createReactClass({
   },
 
   _formatConditionForm(type) {
+    const { availableConditions } = this.state;
     return (
       <AlertConditionForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
                           onCancel={this._resetForm}
                           onSubmit={this._onSubmit}
-                          conditionType={this.state.availableConditions[type]} />
+                          conditionType={availableConditions[type]} />
     );
   },
 
@@ -97,7 +100,8 @@ const CreateAlertConditionInput = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.availableConditions || !this.state.streams;
+    const { availableConditions, streams } = this.state;
+    return !availableConditions || !streams;
   },
 
   render() {
@@ -105,11 +109,13 @@ const CreateAlertConditionInput = createReactClass({
       return <Spinner />;
     }
 
-    const conditionForm = (this.state.type !== this.PLACEHOLDER ? this._formatConditionForm(this.state.type) : null);
-    const availableTypes = Object.keys(this.state.availableConditions).map((value) => {
-      return <option key={`type-option-${value}`} value={value}>{this.state.availableConditions[value].name}</option>;
+    const { availableConditions, selectedStream, streams, type } = this.state;
+
+    const conditionForm = (type !== this.PLACEHOLDER ? this._formatConditionForm(type) : null);
+    const availableTypes = Object.keys(availableConditions).map((value) => {
+      return <option key={`type-option-${value}`} value={value}>{availableConditions[value].name}</option>;
     });
-    const formattedStreams = this.state.streams
+    const formattedStreams = streams
       .map(stream => this._formatOption(stream.title, stream.id))
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
     return (
@@ -124,14 +130,14 @@ const CreateAlertConditionInput = createReactClass({
                 <Select placeholder="Select a stream"
                         options={formattedStreams}
                         onChange={this._onStreamChange}
-                        value={this.state.selectedStream ? this.state.selectedStream.id : undefined} />
+                        value={selectedStream ? selectedStream.id : undefined} />
               </Input>
 
               <Input id="condition-type-selector"
                      type="select"
-                     value={this.state.type}
+                     value={type}
                      onChange={this._onChange}
-                     disabled={!this.state.selectedStream}
+                     disabled={!selectedStream}
                      label="Condition type"
                      help="Select the condition type that will be used.">
                 <option value={this.PLACEHOLDER} disabled>Select a condition type</option>
@@ -139,7 +145,7 @@ const CreateAlertConditionInput = createReactClass({
               </Input>
               {conditionForm}
               {' '}
-              <Button onClick={this._openForm} disabled={this.state.type === this.PLACEHOLDER} bsStyle="success">
+              <Button onClick={this._openForm} disabled={type === this.PLACEHOLDER} bsStyle="success">
                 Add alert condition
               </Button>
             </form>

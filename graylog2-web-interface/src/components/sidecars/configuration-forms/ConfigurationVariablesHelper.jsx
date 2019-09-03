@@ -49,7 +49,9 @@ class ConfigurationVariablesHelper extends React.Component {
   };
 
   _handleDeleteConfirm = () => {
-    ConfigurationVariableActions.delete(this.state.variableToDelete)
+    const { variableToDelete } = this.state;
+
+    ConfigurationVariableActions.delete(variableToDelete)
       .then(() => this._onSuccessfulUpdate(() => this.deleteConfirmModal.close()));
   };
 
@@ -72,8 +74,9 @@ class ConfigurationVariablesHelper extends React.Component {
 
   _configurationVariableListBuilder = () => {
     const variableRows = [];
+    const { configurationVariables } = this.state;
 
-    Object.values(this.state.configurationVariables).forEach((configVar) => {
+    Object.values(configurationVariables).forEach((configVar) => {
       const escapedName = `\${user.${configVar.name}}`;
       variableRows.push(
         <tr key={configVar.id}>
@@ -98,13 +101,17 @@ class ConfigurationVariablesHelper extends React.Component {
   };
 
   _isLoading = () => {
-    return !(this.state.configurationVariables);
+    const { configurationVariables } = this.state;
+
+    return !configurationVariables;
   };
 
   _saveConfigurationVariable = (configurationVariable, oldName, callback) => {
+    const { onVariableRename } = this.props;
+
     ConfigurationVariableActions.save.triggerPromise(configurationVariable)
       .then(() => this._onSuccessfulUpdate(() => {
-        this.props.onVariableRename(oldName, configurationVariable.name);
+        onVariableRename(oldName, configurationVariable.name);
         callback();
       }));
   };
@@ -120,6 +127,8 @@ class ConfigurationVariablesHelper extends React.Component {
     if (this._isLoading()) {
       return <Spinner />;
     }
+
+    const { variableToDelete, errorModalContent } = this.state;
 
     return (
       <div>
@@ -143,14 +152,14 @@ class ConfigurationVariablesHelper extends React.Component {
 
         <BootstrapModalWrapper ref={(modal) => { this.errorModal = modal; }}>
           <Modal.Header>
-            <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{this.state.variableToDelete.name}&#125;</strong></Modal.Title>
+            <Modal.Title>Error deleting configuration variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong></Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Alert bsStyle="warning">
               <p>
               Cannot delete this configuration variable as it is still in use. Please remove the variable from
                 the following configurations and try again.
-                {this.state.errorModalContent}
+                {errorModalContent}
               </p>
             </Alert>
           </Modal.Body>
@@ -162,7 +171,7 @@ class ConfigurationVariablesHelper extends React.Component {
         <BootstrapModalConfirm ref={(c) => { this.deleteConfirmModal = c; }}
                                title="Delete Configuration Variable?"
                                onConfirm={this._handleDeleteConfirm}>
-          <p>Are you sure you want to remove the configuration variable <strong>{this.state.variableToDelete.name}</strong>?</p>
+          <p>Are you sure you want to remove the configuration variable <strong>{variableToDelete.name}</strong>?</p>
         </BootstrapModalConfirm>
       </div>
     );

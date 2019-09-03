@@ -22,17 +22,23 @@ class CachesOverview extends React.Component {
   };
 
   _onPageChange = (newPage, newPerPage) => {
-    LookupTableCachesActions.searchPaginated(newPage, newPerPage, this.props.pagination.query);
+    const { pagination } = this.props;
+
+    LookupTableCachesActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
 
   _onSearch = (query, resetLoadingStateCb) => {
+    const { pagination } = this.props;
+
     LookupTableCachesActions
-      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .searchPaginated(pagination.page, pagination.per_page, query)
       .then(resetLoadingStateCb);
   };
 
   _onReset = () => {
-    LookupTableCachesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
+    const { pagination } = this.props;
+
+    LookupTableCachesActions.searchPaginated(pagination.page, pagination.per_page);
   };
 
   _helpPopover = () => {
@@ -81,10 +87,12 @@ class CachesOverview extends React.Component {
   };
 
   render() {
-    if (!this.props.caches) {
+    const { caches, pagination } = this.props;
+
+    if (!caches) {
       return <Spinner text="Loading caches" />;
     }
-    const caches = this.props.caches.map((cache) => {
+    const cacheTableEntries = caches.map((cache) => {
       return (
         <CacheTableEntry key={cache.id}
                          cache={cache} />
@@ -98,10 +106,10 @@ class CachesOverview extends React.Component {
             <h2>
             Configured lookup Caches
               <span>&nbsp;
-                <small>{this.props.pagination.total} total</small>
+                <small>{pagination.total} total</small>
               </span>
             </h2>
-            <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+            <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
                   <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
@@ -122,7 +130,7 @@ class CachesOverview extends React.Component {
                     <th className={Styles.rowActions}>Actions</th>
                   </tr>
                 </thead>
-                {caches}
+                {cacheTableEntries}
               </Table>
             </PaginatedList>
           </Col>

@@ -65,9 +65,16 @@ class ContentPackUploadControls extends React.Component {
   }
 
   render() {
+    const { isOpen } = this.state;
+
     return (
       <span>
-        <Button className={style.button} active={this.state.isOpen} id="upload-content-pack-button" bsStyle="success" onClick={this._openModal}>Upload</Button>
+        <Button className={style.button}
+                active={isOpen}
+                id="upload-content-pack-button"
+                bsStyle="success"
+                onClick={this._openModal}>Upload
+        </Button>
         <BootstrapModalForm onModalClose={() => { this.setState({ isOpen: false }); }}
                             ref={(node) => { this.uploadModal = node; }}
                             onSubmitForm={this._save}

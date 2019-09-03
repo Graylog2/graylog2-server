@@ -36,11 +36,15 @@ class ContentPackEntitiesList extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    this._filterEntities(this.state.filter, newProps.contentPack.entities);
+    const { filter } = this.state;
+
+    this._filterEntities(filter, newProps.contentPack.entities);
   }
 
   _filterEntities = (filter, entitiesArg) => {
-    const entities = entitiesArg || this.props.contentPack.entities;
+    const { contentPack } = this.props;
+
+    const entities = entitiesArg || contentPack.entities;
     if (!filter || filter.length <= 0) {
       this.setState({ filteredEntities: entities, filter: undefined });
       return;
@@ -61,13 +65,21 @@ class ContentPackEntitiesList extends React.Component {
   };
 
   _entityRowFormatter = (entity) => {
+    const {
+      contentPack,
+      appliedParameter,
+      onParameterApply,
+      onParameterClear,
+      readOnly,
+    } = this.props;
+
     let applyModalRef;
     const applyParamComponent = (
-      <ContentPackApplyParameter parameters={this.props.contentPack.parameters}
+      <ContentPackApplyParameter parameters={contentPack.parameters}
                                  entity={entity}
-                                 appliedParameter={this.props.appliedParameter[entity.id]}
-                                 onParameterApply={(key, value) => { this.props.onParameterApply(entity.id, key, value); }}
-                                 onParameterClear={(key) => { this.props.onParameterClear(entity.id, key); }} />
+                                 appliedParameter={appliedParameter[entity.id]}
+                                 onParameterApply={(key, value) => { onParameterApply(entity.id, key, value); }}
+                                 onParameterClear={(key) => { onParameterClear(entity.id, key); }} />
     );
 
     const closeModal = () => {
@@ -94,8 +106,8 @@ class ContentPackEntitiesList extends React.Component {
 
     let showModalRef;
     const entityComponent = (
-      <ContentPackEntityConfig appliedParameter={this.props.appliedParameter[entity.id]}
-                               parameters={this.props.contentPack.parameters}
+      <ContentPackEntityConfig appliedParameter={appliedParameter[entity.id]}
+                               parameters={contentPack.parameters}
                                entity={entity} />
     );
 
@@ -121,18 +133,18 @@ class ContentPackEntitiesList extends React.Component {
       </BootstrapModalWrapper>
     );
 
-    const disableBtn = this.props.contentPack.parameters.length <= 0;
-    const appliedParameterCount = (this.props.appliedParameter[entity.id] || []).length;
+    const disableBtn = contentPack.parameters.length <= 0;
+    const appliedParameterCount = (appliedParameter[entity.id] || []).length;
     return (
       <tr key={entity.id}>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.title}</td>
         <td>{entity.type.name}</td>
         <td className={ContentPackEntitiesListStyle.bigColumns}>{entity.description}</td>
-        {!this.props.readOnly && <td>{this._entityIcon(entity)}</td>}
-        {!this.props.readOnly && <td>{appliedParameterCount}</td>}
+        {!readOnly && <td>{this._entityIcon(entity)}</td>}
+        {!readOnly && <td>{appliedParameterCount}</td>}
         <td>
           <ButtonToolbar>
-            {!this.props.readOnly
+            {!readOnly
             && (
             <Button bsStyle="primary"
                     bsSize="xs"
@@ -151,14 +163,17 @@ class ContentPackEntitiesList extends React.Component {
             </Button>
           </ButtonToolbar>
         </td>
-        {!this.props.readOnly && applyModal}
+        {!readOnly && applyModal}
         {showModal}
       </tr>
     );
   };
 
   render() {
-    const headers = this.props.readOnly
+    const { readOnly } = this.props;
+    const { filteredEntities } = this.state;
+
+    const headers = readOnly
       ? ['Title', 'Type', 'Description', 'Action']
       : ['Title', 'Type', 'Description', 'Origin', 'Used Parameters', 'Action'];
 
@@ -174,7 +189,7 @@ class ContentPackEntitiesList extends React.Component {
                    className={ContentPackEntitiesListStyle.scrollable}
                    sortBy={entity => entity.type.name}
                    filterKeys={[]}
-                   rows={this.state.filteredEntities}
+                   rows={filteredEntities}
                    dataRowFormatter={this._entityRowFormatter} />
       </div>
     );
