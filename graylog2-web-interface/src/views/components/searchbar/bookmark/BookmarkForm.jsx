@@ -14,7 +14,7 @@ type Props = {
   isCreateNew: boolean,
   value: string,
   target: any,
-}
+};
 
 const BookmarkForm = (props: Props) => {
   const {
