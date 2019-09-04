@@ -251,7 +251,7 @@ public class NotificationResourceHandler {
                 ).build();
 
         return EventNotificationContext.builder()
-                .notificationId(notificationDto.id())
+                .notificationId("1234")
                 .notificationConfig(notificationDto.config())
                 .event(eventDto)
                 .eventDefinition(eventDefinitionDto)
