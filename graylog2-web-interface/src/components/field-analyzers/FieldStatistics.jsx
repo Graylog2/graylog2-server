@@ -29,6 +29,13 @@ const FieldStatistics = createReactClass({
 
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
 
+  getDefaultProps() {
+    return {
+      stream: undefined,
+      forceFetch: false,
+    };
+  },
+
   getInitialState() {
     return {
       statsLoadPending: Immutable.Map(),
@@ -39,11 +46,12 @@ const FieldStatistics = createReactClass({
   },
 
   componentWillReceiveProps(nextProps) {
+    const { query, rangeType, rangeParams, stream } = this.props;
     // Reload values when executed search changes
-    if (this.props.query !== nextProps.query
-        || this.props.rangeType !== nextProps.rangeType
-        || JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams)
-        || this.props.stream !== nextProps.stream
+    if (query !== nextProps.query
+        || rangeType !== nextProps.rangeType
+        || JSON.stringify(rangeParams) !== JSON.stringify(nextProps.rangeParams)
+        || stream !== nextProps.stream
         || nextProps.forceFetch) {
       this._reloadAllStatistics();
     }
@@ -69,24 +77,28 @@ const FieldStatistics = createReactClass({
   },
 
   _reloadAllStatistics() {
-    this.state.fieldStatistics.keySeq().forEach(field => this._reloadFieldStatistics(field));
+    const { fieldStatistics } = this.state;
+
+    fieldStatistics.keySeq().forEach(field => this._reloadFieldStatistics(field));
   },
 
   _reloadFieldStatistics(field) {
+    const { statsLoadPending, fieldStatistics } = this.state;
+
     if (this.isMounted) {
-      this.setState({ statsLoadPending: this.state.statsLoadPending.set(field, true) });
+      this.setState({ statsLoadPending: statsLoadPending.set(field, true) });
       const promise = FieldStatisticsStore.getFieldStatistics(field);
       promise.then((statistics) => {
         this.setState({
-          fieldStatistics: this.state.fieldStatistics.set(field, statistics),
-          statsLoadPending: this.state.statsLoadPending.set(field, false),
+          fieldStatistics: fieldStatistics.set(field, statistics),
+          statsLoadPending: statsLoadPending.set(field, false),
         });
       }).catch((error) => {
         // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
         if (error.additional && error.additional.status === 400) {
           this.setState({
-            fieldStatistics: this.state.fieldStatistics.delete(field),
-            statsLoadPending: this.state.statsLoadPending.delete(field),
+            fieldStatistics: fieldStatistics.delete(field),
+            statsLoadPending: statsLoadPending.delete(field),
           });
         } else {
           UserNotification.error(`Loading field statistics failed with status: ${error}`,
@@ -97,8 +109,10 @@ const FieldStatistics = createReactClass({
   },
 
   _changeSortOrder(column) {
-    if (this.state.sortBy === column) {
-      this.setState({ sortDescending: !this.state.sortDescending });
+    const { sortBy, sortDescending } = this.state;
+
+    if (sortBy === column) {
+      this.setState({ sortDescending: !sortDescending });
     } else {
       this.setState({ sortBy: column, sortDescending: false });
     }
@@ -109,24 +123,26 @@ const FieldStatistics = createReactClass({
   },
 
   _renderStatistics() {
+    const { fieldStatistics, sortBy, sortDescending, statsLoadPending } = this.state;
+
     const statistics = [];
 
-    this.state.fieldStatistics.keySeq()
+    fieldStatistics.keySeq()
       .sort((key1, key2) => {
-        const a = this.state.sortDescending ? key2 : key1;
-        const b = this.state.sortDescending ? key1 : key2;
+        const a = sortDescending ? key2 : key1;
+        const b = sortDescending ? key1 : key2;
 
-        if (this.state.sortBy === 'field') {
+        if (sortBy === 'field') {
           return a.toLowerCase().localeCompare(b.toLowerCase());
         }
-        const statA = this.state.fieldStatistics.get(a)[this.state.sortBy];
-        const statB = this.state.fieldStatistics.get(b)[this.state.sortBy];
+        const statA = fieldStatistics.get(a)[sortBy];
+        const statB = fieldStatistics.get(b)[sortBy];
         return NumberUtils.normalizeNumber(statA) - NumberUtils.normalizeNumber(statB);
       })
       .forEach((field) => {
-        const stats = this.state.fieldStatistics.get(field);
+        const stats = fieldStatistics.get(field);
         let maybeSpinner = null;
-        if (this.state.statsLoadPending.get(field)) {
+        if (statsLoadPending.get(field)) {
           maybeSpinner = <i className="fa fa-spin fa-spinner" />;
         }
         statistics.push(
@@ -159,24 +175,28 @@ const FieldStatistics = createReactClass({
   },
 
   _getHeaderCaret(column) {
-    if (this.state.sortBy !== column) {
+    const { sortBy, sortDescending } = this.state;
+
+    if (sortBy !== column) {
       return null;
     }
-    return this.state.sortDescending ? <i className="fa fa-caret-down" /> : <i className="fa fa-caret-up" />;
+    return sortDescending ? <i className="fa fa-caret-down" /> : <i className="fa fa-caret-up" />;
   },
 
   render() {
+    const { fieldStatistics, statsLoadPending } = this.state;
+    const { permissions } = this.prop;
     let content;
 
-    if (!this.state.fieldStatistics.isEmpty()) {
+    if (!fieldStatistics.isEmpty()) {
       content = (
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                fields={this.state.fieldStatistics.keySeq().toJS()}
+                                fields={fieldStatistics.keySeq().toJS()}
                                 pullRight
-                                permissions={this.props.permissions}>
+                                permissions={permissions}>
               <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
@@ -200,7 +220,7 @@ const FieldStatistics = createReactClass({
           </div>
         </div>
       );
-    } else if (!this.state.statsLoadPending.isEmpty()) {
+    } else if (!statsLoadPending.isEmpty()) {
       content = (
         <div className="content-col">
           <h1>Field Statistics <i className="fa fa-spin fa-spinner" /></h1>
