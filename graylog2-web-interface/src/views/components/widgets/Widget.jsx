@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 import { widgetDefinition } from 'views/logic/Widget';

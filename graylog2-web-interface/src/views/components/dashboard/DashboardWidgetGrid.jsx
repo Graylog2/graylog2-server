@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
+import { Row } from 'components/graylog';
 import _ from 'lodash';
 import Immutable from 'immutable';
 

@@ -29,5 +29,6 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'react/destructuring-assignment': 'off',
   },
 };

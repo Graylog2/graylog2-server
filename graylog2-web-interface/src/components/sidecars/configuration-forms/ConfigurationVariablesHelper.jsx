@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Routes from 'routing/Routes';
-import { Alert, Table, Modal } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, Alert, Table, Modal } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';

@@ -1,6 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Panel, Table, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
 
 import Reflux from 'reflux';
 

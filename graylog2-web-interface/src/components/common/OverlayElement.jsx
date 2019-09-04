@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { OverlayTrigger } from 'react-bootstrap';
+import { OverlayTrigger } from 'components/graylog';
 
 /**
  * Helper component for react-bootstrap's `OverlayTrigger`. It only wraps the content into a `span` element,

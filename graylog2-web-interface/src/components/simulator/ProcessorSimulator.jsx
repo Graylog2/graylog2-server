@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { Link } from 'react-router';
 

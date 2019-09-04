@@ -3,10 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Alert, Row, Col, Panel } from 'react-bootstrap';
 import numeral from 'numeral';
 
-import { Button } from 'components/graylog';
+import { Alert, Row, Col, Panel, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';

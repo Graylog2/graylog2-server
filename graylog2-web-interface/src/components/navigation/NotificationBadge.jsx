@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Badge, Nav } from 'react-bootstrap';
+import { Badge, Nav } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';

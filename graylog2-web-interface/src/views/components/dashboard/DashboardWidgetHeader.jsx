@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Dropdown, MenuItem } from 'react-bootstrap';
+import { Dropdown, MenuItem } from 'components/graylog';
 
 import styles from './DashboardWidgetHeader.css';
 

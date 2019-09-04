@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ProgressBar } from 'react-bootstrap';
+import { ProgressBar } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 

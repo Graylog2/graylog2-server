@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';

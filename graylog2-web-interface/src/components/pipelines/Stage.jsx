@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Button } from 'react-bootstrap';
+import { Col, Button } from 'components/graylog';
 import { Link } from 'react-router';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';

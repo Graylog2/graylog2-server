@@ -3,9 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, OverlayTrigger, Popover } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AddDecoratorButton, Decorator, DecoratorList } from 'components/search';
 import DocumentationLink from 'components/support/DocumentationLink';

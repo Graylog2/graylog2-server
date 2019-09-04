@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, Alert, Modal, OverlayTrigger, Tooltip } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import CombinedProvider from 'injection/CombinedProvider';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';

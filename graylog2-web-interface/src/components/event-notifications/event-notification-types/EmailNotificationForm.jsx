@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
+import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import lodash from 'lodash';
 
 import { MultiSelect, SourceCodeEditor } from 'components/common';

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import { ListGroup, ListGroupItem, Panel } from 'components/graylog';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';

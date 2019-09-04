@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 import Dashboard from './Dashboard';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';

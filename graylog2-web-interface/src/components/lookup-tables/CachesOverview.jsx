@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
-
-import CombinedProvider from 'injection/CombinedProvider';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import CombinedProvider from 'injection/CombinedProvider';
+import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
-
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 
 import Styles from './Overview.css';

@@ -2,8 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';

@@ -1,7 +1,7 @@
 Search form with uncontrolled query string:
 ```js
 const createReactClass = require('create-react-class');
-const Button = require('react-bootstrap').Button;
+const Button = require('components/graylog').Button;
 
 const SearchFormExample = createReactClass({
   getInitialState() {
@@ -44,7 +44,7 @@ Search form with controlled query string and help:
 
 ```js
 const createReactClass = require('create-react-class');
-const Button = require('react-bootstrap').Button;
+const Button = require('components/graylog').Button;
 
 const SearchFormExample = createReactClass({
   getInitialState() {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';
 import uuid from 'uuid/v4';
-import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
 import { MultiSelect, Select } from 'components/common';
 import { Input } from 'components/bootstrap';

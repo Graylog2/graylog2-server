@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 const DSVHTTPAdapterDocumentation = () => {
   const csvFile1 = `"127.0.0.1","localhost"

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ListGroupItem } from 'react-bootstrap';
+import { ListGroupItem } from 'components/graylog';
 import { DragSource, DropTarget } from 'react-dnd';
 
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Panel } from 'react-bootstrap';
+import { Panel } from 'components/graylog';
 
 import styles from './HelpPanel.css';
 

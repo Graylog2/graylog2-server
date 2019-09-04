@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
-import { Col } from 'react-bootstrap';
+import { Col } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import DashboardWidgetGrid from 'views/components/dashboard/DashboardWidgetGrid';

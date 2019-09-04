@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tab, Tabs } from 'react-bootstrap';
 
+import { Tab, Tabs } from 'components/graylog';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import QueryTitle from 'views/components/queries/QueryTitle';
 

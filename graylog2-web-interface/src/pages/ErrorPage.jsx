@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Jumbotron, Row } from 'react-bootstrap';
+import { Col, Jumbotron, Row } from 'components/graylog';
 import { DocumentTitle } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax

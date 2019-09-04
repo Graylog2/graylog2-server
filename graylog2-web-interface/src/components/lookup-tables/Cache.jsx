@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/graylog';
 import { ContentPackMarker } from 'components/common';
 
 import Styles from './ConfigSummary.css';

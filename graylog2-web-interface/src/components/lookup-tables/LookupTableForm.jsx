@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
+
+import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';

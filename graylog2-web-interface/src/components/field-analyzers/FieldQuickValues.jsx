@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import Reflux from 'reflux';
 import crossfilter from 'crossfilter';
 

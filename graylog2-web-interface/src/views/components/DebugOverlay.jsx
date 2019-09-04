@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import { Modal } from 'react-bootstrap';
+import { Modal } from 'components/graylog';
 
 import { ViewStore } from 'views/stores/ViewStore';
 import { SearchStore } from 'views/stores/SearchStore';

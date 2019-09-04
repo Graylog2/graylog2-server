@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
 import URI from 'urijs';
 
-import { Button } from 'components/graylog';
+import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import { ExternalLinkButton, IfPermitted } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';

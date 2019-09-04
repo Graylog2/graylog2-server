@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Alert, Col, Row, Table } from 'react-bootstrap';
-import { Button } from 'components/graylog';
+
+import { Alert, Col, Row, Table, Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { DocumentTitle, IfPermitted, PageHeader, SortableList } from 'components/common';
 import Routes from 'routing/Routes';

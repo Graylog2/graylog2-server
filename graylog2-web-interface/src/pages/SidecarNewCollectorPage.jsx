@@ -1,9 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { ButtonToolbar, Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 

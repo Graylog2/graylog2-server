@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { FormGroup, HelpBlock } from 'react-bootstrap';
 import lodash from 'lodash';
 import moment from 'moment';
 
-import { Button } from 'components/graylog';
+import { Button, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm } from 'components/bootstrap';
 import { IfPermitted, TimeUnitInput } from 'components/common';
 import FormUtils from 'util/FormsUtils';

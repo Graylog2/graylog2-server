@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label } from 'react-bootstrap';
+import { Row, Col, Label } from 'components/graylog';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
