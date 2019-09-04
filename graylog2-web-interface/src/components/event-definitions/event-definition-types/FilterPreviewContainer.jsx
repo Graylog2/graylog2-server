@@ -58,6 +58,7 @@ class FilterPreviewContainer extends React.Component {
     const query = queryBuilder.build();
 
     const search = Search.create().toBuilder()
+      .parameters(config.query_parameters.filter(param => (!param.embryonic)))
       .queries([query])
       .build();
 
@@ -72,10 +73,10 @@ class FilterPreviewContainer extends React.Component {
   componentDidUpdate(prevProps) {
     const { eventDefinition } = this.props;
 
-    const { query: prevQuery, streams: prevStreams, search_within_ms: prevSearchWithin } = prevProps.eventDefinition.config;
-    const { query, streams, search_within_ms: searchWithin } = eventDefinition.config;
+    const { query: prevQuery, query_parameters: prevQueryParameters, streams: prevStreams, search_within_ms: prevSearchWithin } = prevProps.eventDefinition.config;
+    const { query, query_parameters: queryParameters, streams, search_within_ms: searchWithin } = eventDefinition.config;
 
-    if (query !== prevQuery || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
+    if (query !== prevQuery || queryParameters !== prevQueryParameters || !lodash.isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
       this.fetchSearch(eventDefinition.config);
     }
   }

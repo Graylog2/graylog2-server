@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
+import uuid from 'uuid/v4';
+import { ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Well } from 'components/graylog';
 import moment from 'moment';
 
+import connect from 'stores/connect';
+import Query from 'views/logic/queries/Query';
+import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { MultiSelect, TimeUnitInput } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -11,16 +15,33 @@ import { Input } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
 
+import CombinedProvider from 'injection/CombinedProvider';
+import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import PermissionsMixin from 'util/PermissionsMixin';
+import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 
+const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
+
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+
+const LOOKUP_PERMISSIONS = [
+  'lookuptables:read',
+];
+const PREVIEW_PERMISSIONS = [
+  'streams:read',
+  'extendedsearch:create',
+  'extendedsearch:use',
+];
 
 class FilterForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
+    lookupTables: PropTypes.object.isRequired,
     validation: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
+    currentUser: PropTypes.object.isRequired,
   };
 
   formatStreamIds = lodash.memoize(
@@ -41,6 +62,36 @@ class FilterForm extends React.Component {
     streamIds => streamIds.join('-'),
   );
 
+  _parseQuery = lodash.debounce((queryString) => {
+    const { currentUser } = this.props;
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, PREVIEW_PERMISSIONS)) {
+      return;
+    }
+
+    const { queryId, searchTypeId } = this.state;
+
+    const queryBuilder = Query.builder()
+      .id(queryId)
+      .query({ type: 'elasticsearch', query_string: queryString })
+      .timerange({ type: 'relative', range: 1000 })
+      .searchTypes([{
+        id: searchTypeId,
+        type: 'messages',
+        limit: 10,
+        offset: 0,
+      }]);
+
+    const query = queryBuilder.build();
+
+    const search = Search.create().toBuilder()
+      .queries([query])
+      .build();
+
+    SearchMetadataStore.parseSearch(search).then((res) => {
+      this._syncParamsWithQuery(res.undeclared);
+    });
+  }, 250);
+
   constructor(props) {
     super(props);
 
@@ -53,7 +104,19 @@ class FilterForm extends React.Component {
       searchWithinMsUnit: searchWithin.unit,
       executeEveryMsDuration: executeEvery.duration,
       executeEveryMsUnit: executeEvery.unit,
+      queryId: uuid(),
+      searchTypeId: uuid(),
+      queryParameterStash: {}, // keep already defined parameters around to ease editing
     };
+  }
+
+  componentDidMount() {
+    const { currentUser } = this.props;
+    if (!PermissionsMixin.isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS)) {
+      return;
+    }
+
+    LookupTablesActions.searchPaginated(1, 0, undefined, false);
   }
 
   propagateChange = (key, value) => {
@@ -61,6 +124,54 @@ class FilterForm extends React.Component {
     const config = lodash.cloneDeep(eventDefinition.config);
     config[key] = value;
     onChange('config', config);
+  };
+
+  _syncParamsWithQuery = (paramsInQuery) => {
+    const { eventDefinition, onChange } = this.props;
+    const config = lodash.cloneDeep(eventDefinition.config);
+    const queryParameters = config.query_parameters;
+    const keptParameters = [];
+    const staleParameters = {};
+    queryParameters.forEach((p) => {
+      if (paramsInQuery.has(p.name)) {
+        keptParameters.push(p);
+      } else {
+        staleParameters[p.name] = p;
+      }
+    });
+
+    const { queryParameterStash } = this.state;
+    const newParameters = [];
+    paramsInQuery.forEach((np) => {
+      if (!keptParameters.find(p => p.name === np)) {
+        if (queryParameterStash[np]) {
+          newParameters.push(queryParameterStash[np]);
+        } else {
+          newParameters.push(this._buildNewParameter(np));
+        }
+      }
+    });
+
+    this.setState({ queryParameterStash: lodash.merge(queryParameterStash, staleParameters) });
+
+    config.query_parameters = keptParameters.concat(newParameters);
+    onChange('config', config);
+  };
+
+  _buildNewParameter = (name) => {
+    return ({
+      name: name,
+      embryonic: true,
+      type: 'lut-parameter-v1',
+      data_type: 'any',
+      title: 'new title',
+      // has no binding!
+    });
+  };
+
+  handleQueryChange = (event) => {
+    this._parseQuery(event.target.value);
+    this.handleConfigChange(event);
   };
 
   handleConfigChange = (event) => {
@@ -85,6 +196,38 @@ class FilterForm extends React.Component {
     };
   };
 
+  renderQueryParameters = () => {
+    const { eventDefinition, onChange, lookupTables, validation } = this.props;
+    const debug = (key, val) => {
+      onChange(key, val);
+    };
+    const parameterButtons = eventDefinition.config.query_parameters.map((queryParam) => {
+      return (
+        <EditQueryParameterModal
+          key={queryParam.name}
+          queryParameter={queryParam}
+          eventDefinition={eventDefinition}
+          lookupTables={lookupTables.tables || []}
+          validation={validation}
+          onChange={debug} />
+      );
+    });
+
+    if (lodash.isEmpty(parameterButtons)) {
+      return null;
+    }
+    return (
+      <React.Fragment>
+        <ControlLabel>Query Parameters <small className="text-muted">(Optional)</small></ControlLabel>
+        <Well>
+          <ButtonToolbar>
+            {parameterButtons}
+          </ButtonToolbar>
+        </Well>
+      </React.Fragment>
+    );
+  };
+
   render() {
     const { eventDefinition, streams, validation } = this.props;
     const { searchWithinMsDuration, searchWithinMsUnit, executeEveryMsDuration, executeEveryMsUnit } = this.state;
@@ -103,7 +246,12 @@ class FilterForm extends React.Component {
                type="text"
                help="Search query that Messages should match. You can use the same syntax as in the Search page."
                value={lodash.defaultTo(eventDefinition.config.query, '')}
-               onChange={this.handleConfigChange} />
+               onChange={this.handleQueryChange} />
+
+        <FormGroup controlId="filter-query-parameters">
+
+          {this.renderQueryParameters()}
+        </FormGroup>
 
         <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
@@ -145,4 +293,6 @@ class FilterForm extends React.Component {
   }
 }
 
-export default FilterForm;
+export default connect(FilterForm, {
+  lookupTables: LookupTablesStore,
+});

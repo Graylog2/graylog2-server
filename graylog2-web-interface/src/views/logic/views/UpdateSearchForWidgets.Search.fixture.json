@@ -376,6 +376,7 @@
   ],
   "parameters": [
     {
+      "type": "value-parameter-v1",
       "name": "author",
       "title": "Author",
       "description": "",

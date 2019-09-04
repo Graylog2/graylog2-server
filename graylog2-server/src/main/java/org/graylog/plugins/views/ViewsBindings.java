@@ -27,6 +27,7 @@ import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardState
 import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
@@ -146,6 +147,7 @@ public class ViewsBindings extends ViewsModule {
         registerViewSharingSubtypes();
         registerSharingStrategies();
         registerSortConfigSubclasses();
+        registerParameterSubtypes();
 
         install(new FactoryModuleBuilder().build(ViewRequirements.Factory.class));
         install(new FactoryModuleBuilder().build(SearchRequirements.Factory.class));
@@ -189,13 +191,16 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(SpecificUsers.class);
     }
 
+    private void registerParameterSubtypes() {
+        registerJacksonSubtype(ValueParameter.class);
+    }
+
     private void registerSharingStrategies() {
         registerSharingStrategy(AllUsersOfInstance.TYPE, AllUsersOfInstanceStrategy.class);
         registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
         registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
     }
-
-    private void registerExceptionMappers() {
+private void registerExceptionMappers() {
         addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
     }

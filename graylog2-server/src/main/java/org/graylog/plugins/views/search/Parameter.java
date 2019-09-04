@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog.plugins.views.search;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.Maps;
 
 import javax.annotation.Nullable;
@@ -40,64 +38,55 @@ import java.util.Objects;
  * The caller is expected to provide a {@link Parameter} object when binding previously declared parameters.
  * In that case the declaration elements do not need to be repeated, only its {@link Parameter#name() name} property.
  */
-@AutoValue
-@JsonDeserialize(builder = Parameter.Builder.class)
-public abstract class Parameter {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = Parameter.TYPE_FIELD,
+        visible = true,
+        defaultImpl = ValueParameter.class)
+public interface Parameter {
+    String TYPE_FIELD = "type";
+
+    @JsonProperty(TYPE_FIELD)
+    String type();
 
     @JsonProperty
-    public abstract String name();
+    String name();
 
     @Nullable
     @JsonProperty
-    public abstract String title();
+    String title();
 
     @Nullable
     @JsonProperty
-    public abstract String description();
+    String description();
 
-    @JsonProperty("data_type")
-    public abstract String dataType();
+    @Nullable
+    @JsonProperty
+    Binding binding();
+
+    @JsonProperty
+    boolean optional();
 
     @Nullable
     @JsonProperty("default_value")
-    public abstract Object defaultValue();
+    Object defaultValue();
 
-    @JsonProperty
-    public abstract boolean optional();
+    Parameter applyExecutionState(ObjectMapper objectMapper, JsonNode jsonNode);
 
-    @Nullable
-    @JsonProperty
-    public abstract Binding binding();
-
-    public static Builder builder() {
-        return new AutoValue_Parameter.Builder().optional(false);
+    interface Builder<SELF> {
+        @JsonProperty(TYPE_FIELD)
+        SELF type(String type);
     }
-
-    public static Parameter any(String name) {
-        return builder().name(name).dataType("any").build();
-    }
-
-    public abstract Builder toBuilder();
-
-    public Parameter applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
-        final JsonNode bindingState = state.path(name());
-
-        if (bindingState.isMissingNode()) {
-            return this;
-        }
-
-        final Binding binding = objectMapper.convertValue(bindingState, Binding.class);
-
-        return toBuilder().binding(binding).build();
+    interface Factory<TYPE extends Parameter> {
+        TYPE create(Parameter parameter);
     }
 
     @JsonTypeInfo(
             use = JsonTypeInfo.Id.NAME,
-            include = JsonTypeInfo.As.PROPERTY,
             property = Binding.TYPE_FIELD,
             visible = true,
             defaultImpl = Binding.Fallback.class)
-    public interface Binding {
+    interface Binding {
         String TYPE_FIELD = "type";
 
         @JsonProperty(TYPE_FIELD)
@@ -143,46 +132,14 @@ public abstract class Parameter {
         }
     }
 
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonProperty
-        public abstract Builder name(String name);
-
-        @JsonProperty
-        public abstract Builder title(String title);
-
-        @JsonProperty
-        public abstract Builder description(String description);
-
-        @JsonProperty
-        public abstract Builder dataType(String dataType);
-
-        @JsonProperty("default_value")
-        public abstract Builder defaultValue(Object defaultValue);
-
-        @JsonProperty
-        public abstract Builder optional(boolean optional);
-
-        @JsonProperty
-        public abstract Builder binding(Binding binding);
-
-        public abstract Parameter build();
-
-        // to fill the default values
-        @JsonCreator
-        public static Builder create() {
-            return Parameter.builder().optional(false);
-        }
-    }
-
-    public interface BindingHandler<B extends Binding> {
+    interface BindingHandler<B extends Binding, P extends Parameter> {
         // this method only exists because the compiler cannot treat `Binding` and `B extends Binding` as the same types
         // see SearchTypeHandler
         @SuppressWarnings("unchecked")
-        default Object resolve(Binding binding, Object defaultValue, Map<String, QueryResult> results) {
-            return doResolve((B) binding, defaultValue, results);
+        default Object resolve(Binding binding, Parameter parameter, Map<String, QueryResult> results) {
+            return doResolve((B) binding, (P) parameter, results);
         }
 
-        Object doResolve(B binding, Object defaultValue, Map<String, QueryResult> results);
+        Object doResolve(B binding, P parameter, Map<String, QueryResult> results);
     }
 }

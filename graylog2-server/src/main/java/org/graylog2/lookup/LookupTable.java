@@ -71,6 +71,9 @@ public abstract class LookupTable {
     public LookupResult lookup(@Nonnull Object key) {
         final LookupResult result = cache().get(LookupCacheKey.create(dataAdapter(), key), () -> dataAdapter().get(key));
 
+        if (result.hasError()) {
+            return result;
+        }
         // The default value will only be used if single, multi and list values are empty
         if (result.isEmpty()) {
             return LookupResult.addDefaults(defaultSingleValue(), defaultMultiValue()).hasError(result.hasError()).build();

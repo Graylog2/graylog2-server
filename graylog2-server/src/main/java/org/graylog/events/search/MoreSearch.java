@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -31,7 +32,14 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.Parameter;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
+import org.graylog.plugins.views.search.errors.EmptyParameterError;
+import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexHelper;
@@ -85,6 +93,7 @@ public class MoreSearch extends Searches {
     private final ScrollResult.Factory scrollResultFactory;
     private final JestClient jestClient;
     private final boolean allowLeadingWildcardSearches;
+    private final ESQueryDecorators esQueryDecorators;
 
     @Inject
     public MoreSearch(StreamService streamService,
@@ -94,13 +103,15 @@ public class MoreSearch extends Searches {
                       MetricRegistry metricRegistry,
                       ScrollResult.Factory scrollResultFactory,
                       JestClient jestClient,
-                      Configuration configuration) {
+                      Configuration configuration,
+                      ESQueryDecorators esQueryDecorators) {
         super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;
         this.jestClient = jestClient;
         this.allowLeadingWildcardSearches = configuration.isAllowLeadingWildcardSearches();
+        this.esQueryDecorators = esQueryDecorators;
     }
 
     /**
@@ -210,10 +221,20 @@ public class MoreSearch extends Searches {
      * @param batchSize      the number of documents to retrieve at once
      * @param resultCallback the callback that gets executed for each batch
      */
-    public void scrollQuery(String queryString, Set<String> streams, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
+    public void scrollQuery(String queryString, Set<String> streams, Set<Parameter> queryParameters, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
         final String scrollTime = "1m"; // TODO: Does scroll time need to be configurable?
 
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
+
+        try {
+            queryString = decorateQuery(queryParameters, timeRange, queryString);
+        } catch (SearchException e) {
+            if (e.error() instanceof EmptyParameterError) {
+                LOG.debug("Empty parameter from lookup table. Assuming non-matching query. Error: {}", e.getMessage());
+                return;
+            }
+            throw e;
+        }
 
         final QueryBuilder query = (queryString.trim().isEmpty() || queryString.trim().equals("*")) ?
                 matchAllQuery() :
@@ -298,8 +319,21 @@ public class MoreSearch extends Searches {
         return streams;
     }
 
+    private String decorateQuery(Set<Parameter> queryParameters, TimeRange timeRange, String queryString) {
+        org.graylog.plugins.views.search.Search search = org.graylog.plugins.views.search.Search.builder()
+                .parameters(ImmutableSet.copyOf(queryParameters))
+                .build();
+        SearchJob searchJob = new SearchJob("1234", search, "events backend");
+        Query dummyQuery = Query.builder()
+                .id("123")
+                .timerange(timeRange)
+                .query(ElasticsearchQueryString.builder().queryString(queryString).build())
+                .build();
+        return esQueryDecorators.decorate(queryString, searchJob, dummyQuery, ImmutableSet.of());
+    }
+
     /**
-     * Callback that receives message batches from {@link #scrollQuery(String, Set, TimeRange, int, ScrollCallback)}.
+     * Callback that receives message batches from {@link #scrollQuery(String, Set, Set, TimeRange, int, ScrollCallback)}.
      */
     public interface ScrollCallback {
         /**
