@@ -5,6 +5,7 @@ import {} from 'jquery-ui/ui/effects/effect-bounce';
 import dc from 'dc';
 import d3 from 'd3';
 
+import { Icon } from 'components/graylog';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import D3Utils from 'util/D3Utils';
 
@@ -94,7 +95,7 @@ class SourceLineChart extends React.Component {
     };
     const loadingSpinner = (
       <div className="sources overlay" style={loadingSpinnerStyle}>
-        <i className="fa fa-spin fa-refresh spinner" />
+        <Icon className="fa fa-spin fa-refresh spinner" />
       </div>
     );
 

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Col, Row, Button } from 'components/graylog';
+import { Icon, Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner } from 'components/common';
@@ -45,7 +45,7 @@ class Output extends React.Component {
 
     const { output } = this.props;
     const contentPack = (output.content_pack
-      ? <span title="Created from content pack"><i className="fa fa-gift" /></span> : null);
+      ? <span title="Created from content pack"><Icon className="fa fa-gift" /></span> : null);
 
     let alert;
     let configurationWell;

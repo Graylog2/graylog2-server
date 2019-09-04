@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label } from 'components/graylog';
+import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label, Icon } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 
 import StreamLink from 'components/streams/StreamLink';
@@ -71,7 +71,7 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <i className="fa fa-code-fork" />
+          <Icon className="fa fa-code-fork" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
           </span>
@@ -122,7 +122,7 @@ class MessageDetail extends React.Component {
                       id="select-stream-dropdown">
         { streamList }
         { (!streamList && !this.props.allStreamsLoaded) && (
-        <MenuItem header><i className="fa fa-spin fa-spinner" />
+        <MenuItem header><Icon className="fa fa-spin fa-spinner" />
           Loading streams
         </MenuItem>
         ) }
@@ -244,7 +244,7 @@ class MessageDetail extends React.Component {
           <Col md={12}>
             {this._formatMessageActions()}
             <h3 className="message-details-title">
-              <i className="fa fa-envelope" />
+              <Icon className="fa fa-envelope" />
             &nbsp;
               {messageTitle}
             </h3>

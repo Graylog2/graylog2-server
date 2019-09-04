@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
+import { Icon, Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
 
 import WizardStyle from './Wizard.css';
 
@@ -191,10 +191,10 @@ class Wizard extends React.Component {
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('previous')}>
-                <i className="fa fa-caret-left" />
+                <Icon className="fa fa-caret-left" />
               </Button>
               <Button onClick={this._onNext} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('next')}>
-                <i className="fa fa-caret-right" />
+                <Icon className="fa fa-caret-right" />
               </Button>
             </ButtonToolbar>
           </div>

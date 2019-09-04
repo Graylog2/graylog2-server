@@ -3,7 +3,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
 
-import { ButtonGroup, DropdownButton, MenuItem, Button } from 'components/graylog';
+import { ButtonGroup, DropdownButton, MenuItem, Button, Icon } from 'components/graylog';
 import { Pluralize } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -45,7 +45,7 @@ const RefreshControls = createReactClass({
     return (
       <ButtonGroup>
         <Button bsSize="small" onClick={() => (this.state.refresh.enabled ? RefreshActions.disable() : RefreshActions.enable())}>
-          {this.state.refresh.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
+          {this.state.refresh.enabled ? <Icon className="fa fa-pause" /> : <Icon className="fa fa-play" />}
         </Button>
 
         <DropdownButton bsSize="small" title={this.state.refresh.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">

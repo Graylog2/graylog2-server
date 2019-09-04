@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import ReactDOM from 'react-dom';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
-import { Button, DropdownButton } from 'components/graylog';
+import { Button, DropdownButton, Icon } from 'components/graylog';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 
@@ -145,10 +144,10 @@ const LegacyFieldGraph = createReactClass({
                     className="reposition-handle"
                     onClick={e => e.preventDefault()}
                     title="Drag and drop to merge the graph into another">
-              <i className="fa fa-reorder" />
+              <Icon className="fa fa-reorder" />
             </Button>
 
-            <Button bsSize="small" onClick={this.props.onDelete}><i className="fa fa-close" /></Button>
+            <Button bsSize="small" onClick={this.props.onDelete}><Icon className="fa fa-close" /></Button>
           </AddToDashboardMenu>
         </div>
         <h1>{this._getGraphTitle()}</h1>

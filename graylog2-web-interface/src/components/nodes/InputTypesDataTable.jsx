@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 
+import { Icon, Alert } from 'components/graylog';
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 
 class InputTypesDataTable extends React.Component {
@@ -35,7 +35,7 @@ class InputTypesDataTable extends React.Component {
     if (Object.keys(this.props.inputDescriptions).length === 0) {
       return (
         <Alert bsStyle="warning">
-          <i className="fa fa-exclamation-triangle" />&nbsp; Input types are unavailable.
+          <Icon className="fa fa-exclamation-triangle" />&nbsp; Input types are unavailable.
         </Alert>
       );
     }

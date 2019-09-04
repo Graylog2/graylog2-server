@@ -7,7 +7,7 @@ import moment from 'moment';
 import connect from 'stores/connect';
 
 // $FlowFixMe: imports from core need to be fixed in flow
-import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
+import { MenuItem, ButtonGroup, DropdownButton, Button, Icon } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import Pluralize from 'components/common/Pluralize';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
@@ -80,7 +80,7 @@ class RefreshControls extends React.Component<Props, State> {
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
           <Button onClick={this._toggleEnable}>
-            {this.props.refreshConfig.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
+            {this.props.refreshConfig.enabled ? <Icon className="fa fa-pause" /> : <Icon className="fa fa-play" />}
           </Button>
 
           <DropdownButton title={this.props.refreshConfig.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">

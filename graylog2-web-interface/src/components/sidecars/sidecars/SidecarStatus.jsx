@@ -3,7 +3,7 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, Icon } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 
@@ -70,12 +70,12 @@ const SidecarStatus = createReactClass({
         case SidecarStatusEnum.RUNNING:
           statusMessage = 'Collector is running.';
           statusClass = 'text-success';
-          statusBadge = <i className="fa fa-play fa-fw" />;
+          statusBadge = <Icon className="fa fa-play fa-fw" />;
           break;
         case SidecarStatusEnum.FAILING:
           statusMessage = status.message;
           statusClass = 'text-danger';
-          statusBadge = <i className="fa fa-warning fa-fw" />;
+          statusBadge = <Icon className="fa fa-warning fa-fw" />;
 
           if (status.verbose_message) {
             verboseButton = (
@@ -90,12 +90,12 @@ const SidecarStatus = createReactClass({
         case SidecarStatusEnum.STOPPED:
           statusMessage = status.message;
           statusClass = 'text-danger';
-          statusBadge = <i className="fa fa-stop fa-fw" />;
+          statusBadge = <Icon className="fa fa-stop fa-fw" />;
           break;
         default:
           statusMessage = 'Collector status is currently unknown.';
           statusClass = 'text-info';
-          statusBadge = <i className="fa fa-question-circle fa-fw" />;
+          statusBadge = <Icon className="fa fa-question-circle fa-fw" />;
       }
 
       if (collector) {

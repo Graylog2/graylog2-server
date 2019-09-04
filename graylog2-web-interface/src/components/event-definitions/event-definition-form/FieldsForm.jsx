@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Alert, Col, OverlayTrigger, Row, Button } from 'components/graylog';
+import { Icon, Alert, Col, OverlayTrigger, Row, Button } from 'components/graylog';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 
 import FieldForm from './FieldForm';
@@ -109,7 +109,7 @@ class FieldsForm extends React.Component {
                 <OverlayTrigger placement="right"
                                 trigger={['click', 'hover']}
                                 overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-                  <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+                  <Button bsStyle="link" bsSize="xsmall"><Icon className="fa fa-question-circle" /></Button>
                 </OverlayTrigger>
               </dt>
               <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>

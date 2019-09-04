@@ -11,6 +11,7 @@ import {
   FormControl,
   FormGroup,
   HelpBlock,
+  Icon,
   InputGroup,
   OverlayTrigger,
   Row,
@@ -196,7 +197,7 @@ class FieldForm extends React.Component {
               <OverlayTrigger placement="right"
                               trigger={['click', 'focus']}
                               overlay={<EventKeyHelpPopover id="key-popover" />}>
-                <Button bsStyle="link" bsSize="xsmall"><i className="fa fa-question-circle" /></Button>
+                <Button bsStyle="link" bsSize="xsmall"><Icon className="fa fa-question-circle" /></Button>
               </OverlayTrigger>
             </ControlLabel>
             <InputGroup>

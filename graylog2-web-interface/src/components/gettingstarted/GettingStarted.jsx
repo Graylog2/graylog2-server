@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
 
-import { Grid, Row, Col, Button } from 'components/graylog';
+import { Grid, Row, Col, Button, Icon } from 'components/graylog';
 import { Spinner } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
@@ -86,7 +86,7 @@ class GettingStarted extends React.Component {
     if (!noDismissButton) {
       dismissButton = (
         <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
-          <i className="fa fa-times" /> Dismiss guide
+          <Icon className="fa fa-times" /> Dismiss guide
         </Button>
       );
     }

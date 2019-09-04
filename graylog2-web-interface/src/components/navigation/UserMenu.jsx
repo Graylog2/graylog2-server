@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { NavDropdown, MenuItem } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
+
+import { Icon, NavDropdown, MenuItem } from 'components/graylog';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -29,7 +29,7 @@ class UserMenu extends React.Component {
     const { fullName, loginName } = this.props;
 
     return (
-      <NavDropdown title={<i className="fa fa-user" aria-label={fullName} />}
+      <NavDropdown title={<Icon className="fa fa-user" aria-label={fullName} />}
                    id="user-menu-dropdown"
                    noCaret>
         <MenuItem header>{fullName}</MenuItem>
@@ -37,7 +37,7 @@ class UserMenu extends React.Component {
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>
           <MenuItem>Edit profile</MenuItem>
         </LinkContainer>
-        <MenuItem onSelect={this.onLogoutClicked}><i className="fa fa-sign-out" /> Log out</MenuItem>
+        <MenuItem onSelect={this.onLogoutClicked}><Icon className="fa fa-sign-out" /> Log out</MenuItem>
       </NavDropdown>
     );
   }

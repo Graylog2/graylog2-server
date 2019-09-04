@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Table, Button } from 'components/graylog';
+import { Icon, Table, Button } from 'components/graylog';
 
 import styles from './CommonNotificationSummary.css';
 
@@ -32,7 +32,7 @@ class CommonNotificationSummary extends React.Component {
           <dd>{type}</dd>
           <dd>
             <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-              <i className={`fa fa-caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
+              <Icon className={`fa fa-caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
               {displayDetails ? 'Less details' : 'More details'}
             </Button>
             {displayDetails && (

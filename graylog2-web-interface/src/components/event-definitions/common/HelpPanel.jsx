@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Panel } from 'components/graylog';
+
+import { Icon, Panel } from 'components/graylog';
 
 import styles from './HelpPanel.css';
 
@@ -27,7 +28,7 @@ class HelpPanel extends React.Component {
 
   render() {
     const { bsStyle, children, className, collapsible, header, title, defaultExpanded } = this.props;
-    const defaultHeader = (<h3><i className="fa fa-info-circle" />&emsp;{title}</h3>);
+    const defaultHeader = (<h3><Icon className="fa fa-info-circle" />&emsp;{title}</h3>);
 
     return (
       <Panel bsStyle={bsStyle}

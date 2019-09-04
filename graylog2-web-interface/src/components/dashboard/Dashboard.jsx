@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'components/graylog';
 import { Link } from 'react-router';
 
+import { Icon, DropdownButton, MenuItem } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -74,7 +74,7 @@ const Dashboard = createReactClass({
 
   render() {
     const createdFromContentPack = (this.props.dashboard.content_pack
-      ? <i className="fa fa-cube" title="Created from content pack" /> : null);
+      ? <Icon className="fa fa-cube" title="Created from content pack" /> : null);
 
     return (
       <li className="stream">

@@ -2,6 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
+import { Icon } from 'components/graylog';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 
 const OperatingSystemIcon = createReactClass({
@@ -30,7 +31,7 @@ const OperatingSystemIcon = createReactClass({
 
     glyphClass += ` fa-fw ${commonStyles.sidecarOs}`;
 
-    return (<i className={`fa ${glyphClass}`} />);
+    return (<Icon className={`fa ${glyphClass}`} />);
   },
 
   render() {

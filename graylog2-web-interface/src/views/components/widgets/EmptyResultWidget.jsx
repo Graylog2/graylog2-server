@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { DocumentationLink } from 'components/support';
+import { Icon } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
 import PortaledPopover from 'views/components/common/PortaledPopover';
 import styles from './MessageWidgets.css';
@@ -14,15 +15,15 @@ const popover = (
 
     <ul>
       <li>
-        <i className="fa fa-group" />&nbsp;
+        <Icon className="fa fa-group" />&nbsp;
         <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>
-        <i className="fa fa-github-alt" />&nbsp;
+        <Icon className="fa fa-github-alt" />&nbsp;
         <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a>
       </li>
       <li>
-        <i className="fa fa-heart" />&nbsp;
+        <Icon className="fa fa-heart" />&nbsp;
         <a href="https://www.graylog.org/professional-support" target="_blank" rel="noopener noreferrer">Professional support</a>
       </li>
     </ul>
@@ -31,7 +32,7 @@ const popover = (
 
 const EmptyResultWidget = () => (
   <div className={styles.spinnerContainer}>
-    <i className={`fa fa-times fa-3x ${styles.iconMargin}`} />
+    <Icon className={`fa fa-times fa-3x ${styles.iconMargin}`} />
     <div>
       <strong>
       Your search returned no results, try changing the used time range or the search query.{' '}

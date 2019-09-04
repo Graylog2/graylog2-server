@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Jumbotron, Row } from 'components/graylog';
+
+import { Col, Jumbotron, Row, Icon } from 'components/graylog';
 import { DocumentTitle } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -70,7 +71,7 @@ class ErrorPage extends React.Component {
                     <dd className={errorPageStyles.greyBackground}>
                       <pre className="content">
                         <div className="pull-right">
-                          <ClipboardButton title={<i className="fa fa-copy fa-fw" />}
+                          <ClipboardButton title={<Icon className="fa fa-copy fa-fw" />}
                                            bsSize="sm"
                                            text={`${error.message}\n${errorDetails}`}
                                            buttonTitle="Copy error details to clipboard" />

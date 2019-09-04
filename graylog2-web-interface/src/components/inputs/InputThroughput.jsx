@@ -10,6 +10,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 
 import NumberUtils from 'util/NumberUtils';
 import { LinkToNode, Spinner } from 'components/common';
+import { Icon } from 'components/graylog';
 
 const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
@@ -99,19 +100,19 @@ const InputThroughput = createReactClass({
       <span className="input-io">
         <span>Network IO: </span>
         <span className="persec">
-          <i className="fa fa-caret-down channel-direction channel-direction-down" />
+          <Icon className="fa fa-caret-down channel-direction channel-direction-down" />
           <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
-          <i className="fa fa-caret-up channel-direction channel-direction-up" />
+          <Icon className="fa fa-caret-up channel-direction channel-direction-up" />
           <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
         </span>
 
         <span className="total">
           <span> (total: </span>
-          <i className="fa fa-caret-down channel-direction channel-direction-down" />
+          <Icon className="fa fa-caret-down channel-direction channel-direction-down" />
           <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
 
-          <i className="fa fa-caret-up channel-direction channel-direction-up" />
+          <Icon className="fa fa-caret-up channel-direction channel-direction-up" />
           <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
           <span> )</span>
         </span>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonToolbar, DropdownButton, MenuItem, Icon } from 'components/graylog';
 
 import PropTypes from 'views/components/CustomPropTypes';
 
@@ -7,7 +7,7 @@ export default function TimeRangeTypeSelector({ onSelect, value }) {
   return (
     <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
-                      title={<i className="fa fa-clock-o" />}
+                      title={<Icon className="fa fa-clock-o" />}
                       onSelect={onSelect}
                       id="dropdown-timerange-selector">
         <MenuItem eventKey="relative"

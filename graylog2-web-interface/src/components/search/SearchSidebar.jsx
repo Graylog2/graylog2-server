@@ -7,7 +7,7 @@ import numeral from 'numeral';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
-import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'components/graylog';
+import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs, Icon } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -164,7 +164,7 @@ const SearchSidebar = createReactClass({
           <p>{infoText}</p>
           <p>
             <a href={this._getURLForExportAsCSV()} target="_blank">
-              <i className="fa fa-cloud-download" />&nbsp;
+              <Icon className="fa fa-cloud-download" />&nbsp;
               Download
             </a>
           </p>

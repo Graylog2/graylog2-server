@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Button, ButtonGroup } from 'components/graylog';
+import { Button, ButtonGroup, Icon } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
@@ -117,15 +117,15 @@ class ResultTable extends React.Component {
       if (this.props.sortOrder.toLowerCase().localeCompare('desc') === 0) {
         sortLinks = (
           <span>
-            <i className={`${classesDesc} sort-order-active`} />
-            <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
+            <Icon className={`${classesDesc} sort-order-active`} />
+            <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><Icon className={classesAsc} /></a>
           </span>
         );
       } else {
         sortLinks = (
           <span>
-            <i className={`${classesAsc} sort-order-active`} />
-            <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
+            <Icon className={`${classesAsc} sort-order-active`} />
+            <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><Icon className={classesDesc} /></a>
           </span>
         );
       }
@@ -133,8 +133,8 @@ class ResultTable extends React.Component {
       // the given fieldname is not being sorted on
       sortLinks = (
         <span className="sort-order">
-          <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
-          <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
+          <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><Icon className={classesAsc} /></a>
+          <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><Icon className={classesDesc} /></a>
         </span>
       );
     }
@@ -148,10 +148,10 @@ class ResultTable extends React.Component {
         <h1 className="pull-left">Messages</h1>
 
         <ButtonGroup bsSize="small" className="pull-right">
-          <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
+          <Button title="Expand all messages" onClick={this.expandAll}><Icon className="fa fa-expand" /></Button>
           <Button title="Collapse all messages"
                   onClick={this.collapseAll}
-                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" />
+                  disabled={this.state.expandedMessages.size === 0}><Icon className="fa fa-compress" />
           </Button>
         </ButtonGroup>
 
@@ -209,10 +209,10 @@ class ResultTable extends React.Component {
                                position="bottom"
                                resultCount={this.props.resultCount}>
           <ButtonGroup bsSize="small" className="pull-right" style={{ position: 'absolute', marginTop: 20, right: 10 }}>
-            <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
+            <Button title="Expand all messages" onClick={this.expandAll}><Icon className="fa fa-expand" /></Button>
             <Button title="Collapse all messages"
                     onClick={this.collapseAll}
-                    disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" />
+                    disabled={this.state.expandedMessages.size === 0}><Icon className="fa fa-compress" />
             </Button>
           </ButtonGroup>
         </MessageTablePaginator>

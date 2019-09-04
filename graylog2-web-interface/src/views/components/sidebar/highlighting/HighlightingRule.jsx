@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import ColorPickerPopover from 'components/common/ColorPickerPopover';
+import { Icon } from 'components/graylog';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -41,7 +42,7 @@ const HighlightingRule = ({ rule }: Props) => {
       {' '}
       for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       <span role="presentation" title="Remove this Highlighting Rule" onClick={e => onDelete(e, rule)}>
-        <i className="fa fa-trash-o" />
+        <Icon className="fa fa-trash-o" />
       </span>
     </div>
   );

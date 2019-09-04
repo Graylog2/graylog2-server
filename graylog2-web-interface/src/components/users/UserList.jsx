@@ -8,7 +8,7 @@ import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
 
-import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem, Icon } from 'components/graylog';
 import { DataTable, Spinner, Timestamp } from 'components/common';
 
 import UserListStyle from '!style!css!./UserList.css';
@@ -89,7 +89,7 @@ const UserList = createReactClass({
           <th>
             {header}
             <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
-              <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle" /></Button>
+              <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><Icon className="fa fa-fw fa-question-circle" /></Button>
             </OverlayTrigger>
           </th>
         );
@@ -117,7 +117,7 @@ const UserList = createReactClass({
       );
       userBadge = (
         <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-          <i className={`fa fa-circle ${UserListStyle.activeSession}`} />
+          <Icon className={`fa fa-circle ${UserListStyle.activeSession}`} />
         </OverlayTrigger>
       );
     }

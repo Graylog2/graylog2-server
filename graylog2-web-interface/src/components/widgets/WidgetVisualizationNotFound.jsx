@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
+import { Alert, Icon } from 'components/graylog';
 
 class WidgetVisualizationNotFound extends React.Component {
   static propTypes = {
@@ -19,7 +19,7 @@ class WidgetVisualizationNotFound extends React.Component {
   render() {
     return (
       <Alert bsStyle="danger">
-        <i className="fa fa-exclamation-circle" /> Widget Visualization (<i>{this.props.widgetClassName}</i>) not found.
+        <Icon className="fa fa-exclamation-circle" /> Widget Visualization (<i>{this.props.widgetClassName}</i>) not found.
         It looks like the plugin supplying this widget is not loaded.
       </Alert>
     );

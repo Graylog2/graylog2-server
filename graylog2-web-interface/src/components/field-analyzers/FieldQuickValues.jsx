@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import Reflux from 'reflux';
 import crossfilter from 'crossfilter';
 
+import { DropdownButton, MenuItem, Button, Icon } from 'components/graylog';
 import { QuickValuesVisualization, QuickValuesHistogramVisualization } from 'components/visualizations';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
@@ -340,11 +340,11 @@ const FieldQuickValues = createReactClass({
                                 pullRight
                                 permissions={this.props.permissions}
                                 appendMenus={menus}>
-              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for <em>{fields}</em> {this.state.loadPending && (
-          <i className="fa fa-spin fa-spinner" />
+          <Icon className="fa fa-spin fa-spinner" />
           )}
           </h1>
 

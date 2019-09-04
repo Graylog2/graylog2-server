@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Alert } from 'components/graylog';
 
+import { Icon, Alert } from 'components/graylog';
 import Dashboard from './Dashboard';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from '../../util/PermissionsMixin';
@@ -40,7 +40,7 @@ const DashboardList = createReactClass({
       }
       return (
         <Alert bsStyle="warning">
-          <i className="fa fa-info-circle" />&nbsp;
+          <Icon className="fa fa-info-circle" />&nbsp;
           No dashboards configured. {createDashboardButton}
         </Alert>
       );

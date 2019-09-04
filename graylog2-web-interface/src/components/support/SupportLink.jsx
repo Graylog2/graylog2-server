@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Icon } from 'components/graylog';
 
 class SupportLink extends React.Component {
   static propTypes = {
@@ -15,8 +16,8 @@ class SupportLink extends React.Component {
           <tr>
             <td style={{ width: '40px' }}>
               <span className={classNames}>
-                <i className="fa fa-circle fa-stack-2x" />
-                <i className="fa fa-lightbulb-o fa-stack-1x fa-inverse" />
+                <Icon className="fa fa-circle fa-stack-2x" />
+                <Icon className="fa fa-lightbulb-o fa-stack-1x fa-inverse" />
               </span>
             </td>
             <td>

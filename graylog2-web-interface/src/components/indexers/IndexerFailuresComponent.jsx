@@ -3,7 +3,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { Alert, Col, Row, Button } from 'components/graylog';
+import { Alert, Col, Row, Button, Icon } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -26,7 +26,7 @@ class IndexerFailuresComponent extends React.Component {
   _formatFailuresSummary = () => {
     return (
       <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-        <i className={`fa fa-${this._iconForFailureCount(this.state.total)}`} /> {this._formatTextForFailureCount(this.state.total)}
+        <Icon className={`fa fa-${this._iconForFailureCount(this.state.total)}`} /> {this._formatTextForFailureCount(this.state.total)}
 
         <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
           <Button bsStyle="info" bsSize="xs" className="pull-right">

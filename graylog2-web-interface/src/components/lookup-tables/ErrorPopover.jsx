@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { OverlayTrigger, Popover } from 'components/graylog';
+import { OverlayTrigger, Popover, Icon } from 'components/graylog';
 
 import Styles from './ErrorPopover.css';
 
@@ -27,7 +27,7 @@ class ErrorPopover extends React.Component {
     return (
       <OverlayTrigger trigger={['hover', 'focus']} placement={this.props.placement} overlay={overlay}>
         <span className={Styles.trigger}>
-          <i className="fa fa-warning text-danger" />
+          <Icon className="fa fa-warning text-danger" />
         </span>
       </OverlayTrigger>
     );

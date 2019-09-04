@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import ActionDropdown from 'views/components/common/ActionDropdown';
+import { Icon } from 'components/graylog';
 
 import styles from './Widget.css';
 
@@ -10,7 +11,7 @@ type Props = {
 };
 
 const WidgetActionDropdown = ({ children }: Props) => {
-  const widgetActionDropdownCaret = <i className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
+  const widgetActionDropdownCaret = <Icon className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
   return (
     <ActionDropdown element={widgetActionDropdownCaret}>
       {children}

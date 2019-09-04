@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, OverlayTrigger } from 'components/graylog';
 import lodash from 'lodash';
 
+import { Tooltip, OverlayTrigger, Icon } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -54,12 +54,12 @@ class StatusIndicator extends React.Component {
       const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
       return (
         <OverlayTrigger placement="top" overlay={tooltip} rootClose>
-          <span className={`${className} ${style.indicator}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+          <span className={`${className} ${style.indicator}`}><Icon className={`fa ${icon} fa-fw`} /> {text}</span>
         </OverlayTrigger>
       );
     }
     return (
-      <span className={`${className} ${style.indicator}`}><i className={`fa ${icon} fa-fw`} /> {text}</span>
+      <span className={`${className} ${style.indicator}`}><Icon className={`fa ${icon} fa-fw`} /> {text}</span>
     );
   }
 }

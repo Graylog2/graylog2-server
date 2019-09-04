@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
+import { Row, Col, Table, Popover, OverlayTrigger, Button, Icon } from 'components/graylog';
 import { PaginatedList, SearchForm } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 
@@ -133,7 +133,7 @@ class LookupTablesOverview extends React.Component {
                   <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
                 </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
-                  <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
+                  <Button bsStyle="link" className={Styles.searchHelpButton}><Icon className="fa fa-fw fa-question-circle" /></Button>
                 </OverlayTrigger>
               </SearchForm>
               <Table condensed hover className={Styles.overviewTable}>

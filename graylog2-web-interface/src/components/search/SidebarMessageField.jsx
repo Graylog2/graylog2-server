@@ -3,7 +3,7 @@ import React from 'react';
 
 import createReactClass from 'create-react-class';
 
-import { Panel } from 'components/graylog';
+import { Panel, Icon } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 
@@ -90,7 +90,7 @@ const SidebarMessageField = createReactClass({
     return (
       <li>
         <div className="pull-left">
-          <a href="#" onClick={this._toggleFieldAnalyzers}><i className={toggleClassName} /></a>
+          <a href="#" onClick={this._toggleFieldAnalyzers}><Icon className={toggleClassName} /></a>
         </div>
         <div className="field-selector">
           <Input id="field-selector-checkbox"

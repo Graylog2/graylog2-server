@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button } from 'components/graylog';
+import { Button, Icon } from 'components/graylog';
 import { Timestamp } from 'components/common';
 
 class WidgetFooter extends React.Component {
@@ -38,7 +38,7 @@ class WidgetFooter extends React.Component {
     if (this.props.error) {
       loadErrorElement = (
         <span className="load-error" title={this.props.errorMessage}>
-          <i className="fa fa-exclamation-triangle" />
+          <Icon className="fa fa-exclamation-triangle" />
         </span>
       );
     }
@@ -54,7 +54,7 @@ class WidgetFooter extends React.Component {
     const replay = this.props.replayDisabled ? null : (
       <div className="widget-replay">
         <Button bsStyle="link" className="btn-text" title="Replay search" href={this.props.replayHref}>
-          <i className="fa fa-play" />
+          <Icon className="fa fa-play" />
         </Button>
       </div>
     );
@@ -63,7 +63,7 @@ class WidgetFooter extends React.Component {
         {replay}
         <div className="widget-info">
           <Button bsStyle="link" className="btn-text" title="Show widget configuration" onClick={this._showConfig}>
-            <i className="fa fa-info-circle" />
+            <Icon className="fa fa-info-circle" />
           </Button>
         </div>
       </div>
@@ -73,12 +73,12 @@ class WidgetFooter extends React.Component {
       <div className="actions">
         <div className="widget-delete">
           <Button bsStyle="link" className="btn-text" title="Delete widget" onClick={this._delete}>
-            <i className="fa fa-trash" />
+            <Icon className="fa fa-trash" />
           </Button>
         </div>
         <div className="widget-edit">
           <Button bsStyle="link" className="btn-text" title="Edit widget" onClick={this._editConfig}>
-            <i className="fa fa-pencil" />
+            <Icon className="fa fa-pencil" />
           </Button>
         </div>
       </div>

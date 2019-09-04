@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
+
+import { Popover, Icon } from 'components/graylog';
 
 class HoverForHelp extends React.Component {
   state = {
@@ -26,7 +27,7 @@ class HoverForHelp extends React.Component {
     ) : null;
     return (
       <span onMouseEnter={this._onToggleHover} onMouseLeave={this._onToggleHover}>
-        <i className="fa fa-question-circle pull-right" ref={(elem) => { this.target = elem; }} />
+        <Icon className="fa fa-question-circle pull-right" ref={(elem) => { this.target = elem; }} />
         {popover}
       </span>
     );

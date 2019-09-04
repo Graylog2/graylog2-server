@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { DataTable, Spinner, Timestamp } from 'components/common';
+import { DataTable, Timestamp } from 'components/common';
+import { Icon } from 'components/graylog';
 
 class SidecarStatusFileList extends React.Component {
   static propTypes = {
@@ -23,9 +24,9 @@ class SidecarStatusFileList extends React.Component {
 
   _dirFormatter = (file) => {
     if (file.is_dir) {
-      return (<span><i className="fa fa-folder-open" />&nbsp;&nbsp;{file.path}</span>);
+      return (<span><Icon className="fa fa-folder-open" />&nbsp;&nbsp;{file.path}</span>);
     }
-    return (<span><i className="fa fa-file-o" />&nbsp;&nbsp;{file.path}</span>);
+    return (<span><Icon className="fa fa-file-o" />&nbsp;&nbsp;{file.path}</span>);
   };
 
   _fileListFormatter = (file) => {

@@ -4,7 +4,7 @@ import lodash from 'lodash';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
+import { Icon, Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
 import { EmptyEntity, IfPermitted, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
@@ -73,7 +73,7 @@ class Events extends React.Component {
     return (
       <React.Fragment>
         <OverlayTrigger placement="top" overlay={tooltip}>
-          <i className={`fa fa-fw ${icon} ${style} ${styles.priority}`} />
+          <Icon className={`fa fa-fw ${icon} ${style} ${styles.priority}`} />
         </OverlayTrigger>
       </React.Fragment>
     );

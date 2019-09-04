@@ -3,7 +3,7 @@ import React from 'react';
 import URI from 'urijs';
 
 import ApiRoutes from 'routing/ApiRoutes';
-import { Modal, Button } from 'components/graylog';
+import { Icon, Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
@@ -60,7 +60,7 @@ class ContentPackDownloadControl extends React.Component {
           <p>{infoText}</p>
           <p>
             <a href={this._getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-              <i className="fa fa-cloud-download" />{' '}Download
+              <Icon className="fa fa-cloud-download" />{' '}Download
             </a>
           </p>
         </Modal.Body>

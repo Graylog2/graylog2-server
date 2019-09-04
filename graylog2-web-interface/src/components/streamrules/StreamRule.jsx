@@ -3,6 +3,7 @@ import React from 'react';
 
 import createReactClass from 'create-react-class';
 
+import { Icon } from 'components/graylog';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
@@ -58,10 +59,10 @@ const StreamRule = createReactClass({
     return (
       <span>
         <a href="#" onClick={this._onDelete} style={{ marginRight: 5 }}>
-          <i className="fa fa-trash-o" />
+          <Icon className="fa fa-trash-o" />
         </a>
         <a href="#" onClick={this._onEdit} style={{ marginRight: 5 }}>
-          <i className="fa fa-edit" />
+          <Icon className="fa fa-edit" />
         </a>
       </span>
     );

@@ -5,7 +5,7 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import { Button } from 'components/graylog';
+import { Button, Icon } from 'components/graylog';
 
 import { MapsActions, MapsStore } from 'stores/maps/MapsStore';
 import MapVisualization from 'components/maps/widgets/MapVisualization';
@@ -142,7 +142,7 @@ const FieldAnalyzerMapComponent = createReactClass({
                                 pullRight
                                 permissions={permissions}>
 
-              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Map for field: {field}</h1>

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, Icon } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -117,7 +117,7 @@ const SplitAndIndexExtractorConfiguration = createReactClass({
         <Row>
           <Col mdOffset={2} md={10}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
+              {this.state.trying ? <Icon className="fa fa-spin fa-spinner" /> : 'Try'}
             </Button>
           </Col>
         </Row>

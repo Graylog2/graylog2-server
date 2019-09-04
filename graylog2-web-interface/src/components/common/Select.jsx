@@ -2,8 +2,9 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-
 import ReactSelect, { components as Components, Creatable } from 'react-select';
+
+import { Icon } from 'components/graylog';
 
 const MultiValueRemove = props => (
   <Components.MultiValueRemove {...props}>
@@ -16,7 +17,7 @@ const IndicatorSeparator = () => null;
 const DropdownIndicator = (props) => {
   const {
     /* eslint-disable react/prop-types */
-    children = <i className="fa fa-caret-down" />,
+    children = <Icon className="fa fa-caret-down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
     /* eslint-enable react/prop-types */

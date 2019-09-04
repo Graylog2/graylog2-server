@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Button } from 'components/graylog';
 import { Link } from 'react-router';
 
+import { Icon, Col, Button } from 'components/graylog';
 import { DataTable, EntityListItem, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
@@ -42,7 +42,7 @@ const Stage = createReactClass({
         id: `invalid-${ruleIdx}`,
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
-      ruleTitle = <span><i className="fa fa-warning text-danger" /> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = <span><Icon className="fa fa-warning text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
       ruleTitle = (
         <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>

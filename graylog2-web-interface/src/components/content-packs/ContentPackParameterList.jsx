@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { findIndex } from 'lodash';
 
-import { Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
+import { Icon, Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
 import { DataTable, SearchForm } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
@@ -71,7 +71,7 @@ class ContentPackParameterList extends React.Component {
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
-        <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
+        <td><Badge className={bsStyle}><Icon className={icon} /></Badge></td>
         {!readOnly
         && (
         <td>

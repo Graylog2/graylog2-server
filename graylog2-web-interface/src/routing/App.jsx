@@ -6,6 +6,8 @@ import Spinner from 'components/common/Spinner';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
+import { Icon } from 'components/graylog';
+
 import AppErrorBoundary from './AppErrorBoundary';
 
 import 'stylesheets/jquery.dynatable.css';
@@ -27,7 +29,7 @@ const App = ({ children, currentUser, location }) => {
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
-        <i className="fa fa-arrow-up" />
+        <Icon nameame="arrow-up" />
       </div>
       <AppErrorBoundary>
         {children}

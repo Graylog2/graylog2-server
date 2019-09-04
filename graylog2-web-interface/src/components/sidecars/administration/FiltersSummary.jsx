@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, Col, Row } from 'components/graylog';
+import { Button, Col, Row, Icon } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './FiltersSummary.css';
@@ -54,7 +54,7 @@ class FiltersSummary extends React.Component {
             {this.formatFilters(filters)}
             <li>
               <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>
-                <i className="fa fa-times" /> Clear all
+                <Icon className="fa fa-times" /> Clear all
               </Button>
             </li>
           </ul>

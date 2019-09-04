@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Icon } from 'components/graylog';
+
 /**
  * Adds an icon to an entity that was created by a content pack.
  */
@@ -20,7 +22,7 @@ class ContentPackMarker extends React.Component {
     const style = { marginLeft: this.props.marginLeft, marginRight: this.props.marginRight };
 
     if (this.props.contentPack) {
-      return <i className="fa fa-cube" title="Created from content pack" style={style} />;
+      return <Icon className="fa fa-cube" title="Created from content pack" style={style} />;
     }
 
     return null;

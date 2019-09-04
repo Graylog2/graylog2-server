@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button, Icon } from 'components/graylog';
 import { LinkToNode, IfPermitted } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 
@@ -68,7 +68,7 @@ const NodeLoggers = createReactClass({
                         bsStyle="primary"
                         className="trigger-log-level-metrics"
                         onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
-                  <i className="fa fa-dashboard" />{' '}
+                  <Icon className="fa fa-dashboard" />{' '}
                   {this.state.showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>

@@ -3,7 +3,7 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle } from 'components/common';
-import { Row, FormGroup, Alert, Button } from 'components/graylog';
+import { Row, FormGroup, Alert, Button, Icon } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -98,7 +98,7 @@ const LoginPage = createReactClass({
           <div className="container" id="login-box">
             <Row>
               <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-                <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
+                <legend><Icon className="fa fa-group" /> Welcome to Graylog</legend>
 
                 {alert}
 

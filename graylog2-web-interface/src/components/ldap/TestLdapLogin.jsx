@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Row, Col, Panel, Button } from 'components/graylog';
+import { Row, Col, Panel, Button, Icon } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -105,18 +105,18 @@ const TestLdapLogin = createReactClass({
 
     let userFound;
     if (ObjectUtils.isEmpty(loginStatus.result.entry)) {
-      userFound = <i className="fa fa-times ldap-failure" />;
+      userFound = <Icon className="fa fa-times ldap-failure" />;
     } else {
-      userFound = <i className="fa fa-check ldap-success" />;
+      userFound = <Icon className="fa fa-check ldap-success" />;
     }
 
     let loginCheck;
     if (loginStatus.result.login_authenticated) {
-      loginCheck = <i className="fa fa-check ldap-success" />;
+      loginCheck = <Icon className="fa fa-check ldap-success" />;
     } else if (this.state.loginPassword === '') {
-      loginCheck = <i className="fa fa-question ldap-info" />;
+      loginCheck = <Icon className="fa fa-question ldap-info" />;
     } else {
-      loginCheck = <i className="fa fa-times ldap-failure" />;
+      loginCheck = <Icon className="fa fa-times ldap-failure" />;
     }
 
     let serverResponse;
