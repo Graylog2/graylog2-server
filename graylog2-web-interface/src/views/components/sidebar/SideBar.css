@@ -1,5 +1,7 @@
 :local(.sidebarContainer) {
     margin-top: -15px;
+    position: sticky;
+    top: 60px;
 }
 
 :local(.sidebarContent) {

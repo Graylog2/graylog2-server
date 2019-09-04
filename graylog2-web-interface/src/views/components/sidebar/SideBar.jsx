@@ -82,39 +82,37 @@ const SideBar = createReactClass({
     const viewDescription = this.formatViewDescription(viewMetadata);
     return (
       <div className={styles.sidebarContainer}>
-        <AutoAffix viewportOffsetTop={46}>
-          <div id="sidebar">
-            <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
+        <div id="sidebar">
+          <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
               <span className="pull-right">
                 <AddWidgetButton queryId={queryId} />
               </span>
 
-              <div className={styles.viewMetadata}>
-                <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
-                <small>{viewMetadata.summary || defaultNewViewSummary}</small>
-              </div>
-
-              <div className={styles.viewMetadata}>
-                <SearchResultOverview results={results} />
-              </div>
-
-              <PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
-                <Panel eventKey="metadata" header="View Description">
-                  {viewDescription}
-                </Panel>
-                <Panel eventKey="search-details" header="Search Details">
-                  <SearchDetails results={results} />
-                </Panel>
-                <Panel eventKey="decorators" header="Formatting & Highlighting">
-                  <HighlightingRules />
-                </Panel>
-                <Panel eventKey="fields" header="Fields">
-                  {React.cloneElement(children, { maximumHeight: availableHeight })}
-                </Panel>
-              </PanelGroup>
+            <div className={styles.viewMetadata}>
+              <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
+              <small>{viewMetadata.summary || defaultNewViewSummary}</small>
             </div>
+
+            <div className={styles.viewMetadata}>
+              <SearchResultOverview results={results} />
+            </div>
+
+            <PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
+              <Panel eventKey="metadata" header="View Description">
+                {viewDescription}
+              </Panel>
+              <Panel eventKey="search-details" header="Search Details">
+                <SearchDetails results={results} />
+              </Panel>
+              <Panel eventKey="decorators" header="Formatting & Highlighting">
+                <HighlightingRules />
+              </Panel>
+              <Panel eventKey="fields" header="Fields">
+                {React.cloneElement(children, { maximumHeight: availableHeight })}
+              </Panel>
+            </PanelGroup>
           </div>
-        </AutoAffix>
+        </div>
       </div>
     );
   },
