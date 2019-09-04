@@ -8,7 +8,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import IfDashboard from './IfDashboard';
 
 describe('IfDashboard', () => {
-  it('should render children with Dashboard context', () => {
+  it('should render children with dashboard context', () => {
     const wrapper = renderer.create(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <span>I must not fear.</span>
@@ -20,7 +20,7 @@ describe('IfDashboard', () => {
     expect(wrapper).toMatchSnapshot();
   });
 
-  it('should not render children without search context', () => {
+  it('should not render children without dashboard context', () => {
     const wrapper = renderer.create(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <span>I must not fear.</span>
