@@ -126,11 +126,17 @@ class EventNotificationForm extends React.Component {
             {notificationFormComponent}
 
             {!embedded && (
-              <ButtonToolbar>
-                <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
-                <Button onClick={onCancel}>Cancel</Button>
+              <div>
+                <ButtonToolbar>
+                  <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
+                  <Button onClick={onCancel}>Cancel</Button>
+                </ButtonToolbar>
+                <hr />
+                <HelpBlock>
+                  Trigger this notification with a test Alert
+                </HelpBlock>
                 <Button bsStyle="info" disabled={testButtonDisabled} onClick={() => onTest(notification)}> {testButtonText} </Button>
-              </ButtonToolbar>
+              </div>
             )}
           </form>
         </Col>
