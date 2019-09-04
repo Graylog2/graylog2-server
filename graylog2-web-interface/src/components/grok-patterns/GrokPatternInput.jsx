@@ -22,18 +22,16 @@ class GrokPatternInput extends React.Component {
     className: '',
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      patternFilter: '',
-      activeListItem: -1,
-    };
-  }
-
   shownListItems = [];
 
+  state = {
+    patternFilter: '',
+    activeListItem: -1,
+  };
+
   _onPatternChange = (e) => {
-    this.props.onPatternChange(e.target.value);
+    const { onPatternChange } = this.props;
+    onPatternChange(e.target.value);
   };
 
   _onPatternFilterChange = (e) => {
@@ -41,36 +39,37 @@ class GrokPatternInput extends React.Component {
   };
 
   _onPatternFilterKeyDown = (e) => {
+    const { activeListItem } = this.state;
     const ARROW_DOWN = 40;
     const ARROW_UP = 38;
     const ENTER = 13;
-    const listItem = this.shownListItems[this.state.activeListItem];
+    const listItem = this.shownListItems[activeListItem];
 
-    let activeListItem = 0;
+    let newActiveListItem = 0;
     const firstElement = document.getElementById('list-item-0');
     let domElement;
     let list;
     switch (e.keyCode) {
       case ARROW_DOWN:
-        activeListItem = this.state.activeListItem + 1;
+        newActiveListItem = activeListItem + 1;
         if (activeListItem >= this.shownListItems.length) {
           return;
         }
-        domElement = document.getElementById(`list-item-${activeListItem}`);
+        domElement = document.getElementById(`list-item-${newActiveListItem}`);
         list = domElement.parentElement;
         list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
-        this.setState({ activeListItem: activeListItem });
+        this.setState({ activeListItem: newActiveListItem });
         e.preventDefault();
         break;
       case ARROW_UP:
-        activeListItem = this.state.activeListItem - 1;
-        if (activeListItem < 0) {
+        newActiveListItem = activeListItem - 1;
+        if (newActiveListItem < 0) {
           return;
         }
-        domElement = document.getElementById(`list-item-${activeListItem}`);
+        domElement = document.getElementById(`list-item-${newActiveListItem}`);
         list = domElement.parentElement;
         list.scrollTop = domElement.offsetTop - firstElement.offsetTop;
-        this.setState({ activeListItem: activeListItem });
+        this.setState({ activeListItem: newActiveListItem });
         e.preventDefault();
         break;
       case ENTER:
@@ -85,28 +84,30 @@ class GrokPatternInput extends React.Component {
   };
 
   _addToPattern = (name) => {
-    const pattern = this.props.pattern || '';
+    const { pattern, onPatternChange } = this.props;
     const index = this.patternInput.getInputDOMNode().selectionStart || pattern.length;
     const newPattern = `${pattern.slice(0, index)}%{${name}}${pattern.slice(index)}`;
-    this.props.onPatternChange(newPattern);
+    onPatternChange(newPattern);
   };
 
   render() {
-    const regExp = RegExp(this.state.patternFilter, 'i');
+    const { activeListItem, patternFilter } = this.state;
+    const { className, patterns, pattern } = this.props;
+    const regExp = RegExp(patternFilter, 'i');
     this.shownListItems = [];
-    const patternsToDisplay = this.props.patterns.filter(pattern => regExp.test(pattern.name))
-      .map((pattern, index) => {
-        const active = index === this.state.activeListItem;
-        this.shownListItems.push(pattern.name);
+    const patternsToDisplay = patterns.filter(displayedPattern => regExp.test(displayedPattern.name))
+      .map((displayedPattern, index) => {
+        const active = index === activeListItem;
+        this.shownListItems.push(displayedPattern.name);
         return (
           <ListGroupItem id={`list-item-${index}`}
-                         header={pattern.name}
+                         header={displayedPattern.name}
                          bsStyle={active ? 'info' : undefined}
                          onKeyDown={this._onPatternFilterKeyDown}
-                         key={pattern.name}>
-            <span className={GrokPatternInputStyle.patternDisplay}>{pattern.pattern}</span>
+                         key={displayedPattern.name}>
+            <span className={GrokPatternInputStyle.patternDisplay}>{displayedPattern.pattern}</span>
             <span className={GrokPatternInputStyle.addButton}>
-              <Button bsSize="xsmall" bsStyle="primary" onClick={() => { this._addToPattern(pattern.name); }}>
+              <Button bsSize="xsmall" bsStyle="primary" onClick={() => { this._addToPattern(displayedPattern.name); }}>
                 Add
               </Button>
             </span>
@@ -114,7 +115,7 @@ class GrokPatternInput extends React.Component {
         );
       });
     return (
-      <Row className={this.props.className}>
+      <Row className={className}>
         <Col sm={8}>
           <Input ref={(node) => { this.patternInput = node; }}
                  type="textarea"
@@ -123,7 +124,7 @@ class GrokPatternInput extends React.Component {
                  help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
                  rows={9}
                  onChange={this._onPatternChange}
-                 value={this.props.pattern}
+                 value={pattern}
                  required />
         </Col>
         <Col sm={4}>
@@ -134,7 +135,7 @@ class GrokPatternInput extends React.Component {
                  autoComplete="off"
                  formGroupClassName={GrokPatternInputStyle.filterFormGroup}
                  onKeyDown={this._onPatternFilterKeyDown}
-                 value={this.state.patternFilter} />
+                 value={patternFilter} />
           <ListGroup bsClass={GrokPatternInputStyle.resultList}>{patternsToDisplay}</ListGroup>
         </Col>
       </Row>

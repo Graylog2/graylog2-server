@@ -10,23 +10,27 @@ import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 class GettingStarted extends React.Component {
-  static propTypes() {
-    return {
-      clusterId: PropTypes.string.isRequired,
-      masterOs: PropTypes.string.isRequired,
-      masterVersion: PropTypes.string.isRequired,
-      gettingStartedUrl: PropTypes.string.isRequired,
-      noDismissButton: PropTypes.bool,
-      onDismiss: PropTypes.func,
-    };
+  static propTypes = {
+    clusterId: PropTypes.string.isRequired,
+    masterOs: PropTypes.string.isRequired,
+    masterVersion: PropTypes.string.isRequired,
+    gettingStartedUrl: PropTypes.string.isRequired,
+    noDismissButton: PropTypes.bool,
+    onDismiss: PropTypes.func,
+  }
+
+  static defaultProps = {
+    noDismissButton: false,
+    onDismiss: () => {},
   }
 
   state = {
     guideLoaded: false,
     guideUrl: '',
     showStaticContent: false,
-    frameHeight: '500px',
   };
+
+  timeoutId = null;
 
   componentDidMount() {
     if (window.addEventListener) {
@@ -45,11 +49,11 @@ class GettingStarted extends React.Component {
     }
   }
 
-  timeoutId = null;
-
   _onMessage = (messageEvent) => {
+    const { gettingStartedUrl } = this.props;
+    const { minHeight } = this.state;
     // make sure we only process messages from the getting started url, otherwise this can interfere with other messages being posted
-    if (this.props.gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
+    if (gettingStartedUrl.indexOf(messageEvent.origin) === 0) {
       if (this.timeoutId !== null) {
         window.clearTimeout(Number(this.timeoutId));
         this.timeoutId = null;
@@ -57,7 +61,7 @@ class GettingStarted extends React.Component {
       this.setState({
         guideLoaded: messageEvent.data.guideLoaded,
         guideUrl: messageEvent.data.guideUrl,
-        minHeight: messageEvent.data.height === 0 ? this.state.minHeight : messageEvent.data.height,
+        minHeight: messageEvent.data.height === 0 ? minHeight : messageEvent.data.height,
       });
     }
   };
@@ -67,16 +71,20 @@ class GettingStarted extends React.Component {
   };
 
   _dismissGuide = () => {
+    const { onDismiss } = this.props;
     GettingStartedActions.dismiss.triggerPromise().then(() => {
-      if (this.props.onDismiss) {
-        this.props.onDismiss();
+      if (onDismiss) {
+        onDismiss();
       }
     });
   };
 
   render() {
+    const { noDismissButton, clusterId, masterOs, masterVersion, gettingStartedUrl } = this.props;
+    const { minHeight, showStaticContent, guideLoaded, guideUrl } = this.state;
+
     let dismissButton = null;
-    if (!this.props.noDismissButton) {
+    if (!noDismissButton) {
       dismissButton = (
         <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
           <i className="fa fa-times" /> Dismiss guide
@@ -84,14 +92,14 @@ class GettingStarted extends React.Component {
       );
     }
     let gettingStartedContent = null;
-    if (this.state.showStaticContent) {
+    if (showStaticContent) {
       gettingStartedContent = (
         <Grid>
           <Row>
             <Col mdPush={3} md={6} className="content content-head text-center" style={{ paddingBottom: '15px' }}>
               <span>
                 We could not load the{' '}
-                <a target="_blank" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
+                <a target="_blank" rel="noopener noreferrer" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
                 Please open it directly with a browser that can access the public internet.
               </span>
             </Col>
@@ -100,25 +108,25 @@ class GettingStarted extends React.Component {
       );
     } else {
       const query = Qs.stringify({
-        c: this.props.clusterId,
-        o: this.props.masterOs,
-        v: this.props.masterVersion,
-        m: this.props.noDismissButton,
+        c: clusterId,
+        o: masterOs,
+        v: masterVersion,
+        m: noDismissButton,
       });
 
       const iframeStyles = {
-        minHeight: this.state.minHeight,
-        height: this.state.minHeight,
+        minHeight: minHeight,
+        height: minHeight,
         width: '100%',
       };
       // hide iframe if there's no content loaded yet
-      if (!this.state.guideLoaded) {
+      if (!guideLoaded) {
         iframeStyles.display = 'none';
       }
 
-      const url = this.state.guideUrl === '' ? (`${this.props.gettingStartedUrl}?${query}`) : this.state.guideUrl;
+      const url = guideUrl === '' ? (`${gettingStartedUrl}?${query}`) : guideUrl;
       let spinner = null;
-      if (!this.state.guideLoaded) {
+      if (!guideLoaded) {
         spinner = (
           <Grid>
             <Row>
@@ -137,7 +145,8 @@ class GettingStarted extends React.Component {
                   style={iframeStyles}
                   id="getting-started-frame"
                   frameBorder="0"
-                  scrolling="yes">
+                  scrolling="yes"
+                  title="getting-started-content">
             <p>Sorry, no iframes</p>
           </iframe>
         </div>

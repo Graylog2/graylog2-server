@@ -53,25 +53,28 @@ class GrokExtractorConfiguration extends React.Component {
   };
 
   _onChange = (key) => {
+    const { onChange, onExtractorPreviewLoad, configuration } = this.props;
     return (event) => {
-      this.props.onExtractorPreviewLoad(undefined);
-      const newConfig = this.props.configuration;
+      onExtractorPreviewLoad(undefined);
+      const newConfig = configuration;
       newConfig[key] = FormUtils.getValueFromInput(event.target);
-      this.props.onChange(newConfig);
+      onChange(newConfig);
     };
   };
 
   _onPatternChange = (newPattern) => {
-    this.props.onExtractorPreviewLoad(undefined);
-    const newConfig = this.props.configuration;
+    const { onChange, onExtractorPreviewLoad, configuration } = this.props;
+    onExtractorPreviewLoad(undefined);
+    const newConfig = configuration;
     newConfig.grok_pattern = newPattern;
-    this.props.onChange(newConfig);
+    onChange(newConfig);
   };
 
   _onTryClick = () => {
+    const { exampleMessage, configuration, onExtractorPreviewLoad } = this.props;
     this.setState({ trying: true });
 
-    const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
+    const promise = ToolsStore.testGrok(configuration.grok_pattern, configuration.named_captures_only, exampleMessage);
     promise.then((result) => {
       if (result.error_message != null) {
         UserNotification.error(`We were not able to run the grok extraction because of the following error: ${result.error_message}`);
@@ -90,24 +93,30 @@ class GrokExtractorConfiguration extends React.Component {
       });
 
       const preview = (matches.length === 0 ? '' : <dl>{matches}</dl>);
-      this.props.onExtractorPreviewLoad(preview);
+      onExtractorPreviewLoad(preview);
     });
 
     promise.finally(() => this.setState({ trying: false }));
   };
 
   _isTryButtonDisabled = () => {
-    return this.state.trying || !this.props.configuration.grok_pattern || !this.props.exampleMessage;
+    const { trying } = this.state;
+    const { configuration, exampleMessage } = this.props;
+
+    return trying || !configuration.grok_pattern || !exampleMessage;
   };
 
   render() {
+    const { patterns, trying } = this.state;
+    const { configuration } = this.props;
+
     return (
       <div>
         <Input type="checkbox"
                id="named_captures_only"
                label="Named captures only"
                wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked={this.props.configuration.named_captures_only}
+               defaultChecked={configuration.named_captures_only}
                onChange={this._onChange('named_captures_only')}
                help="Only put the explicitly named captures into the message." />
 
@@ -117,15 +126,15 @@ class GrokExtractorConfiguration extends React.Component {
           </Col>
           <Col md={10}>
             <GrokPatternInput onPatternChange={this._onPatternChange}
-                              pattern={this.props.configuration.grok_pattern || ''}
-                              patterns={this.state.patterns}
+                              pattern={configuration.grok_pattern || ''}
+                              patterns={patterns}
                               className={Style.grokInput} />
           </Col>
         </Row>
         <Row>
           <Col mdOffset={2} md={1}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
+              {trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
             </Button>
           </Col>
         </Row>
