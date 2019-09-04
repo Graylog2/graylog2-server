@@ -47,3 +47,19 @@
     fill: #757575 !important;
 }
 
+.grid-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "sidebar search";
+}
+
+.sidebar { grid-area: sidebar; }
+
+.search { grid-area: search; }
+
+
+
+
+
+

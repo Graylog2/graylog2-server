@@ -57,19 +57,10 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   );
 };
 
-const Query = ({ children, allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
+const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (results) {
     const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
-    return (
-      <span>
-        <Col md={3} style={{ paddingLeft: 0, paddingRight: 10 }}>
-          {children}
-        </Col>
-        <Col md={9}>
-          {content}
-        </Col>
-      </span>
-    );
+    return (<span>{content}</span>);
   }
 
   return <Spinner />;
@@ -77,7 +68,6 @@ const Query = ({ children, allFields, fields, results, positions, widgetMapping,
 
 Query.propTypes = {
   allFields: PropTypes.object.isRequired,
-  children: PropTypes.node.isRequired,
   fields: PropTypes.object.isRequired,
   positions: PositionsMap,
   queryId: PropTypes.string.isRequired,

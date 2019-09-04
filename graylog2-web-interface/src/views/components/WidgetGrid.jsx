@@ -138,12 +138,10 @@ class WidgetGrid extends React.Component {
       </ReactGridContainer>
     ) : null;
     return (
-      <Row>
-        <div className="dashboard" style={{ marginLeft: '-20px' }}>
-          {grid}
-          {staticWidgets}
-        </div>
-      </Row>
+      <div className="dashboard">
+        {grid}
+        {staticWidgets}
+      </div>
     );
   }
 }

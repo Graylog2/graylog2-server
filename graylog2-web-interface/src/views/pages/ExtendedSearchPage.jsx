@@ -1,22 +1,22 @@
 // @flow strict
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
+import SideBar from 'views/components/sidebar/SideBar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
-import { FieldTypesActions } from 'views/stores/FieldTypesStore';
-import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 
+import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
+import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
-import { SearchActions } from 'views/stores/SearchStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import HeaderElements from 'views/components/HeaderElements';
@@ -25,6 +25,12 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
+import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { FieldList } from 'views/components/sidebar';
+import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
+
+import type { QueryId } from 'views/logic/queries/Query';
+import TSearchResult from 'views/logic/SearchResult';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
@@ -33,9 +39,15 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import Spinner from '../../components/common/Spinner';
+
+const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore });
+const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsStore });
 
 type Props = {
   route: any,
+  queryId: QueryId,
+  searches: TSearchResult,
   searchRefreshHooks: Array<SearchRefreshCondition>,
 };
 
@@ -61,8 +73,11 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
-const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
+const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefreshHooks }) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
+  const results = searches && searches.result;
+  const currentResults = results ? results.forId(queryId) : undefined;
+  const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
   useEffect(() => {
     style.use();
 
@@ -90,28 +105,41 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
     };
   }, []);
 
+  const sidebar = currentResults
+    ? (
+      <ConnectedSideBar queryId={queryId} results={currentResults}>
+        <ConnectedFieldList allFields={fieldTypes.all}
+                            fields={queryFields} />
+      </ConnectedSideBar>
+    )
+    : <Spinner />;
+
   return (
     <CurrentViewTypeProvider>
       <IfDashboard>
         <WindowLeaveMessage route={route} />
       </IfDashboard>
-      <HeaderElements />
-      <Row id="main-row">
-        <IfDashboard>
-          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-          <QueryBar />
-        </IfDashboard>
+      <div id="main-row" className="grid-container">
+        <div className="sidebar">
+          {sidebar}
+        </div>
+        <div className="search">
+          <HeaderElements />
+          <IfDashboard>
+            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+            <QueryBar />
+          </IfDashboard>
+          <IfSearch>
+            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+          </IfSearch>
 
-        <IfSearch>
-          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-        </IfSearch>
+          <QueryBarElements />
 
-        <QueryBarElements />
-
-        <ViewAdditionalContextProvider>
-          <SearchResult />
-        </ViewAdditionalContextProvider>
-      </Row>
+          <ViewAdditionalContextProvider>
+            <SearchResult />
+          </ViewAdditionalContextProvider>
+        </div>
+      </div>
     </CurrentViewTypeProvider>
   );
 };
@@ -119,10 +147,26 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
 ExtendedSearchPage.propTypes = {
   route: PropTypes.object.isRequired,
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
+  fieldTypes: PropTypes.object.isRequired,
+  searches: PropTypes.object.isRequired,
+  queryId: PropTypes.string.isRequired,
 };
+
+const ConnectedExtendedSearchPage = connect(ExtendedSearchPage, {
+  fieldTypes: FieldTypesStore,
+  searches: SearchStore,
+  viewMetadata: ViewMetadataStore,
+}, props => Object.assign(
+  {},
+  props,
+  {
+    searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
+    queryId: props.viewMetadata.activeQuery,
+  },
+));
 
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPage, mapping);
+export default withPluginEntities<Props, typeof mapping>(ConnectedExtendedSearchPage, mapping);
