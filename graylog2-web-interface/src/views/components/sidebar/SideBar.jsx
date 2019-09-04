@@ -57,8 +57,12 @@ const SideBar = createReactClass({
     this.eventsThrottler.throttle(() => this._updateHeight());
   },
 
+  _getMaxHeight() {
+    return window.innerHeight;
+  },
+
   _updateHeight() {
-    const viewPortHeight = window.innerHeight;
+    const viewPortHeight = this._getMaxHeight();
 
     const sidebarCss = window.getComputedStyle(this.sidebar);
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
@@ -83,7 +87,7 @@ const SideBar = createReactClass({
     return (
       <div className={styles.sidebarContainer}>
         <div id="sidebar">
-          <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
+          <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }} style={{ height: `${this._getMaxHeight()}px`}}>
               <span className="pull-right">
                 <AddWidgetButton queryId={queryId} />
               </span>

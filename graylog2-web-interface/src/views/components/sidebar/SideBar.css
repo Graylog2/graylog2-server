@@ -1,12 +1,12 @@
 :local(.sidebarContainer) {
-    margin-top: -15px;
-    position: sticky;
-    top: 60px;
+    position: fixed;
+    top: 35px;
+    left: 0px;
+    width: 300px;
 }
 
 :local(.sidebarContent) {
     overflow: hidden;
-    max-height: calc(100vh - 72px);
 }
 
 :local(.viewMetadata) {
