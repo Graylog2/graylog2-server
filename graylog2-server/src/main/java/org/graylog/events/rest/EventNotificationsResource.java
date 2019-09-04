@@ -27,7 +27,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
 import org.graylog.events.notifications.DBNotificationService;
-import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
@@ -86,7 +85,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Inject
     public EventNotificationsResource(DBNotificationService dbNotificationService,
                                       Set<AlarmCallback> availableLegacyAlarmCallbacks,
-                                      NotificationResourceHandler resourceHandler, Map<String, EventNotification.Factory> eventNotificationFactories) {
+                                      NotificationResourceHandler resourceHandler) {
         this.dbNotificationService = dbNotificationService;
         this.availableLegacyAlarmCallbacks = availableLegacyAlarmCallbacks;
         this.resourceHandler = resourceHandler;
