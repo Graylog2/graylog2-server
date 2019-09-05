@@ -84,6 +84,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 // TODO permission system
 @Api(value = "Enterprise/Search", description = "Searching")
@@ -203,6 +204,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 throwStreamAccessForbiddenException();
             }
 
+            // Unless explicitly queried, exclude event indices by default
+            allAvailableStreamIds.removeAll(DEFAULT_EVENT_STREAM_IDS);
 
             final ImmutableSet<Query> newQueries = search.queries().stream().map(query -> {
                 if (query.usedStreamIds().isEmpty()) {
