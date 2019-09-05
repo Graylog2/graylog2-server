@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import { Panel } from 'components/graylog';
 
 import useFetch from './hooks/useFetch';
