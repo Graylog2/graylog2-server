@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Panel } from 'react-bootstrap';
+import { Button, Panel } from 'components/graylog';
 import styled, { createGlobalStyle } from 'styled-components';
 
 export const ErrorMessage = ({ fullMessage, niceMessage }) => {
