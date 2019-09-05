@@ -35,7 +35,7 @@ public abstract class EventNotificationContext {
 
     public abstract Optional<EventDefinitionDto> eventDefinition();
 
-    public abstract JobTriggerDto jobTrigger();
+    public abstract Optional<JobTriggerDto> jobTrigger();
 
     public static Builder builder() {
         return Builder.create();

@@ -31,6 +31,7 @@ import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.jackson.TypeReferences;
@@ -109,6 +110,7 @@ public class EmailSender {
 
     private Map<String, Object> getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
         final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
+        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
 
         // TODO: This needs at search URL, event definition URL, anything else?
         final EventNotificationModelData modelData = EventNotificationModelData.builder()
@@ -116,8 +118,8 @@ public class EmailSender {
                 .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
                 .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
                 .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(ctx.jobTrigger().jobDefinitionId())
-                .jobTriggerId(ctx.jobTrigger().id())
+                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
+                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
                 .event(ctx.event())
                 .backlog(backlog)
                 .build();
