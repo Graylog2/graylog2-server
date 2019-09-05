@@ -33,6 +33,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.elasticsearch.IndexRangeContainsOneOfStreams;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
@@ -94,8 +95,9 @@ public class MoreSearch extends Searches {
                       MetricRegistry metricRegistry,
                       ScrollResult.Factory scrollResultFactory,
                       JestClient jestClient,
-                      Configuration configuration) {
-        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory);
+                      Configuration configuration,
+                      ElasticsearchConfiguration elasticsearchConfiguration) {
+        super(configuration, indexRangeService, metricRegistry, streamService, indices, indexSetRegistry, jestClient, scrollResultFactory, elasticsearchConfiguration);
         this.streamService = streamService;
         this.indexRangeService = indexRangeService;
         this.scrollResultFactory = scrollResultFactory;

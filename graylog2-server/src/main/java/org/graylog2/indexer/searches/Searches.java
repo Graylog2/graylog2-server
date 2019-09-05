@@ -52,6 +52,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -183,6 +184,7 @@ public class Searches {
     private final IndexSetRegistry indexSetRegistry;
     private final JestClient jestClient;
     private final ScrollResult.Factory scrollResultFactory;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Inject
     public Searches(Configuration configuration,
@@ -192,7 +194,8 @@ public class Searches {
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
                     JestClient jestClient,
-                    ScrollResult.Factory scrollResultFactory) {
+                    ScrollResult.Factory scrollResultFactory,
+                    ElasticsearchConfiguration elasticsearchConfiguration) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
 
@@ -204,6 +207,7 @@ public class Searches {
         this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
         this.jestClient = requireNonNull(jestClient, "jestClient");
         this.scrollResultFactory = requireNonNull(scrollResultFactory, "scrollResultFactory");
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -915,6 +919,12 @@ public class Searches {
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
             if (indexSet == null && filter == null) {
+                // Exclude Event indices by name
+                // TODO This will fail if the prefix settings are changed. But it's the only info we have in IndexRanges
+                if (indexRange.indexName().startsWith(elasticsearchConfiguration.getDefaultEventsIndexPrefix()) ||
+                    indexRange.indexName().startsWith(elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix())) {
+                    continue;
+                }
                 indices.add(indexRange);
                 continue;
             }
