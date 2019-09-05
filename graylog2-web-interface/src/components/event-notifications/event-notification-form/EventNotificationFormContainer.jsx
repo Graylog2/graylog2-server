@@ -111,7 +111,7 @@ class EventNotificationFormContainer extends React.Component {
   handleTest = () => {
     const { notification } = this.state;
     const promise = EventNotificationsActions.test(notification);
-    promise.then(
+    return promise.then(
       () => {
       },
       (errorResponse) => {

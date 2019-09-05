@@ -3,15 +3,12 @@ import PropTypes from 'prop-types';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
-import connect from 'stores/connect';
-import CombinedProvider from 'injection/CombinedProvider';
 
 import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
 
-const { EventNotificationsStore } = CombinedProvider.get('EventNotifications');
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -24,13 +21,17 @@ class EventNotificationForm extends React.Component {
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onTest: PropTypes.func.isRequired,
-    testState: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
     action: 'edit',
     formId: undefined,
   };
+
+  constructor(props, context) {
+    super(props, context);
+    this.state = { testRunning: false };
+  }
 
   handleSubmit = (event) => {
     const { notification, onSubmit } = this.props;
@@ -63,13 +64,19 @@ class EventNotificationForm extends React.Component {
     this.handleConfigChange({ ...defaultConfig, type: nextType });
   };
 
+  handleTestTrigger = (notification) => {
+    this.setState({ testRunning: true });
+    const { onTest } = this.props;
+    onTest(notification).finally(() => this.setState({ testRunning: false }));
+  };
+
   formattedEventNotificationTypes = () => {
     return PluginStore.exports('eventNotificationTypes')
       .map(type => ({ label: type.displayName, value: type.type }));
   };
 
   render() {
-    const { action, embedded, formId, notification, onCancel, onTest, validation, testState } = this.props;
+    const { action, embedded, formId, notification, onCancel, validation } = this.props;
 
     const notificationPlugin = this.getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
@@ -80,12 +87,8 @@ class EventNotificationForm extends React.Component {
       })
       : null;
 
-    let testButtonDisabled = false;
-    let testButtonText = 'Test';
-    if (testState && testState.running) {
-      testButtonDisabled = true;
-      testButtonText = <Spinner text="Testing..." />;
-    }
+    const { testRunning } = this.state;
+    const testButtonText = testRunning ? <Spinner text="Testing..." /> : 'Test';
 
     return (
       <Row>
@@ -127,7 +130,7 @@ class EventNotificationForm extends React.Component {
 
             {!embedded && (
               <div>
-                <Button bsStyle="info" disabled={testButtonDisabled} onClick={() => onTest(notification)}> {testButtonText} </Button>
+                <Button bsStyle="info" disabled={testRunning} onClick={() => this.handleTestTrigger(notification)}> {testButtonText} </Button>
                 <HelpBlock>
                   Trigger this notification with a test Alert
                 </HelpBlock>
@@ -144,7 +147,4 @@ class EventNotificationForm extends React.Component {
   }
 }
 
-export default connect(EventNotificationForm, {
-  testState: EventNotificationsStore,
-},
-({ testState }) => ({ testState: testState.testState }));
+export default EventNotificationForm;
