@@ -4,10 +4,11 @@ import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } f
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 
-import { Select } from 'components/common';
+import { Select, Spinner } from 'components/common';
 import { Input } from 'components/bootstrap';
 
 import FormsUtils from 'util/FormsUtils';
+
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -19,12 +20,18 @@ class EventNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    onTest: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     action: 'edit',
     formId: undefined,
   };
+
+  constructor(props, context) {
+    super(props, context);
+    this.state = { testRunning: false };
+  }
 
   handleSubmit = (event) => {
     const { notification, onSubmit } = this.props;
@@ -57,6 +64,12 @@ class EventNotificationForm extends React.Component {
     this.handleConfigChange({ ...defaultConfig, type: nextType });
   };
 
+  handleTestTrigger = (notification) => {
+    this.setState({ testRunning: true });
+    const { onTest } = this.props;
+    onTest(notification).finally(() => this.setState({ testRunning: false }));
+  };
+
   formattedEventNotificationTypes = () => {
     return PluginStore.exports('eventNotificationTypes')
       .map(type => ({ label: type.displayName, value: type.type }));
@@ -73,6 +86,9 @@ class EventNotificationForm extends React.Component {
         validation: validation,
       })
       : null;
+
+    const { testRunning } = this.state;
+    const testButtonText = testRunning ? <Spinner text="Testing..." /> : 'Test';
 
     return (
       <Row>
@@ -113,10 +129,16 @@ class EventNotificationForm extends React.Component {
             {notificationFormComponent}
 
             {!embedded && (
-              <ButtonToolbar>
-                <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
-                <Button onClick={onCancel}>Cancel</Button>
-              </ButtonToolbar>
+              <div>
+                <Button bsStyle="info" disabled={testRunning} onClick={() => this.handleTestTrigger(notification)}> {testButtonText} </Button>
+                <HelpBlock>
+                  Trigger this notification with a test Alert
+                </HelpBlock>
+                <ButtonToolbar>
+                  <Button bsStyle="primary" type="submit">{action === 'create' ? 'Create' : 'Update'}</Button>
+                  <Button onClick={onCancel}>Cancel</Button>
+                </ButtonToolbar>
+              </div>
             )}
           </form>
         </Col>
