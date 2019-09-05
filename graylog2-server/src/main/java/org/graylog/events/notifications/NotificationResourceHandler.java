@@ -180,7 +180,11 @@ public class NotificationResourceHandler {
         try {
             eventNotification.execute(notificationContext);
         } catch (EventNotificationException e) {
-            throw new InternalServerErrorException(e.getMessage(), e);
+            if (e.getCause() != null) {
+                throw new InternalServerErrorException(e.getCause().getMessage(), e);
+            } else {
+                throw new InternalServerErrorException(e.getMessage(), e);
+            }
         }
     }
 
