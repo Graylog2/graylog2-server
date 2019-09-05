@@ -13,6 +13,7 @@ import type {
 } from 'views/logic/hooks/SearchRefreshCondition';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
@@ -53,6 +54,12 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
   });
 };
 
+const CurrentViewTypeProvider = connect(
+  ({ type, children }) => <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>,
+  { view: ViewStore },
+  ({ view }) => ({ type: view && view.view ? view.view.type : undefined }),
+);
+
 const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
   useEffect(() => {
@@ -83,7 +90,7 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   }, []);
 
   return (
-    <React.Fragment>
+    <CurrentViewTypeProvider>
       <WindowLeaveMessage route={route} />
       <HeaderElements />
       <Row id="main-row">
@@ -96,7 +103,7 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
 
         <SearchResult />
       </Row>
-    </React.Fragment>
+    </CurrentViewTypeProvider>
   );
 };
 

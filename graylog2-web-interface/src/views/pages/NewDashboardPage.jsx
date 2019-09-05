@@ -5,7 +5,6 @@ import Spinner from 'components/common/Spinner';
 
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import ExtendedSearchPage from './ExtendedSearchPage';
 
 type Props = {
@@ -14,15 +13,11 @@ type Props = {
 const NewDashboardPage = ({ route }: Props) => {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
-    ViewActions.create().then(() => setLoaded(true));
+    ViewActions.create(View.Type.Dashboard).then(() => setLoaded(true));
   }, []);
 
   return loaded
-    ? (
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <ExtendedSearchPage route={route} />
-      </ViewTypeContext.Provider>
-    )
+    ? <ExtendedSearchPage route={route} />
     : <Spinner />;
 };
 

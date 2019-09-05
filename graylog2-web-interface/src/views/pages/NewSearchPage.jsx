@@ -12,7 +12,6 @@ import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStor
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader from 'views/logic/views/ViewLoader';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { SearchActions } from 'views/stores/SearchStore';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
@@ -102,9 +101,7 @@ class NewSearchPage extends React.Component<Props, State> {
       const { route } = this.props;
       return (
         <ViewLoaderContext.Provider value={{ loaderFunc: this.loadView, dirty, loadedView }}>
-          <ViewTypeContext.Provider value={View.Type.Search}>
-            <ExtendedSearchPage route={route} />
-          </ViewTypeContext.Provider>
+          <ExtendedSearchPage route={route} />
         </ViewLoaderContext.Provider>
       );
     }
