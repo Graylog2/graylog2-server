@@ -9,15 +9,14 @@ class SupportLink extends React.Component {
   };
 
   render() {
-    const classNames = (this.props.small ? 'fa-stack' : 'fa-stack fa-lg');
     return (
       <table className="description-tooltips" style={{ marginBottom: '10px' }}>
         <tbody>
           <tr>
             <td style={{ width: '40px' }}>
-              <span className={classNames}>
-                <Icon className="fa fa-circle fa-stack-2x" />
-                <Icon className="fa fa-lightbulb-o fa-stack-1x fa-inverse" />
+              <span className={`fa-stack ${!this.props.small && 'fa-lg'}`}>
+                <Icon name="circle" className="fa-stack-2x" />
+                <Icon name="lightbulb-o" className="fa-stack-1x" inverse />
               </span>
             </td>
             <td>

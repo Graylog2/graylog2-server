@@ -5,7 +5,7 @@ import { Icon } from 'components/graylog';
 /**
  * Simple spinner to use while waiting for something to load.
  */
-const Spinner = ({ text }) => <span><Icon className="fa fa-spin fa-spinner" /> {text}</span>;
+const Spinner = ({ text }) => <span><Icon name="spinner" spin /> {text}</span>;
 
 Spinner.propTypes = {
   /** Text to show while loading. */

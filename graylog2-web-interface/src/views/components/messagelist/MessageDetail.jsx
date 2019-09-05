@@ -61,10 +61,9 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <Icon className="fa fa-code-fork" />
+          <Icon name="code-fork" />
           &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
-          </span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
         </a>
       );
     } else {
@@ -156,7 +155,7 @@ class MessageDetail extends React.Component {
                             searchConfig={this.props.searchConfig}
                             streams={allStreams} />
             <h3 className="message-details-title">
-              <Icon className="fa fa-envelope" />
+              <Icon name="envelope" />
               &nbsp;
               {messageTitle}
             </h3>

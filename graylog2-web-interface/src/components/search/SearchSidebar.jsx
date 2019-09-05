@@ -164,7 +164,7 @@ const SearchSidebar = createReactClass({
           <p>{infoText}</p>
           <p>
             <a href={this._getURLForExportAsCSV()} target="_blank">
-              <Icon className="fa fa-cloud-download" />&nbsp;
+              <Icon name="cloud-download" />&nbsp;
               Download
             </a>
           </p>

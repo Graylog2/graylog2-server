@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import { Icon } from 'components/graylog';
 import ScrollButtonStyle from './ScrollButton.css';
 
 class ScrollButton extends React.Component {
@@ -55,8 +56,11 @@ class ScrollButton extends React.Component {
     }
 
     return (
-      <button title="Back to top" className={`${ScrollButtonStyle.scroll} ${this.props.possition}`} onClick={this.scrollToTop}>
-        <span className={`${ScrollButtonStyle.arrowUp} fa fa-chevron-up`} />
+      <button title="Back to top"
+              type="button"
+              className={`${ScrollButtonStyle.scroll} ${this.props.possition}`}
+              onClick={this.scrollToTop}>
+        <Icon name="chevron-up" className={ScrollButtonStyle.arrowUp} />
       </button>
     );
   }

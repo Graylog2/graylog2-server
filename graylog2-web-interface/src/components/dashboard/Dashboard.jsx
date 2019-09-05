@@ -14,7 +14,7 @@ import Routes from 'routing/Routes';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const { DashboardsActions } = CombinedProvider.get('Dashboards');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 const Dashboard = createReactClass({
@@ -74,7 +74,7 @@ const Dashboard = createReactClass({
 
   render() {
     const createdFromContentPack = (this.props.dashboard.content_pack
-      ? <Icon className="fa fa-cube" title="Created from content pack" /> : null);
+      ? <Icon name="cube" title="Created from content pack" /> : null);
 
     return (
       <li className="stream">

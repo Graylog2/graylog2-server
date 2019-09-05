@@ -114,7 +114,7 @@ class RegexReplaceExtractorConfiguration extends React.Component {
         <Row>
           <Col mdOffset={2} md={10}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <Icon className="fa fa-spin fa-spinner" /> : 'Try'}
+              {this.state.trying ? <Icon name="spinner" spin /> : 'Try'}
             </Button>
           </Col>
         </Row>

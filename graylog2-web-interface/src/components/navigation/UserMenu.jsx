@@ -29,7 +29,7 @@ class UserMenu extends React.Component {
     const { fullName, loginName } = this.props;
 
     return (
-      <NavDropdown title={<Icon className="fa fa-user" aria-label={fullName} />}
+      <NavDropdown title={<Icon name="user" aria-label={fullName} />}
                    id="user-menu-dropdown"
                    noCaret>
         <MenuItem header>{fullName}</MenuItem>
@@ -37,7 +37,7 @@ class UserMenu extends React.Component {
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(loginName))}>
           <MenuItem>Edit profile</MenuItem>
         </LinkContainer>
-        <MenuItem onSelect={this.onLogoutClicked}><Icon className="fa fa-sign-out" /> Log out</MenuItem>
+        <MenuItem onSelect={this.onLogoutClicked}><Icon name="sign-out" /> Log out</MenuItem>
       </NavDropdown>
     );
   }

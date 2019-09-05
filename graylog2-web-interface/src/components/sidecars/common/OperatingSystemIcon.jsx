@@ -17,21 +17,19 @@ const OperatingSystemIcon = createReactClass({
   },
 
   operatingSystemIcon(operatingSystem) {
-    let glyphClass = 'fa-question-circle';
+    let glyphName = 'question-circle';
     if (operatingSystem) {
       const os = operatingSystem.trim().toLowerCase();
       if (os.indexOf('darwin') !== -1 || os.indexOf('mac os') !== -1) {
-        glyphClass = 'fa-apple';
+        glyphName = 'apple';
       } else if (os.indexOf('linux') !== -1) {
-        glyphClass = 'fa-linux';
+        glyphName = 'linux';
       } else if (os.indexOf('win') !== -1) {
-        glyphClass = 'fa-windows';
+        glyphName = 'windows';
       }
     }
 
-    glyphClass += ` fa-fw ${commonStyles.sidecarOs}`;
-
-    return (<Icon className={`fa ${glyphClass}`} />);
+    return (<Icon name={glyphName} className={commonStyles.sidecarOs} fixedWidth />);
   },
 
   render() {

@@ -72,7 +72,7 @@ class SidecarSearchForm extends React.Component {
 
     const queryHelp = (
       <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover}>
-        <Button bsStyle="link"><Icon className="fa fa-question-circle" /></Button>
+        <Button bsStyle="link"><Icon name="question-circle" /></Button>
       </OverlayTrigger>
     );
 

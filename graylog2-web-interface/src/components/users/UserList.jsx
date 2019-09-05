@@ -89,7 +89,7 @@ const UserList = createReactClass({
           <th>
             {header}
             <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
-              <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><Icon className="fa fa-fw fa-question-circle" /></Button>
+              <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><Icon name="question-circle" fixedWidth /></Button>
             </OverlayTrigger>
           </th>
         );
@@ -117,7 +117,7 @@ const UserList = createReactClass({
       );
       userBadge = (
         <OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-          <Icon className={`fa fa-circle ${UserListStyle.activeSession}`} />
+          <Icon name="circle" className={UserListStyle.activeSession} />
         </OverlayTrigger>
       );
     }

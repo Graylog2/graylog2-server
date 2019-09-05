@@ -100,19 +100,19 @@ const InputThroughput = createReactClass({
       <span className="input-io">
         <span>Network IO: </span>
         <span className="persec">
-          <Icon className="fa fa-caret-down channel-direction channel-direction-down" />
+          <Icon name="caret-down" className="channel-direction channel-direction-down" />
           <span className="rx value">{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
-          <Icon className="fa fa-caret-up channel-direction channel-direction-up" />
+          <Icon name="caret-up" className="channel-direction channel-direction-up" />
           <span className="tx value">{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
         </span>
 
         <span className="total">
           <span> (total: </span>
-          <Icon className="fa fa-caret-down channel-direction channel-direction-down" />
+          <Icon name="caret-down" className="channel-direction channel-direction-down" />
           <span className="rx value">{NumberUtils.formatBytes(readBytesTotal)} </span>
 
-          <Icon className="fa fa-caret-up channel-direction channel-direction-up" />
+          <Icon name="caret-up" className="channel-direction channel-direction-up" />
           <span className="tx value">{NumberUtils.formatBytes(writtenBytesTotal)}</span>
           <span> )</span>
         </span>

@@ -23,7 +23,7 @@ const _changeScaling = (event: SyntheticInputEvent<HTMLInputElement>, interval: 
 const AutoTimeHistogramPivot = ({ interval, onChange }: Props) => (
   <React.Fragment>
     <div className={styles.alignSliderWithLabels}>
-      <Icon className="fa fa-search-minus" style={{ lineHeight: 2, paddingRight: '0.5rem' }} />
+      <Icon name="search-minus" style={{ lineHeight: 2, paddingRight: '0.5rem' }} />
       <FormControl type="range"
                    style={{ padding: 0, border: 0 }}
                    min={0.5}
@@ -31,7 +31,7 @@ const AutoTimeHistogramPivot = ({ interval, onChange }: Props) => (
                    step={0.5}
                    value={interval.scaling ? (1 / interval.scaling) : 1.0}
                    onChange={e => _changeScaling(e, interval, onChange)} />
-      <Icon className="fa fa-search-plus" style={{ lineHeight: 2, paddingLeft: '0.5rem' }} />
+      <Icon name="search-plus" style={{ lineHeight: 2, paddingLeft: '0.5rem' }} />
     </div>
     <div className="pull-right">Currently: {interval.scaling ? (1 / interval.scaling) : 1.0}x</div>
     <HelpBlock className={styles.helpBlock}>

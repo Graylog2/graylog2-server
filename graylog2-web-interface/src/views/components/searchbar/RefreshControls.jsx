@@ -80,7 +80,7 @@ class RefreshControls extends React.Component<Props, State> {
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
           <Button onClick={this._toggleEnable}>
-            {this.props.refreshConfig.enabled ? <Icon className="fa fa-pause" /> : <Icon className="fa fa-play" />}
+            {this.props.refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
           </Button>
 
           <DropdownButton title={this.props.refreshConfig.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">

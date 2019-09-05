@@ -191,10 +191,10 @@ class Wizard extends React.Component {
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('previous')}>
-                <Icon className="fa fa-caret-left" />
+                <Icon name="caret-left" />
               </Button>
               <Button onClick={this._onNext} bsSize="xsmall" bsStyle="info" disabled={this._disableButton('next')}>
-                <Icon className="fa fa-caret-right" />
+                <Icon name="caret-right" />
               </Button>
             </ButtonToolbar>
           </div>

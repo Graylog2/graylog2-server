@@ -32,7 +32,7 @@ class CommonNotificationSummary extends React.Component {
           <dd>{type}</dd>
           <dd>
             <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-              <Icon className={`fa fa-caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
+              <Icon name={`caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
               {displayDetails ? 'Less details' : 'More details'}
             </Button>
             {displayDetails && (

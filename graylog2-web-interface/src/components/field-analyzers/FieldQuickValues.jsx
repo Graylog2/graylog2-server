@@ -340,11 +340,11 @@ const FieldQuickValues = createReactClass({
                                 pullRight
                                 permissions={this.props.permissions}
                                 appendMenus={menus}>
-              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon name="close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for <em>{fields}</em> {this.state.loadPending && (
-          <Icon className="fa fa-spin fa-spinner" />
+          <Icon name="spinner" spin />
           )}
           </h1>
 

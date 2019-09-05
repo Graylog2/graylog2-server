@@ -10,7 +10,7 @@ type Props = {
 };
 
 const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<Icon className="fa fa-chevron-down" />}>
+  <ActionDropdown element={<Icon name="chevron-down" />}>
     {children}
   </ActionDropdown>
 );

@@ -67,9 +67,9 @@ class IndexSummary extends React.Component {
 
   _formatShowDetailsLink = () => {
     if (this.state.showDetails) {
-      return <span className="index-more-actions"><Icon className="fa fa-caret-down" /> Hide Details / Actions</span>;
+      return <span className="index-more-actions"><Icon name="caret-down" /> Hide Details / Actions</span>;
     }
-    return <span className="index-more-actions"><Icon className="fa fa-caret-right" /> Show Details / Actions</span>;
+    return <span className="index-more-actions"><Icon name="caret-right" /> Show Details / Actions</span>;
   };
 
   _toggleShowDetails = (event) => {

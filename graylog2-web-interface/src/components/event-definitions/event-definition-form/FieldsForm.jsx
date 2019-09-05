@@ -109,7 +109,7 @@ class FieldsForm extends React.Component {
                 <OverlayTrigger placement="right"
                                 trigger={['click', 'hover']}
                                 overlay={<EventKeyHelpPopover id="key-header-popover" />}>
-                  <Button bsStyle="link" bsSize="xsmall"><Icon className="fa fa-question-circle" /></Button>
+                  <Button bsStyle="link" bsSize="xsmall"><Icon name="question-circle" /></Button>
                 </OverlayTrigger>
               </dt>
               <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>

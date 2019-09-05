@@ -26,7 +26,7 @@ const iconClass = (type) => {
   }
 };
 const FieldTypeIcon = ({ type }) => {
-  return <Icon className={`fa fa-${iconClass(type.type)} ${styles.fieldTypeIcon}`} />;
+  return <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
 };
 
 FieldTypeIcon.propTypes = {

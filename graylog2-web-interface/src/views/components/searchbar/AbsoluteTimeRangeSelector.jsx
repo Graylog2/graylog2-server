@@ -87,7 +87,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onChange={event => this.onChange('from', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button onClick={() => _setDateTimeToNow('from', onChange)}><Icon className="fa fa-magic" />
+                     <Button onClick={() => _setDateTimeToNow('from', onChange)}><Icon name="magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(from) ? null : 'error'}
@@ -96,7 +96,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
         </div>
 
         <p className={`text-center ${styles.separator}`}>
-          <Icon className="fa fa-long-arrow-right" />
+          <Icon name="long-arrow-right" />
         </p>
         <input type="hidden" name="to" />
         <div className={styles.inputWidth}>
@@ -112,7 +112,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onChange={event => this.onChange('to', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button onClick={() => _setDateTimeToNow('to', onChange)}><Icon className="fa fa-magic" />
+                     <Button onClick={() => _setDateTimeToNow('to', onChange)}><Icon name="magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(to) ? null : 'error'}

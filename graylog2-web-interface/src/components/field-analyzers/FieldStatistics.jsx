@@ -143,7 +143,7 @@ const FieldStatistics = createReactClass({
         const stats = fieldStatistics.get(field);
         let maybeSpinner = null;
         if (statsLoadPending.get(field)) {
-          maybeSpinner = <Icon className="fa fa-spin fa-spinner" />;
+          maybeSpinner = <Icon name="spinner" spin />;
         }
         statistics.push(
           <tr key={field}>
@@ -180,7 +180,7 @@ const FieldStatistics = createReactClass({
     if (sortBy !== column) {
       return null;
     }
-    return sortDescending ? <Icon className="fa fa-caret-down" /> : <Icon className="fa fa-caret-up" />;
+    return sortDescending ? <Icon name="caret-down" /> : <Icon name="caret-up" />;
   },
 
   render() {
@@ -197,7 +197,7 @@ const FieldStatistics = createReactClass({
                                 fields={fieldStatistics.keySeq().toJS()}
                                 pullRight
                                 permissions={permissions}>
-              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon name="close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Field Statistics</h1>
@@ -223,7 +223,7 @@ const FieldStatistics = createReactClass({
     } else if (!statsLoadPending.isEmpty()) {
       content = (
         <div className="content-col">
-          <h1>Field Statistics <Icon className="fa fa-spin fa-spinner" /></h1>
+          <h1>Field Statistics <Icon name="spinner" spin /></h1>
         </div>
       );
     }

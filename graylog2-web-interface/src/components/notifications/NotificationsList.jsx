@@ -39,7 +39,7 @@ const NotificationsList = createReactClass({
       title = 'No notifications';
       content = (
         <Alert bsStyle="success" className="notifications-none">
-          <Icon className="fa fa-check-circle" />{' '}
+          <Icon name="check-circle" />{' '}
           &nbsp;No notifications
         </Alert>
       );

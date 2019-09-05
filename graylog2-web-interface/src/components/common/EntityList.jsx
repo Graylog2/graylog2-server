@@ -30,7 +30,7 @@ class EntityList extends React.Component {
     if (this.props.items.length === 0) {
       return (
         <Alert bsStyle={this.props.bsNoItemsStyle}>
-          <Icon className="fa fa-info-circle" />&nbsp;
+          <Icon name="info-circle" />&nbsp;
           {this.props.noItemsText}
         </Alert>
       );

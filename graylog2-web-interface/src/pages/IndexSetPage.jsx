@@ -68,7 +68,7 @@ const IndexSetPage = createReactClass({
         <Col md={8} mdOffset={2}>
           <div className="top-margin">
             <Panel bsStyle="danger"
-                   header={<span><Icon className="fa fa-exclamation-triangle" /> Indices overview unavailable</span>}>
+                   header={<span><Icon name="exclamation-triangle" /> Indices overview unavailable</span>}>
               <p>
                 We could not get the indices overview information. This usually means there was a problem
                 connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
@@ -140,7 +140,7 @@ const IndexSetPage = createReactClass({
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            <Icon className="fa fa-th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
+            <Icon name="th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
             {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>

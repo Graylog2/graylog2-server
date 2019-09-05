@@ -34,7 +34,7 @@ class PluginsDataTable extends React.Component {
     }
 
     if (this.props.plugins.length === 0) {
-      return <Alert bsStyle="info"><Icon className="fa fa-info-circle" />&nbsp; This node has not any installed plugins.</Alert>;
+      return <Alert bsStyle="info"><Icon name="info-circle" />&nbsp; This node has not any installed plugins.</Alert>;
     }
 
     const headers = ['Name', 'Version', 'Author', 'Description'];

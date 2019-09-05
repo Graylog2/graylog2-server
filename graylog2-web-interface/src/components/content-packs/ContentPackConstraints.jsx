@@ -22,7 +22,9 @@ class ContentPackConstraints extends React.Component {
 
   _rowFormatter = (item) => {
     const constraint = item.constraint || item;
-    const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <Icon className="fa fa-check" /> : <Icon className="fa fa-times" />;
+    const fulfilledIcon = (item.fulfilled || this.props.isFulfilled)
+      ? <Icon name="check" />
+      : <Icon name="times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
     return (

@@ -29,7 +29,7 @@ class Notification extends React.Component {
         <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>
 
         <h3 className="notification-head">
-          <Icon className="fa fa-bolt" />{' '}
+          <Icon name="bolt" />{' '}
           {notificationView.title}{' '}
 
           <span className="notification-timestamp">

@@ -47,7 +47,7 @@ class MessageFieldSearchActions extends React.Component {
       <div className="message-field-actions pull-right">
         <SplitButton pullRight
                      bsSize="xsmall"
-                     title={<Icon className="fa fa-search-plus" />}
+                     title={<Icon name="search-plus" />}
                      key={1}
                      onClick={this.props.onAddFieldToSearchBar}
                      id={`more-actions-dropdown-field-${this.props.fieldName}`}>

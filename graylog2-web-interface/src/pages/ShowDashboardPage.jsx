@@ -275,7 +275,7 @@ const ShowDashboardPage = createReactClass({
                                    description={dashboard.description}
                                    onSaved={this._handleDashboardUpdate}
                                    buttonClass="btn-info btn-xs">
-          <Icon className="fa fa-pencil" />
+          <Icon name="pencil" />
         </EditDashboardModalTrigger>
       ) : null;
     const dashboardTitle = (

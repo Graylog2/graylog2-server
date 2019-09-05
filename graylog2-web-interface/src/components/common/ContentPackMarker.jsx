@@ -22,7 +22,7 @@ class ContentPackMarker extends React.Component {
     const style = { marginLeft: this.props.marginLeft, marginRight: this.props.marginRight };
 
     if (this.props.contentPack) {
-      return <Icon className="fa fa-cube" title="Created from content pack" style={style} />;
+      return <Icon name="cube" title="Created from content pack" style={style} />;
     }
 
     return null;

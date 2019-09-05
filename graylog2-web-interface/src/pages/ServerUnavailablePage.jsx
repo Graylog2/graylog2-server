@@ -97,7 +97,7 @@ class ServerUnavailablePage extends React.Component {
       <DocumentTitle title="Server unavailable">
         <Modal show>
           <Modal.Header>
-            <Modal.Title><Icon className="fa fa-exclamation-triangle" /> Server currently unavailable</Modal.Title>
+            <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>

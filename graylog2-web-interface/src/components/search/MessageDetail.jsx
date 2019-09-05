@@ -71,7 +71,7 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <Icon className="fa fa-code-fork" />
+          <Icon name="code-fork" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
           </span>
@@ -122,7 +122,7 @@ class MessageDetail extends React.Component {
                       id="select-stream-dropdown">
         { streamList }
         { (!streamList && !this.props.allStreamsLoaded) && (
-        <MenuItem header><Icon className="fa fa-spin fa-spinner" />
+        <MenuItem header><Icon name="spinner" spin />
           Loading streams
         </MenuItem>
         ) }
@@ -244,7 +244,7 @@ class MessageDetail extends React.Component {
           <Col md={12}>
             {this._formatMessageActions()}
             <h3 className="message-details-title">
-              <Icon className="fa fa-envelope" />
+              <Icon name="envelope" />
             &nbsp;
               {messageTitle}
             </h3>

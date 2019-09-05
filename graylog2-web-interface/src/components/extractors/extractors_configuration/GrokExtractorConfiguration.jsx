@@ -133,7 +133,7 @@ class GrokExtractorConfiguration extends React.Component {
         <Row>
           <Col mdOffset={2} md={1}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {trying ? <Icon className="fa fa-spin fa-spinner" /> : 'Try against example'}
+              {trying ? <Icon name="spinner" spin /> : 'Try against example'}
             </Button>
           </Col>
         </Row>

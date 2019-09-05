@@ -50,7 +50,7 @@ const StreamList = createReactClass({
     }
     return (
       <Alert bsStyle="info">
-        <Icon className="fa fa-info-circle" />&nbsp;No streams match your search filter.
+        <Icon name="info-circle" />&nbsp;No streams match your search filter.
       </Alert>
     );
   },

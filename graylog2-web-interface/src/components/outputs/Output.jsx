@@ -45,7 +45,7 @@ class Output extends React.Component {
 
     const { output } = this.props;
     const contentPack = (output.content_pack
-      ? <span title="Created from content pack"><Icon className="fa fa-gift" /></span> : null);
+      ? <span title="Created from content pack"><Icon name="gift" /></span> : null);
 
     let alert;
     let configurationWell;

@@ -11,8 +11,8 @@ class SmallSupportLink extends React.Component {
     return (
       <p className="description-tooltips description-tooltips-small">
         <span className="fa-stack">
-          <Icon className="fa fa-circle fa-stack-2x" />
-          <Icon className="fa fa-lightbulb-o fa-stack-1x fa-inverse" />
+          <Icon name="circle" className="fa-stack-2x" />
+          <Icon name="lightbulb-o" className="fa-stack-1x" inverse />
         </span>
         <strong>
           {this.props.children}

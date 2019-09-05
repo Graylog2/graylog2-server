@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Modal, ButtonToolbar } from 'components/graylog';
+import { Icon, Button, Modal, ButtonToolbar } from 'components/graylog';
 import { SearchForm, DataTable } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
@@ -58,9 +58,9 @@ class ContentPackEntitiesList extends React.Component {
 
   _entityIcon = (entity) => {
     if (!entity.fromServer) {
-      return <span><i title="Content Pack" className={`fa fa-archive ${ContentPackEntitiesListStyle.contentPackEntity}`} /></span>;
+      return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
     }
-    return <span><i title="Server" className="fa fa-server" /></span>;
+    return <span><Icon title="Server" name="server" /></span>;
   };
 
   _entityRowFormatter = (entity) => {

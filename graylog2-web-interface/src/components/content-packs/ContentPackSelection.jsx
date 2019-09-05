@@ -164,9 +164,9 @@ class ContentPackSelection extends React.Component {
 
   _entityItemHeader = (entity) => {
     if (entity instanceof Entity) {
-      return <span><Icon className={`fa fa-archive ${style.contentPackEntity}`} />{' '}<span>{entity.title}</span></span>;
+      return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
     }
-    return <span><Icon className="fa fa-server" />{' '}<span>{entity.title}</span></span>;
+    return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
   };
 
   render() {
@@ -269,8 +269,8 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
             {this.props.edit && (
-            <HelpBlock>You can select between installed entities from the server (<Icon className="fa fa-server" />) or
-              entities from the former content pack revision (<Icon className={`fa fa-archive ${style.contentPackEntity}`} />).
+            <HelpBlock>You can select between installed entities from the server (<Icon name="server" />) or
+              entities from the former content pack revision (<Icon name="archive" className={style.contentPackEntity} />).
             </HelpBlock>
             )}
           </Col>

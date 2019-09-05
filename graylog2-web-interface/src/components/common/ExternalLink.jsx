@@ -33,7 +33,7 @@ class ExternalLink extends React.Component {
       <span>
         {this.props.children}
         &nbsp;
-        <Icon className={`fa ${this.props.iconClass}`} />
+        <Icon name={this.props.iconClass} />
       </span>
     );
 

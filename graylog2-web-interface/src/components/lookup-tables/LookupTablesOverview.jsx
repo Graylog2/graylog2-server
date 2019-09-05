@@ -133,7 +133,7 @@ class LookupTablesOverview extends React.Component {
                   <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
                 </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
-                  <Button bsStyle="link" className={Styles.searchHelpButton}><Icon className="fa fa-fw fa-question-circle" /></Button>
+                  <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
               </SearchForm>
               <Table condensed hover className={Styles.overviewTable}>

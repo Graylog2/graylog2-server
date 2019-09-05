@@ -112,7 +112,7 @@ class SortableListItem extends React.Component {
       classes.push('over');
     }
 
-    const handle = <span className={SortableListItemStyle.itemHandle}><Icon className="fa fa-sort" /></span>;
+    const handle = <span className={SortableListItemStyle.itemHandle}><Icon name="sort" /></span>;
 
     const component = (
       <div className="sortable-list-item">

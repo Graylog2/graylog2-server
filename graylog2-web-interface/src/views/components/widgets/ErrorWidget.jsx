@@ -7,7 +7,7 @@ import styles from './MessageWidgets.css';
 
 const ErrorWidget = ({ errors }) => (
   <div className={styles.spinnerContainer}>
-    <Icon className={`fa fa-exclamation-triangle fa-3x ${styles.iconMargin}`} />
+    <Icon name="exclamation-triangle" size="3x" className={styles.iconMargin} />
     <span>
       <strong>While retrieving data for this widget, the following error(s) occurred:</strong>
 

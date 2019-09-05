@@ -95,7 +95,7 @@ class SourceLineChart extends React.Component {
     };
     const loadingSpinner = (
       <div className="sources overlay" style={loadingSpinnerStyle}>
-        <Icon className="fa fa-spin fa-refresh spinner" />
+        <Icon name="refresh" spin className="spinner" />
       </div>
     );
 

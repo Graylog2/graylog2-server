@@ -80,7 +80,10 @@ const SearchFormExample = createReactClass({
                     searchBsStyle="info"
                     label="Search"
                     queryWidth={300}
-                    queryHelpComponent={<Button onClick={() => alert('help!')} bsStyle="link"><Icon className="fa fa-question-circle" /></Button>}
+                    queryHelpComponent={(
+                      <Button onClick={() => alert('help!')} bsStyle="link">
+                        <Icon name="question-circle" />
+                      </Button>)}
                     useLoadingState />
       </div>
     );

@@ -11,7 +11,7 @@ type Props = {
 };
 
 const WidgetActionDropdown = ({ children }: Props) => {
-  const widgetActionDropdownCaret = <Icon className={`fa fa-chevron-down ${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
+  const widgetActionDropdownCaret = <Icon name="chevron-down" className={`${styles.widgetActionDropdownCaret} ${styles.tonedDown}`} />;
   return (
     <ActionDropdown element={widgetActionDropdownCaret}>
       {children}

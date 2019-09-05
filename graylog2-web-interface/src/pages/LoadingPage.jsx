@@ -32,7 +32,7 @@ class LoadingPage extends React.Component {
         <div className="container" id="login-box">
           <Row>
             <Col md={4} mdOffset={4} className="well" id="login-box-content">
-              <legend><Icon className="fa fa-group" /> Welcome to Graylog</legend>
+              <legend><Icon name="group" /> Welcome to Graylog</legend>
               <p className="loading-text">
                 <Spinner text={this.props.text} />
               </p>

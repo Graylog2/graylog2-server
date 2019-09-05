@@ -70,14 +70,14 @@ class EventsSearchBar extends React.Component {
           <div className={styles.searchForm}>
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
-                        searchButtonLabel={<Icon className="fa fa-search" />}
+                        searchButtonLabel={<Icon name="search" />}
                         loadingLabel=""
                         placeholder="Find Events"
                         queryWidth="100%"
                         topMargin={0}
                         useLoadingState>
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>
-                <Icon className={`fa fa-refresh ${isReloadingResults ? 'fa-spin' : ''}`} />
+                <Icon name="refresh" spin={isReloadingResults} />
               </Button>
             </SearchForm>
           </div>

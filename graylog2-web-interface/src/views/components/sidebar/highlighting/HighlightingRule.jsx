@@ -42,7 +42,7 @@ const HighlightingRule = ({ rule }: Props) => {
       {' '}
       for <strong>{field}</strong> = <i>&quot;{value}&quot;</i>.
       <span role="presentation" title="Remove this Highlighting Rule" onClick={e => onDelete(e, rule)}>
-        <Icon className="fa fa-trash-o" />
+        <Icon name="trash-o" />
       </span>
     </div>
   );

@@ -27,7 +27,7 @@ class ErrorPopover extends React.Component {
     return (
       <OverlayTrigger trigger={['hover', 'focus']} placement={this.props.placement} overlay={overlay}>
         <span className={Styles.trigger}>
-          <Icon className="fa fa-warning text-danger" />
+          <Icon name="warning" className="text-danger" />
         </span>
       </OverlayTrigger>
     );

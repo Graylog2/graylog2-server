@@ -69,7 +69,7 @@ end`,
         <tr key={p.name}>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
-          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon className="fa fa-check" />}</td>
+          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
           <td>{p.description}</td>
         </tr>
       );

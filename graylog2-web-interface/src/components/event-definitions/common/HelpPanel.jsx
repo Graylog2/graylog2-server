@@ -28,7 +28,7 @@ class HelpPanel extends React.Component {
 
   render() {
     const { bsStyle, children, className, collapsible, header, title, defaultExpanded } = this.props;
-    const defaultHeader = (<h3><Icon className="fa fa-info-circle" />&emsp;{title}</h3>);
+    const defaultHeader = (<h3><Icon name="info-circle" />&emsp;{title}</h3>);
 
     return (
       <Panel bsStyle={bsStyle}

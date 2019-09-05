@@ -40,7 +40,7 @@ const DashboardList = createReactClass({
       }
       return (
         <Alert bsStyle="warning">
-          <Icon className="fa fa-info-circle" />&nbsp;
+          <Icon name="info-circle" />&nbsp;
           No dashboards configured. {createDashboardButton}
         </Alert>
       );

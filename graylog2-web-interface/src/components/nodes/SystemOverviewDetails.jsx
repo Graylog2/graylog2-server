@@ -37,13 +37,13 @@ class SystemOverviewDetails extends React.Component {
     if (information.is_processing) {
       processingStatus = (
         <span>
-          <Icon className="fa fa-info-circle" />&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat />
+          <Icon name="info-circle" />&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat />
         </span>
       );
     } else {
       processingStatus = (
         <span>
-          <Icon className="fa fa-exclamation-triangle" />&nbsp; Node is <strong>not</strong> processing messages
+          <Icon name="exclamation-triangle" />&nbsp; Node is <strong>not</strong> processing messages
         </span>
       );
     }
@@ -53,14 +53,14 @@ class SystemOverviewDetails extends React.Component {
         <Col md={4}>
           <Alert bsStyle="info">
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon className="fa fa-exchange" />&nbsp;
+            <Icon name="exchange" />&nbsp;
             Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
             <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
-            <Icon className="fa fa-heart" />&nbsp;
+            <Icon name="heart" />&nbsp;
             Marked as <strong>{lbStatus}</strong> for load balancers
           </Alert>
         </Col>

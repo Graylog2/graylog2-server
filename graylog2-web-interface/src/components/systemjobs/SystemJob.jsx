@@ -27,7 +27,7 @@ class SystemJob extends React.Component {
     return (
       <div>
         <div style={{ lineHeight: 1.5, marginBottom: 5 }}>
-          <Icon className="fa fa-cog" />{' '}
+          <Icon name="cog" />{' '}
           <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
           - Started on <LinkToNode nodeId={job.node_id} />{' '}
           <Timestamp dateTime={job.started_at} relative />{' '}

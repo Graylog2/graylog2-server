@@ -22,7 +22,7 @@ class InputStaticFields extends React.Component {
   _deleteButton = (fieldName) => {
     return (
       <Button bsStyle="link" bsSize="xsmall" style={{ verticalAlign: 'baseline' }} onClick={this._deleteStaticField(fieldName)}>
-        <Icon className="fa fa-remove" />
+        <Icon name="remove" />
       </Button>
     );
   };

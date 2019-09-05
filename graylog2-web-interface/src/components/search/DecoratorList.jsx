@@ -23,7 +23,7 @@ class DecoratorList extends React.Component {
     if (!this.props.decorators || this.props.decorators.length === 0) {
       return (
         <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-          <Icon className="fa fa-info-circle" />&nbsp;No decorators configured.
+          <Icon name="info-circle" />&nbsp;No decorators configured.
         </Alert>
       );
     }

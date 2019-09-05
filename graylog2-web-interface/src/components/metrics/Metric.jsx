@@ -62,7 +62,7 @@ const Metric = createReactClass({
     return (
       <span>
         <div className="name">
-          <Icon className={`fa fa-${this._formatIcon(metric.type)}`} />{' '}
+          <Icon name={this._formatIcon(metric.type)} />{' '}
           <a className="open" href="#" onClick={this._showDetails}>{this._formatName(metric.full_name)}</a>
         </div>
         {details}

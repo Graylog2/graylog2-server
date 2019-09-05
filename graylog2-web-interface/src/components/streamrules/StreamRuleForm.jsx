@@ -107,14 +107,14 @@ class StreamRuleForm extends React.Component {
               can.
 
               <br /><br />
-              <Icon className="fa fa-github" />
+              <Icon name="github" />
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                  target="_blank"> Take a look at the matcher code on GitHub
               </a>
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
-                                                                      text={<Icon className="fa fa-lightbulb-o" />} />
+                                                                      text={<Icon name="lightbulb-o" />} />
             </div>
           </Col>
         </div>

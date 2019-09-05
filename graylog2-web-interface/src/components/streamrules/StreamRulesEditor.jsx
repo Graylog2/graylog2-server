@@ -82,13 +82,13 @@ class StreamRulesEditor extends React.Component {
       if (this.state.matchData.matches) {
         return (
           <span>
-            <Icon className="fa fa-check" style={{ color: 'green' }} /> This message would be routed to this stream.
+            <Icon name="check" style={{ color: 'green' }} /> This message would be routed to this stream.
           </span>
         );
       }
       return (
         <span>
-          <Icon className="fa fa-remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
+          <Icon name="remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
         </span>
       );
     }
@@ -109,7 +109,7 @@ class StreamRulesEditor extends React.Component {
               <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded} />
             </div>
 
-            <div className="spinner" style={{ display: 'none' }}><h2><Icon className="fa fa-spinner fa-spin" /> &nbsp;Loading message
+            <div className="spinner" style={{ display: 'none' }}><h2><Icon name="spinner" spin /> &nbsp;Loading message
             </h2>
             </div>
 

@@ -54,12 +54,16 @@ class StatusIndicator extends React.Component {
       const tooltip = <Tooltip id={`${this.props.id}-status-tooltip`}>{message}</Tooltip>;
       return (
         <OverlayTrigger placement="top" overlay={tooltip} rootClose>
-          <span className={`${className} ${style.indicator}`}><Icon className={`fa ${icon} fa-fw`} /> {text}</span>
+          <span className={`${className} ${style.indicator}`}>
+            <Icon name={icon} fixedWidth /> {text}
+          </span>
         </OverlayTrigger>
       );
     }
     return (
-      <span className={`${className} ${style.indicator}`}><Icon className={`fa ${icon} fa-fw`} /> {text}</span>
+      <span className={`${className} ${style.indicator}`}>
+        <Icon name={icon} fixedWidth /> {text}
+      </span>
     );
   }
 }

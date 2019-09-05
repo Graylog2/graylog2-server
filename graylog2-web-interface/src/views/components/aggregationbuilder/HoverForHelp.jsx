@@ -27,7 +27,7 @@ class HoverForHelp extends React.Component {
     ) : null;
     return (
       <span onMouseEnter={this._onToggleHover} onMouseLeave={this._onToggleHover}>
-        <Icon className="fa fa-question-circle pull-right" ref={(elem) => { this.target = elem; }} />
+        <Icon name="question-circle" className="pull-right" ref={(elem) => { this.target = elem; }} />
         {popover}
       </span>
     );

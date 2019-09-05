@@ -162,7 +162,7 @@ const Widget = createReactClass({
     if (result === undefined) {
       return (
         <div className="loading">
-          <Icon className="fa fa-spin fa-3x fa-refresh spinner" />
+          <Icon name="refresh" spin size="3x" className="spinner" />
         </div>
       );
     }

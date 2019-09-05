@@ -42,7 +42,7 @@ class IndexerClusterHealthSummary extends React.Component {
     const { health } = this.props;
     return (
       <Alert bsStyle={this._alertClassForHealth(health)} className="es-cluster-status">
-        <Icon className={`fa fa-${this._iconNameForHealth(health)}`} /> &nbsp;{this._formatTextForHealth(health)}{' '}
+        <Icon name={this._iconNameForHealth(health)} /> &nbsp;{this._formatTextForHealth(health)}{' '}
         Shards:{' '}
         {health.shards.active} active,{' '}
         {health.shards.initializing} initializing,{' '}

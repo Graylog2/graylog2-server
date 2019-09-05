@@ -26,7 +26,7 @@ class IndexerFailuresComponent extends React.Component {
   _formatFailuresSummary = () => {
     return (
       <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-        <Icon className={`fa fa-${this._iconForFailureCount(this.state.total)}`} /> {this._formatTextForFailureCount(this.state.total)}
+        <Icon name={this._iconForFailureCount(this.state.total)} /> {this._formatTextForFailureCount(this.state.total)}
 
         <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
           <Button bsStyle="info" bsSize="xs" className="pull-right">

@@ -109,8 +109,8 @@ class ExpandableListItem extends React.Component {
           && (
           <div className={style.expandBoxContainer}>
             <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
-              <Icon className={`fa fa-circle-thin fa-stack-1x ${style.iconBackground}`} />
-              <Icon className={`fa fa-stack-1x fa-angle-${expanded ? 'down' : 'up'}`} />
+              <Icon name="circle-thin" className={`fa-stack-1x ${style.iconBackground}`} />
+              <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
             </div>
           </div>
           )

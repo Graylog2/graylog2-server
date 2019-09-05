@@ -22,7 +22,7 @@ class SystemJobsList extends React.Component {
     if (jobs.length === 0) {
       return (
         <Alert bsStyle="info" className="systemjobs-none">
-          <Icon className="fa fa-info-circle" />{' '}
+          <Icon name="info-circle" />{' '}
           &nbsp;No active system jobs.
         </Alert>
       );

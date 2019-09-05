@@ -45,7 +45,7 @@ const RefreshControls = createReactClass({
     return (
       <ButtonGroup>
         <Button bsSize="small" onClick={() => (this.state.refresh.enabled ? RefreshActions.disable() : RefreshActions.enable())}>
-          {this.state.refresh.enabled ? <Icon className="fa fa-pause" /> : <Icon className="fa fa-play" />}
+          <Icon name={this.state.refresh.enabled ? 'pause' : 'play'} />
         </Button>
 
         <DropdownButton bsSize="small" title={this.state.refresh.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">

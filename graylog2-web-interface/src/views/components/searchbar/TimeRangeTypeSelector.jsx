@@ -7,7 +7,7 @@ export default function TimeRangeTypeSelector({ onSelect, value }) {
   return (
     <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
-                      title={<Icon className="fa fa-clock-o" />}
+                      title={<Icon name="clock-o" />}
                       onSelect={onSelect}
                       id="dropdown-timerange-selector">
         <MenuItem eventKey="relative"

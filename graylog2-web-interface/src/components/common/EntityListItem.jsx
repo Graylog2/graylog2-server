@@ -53,7 +53,7 @@ class EntityListItem extends React.Component {
               && (
               <div className="item-description">
                 {this.props.createdFromContentPack
-                && <span><Icon className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
+                && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>
               }
                 <span>{this.props.description}</span>
               </div>

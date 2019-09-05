@@ -60,7 +60,7 @@ class ContentPackDownloadControl extends React.Component {
           <p>{infoText}</p>
           <p>
             <a href={this._getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-              <Icon className="fa fa-cloud-download" />{' '}Download
+              <Icon name="cloud-download" />{' '}Download
             </a>
           </p>
         </Modal.Body>

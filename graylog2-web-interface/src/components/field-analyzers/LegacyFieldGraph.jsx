@@ -144,10 +144,10 @@ const LegacyFieldGraph = createReactClass({
                     className="reposition-handle"
                     onClick={e => e.preventDefault()}
                     title="Drag and drop to merge the graph into another">
-              <Icon className="fa fa-reorder" />
+              <Icon name="reorder" />
             </Button>
 
-            <Button bsSize="small" onClick={this.props.onDelete}><Icon className="fa fa-close" /></Button>
+            <Button bsSize="small" onClick={this.props.onDelete}><Icon name="close" /></Button>
           </AddToDashboardMenu>
         </div>
         <h1>{this._getGraphTitle()}</h1>

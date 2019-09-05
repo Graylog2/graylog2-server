@@ -59,10 +59,10 @@ const StreamRule = createReactClass({
     return (
       <span>
         <a href="#" onClick={this._onDelete} style={{ marginRight: 5 }}>
-          <Icon className="fa fa-trash-o" />
+          <Icon name="trash-o" />
         </a>
         <a href="#" onClick={this._onEdit} style={{ marginRight: 5 }}>
-          <Icon className="fa fa-edit" />
+          <Icon name="edit" />
         </a>
       </span>
     );

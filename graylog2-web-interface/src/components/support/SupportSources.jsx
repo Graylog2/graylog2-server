@@ -14,15 +14,15 @@ const SupportSources = () => (
 
     <ul>
       <li>
-        <Icon className="fa fa-group" />&nbsp;
+        <Icon name="group" />&nbsp;
         <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">Community support</a>
       </li>
       <li>
-        <Icon className="fa fa-github-alt" />&nbsp;
+        <Icon name="github-alt" />&nbsp;
         <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">Issue tracker</a>
       </li>
       <li>
-        <Icon className="fa fa-heart" />&nbsp;
+        <Icon name="heart" />&nbsp;
         <a href="https://www.graylog.org/professional-support" target="_blank" rel="noopener noreferrer">Professional support</a>
       </li>
     </ul>

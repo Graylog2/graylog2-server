@@ -86,7 +86,7 @@ class GettingStarted extends React.Component {
     if (!noDismissButton) {
       dismissButton = (
         <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
-          <Icon className="fa fa-times" /> Dismiss guide
+          <Icon name="times" /> Dismiss guide
         </Button>
       );
     }

@@ -105,18 +105,18 @@ const TestLdapLogin = createReactClass({
 
     let userFound;
     if (ObjectUtils.isEmpty(loginStatus.result.entry)) {
-      userFound = <Icon className="fa fa-times ldap-failure" />;
+      userFound = <Icon name="times" className="ldap-failure" />;
     } else {
-      userFound = <Icon className="fa fa-check ldap-success" />;
+      userFound = <Icon name="check" className="ldap-success" />;
     }
 
     let loginCheck;
     if (loginStatus.result.login_authenticated) {
-      loginCheck = <Icon className="fa fa-check ldap-success" />;
+      loginCheck = <Icon name="check" className="ldap-success" />;
     } else if (this.state.loginPassword === '') {
-      loginCheck = <Icon className="fa fa-question ldap-info" />;
+      loginCheck = <Icon name="question" className="ldap-info" />;
     } else {
-      loginCheck = <Icon className="fa fa-times ldap-failure" />;
+      loginCheck = <Icon name="times" className="ldap-failure" />;
     }
 
     let serverResponse;

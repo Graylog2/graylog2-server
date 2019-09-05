@@ -175,7 +175,7 @@ const Stream = createReactClass({
     }
 
     const createdFromContentPack = (stream.content_pack
-      ? <Icon className="fa fa-cube" title="Created from content pack" /> : null);
+      ? <Icon name="cube" title="Created from content pack" /> : null);
 
     const streamRuleList = isDefaultStream ? null
       : (

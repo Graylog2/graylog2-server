@@ -16,7 +16,7 @@ const PluginList = createReactClass({
     const plugin = PluginStore.get().filter(p => p.metadata.name === pluginName)[0];
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <Icon className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`} />&nbsp;
+        <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );

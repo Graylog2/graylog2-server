@@ -19,7 +19,7 @@ class WidgetVisualizationNotFound extends React.Component {
   render() {
     return (
       <Alert bsStyle="danger">
-        <Icon className="fa fa-exclamation-circle" /> Widget Visualization (<i>{this.props.widgetClassName}</i>) not found.
+        <Icon name="exclamation-circle" /> Widget Visualization (<i>{this.props.widgetClassName}</i>) not found.
         It looks like the plugin supplying this widget is not loaded.
       </Alert>
     );

@@ -89,7 +89,7 @@ class StreamComponent extends React.Component {
 
       return (
         <Alert bsStyle="warning">
-          <Icon className="fa fa-info-circle" />&nbsp;No streams configured. {createStreamButton}
+          <Icon name="info-circle" />&nbsp;No streams configured. {createStreamButton}
         </Alert>
       );
     }

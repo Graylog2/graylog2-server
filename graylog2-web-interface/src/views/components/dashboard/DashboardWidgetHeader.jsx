@@ -25,7 +25,7 @@ class WidgetActionToggle extends React.Component {
   render() {
     return (
       <span onClick={this.handleClick} role="presentation">
-        <Icon className={`fa fa-caret-down ${styles.widgetActionDropdownCaret}`} />
+        <Icon name="caret-down" className={styles.widgetActionDropdownCaret} />
       </span>
     );
   }
@@ -33,7 +33,7 @@ class WidgetActionToggle extends React.Component {
 
 const DashboardWidgetHeader = ({ children, onDelete, title }) => (
   <div className={styles.widgetHeader}>
-    <Icon className={`fa fa-bars widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
+    <Icon name="bars" className={`widget-drag-handle ${styles.widgetDragHandle}`} />{' '}
     {title}
     {children}
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
