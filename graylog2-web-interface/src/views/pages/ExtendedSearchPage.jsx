@@ -120,10 +120,10 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
         <WindowLeaveMessage route={route} />
       </IfDashboard>
       <div id="main-row" className="grid-container">
-        <div className="sidebar">
+        <div className="sidebar-grid">
           {sidebar}
         </div>
-        <div className="search">
+        <div className="search-grid">
           <HeaderElements />
           <IfDashboard>
             <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />

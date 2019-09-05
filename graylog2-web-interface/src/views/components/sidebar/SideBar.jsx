@@ -86,8 +86,8 @@ const SideBar = createReactClass({
     const viewDescription = this.formatViewDescription(viewMetadata);
     return (
       <div className={styles.sidebarContainer}>
-        <div id="sidebar">
-          <div className={`content-col ${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }} style={{ height: `${this._getMaxHeight()}px`}}>
+        <div className="sidebar">
+          <div className={`${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
               <span className="pull-right">
                 <AddWidgetButton queryId={queryId} />
               </span>
@@ -112,7 +112,7 @@ const SideBar = createReactClass({
                 <HighlightingRules />
               </Panel>
               <Panel eventKey="fields" header="Fields">
-                {React.cloneElement(children, { maximumHeight: availableHeight })}
+                {children}
               </Panel>
             </PanelGroup>
           </div>

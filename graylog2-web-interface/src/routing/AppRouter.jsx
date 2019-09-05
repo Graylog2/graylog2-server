@@ -4,6 +4,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
+import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
@@ -110,8 +111,10 @@ const AppRouter = () => {
             {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
             {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
           </Route>
-          <Route component={AppWithoutSearchBar}>
+          <Route component={AppWithExtendedSearchBar}>
             {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+          </Route>
+          <Route component={AppWithoutSearchBar}>
             <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
             <Route path={Routes.STREAMS} component={StreamsPage} />

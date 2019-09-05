@@ -54,9 +54,14 @@
     grid-template-areas: "sidebar search";
 }
 
-.sidebar { grid-area: sidebar; }
+.sidebar-grid {
+    grid-area: sidebar;
+    height: calc(100vh - 74px);
+    position: sticky;
+    top: 74px;
+}
 
-.search { grid-area: search; }
+.search-grid { grid-area: search; }
 
 
 
