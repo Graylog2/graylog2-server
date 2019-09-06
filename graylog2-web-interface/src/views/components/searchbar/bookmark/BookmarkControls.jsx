@@ -132,10 +132,9 @@ class BookmarkControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
 
-    const bookmarkList = (
+    const bookmarkList = showList && (
       <BookmarkList loadBookmark={this.loadBookmark}
                     deleteBookmark={this.deleteBookmark}
-                    showModal={showList}
                     toggleModal={this.toggleListModal} />
     );
 

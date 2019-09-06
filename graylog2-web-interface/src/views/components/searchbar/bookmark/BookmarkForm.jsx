@@ -4,6 +4,8 @@ import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'react-boo
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
+import styles from './BookmarkForm.css';
+
 type Props = {
   // eslint-disable-next-line no-undef
   onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
@@ -46,6 +48,7 @@ const BookmarkForm = (props: Props) => {
             {!isCreateNew
             && (
               <Button bsStyle="primary"
+                      className={styles.button}
                       type="submit"
                       onClick={saveSearch}>
                 Save
@@ -53,11 +56,15 @@ const BookmarkForm = (props: Props) => {
             )}
             <Button disabled={disableSaveAs}
                     bsStyle="info"
+                    className={styles.button}
                     type="submit"
                     onClick={saveAsSearch}>
               {createNewTitle}
             </Button>
-            <Button onClick={toggleModal}>Cancel</Button>
+            <Button className={styles.button}
+                    onClick={toggleModal}>
+              Cancel
+            </Button>
           </form>
         </Popover>
       </Position>

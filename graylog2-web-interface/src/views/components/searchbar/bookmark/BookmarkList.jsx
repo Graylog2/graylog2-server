@@ -14,7 +14,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 type Props = {
   toggleModal: () => void,
   deleteBookmark: (View) => Promise<View>,
-  showModal: boolean,
   views: SavedSearchesState,
 }
 
@@ -29,7 +28,6 @@ class BookmarkList extends React.Component<Props, State> {
   static propTypes = {
     toggleModal: PropTypes.func.isRequired,
     deleteBookmark: PropTypes.func,
-    showModal: PropTypes.bool.isRequired,
     views: PropTypes.object,
   };
 
@@ -51,15 +49,6 @@ class BookmarkList extends React.Component<Props, State> {
 
   componentDidMount() {
     this.execSearch();
-  }
-
-  componentDidUpdate(prevProps: Props, prevState: State, prevContext: *): * {
-    const { showModal } = this.props;
-
-    /* Modal was opened */
-    if (!prevProps.showModal && showModal) {
-      this.execSearch();
-    }
   }
 
   execSearch = () => {
@@ -106,7 +95,7 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   render() {
-    const { views, toggleModal, showModal } = this.props;
+    const { views, toggleModal } = this.props;
     const { total, page, perPage = 5 } = views.pagination;
     const { selectedBookmark } = this.state;
     const bookmarkList = (views.list || []).map((bookmark) => {
@@ -125,7 +114,7 @@ class BookmarkList extends React.Component<Props, State> {
       : (<span>No bookmarks found</span>);
 
     return (
-      <Modal show={showModal}>
+      <Modal show>
         <Modal.Body>
           <SearchForm onSearch={this.handleSearch}
                       onReset={this.handleSearchReset} />
