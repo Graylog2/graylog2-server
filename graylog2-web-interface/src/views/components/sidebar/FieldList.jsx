@@ -4,7 +4,6 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual, isFinite } from 'lodash';
-import { Button } from 'react-bootstrap';
 import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
