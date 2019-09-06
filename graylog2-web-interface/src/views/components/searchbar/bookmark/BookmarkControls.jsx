@@ -80,7 +80,14 @@ class BookmarkControls extends React.Component<Props, State> {
     ViewManagementActions.update(newView)
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));
+      .catch(error => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+  };
+
+  _extractErrorMessage = (error) => {
+    return (error
+      && error.additional
+      && error.additional.body
+      && error.additional.body.message) ? error.additional.body.message : error;
   };
 
   saveAsSearch = () => {
@@ -105,14 +112,7 @@ class BookmarkControls extends React.Component<Props, State> {
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
-      .catch((error) => {
-        const errMsg = (error
-          && error.additional
-          && error.additional.body
-          && error.additional.body.message) ? error.additional.body.message : error;
-
-        UserNotification.error(`Saving view failed: ${errMsg}`, 'Error!');
-      });
+      .catch(error => UserNotification.error(`Saving view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
   loadBookmark = () => {
@@ -123,7 +123,7 @@ class BookmarkControls extends React.Component<Props, State> {
     return ViewManagementActions.delete(view)
       .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
       .then(ViewActions.create())
-      .catch(error => UserNotification.error(`Deleting view failed: ${error}`, 'Error!'));
+      .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
   render() {
