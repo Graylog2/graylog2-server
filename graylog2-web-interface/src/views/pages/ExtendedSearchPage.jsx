@@ -5,7 +5,7 @@ import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import SearchBarWithStatus from 'views/components/SearchBarWithStatus';
+import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
   SearchRefreshCondition,
@@ -31,6 +31,8 @@ import QueryBar from 'views/components/QueryBar';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import DashboardSearchBar from '../components/DashboardSearchBar';
+import SearchBar from '../components/SearchBar';
 
 type Props = {
   route: any,
@@ -59,6 +61,9 @@ const CurrentViewTypeProvider = connect(
   { view: ViewStore },
   ({ view }) => ({ type: view && view.view ? view.view.type : undefined }),
 );
+
+const SearchBarWithStatus = WithSearchStatus(SearchBar);
+const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
@@ -91,13 +96,15 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
 
   return (
     <CurrentViewTypeProvider>
-      <WindowLeaveMessage route={route} />
+      <IfDashboard>
+        <WindowLeaveMessage route={route} />
+      </IfDashboard>
       <HeaderElements />
       <Row id="main-row">
         <IfDashboard>
+          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
           <QueryBar />
         </IfDashboard>
-        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
 
         <QueryBarElements />
 
