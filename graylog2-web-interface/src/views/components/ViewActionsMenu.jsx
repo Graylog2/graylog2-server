@@ -120,7 +120,7 @@ const ViewActionsMenu = createReactClass({
     );
     return (
       <span>
-        <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
+        <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
           <MenuItem onSelect={this.handleEdit} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
           <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
