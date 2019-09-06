@@ -5,7 +5,7 @@ import ViewStateGenerator from 'views/logic/views/ViewStateGenerator';
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { escape } from 'views/logic/queries/QueryHelper';
-import type { ValueActionHandlerCondition, ValueActionHandlerWithContext } from './ValueActionHandler';
+import type { ValueActionHandlerWithContext, ValueActionHideCondition } from './ValueActionHandler';
 import View from '../views/View';
 
 const UseInNewQueryHandler: ValueActionHandlerWithContext = (queryId: string, field: string, value: string) => {
@@ -16,7 +16,7 @@ const UseInNewQueryHandler: ValueActionHandlerWithContext = (queryId: string, fi
   return QueriesActions.create(query, state);
 };
 
-const condition = ({ view }) => !view || view.type !== View.Type.Dashboard;
+const condition: ValueActionHideCondition = ({ view }) => !view || view.type !== View.Type.Dashboard;
 
 UseInNewQueryHandler.isEnabled = condition;
 
