@@ -61,7 +61,8 @@ const BufferUsage = createReactClass({
     const usage = usageMetric ? usageMetric.metric.value : NaN;
     const sizeMetric = metrics[nodeId][`${prefix}.size`];
     const size = sizeMetric ? sizeMetric.metric.value : NaN;
-    const usagePercentage = ((!Number.isNaN(usage) && !Number.isNaN(size)) ? usage / size : 0);
+    // eslint-disable-next-line no-restricted-globals
+    const usagePercentage = ((!isNaN(usage) && !isNaN(size)) ? usage / size : 0);
     const percentLabel = NumberUtils.formatPercentage(usagePercentage);
 
     return (

@@ -56,7 +56,8 @@ const FieldList = createReactClass({
 
   componentDidUpdate(prevProps) {
     const { maximumHeight } = this.props;
-    if (!Number.isNaN(maximumHeight) && maximumHeight !== prevProps.maximumHeight) {
+    // eslint-disable-next-line no-restricted-globals
+    if (!isNaN(maximumHeight) && maximumHeight !== prevProps.maximumHeight) {
       this._updateHeight();
     }
   },
@@ -78,7 +79,9 @@ const FieldList = createReactClass({
 
     const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
 
-    this.setState({ maxFieldsHeight: Math.max(Number.isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
+    // eslint-disable-next-line no-restricted-globals
+    const maxFieldsHeight = Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT);
+    this.setState({ maxFieldsHeight });
   },
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, style }) {
