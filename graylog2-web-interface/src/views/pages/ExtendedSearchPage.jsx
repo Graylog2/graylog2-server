@@ -33,6 +33,7 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import IfSearch from '../components/search/IfSearch';
 
 type Props = {
   route: any,
@@ -99,6 +100,10 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
           <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
           <QueryBar />
         </IfDashboard>
+
+        <IfSearch>
+          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+        </IfSearch>
 
         <QueryBarElements />
 
