@@ -17,6 +17,8 @@ import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchM
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -32,6 +34,7 @@ jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, Sear
 jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
+jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());
 
 const mockPromise = (res) => {
   const promise = Promise.resolve(res);
@@ -50,12 +53,17 @@ describe('ExtendedSearchPage', () => {
     SearchConfigActions.refresh = jest.fn();
     SearchExecutionStateStore.listen = jest.fn(() => jest.fn());
     ViewActions.search.completed.listen = jest.fn(() => jest.fn());
-    ViewStore.getInitialState = jest.fn(() => ({ view: View.create(), dirty: false, activeQuery: 'foobar' }));
+    ViewStore.getInitialState = jest.fn(() => ({
+      view: View.create().toBuilder().type(View.Type.Dashboard).build(),
+      dirty: false,
+      activeQuery: 'foobar',
+    }));
     FieldTypesActions.all = mockAction(jest.fn());
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
     SearchMetadataStore.listen = jest.fn(() => jest.fn());
     // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
+    CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
   const SimpleExtendedSearchPage = props => (
@@ -174,7 +182,7 @@ describe('ExtendedSearchPage', () => {
   it('refreshing after query change parses search metadata first', (done) => {
     const wrapper = mount(<SimpleExtendedSearchPage />);
 
-    const searchBar = wrapper.find('SearchBar');
+    const searchBar = wrapper.find('DashboardSearchBar');
     const cb = searchBar.at(0).props().onExecute;
 
     const view = { search: {} };
