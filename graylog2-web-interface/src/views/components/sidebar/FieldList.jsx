@@ -76,8 +76,6 @@ const FieldList = createReactClass({
     const { maximumHeight } = this.props;
     const fieldsContainer = this.fieldList;
 
-    const { maximumHeight } = this.props;
-
     if (fieldsContainer && fieldsContainer.getBoundingClientRect) {
       const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
 
@@ -117,13 +115,19 @@ const FieldList = createReactClass({
     }
   },
   _renderFieldList({ fields, allFields, showFieldsBy }) {
-    const { filter, maxFieldsHeight, viewMetadata } = this.state;
+    const {
+      filter,
+      maxFieldsHeight,
+      viewMetadata: {
+        id: selectedView,
+        activeQuery: selectedQuery,
+      },
+    } = this.state;
 
     if (!fields) {
       return <span>No field information available.</span>;
     }
-    const { filter, maxFieldsHeight, viewMetadata } = this.state;
-    const { id: selectedView, activeQuery: selectedQuery } = viewMetadata;
+
     const fieldFilter = filter ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
