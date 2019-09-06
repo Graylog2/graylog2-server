@@ -81,21 +81,23 @@ const SideBar = createReactClass({
   },
 
   _getPanelHeader(key) {
-    const { open } = this.props;
     return {
-      true: {
-        viewDescription: 'View Description',
-        searchDetails: 'Search Details',
-        highlighting: 'Formatting & Highlighting',
-        fields: 'Fields',
-      },
-      false: {
-        viewDescription: (<i className={'fa fa-info'} />),
-        searchDetails: (<i className={'fa fa-search'} />),
-        highlighting: (<i className={'fa fa-paragraph'} />),
-        fields: (<i className={'fa fa-subscript'} />),
-      }
-    }[open][key];
+      viewDescription: ['View Description', (<i className={'fa fa-info'} />)],
+      searchDetails: ['Search Details', (<i className={'fa fa-search'} />)],
+      highlighting: ['Formatting & Highlighting', (<i className={'fa fa-paragraph'} />)],
+      fields: ['Fields',(<i className={'fa fa-subscript'} />)],
+    }[key];
+  },
+
+  renderNavItem(key) {
+    const { open } = this.props;
+    const [text, icon] = this._getPanelHeader(key);
+
+    return (
+      <span className={styles.sidebarNav}>
+        <span>{icon}</span> {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
+      </span>
+    );
   },
 
   render() {
@@ -108,24 +110,12 @@ const SideBar = createReactClass({
         <div className="sidebar">
           <div className={`${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
             <span className={styles.sidebarNav}>
-              <i onClick={toggleOpen} className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} />
+              <span><i onClick={toggleOpen} className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
             </span>
-            <span className={styles.sidebarNav}>
-              <i onClick={toggleOpen} className={`fa fa-info ${styles.sidebarIcon}`} />
-              {(open && <div className={styles.sidebarNavFont}>View Description</div>)}
-            </span>
-            <span className={styles.sidebarNav}>
-              <i onClick={toggleOpen} className={`fa fa-search ${styles.sidebarIcon}`} />
-              {(open && <div className={styles.sidebarNavFont}>Search Details</div>)}
-            </span>
-            <span className={styles.sidebarNav}>
-              <i onClick={toggleOpen} className={`fa fa-paragraph ${styles.sidebarIcon}`} />
-              {(open && <div className={styles.sidebarNavFont}>Formatting and Highlighting</div>)}
-            </span>
-            <span className={styles.sidebarNav}>
-              <i onClick={toggleOpen} className={`fa fa-subscript ${styles.sidebarIcon}`} />
-              {(open && <div className={styles.sidebarNavFont}>Fields</div>)}
-            </span>
+            {this.renderNavItem('viewDescription')}
+            {this.renderNavItem('searchDetails')}
+            {this.renderNavItem('highlighting')}
+            {this.renderNavItem('fields')}
             {/*<PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>*/}
             {/*  <Panel eventKey="metadata" header={this._getPanelHeader('viewDescription')}>*/}
             {/*    <span className="pull-right">*/}
