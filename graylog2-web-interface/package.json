@@ -29,7 +29,7 @@
       "<rootDir>/test/mock-FetchProvider.js"
     ],
     "setupFilesAfterEnv": [
-      "./node_modules/jest-enzyme/lib/index.js"
+      "jest-enzyme"
     ],
     "moduleDirectories": [
       "src",
@@ -45,7 +45,8 @@
       "^file-loader!(.+)$": "$1",
       "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
       "\\.(css|less)$": "identity-obj-proxy",
-      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx"
+      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
     },
     "testPathIgnorePatterns": [
       ".fixtures.js$"
@@ -115,10 +116,12 @@
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/react": "^8.0.4",
     "@types/bluebird": "^3.5.8",
     "@types/jquery": "^3.3.30",
     "@types/node": "^11.11.0",
@@ -165,11 +168,11 @@
     "ts-loader": "^5.3.3",
     "typescript": "^2.7.2",
     "url-loader": "^1.0.1",
-    "webpack": "^4.19.1",
-    "webpack-dev-middleware": "^3.3.0",
-    "webpack-dev-server": "^3.1.8",
-    "webpack-hot-middleware": "^2.24.0",
-    "webpack-merge": "^4.1.4",
+    "webpack": "^4.39.3",
+    "webpack-dev-middleware": "^3.7.1",
+    "webpack-dev-server": "^3.8.0",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-merge": "^4.2.2",
     "yargs": "^10.0.3"
   },
   "resolutions": {

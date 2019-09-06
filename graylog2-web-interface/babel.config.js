@@ -7,7 +7,8 @@ module.exports = {
   ],
   env: {
     test: {
-      plugins: ['babel-plugin-dynamic-import-node'],
+      presets: ['@babel/env'],
+      plugins: ['babel-plugin-dynamic-import-node', '@babel/plugin-transform-runtime'],
     },
   },
 };

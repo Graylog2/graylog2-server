@@ -111,7 +111,7 @@ export const SearchStore = singletonStore(
     },
 
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
-      if (this.executePromise) {
+      if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
       if (this.search) {

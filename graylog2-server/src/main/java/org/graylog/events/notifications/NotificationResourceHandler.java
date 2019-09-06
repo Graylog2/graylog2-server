@@ -25,6 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
+import java.util.Map;
 import java.util.Optional;
 
 public class NotificationResourceHandler {
@@ -33,14 +36,17 @@ public class NotificationResourceHandler {
     private final DBNotificationService notificationService;
     private final DBJobDefinitionService jobDefinitionService;
     private final DBEventDefinitionService eventDefinitionService;
+    private final Map<String, EventNotification.Factory> eventNotificationFactories;
 
     @Inject
     public NotificationResourceHandler(DBNotificationService notificationService,
                                        DBJobDefinitionService jobDefinitionService,
-                                       DBEventDefinitionService eventDefinitionService) {
+                                       DBEventDefinitionService eventDefinitionService,
+                                       Map<String, EventNotification.Factory> eventNotificationFactories) {
         this.notificationService = notificationService;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
+        this.eventNotificationFactories = eventNotificationFactories;
     }
 
     /**
@@ -154,6 +160,32 @@ public class NotificationResourceHandler {
             });
         LOG.debug("Deleting notification definition <{}/{}>", dto.get().id(), dto.get().title());
         return notificationService.delete(dtoId) > 0;
+    }
+
+    /**
+     * Tests a notification definition by executing it with a dummy event.
+     *
+     * @param notificationDto the notification definition to test
+     * @param userName the name of the user that triggered the test
+     * @throws NotFoundException if the notification definition or the notification factory cannot be found
+     * @throws InternalServerErrorException if the notification definition failed to be executed
+     */
+    public void test(NotificationDto notificationDto, String userName) throws NotFoundException, InternalServerErrorException {
+        final EventNotification.Factory eventNotificationFactory = eventNotificationFactories.get(notificationDto.config().type());
+        if (eventNotificationFactory == null) {
+            throw new NotFoundException("Couldn't find factory for notification type <" + notificationDto.config().type() + ">");
+        }
+        final EventNotificationContext notificationContext = NotificationTestData.getDummyContext(notificationDto, userName);
+        final EventNotification eventNotification = eventNotificationFactory.create();
+        try {
+            eventNotification.execute(notificationContext);
+        } catch (EventNotificationException e) {
+            if (e.getCause() != null) {
+                throw new InternalServerErrorException(e.getCause().getMessage(), e);
+            } else {
+                throw new InternalServerErrorException(e.getMessage(), e);
+            }
+        }
     }
 
     private EventNotificationExecutionJob.Config getSchedulerConfig(String notificationId) {

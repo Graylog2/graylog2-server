@@ -3,7 +3,8 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
-import { isEqual } from 'lodash';
+import { isEqual, isFinite } from 'lodash';
+import { Button } from 'react-bootstrap';
 import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
@@ -56,8 +57,7 @@ const FieldList = createReactClass({
 
   componentDidUpdate(prevProps) {
     const { maximumHeight } = this.props;
-    // eslint-disable-next-line no-restricted-globals
-    if (!isNaN(maximumHeight) && maximumHeight !== prevProps.maximumHeight) {
+    if (isFinite(maximumHeight) && maximumHeight !== prevProps.maximumHeight) {
       this._updateHeight();
     }
   },
@@ -77,11 +77,13 @@ const FieldList = createReactClass({
     const { maximumHeight } = this.props;
     const fieldsContainer = this.fieldList;
 
-    const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
+    const { maximumHeight } = this.props;
 
-    // eslint-disable-next-line no-restricted-globals
-    const maxFieldsHeight = Math.max(isNaN(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT);
-    this.setState({ maxFieldsHeight });
+    if (fieldsContainer && fieldsContainer.getBoundingClientRect) {
+      const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
+
+      this.setState({ maxFieldsHeight: Math.max(!isFinite(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
+    }
   },
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, style }) {
@@ -121,14 +123,12 @@ const FieldList = createReactClass({
     if (!fields) {
       return <span>No field information available.</span>;
     }
-    const selectedQuery = viewMetadata.activeQuery;
-    const selectedView = viewMetadata.id;
-    const filtered = filter
-      ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase()))
-      : () => true;
+    const { filter, maxFieldsHeight, viewMetadata } = this.state;
+    const { id: selectedView, activeQuery: selectedQuery } = viewMetadata;
+    const fieldFilter = filter ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
-      .filter(filtered)
+      .filter(fieldFilter)
       .sortBy(field => field.name.toLocaleUpperCase());
 
     if (fieldList.isEmpty()) {
@@ -163,7 +163,7 @@ const FieldList = createReactClass({
   },
   showFieldsByLink(mode, text, title) {
     return (
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid,jsx-a11y/click-events-have-key-events
       <a onClick={() => this.changeShowFieldsBy(mode)}
          role="button"
          tabIndex={0}
