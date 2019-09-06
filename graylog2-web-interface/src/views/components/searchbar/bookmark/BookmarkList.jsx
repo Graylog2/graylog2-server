@@ -53,6 +53,15 @@ class BookmarkList extends React.Component<Props, State> {
     this.execSearch();
   }
 
+  componentDidUpdate(prevProps: Props, prevState: State, prevContext: *): * {
+    const { showModal } = this.props;
+
+    /* Modal was opened */
+    if (!prevProps.showModal && showModal) {
+      this.execSearch();
+    }
+  }
+
   execSearch = () => {
     const { query, page, perPage } = this.state;
     SavedSearchesActions.search(query, page, perPage);
@@ -71,10 +80,11 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   onLoad = (selectedBookmark, loadFunc) => {
+    const { toggleModal } = this.props
     if (!selectedBookmark) {
       return;
     }
-    loadFunc(selectedBookmark);
+    loadFunc(selectedBookmark).then(toggleModal);
   };
 
   onDelete = (selectedBookmark) => {

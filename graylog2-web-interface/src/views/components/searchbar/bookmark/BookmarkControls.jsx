@@ -146,7 +146,11 @@ class BookmarkControls extends React.Component<Props, State> {
             {({ loadedView, dirty }) => {
               const loaded = (loadedView && loadedView.id);
               const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
-              const bookmarkColor = dirty ? '#ffc107' : '#007bff';
+              let bookmarkColor: string = '';
+              if (loaded) {
+                bookmarkColor = dirty ? '#ffc107' : '#007bff';
+              }
+
               const disableReset = !(dirty || loaded);
               let title: string;
               if (dirty) {
