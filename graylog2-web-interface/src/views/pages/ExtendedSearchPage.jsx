@@ -13,7 +13,6 @@ import type {
 } from 'views/logic/hooks/SearchRefreshCondition';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
@@ -28,11 +27,12 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
+import DashboardSearchBar from 'views/components/DashboardSearchBar';
+import SearchBar from 'views/components/SearchBar';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
-import DashboardSearchBar from '../components/DashboardSearchBar';
-import SearchBar from '../components/SearchBar';
 
 type Props = {
   route: any,
@@ -55,12 +55,6 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
     return Promise.reject(searchMetadata);
   });
 };
-
-const CurrentViewTypeProvider = connect(
-  ({ type, children }) => <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>,
-  { view: ViewStore },
-  ({ view }) => ({ type: view && view.view ? view.view.type : undefined }),
-);
 
 const SearchBarWithStatus = WithSearchStatus(SearchBar);
 const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
