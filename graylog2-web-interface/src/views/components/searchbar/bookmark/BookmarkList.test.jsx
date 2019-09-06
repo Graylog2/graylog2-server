@@ -118,7 +118,7 @@ describe('BookmarkList', () => {
     });
 
     it('should handle with load', () => {
-      const onLoad = jest.fn();
+      const onLoad = jest.fn(() => { return new Promise(() => {}); });
       const views = {
         pagination: {
           total: 0,

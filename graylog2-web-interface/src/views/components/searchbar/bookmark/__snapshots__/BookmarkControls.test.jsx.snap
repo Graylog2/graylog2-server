@@ -94,7 +94,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 className="fa fa-bookmark-o"
                 style={
                   Object {
-                    "color": "#007bff",
+                    "color": "",
                   }
                 }
               />
@@ -121,86 +121,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
               />
             </button>
           </Button>
-          <ConnectStoresWrapper[BookmarkList] stores=views
-            deleteBookmark={[Function]}
-            loadBookmark={[Function]}
-            showModal={false}
-            toggleModal={[Function]}
-          >
-            <BookmarkList
-              deleteBookmark={[Function]}
-              loadBookmark={[Function]}
-              showModal={false}
-              toggleModal={[Function]}
-              views={
-                Object {
-                  "list": undefined,
-                  "pagination": Object {
-                    "count": 0,
-                    "page": 1,
-                    "perPage": 10,
-                    "total": 0,
-                  },
-                }
-              }
-            >
-              <Modal
-                animation={true}
-                autoFocus={true}
-                backdrop={true}
-                bsClass="modal"
-                dialogComponentClass={[Function]}
-                enforceFocus={true}
-                keyboard={true}
-                manager={
-                  ModalManager {
-                    "add": [Function],
-                    "containers": Array [],
-                    "data": Array [],
-                    "handleContainerOverflow": true,
-                    "hideSiblingNodes": true,
-                    "isTopModal": [Function],
-                    "modals": Array [],
-                    "remove": [Function],
-                  }
-                }
-                onHide={[Function]}
-                renderBackdrop={[Function]}
-                restoreFocus={true}
-                show={false}
-              >
-                <Modal
-                  autoFocus={true}
-                  backdrop={true}
-                  backdropClassName="modal-backdrop"
-                  backdropTransitionTimeout={150}
-                  containerClassName="modal-open"
-                  dialogTransitionTimeout={300}
-                  enforceFocus={true}
-                  keyboard={true}
-                  manager={
-                    ModalManager {
-                      "add": [Function],
-                      "containers": Array [],
-                      "data": Array [],
-                      "handleContainerOverflow": true,
-                      "hideSiblingNodes": true,
-                      "isTopModal": [Function],
-                      "modals": Array [],
-                      "remove": [Function],
-                    }
-                  }
-                  onEntering={[Function]}
-                  onExited={[Function]}
-                  onHide={[Function]}
-                  renderBackdrop={[Function]}
-                  restoreFocus={true}
-                  show={false}
-                  transition={[Function]}
-                />
-              </Modal>
-            </BookmarkList>
-          </ConnectStoresWrapper[BookmarkList] stores=views>
         </div>
       </ButtonGroup>
     </div>
@@ -329,86 +249,6 @@ exports[`BookmarkControls render the BookmarkControls should render with context
               />
             </button>
           </Button>
-          <ConnectStoresWrapper[BookmarkList] stores=views
-            deleteBookmark={[Function]}
-            loadBookmark={[Function]}
-            showModal={false}
-            toggleModal={[Function]}
-          >
-            <BookmarkList
-              deleteBookmark={[Function]}
-              loadBookmark={[Function]}
-              showModal={false}
-              toggleModal={[Function]}
-              views={
-                Object {
-                  "list": undefined,
-                  "pagination": Object {
-                    "count": 0,
-                    "page": 1,
-                    "perPage": 10,
-                    "total": 0,
-                  },
-                }
-              }
-            >
-              <Modal
-                animation={true}
-                autoFocus={true}
-                backdrop={true}
-                bsClass="modal"
-                dialogComponentClass={[Function]}
-                enforceFocus={true}
-                keyboard={true}
-                manager={
-                  ModalManager {
-                    "add": [Function],
-                    "containers": Array [],
-                    "data": Array [],
-                    "handleContainerOverflow": true,
-                    "hideSiblingNodes": true,
-                    "isTopModal": [Function],
-                    "modals": Array [],
-                    "remove": [Function],
-                  }
-                }
-                onHide={[Function]}
-                renderBackdrop={[Function]}
-                restoreFocus={true}
-                show={false}
-              >
-                <Modal
-                  autoFocus={true}
-                  backdrop={true}
-                  backdropClassName="modal-backdrop"
-                  backdropTransitionTimeout={150}
-                  containerClassName="modal-open"
-                  dialogTransitionTimeout={300}
-                  enforceFocus={true}
-                  keyboard={true}
-                  manager={
-                    ModalManager {
-                      "add": [Function],
-                      "containers": Array [],
-                      "data": Array [],
-                      "handleContainerOverflow": true,
-                      "hideSiblingNodes": true,
-                      "isTopModal": [Function],
-                      "modals": Array [],
-                      "remove": [Function],
-                    }
-                  }
-                  onEntering={[Function]}
-                  onExited={[Function]}
-                  onHide={[Function]}
-                  renderBackdrop={[Function]}
-                  restoreFocus={true}
-                  show={false}
-                  transition={[Function]}
-                />
-              </Modal>
-            </BookmarkList>
-          </ConnectStoresWrapper[BookmarkList] stores=views>
         </div>
       </ButtonGroup>
     </div>
