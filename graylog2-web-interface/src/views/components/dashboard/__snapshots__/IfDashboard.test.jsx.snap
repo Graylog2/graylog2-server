@@ -1,16 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`IfDashboard should not render children without context 1`] = `
-<div>
-  <span>
-    I must not fear.
-  </span>
-  <span>
-    Fear is the mind-killer.
-  </span>
-</div>
-`;
-
 exports[`IfDashboard should not render children without dashboard context 1`] = `
 <span>
   I must not fear.
