@@ -81,6 +81,7 @@ import {
   StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
+  StreamSearchPage,
   StreamsPage,
   SystemOutputsPage,
   SystemOverviewPage,
@@ -107,6 +108,7 @@ const AppRouter = () => {
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
             {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+            {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
           </Route>
           <Route component={AppWithoutSearchBar}>
             {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}

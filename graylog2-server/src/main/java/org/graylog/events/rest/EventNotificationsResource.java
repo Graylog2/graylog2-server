@@ -16,10 +16,13 @@
  */
 package org.graylog.events.rest;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -28,6 +31,7 @@ import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.notifications.NotificationResourceHandler;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -150,6 +154,48 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
         resourceHandler.delete(notificationId);
+    }
+
+    @POST
+    @Timed
+    @Path("/{notificationId}/test")
+    @ApiOperation(value = "Send a test alert for a given event notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Event notification not found."),
+            @ApiResponse(code = 500, message = "Error while testing event notification")
+    })
+    @NoAuditEvent("only used to test event notifications")
+    public Response test(@ApiParam(name = "notificationId", value = "The event notification id to send a test alert for.", required = true)
+                         @PathParam("notificationId") @NotBlank String notificationId) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
+        final NotificationDto notificationDto =
+                dbNotificationService.get(notificationId).orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+
+        resourceHandler.test(notificationDto, getSubject().getPrincipal().toString());
+
+        return Response.ok().build();
+    }
+
+    @POST
+    @Timed
+    @Path("/test")
+    @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
+    @ApiOperation(value = "Send a test alert for a given event notification")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Event notification is invalid."),
+            @ApiResponse(code = 500, message = "Error while testing event notification")
+    })
+    @NoAuditEvent("only used to test event notifications")
+    public Response test(NotificationDto dto) {
+        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
+        final ValidationResult validationResult = dto.validate();
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        resourceHandler.test(dto, getSubject().getPrincipal().toString());
+
+        return Response.ok().build();
     }
 
     @GET
