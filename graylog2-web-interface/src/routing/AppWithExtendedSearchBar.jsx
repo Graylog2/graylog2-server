@@ -113,7 +113,7 @@ const AppWithExtendedSearchBar = createReactClass({
 
     const { children } = this.props;
     return (
-      <div className="container-fluid">
+      <div>
         {children}
       </div>
     );

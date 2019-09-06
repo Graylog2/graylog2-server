@@ -120,7 +120,7 @@ class WidgetGrid extends React.Component {
     // eslint-disable-next-line react/destructuring-assignment
     const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, data, errors);
     const grid = widgets && widgets.length > 0 ? (
-      <ReactGridContainer animate={false}
+      <ReactGridContainer animate
                           locked={locked}
                           columns={{
                             xxl: 12,

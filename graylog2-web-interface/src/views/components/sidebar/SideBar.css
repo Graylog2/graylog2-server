@@ -1,4 +1,29 @@
 :local(.sidebarContainer) {
+    padding-top: 20px;
+}
+
+:local(.toggleOpen) {
+    transition: 0.5s;
+}
+
+:local(.toggleClose) {
+    transform: rotate(180deg);
+    transition: 0.5s;
+}
+
+:local(.sidebarNav) {
+    padding: 10px 20px 10px 25px;
+    display: block;
+}
+
+:local(.sidebarNavFont) {
+    font-size: 16px;
+    display: inline;
+    margin-left: 20px;
+}
+
+:local(.sidebarIcon) {
+    font-size: 20px;
 }
 
 :local(.sidebarContent) {

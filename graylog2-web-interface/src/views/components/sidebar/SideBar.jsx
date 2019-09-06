@@ -2,12 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-// $FlowFixMe: imports from core need to be fixed in flow
-import { AutoAffix } from 'react-overlays';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
-import { Panel, PanelGroup } from 'components/graylog';
+import { Panel, PanelGroup, Button } from 'components/graylog';
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 
 import styles from './SideBar.css';
@@ -22,6 +20,8 @@ const SideBar = createReactClass({
   displayName: 'SideBar',
 
   propTypes: {
+    open: PropTypes.bool.isRequired,
+    toggleOpen: PropTypes.func.isRequired,
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
     queryId: PropTypes.string.isRequired,
     results: PropTypes.object.isRequired,
@@ -80,41 +80,78 @@ const SideBar = createReactClass({
     return <i>No view description.</i>;
   },
 
+  _getPanelHeader(key) {
+    const { open } = this.props;
+    return {
+      true: {
+        viewDescription: 'View Description',
+        searchDetails: 'Search Details',
+        highlighting: 'Formatting & Highlighting',
+        fields: 'Fields',
+      },
+      false: {
+        viewDescription: (<i className={'fa fa-info'} />),
+        searchDetails: (<i className={'fa fa-search'} />),
+        highlighting: (<i className={'fa fa-paragraph'} />),
+        fields: (<i className={'fa fa-subscript'} />),
+      }
+    }[open][key];
+  },
+
   render() {
-    const { children, results, viewMetadata, queryId } = this.props;
+    const { children, results, viewMetadata, queryId, toggleOpen, open } = this.props;
     const { activePanel, availableHeight } = this.state;
     const viewDescription = this.formatViewDescription(viewMetadata);
+    const toggleClassName = open ? styles.toggleOpen : styles.toggleClose;
     return (
       <div className={styles.sidebarContainer}>
         <div className="sidebar">
           <div className={`${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
-              <span className="pull-right">
-                <AddWidgetButton queryId={queryId} />
-              </span>
+            <span className={styles.sidebarNav}>
+              <i onClick={toggleOpen} className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} />
+            </span>
+            <span className={styles.sidebarNav}>
+              <i onClick={toggleOpen} className={`fa fa-info ${styles.sidebarIcon}`} />
+              {(open && <div className={styles.sidebarNavFont}>View Description</div>)}
+            </span>
+            <span className={styles.sidebarNav}>
+              <i onClick={toggleOpen} className={`fa fa-search ${styles.sidebarIcon}`} />
+              {(open && <div className={styles.sidebarNavFont}>Search Details</div>)}
+            </span>
+            <span className={styles.sidebarNav}>
+              <i onClick={toggleOpen} className={`fa fa-paragraph ${styles.sidebarIcon}`} />
+              {(open && <div className={styles.sidebarNavFont}>Formatting and Highlighting</div>)}
+            </span>
+            <span className={styles.sidebarNav}>
+              <i onClick={toggleOpen} className={`fa fa-subscript ${styles.sidebarIcon}`} />
+              {(open && <div className={styles.sidebarNavFont}>Fields</div>)}
+            </span>
+            {/*<PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>*/}
+            {/*  <Panel eventKey="metadata" header={this._getPanelHeader('viewDescription')}>*/}
+            {/*    <span className="pull-right">*/}
+            {/*      <AddWidgetButton queryId={queryId} />*/}
+            {/*    </span>*/}
 
-            <div className={styles.viewMetadata}>
-              <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
-              <small>{viewMetadata.summary || defaultNewViewSummary}</small>
-            </div>
+            {/*    <div className={styles.viewMetadata}>*/}
+            {/*      <h3>{viewMetadata.title || defaultNewViewTitle}</h3>*/}
+            {/*      <small>{viewMetadata.summary || defaultNewViewSummary}</small>*/}
+            {/*    </div>*/}
 
-            <div className={styles.viewMetadata}>
-              <SearchResultOverview results={results} />
-            </div>
-
-            <PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>
-              <Panel eventKey="metadata" header="View Description">
-                {viewDescription}
-              </Panel>
-              <Panel eventKey="search-details" header="Search Details">
-                <SearchDetails results={results} />
-              </Panel>
-              <Panel eventKey="decorators" header="Formatting & Highlighting">
-                <HighlightingRules />
-              </Panel>
-              <Panel eventKey="fields" header="Fields">
-                {children}
-              </Panel>
-            </PanelGroup>
+            {/*    <div className={styles.viewMetadata}>*/}
+            {/*      <SearchResultOverview results={results} />*/}
+            {/*    </div>*/}
+            {/*    {viewDescription}*/}
+            {/*  </Panel>*/}
+            {/*  <Panel eventKey="search-details" header={this._getPanelHeader('searchDetails')}>*/}
+            {/*    <SearchDetails results={results} />*/}
+            {/*  </Panel>*/}
+            {/*  <Panel eventKey="decorators" header={this._getPanelHeader('highlighting')}>*/}
+            {/*    <HighlightingRules />*/}
+            {/*  </Panel>*/}
+            {/*  <Panel eventKey="fields" header={this._getPanelHeader('fields')}>*/}
+            {/*    {children}*/}
+            {/*  </Panel>*/}
+            {/*</PanelGroup>*/}
           </div>
         </div>
       </div>

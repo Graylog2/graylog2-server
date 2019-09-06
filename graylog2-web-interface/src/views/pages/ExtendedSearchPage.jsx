@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
@@ -78,6 +78,8 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
   const results = searches && searches.result;
   const currentResults = results ? results.forId(queryId) : undefined;
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
+  const [ sideBarOpen, setSideBarOpen ] = useState(true);
+
   useEffect(() => {
     style.use();
 
@@ -93,8 +95,7 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
         }))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    }, () => {
-    });
+    }, () => { });
 
     StreamsActions.refresh();
 
@@ -107,19 +108,24 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
 
   const sidebar = currentResults
     ? (
-      <ConnectedSideBar queryId={queryId} results={currentResults}>
+      <ConnectedSideBar queryId={queryId}
+                        results={currentResults}
+                        open={sideBarOpen}
+                        toggleOpen={() => setSideBarOpen(!sideBarOpen)}>
         <ConnectedFieldList allFields={fieldTypes.all}
                             fields={queryFields} />
       </ConnectedSideBar>
     )
     : <Spinner />;
 
+  const gridClass = sideBarOpen ? 'grid-container-open' : 'grid-container-closed';
+
   return (
     <CurrentViewTypeProvider>
       <IfDashboard>
         <WindowLeaveMessage route={route} />
       </IfDashboard>
-      <div id="main-row" className="grid-container">
+      <div id="main-row" className={`grid-container ${gridClass}`}>
         <div className="sidebar-grid">
           {sidebar}
         </div>

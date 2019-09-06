@@ -49,16 +49,26 @@
 
 .grid-container {
     display: grid;
-    grid-template-columns: 300px 1fr;
     grid-template-rows: 1fr;
     grid-template-areas: "sidebar search";
 }
 
+.grid-container-closed {
+    grid-template-columns: 60px 1fr;
+    transition-duration: 0.5s;
+}
+
+.grid-container-open {
+    grid-template-columns: 300px 1fr;
+    transition-duration: 0.5s;
+}
+
 .sidebar-grid {
+    background: rgb(34, 34, 34);
     grid-area: sidebar;
-    height: calc(100vh - 74px);
+    height: 100vh;
     position: sticky;
-    top: 74px;
+    top: 45px;
 }
 
 .search-grid { grid-area: search; }
