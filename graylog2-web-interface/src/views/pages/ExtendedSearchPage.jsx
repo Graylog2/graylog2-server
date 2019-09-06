@@ -34,6 +34,7 @@ import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvi
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
 import IfSearch from '../components/search/IfSearch';
+import { AdditionalContext } from '../logic/ActionContext';
 
 type Props = {
   route: any,
@@ -59,6 +60,8 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
 
 const SearchBarWithStatus = WithSearchStatus(SearchBar);
 const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
+
+const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
 const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
@@ -107,7 +110,9 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
 
         <QueryBarElements />
 
-        <SearchResult />
+        <ViewAdditionalContextProvider>
+          <SearchResult />
+        </ViewAdditionalContextProvider>
       </Row>
     </CurrentViewTypeProvider>
   );
