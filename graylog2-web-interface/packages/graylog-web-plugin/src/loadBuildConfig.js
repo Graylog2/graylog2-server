@@ -9,7 +9,7 @@ module.exports = function loadBuildConfig(filename) {
       console.error('Path to graylog web interface sources is not defined, does not exist or is not a directory: (', buildConfig.web_src_path, ').');
       console.error('Please configure it in a file named `build.config.js` before trying to build the plugin.');
       // TODO: add link to documentation
-      console.error('For further information please check http://docs.graylog.org/PLACEHOLDER');
+      console.error('For further information please check https://docs.graylog.org/PLACEHOLDER');
       process.exit(-1);
       /* eslint-enable no-console */
     }

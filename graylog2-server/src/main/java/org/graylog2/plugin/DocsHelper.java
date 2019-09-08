@@ -21,7 +21,7 @@ public enum DocsHelper {
     PAGE_ES_CONFIGURATION("configuration/elasticsearch.html"),
     PAGE_LDAP_TROUBLESHOOTING("users_and_roles/external_auth.html#troubleshooting");
 
-    private static final String DOCS_URL = "http://docs.graylog.org/en/";
+    private static final String DOCS_URL = "https://docs.graylog.org/en/";
 
     private final String path;
 

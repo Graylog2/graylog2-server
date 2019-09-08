@@ -6,7 +6,7 @@
 
 Welcome! _Graylog_ is an open source log management platform.
 
-You can read more about the project on our [website](https://www.graylog.org/) and check out the [documentation](http://docs.graylog.org/) on the documentation site.
+You can read more about the project on our [website](https://www.graylog.org/) and check out the [documentation](https://docs.graylog.org/) on the documentation site.
 
 
 ## Issue Tracking

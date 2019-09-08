@@ -87,7 +87,7 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
         public Descriptor() {
-            super("Syslog Severity Mapper", "http://docs.graylog.org/", "Syslog Severity Mapper");
+            super("Syslog Severity Mapper", "https://docs.graylog.org/", "Syslog Severity Mapper");
         }
     }
 

@@ -5,7 +5,7 @@ Upgrading to Graylog 3.0.x
 .. _upgrade-from-24-to-30:
 
 This file only contains the upgrade note for the upcoming release.
-Please see `our documentation <http://docs.graylog.org/en/latest/pages/upgrade.html>`_
+Please see `our documentation <https://docs.graylog.org/en/latest/pages/upgrade.html>`_
 for the complete upgrade notes.
 
 Elasticsearch Version Requirements
@@ -109,7 +109,7 @@ Starting with Graylog 3.0.0, the following official plugins were merged into the
 - `NetFlow Input <https://github.com/Graylog2/graylog-plugin-netflow>`_
 - `Pipeline Processor <https://github.com/Graylog2/graylog-plugin-pipeline-processor>`_
 
-That means these plugins are not available as separate plugins anymore. If you manually update your Graylog installation (without using operating system packages), make sure to remove all old plugin files from the `plugin_dir <http://docs.graylog.org/en/3.0/pages/configuration/server.conf.html>`_ folder.
+That means these plugins are not available as separate plugins anymore. If you manually update your Graylog installation (without using operating system packages), make sure to remove all old plugin files from the `plugin_dir <https://docs.graylog.org/en/3.0/pages/configuration/server.conf.html>`_ folder.
 
 The old issues in these repositories are still available for reference but new issues should only be created in the `Graylog server issue tracker <https://github.com/Graylog2/graylog2-server/issues>`_.
 
@@ -159,7 +159,7 @@ For a long time, Graylog allowed to use `Drools <https://www.drools.org/>`_ to f
 
 Starting with Graylog 3.0.0, the support for Drools-based message filters has been removed from Graylog. The ``rules_file`` configuration setting has been removed accordingly.
 
-We recommend migrating the Drools-based logic to `Processing Pipelines <http://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
+We recommend migrating the Drools-based logic to `Processing Pipelines <https://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
 
 
 Drools-based blacklist
@@ -167,7 +167,7 @@ Drools-based blacklist
 
 Graylog provided undocumented blacklist-functionality based on Drools. This blacklist could only be modified via the Graylog REST API on the ``/filters/blacklist`` resource.
 
-If you've been using this functionality, you'll have to migrate these blacklist rules to the `Processing Pipelines <http://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
+If you've been using this functionality, you'll have to migrate these blacklist rules to the `Processing Pipelines <https://docs.graylog.org/en/3.0/pages/pipelines.html>`_.
 
 To check if you're using the Drools-based blacklist in Graylog prior to version 3.0.0, you can run the following command::
 
@@ -202,9 +202,9 @@ New pipeline rule::
 
 See also:
 
-* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
-* `lowercase() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#lowercase>`_
-* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+* `has_field() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `lowercase() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#lowercase>`_
+* `drop_message() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
 
 Regex-based blacklist rule
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -234,9 +234,9 @@ New pipeline rule::
 
 See also:
 
-* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
-* `regex() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#regex>`_
-* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+* `has_field() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `regex() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#regex>`_
+* `drop_message() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
 
 IP Range-based blacklist rule
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -266,10 +266,10 @@ New pipeline rule::
 
 See also:
 
-* `has_field() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
-* `to_ip() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#to-ip>`_
-* `cidr_match() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#cidr-match>`_
-* `drop_message() <http://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
+* `has_field() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#has-field>`_
+* `to_ip() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#to-ip>`_
+* `cidr_match() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#cidr-match>`_
+* `drop_message() <https://docs.graylog.org/en/3.0/pages/pipelines/functions.html#drop-message>`_
 
 
 Changed metrics name for stream rules

@@ -73,7 +73,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
         public Descriptor() {
-            super("Hyperlink String", "http://docs.graylog.org/", "Hyperlink string");
+            super("Hyperlink String", "https://docs.graylog.org/", "Hyperlink string");
         }
     }
 

@@ -88,7 +88,7 @@ public class FormatStringDecorator implements SearchResponseDecorator {
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
         public Descriptor() {
-            super("Format String", "http://docs.graylog.org/", "Format string");
+            super("Format String", "https://docs.graylog.org/", "Format string");
         }
     }
 
