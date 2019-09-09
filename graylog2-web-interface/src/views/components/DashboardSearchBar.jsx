@@ -1,25 +1,22 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import ScrollToHint from './common/ScrollToHint';
+import * as Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
-import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import { QueriesActions } from '../actions/QueriesActions';
-import TimeRangeInput from './searchbar/TimeRangeInput';
-import StreamsFilter from './searchbar/StreamsFilter';
-import { QueryFiltersActions, QueryFiltersStore } from '../stores/QueryFiltersStore';
-import RefreshControls from './searchbar/RefreshControls';
-import DocumentationLink from '../../components/support/DocumentationLink';
-import DocsHelper from '../../util/DocsHelper';
-import SearchButton from './searchbar/SearchButton';
-import QueryInput from './searchbar/AsyncQueryInput';
-import View from '../logic/views/View';
-import * as Immutable from "immutable";
-import { Spinner } from '../../components/common/index';
-import { ViewStore } from '../stores/ViewStore';
-import connect from '../../stores/connect';
-import { CurrentQueryStore } from '../stores/CurrentQueryStore';
-import { StreamsStore } from '../stores/StreamsStore';
+
+import connect from 'stores/connect';
+import DocumentationLink from 'components/support/DocumentationLink';
+import DocsHelper from 'util/DocsHelper';
+import Spinner from 'components/common/Spinner';
+import ScrollToHint from 'views/components/common/ScrollToHint';
+import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
+import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import SearchButton from 'views/components/searchbar/SearchButton';
+import QueryInput from 'views/components/searchbar/AsyncQueryInput';
+import View from 'views/logic/views/View';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import { ViewStore } from 'views/stores/ViewStore';
+import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 
 type Props = {
   availableStreams: Array<*>,
@@ -41,7 +38,7 @@ const _performSearch = (onExecute) => {
   onExecute(view);
 };
 
-const DashboardSearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute, queryFilters }: Props) => {
+const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -54,10 +51,6 @@ const DashboardSearchBar = ({ availableStreams, config, currentQuery, disableSea
   const { type, ...rest } = timerange;
   const rangeParams = Immutable.Map(rest);
   const rangeType = type;
-  const streams = queryFilters.getIn([id, 'filters'], Immutable.List())
-    .filter(f => f.get('type') === 'stream')
-    .map(f => f.get('id'))
-    .toJS();
 
   return (
     <ScrollToHint value={query.query_string}>
@@ -79,12 +72,12 @@ const DashboardSearchBar = ({ availableStreams, config, currentQuery, disableSea
                             onExecute={performSearch} />
               </Col>
               <Col md={3}>
-                    <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
-                                           value={rangeType} />
-                    <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
-                                    rangeType={rangeType}
-                                    rangeParams={rangeParams}
-                                    config={config} />
+                <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                                       value={rangeType} />
+                <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
+                                rangeType={rangeType}
+                                rangeParams={rangeParams}
+                                config={config} />
               </Col>
             </form>
           </Row>
@@ -108,11 +101,5 @@ export default connect(
   DashboardSearchBar,
   {
     currentQuery: CurrentQueryStore,
-    availableStreams: StreamsStore,
-    queryFilters: QueryFiltersStore,
   },
-  ({ availableStreams: { streams }, ...rest }) => ({
-    ...rest,
-    availableStreams: streams.map(stream => ({ key: stream.title, value: stream.id })),
-  }),
 );
