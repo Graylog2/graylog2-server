@@ -46,14 +46,19 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 };
 
 QueryTabs.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
+  children: PropTypes.node,
   onSaveView: PropTypes.func.isRequired,
+  onSaveAsView: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
   queries: PropTypes.object.isRequired,
   selectedQuery: PropTypes.string.isRequired,
   titles: PropTypes.object.isRequired,
+};
+
+QueryTabs.defaultProps = {
+  children: null,
 };
 
 export default QueryTabs;

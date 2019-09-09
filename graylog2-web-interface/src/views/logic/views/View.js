@@ -134,7 +134,7 @@ export default class View {
 
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires } = this._value;
+    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({
       id,
@@ -147,6 +147,7 @@ export default class View {
       createdAt,
       owner,
       requires,
+      type,
     }));
   }
 

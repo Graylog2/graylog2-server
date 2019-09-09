@@ -1,5 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`IfDashboard should not render children without context 1`] = `
+<div>
+  <span>
+    I must not fear.
+  </span>
+</div>
+`;
+
 exports[`IfDashboard should not render children without dashboard context 1`] = `
 <span>
   I must not fear.
@@ -15,15 +23,4 @@ Array [
     Fear is the mind-killer.
   </span>,
 ]
-`;
-
-exports[`IfDashboard should render children without context since Dashboard is the default 1`] = `
-<div>
-  <span>
-    I must not fear.
-  </span>
-  <span>
-    Fear is the mind-killer.
-  </span>
-</div>
 `;
