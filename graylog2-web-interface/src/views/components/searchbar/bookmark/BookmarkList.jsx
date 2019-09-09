@@ -69,7 +69,7 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   onLoad = (selectedBookmark, loadFunc) => {
-    const { toggleModal } = this.props
+    const { toggleModal } = this.props;
     if (!selectedBookmark) {
       return;
     }
