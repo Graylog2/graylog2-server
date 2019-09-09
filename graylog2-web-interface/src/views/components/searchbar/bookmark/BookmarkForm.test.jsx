@@ -61,7 +61,7 @@ describe('BookmarkForm', () => {
                                           target={() => {}}
                                           saveSearch={() => {}} />);
       wrapper.find('button[children="Cancel"]').simulate('click');
-      expect(onToggleModal.mock.calls.length).toBe(1);
+      expect(onToggleModal).toHaveBeenCalledTimes(1);
     });
 
     it('should handle saveSearch', () => {
@@ -75,7 +75,7 @@ describe('BookmarkForm', () => {
                                           target={() => {}}
                                           saveSearch={onSave} />);
       wrapper.find('button[children="Save"]').simulate('click');
-      expect(onSave.mock.calls.length).toBe(1);
+      expect(onSave).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -90,7 +90,7 @@ describe('BookmarkForm', () => {
                                         target={() => {}}
                                         saveSearch={() => {}} />);
     wrapper.find('button[children="Save as"]').simulate('click');
-    expect(onSaveAs.mock.calls.length).toBe(1);
+    expect(onSaveAs).toHaveBeenCalledTimes(1);
   });
 
   it('should not handle saveAsSearch if disabled', () => {
@@ -104,7 +104,7 @@ describe('BookmarkForm', () => {
                                         target={() => {}}
                                         saveSearch={() => {}} />);
     wrapper.find('button[children="Save as"]').simulate('click');
-    expect(onSaveAs.mock.calls.length).toBe(0);
+    expect(onSaveAs).toHaveBeenCalledTimes(0);
   });
 
   it('should handle create new', () => {
@@ -118,6 +118,6 @@ describe('BookmarkForm', () => {
                                         target={() => {}}
                                         saveSearch={() => {}} />);
     wrapper.find('button[children="Create new"]').simulate('click');
-    expect(onSaveAs.mock.calls.length).toBe(1);
+    expect(onSaveAs).toHaveBeenCalledTimes(1);
   });
 });

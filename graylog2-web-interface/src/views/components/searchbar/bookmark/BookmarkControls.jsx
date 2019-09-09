@@ -122,7 +122,7 @@ class BookmarkControls extends React.Component<Props, State> {
   deleteBookmark = (view) => {
     return ViewManagementActions.delete(view)
       .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
-      .then(ViewActions.create())
+      .then(ViewActions.create)
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 

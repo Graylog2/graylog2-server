@@ -148,7 +148,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
               </div>
             </SearchForm>
             <PaginatedList
-              activePage={0}
+              activePage={1}
               onChange={[Function]}
               pageSize={5}
               pageSizes={
@@ -159,7 +159,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                 ]
               }
               showPageSizeSelect={true}
-              totalItems={0}
+              totalItems={1}
             >
               <span>
                 <div
@@ -252,9 +252,37 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                     </FormGroup>
                   </Input>
                 </div>
-                <span>
-                  No bookmarks found
-                </span>
+                <ListGroup
+                  bsClass="list-group"
+                >
+                  <div
+                    className="list-group"
+                  >
+                    <ListGroupItem
+                      active={false}
+                      bsClass="list-group-item"
+                      header="test-0"
+                      key="foo-bar-0"
+                      listItem={false}
+                      onClick={[Function]}
+                    >
+                      <button
+                        className="list-group-item"
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        <h4
+                          className="list-group-item-heading"
+                        >
+                          test-0
+                        </h4>
+                        <p
+                          className="list-group-item-text"
+                        />
+                      </button>
+                    </ListGroupItem>
+                  </div>
+                </ListGroup>
                 <div
                   className="text-center"
                 >
@@ -265,7 +293,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                     bsSize="small"
                     ellipsis={true}
                     first={true}
-                    items={0}
+                    items={1}
                     last={true}
                     maxButtons={10}
                     next={true}
@@ -348,6 +376,33 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                         </li>
                       </PaginationButton>
                       <PaginationButton
+                        active={true}
+                        componentClass={[Function]}
+                        disabled={false}
+                        eventKey={1}
+                        key="1"
+                        onSelect={[Function]}
+                      >
+                        <li
+                          className="active"
+                        >
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </PaginationButton>
+                      <PaginationButton
                         active={false}
                         componentClass={[Function]}
                         disabled={true}
@@ -387,7 +442,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                         active={false}
                         componentClass={[Function]}
                         disabled={true}
-                        eventKey={0}
+                        eventKey={1}
                         onSelect={[Function]}
                       >
                         <li
@@ -1132,7 +1187,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               </div>
             </SearchForm>
             <PaginatedList
-              activePage={0}
+              activePage={1}
               onChange={[Function]}
               pageSize={5}
               pageSizes={
@@ -1143,7 +1198,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                 ]
               }
               showPageSizeSelect={true}
-              totalItems={0}
+              totalItems={1}
             >
               <span>
                 <div
@@ -1245,8 +1300,8 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                     <ListGroupItem
                       active={false}
                       bsClass="list-group-item"
-                      header="test"
-                      key="foo-bar"
+                      header="test-0"
+                      key="foo-bar-0"
                       listItem={false}
                       onClick={[Function]}
                     >
@@ -1258,7 +1313,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                         <h4
                           className="list-group-item-heading"
                         >
-                          test
+                          test-0
                         </h4>
                         <p
                           className="list-group-item-text"
@@ -1277,7 +1332,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                     bsSize="small"
                     ellipsis={true}
                     first={true}
-                    items={0}
+                    items={1}
                     last={true}
                     maxButtons={10}
                     next={true}
@@ -1360,6 +1415,33 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                         </li>
                       </PaginationButton>
                       <PaginationButton
+                        active={true}
+                        componentClass={[Function]}
+                        disabled={false}
+                        eventKey={1}
+                        key="1"
+                        onSelect={[Function]}
+                      >
+                        <li
+                          className="active"
+                        >
+                          <SafeAnchor
+                            componentClass="a"
+                            disabled={false}
+                            onClick={[Function]}
+                          >
+                            <a
+                              href="#"
+                              onClick={[Function]}
+                              onKeyDown={[Function]}
+                              role="button"
+                            >
+                              1
+                            </a>
+                          </SafeAnchor>
+                        </li>
+                      </PaginationButton>
+                      <PaginationButton
                         active={false}
                         componentClass={[Function]}
                         disabled={true}
@@ -1399,7 +1481,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                         active={false}
                         componentClass={[Function]}
                         disabled={true}
-                        eventKey={0}
+                        eventKey={1}
                         onSelect={[Function]}
                       >
                         <li
