@@ -128,7 +128,7 @@ class BookmarkList extends React.Component<Props, State> {
         </Modal.Body>
         <Modal.Footer>
           <ViewLoaderContext.Consumer>
-            {({ loaderFunc }) => (
+            {loaderFunc => (
               <Button disabled={!selectedBookmark}
                       bsStyle="primary"
                       onClick={() => { this.onLoad(selectedBookmark, loaderFunc); }}>

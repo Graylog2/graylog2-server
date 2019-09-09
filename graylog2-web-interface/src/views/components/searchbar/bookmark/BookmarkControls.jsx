@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, ButtonGroup } from 'react-bootstrap';
-import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -32,8 +31,8 @@ class BookmarkControls extends React.Component<Props, State> {
 
   formTarget: any;
 
-  constructor(props: Props, context: ViewLoaderContextType) {
-    super(props, context);
+  constructor(props: Props) {
+    super(props);
 
     const { viewStoreState } = props;
     const { view } = viewStoreState;

@@ -86,7 +86,7 @@ class NewSearchPage extends React.Component<Props, State> {
     if (loaded) {
       const { route } = this.props;
       return (
-        <ViewLoaderContext.Provider value={{ loaderFunc: this.loadView }}>
+        <ViewLoaderContext.Provider value={this.loadView}>
           <ExtendedSearchPage route={route} />
         </ViewLoaderContext.Provider>
       );

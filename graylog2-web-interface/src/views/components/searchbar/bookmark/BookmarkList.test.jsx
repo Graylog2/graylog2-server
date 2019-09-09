@@ -93,7 +93,7 @@ describe('BookmarkList', () => {
       const views = createViewsResponse(1);
 
       const wrapper = mount(
-        <ViewLoaderContext.Provider value={{ loaderFunc: onLoad, dirty: false, loadedView: undefined }}>
+        <ViewLoaderContext.Provider value={onLoad}>
           <BookmarkList toggleModal={() => {}}
                         showModal
                         deleteBookmark={() => {}}
