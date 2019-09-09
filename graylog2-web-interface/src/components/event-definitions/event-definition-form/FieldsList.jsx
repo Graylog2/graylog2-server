@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import naturalSort from 'javascript-natural-sort';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { ButtonToolbar } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DataTable } from 'components/common';

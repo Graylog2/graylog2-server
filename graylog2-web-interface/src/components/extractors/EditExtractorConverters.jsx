@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button, Panel } from 'react-bootstrap';
+import { Row, Col, Panel } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
@@ -29,43 +31,50 @@ class EditExtractorConverters extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  state = {
-    displayedConverters: this.props.converters.map(converter => converter.type),
-    disabledConverters: {}, // Keep disabled converters configuration, so the user doesn't need to type it again
-    selectedConverter: undefined,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      displayedConverters: props.converters.map(converter => converter.type),
+      disabledConverters: {}, // Keep disabled converters configuration, so the user doesn't need to type it again
+      selectedConverter: undefined,
+    };
+  }
 
   _onConverterSelect = (newValue) => {
     this.setState({ selectedConverter: newValue });
   };
 
   _onConverterAdd = () => {
-    const newDisplayedConverters = this.state.displayedConverters;
-    newDisplayedConverters.push(this.state.selectedConverter);
-    this.setState({ selectedConverter: undefined, converters: newDisplayedConverters });
+    this.setState({ selectedConverter: undefined });
   };
 
   _onConverterChange = (converterType, converter) => {
+    const { disabledConverters } = this.state;
+    const { onChange } = this.props;
+
     if (converter) {
-      const newDisabledConverters = this.state.disabledConverters;
-      if (newDisabledConverters.hasOwnProperty(converterType)) {
+      const newDisabledConverters = disabledConverters;
+      if ('converterType' in newDisabledConverters) {
         delete newDisabledConverters[converterType];
         this.setState({ disabledConverters: newDisabledConverters });
       }
     } else {
-      const newDisabledConverters = this.state.disabledConverters;
+      const newDisabledConverters = disabledConverters;
       newDisabledConverters[converterType] = this._getConverterByType(converterType);
       this.setState({ disabledConverters: newDisabledConverters });
     }
 
-    this.props.onChange(converterType, converter);
+    onChange(converterType, converter);
   };
 
   _getConverterOptions = () => {
+    const { displayedConverters } = this.state;
+
     const converterOptions = [];
     Object.keys(ExtractorUtils.ConverterTypes).forEach((converterType) => {
       const type = ExtractorUtils.ConverterTypes[converterType];
-      const disabled = this.state.displayedConverters.indexOf(type) !== -1;
+      const disabled = displayedConverters.indexOf(type) !== -1;
       converterOptions.push({
         value: type,
         label: ExtractorUtils.getReadableConverterTypeName(type),
@@ -77,16 +86,18 @@ class EditExtractorConverters extends React.Component {
   };
 
   _getConverterByType = (converterType) => {
-    const currentConverter = this.props.converters.filter(converter => converter.type === converterType)[0];
+    const { converters } = this.props;
+    const currentConverter = converters.filter(converter => converter.type === converterType)[0];
     return (currentConverter ? currentConverter.config : {});
   };
 
   _getConvertersConfiguration = () => {
-    const controls = this.state.displayedConverters.map((converterType) => {
+    const { displayedConverters, disabledConverters } = this.state;
+    const controls = displayedConverters.map((converterType) => {
       // Get converter configuration from disabledConverters if it was disabled
       let converterConfig = this._getConverterByType(converterType);
-      if (Object.keys(converterConfig).length === 0 && this.state.disabledConverters.hasOwnProperty(converterType)) {
-        converterConfig = this.state.disabledConverters[converterType];
+      if (Object.keys(converterConfig).length === 0 && ('converterType' in disabledConverters)) {
+        converterConfig = disabledConverters[converterType];
       }
 
       switch (converterType) {
@@ -182,7 +193,9 @@ class EditExtractorConverters extends React.Component {
                                                onChange={this._onConverterChange} />
           );
         default:
+          // eslint-disable-next-line no-console
           console.warn(`Converter type ${converterType} is not supported.`);
+          return <></>;
       }
     });
 
@@ -190,13 +203,16 @@ class EditExtractorConverters extends React.Component {
   };
 
   render() {
-    if (this.props.extractorType === ExtractorUtils.ExtractorTypes.GROK || this.props.extractorType === ExtractorUtils.ExtractorTypes.JSON) {
+    const { extractorType } = this.props;
+    const { selectedConverter } = this.state;
+    if (extractorType === ExtractorUtils.ExtractorTypes.GROK
+      || extractorType === ExtractorUtils.ExtractorTypes.JSON) {
       return (
         <div className="form-group">
           <div className="col-md-offset-2 col-md-10">
             <Panel bsStyle="info" style={{ marginBottom: 0 }}>
               Cannot add converters to{' '}
-              <em>{ExtractorUtils.getReadableExtractorTypeName(this.props.extractorType)}</em> extractors.
+              <em>{ExtractorUtils.getReadableExtractorTypeName(extractorType)}</em> extractors.
             </Panel>
           </div>
         </div>
@@ -215,11 +231,11 @@ class EditExtractorConverters extends React.Component {
               <Select id="add-converter"
                       placeholder="Select a converter"
                       options={this._getConverterOptions()}
-                      value={this.state.selectedConverter}
+                      value={selectedConverter}
                       onChange={this._onConverterSelect} />
             </Col>
             <Col md={1} className="text-right">
-              <Button bsStyle="info" onClick={this._onConverterAdd} disabled={!this.state.selectedConverter}>
+              <Button bsStyle="info" onClick={this._onConverterAdd} disabled={!selectedConverter}>
                 Add
               </Button>
             </Col>

@@ -3,15 +3,14 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
-import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Col, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
-
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');

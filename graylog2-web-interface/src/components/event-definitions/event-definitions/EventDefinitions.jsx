@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
+import { Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
 import {} from 'moment-duration-format';
 
+import { Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 
 import {

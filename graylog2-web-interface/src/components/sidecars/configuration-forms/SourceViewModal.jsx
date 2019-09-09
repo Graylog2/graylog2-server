@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import lodash from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';

@@ -41,7 +41,9 @@ class CreateUsersPage extends React.Component {
   };
 
   render() {
-    if (!this.state.roles) {
+    const { roles } = this.state;
+
+    if (!roles) {
       return <Spinner />;
     }
     return (
@@ -55,7 +57,7 @@ class CreateUsersPage extends React.Component {
           </PageHeader>
           <Row>
             <Col lg={8}>
-              <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit} onCancel={this._onCancel} />
+              <NewUserForm roles={roles} onSubmit={this._onSubmit} onCancel={this._onCancel} />
             </Col>
           </Row>
         </span>

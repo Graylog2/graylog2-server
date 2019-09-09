@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 

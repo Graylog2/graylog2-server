@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Panel } from 'react-bootstrap';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button, Panel } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 
 import GrokPatternInput from './GrokPatternInput';
 
@@ -28,16 +29,21 @@ class EditPatternModal extends React.Component {
     sampleData: '',
   };
 
-  state = {
-    id: this.props.id,
-    name: this.props.name,
-    pattern: this.props.pattern,
-    sampleData: this.props.sampleData,
-    test_result: '',
-    test_error: undefined,
-    error: false,
-    error_message: '',
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      id: props.id,
+      name: props.name,
+      pattern: props.pattern,
+      sampleData: props.sampleData,
+      test_result: '',
+      test_error: undefined,
+      error: false,
+      error_message: '',
+    };
+  }
+
 
   openModal = () => {
     this.modal.open();
@@ -48,9 +54,10 @@ class EditPatternModal extends React.Component {
   };
 
   _onNameChange = (event) => {
+    const { validPatternName } = this.props;
     const name = event.target.value;
 
-    if (!this.props.validPatternName(name)) {
+    if (!validPatternName(name)) {
       this.setState({ name: name, error: true, error_message: 'Pattern with that name already exists!' });
     } else {
       this.setState({ name: name, error: false, error_message: '' });
@@ -62,7 +69,9 @@ class EditPatternModal extends React.Component {
   };
 
   _getId = (prefixIdName) => {
-    return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
+    const { name } = this.state;
+
+    return name !== undefined ? prefixIdName + name : prefixIdName;
   };
 
   _closeModal = () => {
@@ -70,29 +79,35 @@ class EditPatternModal extends React.Component {
   };
 
   _saved = () => {
+    const { create } = this.props;
+
     this._closeModal();
-    if (this.props.create) {
+    if (create) {
       this.setState({ name: '', pattern: '', sampleData: '', test_result: '' });
     }
   };
 
   _save = () => {
-    const pattern = this.state;
+    const { savePattern } = this.props;
+    const { error } = this.state;
 
-    if (!pattern.error) {
-      this.props.savePattern(pattern, this._saved);
+    if (!error) {
+      savePattern(this.state, this._saved);
     }
   };
 
   _testPattern = () => {
-    if (this.state.name === '' || this.state.pattern === '') {
+    const { name, pattern } = this.state;
+    const { testPattern } = this.props;
+
+    if (name === '' || pattern === '') {
       this.setState({ error: true, error_message: 'To test the pattern a name and a pattern must be given!' });
       return;
     }
 
     this.setState({ error: false, error_message: '' });
 
-    this.props.testPattern(this.state, (response) => {
+    testPattern(this.state, (response) => {
       this.setState({ test_result: JSON.stringify(response, null, 2), test_error: undefined });
     }, (errMessage) => {
       this.setState({ test_result: '', test_error: errMessage });
@@ -100,19 +115,32 @@ class EditPatternModal extends React.Component {
   };
 
   render() {
+    const { create, patterns } = this.props;
+    const {
+      name,
+      error,
+      error_message: errorMessage,
+      pattern,
+      test_error: testError,
+      sampleData,
+      test_result: testResult,
+    } = this.state;
+
     let triggerButtonContent;
-    if (this.props.create) {
+    if (create) {
       triggerButtonContent = 'Create pattern';
     } else {
       triggerButtonContent = <span>Edit</span>;
     }
     return (
       <span>
-        <button onClick={this.openModal} className={this.props.create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
+        <button type="button"
+                onClick={this.openModal}
+                className={create ? 'btn btn-success' : 'btn btn-info btn-xs'}>
           {triggerButtonContent}
         </button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                            title={`${this.props.create ? 'Create' : 'Edit'} Grok Pattern ${this.state.name}`}
+                            title={`${create ? 'Create' : 'Edit'} Grok Pattern ${name}`}
                             bsSize="large"
                             onSubmitForm={this._save}
                             submitButtonText="Save">
@@ -121,26 +149,27 @@ class EditPatternModal extends React.Component {
                    id={this._getId('pattern-name')}
                    label="Name"
                    onChange={this._onNameChange}
-                   value={this.state.name}
-                   bsStyle={this.state.error ? 'error' : null}
-                   help={this.state.error ? this.state.error_message : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "}
+                   value={name}
+                   bsStyle={error ? 'error' : null}
+                   help={error ? errorMessage : "Under this name the pattern will be stored and can be used like: '%{THISNAME}' later on "}
                    autoFocus
                    required />
             <GrokPatternInput onPatternChange={this._onPatternChange}
-                              pattern={this.state.pattern}
-                              patterns={this.props.patterns} />
-            { this.state.test_error
-            && (
-            <Panel bsStyle="danger" header="Grok Error">
-              <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{this.state.test_error}</code>
-            </Panel>
-            ) }
+                              pattern={pattern}
+                              patterns={patterns} />
+            { testError
+              && (
+              <Panel bsStyle="danger" header="Grok Error">
+                <code style={{ display: 'block', whiteSpace: 'pre-wrap' }}>{testError}</code>
+              </Panel>
+              )
+            }
             <Input type="textarea"
                    id={this._getId('sampleData')}
                    label="Sample Data"
                    help="Here you can add sample data to test your pattern"
                    onChange={this._onSampleDataChange}
-                   value={this.state.sampleData} />
+                   value={sampleData} />
             <Button bsStyle="info" onClick={this._testPattern}>Test with Sample Data</Button>
             <br />
             <br />
@@ -150,7 +179,7 @@ class EditPatternModal extends React.Component {
                    rows={8}
                    help="Will contain the result of your test in a JSON format"
                    label="Test Result"
-                   value={this.state.test_result} />
+                   value={testResult} />
           </fieldset>
         </BootstrapModalForm>
       </span>

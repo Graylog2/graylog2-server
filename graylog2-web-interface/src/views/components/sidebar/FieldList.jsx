@@ -4,11 +4,11 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
 import { isEqual, isFinite } from 'lodash';
-import { Button } from 'react-bootstrap';
 import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
+import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
 import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
@@ -24,6 +24,7 @@ const FieldList = createReactClass({
     fields: PropTypes.object.isRequired,
     maximumHeight: PropTypes.number.isRequired,
   },
+
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
 
   getInitialState() {
@@ -32,6 +33,7 @@ const FieldList = createReactClass({
       showFieldsBy: 'current',
     };
   },
+
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('scroll', this._onScroll);
@@ -71,9 +73,8 @@ const FieldList = createReactClass({
   },
 
   _updateHeight() {
-    const fieldsContainer = this.fieldList;
-
     const { maximumHeight } = this.props;
+    const fieldsContainer = this.fieldList;
 
     if (fieldsContainer && fieldsContainer.getBoundingClientRect) {
       const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
@@ -114,11 +115,19 @@ const FieldList = createReactClass({
     }
   },
   _renderFieldList({ fields, allFields, showFieldsBy }) {
+    const {
+      filter,
+      maxFieldsHeight,
+      viewMetadata: {
+        id: selectedView,
+        activeQuery: selectedQuery,
+      },
+    } = this.state;
+
     if (!fields) {
       return <span>No field information available.</span>;
     }
-    const { filter, maxFieldsHeight, viewMetadata } = this.state;
-    const { id: selectedView, activeQuery: selectedQuery } = viewMetadata;
+
     const fieldFilter = filter ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
@@ -129,6 +138,7 @@ const FieldList = createReactClass({
       return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
     }
     const Row = ({ index, style }) => this._renderField({ fieldType: fieldList.get(index), selectedQuery, selectedView, fields, style });
+
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
         <List height={maxFieldsHeight || 0}
@@ -151,6 +161,7 @@ const FieldList = createReactClass({
   },
   isCurrentShowFieldsBy(mode) {
     const { showFieldsBy } = this.state;
+
     return showFieldsBy === mode;
   },
   showFieldsByLink(mode, text, title) {
@@ -167,8 +178,8 @@ const FieldList = createReactClass({
   },
   render() {
     const { allFields, fields } = this.props;
-    const { showFieldsBy } = this.state;
-    const { filter } = this.state;
+    const { filter, showFieldsBy } = this.state;
+
     return (
       <div>
         <form className={`form-inline ${styles.filterContainer}`} onSubmit={e => e.preventDefault()}>

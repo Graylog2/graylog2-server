@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from 'react-bootstrap';
-
+import { Button } from 'components/graylog';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+
 import TimeHistogramPivot from './pivottypes/TimeHistogramPivot';
 import TermsPivotConfiguration from './pivottypes/TermsPivotConfiguration';
+
 import CustomPropTypes from '../CustomPropTypes';
 
 const _configurationComponentByType = (type, value, onChange) => {

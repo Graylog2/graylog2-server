@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
+import { ButtonGroup, ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 import moment from 'moment';
 import lodash from 'lodash';
 
+import { Button } from 'components/graylog';
 import { SearchForm, TimeUnitInput } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormsUtils from 'util/FormsUtils';

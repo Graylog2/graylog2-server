@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Button, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button } from 'components/graylog';
 import { EmptyEntity, IfPermitted, PaginatedList, Timestamp } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
@@ -168,7 +169,8 @@ class Events extends React.Component {
     }
 
     const filter = parameters.filter.alerts;
-    const entity = (filter === 'only' ? 'Alerts' : (filter === 'exclude' ? 'Events' : 'Alerts & Events'));
+    const excludedFile = filter === 'exclude' ? 'Events' : 'Alerts & Events';
+    const entity = (filter === 'only' ? 'Alerts' : excludedFile);
 
     return (
       <React.Fragment>

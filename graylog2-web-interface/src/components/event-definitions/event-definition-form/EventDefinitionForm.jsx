@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
+import { ButtonToolbar, Col, Row } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Wizard } from 'components/common';

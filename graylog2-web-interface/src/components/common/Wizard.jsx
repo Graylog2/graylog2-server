@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'react-bootstrap';
+import { ButtonToolbar, Col, Nav, NavItem, Row } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 
 import WizardStyle from './Wizard.css';
 

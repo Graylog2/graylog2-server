@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { ButtonToolbar } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 

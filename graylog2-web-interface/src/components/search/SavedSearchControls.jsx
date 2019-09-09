@@ -2,12 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 const SavedSearchesStore = StoreProvider.getStore('SavedSearches');

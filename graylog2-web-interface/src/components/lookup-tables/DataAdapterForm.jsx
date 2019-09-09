@@ -1,15 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
+import { Col, Row } from 'react-bootstrap';
 import _ from 'lodash';
 
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
@@ -37,28 +35,44 @@ class DataAdapterForm extends React.Component {
     validationErrors: {},
   };
 
+  validationCheckTimer = undefined;
+
+  constructor(props) {
+    super(props);
+
+    this.state = this._initialState(props.dataAdapter);
+  }
+
+  componentDidMount() {
+    const { create, dataAdapter } = this.props;
+
+    if (!create) {
+      // Validate when mounted to immediately show errors for invalid objects
+      this._validate(dataAdapter);
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (_.isEqual(this.props.dataAdapter, nextProps.dataAdapter)) {
+    const { dataAdapter } = this.props;
+    if (_.isEqual(dataAdapter, nextProps.dataAdapter)) {
       // props haven't changed, don't update our state from them
       return;
     }
     this.setState(this._initialState(nextProps.dataAdapter));
   }
 
-  componentDidMount() {
-    if (!this.props.create) {
-      // Validate when mounted to immediately show errors for invalid objects
-      this._validate(this.props.dataAdapter);
-    }
+  componentWillUnmount() {
+    this._clearTimer();
   }
 
   _initialState = (dataAdapter) => {
     const adapter = ObjectUtils.clone(dataAdapter);
+    const { create } = this.props;
 
     return {
       // when creating always initially auto-generate the adapter name,
       // this will be false if the user changed the adapter name manually
-      generateAdapterName: this.props.create,
+      generateAdapterName: create,
       dataAdapter: {
         id: adapter.id,
         title: adapter.title,
@@ -69,12 +83,6 @@ class DataAdapterForm extends React.Component {
     };
   };
 
-  componentWillUnmount() {
-    this._clearTimer();
-  }
-
-  validationCheckTimer = undefined;
-
   _clearTimer = () => {
     if (this.validationCheckTimer !== undefined) {
       clearTimeout(this.validationCheckTimer);
@@ -83,15 +91,18 @@ class DataAdapterForm extends React.Component {
   };
 
   _validate = (adapter) => {
+    const { validate } = this.props;
+
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
-    if (this.props.validate) {
-      this.validationCheckTimer = setTimeout(() => this.props.validate(adapter), 500);
+    if (validate) {
+      this.validationCheckTimer = setTimeout(() => validate(adapter), 500);
     }
   };
 
   _onChange = (event) => {
-    const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
+    const { dataAdapter: dataAdapterState } = this.state;
+    const dataAdapter = ObjectUtils.clone(dataAdapterState);
     dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
     let { generateAdapterName } = this.state;
     if (generateAdapterName && event.target.name === 'title') {
@@ -107,14 +118,16 @@ class DataAdapterForm extends React.Component {
   };
 
   _onConfigChange = (event) => {
-    const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
+    const { dataAdapter: dataAdapterState } = this.state;
+    const dataAdapter = ObjectUtils.clone(dataAdapterState);
     dataAdapter.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
   };
 
   _updateConfig = (newConfig) => {
-    const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
+    const { dataAdapter: dataAdapterState } = this.state;
+    const dataAdapter = ObjectUtils.clone(dataAdapterState);
     dataAdapter.config = newConfig;
     this._validate(dataAdapter);
     this.setState({ dataAdapter: dataAdapter });
@@ -125,15 +138,18 @@ class DataAdapterForm extends React.Component {
       event.preventDefault();
     }
 
+    const { dataAdapter } = this.state;
+    const { create, saved } = this.props;
+
     let promise;
-    if (this.props.create) {
-      promise = LookupTableDataAdaptersActions.create(this.state.dataAdapter);
+    if (create) {
+      promise = LookupTableDataAdaptersActions.create(dataAdapter);
     } else {
-      promise = LookupTableDataAdaptersActions.update(this.state.dataAdapter);
+      promise = LookupTableDataAdaptersActions.update(dataAdapter);
     }
 
     promise.then(() => {
-      this.props.saved();
+      saved();
     });
   };
 
@@ -142,39 +158,40 @@ class DataAdapterForm extends React.Component {
   };
 
   _validationState = (fieldName) => {
-    if (this.props.validationErrors[fieldName]) {
+    const { validationErrors } = this.props;
+    if (validationErrors[fieldName]) {
       return 'error';
     }
     return null;
   };
 
   _validationMessage = (fieldName, defaultText) => {
-    if (this.props.validationErrors[fieldName]) {
+    const { validationErrors } = this.props;
+    if (validationErrors[fieldName]) {
       return (
         <div>
           <span>{defaultText}</span>
         &nbsp;
-          <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
+          <span><b>{validationErrors[fieldName][0]}</b></span>
         </div>
       );
     }
     return <span>{defaultText}</span>;
   };
 
-  state = this._initialState(this.props.dataAdapter);
-
   render() {
-    const adapter = this.state.dataAdapter;
+    const { dataAdapter } = this.state;
+    const { create, type } = this.props;
 
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
-    const plugin = adapterPlugins.filter(p => p.type === this.props.type);
+    const plugin = adapterPlugins.filter(p => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
       configFieldSet = React.createElement(p.formComponent, {
-        config: adapter.config,
+        config: dataAdapter.config,
         handleFormEvent: this._onConfigChange,
         updateConfig: this._updateConfig,
         validationMessage: this._validationMessage,
@@ -210,7 +227,7 @@ class DataAdapterForm extends React.Component {
                      required
                      onChange={this._onChange}
                      help="A short title for this data adapter."
-                     value={adapter.title}
+                     value={dataAdapter.title}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
 
@@ -220,7 +237,7 @@ class DataAdapterForm extends React.Component {
                      label="Description"
                      onChange={this._onChange}
                      help="Data adapter description."
-                     value={adapter.description}
+                     value={dataAdapter.description}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
 
@@ -232,7 +249,7 @@ class DataAdapterForm extends React.Component {
                      onChange={this._onChange}
                      help={this._validationMessage('name',
                        'The name that is being used to refer to this data adapter. Must be unique.')}
-                     value={adapter.name}
+                     value={dataAdapter.name}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9"
                      bsStyle={this._validationState('name')} />
@@ -241,7 +258,7 @@ class DataAdapterForm extends React.Component {
             <fieldset>
               <Row>
                 <Col mdOffset={3} md={9}>
-                  <Button type="submit" bsStyle="success">{this.props.create ? 'Create Adapter'
+                  <Button type="submit" bsStyle="success">{create ? 'Create Adapter'
                     : 'Update Adapter'}
                   </Button>
                 </Col>

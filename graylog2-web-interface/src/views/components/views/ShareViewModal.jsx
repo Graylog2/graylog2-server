@@ -1,10 +1,11 @@
 // @flow strict
 import * as React from 'react';
-import { Button, FormGroup, HelpBlock, Modal, Radio } from 'react-bootstrap';
+import { FormGroup, HelpBlock, Modal, Radio } from 'react-bootstrap';
 import { get } from 'lodash';
 
 import Select from 'views/components/Select';
 
+import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import StoreProvider from 'injection/StoreProvider';
 import connect from 'stores/connect';

@@ -1,14 +1,16 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
-import { DocumentTitle } from 'components/common';
+import { Row, FormGroup, Alert } from 'react-bootstrap';
 
+import { DocumentTitle } from 'components/common';
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import LoadingPage from './LoadingPage';
 
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+
+import LoadingPage from './LoadingPage';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';

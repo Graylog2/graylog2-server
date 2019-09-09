@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 
 import Routes from 'routing/Routes';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import history from 'util/History';
 
@@ -27,7 +27,6 @@ const CreateContentPackPage = createReactClass({
       contentPack: ContentPack.builder().build(),
       appliedParameter: {},
       selectedEntities: {},
-      selectedStep: undefined,
       entityIndex: undefined,
     };
   },
@@ -36,28 +35,20 @@ const CreateContentPackPage = createReactClass({
     CatalogActions.showEntityIndex();
   },
 
-  _getUUID() {
-    const s4 = () => {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    };
-    return `${s4()}${s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
-  },
-
   _onStateChanged(newState) {
-    const contentPack = newState.contentPack || this.state.contentPack;
-    const selectedEntities = newState.selectedEntities || this.state.selectedEntities;
-    const appliedParameter = newState.appliedParameter || this.state.appliedParameter;
+    const { contentPack, selectedEntities, appliedParameter } = this.state;
+
     this.setState({
-      contentPack: contentPack,
-      selectedEntities: selectedEntities,
-      appliedParameter: appliedParameter,
+      contentPack: newState.contentPack || contentPack,
+      selectedEntities: newState.selectedEntities || selectedEntities,
+      appliedParameter: newState.appliedParameter || appliedParameter,
     });
   },
 
   _onSave() {
-    ContentPacksActions.create.triggerPromise(this.state.contentPack.toJSON())
+    const { contentPack } = this.state;
+
+    ContentPacksActions.create.triggerPromise(contentPack.toJSON())
       .then(
         () => {
           UserNotification.success('Content pack imported successfully', 'Success!');
@@ -77,17 +68,21 @@ const CreateContentPackPage = createReactClass({
   },
 
   _getEntities(selectedEntities) {
+    const { contentPack } = this.state;
+
     CatalogActions.getSelectedEntities(selectedEntities).then((result) => {
-      const newContentPack = this.state.contentPack.toBuilder()
+      const newContentPack = contentPack.toBuilder()
         /* Mark entities from server */
-        .entities(result.entities.map(e => Entity.fromJSON(e, true, this.state.contentPack.parameters)))
+        .entities(result.entities.map(e => Entity.fromJSON(e, true, contentPack.parameters)))
         .build();
-      const fetchedEntities = result.entities.map(e => Entity.fromJSON(e, false, this.state.contentPack.parameters));
+      const fetchedEntities = result.entities.map(e => Entity.fromJSON(e, false, contentPack.parameters));
       this.setState({ contentPack: newContentPack, fetchedEntities });
     });
   },
 
   render() {
+    const { contentPack, fetchedEntities, selectedEntities, appliedParameter, entityIndex } = this.state;
+
     return (
       <DocumentTitle title="Content packs">
         <span>
@@ -107,13 +102,13 @@ const CreateContentPackPage = createReactClass({
               </LinkContainer>
             </div>
           </PageHeader>
-          <ContentPackEdit contentPack={this.state.contentPack}
+          <ContentPackEdit contentPack={contentPack}
                            onGetEntities={this._getEntities}
                            onStateChange={this._onStateChanged}
-                           fetchedEntities={this.state.fetchedEntities}
-                           selectedEntities={this.state.selectedEntities}
-                           appliedParameter={this.state.appliedParameter}
-                           entityIndex={this.state.entityIndex}
+                           fetchedEntities={fetchedEntities}
+                           selectedEntities={selectedEntities}
+                           appliedParameter={appliedParameter}
+                           entityIndex={entityIndex}
                            onSave={this._onSave} />
         </span>
       </DocumentTitle>

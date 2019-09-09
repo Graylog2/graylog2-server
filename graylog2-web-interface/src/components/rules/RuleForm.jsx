@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 
+import { Button } from 'components/graylog';
 import { SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';

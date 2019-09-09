@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import ClipboardJS from 'clipboard';
+
+import { Button } from 'components/graylog';
 
 /**
  * Component that renders a button to copy some text in the clipboard when pressed.
@@ -40,6 +42,13 @@ class ClipboardButton extends React.Component {
     disabled: false,
     buttonTitle: undefined,
     container: undefined,
+    text: undefined,
+    target: undefined,
+    className: undefined,
+    style: undefined,
+    bsStyle: undefined,
+    bsSize: undefined,
+    onSuccess: () => {},
   };
 
   state = {
@@ -47,10 +56,13 @@ class ClipboardButton extends React.Component {
   };
 
   componentDidMount() {
+    const { container } = this.props;
     const options = {};
-    if (this.props.container) {
-      options.container = this.props.container;
+
+    if (container) {
+      options.container = container;
     }
+
     this.clipboard = new ClipboardJS('[data-clipboard-button]', options);
     this.clipboard.on('success', this._onSuccess);
     this.clipboard.on('error', this._onError);
@@ -63,11 +75,10 @@ class ClipboardButton extends React.Component {
   }
 
   _onSuccess = (event) => {
+    const { onSuccess } = this.props;
     this.setState({ tooltipMessage: 'Copied!' });
 
-    if (this.props.onSuccess) {
-      this.props.onSuccess(event);
-    }
+    onSuccess(event);
 
     event.clearSelection();
   };
@@ -79,30 +90,27 @@ class ClipboardButton extends React.Component {
 
   _getFilteredProps = () => {
     const { className, style, bsStyle, bsSize, disabled, buttonTitle } = this.props;
-    return {
-      className: className,
-      style: style,
-      bsStyle: bsStyle,
-      bsSize: bsSize,
-      disabled: disabled,
-      title: buttonTitle,
-    };
+
+    return { className, style, bsStyle, bsSize, disabled, title: buttonTitle };
   };
 
   render() {
-    const filteredProps = this._getFilteredProps();
-    const tooltip = <Tooltip id="copy-button-tooltip">{this.state.tooltipMessage}</Tooltip>;
+    const { action, title, text, target } = this.props;
+    const { tooltipMessage } = this.state;
 
-    if (this.props.text) {
-      filteredProps['data-clipboard-text'] = this.props.text;
+    const filteredProps = this._getFilteredProps();
+    const tooltip = <Tooltip id="copy-button-tooltip">{tooltipMessage}</Tooltip>;
+
+    if (text) {
+      filteredProps['data-clipboard-text'] = text;
     } else {
-      filteredProps['data-clipboard-target'] = this.props.target;
+      filteredProps['data-clipboard-target'] = target;
     }
 
     return (
       <OverlayTrigger placement="top" trigger="click" overlay={tooltip} rootClose>
-        <Button data-clipboard-button data-clipboard-action={this.props.action} {...filteredProps}>
-          {this.props.title}
+        <Button data-clipboard-button data-clipboard-action={action} {...filteredProps}>
+          {title}
         </Button>
       </OverlayTrigger>
     );

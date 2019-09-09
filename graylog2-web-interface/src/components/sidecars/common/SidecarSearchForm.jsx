@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, OverlayTrigger, Popover, Table } from 'react-bootstrap';
+import { OverlayTrigger, Popover, Table } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { SearchForm } from 'components/common';
+
 import style from './SidecarSearchForm.css';
 
 class SidecarSearchForm extends React.Component {

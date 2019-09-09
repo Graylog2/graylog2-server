@@ -2,13 +2,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'react-bootstrap';
+import { OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
 
+import { Button } from 'components/graylog';
 import { DataTable, Spinner, Timestamp } from 'components/common';
 
 import UserListStyle from '!style!css!./UserList.css';

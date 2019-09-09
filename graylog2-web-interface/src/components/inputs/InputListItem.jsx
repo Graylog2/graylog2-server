@@ -2,17 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button } from 'components/graylog';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
 
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';

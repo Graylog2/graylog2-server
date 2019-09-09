@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, Select } from 'components/common';
 import { DocumentationLink } from 'components/support';
@@ -27,8 +28,10 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   getInitialState() {
+    const { config } = this.props;
+
     return {
-      config: ObjectUtils.clone(this.props.config),
+      config: ObjectUtils.clone(config),
     };
   },
 
@@ -39,7 +42,8 @@ const GeoIpResolverConfig = createReactClass({
   inputs: {},
 
   _updateConfigField(field, value) {
-    const update = ObjectUtils.clone(this.state.config);
+    const { config } = this.state;
+    const update = ObjectUtils.clone(config);
     update[field] = value;
     this.setState({ config: update });
   },
@@ -70,7 +74,10 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   _saveConfig() {
-    this.props.updateConfig(this.state.config).then(() => {
+    const { updateConfig } = this.props;
+    const { config } = this.state;
+
+    updateConfig(config).then(() => {
       this._closeModal();
     });
   },
@@ -87,6 +94,8 @@ const GeoIpResolverConfig = createReactClass({
   },
 
   render() {
+    const { config } = this.state;
+
     return (
       <div>
         <h3>Geo-Location Processor</h3>
@@ -99,11 +108,11 @@ const GeoIpResolverConfig = createReactClass({
 
         <dl className="deflist">
           <dt>Enabled:</dt>
-          <dd>{this.state.config.enabled === true ? 'yes' : 'no'}</dd>
+          <dd>{config.enabled === true ? 'yes' : 'no'}</dd>
           <dt>Database type:</dt>
-          <dd>{this._activeDatabaseType(this.state.config.db_type)}</dd>
+          <dd>{this._activeDatabaseType(config.db_type)}</dd>
           <dt>Database path:</dt>
-          <dd>{this.state.config.db_path}</dd>
+          <dd>{config.db_path}</dd>
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
@@ -121,7 +130,7 @@ const GeoIpResolverConfig = createReactClass({
                    ref={(elem) => { this.inputs.configEnabled = elem; }}
                    label="Enable Geo-Location processor"
                    name="enabled"
-                   checked={this.state.config.enabled}
+                   checked={config.enabled}
                    onChange={this._onCheckboxClick('enabled', 'configEnabled')} />
             <Input id="maxmind-db-select"
                    label="Select the MaxMind database type"
@@ -130,7 +139,7 @@ const GeoIpResolverConfig = createReactClass({
                       required
                       options={this._availableDatabaseTypes()}
                       matchProp="label"
-                      value={this.state.config.db_type}
+                      value={config.db_type}
                       onChange={this._onDbTypeSelect} />
             </Input>
             <Input id="maxmind-db-path"
@@ -138,7 +147,7 @@ const GeoIpResolverConfig = createReactClass({
                    label="Path to the MaxMind database"
                    help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank" rel="noopener noreferrer">MaxMind</a>.</span>}
                    name="db_path"
-                   value={this.state.config.db_path}
+                   value={config.db_path}
                    onChange={this._onUpdate('db_path')} />
           </fieldset>
         </BootstrapModalForm>

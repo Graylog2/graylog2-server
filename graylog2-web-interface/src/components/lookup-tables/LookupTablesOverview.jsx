@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
