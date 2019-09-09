@@ -13,16 +13,25 @@
 
 :local(.sidebarNav) {
     padding: 10px 20px 10px 25px;
-    display: block;
+    display: flex;
 }
 
 :local(.sidebarNavFont) {
     font-size: 16px;
     display: inline;
+    margin-top: 5px;
     margin-left: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+:local(.selected) {
+   color: #FF3633;
 }
 
 :local(.sidebarIcon) {
+    width: 10px;
+    text-align: center;
     font-size: 20px;
 }
 

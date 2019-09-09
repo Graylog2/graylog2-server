@@ -38,6 +38,7 @@ const SideBar = createReactClass({
     return {
       availableHeight: 1000,
       activePanel: 'fields',
+      selectedKey: undefined,
     };
   },
 
@@ -82,21 +83,28 @@ const SideBar = createReactClass({
 
   _getPanelHeader(key) {
     return {
-      viewDescription: ['View Description', (<i className={'fa fa-info'} />)],
-      searchDetails: ['Search Details', (<i className={'fa fa-search'} />)],
-      highlighting: ['Formatting & Highlighting', (<i className={'fa fa-paragraph'} />)],
-      fields: ['Fields',(<i className={'fa fa-subscript'} />)],
+      viewDescription: ['View Description', (<i className="fa fa-info" />)],
+      searchDetails: ['Search Details', (<i className="fa fa-search" />)],
+      highlighting: ['Formatting & Highlighting', (<i className="fa fa-paragraph" />)],
+      fields: ['Fields', (<i className="fa fa-subscript" />)],
     }[key];
+  },
+
+  setSelectedKey(key) {
+    return () => this.setState({ selectedKey: key });
   },
 
   renderNavItem(key) {
     const { open } = this.props;
+    const { selectedKey } = this.state;
     const [text, icon] = this._getPanelHeader(key);
+    const selectedColor = selectedKey === key ? styles.selected : '';
 
     return (
-      <span className={styles.sidebarNav}>
-        <span>{icon}</span> {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
-      </span>
+      <div onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
+        <div className={styles.sidebarIcon}>{icon}</div>
+        {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
+      </div>
     );
   },
 
