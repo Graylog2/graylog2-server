@@ -17,7 +17,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewManagementActions } from './ViewManagementStore';
 import type { RefluxActions } from './StoreTypes';
 
-type ViewStoreState = {
+export type ViewStoreState = {
   activeQuery: string,
   view: View,
   dirty: boolean,

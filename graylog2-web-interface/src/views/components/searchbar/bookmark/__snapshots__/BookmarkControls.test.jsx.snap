@@ -1,0 +1,257 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BookmarkControls render the BookmarkControls should render not dirty 1`] = `
+<ConnectStoresWrapper[BookmarkControls] stores=viewStoreState
+  viewStoreState={
+    Object {
+      "activeQuery": "",
+      "dirty": false,
+      "view": Object {
+        "created_at": undefined,
+        "description": "description",
+        "id": "id-beef",
+        "owner": undefined,
+        "properties": undefined,
+        "search_id": "id-beef",
+        "state": undefined,
+        "summary": undefined,
+        "title": "title",
+        "type": undefined,
+      },
+    }
+  }
+>
+  <BookmarkControls
+    viewStoreState={
+      Object {
+        "activeQuery": "",
+        "dirty": false,
+        "view": Object {
+          "created_at": undefined,
+          "description": "description",
+          "id": "id-beef",
+          "owner": undefined,
+          "properties": undefined,
+          "search_id": "id-beef",
+          "state": undefined,
+          "summary": undefined,
+          "title": "title",
+          "type": undefined,
+        },
+      }
+    }
+  >
+    <div
+      className="position pull-right"
+    >
+      <ButtonGroup
+        block={false}
+        bsClass="btn-group"
+        justified={false}
+        vertical={false}
+      >
+        <div
+          className="btn-group"
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={true}
+            onClick={[Function]}
+            title="Empty search"
+          >
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              title="Empty search"
+              type="button"
+            >
+              <i
+                className="fa fa-eraser"
+              />
+            </button>
+          </Button>
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={false}
+            onClick={[Function]}
+            title="Save search"
+          >
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              title="Save search"
+              type="button"
+            >
+              <i
+                className="fa fa-bookmark-o"
+                style={
+                  Object {
+                    "color": "",
+                  }
+                }
+              />
+            </button>
+          </Button>
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={false}
+            onClick={[Function]}
+            title="List of saved searches"
+          >
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              title="List of saved searches"
+              type="button"
+            >
+              <i
+                className="fa fa-folder-o"
+              />
+            </button>
+          </Button>
+        </div>
+      </ButtonGroup>
+    </div>
+  </BookmarkControls>
+</ConnectStoresWrapper[BookmarkControls] stores=viewStoreState>
+`;
+
+exports[`BookmarkControls render the BookmarkControls should render with context 1`] = `
+<ConnectStoresWrapper[BookmarkControls] stores=viewStoreState
+  viewStoreState={
+    Object {
+      "activeQuery": "",
+      "dirty": true,
+      "view": Object {
+        "created_at": undefined,
+        "description": "description",
+        "id": "id-beef",
+        "owner": undefined,
+        "properties": undefined,
+        "search_id": "id-beef",
+        "state": undefined,
+        "summary": undefined,
+        "title": "title",
+        "type": undefined,
+      },
+    }
+  }
+>
+  <BookmarkControls
+    viewStoreState={
+      Object {
+        "activeQuery": "",
+        "dirty": true,
+        "view": Object {
+          "created_at": undefined,
+          "description": "description",
+          "id": "id-beef",
+          "owner": undefined,
+          "properties": undefined,
+          "search_id": "id-beef",
+          "state": undefined,
+          "summary": undefined,
+          "title": "title",
+          "type": undefined,
+        },
+      }
+    }
+  >
+    <div
+      className="position pull-right"
+    >
+      <ButtonGroup
+        block={false}
+        bsClass="btn-group"
+        justified={false}
+        vertical={false}
+      >
+        <div
+          className="btn-group"
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={false}
+            onClick={[Function]}
+            title="Empty search"
+          >
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              title="Empty search"
+              type="button"
+            >
+              <i
+                className="fa fa-eraser"
+              />
+            </button>
+          </Button>
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={false}
+            onClick={[Function]}
+            title="Unsaved changes"
+          >
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              title="Unsaved changes"
+              type="button"
+            >
+              <i
+                className="fa fa-bookmark"
+                style={
+                  Object {
+                    "color": "#ffc107",
+                  }
+                }
+              />
+            </button>
+          </Button>
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="default"
+            disabled={false}
+            onClick={[Function]}
+            title="List of saved searches"
+          >
+            <button
+              className="btn btn-default"
+              disabled={false}
+              onClick={[Function]}
+              title="List of saved searches"
+              type="button"
+            >
+              <i
+                className="fa fa-folder-o"
+              />
+            </button>
+          </Button>
+        </div>
+      </ButtonGroup>
+    </div>
+  </BookmarkControls>
+</ConnectStoresWrapper[BookmarkControls] stores=viewStoreState>
+`;
