@@ -50,7 +50,7 @@ class NewSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    ViewActions.create().then(() => this.setState({ loaded: true }));
+    ViewActions.create(View.Type.Search).then(() => this.setState({ loaded: true }));
   }
 
   componentWillReceiveProps(nextProps: Props): any {
