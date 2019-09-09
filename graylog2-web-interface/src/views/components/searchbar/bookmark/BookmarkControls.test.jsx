@@ -25,7 +25,6 @@ describe('BookmarkControls', () => {
     });
 
     it('should render with context', () => {
-      const onLoad = jest.fn();
       const view = View.builder()
         .title('title')
         .description('description')
@@ -37,11 +36,7 @@ describe('BookmarkControls', () => {
         view: view,
         dirty: true,
       };
-      const wrapper = mount(
-        <ViewLoaderContext.Provider value={{ loaderFunc: onLoad, dirty: true, loadedView: view }}>
-          <BookmarkControls viewStoreState={viewStoreState} />
-        </ViewLoaderContext.Provider>,
-      );
+      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
       expect(wrapper).toMatchSnapshot();
     });
   });

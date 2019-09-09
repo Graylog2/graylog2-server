@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import View from 'views/logic/views/View';
 
-export type ViewLoaderContextType = { loaderFunc: string => Promise<?View>, loadedView: ?View, dirty: boolean };
+export type ViewLoaderContextType = { loaderFunc: string => Promise<?View> };
 
 const ViewLoaderContext = React.createContext<ViewLoaderContextType>({});
 

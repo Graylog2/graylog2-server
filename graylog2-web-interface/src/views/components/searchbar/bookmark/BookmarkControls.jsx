@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, ButtonGroup } from 'react-bootstrap';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -27,8 +26,6 @@ type State = {
 };
 
 class BookmarkControls extends React.Component<Props, State> {
-  static contextType = ViewLoaderContext;
-
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
   };
@@ -129,7 +126,7 @@ class BookmarkControls extends React.Component<Props, State> {
   render() {
     const { showForm, showList, newTitle } = this.state;
     const { viewStoreState } = this.props;
-    const { view } = viewStoreState;
+    const { view, dirty } = viewStoreState;
 
 
     const bookmarkList = showList && (
@@ -138,49 +135,44 @@ class BookmarkControls extends React.Component<Props, State> {
                     toggleModal={this.toggleListModal} />
     );
 
+    const loaded = (view && view.id);
+    const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
+    let bookmarkColor: string = '';
+    if (loaded) {
+      bookmarkColor = dirty ? '#ffc107' : '#007bff';
+    }
+
+    const disableReset = !(dirty || loaded);
+    let title: string;
+    if (dirty) {
+      title = 'Unsaved changes';
+    } else {
+      title = loaded ? 'Saved search' : 'Save search';
+    }
+
+    const bookmarkForm = showForm && (
+      <BookmarkForm onChangeTitle={this.onChangeTitle}
+                    target={this.formTarget}
+                    saveSearch={this.saveSearch}
+                    saveAsSearch={this.saveAsSearch}
+                    disableCreateNew={newTitle === view.title}
+                    isCreateNew={!view.id}
+                    toggleModal={this.toggleFormModal}
+                    value={newTitle} />
+    );
+
     return (
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
-          <ViewLoaderContext.Consumer>
-            {({ loadedView, dirty }) => {
-              const loaded = (loadedView && loadedView.id);
-              const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
-              let bookmarkColor: string = '';
-              if (loaded) {
-                bookmarkColor = dirty ? '#ffc107' : '#007bff';
-              }
-
-              const disableReset = !(dirty || loaded);
-              let title: string;
-              if (dirty) {
-                title = 'Unsaved changes';
-              } else {
-                title = loaded ? 'Saved search' : 'Save search';
-              }
-
-              const bookmarkForm = showForm && (
-                <BookmarkForm onChangeTitle={this.onChangeTitle}
-                              target={this.formTarget}
-                              saveSearch={this.saveSearch}
-                              saveAsSearch={this.saveAsSearch}
-                              disableCreateNew={newTitle === view.title}
-                              isCreateNew={!view.id}
-                              toggleModal={this.toggleFormModal}
-                              value={newTitle} />
-              );
-              return (
-                <React.Fragment>
-                  <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
-                    <i className="fa fa-eraser" />
-                  </Button>
-                  <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-                    <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
-                  </Button>
-                  {bookmarkForm}
-                </React.Fragment>
-              );
-            }}
-          </ViewLoaderContext.Consumer>
+          <React.Fragment>
+            <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
+              <i className="fa fa-eraser" />
+            </Button>
+            <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
+              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+            </Button>
+            {bookmarkForm}
+          </React.Fragment>
           <Button title="List of saved searches"
                   onClick={this.toggleListModal}>
             <i className="fa fa-folder-o" />
