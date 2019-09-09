@@ -3,7 +3,6 @@ import React from 'react';
 import { mount } from 'enzyme';
 
 import View from 'views/logic/views/View';
-import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Search from 'views/logic/search/Search';
 import BookmarkControls from './BookmarkControls';
 

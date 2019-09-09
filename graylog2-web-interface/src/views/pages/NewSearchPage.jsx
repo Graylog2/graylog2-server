@@ -6,7 +6,6 @@ import connect from 'stores/connect';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
