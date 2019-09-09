@@ -9,6 +9,20 @@ import BookmarkControls from './BookmarkControls';
 
 describe('BookmarkControls', () => {
   describe('render the BookmarkControls', () => {
+    it('should render not dirty with unsaved view', () => {
+      const viewStoreState = {
+        activeQuery: '',
+        view: View.builder()
+          .title('title')
+          .description('description')
+          .search(Search.create().toBuilder().id('id-beef').build())
+          .build(),
+        dirty: false,
+      };
+      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
+      expect(wrapper).toMatchSnapshot();
+    });
+
     it('should render not dirty', () => {
       const viewStoreState = {
         activeQuery: '',
@@ -24,7 +38,7 @@ describe('BookmarkControls', () => {
       expect(wrapper).toMatchSnapshot();
     });
 
-    it('should render with context', () => {
+    it('should render dirty', () => {
       const view = View.builder()
         .title('title')
         .description('description')
