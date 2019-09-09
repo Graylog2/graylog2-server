@@ -48,6 +48,7 @@ const QueryTabs = ({ children, onSelect, onRemove, onTitleChange, queries, selec
 QueryTabs.propTypes = {
   children: PropTypes.node,
   onSaveView: PropTypes.func.isRequired,
+  onSaveAsView: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   onTitleChange: PropTypes.func.isRequired,
