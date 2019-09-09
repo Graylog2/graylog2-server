@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'react-bootstrap';
+import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'components/graylog';
 import lodash from 'lodash';
 import IsolatedScroll from 'react-isolated-scroll';
 

@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
-
+import { Col } from 'components/graylog';
 import { EntityListItem } from 'components/common';
-
 import { GenericAlertConditionSummary } from 'components/alertconditions';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { NavDropdown, MenuItem } from 'react-bootstrap';
+import { NavDropdown, MenuItem } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';

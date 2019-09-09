@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 
 import { PaginatedList, SearchForm, Spinner, EntityList } from 'components/common';
 import View from './View';

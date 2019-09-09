@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Row, Col, Button } from 'react-bootstrap';
+import { Alert, Row, Col, Button } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';

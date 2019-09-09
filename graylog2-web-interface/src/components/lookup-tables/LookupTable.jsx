@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonToolbar, Row, Col } from 'react-bootstrap';
-
-import { Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
+
+import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
+import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import FormsUtils from 'util/FormsUtils';
 import { ContentPackMarker } from 'components/common';

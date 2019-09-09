@@ -1,10 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, FormGroup, Alert } from 'react-bootstrap';
 
 import { DocumentTitle } from 'components/common';
-import { Button } from 'components/graylog';
+import { Row, FormGroup, Alert, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';

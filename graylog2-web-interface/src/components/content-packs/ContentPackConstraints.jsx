@@ -3,7 +3,7 @@ import React from 'react';
 import { Set } from 'immutable';
 
 import { DataTable } from 'components/common';
-import { Badge } from 'react-bootstrap';
+import { Badge } from 'components/graylog';
 import './ContentPackConstraints.css';
 
 class ContentPackConstraints extends React.Component {

@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Well } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 
-import { Button } from 'components/graylog';
+import { Button, Row, Col, Well } from 'components/graylog';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
 import ActionsProvider from 'injection/ActionsProvider';

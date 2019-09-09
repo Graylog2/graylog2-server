@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import lodash from 'lodash';
 
 import CombinedProvider from 'injection/CombinedProvider';

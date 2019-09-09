@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';

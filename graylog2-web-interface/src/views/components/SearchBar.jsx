@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';

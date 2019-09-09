@@ -2,11 +2,10 @@
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import URLUtils from 'util/URLUtils';
 import fixup from 'views/pages/StyleFixups.css';
 import View from 'views/logic/views/View';

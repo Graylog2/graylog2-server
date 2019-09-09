@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Row, Col } from 'react-bootstrap';
+import { Alert, Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';

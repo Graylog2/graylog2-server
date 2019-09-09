@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';

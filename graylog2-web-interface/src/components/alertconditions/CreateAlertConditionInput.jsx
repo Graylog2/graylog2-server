@@ -3,9 +3,8 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
-import { Col, Row } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import { AlertConditionForm } from 'components/alertconditions';

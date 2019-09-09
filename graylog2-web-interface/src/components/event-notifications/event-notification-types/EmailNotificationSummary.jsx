@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Well } from 'react-bootstrap';
+import { Well } from 'components/graylog';
 
 import CommonNotificationSummary from './CommonNotificationSummary';
 

@@ -3,7 +3,7 @@ import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 const menuTitle = <React.Fragment><i className="fa fa-plus" />{' '}Create</React.Fragment>;
 

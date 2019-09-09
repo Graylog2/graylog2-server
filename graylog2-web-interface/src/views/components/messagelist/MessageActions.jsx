@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 // $FlowFixMe: imports from core need to be fixed in flow
@@ -8,7 +7,7 @@ import Routes from 'routing/Routes';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { ClipboardButton } from 'components/common';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { Button } from 'components/graylog';
+import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 

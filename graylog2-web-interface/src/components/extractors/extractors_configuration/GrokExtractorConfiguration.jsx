@@ -1,8 +1,7 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, ControlLabel } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
-import { Button } from 'components/graylog';
+import { Row, Col, ControlLabel, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';

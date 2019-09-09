@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 
+import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 

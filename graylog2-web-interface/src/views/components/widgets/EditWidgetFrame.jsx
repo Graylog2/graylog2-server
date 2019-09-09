@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'react-bootstrap';
+import { Modal } from 'components/graylog';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';

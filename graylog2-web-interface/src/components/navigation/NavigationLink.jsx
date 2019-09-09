@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 const NavigationLink = ({ description, path, ...rest }) => (

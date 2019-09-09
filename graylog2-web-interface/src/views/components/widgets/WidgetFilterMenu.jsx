@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
-
+import { OverlayTrigger, Popover, Button } from 'components/graylog';
 import QueryInput from '../searchbar/AsyncQueryInput';
 
 import style from './WidgetFilterMenu.css';

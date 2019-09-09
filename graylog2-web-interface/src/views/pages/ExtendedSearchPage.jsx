@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
+import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';

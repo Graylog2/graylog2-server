@@ -4,7 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';

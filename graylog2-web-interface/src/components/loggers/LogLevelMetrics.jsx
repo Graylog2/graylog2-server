@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col } from 'react-bootstrap';
+import { Col } from 'components/graylog';
 import lodash from 'lodash';
 import numeral from 'numeral';
 

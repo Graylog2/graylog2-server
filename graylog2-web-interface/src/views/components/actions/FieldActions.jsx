@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import uuid from 'uuid/v4';
 

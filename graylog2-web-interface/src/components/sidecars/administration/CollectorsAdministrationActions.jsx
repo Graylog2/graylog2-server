@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { ButtonToolbar } from 'react-bootstrap';
+import { ButtonToolbar } from 'components/graylog';
 
 import CollectorConfigurationSelector from './CollectorConfigurationSelector';
 import CollectorProcessControl from './CollectorProcessControl';

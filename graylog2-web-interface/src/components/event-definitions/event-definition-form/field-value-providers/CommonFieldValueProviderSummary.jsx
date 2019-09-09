@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
-
+import { Table, Button } from 'components/graylog';
 import styles from './CommonFieldValueProviderSummary.css';
 
 class CommonFieldValueProviderSummary extends React.Component {

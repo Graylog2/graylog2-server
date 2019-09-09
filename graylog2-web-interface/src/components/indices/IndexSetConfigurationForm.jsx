@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import moment from 'moment';
 import lodash from 'lodash';
 
+import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Spinner, TimeUnitInput } from 'components/common';
 

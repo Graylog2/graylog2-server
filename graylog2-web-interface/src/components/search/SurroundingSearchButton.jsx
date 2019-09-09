@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
 import StoreProvider from 'injection/StoreProvider';

@@ -1,2 +1,1 @@
-// export { Button } from './Button';
-export { Button } from 'react-bootstrap';
+export * from './bootstrap-import';

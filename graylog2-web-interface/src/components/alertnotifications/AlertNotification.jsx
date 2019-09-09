@@ -2,13 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { Button } from 'components/graylog';
+import { Col, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { EntityListItem, IfPermitted, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';

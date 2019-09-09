@@ -2,9 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Panel } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, Panel } from 'components/graylog';
 import { Pluralize, SelectPopover } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 

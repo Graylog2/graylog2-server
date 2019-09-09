@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Stream from './Stream';

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Badge } from 'react-bootstrap';
+import { Badge } from 'components/graylog';
 import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from 'components/graylog';
 
 import { EntityListItem, LinkToNode } from 'components/common';
 import NodeThroughput from 'components/throughput/NodeThroughput';

@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ContentPackMarker } from 'components/common';
 import FormsUtils from 'util/FormsUtils';

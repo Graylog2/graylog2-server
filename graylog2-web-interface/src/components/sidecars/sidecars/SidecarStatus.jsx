@@ -2,9 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 
+import { Col, Row, Button } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 

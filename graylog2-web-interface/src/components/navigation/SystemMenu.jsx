@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import { NavDropdown } from 'react-bootstrap';
+import { NavDropdown } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 

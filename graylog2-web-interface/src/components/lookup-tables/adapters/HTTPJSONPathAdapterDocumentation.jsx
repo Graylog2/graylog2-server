@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
 import React from 'react';
-import { Alert, Col, Row } from 'react-bootstrap';
+import { Alert, Col, Row } from 'components/graylog';
 
 const HTTPJSONPathAdapterDocumentation = () => {
   const exampleJSON = `{
@@ -40,7 +40,7 @@ then
   let userName = lookup_value("user-api", userLogin);
   // Set the field "user_name" in the message
   set_field("user_name", userName)
-  
+
   // Lookup the multi value in the user-api lookup table
   let userData = lookup("user-api", userLogin);
   // Set the email and cellphone as fields in the message

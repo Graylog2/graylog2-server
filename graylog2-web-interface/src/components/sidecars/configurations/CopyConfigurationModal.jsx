@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 

@@ -3,7 +3,7 @@ import React from 'react';
 
 import createReactClass from 'create-react-class';
 
-import { Panel } from 'react-bootstrap';
+import { Panel } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 

@@ -57,7 +57,7 @@ const ReactGridContainerExample = createReactClass({
 Lock or block resizing in `ReactGridContainer`:
 ```js
 const createReactClass = require('create-react-class');
-const { Button, ButtonToolbar } = require('react-bootstrap');
+const { Button, ButtonToolbar } = require('components/graylog');
 
 const ReactGridContainerExampleLocked = createReactClass({
   getInitialState() {
