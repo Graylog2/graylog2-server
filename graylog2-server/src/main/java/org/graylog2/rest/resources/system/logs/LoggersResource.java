@@ -185,6 +185,9 @@ public class LoggersResource extends RestResource {
         final Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
         setLoggerLevel(subsystem.getCategory(), newLevel);
+        if (subsystem.getCategory().equals("org.graylog2")) {
+            setLoggerLevel("org.graylog", newLevel);
+        }
 
         LOG.debug("Successfully set log level for subsystem \"{}\" to \"{}\"", subsystem.getTitle(), newLevel);
     }
