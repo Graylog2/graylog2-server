@@ -1,7 +1,7 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
+// $FlowFixMe: could not find types
 import { SizeMe } from 'react-sizeme';
 
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
@@ -14,10 +14,29 @@ import HighlightingRules from './highlighting/HighlightingRules';
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
 
-const SideBar = createReactClass({
-  displayName: 'SideBar',
+type ViewMetaData = {
+  activeQuery: string,
+  description: string,
+  id: string,
+  summary: string,
+  title: string,
+};
 
-  propTypes: {
+type Props = {
+  open: boolean,
+  toggleOpen: () => void,
+  children: React.Node,
+  queryId: string,
+  results: {},
+  viewMetadata: ViewMetaData,
+};
+
+type State = {
+  selectedKey: string,
+};
+
+class SideBar extends React.Component<Props, State> {
+  static propTypes = {
     open: PropTypes.bool.isRequired,
     toggleOpen: PropTypes.func.isRequired,
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
@@ -30,23 +49,24 @@ const SideBar = createReactClass({
       summary: PropTypes.string,
       title: PropTypes.string,
     }).isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
       selectedKey: 'fields',
     };
-  },
+  }
 
-  formatViewDescription(view) {
+  formatViewDescription = (view: ViewMetaData) => {
     const { description } = view;
     if (description) {
       return <span>{description}</span>;
     }
     return <i>No view description.</i>;
-  },
+  };
 
-  _getPanelHeader(key) {
+  _getPanelHeader = (key: string) => {
     const { children, results, viewMetadata, queryId } = this.props;
     const viewDescription = this.formatViewDescription(viewMetadata);
     return {
@@ -55,9 +75,9 @@ const SideBar = createReactClass({
         (<i className="fa fa-info" />),
         (
           <React.Fragment>
-          <span className="pull-right">
-            <AddWidgetButton queryId={queryId} />
-          </span>
+            <span className="pull-right">
+              <AddWidgetButton queryId={queryId} />
+            </span>
 
             <div className={styles.viewMetadata}>
               <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
@@ -87,16 +107,17 @@ const SideBar = createReactClass({
         children,
       ],
     }[key];
-  },
+  };
 
-  setSelectedKey(key) {
+  setSelectedKey = (key: string) => {
     const { toggleOpen, open } = this.props;
     return () => this.setState(
       { selectedKey: key },
-      () => !open && toggleOpen());
-  },
+      () => !open && toggleOpen(),
+    );
+  };
 
-  renderNavItem(key) {
+  renderNavItem = (key: string) => {
     const { open } = this.props;
     const { selectedKey } = this.state;
     const isSelected = selectedKey === key && open;
@@ -112,11 +133,11 @@ const SideBar = createReactClass({
 
     return (
       <div>
-        <div onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
+        <div role="presentation" onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
           <div className={styles.sidebarIcon}>{icon}</div>
           {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
         </div>
-        <SizeMe monitorHeight refreshRate={32}>
+        <SizeMe monitorHeight refreshRate={100}>
           {({ size }) => {
             return (
               <div className={`${styles.navContent} ${selected}`}>
@@ -127,7 +148,7 @@ const SideBar = createReactClass({
         </SizeMe>
       </div>
     );
-  },
+  };
 
   render() {
     const { toggleOpen, open } = this.props;
@@ -135,8 +156,8 @@ const SideBar = createReactClass({
     return (
       <div className={styles.sidebarContainer}>
         <div className="sidebar">
-          <div className={`${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
-            <span onClick={toggleOpen} className={styles.sidebarNav}>
+          <div className={`${styles.sidebarContent}`}>
+            <span role="presentation" onClick={toggleOpen} className={styles.sidebarNav}>
               <span><i className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
             </span>
             {this.renderNavItem('viewDescription')}
@@ -147,7 +168,7 @@ const SideBar = createReactClass({
         </div>
       </div>
     );
-  },
-});
+  }
+}
 
 export default SideBar;
