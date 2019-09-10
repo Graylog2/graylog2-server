@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.logs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
@@ -77,7 +78,7 @@ public class LoggersResource extends RestResource {
     private static final String MEMORY_APPENDER_NAME = "graylog-internal-logs";
 
     private static final Map<String, Subsystem> SUBSYSTEMS = ImmutableMap.<String, Subsystem>of(
-            "graylog", new Subsystem("Graylog", "org.graylog2", "All messages from Graylog-owned systems."),
+            "graylog", new Subsystem("Graylog", ImmutableList.of("org.graylog2", "org.graylog"), "All messages from Graylog-owned systems."),
             "indexer", new Subsystem("Indexer", "org.elasticsearch", "All messages related to indexing and searching."),
             "authentication", new Subsystem("Authentication", "org.apache.shiro", "All user authentication messages."),
             "sockets", new Subsystem("Sockets", "netty", "All messages related to socket communication."));
@@ -121,13 +122,13 @@ public class LoggersResource extends RestResource {
             }
 
             try {
-                final String category = subsystem.getValue().getCategory();
+                final String category = subsystem.getValue().getCategories().get(0);
                 final Level level = getLoggerLevel(category);
 
                 subsystems.put(subsystem.getKey(),
                         SingleSubsystemSummary.create(
                                 subsystem.getValue().getTitle(),
-                                subsystem.getValue().getCategory(),
+                                subsystem.getValue().getCategories(),
                                 subsystem.getValue().getDescription(),
                                 level.toString().toLowerCase(Locale.ENGLISH),
                                 level.intLevel()));
@@ -184,9 +185,8 @@ public class LoggersResource extends RestResource {
 
         final Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
         final Level newLevel = Level.toLevel(level.toUpperCase(Locale.ENGLISH));
-        setLoggerLevel(subsystem.getCategory(), newLevel);
-        if (subsystem.getCategory().equals("org.graylog2")) {
-            setLoggerLevel("org.graylog", newLevel);
+        for (String category: subsystem.getCategories()) {
+            setLoggerLevel(category, newLevel);
         }
 
         LOG.debug("Successfully set log level for subsystem \"{}\" to \"{}\"", subsystem.getTitle(), newLevel);
@@ -272,12 +272,18 @@ public class LoggersResource extends RestResource {
 
     private static class Subsystem {
         private final String title;
-        private final String category;
+        private final List<String> categories;
         private final String description;
 
         public Subsystem(String title, String category, String description) {
             this.title = title;
-            this.category = category;
+            this.categories = ImmutableList.of(category);
+            this.description = description;
+        }
+
+        public Subsystem(String title, List<String> categories, String description) {
+            this.title = title;
+            this.categories = ImmutableList.copyOf(categories);
             this.description = description;
         }
 
@@ -285,8 +291,8 @@ public class LoggersResource extends RestResource {
             return title;
         }
 
-        private String getCategory() {
-            return category;
+        private List<String> getCategories() {
+            return categories;
         }
 
         private String getDescription() {
