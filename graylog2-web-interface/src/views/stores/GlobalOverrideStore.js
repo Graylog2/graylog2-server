@@ -5,6 +5,7 @@ import moment from 'moment';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
+import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions } from './StoreTypes';
 import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
 
@@ -68,11 +69,11 @@ export const GlobalOverrideStore = singletonStore(
             };
             break;
         }
-        const newGlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
+        const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
         const promise = newGlobalOverride !== this.globalOverride
           ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
           : Promise.resolve(this.globalOverride);
-        GlobalOverrideActions.timerange.promise(promise);
+        GlobalOverrideActions.rangeType.promise(promise);
         return promise;
       }
       const promise = Promise.resolve(this.globalOverride);
@@ -80,8 +81,8 @@ export const GlobalOverrideStore = singletonStore(
       return promise;
     },
     rangeParams(key: string, value: string | number) {
-      const newTimerange = this.globalOverride && this.globalOverride.timerange ? { ...this.globalOverride.timerange, [key]: value } : { [key]: value };
-      const newGlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
+      const newTimerange: TimeRange = this.globalOverride && this.globalOverride.timerange ? { ...this.globalOverride.timerange, [key]: value } : { [key]: value };
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
       const promise = newGlobalOverride !== this.globalOverride
         ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
         : Promise.resolve(this.globalOverride);
@@ -93,7 +94,7 @@ export const GlobalOverrideStore = singletonStore(
         type: 'elasticsearch',
         query_string: newQueryString,
       };
-      const newGlobalOverride = this.globalOverride ? { ...this.globalOverride, query: newQuery } : { query: newQuery };
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, query: newQuery } : { query: newQuery };
       const promise = newGlobalOverride !== this.globalOverride
         ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
         : Promise.resolve(this.globalOverride);

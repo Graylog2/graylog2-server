@@ -4,8 +4,8 @@ import ParameterBinding from '../parameters/ParameterBinding';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export type GlobalOverride = {
-  timerange: ?TimeRange,
-  query: ?QueryString,
+  timerange?: TimeRange,
+  query?: QueryString,
 };
 
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
