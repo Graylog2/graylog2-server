@@ -30,11 +30,11 @@ import QueryBar from 'views/components/QueryBar';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import IfSearch from 'views/components/search/IfSearch';
+import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
-import IfSearch from '../components/search/IfSearch';
-import { AdditionalContext } from '../logic/ActionContext';
 
 type Props = {
   route: any,
@@ -63,8 +63,8 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
-const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
-  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
+const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
+  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
   useEffect(() => {
     style.use();
 
@@ -124,10 +124,8 @@ ExtendedSearchPage.propTypes = {
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
-const ExtendedSearchPageWithExecutionState = connect(ExtendedSearchPage, { executionState: SearchExecutionStateStore });
-
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPageWithExecutionState, mapping);
+export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPage, mapping);
