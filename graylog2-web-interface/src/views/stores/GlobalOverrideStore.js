@@ -1,6 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import moment from 'moment';
+import { isEmpty } from 'lodash';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
@@ -42,7 +43,15 @@ export const GlobalOverrideStore = singletonStore(
       return this.globalOverride;
     },
     rangeType(newType: string) {
-      console.log('rangeType: ', newType, this.globalOverride);
+      if (newType === 'disabled') {
+        const { timerange, ...rest } = this.globalOverride || {};
+        const newGlobalOverride: ?GlobalOverride = isEmpty(rest) ? undefined : { ...rest };
+        const promise = newGlobalOverride !== this.globalOverride
+          ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
+          : Promise.resolve(this.globalOverride);
+        GlobalOverrideActions.rangeType.promise(promise);
+        return promise;
+      }
       const oldTimerange = this.globalOverride && this.globalOverride.timerange ? this.globalOverride.timerange : {};
       const { type: oldType } = oldTimerange;
       if (oldType !== newType) {
@@ -81,7 +90,10 @@ export const GlobalOverrideStore = singletonStore(
       return promise;
     },
     rangeParams(key: string, value: string | number) {
-      const newTimerange: TimeRange = this.globalOverride && this.globalOverride.timerange ? { ...this.globalOverride.timerange, [key]: value } : { [key]: value };
+      const newTimerange: TimeRange = this.globalOverride && this.globalOverride.timerange
+        ? { ...this.globalOverride.timerange, [key]: value }
+        // $FlowFixMe: Flow is unable to validate that timerange is complete
+        : { [key]: value };
       const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
       const promise = newGlobalOverride !== this.globalOverride
         ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
