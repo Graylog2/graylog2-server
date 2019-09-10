@@ -6,6 +6,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { RefluxActions } from './StoreTypes';
 
 const defaultExecutionState = SearchExecutionState.empty();
@@ -17,6 +18,7 @@ export type SearchExecutionStateActionsType = RefluxActions<{
   setParameterValues: (ParameterMap) => Promise<SearchExecutionState>,
   replace: (SearchExecutionState, ?boolean) => Promise<SearchExecutionState>,
   clear: () => Promise<SearchExecutionState>,
+  globalOverride: (?GlobalOverride) => Promise<SearchExecutionState>,
 }>;
 
 export const SearchExecutionStateActions: SearchExecutionStateActionsType = singletonActions(
@@ -26,6 +28,7 @@ export const SearchExecutionStateActions: SearchExecutionStateActionsType = sing
     setParameterValues: { asyncResult: true },
     replace: { asyncResult: true },
     clear: { asyncResult: true },
+    globalOverride: { asyncResult: true },
   }),
 );
 
@@ -85,6 +88,15 @@ export const SearchExecutionStateStore = singletonStore(
         .build();
       this.trigger(this.executionState);
       SearchExecutionStateActions.bindParameterValue.promise(Promise.resolve(this.executionState));
+      return this.executionState;
+    },
+
+    globalOverride(newGlobalOverride: ?GlobalOverride): SearchExecutionState {
+      this.executionState = this.executionState.toBuilder()
+        .globalOverride(newGlobalOverride)
+        .build();
+      this.trigger(this.executionState);
+      SearchExecutionStateActions.globalOverride.promise(Promise.resolve(this.executionState));
       return this.executionState;
     },
   }),
