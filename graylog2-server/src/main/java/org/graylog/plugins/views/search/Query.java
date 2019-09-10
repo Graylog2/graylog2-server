@@ -92,8 +92,9 @@ public abstract class Query {
             return this;
         }
         final boolean hasTimerange = state.hasNonNull("timerange");
+        final boolean hasQuery = state.hasNonNull("query");
         final boolean hasSearchTypes = state.hasNonNull("search_types");
-        if (hasTimerange || hasSearchTypes) {
+        if (hasTimerange || hasQuery || hasSearchTypes) {
             final Builder builder = toBuilder();
             if (hasTimerange) {
                 try {
@@ -103,6 +104,11 @@ public abstract class Query {
                 } catch (Exception e) {
                     LOG.error("Unable to deserialize execution state for time range", e);
                 }
+            }
+            if (hasQuery) {
+                final Object rawQuery = state.path("query");
+                final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
+                builder.query(newQuery);
             }
             if (hasSearchTypes) {
                 // copy all existing search types, we'll update them by id if necessary below
