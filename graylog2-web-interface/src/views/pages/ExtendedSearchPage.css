@@ -64,7 +64,7 @@
 }
 
 .sidebar-grid {
-    background: rgb(34, 34, 34);
+    background: #e3e3e3;
     grid-area: sidebar;
     height: 100vh;
     position: sticky;

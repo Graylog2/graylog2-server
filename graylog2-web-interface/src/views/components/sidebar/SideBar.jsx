@@ -82,11 +82,43 @@ const SideBar = createReactClass({
   },
 
   _getPanelHeader(key) {
+    const { children, results, viewMetadata, queryId } = this.props;
+    const viewDescription = this.formatViewDescription(viewMetadata);
     return {
-      viewDescription: ['View Description', (<i className="fa fa-info" />)],
-      searchDetails: ['Search Details', (<i className="fa fa-search" />)],
-      highlighting: ['Formatting & Highlighting', (<i className="fa fa-paragraph" />)],
-      fields: ['Fields', (<i className="fa fa-subscript" />)],
+      viewDescription: [
+        'View Description',
+        (<i className="fa fa-info" />),
+        (<React.Fragment>
+          <span className="pull-right">
+            <AddWidgetButton queryId={queryId} />
+          </span>
+
+          <div className={styles.viewMetadata}>
+            <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
+            <small>{viewMetadata.summary || defaultNewViewSummary}</small>
+          </div>
+
+          <div className={styles.viewMetadata}>
+            <SearchResultOverview results={results} />
+          </div>
+          {viewDescription}
+        </React.Fragment>)
+      ],
+      searchDetails: [
+        'Search Details',
+        (<i className="fa fa-search" />),
+        (<SearchDetails results={results} />),
+      ],
+      highlighting: [
+        'Formatting & Highlighting',
+        (<i className="fa fa-paragraph" />),
+        <HighlightingRules />,
+      ],
+      fields: [
+        'Fields',
+        (<i className="fa fa-subscript" />),
+        children,
+      ],
     }[key];
   },
 
@@ -97,21 +129,25 @@ const SideBar = createReactClass({
   renderNavItem(key) {
     const { open } = this.props;
     const { selectedKey } = this.state;
-    const [text, icon] = this._getPanelHeader(key);
-    const selectedColor = selectedKey === key ? styles.selected : '';
+    const isSelected = selectedKey === key && open;
+    const [text, icon, content] = this._getPanelHeader(key);
+    const selectedColor = isSelected ? styles.selected : '';
+    const selected = isSelected ? styles.contentOpen : styles.contentClosed;
+    const openContent = isSelected ? content : '';
 
     return (
-      <div onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
-        <div className={styles.sidebarIcon}>{icon}</div>
-        {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
+      <div>
+        <div onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
+          <div className={styles.sidebarIcon}>{icon}</div>
+          {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
+        </div>
+        <div className={`${styles.navContent} ${selected}`}>{openContent}</div>
       </div>
-    );
+  );
   },
 
   render() {
-    const { children, results, viewMetadata, queryId, toggleOpen, open } = this.props;
-    const { activePanel, availableHeight } = this.state;
-    const viewDescription = this.formatViewDescription(viewMetadata);
+    const { toggleOpen, open } = this.props;
     const toggleClassName = open ? styles.toggleOpen : styles.toggleClose;
     return (
       <div className={styles.sidebarContainer}>
@@ -124,32 +160,6 @@ const SideBar = createReactClass({
             {this.renderNavItem('searchDetails')}
             {this.renderNavItem('highlighting')}
             {this.renderNavItem('fields')}
-            {/*<PanelGroup accordion activeKey={activePanel} onSelect={newPanel => this.setState({ activePanel: newPanel })}>*/}
-            {/*  <Panel eventKey="metadata" header={this._getPanelHeader('viewDescription')}>*/}
-            {/*    <span className="pull-right">*/}
-            {/*      <AddWidgetButton queryId={queryId} />*/}
-            {/*    </span>*/}
-
-            {/*    <div className={styles.viewMetadata}>*/}
-            {/*      <h3>{viewMetadata.title || defaultNewViewTitle}</h3>*/}
-            {/*      <small>{viewMetadata.summary || defaultNewViewSummary}</small>*/}
-            {/*    </div>*/}
-
-            {/*    <div className={styles.viewMetadata}>*/}
-            {/*      <SearchResultOverview results={results} />*/}
-            {/*    </div>*/}
-            {/*    {viewDescription}*/}
-            {/*  </Panel>*/}
-            {/*  <Panel eventKey="search-details" header={this._getPanelHeader('searchDetails')}>*/}
-            {/*    <SearchDetails results={results} />*/}
-            {/*  </Panel>*/}
-            {/*  <Panel eventKey="decorators" header={this._getPanelHeader('highlighting')}>*/}
-            {/*    <HighlightingRules />*/}
-            {/*  </Panel>*/}
-            {/*  <Panel eventKey="fields" header={this._getPanelHeader('fields')}>*/}
-            {/*    {children}*/}
-            {/*  </Panel>*/}
-            {/*</PanelGroup>*/}
           </div>
         </div>
       </div>

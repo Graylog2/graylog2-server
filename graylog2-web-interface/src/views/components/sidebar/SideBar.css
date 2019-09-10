@@ -17,6 +17,7 @@
 }
 
 :local(.sidebarNavFont) {
+    cursor: pointer;
     font-size: 16px;
     display: inline;
     margin-top: 5px;
@@ -29,10 +30,33 @@
    color: #FF3633;
 }
 
+:local(.navContent) {
+    color: #666666;
+    background: #FFFFFF;
+}
+
+:local(.contentOpen) {
+    padding: 20px;
+    transition: max-height 0.5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    max-height: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+
+:local(.contentClosed) {
+    max-height: 0;
+    transition: max-height 0.5s;
+    transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
 :local(.sidebarIcon) {
     width: 10px;
     text-align: center;
     font-size: 20px;
+    cursor: pointer;
 }
 
 :local(.sidebarContent) {
