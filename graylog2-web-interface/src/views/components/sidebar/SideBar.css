@@ -40,11 +40,18 @@
     transition: max-height 0.5s;
     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
     max-height: 200px;
-    overflow: hidden;
     white-space: nowrap;
 }
 
-
+:local(.openFieldContent) {
+    white-space: nowrap;
+    padding: 20px;
+    position: absolute;
+    bottom: 20px;
+    max-height: calc(100vh - 280px);
+    height: calc(100vh - 280px);
+    transition: max-height 0.5s;
+}
 
 :local(.contentClosed) {
     max-height: 0;

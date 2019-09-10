@@ -3,9 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
-import { Panel, PanelGroup, Button } from 'components/graylog';
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 
 import styles from './SideBar.css';
@@ -88,21 +86,23 @@ const SideBar = createReactClass({
       viewDescription: [
         'View Description',
         (<i className="fa fa-info" />),
-        (<React.Fragment>
+        (
+          <React.Fragment>
           <span className="pull-right">
             <AddWidgetButton queryId={queryId} />
           </span>
 
-          <div className={styles.viewMetadata}>
-            <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
-            <small>{viewMetadata.summary || defaultNewViewSummary}</small>
-          </div>
+            <div className={styles.viewMetadata}>
+              <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
+              <small>{viewMetadata.summary || defaultNewViewSummary}</small>
+            </div>
 
-          <div className={styles.viewMetadata}>
-            <SearchResultOverview results={results} />
-          </div>
-          {viewDescription}
-        </React.Fragment>)
+            <div className={styles.viewMetadata}>
+              <SearchResultOverview results={results} />
+            </div>
+            {viewDescription}
+          </React.Fragment>
+        ),
       ],
       searchDetails: [
         'Search Details',
@@ -123,7 +123,9 @@ const SideBar = createReactClass({
   },
 
   setSelectedKey(key) {
-    return () => this.setState({ selectedKey: key });
+    const { toggleOpen, open } = this.props;
+    return () => this.setState({ selectedKey: key },
+      () => { !open && toggleOpen()});
   },
 
   renderNavItem(key) {
@@ -132,7 +134,12 @@ const SideBar = createReactClass({
     const isSelected = selectedKey === key && open;
     const [text, icon, content] = this._getPanelHeader(key);
     const selectedColor = isSelected ? styles.selected : '';
-    const selected = isSelected ? styles.contentOpen : styles.contentClosed;
+    // eslint-disable-next-line no-nested-ternary
+    const selected = isSelected
+      ? (key === 'fields'
+        ? styles.openFieldContent
+        : styles.contentOpen)
+      : styles.contentClosed;
     const openContent = isSelected ? content : '';
 
     return (
@@ -143,7 +150,7 @@ const SideBar = createReactClass({
         </div>
         <div className={`${styles.navContent} ${selected}`}>{openContent}</div>
       </div>
-  );
+    );
   },
 
   render() {
