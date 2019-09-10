@@ -17,6 +17,7 @@ import View from 'views/logic/views/View';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import { ViewStore } from 'views/stores/ViewStore';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
+import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
 
 type Props = {
   availableStreams: Array<*>,
@@ -39,7 +40,7 @@ const _performSearch = (onExecute) => {
 };
 
 const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute }: Props) => {
-  if (!currentQuery || !config) {
+  if (!config) {
     return <Spinner />;
   }
   const performSearch = () => _performSearch(onExecute);
@@ -47,7 +48,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
     event.preventDefault();
     performSearch();
   };
-  const { timerange, query, id } = currentQuery;
+  const { timerange = { type: 'relative' }, query = {} } = currentQuery || {};
   const { type, ...rest } = timerange;
   const rangeParams = Immutable.Map(rest);
   const rangeType = type;
@@ -68,13 +69,13 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 
                 <QueryInput value={query.query_string}
                             placeholder="Apply filter to all widgets"
-                            onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
+                            onChange={value => GlobalOverrideActions.query(value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
               <Col md={3}>
-                <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
+                <TimeRangeTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
                                        value={rangeType} />
-                <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
+                <TimeRangeInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
                                 rangeType={rangeType}
                                 rangeParams={rangeParams}
                                 config={config} />
@@ -100,6 +101,6 @@ DashboardSearchBar.defaultProps = {
 export default connect(
   DashboardSearchBar,
   {
-    currentQuery: CurrentQueryStore,
+    currentQuery: GlobalOverrideStore,
   },
 );
