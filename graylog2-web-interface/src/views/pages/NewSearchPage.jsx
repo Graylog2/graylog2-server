@@ -6,7 +6,6 @@ import connect from 'stores/connect';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import type { ViewStoreState } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -23,13 +22,11 @@ type Props = {
   },
   executingViewHooks: Array<ViewHook>,
   loadingViewHooks: Array<ViewHook>,
-  viewStoreState: ViewStoreState,
 };
 
 type State = {
   loaded: boolean,
   hookComponent: ?any,
-  loadedView: ?View,
 };
 
 class NewSearchPage extends React.Component<Props, State> {
@@ -45,20 +42,11 @@ class NewSearchPage extends React.Component<Props, State> {
     this.state = {
       hookComponent: undefined,
       loaded: false,
-      loadedView: undefined,
     };
   }
 
   componentDidMount() {
     ViewActions.create(View.Type.Search).then(() => this.setState({ loaded: true }));
-  }
-
-  componentWillReceiveProps(nextProps: Props): any {
-    const { viewStoreState } = nextProps;
-    const { view } = viewStoreState;
-    if (!view.id || view.id === '') {
-      this.setState({ loadedView: view });
-    }
   }
 
   loadView = (viewId: string): Promise<?View> => {
@@ -80,7 +68,7 @@ class NewSearchPage extends React.Component<Props, State> {
         this.setState({ hookComponent: e });
       },
     ).then((view) => {
-      this.setState({ loaded: true, loadedView: view });
+      this.setState({ loaded: true });
       return view;
     }).then(() => {
       SearchActions.executeWithCurrentState();
@@ -88,9 +76,7 @@ class NewSearchPage extends React.Component<Props, State> {
   };
 
   render() {
-    const { hookComponent, loaded, loadedView } = this.state;
-    const { viewStoreState } = this.props;
-    const { dirty } = viewStoreState;
+    const { hookComponent, loaded } = this.state;
 
     if (hookComponent) {
       const HookComponent = hookComponent;
@@ -100,7 +86,7 @@ class NewSearchPage extends React.Component<Props, State> {
     if (loaded) {
       const { route } = this.props;
       return (
-        <ViewLoaderContext.Provider value={{ loaderFunc: this.loadView, dirty, loadedView }}>
+        <ViewLoaderContext.Provider value={this.loadView}>
           <ExtendedSearchPage route={route} />
         </ViewLoaderContext.Provider>
       );
