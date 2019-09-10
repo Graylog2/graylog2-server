@@ -19,10 +19,8 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
@@ -119,7 +117,6 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
 };
 
 ExtendedSearchPage.propTypes = {
-  executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
   route: PropTypes.object.isRequired,
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
