@@ -185,7 +185,7 @@ const FieldStatistics = createReactClass({
 
   render() {
     const { fieldStatistics, statsLoadPending } = this.state;
-    const { permissions } = this.prop;
+    const { permissions } = this.props;
     let content;
 
     if (!fieldStatistics.isEmpty()) {
