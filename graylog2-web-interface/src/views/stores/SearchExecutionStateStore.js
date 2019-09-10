@@ -4,10 +4,10 @@ import * as Immutable from 'immutable';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { RefluxActions } from './StoreTypes';
+import { ViewActions } from './ViewStore';
 
 const defaultExecutionState = SearchExecutionState.empty();
 
@@ -40,18 +40,12 @@ export const SearchExecutionStateStore = singletonStore(
     executionState: defaultExecutionState,
 
     init() {
-      this.listenTo(ViewMetadataStore, this.handleViewMetadataChange, this.handleViewMetadataChange);
+      ViewActions.create.completed.listen(this.clear);
+      ViewActions.load.completed.listen(this.clear);
     },
 
     getInitialState(): SearchExecutionState {
       return this.executionState;
-    },
-
-    handleViewMetadataChange({ id }) {
-      if (this.viewId !== id) {
-        this.clear();
-        this.viewId = id;
-      }
     },
 
     clear(): SearchExecutionState {
