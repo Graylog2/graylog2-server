@@ -1,15 +1,13 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import { trim } from 'lodash';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { getParameterBindingsAsMap } from 'views/logic/search/SearchExecutionState';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import SearchBar from './SearchBar';
 
 const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters) => {
   const bindingsMap = getParameterBindingsAsMap(parameterBindings);
@@ -18,9 +16,9 @@ const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters)
   return undeclaredParameters.size > 0 || missingValues.size > 0;
 };
 
-const SearchBarWithStatus = connect(
+const WithSearchStatus = (Component: React.AbstractComponent<any>) => connect(
   ({ config, isDisabled, onExecute }) => {
-    return <SearchBar disableSearch={isDisabled} onExecute={onExecute} config={config} />;
+    return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
   },
   {
     searchMetadata: SearchMetadataStore,
@@ -33,4 +31,4 @@ const SearchBarWithStatus = connect(
   }),
 );
 
-export default SearchBarWithStatus;
+export default WithSearchStatus;

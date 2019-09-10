@@ -208,6 +208,7 @@ export default {
       type: 'new-query',
       title: 'Use in new query',
       handler: UseInNewQueryHandler,
+      hide: UseInNewQueryHandler.isEnabled,
     },
     {
       type: 'show-bucket',

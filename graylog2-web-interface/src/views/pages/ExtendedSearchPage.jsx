@@ -5,7 +5,7 @@ import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import SearchBarWithStatus from 'views/components/SearchBarWithStatus';
+import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
   SearchRefreshCondition,
@@ -13,7 +13,6 @@ import type {
 } from 'views/logic/hooks/SearchRefreshCondition';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
@@ -28,9 +27,14 @@ import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
+import DashboardSearchBar from 'views/components/DashboardSearchBar';
+import SearchBar from 'views/components/SearchBar';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import IfSearch from '../components/search/IfSearch';
+import { AdditionalContext } from '../logic/ActionContext';
 
 type Props = {
   route: any,
@@ -54,11 +58,10 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
   });
 };
 
-const CurrentViewTypeProvider = connect(
-  ({ type, children }) => <ViewTypeContext.Provider value={type}>{children}</ViewTypeContext.Provider>,
-  { view: ViewStore },
-  ({ view }) => ({ type: view && view.view ? view.view.type : undefined }),
-);
+const SearchBarWithStatus = WithSearchStatus(SearchBar);
+const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
+
+const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
 const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
@@ -91,17 +94,25 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
 
   return (
     <CurrentViewTypeProvider>
-      <WindowLeaveMessage route={route} />
+      <IfDashboard>
+        <WindowLeaveMessage route={route} />
+      </IfDashboard>
       <HeaderElements />
       <Row id="main-row">
         <IfDashboard>
+          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
           <QueryBar />
         </IfDashboard>
-        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+
+        <IfSearch>
+          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+        </IfSearch>
 
         <QueryBarElements />
 
-        <SearchResult />
+        <ViewAdditionalContextProvider>
+          <SearchResult />
+        </ViewAdditionalContextProvider>
       </Row>
     </CurrentViewTypeProvider>
   );

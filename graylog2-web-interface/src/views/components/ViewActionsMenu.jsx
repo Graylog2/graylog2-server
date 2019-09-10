@@ -6,13 +6,9 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
 
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-// $FlowFixMe: imports from core need to be fixed in flow
 import StoreProvider from 'injection/StoreProvider';
-// $FlowFixMe: imports from core need to be fixed in flow
 import PermissionsMixin from 'util/PermissionsMixin';
-// $FlowFixMe: imports from core need to be fixed in flow
 import AppConfig from 'util/AppConfig';
 
 import DebugOverlay from 'views/components/DebugOverlay';
@@ -47,7 +43,6 @@ const ViewActionsMenu = createReactClass({
     return {
       debugOpen: false,
       editViewOpen: false,
-      saveViewOpen: false,
       shareViewOpen: false,
     };
   },
@@ -85,10 +80,12 @@ const ViewActionsMenu = createReactClass({
   },
 
   handleSaveView(view) {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.onSaveView(view);
   },
 
   handleSaveAsView(view) {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.onSaveAsView(view);
   },
 
@@ -97,6 +94,7 @@ const ViewActionsMenu = createReactClass({
   },
 
   _isAllowedToEdit(view) {
+    // eslint-disable-next-line react/destructuring-assignment
     const { currentUser } = this.props.currentUser;
     return isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
   },
@@ -106,6 +104,7 @@ const ViewActionsMenu = createReactClass({
   },
 
   render() {
+    // eslint-disable-next-line react/destructuring-assignment
     const { view } = this.props.view;
     const onSave = () => this.handleSaveView(view);
     const { metadata } = this.props;
@@ -118,9 +117,10 @@ const ViewActionsMenu = createReactClass({
         <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
       </React.Fragment>
     );
+    const { saveAsViewOpen, editViewOpen, shareViewOpen, debugOpen } = this.state;
     return (
       <span>
-        <DropdownButton title="View Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
+        <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
           <MenuItem onSelect={this.handleEdit} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
           <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>Save</MenuItem>
           <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
@@ -128,10 +128,10 @@ const ViewActionsMenu = createReactClass({
 
           {debugOverlay}
         </DropdownButton>
-        <DebugOverlay show={this.state.debugOpen} onClose={this.handleDebugClose} />
-        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveAsView} show={this.state.saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
-        <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={this.state.editViewOpen} onClose={this.handleEditClose} />
-        {this.state.shareViewOpen && <ShareViewModal view={view} show onClose={this.handleShareViewClose} />}
+        <DebugOverlay show={debugOpen} onClose={this.handleDebugClose} />
+        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveAsView} show={saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
+        <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={editViewOpen} onClose={this.handleEditClose} />
+        {shareViewOpen && <ShareViewModal view={view} show onClose={this.handleShareViewClose} />}
       </span>
     );
   },
