@@ -14,13 +14,10 @@ import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import View from 'views/logic/views/View';
-import { QueriesActions } from 'views/actions/QueriesActions';
 import { ViewStore } from 'views/stores/ViewStore';
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
 
 type Props = {
-  availableStreams: Array<*>,
   config: any,
   currentQuery: {
     id: string,
@@ -31,7 +28,6 @@ type Props = {
   },
   disableSearch: boolean,
   onExecute: (View) => void,
-  queryFilters: Immutable.Map,
 };
 
 const _performSearch = (onExecute) => {
