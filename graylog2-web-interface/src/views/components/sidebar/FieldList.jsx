@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { is } from 'immutable';
-import { isEqual, isFinite } from 'lodash';
+import { isEqual } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
@@ -21,8 +21,8 @@ const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.include
 const FieldList = createReactClass({
   propTypes: {
     allFields: PropTypes.object.isRequired,
+    listHeight: PropTypes.number.isRequired,
     fields: PropTypes.object.isRequired,
-    maximumHeight: PropTypes.number.isRequired,
   },
 
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
@@ -34,53 +34,16 @@ const FieldList = createReactClass({
     };
   },
 
-  componentDidMount() {
-    this._updateHeight();
-    window.addEventListener('scroll', this._onScroll);
-  },
-
   shouldComponentUpdate(nextProps, nextState) {
-    const { allFields, fields, maximumHeight } = this.props;
-    if (maximumHeight !== nextProps.maximumHeight) {
+    const { allFields, fields, listHeight } = this.props;
+    if (!isEqual(nextProps.listHeight, listHeight)) {
       return true;
     }
+
     if (!isEqual(this.state, nextState)) {
       return true;
     }
-    if (!is(nextProps.allFields, allFields) || !is(nextProps.fields, fields)) {
-      return true;
-    }
-
-    return false;
-  },
-
-  componentDidUpdate(prevProps) {
-    const { maximumHeight } = this.props;
-    if (isFinite(maximumHeight) && maximumHeight !== prevProps.maximumHeight) {
-      this._updateHeight();
-    }
-  },
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this._onScroll);
-  },
-
-  eventsThrottler: new EventHandlersThrottler(),
-  MINIMUM_FIELDS_HEIGHT: 50,
-
-  _onScroll() {
-    this.eventsThrottler.throttle(this._updateHeight, 300);
-  },
-
-  _updateHeight() {
-    const { maximumHeight } = this.props;
-    const fieldsContainer = this.fieldList;
-
-    if (fieldsContainer && fieldsContainer.getBoundingClientRect) {
-      const maxHeight = maximumHeight - fieldsContainer.getBoundingClientRect().top;
-
-      this.setState({ maxFieldsHeight: Math.max(!isFinite(maxHeight) ? 0 : maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
-    }
+    return !is(nextProps.allFields, allFields) || !is(nextProps.fields, fields);
   },
 
   _renderField({ fields, fieldType, selectedQuery, selectedView, style }) {
@@ -102,6 +65,7 @@ const FieldList = createReactClass({
       </li>
     );
   },
+
   _fieldsToShow(fields, allFields, showFieldsBy = 'all') {
     const isNotReservedField = f => !isReservedField(f.name);
     switch (showFieldsBy) {
@@ -114,20 +78,20 @@ const FieldList = createReactClass({
         return fields.filter(isNotReservedField);
     }
   },
+
   _renderFieldList({ fields, allFields, showFieldsBy }) {
     const {
       filter,
-      maxFieldsHeight,
       viewMetadata: {
         id: selectedView,
         activeQuery: selectedQuery,
       },
     } = this.state;
+    const { listHeight } = this.props;
 
     if (!fields) {
       return <span>No field information available.</span>;
     }
-
     const fieldFilter = filter ? (field => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())) : () => true;
     const fieldsToShow = this._fieldsToShow(fields, allFields, showFieldsBy);
     const fieldList = fieldsToShow
@@ -141,7 +105,7 @@ const FieldList = createReactClass({
 
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
-        <List height={maxFieldsHeight || 0}
+        <List height={listHeight || 50}
               itemCount={fieldList.size}
               itemSize={17}>
           {Row}
@@ -181,7 +145,7 @@ const FieldList = createReactClass({
     const { filter, showFieldsBy } = this.state;
 
     return (
-      <div>
+      <div style={{ whiteSpace: 'break-spaces' }}>
         <form className={`form-inline ${styles.filterContainer}`} onSubmit={e => e.preventDefault()}>
           <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
             <input id="common-search-form-query-input"
@@ -200,7 +164,7 @@ const FieldList = createReactClass({
             </Button>
           </div>
         </form>
-        <div style={{ marginTop: '5px', marginBottom: '0px', whiteSpace: 'break-spaces' }}>
+        <div style={{ marginTop: '5px', marginBottom: '0px'}}>
           List fields of{' '}
           {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}
           {this.showFieldsByLink('all', 'all', 'This shows all fields, but no reserved (gl2_*) fields.')} or{' '}

@@ -46,10 +46,10 @@
 :local(.openFieldContent) {
     white-space: nowrap;
     padding: 20px;
-    position: absolute;
+    position: absolute !important;
     bottom: 20px;
-    max-height: calc(100vh - 280px);
-    height: calc(100vh - 280px);
+    max-height: calc(100vh - 325px);
+    height: calc(100vh - 325px);
     transition: max-height 0.5s;
 }
 

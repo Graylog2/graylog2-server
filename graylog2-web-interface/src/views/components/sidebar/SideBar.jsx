@@ -2,8 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
+import { SizeMe } from 'react-sizeme';
 
-import EventHandlersThrottler from 'util/EventHandlersThrottler';
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 
 import styles from './SideBar.css';
@@ -34,41 +34,8 @@ const SideBar = createReactClass({
 
   getInitialState() {
     return {
-      availableHeight: 1000,
-      activePanel: 'fields',
-      selectedKey: undefined,
+      selectedKey: 'fields',
     };
-  },
-
-  componentDidMount() {
-    this._updateHeight();
-    window.addEventListener('resize', this._resizeCallback);
-  },
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this._resizeCallback);
-  },
-
-  eventsThrottler: new EventHandlersThrottler(),
-  SIDEBAR_MARGIN_BOTTOM: 40,
-
-  _resizeCallback() {
-    this.eventsThrottler.throttle(() => this._updateHeight());
-  },
-
-  _getMaxHeight() {
-    return window.innerHeight;
-  },
-
-  _updateHeight() {
-    const viewPortHeight = this._getMaxHeight();
-
-    const sidebarCss = window.getComputedStyle(this.sidebar);
-    const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
-
-    const maxHeight = viewPortHeight - sidebarPaddingBottom - this.SIDEBAR_MARGIN_BOTTOM;
-
-    this.setState({ availableHeight: maxHeight });
   },
 
   formatViewDescription(view) {
@@ -124,8 +91,9 @@ const SideBar = createReactClass({
 
   setSelectedKey(key) {
     const { toggleOpen, open } = this.props;
-    return () => this.setState({ selectedKey: key },
-      () => { !open && toggleOpen()});
+    return () => this.setState(
+      { selectedKey: key },
+      () => !open && toggleOpen());
   },
 
   renderNavItem(key) {
@@ -140,7 +108,7 @@ const SideBar = createReactClass({
         ? styles.openFieldContent
         : styles.contentOpen)
       : styles.contentClosed;
-    const openContent = isSelected ? content : '';
+    const openContent = isSelected ? content : <span />;
 
     return (
       <div>
@@ -148,7 +116,15 @@ const SideBar = createReactClass({
           <div className={styles.sidebarIcon}>{icon}</div>
           {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
         </div>
-        <div className={`${styles.navContent} ${selected}`}>{openContent}</div>
+        <SizeMe monitorHeight refreshRate={32}>
+          {({ size }) => {
+            return (
+              <div className={`${styles.navContent} ${selected}`}>
+                {React.cloneElement(openContent, { listHeight: size.height - 180 })}
+              </div>
+            );
+          }}
+        </SizeMe>
       </div>
     );
   },
@@ -160,8 +136,8 @@ const SideBar = createReactClass({
       <div className={styles.sidebarContainer}>
         <div className="sidebar">
           <div className={`${styles.sidebarContent}`} ref={(elem) => { this.sidebar = elem; }}>
-            <span className={styles.sidebarNav}>
-              <span><i onClick={toggleOpen} className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
+            <span onClick={toggleOpen} className={styles.sidebarNav}>
+              <span><i className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
             </span>
             {this.renderNavItem('viewDescription')}
             {this.renderNavItem('searchDetails')}
