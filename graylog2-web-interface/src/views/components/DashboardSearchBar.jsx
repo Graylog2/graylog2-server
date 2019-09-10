@@ -9,8 +9,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import Spinner from 'components/common/Spinner';
 import ScrollToHint from 'views/components/common/ScrollToHint';
-import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
-import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
+import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeOverrideTypeSelector';
+import TimeRangeOverrideInput from 'views/components/searchbar/TimeRangeOverrideInput';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
 import View from 'views/logic/views/View';
@@ -44,7 +44,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
     event.preventDefault();
     performSearch();
   };
-  const { timerange = { type: 'relative' }, query = {} } = currentQuery || {};
+  const { timerange = {}, query = {} } = currentQuery || {};
   const { type, ...rest } = timerange;
   const rangeParams = Immutable.Map(rest);
   const rangeType = type;
@@ -69,12 +69,12 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
                             onExecute={performSearch} />
               </Col>
               <Col md={3}>
-                <TimeRangeTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
-                                       value={rangeType} />
-                <TimeRangeInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
-                                rangeType={rangeType}
-                                rangeParams={rangeParams}
-                                config={config} />
+                <TimeRangeOverrideTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
+                                               value={rangeType} />
+                <TimeRangeOverrideInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
+                                        rangeType={rangeType}
+                                        rangeParams={rangeParams}
+                                        config={config} />
               </Col>
             </form>
           </Row>
