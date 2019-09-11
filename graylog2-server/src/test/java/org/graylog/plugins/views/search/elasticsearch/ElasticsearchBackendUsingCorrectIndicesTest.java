@@ -26,12 +26,10 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchtypes.DateHistogram;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -74,8 +72,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()),
-            DateHistogram.NAME, ESDateHistogram::new
+            MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake())
     );
     private static final QueryStringParser queryStringParser = new QueryStringParser();
 
@@ -245,7 +242,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isNotEqualTo("_all");
     }
-    
+
     @Test
     public void queryUsesOnlyIndicesBelongingToStream() throws Exception {
         final String stream1id = "stream1id";
