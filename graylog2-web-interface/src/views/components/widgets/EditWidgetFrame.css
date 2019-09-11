@@ -1,4 +1,13 @@
 :local(.editWidgetDialog) {
     height: 80vh !important;
     width: 80vw !important;
+    margin-top: 20px !important;
+}
+
+:local(.editWidgetControls) {
+    width: 80vw !important;
+}
+
+:local(.editWidgetControlsContent) {
+    padding: 15px 20px 15px 20px;
 }
