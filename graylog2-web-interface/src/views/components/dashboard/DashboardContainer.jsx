@@ -7,7 +7,7 @@ import { Col } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import DashboardWidgetGrid from 'views/components/dashboard/DashboardWidgetGrid';
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import { DashboardWidgetsActions } from 'views/stores/DashboardWidgetsStore';
 import EmptyDashboardHelpMessage from './EmptyDashboardHelpMessage';
 import * as WidgetPropTypes from '../widgets/WidgetPropTypes';

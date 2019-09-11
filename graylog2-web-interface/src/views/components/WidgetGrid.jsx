@@ -10,7 +10,7 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from './widgets/Widget';

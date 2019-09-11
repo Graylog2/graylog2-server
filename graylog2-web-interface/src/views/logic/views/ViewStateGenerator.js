@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import WidgetPosition from '../widgets/WidgetPosition';
 import View from './View';
 import ViewState from './ViewState';
-import { resultHistogram, allMessagesTable } from '../Widget';
+import { resultHistogram, allMessagesTable } from '../Widgets';
 import type { ViewType } from './View';
 
 const _defaultWidgets = {

@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import Widget from 'views/logic/widgets/Widget';
 
-import { widgetDefinition } from '../Widget';
+import { widgetDefinition } from '../Widgets';
 import searchTypeDefinition from '../SearchType';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
