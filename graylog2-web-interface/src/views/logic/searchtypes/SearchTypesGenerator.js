@@ -10,7 +10,14 @@ const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_stri
 
 export default (widgets: Array<Widget>) => {
   let widgetMapping = Immutable.Map();
-  const searchTypes = widgets.map(widget => widgetDefinition(widget.type).searchTypes(widget.config).map(searchType => Object.assign(searchType, { widgetId: widget.id }, filterForWidget(widget))))
+  const searchTypes = widgets
+    .map(widget => widgetDefinition(widget.type)
+      .searchTypes(widget.config)
+      .map(searchType => Object.assign(
+        searchType,
+        { widgetId: widget.id, timerange: widget.timerange, query: widget.query },
+        filterForWidget(widget),
+      )))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set())
     .map((searchType) => {
       const searchTypeId = uuid();
@@ -21,10 +28,15 @@ export default (widgets: Array<Widget>) => {
         console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
       }
       const defaults = typeDefinition ? typeDefinition.defaults : {};
-      const filter = { filter: searchType.filter } || {};
+      const { config, filter, timerange, query } = searchType;
+      const filterMap = filter ? { filter } : {};
+      const timerangeMap = timerange ? { timerange } : {};
+      const queryMap = query ? { query } : {};
       return new Immutable.Map(defaults)
-        .merge(searchType.config)
-        .merge(filter)
+        .merge(config)
+        .merge(filterMap)
+        .merge(timerangeMap)
+        .merge(queryMap)
         .merge(
           {
             id: searchTypeId,
