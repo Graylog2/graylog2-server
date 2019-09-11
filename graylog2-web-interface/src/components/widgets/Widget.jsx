@@ -224,6 +224,10 @@ const Widget = createReactClass({
     }
   },
 
+  _stopPropagation(e) {
+    e.stopPropagation();
+  },
+
   render() {
     if (this.state.deleted) {
       return <span />;
@@ -252,7 +256,11 @@ const Widget = createReactClass({
     const disabledReplay = !canReadConfiguredStream && !canSearchGlobally;
 
     return (
-      <div ref={(node) => { this.node = node; }} className="widget" data-widget-id={this.props.widget.id}>
+      <div ref={(node) => { this.node = node; }}
+           className="widget"
+           data-widget-id={this.props.widget.id}
+           onClick={this._stopPropagation}
+           onMouseDown={this._stopPropagation}>
         <WidgetHeader title={this.props.widget.description} />
 
         {this._getVisualization()}

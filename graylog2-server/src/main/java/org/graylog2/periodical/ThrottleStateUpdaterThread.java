@@ -1,4 +1,5 @@
 /**
+/**
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -231,7 +232,7 @@ public class ThrottleStateUpdaterThread extends Periodical {
 
         // the journal needs this to provide information to rest clients
         journal.setThrottleState(throttleState);
-        
+
         // publish to interested parties
         eventBus.post(throttleState);
 
