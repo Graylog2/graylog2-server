@@ -104,6 +104,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         this.esQueryDecorators = esQueryDecorators;
     }
 
+    private QueryBuilder normalizeQueryString(String queryString) {
+        return (queryString.isEmpty() || queryString.trim().equals("*"))
+                ? QueryBuilders.matchAllQuery()
+                : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(true);
+    }
+
     @Override
     public ESGeneratedQueryContext generate(SearchJob job, Query query, Set<QueryResult> results) {
         final ElasticsearchQueryString backendQuery = (ElasticsearchQueryString) query.query();
@@ -114,25 +120,44 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         }
 
         final String queryString = this.esQueryDecorators.decorate(backendQuery.queryString(), job, query, results);
-        final QueryBuilder esBuilder = (queryString.isEmpty() || queryString.trim().equals("*")) ?
-                QueryBuilders.matchAllQuery() :
-                QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(true);
+        final QueryBuilder normalizedRootQuery = normalizeQueryString(queryString);
 
         final BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .filter(esBuilder)
-                .filter(Objects.requireNonNull(IndexHelper.getTimestampRangeFilter(query.timerange()), "Timerange is missing."));
+                .filter(normalizedRootQuery);
 
-        // add the specified filters
+        // add the optional root query filters
         generateFilterClause(query.filter(), job, query, results)
                 .map(boolQuery::filter);
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(boolQuery)
                 .from(0)
                 .size(0);
 
         final ESGeneratedQueryContext queryContext = new ESGeneratedQueryContext(this, searchSourceBuilder, job, query, results);
         for (SearchType searchType : searchTypes) {
+            final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
+
+            final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
+                    .must(searchTypeSourceBuilder.query())
+                    .must(
+                            Objects.requireNonNull(
+                                    IndexHelper.getTimestampRangeFilter(
+                                            searchType.timerange().orElse(query.timerange())
+                                    ),
+                                    "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
+                            )
+                    );
+
+            searchType.query().ifPresent(q -> {
+                final ElasticsearchQueryString searchTypeBackendQuery = (ElasticsearchQueryString) q;
+                final String searchTypeQueryString = this.esQueryDecorators.decorate(searchTypeBackendQuery.queryString(), job, query, results);
+                final QueryBuilder normalizedSearchTypeQuery = normalizeQueryString(searchTypeQueryString);
+                searchTypeOverrides.must(normalizedSearchTypeQuery);
+            });
+
+            searchTypeSourceBuilder.query(searchTypeOverrides);
+
             final String type = searchType.type();
             final Provider<ESSearchTypeHandler<? extends SearchType>> searchTypeHandler = elasticsearchSearchTypeHandlers.get(type);
             if (searchTypeHandler == null) {

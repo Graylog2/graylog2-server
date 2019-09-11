@@ -1,0 +1,72 @@
+package org.graylog.plugins.views.search.elasticsearch;
+
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBackendGeneratedRequestTestBase {
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
+    private SearchJob searchJob;
+    private Query query;
+
+    @Before
+    public void setUpFixtures() throws InvalidRangeParametersException {
+        final Set<SearchType> searchTypes = new HashSet<SearchType>() {{
+            add(
+                    Pivot.builder()
+                            .id("pivot1")
+                            .series(Collections.singletonList(Average.builder().field("field1").build()))
+                            .rollup(true)
+                            .timerange(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z"))
+                            .build()
+            );
+            add(
+                    Pivot.builder()
+                            .id("pivot2")
+                            .series(Collections.singletonList(Max.builder().field("field2").build()))
+                            .rollup(true)
+                            .query(ElasticsearchQueryString.builder().queryString("source:babbage").build())
+                            .build()
+            );
+        }};
+        this.query = Query.builder()
+                .id("query1")
+                .searchTypes(searchTypes)
+                .query(ElasticsearchQueryString.builder().queryString("production:true").build())
+                .timerange(timeRangeForTest())
+                .build();
+
+        this.searchJob = searchJobForQuery(this.query);
+    }
+
+    @Test
+    public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
+        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(searchJob, query, Collections.emptySet());
+        when(jestClient.execute(any(), any())).thenReturn(resultFor(resourceFile("successfulMultiSearchResponse.json")));
+
+        final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+
+        assertThat(generatedRequest).isEqualTo(resourceFile("overridesInSearchTypeAreIncorporatedIntoGeneratedQueries.request.ndjson"));
+    }
+}
