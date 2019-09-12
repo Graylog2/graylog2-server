@@ -281,9 +281,7 @@ const Widget = createReactClass({
       <div role="presentation"
            ref={(node) => { this.node = node; }}
            className="widget"
-           data-widget-id={widget.id}
-           onClick={this._stopPropagation}
-           onMouseDown={this._stopPropagation}>
+           data-widget-id={widget.id}>
         <WidgetHeader title={widget.description} />
 
         {this._getVisualization()}
@@ -297,7 +295,11 @@ const Widget = createReactClass({
                       calculatedAt={calculatedAt}
                       error={error}
                       errorMessage={errorMessage} />
-        {locked ? showConfigModal : editConfigModal}
+        <div role="presentation"
+             onClick={this._stopPropagation}
+             onMouseDown={this._stopPropagation}>
+          {locked ? showConfigModal : editConfigModal}
+        </div>
       </div>
     );
   },
