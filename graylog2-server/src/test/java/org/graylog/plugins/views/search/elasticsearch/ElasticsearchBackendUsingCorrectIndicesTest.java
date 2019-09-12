@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.http.JestHttpClient;
@@ -50,16 +48,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -130,22 +122,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final MultiSearch clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("");
-    }
-
-    private List<String> indicesOf(MultiSearch clientRequest) throws IOException {
-        final ObjectMapper objectMapper = objectMapperProvider.get();
-        final String request = clientRequest.getData(objectMapper);
-        final String[] lines = request.split("\\r?\\n");
-        final int noOfHeaders = lines.length / 2;
-        return IntStream.range(0, noOfHeaders)
-                .mapToObj(headerNumber -> {
-                    try {
-                        final JsonNode headerNode = objectMapper.readTree(lines[headerNumber * 2]);
-                        return headerNode.get("index").asText();
-                    } catch (IOException ignored) {}
-                    return null;
-                })
-                .collect(Collectors.toList());
     }
 
     @Test
