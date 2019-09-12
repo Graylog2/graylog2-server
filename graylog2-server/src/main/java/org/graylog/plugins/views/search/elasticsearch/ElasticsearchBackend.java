@@ -47,7 +47,6 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
@@ -206,15 +205,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     private Set<Stream> loadStreams(Set<String> streamIds) {
-        // TODO: Use method from `StreamService` which loads a collection of ids (when implemented) to prevent n+1.
-        // Track https://github.com/Graylog2/graylog2-server/issues/4897 for progress.
-        return streamIds.stream().map(streamId -> {
-            try {
-                return streamService.load(streamId);
-            } catch (NotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toSet());
+        return streamService.loadByIds(streamIds);
     }
 
     @Override
