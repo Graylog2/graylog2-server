@@ -78,7 +78,8 @@ public abstract class Pivot implements SearchType {
                 .type(NAME)
                 .rowGroups(of())
                 .columnGroups(of())
-                .sort(of());
+                .sort(of())
+                .streams(Collections.emptySet());
     }
 
     @AutoValue.Builder
