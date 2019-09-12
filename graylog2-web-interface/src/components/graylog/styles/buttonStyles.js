@@ -16,7 +16,7 @@ const buttonStyles = (colors, utility) => {
     `;
   };
 
-  return (theme.variants('mode', 'bsStyle', {
+  return theme.variants('mode', 'bsStyle', {
     danger: {
       teinte: cssBuilder(colors.secondary.uno),
       noire: cssBuilder(utility.opposite(colors.secondary.uno)),
@@ -41,7 +41,7 @@ const buttonStyles = (colors, utility) => {
       teinte: cssBuilder(colors.tertiary.sei),
       noire: cssBuilder(utility.opposite(colors.tertiary.sei)),
     },
-  }));
+  });
 };
 
 export default buttonStyles;
