@@ -196,7 +196,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final String streamId = "streamId";
         final Stream stream = mock(Stream.class, RETURNS_DEEP_STUBS);
         when(stream.getId()).thenReturn(streamId);
-        when(streamService.load(streamId)).thenReturn(stream);
+        when(streamService.loadByIds(Collections.singleton(streamId))).thenReturn(Collections.singleton(stream));
 
         final IndexRange indexRange1 = mock(IndexRange.class);
         when(indexRange1.indexName()).thenReturn("index1");
@@ -273,10 +273,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final SortedSet<IndexRange> indexRanges = sortedSetOf(indexRange1, indexRange2);
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
-        when(streamService.load(eq(stream1id))).thenReturn(stream1);
-        when(streamService.load(eq(stream2id))).thenReturn(stream2);
-        when(streamService.load(eq(stream3id))).thenReturn(stream3);
-        when(streamService.load(eq(stream4id))).thenReturn(stream4);
+        when(streamService.loadByIds(any())).thenReturn(ImmutableSet.of(stream1, stream2, stream3, stream4));
 
         final Query query = dummyQuery(RelativeRange.create(600)).toBuilder()
                 .filter(AndFilter.and(StreamFilter.ofId(stream1id), StreamFilter.ofId(stream2id), StreamFilter.ofId(stream3id), StreamFilter.ofId(stream4id)))
