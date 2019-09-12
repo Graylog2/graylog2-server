@@ -10,7 +10,7 @@ const Button = ({ bsStyle, ...props }) => {
   const { colors, utility } = useTheme();
 
   const StyledButton = styled(BootstrapButton)`
-    ${buttonStyles(colors, utility)};
+    ${buttonStyles({ colors, utility })};
   `;
 
   return (

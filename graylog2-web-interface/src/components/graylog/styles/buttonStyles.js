@@ -1,10 +1,10 @@
 import { css } from 'styled-components';
 import theme from 'styled-theming';
 
-const buttonStyles = (colors, utility) => {
+const buttonStyles = ({ colors, utility, specific = true }) => {
   const cssBuilder = (color) => {
     return css`
-      && {
+      ${specific && '&& {'}
         background-color: ${color};
         border-color: ${utility.darken(color, 0.25)};
 
@@ -12,7 +12,7 @@ const buttonStyles = (colors, utility) => {
           background-color: ${utility.darken(color, 0.25)};
           border-color: ${utility.darken(color, 0.5)};
         }
-      }
+        ${specific && '}'}
     `;
   };
 
