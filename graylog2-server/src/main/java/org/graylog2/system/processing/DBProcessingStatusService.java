@@ -43,7 +43,7 @@ import static org.graylog2.system.processing.ProcessingStatusDto.FIELD_UPDATED_A
  * Manages the database collection for processing status.
  */
 public class DBProcessingStatusService {
-    static final String COLLECTION_NAME = "processing_status";
+    public static final String COLLECTION_NAME = "processing_status";
     private static final String FIELD_WRITTEN_MESSAGES_1M = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_WRITTEN_MESSAGES_1M_RATE;
     private static final String FIELD_UNCOMMITTED_ENTRIES = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_UNCOMMITTED_ENTRIES;
 
