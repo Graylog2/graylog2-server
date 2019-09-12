@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
-// TODO: figure out how to make `teinte` a dynamic set of colors
+// TODO: make `teinte` a dynamic set of colors
 import { teinte, lighten, darken, opposite } from './index';
 
 const ThemeColor = createContext();
