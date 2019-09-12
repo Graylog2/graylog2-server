@@ -11,16 +11,16 @@ import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 
 
-const EditWidgetDialog = ({ className, children, ...rest }) => (
+const EditWidgetDialog = ({ className, children, widget, ...rest }) => (
   <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
     <IfDashboard>
       <div className={`${styles.editWidgetControls} modal-dialog`}>
         <div className={`${styles.editWidgetControlsContent} modal-content`} role="document">
-          <WidgetQueryControls />
+          <WidgetQueryControls widget={widget} />
         </div>
       </div>
     </IfDashboard>
-   <div className={`${styles.editWidgetDialog} modal-dialog`}>
+    <div className={`${styles.editWidgetDialog} modal-dialog`}>
       <div className="modal-content" role="document">
         {children}
       </div>
@@ -51,9 +51,12 @@ export default class EditWidgetFrame extends React.Component<Props> {
   }
 
   render() {
-    const { children } = this.props;
+    const { children, widget } = this.props;
     return (
-      <Modal show animation={false} dialogComponentClass={EditWidgetDialog} enforceFocus={false}>
+      <Modal show
+             animation={false}
+             dialogComponentClass={({ children, ...props }) => <EditWidgetDialog {...props} widget={widget}>{children}</EditWidgetDialog>} 
+             enforceFocus={false}>
         <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
           <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>
             {children[0]}

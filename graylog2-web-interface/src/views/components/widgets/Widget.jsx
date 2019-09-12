@@ -182,7 +182,7 @@ class Widget extends React.Component<Props, State> {
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
         <WidgetColorContext id={id}>
-          <EditWidgetFrame widgetId={id}>
+          <EditWidgetFrame widget={widget}>
             <MeasureDimensions>
               <WidgetHeader title={title}
                             hideDragHandle

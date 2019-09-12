@@ -1,29 +1,39 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
-import { Col, Row } from '../../components/graylog/index';
+import connect from 'stores/connect';
+import { Col, Row } from 'components/graylog/index';
+import DocumentationLink from 'components/support/DocumentationLink';
+import DocsHelper from 'util/DocsHelper';
+
+import Widget from 'views/logic/widgets/Widget';
+import { QueriesActions } from 'views/actions/QueriesActions';
+import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
-import { QueriesActions } from '../actions/QueriesActions';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
-import { QueryFiltersActions } from '../stores/QueryFiltersStore';
-import DocumentationLink from '../../components/support/DocumentationLink';
-import DocsHelper from '../../util/DocsHelper';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/AsyncQueryInput';
-import { StreamsStore } from '../stores/StreamsStore';
-import connect from '../../stores/connect';
-import { SearchConfigStore } from '../stores/SearchConfigStore';
 
-const WidgetQueryControls = ({ availableStreams, config }) => {
-  const query = { type: 'elasticsearch', query_string: 'Hello!' };
+type Props = {
+  availableStreams: Array<any>,
+  config: any,
+  widget: Widget,
+};
+
+const WidgetQueryControls = ({ availableStreams, config, widget }: Props) => {
+  const { query, timerange } = widget;
   const disableSearch = false;
-  const rangeType = 'relative';
-  const rangeParams = Immutable.Map({ range: 300 });
-  const streams = [];
-  const id = 'deadbeef';
+  const rangeType = timerange ? timerange.type : 'relative';
+  const rangeParams = Immutable.Map(timerange || { range: 300 });
+  const streams = widget.filter
+    .filter(f => f.get('type') === 'stream')
+    .map(f => f.get('id'))
+    .toJS();
+  const { id } = widget;
   const performSearch = () => {};
   return (
     <React.Fragment>
@@ -53,7 +63,7 @@ const WidgetQueryControls = ({ availableStreams, config }) => {
           </div>
           <SearchButton disabled={disableSearch} />
 
-          <QueryInput value={query.query_string}
+          <QueryInput value={query ? query.query_string : undefined}
                       placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                       onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                       onExecute={performSearch} />
@@ -65,7 +75,8 @@ const WidgetQueryControls = ({ availableStreams, config }) => {
 
 WidgetQueryControls.propTypes = {};
 
-export default connect(WidgetQueryControls,
+export default connect(
+  WidgetQueryControls,
   {
     availableStreams: StreamsStore,
     configurations: SearchConfigStore,

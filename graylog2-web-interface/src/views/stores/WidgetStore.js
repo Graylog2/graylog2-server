@@ -9,13 +9,15 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { RefluxActions } from './StoreTypes';
 
+type WidgetId = string;
+
 type WidgetActionsType = RefluxActions<{
   create: (Widget) => Promise<Widget>,
-  duplicate: (string) => Promise<Widget>,
-  filter: (string, string) => Promise<void>,
-  remove: (string) => Promise<void>,
-  update: (string, Widget) => Promise<void>,
-  updateConfig: (string, any) => Promise<void>,
+  duplicate: (WidgetId) => Promise<Widget>,
+  filter: (WidgetId, string) => Promise<void>,
+  remove: (WidgetId) => Promise<void>,
+  update: (WidgetId, Widget) => Promise<void>,
+  updateConfig: (WidgetId, any) => Promise<void>,
   updateWidgets: (Map<string, Widget>) => Promise<void>,
 }>;
 
