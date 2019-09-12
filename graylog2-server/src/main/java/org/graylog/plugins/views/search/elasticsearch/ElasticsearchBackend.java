@@ -228,16 +228,19 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .map(searchTypeId -> {
                     final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
-                            .map(searchType -> {
+                            .flatMap(searchType -> {
+                                if (searchType.streams().isEmpty() && !searchType.timerange().isPresent()) {
+                                    return Optional.empty();
+                                }
                                 final Set<String> usedStreamIds = searchType.streams().isEmpty()
                                         ? query.usedStreamIds()
                                         : searchType.streams();
                                 final Set<Stream> usedStreamsOfSearchType = loadStreams(usedStreamIds);
 
-                                return indicesByTimeRange(searchType.timerange().orElse(query.timerange())).stream()
+                                return Optional.of(indicesByTimeRange(searchType.timerange().orElse(query.timerange())).stream()
                                         .filter(new IndexRangeContainsOneOfStreams(usedStreamsOfSearchType))
                                         .map(IndexRange::indexName)
-                                        .collect(Collectors.toSet());
+                                        .collect(Collectors.toSet()));
                             })
                             .orElse(affectedIndices);
 
