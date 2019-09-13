@@ -103,6 +103,6 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
         final String generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
-        assertThat(generatedRequest).isEqualTo(resourceFile("overridesInSearchTypeAreIncorporatedIntoGeneratedQueries.request.ndjson"));
+        assertThat(generatedRequest).isEqualTo(resourceFile("timerangeOverridesAffectIndicesSelection.request.ndjson"));
     }
 }
