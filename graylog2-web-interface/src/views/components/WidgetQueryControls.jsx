@@ -9,7 +9,6 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import Widget from 'views/logic/widgets/Widget';
-import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { WidgetActions } from 'views/stores/WidgetStore';
@@ -62,21 +61,22 @@ type Delta = {| range: number |} | {| from: string |} | {| to: string |} | {| ke
 
 const _updateRangeParams = (currentTimerange: ?TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, ...delta });
 
+const _updateStreams = (id: string, streams: Array<string>) => WidgetActions.streams(id, streams);
+
 const WidgetQueryControls = ({ availableStreams, config, widget }: Props) => {
-  const { query, timerange } = widget;
+  const { query, timerange, streams } = widget;
   const disableSearch = false;
   const { type: rangeType = 'relative', ...rest } = timerange || {};
   const rangeParams = Immutable.Map(rest || { range: 300 });
-  const streams = [];
   const { id } = widget;
-  const performSearch = () => {};
+  const performSearch = () => { };
   return (
     <React.Fragment>
       <Row className="no-bm extended-search-query-metadata">
         <Col md={4}>
-          <TimeRangeTypeSelector onSelect={newRangeType => _updateRangeType(timerange, id, newRangeType).then(performSearch)}
+          <TimeRangeTypeSelector onSelect={newRangeType => _updateRangeType(timerange, id, newRangeType)}
                                  value={rangeType} />
-          <TimeRangeInput onChange={(key, value) => _updateRangeParams(timerange, id, { [key]: value }).then(performSearch)}
+          <TimeRangeInput onChange={(key, value) => _updateRangeParams(timerange, id, { [key]: value })}
                           rangeType={rangeType}
                           rangeParams={rangeParams}
                           config={config} />
@@ -85,7 +85,7 @@ const WidgetQueryControls = ({ availableStreams, config, widget }: Props) => {
         <Col md={8}>
           <StreamsFilter value={streams}
                          streams={availableStreams}
-                         onChange={value => QueryFiltersActions.streams(id, value)} />
+                         onChange={value => _updateStreams(id, value)} />
         </Col>
       </Row>
 
@@ -100,7 +100,7 @@ const WidgetQueryControls = ({ availableStreams, config, widget }: Props) => {
 
           <QueryInput value={query ? query.query_string : undefined}
                       placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
-                      onChange={value => _updateQuery(id, value).then(performSearch).then(() => value)}
+                      onChange={value => _updateQuery(id, value).then(() => value)}
                       onExecute={performSearch} />
         </Col>
       </Row>
