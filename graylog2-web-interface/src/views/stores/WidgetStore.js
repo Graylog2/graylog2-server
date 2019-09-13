@@ -20,6 +20,7 @@ type WidgetActionsType = RefluxActions<{
   filter: (WidgetId, string) => Promise<Widgets>,
   timerange: (WidgetId, TimeRange) => Promise<Widgets>,
   query: (WidgetId, QueryString) => Promise<Widgets>,
+  streams: (WidgetId, Array<string>) => Promise<Widgets>,
   remove: (WidgetId) => Promise<Widgets>,
   update: (WidgetId, Widget) => Promise<Widgets>,
   updateConfig: (WidgetId, any) => Promise<Widgets>,
@@ -38,6 +39,7 @@ export const WidgetActions: WidgetActionsType = singletonActions(
     filter: { asyncResult: true },
     timerange: { asyncResult: true },
     query: { asyncResult: true },
+    streams: { asyncResult: true },
     remove: { asyncResult: true },
     update: { asyncResult: true },
     updateConfig: { asyncResult: true },
@@ -110,6 +112,12 @@ export const WidgetStore = singletonStore(
       const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().query(query).build());
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.query.promise(promise);
+      return newWidgets;
+    },
+    streams(widgetId: WidgetId, streams: Array<string>): Promise<Widgets> {
+      const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().streams(streams).build());
+      const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+      WidgetActions.streams.promise(promise);
       return newWidgets;
     },
     remove(widgetId): Promise<Widgets> {
