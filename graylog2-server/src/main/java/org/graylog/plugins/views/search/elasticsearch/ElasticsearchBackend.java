@@ -225,12 +225,30 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final List<String> searchTypeIds = new ArrayList<>(searchTypeQueries.keySet());
         final List<Search> searches = searchTypeIds
                 .stream()
-                .map(searchTypeId -> new Search.Builder(searchTypeQueries.get(searchTypeId).toString())
-                        .addType(IndexMapping.TYPE_MESSAGE)
-                        .addIndex(affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices)
-                        .allowNoIndices(false)
-                        .ignoreUnavailable(false)
-                        .build())
+                .map(searchTypeId -> {
+                    final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
+                            .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
+                            .flatMap(searchType -> {
+                                if (!searchType.timerange().isPresent()) {
+                                    return Optional.empty();
+                                }
+                                final Set<String> usedStreamIds = query.usedStreamIds();
+                                final Set<Stream> usedStreamsOfSearchType = loadStreams(usedStreamIds);
+
+                                return Optional.of(indicesByTimeRange(searchType.timerange().orElse(query.timerange())).stream()
+                                        .filter(new IndexRangeContainsOneOfStreams(usedStreamsOfSearchType))
+                                        .map(IndexRange::indexName)
+                                        .collect(Collectors.toSet()));
+                            })
+                            .orElse(affectedIndices);
+
+                    return new Search.Builder(searchTypeQueries.get(searchTypeId).toString())
+                            .addType(IndexMapping.TYPE_MESSAGE)
+                            .addIndex(affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType)
+                            .allowNoIndices(false)
+                            .ignoreUnavailable(false)
+                            .build();
+                })
                 .collect(Collectors.toList());
         final MultiSearch.Builder multiSearchBuilder = new MultiSearch.Builder(searches);
         final MultiSearchResult result = JestUtils.execute(jestClient, multiSearchBuilder.build(), () -> "Unable to perform search query");
