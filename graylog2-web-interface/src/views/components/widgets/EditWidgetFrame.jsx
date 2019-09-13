@@ -3,15 +3,24 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'components/graylog';
 
+import Widget from 'views/logic/widgets/Widget';
+import WidgetQueryControls from '../WidgetQueryControls';
+import IfDashboard from '../dashboard/IfDashboard';
+
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
-import WidgetQueryControls from '../WidgetQueryControls';
-import IfDashboard from '../dashboard/IfDashboard';
 
 
-const EditWidgetDialog = ({ className, children, widget, ...rest }) => (
+type DialogProps = {
+  bsClass: string,
+  className: string,
+  children: React.Node,
+  widget: Widget,
+};
+
+const EditWidgetDialog = ({ className, children, widget, bsClass, ...rest }: DialogProps) => (
   <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
     <IfDashboard>
       <div className={`${styles.editWidgetControls} modal-dialog`}>
@@ -35,6 +44,7 @@ EditWidgetDialog.propTypes = {
 
 type Props = {
   children: Array<React.Node>,
+  widget: Widget,
 };
 
 export default class EditWidgetFrame extends React.Component<Props> {
@@ -55,7 +65,7 @@ export default class EditWidgetFrame extends React.Component<Props> {
     return (
       <Modal show
              animation={false}
-             dialogComponentClass={({ children, ...props }) => <EditWidgetDialog {...props} widget={widget}>{children}</EditWidgetDialog>} 
+             dialogComponentClass={({ children: _children, ...props }) => <EditWidgetDialog {...props} widget={widget}>{_children}</EditWidgetDialog>}
              enforceFocus={false}>
         <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
           <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>

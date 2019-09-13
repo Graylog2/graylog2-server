@@ -27,7 +27,7 @@ type Props = {
 };
 
 const _updateQuery = (id: string, queryString: string) => WidgetActions.query(id, { type: 'elasticsearch', query_string: queryString });
-const _updateRangeType = (oldTimerange: TimeRange, id: string, newRangeType: TimeRangeTypes) => {
+const _updateRangeType = (oldTimerange: ?TimeRange, id: string, newRangeType: TimeRangeTypes) => {
   const { type } = oldTimerange || {};
   if (type === newRangeType) {
     return Promise.resolve();
@@ -38,7 +38,7 @@ const _updateRangeType = (oldTimerange: TimeRange, id: string, newRangeType: Tim
     case 'absolute':
       newTimerange = {
         type: newRangeType,
-        from: moment().subtract(oldTimerange ? oldTimerange.range : 300, 'seconds').toISOString(),
+        from: moment().subtract(oldTimerange && oldTimerange.type === 'relative' ? oldTimerange.range : 300, 'seconds').toISOString(),
         to: moment().toISOString(),
       };
       break;
@@ -60,7 +60,7 @@ const _updateRangeType = (oldTimerange: TimeRange, id: string, newRangeType: Tim
 
 type Delta = {| range: number |} | {| from: string |} | {| to: string |} | {| keyword: string |};
 
-const _updateRangeParams = (currentTimerange: TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, ...delta });
+const _updateRangeParams = (currentTimerange: ?TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, ...delta });
 
 const WidgetQueryControls = ({ availableStreams, config, widget }: Props) => {
   const { query, timerange } = widget;
