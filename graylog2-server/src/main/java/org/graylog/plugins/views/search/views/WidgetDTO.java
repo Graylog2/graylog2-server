@@ -71,10 +71,10 @@ public abstract class WidgetDTO {
         public abstract Builder filter(String filter);
 
         @JsonProperty(FIELD_TIMERANGE)
-        public abstract Builder timerange(TimeRange timerange);
+        public abstract Builder timerange(@Nullable TimeRange timerange);
 
         @JsonProperty(FIELD_QUERY)
-        public abstract Builder query(BackendQuery query);
+        public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(
