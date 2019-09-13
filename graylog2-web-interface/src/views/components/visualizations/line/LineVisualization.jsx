@@ -22,8 +22,9 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ line: { color: colors[chart.name] } });
 
-const LineVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
+const LineVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => (
   <XYPlot config={config}
+          effectiveTimerange={effectiveTimerange}
           getChartColor={getChartColor}
           setChartColor={setChartColor}
           chartData={chartData(config, data, 'scatter', chartGenerator)} />
