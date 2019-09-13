@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.searchtypes;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,7 +36,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
-@JsonDeserialize(builder = AutoValue_MessageList.Builder.class)
+@JsonDeserialize(builder = MessageList.Builder.class)
 public abstract class MessageList implements SearchType {
     public static final String NAME = "messages";
 
@@ -60,6 +61,7 @@ public abstract class MessageList implements SearchType {
     @Nullable
     public abstract List<Sort> sort();
 
+    @JsonCreator
     public static Builder builder() {
         return new AutoValue_MessageList.Builder()
                 .type(NAME)
@@ -89,6 +91,12 @@ public abstract class MessageList implements SearchType {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        @JsonCreator
+        public static Builder createDefault() {
+            return builder()
+                    .streams(Collections.emptySet());
+        }
+
         @JsonProperty
         public abstract Builder type(String type);
 
