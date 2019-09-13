@@ -166,16 +166,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC))).isTrue();
     }
 
-    private SortedSet<IndexRange> sortedSetOf(IndexRange... indexRanges) {
-        final Comparator<IndexRange> indexRangeComparator = Comparator.comparing(IndexRange::indexName);
-
-        final TreeSet<IndexRange> indexRangeSets = new TreeSet<>(indexRangeComparator);
-
-        indexRangeSets.addAll(Arrays.asList(indexRanges));
-
-        return indexRangeSets;
-    }
-
     private Query dummyQuery(TimeRange timeRange) {
         return Query.builder()
                 .id("query1")
