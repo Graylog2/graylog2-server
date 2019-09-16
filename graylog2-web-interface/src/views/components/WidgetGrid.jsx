@@ -108,7 +108,7 @@ class WidgetGrid extends React.Component {
                       title={widgetTitle} />
             </AdditionalContext.Provider>
           </WidgetContext.Provider>,
-        </div>
+        </div>,
       );
     });
 

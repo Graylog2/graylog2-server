@@ -3,7 +3,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'components/graylog';
 
-import Widget from 'views/logic/widgets/Widget';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -18,12 +17,11 @@ type DialogProps = {
   bsClass: string,
   className: string,
   children: React.Node,
-  widget: Widget,
 };
 
 const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
   <WidgetContext.Consumer>
-    {(widget) => (
+    {widget => (
       <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
         <IfDashboard>
           <div className={`${styles.editWidgetControls} modal-dialog`}>
@@ -49,7 +47,6 @@ EditWidgetDialog.propTypes = {
 
 type Props = {
   children: Array<React.Node>,
-  widget: Widget,
 };
 
 export default class EditWidgetFrame extends React.Component<Props> {
@@ -66,7 +63,7 @@ export default class EditWidgetFrame extends React.Component<Props> {
   }
 
   render() {
-    const { children, widget } = this.props;
+    const { children } = this.props;
     return (
       <Modal show
              animation={false}

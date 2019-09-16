@@ -2,9 +2,10 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+
 import { MenuItem } from 'components/graylog';
-// $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
+
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
@@ -17,19 +18,16 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
-import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
 
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import MeasureDimensions from './MeasureDimensions';
-import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
 import { WidgetErrorsList } from './WidgetPropTypes';
 import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
-import IfDashboard from '../dashboard/IfDashboard';
 
 type Props = {
   id: string,
@@ -176,13 +174,13 @@ class Widget extends React.Component<Props, State> {
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
     const { editing } = this.state;
-    const { config, filter } = widget;
+    const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
         <WidgetColorContext id={id}>
-          <EditWidgetFrame widget={widget}>
+          <EditWidgetFrame>
             <MeasureDimensions>
               <WidgetHeader title={title}
                             hideDragHandle
