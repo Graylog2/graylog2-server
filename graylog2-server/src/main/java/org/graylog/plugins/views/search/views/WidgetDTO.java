@@ -22,8 +22,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
@@ -33,6 +36,8 @@ public abstract class WidgetDTO {
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
     public static final String FIELD_CONFIG = "config";
+    public static final String FIELD_TIMERANGE = "timerange";
+    public static final String FIELD_QUERY = "query";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -43,6 +48,12 @@ public abstract class WidgetDTO {
     @JsonProperty(FIELD_FILTER)
     @Nullable
     public abstract String filter();
+
+    @JsonProperty(FIELD_TIMERANGE)
+    public abstract Optional<TimeRange> timerange();
+
+    @JsonProperty(FIELD_QUERY)
+    public abstract Optional<BackendQuery> query();
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
@@ -58,6 +69,12 @@ public abstract class WidgetDTO {
         @JsonProperty(FIELD_FILTER)
         @Nullable
         public abstract Builder filter(String filter);
+
+        @JsonProperty(FIELD_TIMERANGE)
+        public abstract Builder timerange(@Nullable TimeRange timerange);
+
+        @JsonProperty(FIELD_QUERY)
+        public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(

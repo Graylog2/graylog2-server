@@ -12,7 +12,7 @@ import { ViewActions, ViewStore } from './ViewStore';
 import { ViewManagementActions } from './ViewManagementStore';
 
 jest.mock('views/actions/SearchActions');
-jest.mock('views/logic/Widget', () => ({
+jest.mock('views/logic/Widgets', () => ({
   widgetDefinition: () => ({
     searchTypes: () => [],
   }),

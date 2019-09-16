@@ -25,7 +25,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -111,6 +112,12 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty
+        public abstract Builder timerange(@Nullable TimeRange timerange);
+
+        @JsonProperty
+        public abstract Builder query(@Nullable BackendQuery query);
 
         public abstract Pivot build();
     }

@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import javax.annotation.Nullable;
@@ -92,6 +94,12 @@ public abstract class MessageList implements SearchType {
 
         @JsonProperty
         public abstract Builder filter(@Nullable Filter filter);
+
+        @JsonProperty
+        public abstract Builder timerange(@Nullable TimeRange timerange);
+
+        @JsonProperty
+        public abstract Builder query(@Nullable BackendQuery query);
 
         @JsonProperty
         public abstract Builder limit(int limit);

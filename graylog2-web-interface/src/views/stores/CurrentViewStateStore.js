@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import Widget from 'views/logic/widgets/Widget';
