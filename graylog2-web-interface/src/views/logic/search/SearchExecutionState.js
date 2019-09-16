@@ -1,37 +1,49 @@
 // @flow strict
 import * as Immutable from 'immutable';
 import ParameterBinding from '../parameters/ParameterBinding';
+import type { QueryString, TimeRange } from '../queries/Query';
+
+export type GlobalOverride = {
+  timerange?: TimeRange,
+  query?: QueryString,
+};
 
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
 
 type InternalState = {
   parameterBindings: ParameterBindings,
+  globalOverride: ?GlobalOverride,
 };
 
 type JsonRepresentation = {
-  parameter_bindings: ParameterBindings;
+  global_override: ?GlobalOverride,
+  parameter_bindings: ParameterBindings,
 };
 
 export default class SearchExecutionState {
   _value: InternalState;
 
-  constructor(parameterBindings: ParameterBindings = Immutable.Map()) {
-    this._value = { parameterBindings };
+  constructor(parameterBindings: ParameterBindings = Immutable.Map(), globalOverride: ?GlobalOverride) {
+    this._value = { parameterBindings, globalOverride };
   }
 
   get parameterBindings(): ParameterBindings {
     return this._value.parameterBindings;
   }
 
-  // eslint-disable-next-line no-use-before-define
-  toBuilder(): Builder {
-    const { parameterBindings } = this._value;
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map({ parameterBindings }));
+  get globalOverride(): ?GlobalOverride {
+    return this._value.globalOverride;
   }
 
-  static create(parameterBindings: ParameterBindings): SearchExecutionState {
-    return new SearchExecutionState(parameterBindings);
+  // eslint-disable-next-line no-use-before-define
+  toBuilder(): Builder {
+    const { globalOverride, parameterBindings } = this._value;
+    // eslint-disable-next-line no-use-before-define
+    return new Builder(Immutable.Map({ globalOverride, parameterBindings }));
+  }
+
+  static create(parameterBindings: ParameterBindings, globalOverride: ?GlobalOverride): SearchExecutionState {
+    return new SearchExecutionState(parameterBindings, globalOverride);
   }
 
   static empty(): SearchExecutionState {
@@ -39,17 +51,18 @@ export default class SearchExecutionState {
   }
 
   toJSON(): JsonRepresentation {
-    const { parameterBindings } = this._value;
+    const { globalOverride, parameterBindings } = this._value;
 
     return {
+      global_override: globalOverride,
       parameter_bindings: parameterBindings,
     };
   }
 
   static fromJSON(value: JsonRepresentation): SearchExecutionState {
     // eslint-disable-next-line camelcase
-    const { parameter_bindings } = value;
-    return SearchExecutionState.create(parameter_bindings);
+    const { global_override, parameter_bindings } = value;
+    return SearchExecutionState.create(parameter_bindings, global_override);
   }
 }
 
@@ -66,9 +79,13 @@ class Builder {
     return new Builder(this.value.set('parameterBindings', newBindings));
   }
 
+  globalOverride(globalOverride: GlobalOverride): Builder {
+    return new Builder(this.value.set('globalOverride', globalOverride));
+  }
+
   build(): SearchExecutionState {
-    const { parameterBindings } = this.value.toObject();
-    return new SearchExecutionState(parameterBindings);
+    const { globalOverride, parameterBindings } = this.value.toObject();
+    return new SearchExecutionState(parameterBindings, globalOverride);
   }
 }
 
