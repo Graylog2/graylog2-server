@@ -31,7 +31,7 @@ const _updateRangeType = (oldTimerange: ?TimeRange, id: string, newRangeType: Ti
   if (type === newRangeType) {
     return Promise.resolve();
   }
-  let newTimerange: TimeRange;
+  let newTimerange: TimeRange = { type: 'relative', range: 300 };
   // eslint-disable-next-line default-case
   switch (newRangeType) {
     case 'absolute':
@@ -59,6 +59,7 @@ const _updateRangeType = (oldTimerange: ?TimeRange, id: string, newRangeType: Ti
 
 type Delta = {| range: number |} | {| from: string |} | {| to: string |} | {| keyword: string |};
 
+// $FlowFixMe: Resulting time range could actually be inconsistent/incomplete at this point. Need to fix and improve.
 const _updateRangeParams = (currentTimerange: ?TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, ...delta });
 
 const _updateStreams = (id: string, streams: Array<string>) => WidgetActions.streams(id, streams);
