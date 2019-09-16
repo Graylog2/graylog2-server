@@ -13,6 +13,7 @@ import ReactGridContainer from 'components/common/ReactGridContainer';
 import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import WidgetContext from 'views/components/contexts/WidgetContext';
 import Widget from './widgets/Widget';
 import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 
@@ -90,22 +91,24 @@ class WidgetGrid extends React.Component {
 
       returnedWidgets.widgets.push(
         <div key={widget.id} className={style.widgetContainer}>
-          <AdditionalContext.Provider value={{ widget }}>
-            <Widget key={widgetId}
-                    id={widgetId}
-                    widget={widget}
-                    data={widgetData}
-                    errors={widgetErrors}
-                    height={height}
-                    position={returnedWidgets.positions[widgetId]}
-                    width={width}
-                    allFields={allFields}
-                    fields={fields}
-                    onPositionsChange={onPositionsChange}
-                    onSizeChange={this._onWidgetSizeChange}
-                    title={widgetTitle} />
-          </AdditionalContext.Provider>
-        </div>,
+          <WidgetContext.Provider value={widget}>
+            <AdditionalContext.Provider value={{ widget }}>
+              <Widget key={widgetId}
+                      id={widgetId}
+                      widget={widget}
+                      data={widgetData}
+                      errors={widgetErrors}
+                      height={height}
+                      position={returnedWidgets.positions[widgetId]}
+                      width={width}
+                      allFields={allFields}
+                      fields={fields}
+                      onPositionsChange={onPositionsChange}
+                      onSizeChange={this._onWidgetSizeChange}
+                      title={widgetTitle} />
+            </AdditionalContext.Provider>
+          </WidgetContext.Provider>,
+        </div>
       );
     });
 

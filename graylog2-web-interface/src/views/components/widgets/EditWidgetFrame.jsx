@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Modal } from 'components/graylog';
 
 import Widget from 'views/logic/widgets/Widget';
+import WidgetContext from 'views/components/contexts/WidgetContext';
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
 
@@ -20,21 +21,25 @@ type DialogProps = {
   widget: Widget,
 };
 
-const EditWidgetDialog = ({ className, children, widget, bsClass, ...rest }: DialogProps) => (
-  <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
-    <IfDashboard>
-      <div className={`${styles.editWidgetControls} modal-dialog`}>
-        <div className={`${styles.editWidgetControlsContent} modal-content`} role="document">
-          <WidgetQueryControls widget={widget} />
+const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
+  <WidgetContext.Consumer>
+    {(widget) => (
+      <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
+        <IfDashboard>
+          <div className={`${styles.editWidgetControls} modal-dialog`}>
+            <div className={`${styles.editWidgetControlsContent} modal-content`} role="document">
+              <WidgetQueryControls widget={widget} />
+            </div>
+          </div>
+        </IfDashboard>
+        <div className={`${styles.editWidgetDialog} modal-dialog`}>
+          <div className="modal-content" role="document">
+            {children}
+          </div>
         </div>
       </div>
-    </IfDashboard>
-    <div className={`${styles.editWidgetDialog} modal-dialog`}>
-      <div className="modal-content" role="document">
-        {children}
-      </div>
-    </div>
-  </div>
+    )}
+  </WidgetContext.Consumer>
 );
 
 EditWidgetDialog.propTypes = {
@@ -65,7 +70,7 @@ export default class EditWidgetFrame extends React.Component<Props> {
     return (
       <Modal show
              animation={false}
-             dialogComponentClass={({ children: _children, ...props }) => <EditWidgetDialog {...props} widget={widget}>{_children}</EditWidgetDialog>}
+             dialogComponentClass={EditWidgetDialog}
              enforceFocus={false}>
         <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
           <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>
