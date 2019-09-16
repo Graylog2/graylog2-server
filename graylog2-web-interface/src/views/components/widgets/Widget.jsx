@@ -187,13 +187,7 @@ class Widget extends React.Component<Props, State> {
               <WidgetHeader title={title}
                             hideDragHandle
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
-                <IfDashboard>
-                  <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                    <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                  </WidgetFilterMenu>
-                </IfDashboard>
-              </WidgetHeader>
+                            editing={editing} />
               <EditComponent config={config}
                              fields={fields}
                              editting={editing}
@@ -218,12 +212,6 @@ class Widget extends React.Component<Props, State> {
                                        widgetType={widget.type}
                                        onStretch={onPositionsChange}
                                        position={position} />
-              <IfDashboard>
-                {' '}
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
-              </IfDashboard>
               {' '}
               <WidgetActionDropdown>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
