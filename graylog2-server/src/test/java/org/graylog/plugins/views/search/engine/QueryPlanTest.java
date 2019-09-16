@@ -27,10 +27,8 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringParser;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
-import org.graylog.plugins.views.search.searchtypes.DateHistogram;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -55,7 +53,6 @@ public class QueryPlanTest {
         timerange = RelativeRange.create(60);
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()));
-        handlers.put(DateHistogram.NAME, ESDateHistogram::new);
 
         final QueryStringParser queryStringParser = new QueryStringParser();
         ElasticsearchBackend backend = new ElasticsearchBackend(handlers, queryStringParser, null, mock(IndexRangeService.class), mock(StreamService.class), new ESQueryDecorators.Fake());
