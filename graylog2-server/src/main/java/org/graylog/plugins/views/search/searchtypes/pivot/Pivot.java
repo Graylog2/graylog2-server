@@ -31,6 +31,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -77,7 +78,8 @@ public abstract class Pivot implements SearchType {
                 .type(NAME)
                 .rowGroups(of())
                 .columnGroups(of())
-                .sort(of());
+                .sort(of())
+                .streams(Collections.emptySet());
     }
 
     @AutoValue.Builder
@@ -86,7 +88,8 @@ public abstract class Pivot implements SearchType {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
-                    .sort(Collections.emptyList());
+                    .sort(Collections.emptyList())
+                    .streams(Collections.emptySet());
         }
 
         @JsonProperty
@@ -118,6 +121,9 @@ public abstract class Pivot implements SearchType {
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
+
+        @JsonProperty
+        public abstract Builder streams(Set<String> streams);
 
         public abstract Pivot build();
     }

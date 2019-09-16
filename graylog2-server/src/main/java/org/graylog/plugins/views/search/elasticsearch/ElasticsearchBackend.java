@@ -26,7 +26,6 @@ import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
-import org.apache.commons.collections4.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -137,6 +136,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         for (SearchType searchType : searchTypes) {
             final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
+            final Set<String> effectiveStreamIds = searchType.streams().isEmpty() ? query.usedStreamIds() : searchType.streams();
+
             final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                     .must(searchTypeSourceBuilder.query())
                     .must(
@@ -146,7 +147,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                     ),
                                     "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                             )
-                    );
+                    )
+                    .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
 
             searchType.query().ifPresent(q -> {
                 final ElasticsearchQueryString searchTypeBackendQuery = (ElasticsearchQueryString) q;
@@ -193,11 +195,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                         .forEach(optQueryBuilder -> optQueryBuilder.ifPresent(orBuilder::should));
                 return Optional.of(orBuilder);
             case StreamFilter.NAME:
-                if (CollectionUtils.isNotEmpty(filter.filters())) {
-                    LOG.debug("Ignoring meaningless subfilters of StreamFilter");
-                }
-                //noinspection ConstantConditions
-                return Optional.of(QueryBuilders.termQuery(Message.FIELD_STREAMS, ((StreamFilter) filter).streamId()));
+                // Skipping stream filter, will be extracted elsewhere
+                return Optional.empty();
             case QueryStringFilter.NAME:
                 return Optional.of(QueryBuilders.queryStringQuery(this.esQueryDecorators.decorate(((QueryStringFilter) filter).query(), job, query, results)));
         }
@@ -229,10 +228,12 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
-                                if (!searchType.timerange().isPresent()) {
+                                if (searchType.streams().isEmpty() && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
-                                final Set<String> usedStreamIds = query.usedStreamIds();
+                                final Set<String> usedStreamIds = searchType.streams().isEmpty()
+                                        ? query.usedStreamIds()
+                                        : searchType.streams();
                                 final Set<Stream> usedStreamsOfSearchType = loadStreams(usedStreamIds);
 
                                 return Optional.of(indicesByTimeRange(searchType.timerange().orElse(query.timerange())).stream()

@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -137,15 +138,16 @@ public abstract class Query {
     }
 
     public Set<String> usedStreamIds() {
-        if (filter() != null) {
-            final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
-            return StreamSupport.stream(filterTraverser.breadthFirst(filter()).spliterator(), false)
-                    .filter(filter -> filter instanceof StreamFilter)
-                    .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
-        }
-        return Collections.emptySet();
+        return Optional.ofNullable(filter())
+                .map(optFilter -> {
+                    @SuppressWarnings("UnstableApiUsage") final Traverser<Filter> filterTraverser = Traverser.forTree(filter -> firstNonNull(filter.filters(), Collections.emptySet()));
+                    return StreamSupport.stream(filterTraverser.breadthFirst(optFilter).spliterator(), false)
+                            .filter(filter -> filter instanceof StreamFilter)
+                            .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toSet());
+                })
+                .orElse(Collections.emptySet());
     }
 
     @AutoValue.Builder
