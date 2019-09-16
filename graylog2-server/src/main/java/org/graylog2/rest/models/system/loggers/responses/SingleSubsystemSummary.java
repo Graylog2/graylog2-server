@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
+import java.util.List;
+
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
@@ -29,7 +31,7 @@ public abstract class SingleSubsystemSummary {
     @JsonProperty
     public abstract String title();
     @JsonProperty
-    public abstract String category();
+    public abstract List<String> categories();
     @JsonProperty
     public abstract String description();
     @JsonProperty
@@ -39,10 +41,10 @@ public abstract class SingleSubsystemSummary {
 
     @JsonCreator
     public static SingleSubsystemSummary create(@JsonProperty("title") String title,
-                                                @JsonProperty("category") String category,
+                                                @JsonProperty("categories") List<String> categories,
                                                 @JsonProperty("description") String description,
                                                 @JsonProperty("level") String level,
                                                 @JsonProperty("level_syslog") int levelSyslog) {
-        return new AutoValue_SingleSubsystemSummary(title, category, description, level, levelSyslog);
+        return new AutoValue_SingleSubsystemSummary(title, categories, description, level, levelSyslog);
     }
 }
