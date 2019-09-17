@@ -12,8 +12,9 @@
 }
 
 :local(.sidebarNav) {
-    padding: 10px 20px 10px 25px;
+    padding: 9px 18px;
     display: flex;
+    align-items: center;
 }
 
 :local(.sidebarNavFont) {
@@ -28,11 +29,14 @@
 
 :local(.selected) {
    color: #FF3633;
+   background: #393939;
+   border-radius: 0 4px 0 0;
 }
 
 :local(.navContent) {
     color: #666666;
     background: #FFFFFF;
+    border-radius: 0 0 4px 0;
 }
 
 :local(.contentOpen) {
@@ -48,9 +52,10 @@
     padding: 20px;
     position: absolute !important;
     bottom: 20px;
-    max-height: calc(100vh - 325px);
-    height: calc(100vh - 325px);
-    transition: max-height 0.5s;
+    height: calc(100vh - 314px);
+    max-height: calc(100vh - 314px);
+    width: 300px;
+    transition: max-height 150ms;
 }
 
 :local(.contentClosed) {

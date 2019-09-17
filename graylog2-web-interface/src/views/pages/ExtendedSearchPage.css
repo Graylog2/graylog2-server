@@ -59,13 +59,14 @@
 }
 
 .grid-container-open {
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 315px 1fr;
     transition-duration: 0.5s;
 }
 
 .sidebar-grid {
     background: #e3e3e3;
     grid-area: sidebar;
+    padding-right: 15px;
     height: calc(100vh - 50px);
     position: sticky;
     top: 45px;
