@@ -166,7 +166,7 @@
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^1.14.0",
     "react-styleguidist": "^7.0.7",
-    "react-test-renderer": "^16.8.6",
+    "react-test-renderer": "^16.9.0",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
     "ts-jest": "^24.0.2",
