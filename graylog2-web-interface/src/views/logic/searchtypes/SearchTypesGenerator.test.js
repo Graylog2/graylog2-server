@@ -1,7 +1,7 @@
 import SearchTypesGenerator from './SearchTypesGenerator';
 import Widget from '../widgets/Widget';
 
-jest.mock('../Widget', () => ({
+jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{}] }),
 }));
 

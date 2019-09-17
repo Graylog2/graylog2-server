@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { MenuItem } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';

@@ -10,12 +10,11 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import style from 'pages/ShowDashboardPage.css';
 import ReactGridContainer from 'components/common/ReactGridContainer';
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import { TitlesStore, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from './widgets/Widget';
-import { PositionsMap, WidgetsMap, WidgetDataMap, WidgetErrorsMap } from './widgets/WidgetPropTypes';
-
+import { PositionsMap, WidgetDataMap, WidgetErrorsMap, WidgetsMap } from './widgets/WidgetPropTypes';
 
 const defaultTitleGenerator = w => `Untitled ${w.type.replace('_', ' ').split(' ').map(_.capitalize).join(' ')}`;
 
@@ -47,7 +46,6 @@ class WidgetGrid extends React.Component {
     locked: true,
     staticWidgets: [],
     positions: {},
-    errors: {},
   };
 
   state = {
@@ -55,9 +53,7 @@ class WidgetGrid extends React.Component {
   };
 
   _onWidgetSizeChange = (widgetId, dimensions) => {
-    const widgetDimensions = (this.state && this.state.widgetDimensions) || {};
-    widgetDimensions[widgetId] = dimensions;
-    this.setState({ widgetDimensions: widgetDimensions });
+    this.setState(({ widgetDimensions }) => ({ widgetDimensions: { ...widgetDimensions, [widgetId]: dimensions } }));
   };
 
   _renderWidgets = (widgets, positions, data, errors) => {
@@ -73,6 +69,7 @@ class WidgetGrid extends React.Component {
         return { id: id, col: col, row: row, height: height, width: width };
       });
       newPositions.push(newPosition);
+      // eslint-disable-next-line react/destructuring-assignment
       this.props.onPositionsChange(newPositions);
     };
 
@@ -84,9 +81,10 @@ class WidgetGrid extends React.Component {
 
       returnedWidgets.positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
 
-      const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
+      const { widgetDimensions = {} } = this.state;
+      const { height, width } = widgetDimensions[widgetId] || {};
 
-      const titles = this.props.titles || Immutable.Map();
+      const { fields, allFields, titles = Immutable.Map() } = this.props;
 
       const widgetTitle = titles.getIn([TitleTypes.Widget, widget.id], WidgetGrid._defaultTitle(widget));
 
@@ -101,8 +99,8 @@ class WidgetGrid extends React.Component {
                     height={height}
                     position={returnedWidgets.positions[widgetId]}
                     width={width}
-                    allFields={this.props.allFields}
-                    fields={this.props.fields}
+                    allFields={allFields}
+                    fields={fields}
                     onPositionsChange={onPositionsChange}
                     onSizeChange={this._onWidgetSizeChange}
                     title={widgetTitle} />
@@ -115,11 +113,12 @@ class WidgetGrid extends React.Component {
   };
 
   render() {
-    const { staticWidgets } = this.props;
-    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, this.props.data, this.props.errors);
+    const { staticWidgets, data, errors, locked, onPositionsChange } = this.props;
+    // eslint-disable-next-line react/destructuring-assignment
+    const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, data, errors);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer animate={false}
-                          locked={this.props.locked}
+                          locked={locked}
                           columns={{
                             xxl: 12,
                             xl: 12,
@@ -129,7 +128,7 @@ class WidgetGrid extends React.Component {
                             xs: 12,
                           }}
                           measureBeforeMount
-                          onPositionsChange={this.props.onPositionsChange}
+                          onPositionsChange={onPositionsChange}
                           positions={positions}
                           useDragHandle=".widget-drag-handle">
         {widgets}
