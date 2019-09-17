@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Row } from 'components/graylog';
 import _ from 'lodash';
 
 import connect from 'stores/connect';

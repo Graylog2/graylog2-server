@@ -142,8 +142,16 @@ class ReactGridContainer extends React.Component {
     measureBeforeMount: false,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      layout: this.computeLayout(props.positions),
+    };
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (!lodash.isEqual(nextProps.positions, this.props.positions)) {
+    const { positions } = this.props;
+    if (!lodash.isEqual(nextProps.positions, positions)) {
       this.setState({ layout: this.computeLayout(nextProps.positions) });
     }
   }
@@ -165,7 +173,8 @@ class ReactGridContainer extends React.Component {
     // `onLayoutChange` may be triggered when clicking somewhere in a widget, check before propagating the change.
     // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
     const filteredNewLayout = newLayout.map(item => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
-    if (lodash.isEqual(this.state.layout, filteredNewLayout)) {
+    const { layout } = this.state;
+    if (lodash.isEqual(layout, filteredNewLayout)) {
       return;
     }
 
@@ -180,11 +189,8 @@ class ReactGridContainer extends React.Component {
       });
     });
 
-    this.props.onPositionsChange(newPositions);
-  };
-
-  state = {
-    layout: this.computeLayout(this.props.positions),
+    const { onPositionsChange } = this.props;
+    onPositionsChange(newPositions);
   };
 
   render() {
