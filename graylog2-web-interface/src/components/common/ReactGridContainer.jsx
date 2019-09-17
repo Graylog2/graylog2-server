@@ -9,6 +9,13 @@ import style from './ReactGridContainer.css';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
+const WidthProvidedGridLayout = (props) => {
+  const { width } = props;
+  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout />;
+};
+WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
+WidthProvidedGridLayout.defaultProps = { width: undefined };
+
 const COLUMN_WIDTH = 175;
 const ROW_HEIGHT = 100;
 
@@ -130,6 +137,7 @@ class ReactGridContainer extends React.Component {
      *
      */
     measureBeforeMount: PropTypes.bool,
+    width: PropTypes.number,
   };
 
   static defaultProps = {
@@ -140,6 +148,7 @@ class ReactGridContainer extends React.Component {
     animate: true,
     useDragHandle: undefined,
     measureBeforeMount: false,
+    width: undefined,
   };
 
   constructor(props) {
@@ -194,28 +203,29 @@ class ReactGridContainer extends React.Component {
   };
 
   render() {
-    const { children, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount } = this.props;
+    const { children, width, locked, isResizable, rowHeight, columns, animate, useDragHandle, measureBeforeMount } = this.props;
     const { layout } = this.state;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${_gridClass(locked, isResizable, useDragHandle)}`}
-                                    layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
-                                    breakpoints={BREAKPOINTS}
-                                    cols={columns}
-                                    rowHeight={rowHeight}
-                                    margin={[10, 10]}
-                                    measureBeforeMount={measureBeforeMount}
-                                    // Do not allow dragging from elements inside a `.actions` css class. This is
-                                    // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
-                                    draggableCancel=".actions"
-                                    onDragStop={this._onLayoutChange}
-                                    onResizeStop={this._onLayoutChange}
-                                    useCSSTransforms={animate}
-                                    draggableHandle={locked ? '.no-handle' : useDragHandle}>
+      <WidthProvidedGridLayout className={`${style.reactGridLayout} ${_gridClass(locked, isResizable, useDragHandle)}`}
+                               width={width}
+                               layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
+                               breakpoints={BREAKPOINTS}
+                               cols={columns}
+                               rowHeight={rowHeight}
+                               margin={[10, 10]}
+                               measureBeforeMount={measureBeforeMount}
+        // Do not allow dragging from elements inside a `.actions` css class. This is
+        // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
+                               draggableCancel=".actions"
+                               onDragStop={this._onLayoutChange}
+                               onResizeStop={this._onLayoutChange}
+                               useCSSTransforms={animate}
+                               draggableHandle={locked ? '.no-handle' : useDragHandle}>
         {children}
-      </WidthAdjustedReactGridLayout>
+      </WidthProvidedGridLayout>
     );
   }
 }

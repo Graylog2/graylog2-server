@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
+// $FlowFixMe: could not find types
+import { SizeMe } from 'react-sizeme';
 
 import connect from 'stores/connect';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -137,10 +139,16 @@ class WidgetGrid extends React.Component {
       </ReactGridContainer>
     ) : null;
     return (
-      <div className="dashboard">
-        {grid}
-        {staticWidgets}
-      </div>
+      <SizeMe monitorWidth refreshRate={100}>
+        {({ size }) => {
+          return (
+            <div className="dashboard">
+              {React.cloneElement(grid, { width: size.width })}
+              {staticWidgets}
+            </div>
+          );
+        }}
+      </SizeMe>
     );
   }
 }
