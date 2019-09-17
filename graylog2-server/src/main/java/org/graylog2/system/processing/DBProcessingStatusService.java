@@ -107,7 +107,16 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
-        final DBQuery.Query query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+        final DBQuery.Query queryWithoutMetrics = DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
+
+        final DBQuery.Query query;
+        if (db.find(queryWithoutMetrics).count() == 1) {
+            // If there is only one node, we can ignore the journal metrics
+            query = queryWithoutMetrics;
+        } else {
+            query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
+        }
 
         // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
         // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
