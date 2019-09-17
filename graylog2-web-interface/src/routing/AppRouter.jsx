@@ -92,7 +92,17 @@ import {
 import AppConfig from 'util/AppConfig';
 
 const AppRouter = () => {
-  const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
+  const pluginRoutes = PluginStore.exports('routes');
+  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map((pluginRoute) => {
+    return (
+      <Route component={pluginRoute.parentComponent}>
+        <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+               path={URLUtils.appPrefixed(pluginRoute.path)}
+               component={pluginRoute.component} />
+      </Route>
+    );
+  });
+  const standardPluginRoutes = pluginRoutes.filter(route => !route.parentComponent).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
              path={URLUtils.appPrefixed(pluginRoute.path)}
@@ -100,11 +110,13 @@ const AppRouter = () => {
     );
   });
   const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+
   return (
     <Router history={history}>
       <Route path={Routes.STARTPAGE} component={App}>
         <Route component={AppWithGlobalNotifications}>
           <IndexRoute component={StartPage} />
+          {pluginRoutesWithParent}
           <Route component={AppWithSearchBar}>
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
@@ -205,7 +217,7 @@ const AppRouter = () => {
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')} component={SidecarEditConfigurationPage} />
             <Route path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')} component={SidecarEditCollectorPage} />
-            {pluginRoutes}
+            {standardPluginRoutes}
           </Route>
         </Route>
         <Route component={AppWithoutSearchBar}>

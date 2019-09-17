@@ -34,6 +34,7 @@ import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
 import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
+import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
 import AddMessageTableActionHandler from 'views/logic/fieldactions/AddMessageTableActionHandler';
@@ -85,8 +86,8 @@ const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
 
 const searchRoutes = enableNewSearch
   ? [
-    { path: newDashboardsPath, component: NewDashboardPage },
-    { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
+    { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
+    { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage },
   ]
@@ -106,7 +107,7 @@ export default {
     ...searchRoutes,
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
-    { path: showViewsPath, component: ShowViewPage },
+    { path: showViewsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
   ],
   enterpriseWidgets: [
     {

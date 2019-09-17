@@ -137,7 +137,7 @@ class WidgetGrid extends React.Component {
                           useDragHandle=".widget-drag-handle">
         {widgets}
       </ReactGridContainer>
-    ) : null;
+    ) : <span />;
     return (
       <SizeMe monitorWidth refreshRate={100}>
         {({ size }) => {
