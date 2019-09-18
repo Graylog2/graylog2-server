@@ -26,6 +26,11 @@ TimeRangeOverrideInput.propTypes = {
     relative_timerange_options: PropTypes.objectOf(PropTypes.string).isRequired,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
-  rangeParams: PropTypes.object.isRequired,
-  rangeType: PropTypes.string.isRequired,
+  rangeParams: PropTypes.object,
+  rangeType: PropTypes.string,
+};
+
+TimeRangeOverrideInput.defaultProps = {
+  rangeParams: undefined,
+  rangeType: undefined,
 };

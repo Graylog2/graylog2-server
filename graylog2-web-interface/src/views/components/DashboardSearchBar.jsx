@@ -50,7 +50,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
   const rangeType = type;
 
   return (
-    <ScrollToHint value={query.query_string}>
+    <ScrollToHint value={query.query_string || ''}>
       <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
         <Col md={12}>
           <Row className="no-bm">
