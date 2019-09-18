@@ -11,3 +11,24 @@
 :local(.editWidgetControlsContent) {
     padding: 15px 20px 15px 20px;
 }
+
+:local(.gridContainer) {
+    display: grid;
+    height: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(200px, 1fr) auto;
+    grid-template-areas: "Query-Controls" "Visualization" "Footer";
+}
+
+:local(.QueryControls) {
+    grid-area: Query-Controls;
+}
+
+:local(.Visualization) {
+    grid-area: Visualization;
+    overflow: hidden;
+}
+
+:local(.Footer) {
+    grid-area: Footer;
+}

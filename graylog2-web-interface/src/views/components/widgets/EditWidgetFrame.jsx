@@ -20,24 +20,11 @@ type DialogProps = {
 };
 
 const EditWidgetDialog = ({ className, children, bsClass, ...rest }: DialogProps) => (
-  <WidgetContext.Consumer>
-    {widget => (
-      <div {...rest} className={`${className} modal`} style={{ display: 'block' }}>
-        <IfDashboard>
-          <div className={`${styles.editWidgetControls} modal-dialog`}>
-            <div className={`${styles.editWidgetControlsContent} modal-content`} role="document">
-              <WidgetQueryControls widget={widget} />
-            </div>
-          </div>
-        </IfDashboard>
-        <div className={`${styles.editWidgetDialog} modal-dialog`}>
-          <div className="modal-content" role="document">
-            {children}
-          </div>
-        </div>
-      </div>
-    )}
-  </WidgetContext.Consumer>
+  <Modal.Dialog {...rest} dialogClassName={styles.editWidgetDialog}>
+    <div className={styles.gridContainer}>
+      {children}
+    </div>
+  </Modal.Dialog>
 );
 
 EditWidgetDialog.propTypes = {
@@ -69,12 +56,21 @@ export default class EditWidgetFrame extends React.Component<Props> {
              animation={false}
              dialogComponentClass={EditWidgetDialog}
              enforceFocus={false}>
-        <Modal.Body style={{ height: 'calc(100% - 50px)' }}>
-          <div role="presentation" style={{ height: 'calc(100% - 20px)' }}>
+        <IfDashboard>
+          <Modal.Header className={styles.QueryControls}>
+            <WidgetContext.Consumer>
+              {widget => (
+                <WidgetQueryControls widget={widget} />
+              )}
+            </WidgetContext.Consumer>
+          </Modal.Header>
+        </IfDashboard>
+        <Modal.Body className={styles.Visualization}>
+          <div role="presentation" style={{ height: '100%' }}>
             {children[0]}
           </div>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className={styles.Footer}>
           {children[1]}
         </Modal.Footer>
       </Modal>
