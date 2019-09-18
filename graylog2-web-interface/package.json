@@ -124,6 +124,7 @@
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/dom": "^6.2.0",
     "@testing-library/react": "^8.0.4",
     "@types/bluebird": "^3.5.8",
     "@types/jquery": "^3.3.30",
