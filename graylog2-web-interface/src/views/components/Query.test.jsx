@@ -27,23 +27,6 @@ const widget2 = AggregationWidget.builder()
 const widgets = Immutable.Map({ widget1, widget2 });
 
 describe('Query', () => {
-  it('renders provided children in the sidebar', () => {
-    const SidebarContent = mockComponent('SidebarContent');
-    const wrapper = shallow((
-      <Query results={{}}
-             widgetMapping={Immutable.Map()}
-             widgets={Immutable.Map()}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        <SidebarContent />
-      </Query>
-    ));
-    expect(wrapper.find(SidebarContent)).toHaveLength(1);
-  });
-
   it('renders extracted results and provided widgets', () => {
     const results = {
       errors: [],
