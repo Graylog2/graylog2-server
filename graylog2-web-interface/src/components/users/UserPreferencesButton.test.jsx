@@ -1,7 +1,10 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
+// import { shallow } from 'enzyme';
 
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
+
+import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 describe('UserPreferencesButton', () => {
   beforeEach(() => {
@@ -16,15 +19,13 @@ describe('UserPreferencesButton', () => {
 
     jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
-    // eslint-disable-next-line global-require
-    const UserPreferencesButton = require('components/users/UserPreferencesButton');
-    const userName = 'Full';
-    const instance = mount(<UserPreferencesButton userName={userName} />);
+    const instance = render(<UserPreferencesButton userName="Full" />);
+    const button = instance.getByTestId('user-preferences-button');
 
     expect(instance).toMatchSnapshot();
-    expect(instance.find('button')).toBeDefined();
+    expect(button).toBeDefined();
 
-    instance.find('button').simulate('click');
+    fireEvent.click(button);
 
     expect(PreferencesStore.loadUserPreferences).toBeCalled();
   });
