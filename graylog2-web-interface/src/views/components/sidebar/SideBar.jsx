@@ -129,7 +129,6 @@ class SideBar extends React.Component<Props, State> {
         ? styles.openFieldContent
         : styles.contentOpen)
       : styles.contentClosed;
-    const openContent = isSelected ? content : <span />;
 
     return (
       <div>
@@ -141,7 +140,11 @@ class SideBar extends React.Component<Props, State> {
           {({ size }) => {
             return (
               <div className={`${styles.navContent} ${selected}`}>
-                {React.cloneElement(openContent, { listHeight: size.height - 180 })}
+                {
+                  isSelected
+                    ? React.cloneElement(content, { listHeight: size.height - 180 })
+                    : <span />
+                }
               </div>
             );
           }}
@@ -158,7 +161,7 @@ class SideBar extends React.Component<Props, State> {
         <div className="sidebar">
           <div className={`${styles.sidebarContent}`}>
             <span role="presentation" onClick={toggleOpen} className={styles.sidebarNav}>
-              <span><i className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
+              <span data-testid="toggle-button"><i className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
             </span>
             {this.renderNavItem('viewDescription')}
             {this.renderNavItem('searchDetails')}

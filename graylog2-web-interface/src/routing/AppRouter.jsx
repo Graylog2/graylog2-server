@@ -95,9 +95,9 @@ const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes');
   const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map((pluginRoute) => {
     return (
-      <Route component={pluginRoute.parentComponent}>
-        <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-               path={URLUtils.appPrefixed(pluginRoute.path)}
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+             component={pluginRoute.parentComponent}>
+        <Route path={URLUtils.appPrefixed(pluginRoute.path)}
                component={pluginRoute.component} />
       </Route>
     );
