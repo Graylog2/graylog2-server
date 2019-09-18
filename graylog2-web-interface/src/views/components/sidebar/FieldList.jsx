@@ -6,8 +6,6 @@ import { is } from 'immutable';
 import { isEqual } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
 
-import EventHandlersThrottler from 'util/EventHandlersThrottler';
-
 import { Button } from 'components/graylog';
 import Field from 'views/components/Field';
 import FieldTypeIcon from 'views/components/sidebar/FieldTypeIcon';
@@ -21,11 +19,17 @@ const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.include
 const FieldList = createReactClass({
   propTypes: {
     allFields: PropTypes.object.isRequired,
-    listHeight: PropTypes.number.isRequired,
+    listHeight: PropTypes.number,
     fields: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(ViewMetadataStore, 'viewMetadata')],
+
+  getDefaultProps() {
+    return {
+      listHeight: 50,
+    };
+  },
 
   getInitialState() {
     return {
@@ -105,7 +109,7 @@ const FieldList = createReactClass({
 
     return (
       <div ref={(elem) => { this.fieldList = elem; }}>
-        <List height={listHeight || 50}
+        <List height={listHeight}
               itemCount={fieldList.size}
               itemSize={17}>
           {Row}
