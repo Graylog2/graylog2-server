@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import { mount } from 'enzyme';
+import Immutable from 'immutable';
 
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
@@ -19,6 +20,7 @@ import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import SearchResult from 'views/logic/SearchResult';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -60,8 +62,7 @@ describe('ExtendedSearchPage', () => {
     }));
     FieldTypesActions.all = mockAction(jest.fn());
     SearchMetadataActions.parseSearch = mockAction(jest.fn(() => mockPromise(SearchMetadata.empty())));
-    SearchMetadataStore.listen = jest.fn(() => jest.fn());
-    // $FlowFixMe: Somehow flow does not see the `listen` property.
+    SearchMetadataStore.listen = jest.fn(() => jest.fn()); // $FlowFixMe: Somehow flow does not see the `listen` property.
     SearchActions.refresh = mockAction(jest.fn(() => Promise.resolve()));
     CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
@@ -69,6 +70,9 @@ describe('ExtendedSearchPage', () => {
   const SimpleExtendedSearchPage = props => (
     <ExtendedSearchPage route={{}}
                         executionState={SearchExecutionState.empty()}
+                        searches={{ result: new SearchResult({ results: [] }), widgetMapping: Immutable.Map() }}
+                        fieldTypes={{ all: Immutable.List(), queryFields: Immutable.Map() }}
+                        queryId="beef-id"
                         headerElements={[]}
                         searchRefreshHooks={[]}
                         queryBarElements={[]}
