@@ -118,15 +118,15 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
     )
     : <Spinner />;
 
-  const gridClass = sideBarOpen ? 'grid-container-open' : 'grid-container-closed';
+  const gridClass = sideBarOpen ? 'open' : 'closed';
 
   return (
     <CurrentViewTypeProvider>
       <IfDashboard>
         <WindowLeaveMessage route={route} />
       </IfDashboard>
-      <div id="main-row" className={`grid-container ${gridClass}`}>
-        <div className="sidebar-grid">
+      <div id="main-row" className="grid-container">
+        <div className={`sidebar-grid ${gridClass}`}>
           {sidebar}
         </div>
         <div className="search-grid">

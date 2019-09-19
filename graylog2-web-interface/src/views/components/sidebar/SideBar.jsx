@@ -161,7 +161,7 @@ class SideBar extends React.Component<Props, State> {
         <div className="sidebar">
           <div className={`${styles.sidebarContent}`}>
             <span role="presentation" onClick={toggleOpen} className={styles.sidebarNav}>
-              <span data-testid="toggle-button"><i className={`fa fa-chevron-left ${toggleClassName} ${styles.sidebarIcon}`} /></span>
+              <span data-testid="toggle-button" className={toggleClassName}><i className={`fa fa-chevron-left ${styles.sidebarIcon}`} /></span>
             </span>
             {this.renderNavItem('viewDescription')}
             {this.renderNavItem('searchDetails')}
