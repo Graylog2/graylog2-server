@@ -1,0 +1,65 @@
+{
+  "name": "graylog-dev-plugin",
+  "version": "3.2.0-SNAPSHOT",
+  "description": "Helper code for streamlining Graylog web interface plugin development",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Graylog2/graylog-dev-plugin.git"
+  },
+  "keywords": [
+    "graylog",
+    "dev",
+    "plugin"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Graylog2/graylog-dev-plugin/issues"
+  },
+  "homepage": "https://github.com/Graylog2/graylog-dev-plugin#readme",
+  "files": [
+    "index.js",
+    "README.md"
+  ],
+  "dependencies": {
+    "@babel/cli": "7.6.0",
+    "@babel/core": "7.4.5",
+    "@babel/plugin-proposal-class-properties": "7.4.4",
+    "@babel/plugin-syntax-dynamic-import": "7.0.0",
+    "@babel/plugin-transform-runtime": "7.4.4",
+    "@babel/polyfill": "7.0.0",
+    "@babel/preset-env": "7.4.5",
+    "@babel/preset-flow": "7.0.0",
+    "@babel/preset-react": "7.0.0",
+    "@testing-library/dom": "6.2.0",
+    "@testing-library/react": "8.0.4",
+    "babel-eslint": "10.0.3",
+    "babel-jest": "24.9.0",
+    "babel-loader": "8.0.6",
+    "babel-plugin-add-module-exports": "1.0.2",
+    "babel-plugin-dynamic-import-node": "2.2.0",
+    "enzyme": "3.10.0",
+    "enzyme-adapter-react-16": "1.14.0",
+    "flow-bin": "0.108.0",
+    "eslint-config-graylog": "file:../eslint-config-graylog",
+    "eslint-loader": "1.6.3",
+    "html-webpack-plugin": "3.2.0",
+    "identity-obj-proxy": "3.0.0",
+    "jest": "24.8.0",
+    "jest-environment-enzyme": "7.0.1",
+    "jest-enzyme": "7.0.2",
+    "jest-localstorage-mock": "2.4.0",
+    "webpack-cleanup-plugin": "0.5.1",
+    "webpack-cli": "3.3.7",
+    "webpack-merge": "4.2.2",
+    "webpack": "4.39.3",
+    "webpack-dev-middleware": "3.7.1",
+    "webpack-dev-server": "3.8.0",
+    "webpack-hot-middleware": "2.25.0"
+  },
+  "devDependencies": {
+    "graylog-web-plugin": "file:../graylog-web-plugin"
+  }
+}
