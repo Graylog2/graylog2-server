@@ -6,6 +6,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import FullSizeContainer from './FullSizeContainer';
@@ -19,6 +20,7 @@ type Props = {
   data: {
     total: number,
     rows: Rows,
+    effective_timerange: TimeRange,
   },
   editing?: boolean,
   toggleEdit: () => void,
@@ -30,6 +32,7 @@ export type VisualizationComponentProps = {|
   config: AggregationWidgetConfig,
   data: Rows,
   editing?: boolean,
+  effectiveTimerange: TimeRange,
   fields: FieldTypeMappingsList,
   height: number,
   onChange: OnVisualizationConfigChange,
@@ -63,6 +66,7 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
       {({ height, width }) => (
         <VisComponent config={config}
                       data={rows}
+                      effectiveTimerange={data.effective_timerange}
                       editing={editing}
                       fields={fields}
                       height={height}
