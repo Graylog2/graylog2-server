@@ -31,7 +31,11 @@ const TimeRangeOverrideTypeSelector = ({ onSelect, value }) => (
 
 TimeRangeOverrideTypeSelector.propTypes = {
   onSelect: PropTypes.func.isRequired,
-  value: PropTypes.TimeRangeType.isRequired,
+  value: PropTypes.TimeRangeType,
+};
+
+TimeRangeOverrideTypeSelector.defaultProps = {
+  value: undefined,
 };
 
 export default TimeRangeOverrideTypeSelector;
