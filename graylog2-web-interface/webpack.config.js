@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -147,6 +148,7 @@ if (TARGET === 'start') {
       }),
       new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
+      new DashboardPlugin(),
     ],
   });
 }
@@ -154,7 +156,6 @@ if (TARGET === 'start') {
 if (TARGET === 'build') {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
-  process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
@@ -173,11 +174,6 @@ if (TARGET === 'build') {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-      // Looking at https://webpack.js.org/plugins/loader-options-plugin, this plugin seems to not
-      // be needed any longer. We should try deleting it next time we clean up this configuration.
-      new webpack.LoaderOptionsPlugin({
-        minimize: true,
       }),
     ],
   });

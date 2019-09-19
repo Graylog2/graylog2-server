@@ -38,6 +38,7 @@
     "immutable": "3.8.1",
     "javascript-natural-sort": "0.7.1",
     "jquery": "3.4.1",
+    "lodash": "4.17.15",
     "moment-timezone": "0.5.26",
     "moment": "2.24.0",
     "moment-duration-format": "2.2.2",

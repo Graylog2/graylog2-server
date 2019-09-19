@@ -13,8 +13,8 @@
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
     "flow-check": "flow check",
-    "start": "node devServer.js",
-    "build": "disable_plugins=true webpack --config webpack.bundled.js",
+    "start": "webpack-dashboard -- node devServer.js",
+    "build": "disable_plugins=true webpack --config webpack.bundled.js --env production",
     "build:stats": "disable_plugins=true webpack --config webpack.bundled.js --json > webpack-stats.json",
     "lint": "eslint --ext js,jsx src",
     "test": "jest",
@@ -73,7 +73,6 @@
     "jquery-ui": "1.12.x",
     "leaflet": "^1.5.1",
     "loadable-components": "^2.2.3",
-    "lodash": "^4.17.4",
     "markdown": "^0.5.0",
     "md5": "^2.2.1",
     "opensans-npm-webfont": "^1.0.0",
@@ -121,6 +120,7 @@
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^1.1.11",
     "glob": "^7.0.0",
+    "graylog-dev-plugin": "file:packages/graylog-dev-plugin",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
@@ -134,8 +134,8 @@
     "ts-loader": "^5.3.3",
     "typescript": "^2.7.2",
     "url-loader": "^1.0.1",
-    "yargs": "^10.0.3",
-    "graylog-dev-plugin": "file:packages/graylog-dev-plugin"
+    "webpack-dashboard": "^3.2.0",
+    "yargs": "^10.0.3"
   },
   "resolutions": {
     "@types/jquery": "3.3.0",

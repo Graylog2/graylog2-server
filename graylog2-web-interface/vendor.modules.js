@@ -5,6 +5,7 @@ module.exports = [
   'deep-equal',
   'jquery',
   'leaflet',
+  'lodash',
   'moment-timezone',
   'moment',
   'react-addons-pure-render-mixin',
