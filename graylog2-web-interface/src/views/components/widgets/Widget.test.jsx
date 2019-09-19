@@ -136,7 +136,7 @@ describe('<Widget />', () => {
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const cancelButton = wrapper.find('Button[children="Cancel"]').at(0);
+    const cancelButton = wrapper.find('button[children="Cancel"]');
     cancelButton.simulate('click');
 
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 42 });
@@ -152,7 +152,7 @@ describe('<Widget />', () => {
     widgetConfigChange({ foo: 23 });
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
-    const cancelButton = wrapper.find('Button[children="Save"]').at(0);
+    const cancelButton = wrapper.find('button[children="Save"]');
     cancelButton.simulate('click');
 
     expect(WidgetActions.updateConfig).not.toHaveBeenCalledWith('widgetId', { foo: 42 });
