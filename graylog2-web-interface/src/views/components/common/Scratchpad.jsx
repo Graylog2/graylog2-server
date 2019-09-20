@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
+import { Alert } from 'components/graylog';
+
+import isLocalStorageReady from 'util/isLocalStorageReady';
+
+const LOCALSTORAGE_ITEM = 'gl-scratchpad';
+
 const ScratchpadBar = styled.div`
   width: ${({ opened }) => (opened ? '300px' : '30px')};
   overflow: hidden;
@@ -51,6 +57,8 @@ const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
+  min-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
   padding-right: 5px;
 `;
 
@@ -69,16 +77,31 @@ const Textarea = styled.textarea`
   flex: 1;
 `;
 
+const StyledAlert = styled(Alert)`
+  margin-bottom: 10px;
+`;
+
 const Scratchpad = () => {
   const [opened, setOpened] = useState(false);
+  const [scratchData, setScratchData] = useState(localStorage.getItem(LOCALSTORAGE_ITEM));
+  const [localStorageReady] = useState(isLocalStorageReady());
   const textareaRef = useRef();
 
   const toggleOpened = () => {
     setOpened(!opened);
   };
 
+  const onChange = () => {
+    const { value } = textareaRef.current;
+    setScratchData(value);
+
+    if (localStorageReady) {
+      localStorage.setItem(LOCALSTORAGE_ITEM, textareaRef.current.value);
+    }
+  };
+
   useEffect(() => {
-    if (textareaRef.current) {
+    if (textareaRef.current && opened) {
       textareaRef.current.focus();
     }
   }, [opened]);
@@ -92,7 +115,10 @@ const Scratchpad = () => {
       <ContentArea>
         <Title>Scratchpad</Title>
         <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
-        {opened && (<Textarea ref={textareaRef} />)}
+
+        {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
+
+        <Textarea ref={textareaRef} onChange={onChange} value={scratchData} />
       </ContentArea>
     </ScratchpadBar>
   );
