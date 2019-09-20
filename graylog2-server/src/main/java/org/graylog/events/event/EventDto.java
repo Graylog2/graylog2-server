@@ -128,15 +128,19 @@ public abstract class EventDto {
         public abstract Builder originContext(@Nullable String originContext);
 
         @JsonProperty(FIELD_EVENT_TIMESTAMP)
+        @JsonDeserialize(using = ESMongoDateTimeDeserializer.class)
         public abstract Builder eventTimestamp(DateTime eventTimestamp);
 
         @JsonProperty(FIELD_PROCESSING_TIMESTAMP)
+        @JsonDeserialize(using = ESMongoDateTimeDeserializer.class)
         public abstract Builder processingTimestamp(DateTime processingTimestamp);
 
         @JsonProperty(FIELD_TIMERANGE_START)
+        @JsonDeserialize(using = ESMongoDateTimeDeserializer.class)
         public abstract Builder timerangeStart(@Nullable DateTime timerangeStart);
 
         @JsonProperty(FIELD_TIMERANGE_END)
+        @JsonDeserialize(using = ESMongoDateTimeDeserializer.class)
         public abstract Builder timerangeEnd(@Nullable DateTime timerangeEnd);
 
         @JsonProperty(FIELD_STREAMS)
