@@ -11,3 +11,4 @@ node
 manifests/*-manifest.json
 plugin
 cache
+webpack-stats.json

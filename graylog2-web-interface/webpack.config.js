@@ -157,7 +157,6 @@ if (TARGET === 'build') {
   // eslint-disable-next-line no-console
   console.error('Running in production mode');
   module.exports = merge(webpackConfig, {
-    mode: 'production',
     optimization: {
       minimizer: [new TerserPlugin({
         sourceMap: true,
@@ -171,11 +170,6 @@ if (TARGET === 'build') {
         },
       })],
     },
-    plugins: [
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      }),
-    ],
   });
 }
 

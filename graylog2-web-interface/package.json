@@ -14,8 +14,8 @@
     "docs:server": "styleguidist server",
     "flow-check": "flow check",
     "start": "webpack-dashboard -- node devServer.js",
-    "build": "disable_plugins=true webpack --config webpack.bundled.js --env production",
-    "build:stats": "disable_plugins=true webpack --config webpack.bundled.js --json > webpack-stats.json",
+    "build": "disable_plugins=true webpack --config webpack.bundled.js -p",
+    "build:stats": "yarn build --json > webpack-stats.json",
     "lint": "eslint --ext js,jsx src",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
