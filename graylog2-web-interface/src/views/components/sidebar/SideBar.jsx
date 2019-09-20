@@ -164,7 +164,7 @@ class SideBar extends React.Component<Props, State> {
               <div className={`${styles.navContent} ${selected}`}>
                 {
                   isSelected
-                    ? React.cloneElement(content, { listHeight: size.height - 180 })
+                    ? React.cloneElement(content, { listHeight: size.height - 150 })
                     : <span />
                 }
               </div>

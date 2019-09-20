@@ -26,6 +26,9 @@
 :local(.navContent) {
     color: #666666;
     background: #FFFFFF;
+    box-shadow:
+            inset 0px 13px 5px -10px #CCC,
+            inset 0px -13px 5px -10px #CCC;
 
 }
 
