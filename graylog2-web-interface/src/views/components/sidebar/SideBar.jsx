@@ -157,15 +157,21 @@ class SideBar extends React.Component<Props, State> {
 
   render() {
     const { open } = this.state;
-    const toggleClassName = open ? styles.toggleOpen : styles.toggleClose;
     const gridClass = open ? 'open' : 'closed';
+
+    const shiftToRight = open
+      ? styles.iconRight
+      : styles.iconLeft;
+    const icon = open
+      ? 'fa-times'
+      : 'fa-chevron-right';
     return (
       <div className={`sidebar-grid ${gridClass}`}>
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={`${styles.sidebarContent}`}>
-              <span role="presentation" onClick={this.toggleOpen} className={styles.sidebarNav}>
-                <span data-testid="toggle-button" className={toggleClassName}><i className={`fa fa-chevron-left ${styles.sidebarIcon}`} /></span>
+              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
+                <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
               </span>
               {this.renderNavItem('viewDescription')}
               {this.renderNavItem('searchDetails')}
