@@ -3,13 +3,13 @@ import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonGroup, Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
-const menuTitle = <React.Fragment><i className="fa fa-plus" />{' '}Create</React.Fragment>;
-
-type Props = {};
+type Props = {
+  onClick: () => void,
+};
 
 type State = {
   overflowingComponents: { [string]: React.Node },
@@ -47,9 +47,13 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
+    const { onClick } = this.props;
     const { view } = ViewStore.getInitialState();
     if (creator.func) {
-      return () => creator.func({ view });
+      return () => {
+        onClick();
+        creator.func({ view });
+      };
     }
     if (creator.component) {
       const CreatorComponent = creator.component;
@@ -66,17 +70,18 @@ class AddWidgetButton extends React.Component<Props, State> {
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
         });
+        onClick();
       };
     }
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
-    <MenuItem key={creator.title}
-              onSelect={this._createHandlerFor(creator)}
-              disabled={creator.condition ? !creator.condition() : false}>
+    <Button key={creator.title}
+            onClick={this._createHandlerFor(creator)}
+            disabled={creator.condition ? !creator.condition() : false}>
       {creator.title}
-    </MenuItem>
+    </Button>
   );
 
   render() {
@@ -90,11 +95,10 @@ class AddWidgetButton extends React.Component<Props, State> {
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <React.Fragment>
-        <DropdownButton title={menuTitle} id="add-widget-button-dropdown" bsStyle="info" pullRight>
+        <ButtonGroup vertical block>
           {presets}
-          <MenuItem divider />
           {generic}
-        </DropdownButton>
+        </ButtonGroup>
         {components}
       </React.Fragment>
     );

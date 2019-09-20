@@ -7,7 +7,6 @@ import { SizeMe } from 'react-sizeme';
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 
 import styles from './SideBar.css';
-import SearchDetails from './SearchDetails';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 
@@ -35,6 +34,8 @@ type State = {
 };
 
 class SideBar extends React.Component<Props, State> {
+  wrapperRef: ?HTMLDivElement;
+
   static propTypes = {
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
     queryId: PropTypes.string.isRequired,
@@ -55,6 +56,22 @@ class SideBar extends React.Component<Props, State> {
       open: false,
     };
   }
+
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  handleClickOutside = (event: MouseEvent) => {
+    const { open } = this.state;
+    // $FlowFixMe: EventTarget and Node do work here :(
+    if (open && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.toggleOpen();
+    }
+  };
 
   toggleOpen = () => {
     const { open } = this.state;
@@ -78,10 +95,6 @@ class SideBar extends React.Component<Props, State> {
         (<i className="fa fa-info" />),
         (
           <React.Fragment>
-            <span className="pull-right">
-              <AddWidgetButton queryId={queryId} />
-            </span>
-
             <div className={styles.viewMetadata}>
               <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
               <small>{viewMetadata.summary || defaultNewViewSummary}</small>
@@ -94,10 +107,10 @@ class SideBar extends React.Component<Props, State> {
           </React.Fragment>
         ),
       ],
-      searchDetails: [
-        'Search Details',
-        (<i className="fa fa-search" />),
-        (<SearchDetails results={results} />),
+      createWidget: [
+        'Create',
+        (<i className="fa fa-plus" />),
+        (<AddWidgetButton onClick={this.toggleOpen} queryId={queryId} />),
       ],
       highlighting: [
         'Formatting & Highlighting',
@@ -166,7 +179,7 @@ class SideBar extends React.Component<Props, State> {
       ? 'fa-times'
       : 'fa-chevron-right';
     return (
-      <div className={`sidebar-grid ${gridClass}`}>
+      <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={`${styles.sidebarContent}`}>
@@ -174,7 +187,7 @@ class SideBar extends React.Component<Props, State> {
                 <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
               </span>
               {this.renderNavItem('viewDescription')}
-              {this.renderNavItem('searchDetails')}
+              {this.renderNavItem('createWidget')}
               {this.renderNavItem('highlighting')}
               {this.renderNavItem('fields')}
             </div>
