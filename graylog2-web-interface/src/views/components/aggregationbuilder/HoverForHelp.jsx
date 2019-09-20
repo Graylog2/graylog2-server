@@ -14,7 +14,8 @@ class HoverForHelp extends React.Component {
 
   render() {
     const { children, title } = this.props;
-    const popover = this.state.hover ? (
+    const { hover } = this.state;
+    const popover = hover && (
       <Portal>
         <Position container={document.body}
                   placement="bottom"
@@ -24,7 +25,8 @@ class HoverForHelp extends React.Component {
           </Popover>
         </Position>
       </Portal>
-    ) : null;
+    );
+
     return (
       <span onMouseEnter={this._onToggleHover} onMouseLeave={this._onToggleHover}>
         <Icon name="question-circle" className="pull-right" ref={(elem) => { this.target = elem; }} />
@@ -34,6 +36,9 @@ class HoverForHelp extends React.Component {
   }
 }
 
-HoverForHelp.propTypes = {};
+HoverForHelp.propTypes = {
+  children: PropTypes.any.isRequired,
+  title: PropTypes.string.isRequired,
+};
 
 export default HoverForHelp;

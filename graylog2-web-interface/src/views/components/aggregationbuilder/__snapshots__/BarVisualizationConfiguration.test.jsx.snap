@@ -10,7 +10,18 @@ Array [
     onMouseLeave={[Function]}
   >
     <i
-      className="fa fa-question-circle pull-right"
+      className="
+         fa
+         fa-question-circle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         pull-right
+       "
     />
   </span>,
   <div

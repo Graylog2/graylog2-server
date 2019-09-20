@@ -157,7 +157,18 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           className="failure badge"
                         >
                           <i
-                            className="fa fa-times"
+                            className="
+         fa
+         fa-times
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
                           />
                         </span>
                       </td>
@@ -327,7 +338,18 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       <td>
                         <span>
                           <i
-                            className="fa fa-archive contentPackEntity"
+                            className="
+         fa
+         fa-archive
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         contentPackEntity
+       "
                             title="Content Pack"
                           />
                         </span>

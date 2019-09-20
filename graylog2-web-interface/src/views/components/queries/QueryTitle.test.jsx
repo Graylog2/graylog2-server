@@ -19,7 +19,7 @@ describe('QueryTitle', () => {
   });
   describe('duplicate action', () => {
     const findAction = (wrapper, name) => {
-      const openMenuTrigger = wrapper.find('i[className="fa fa-chevron-down"]');
+      const openMenuTrigger = wrapper.find('Icon[name="chevron-down"]');
       openMenuTrigger.simulate('click');
 
       wrapper.update();

@@ -10,7 +10,18 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
       title=""
     >
       <i
-        className="fa fa-exclamation-triangle"
+        className="
+         fa
+         fa-exclamation-triangle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
       />
     </span>
     <span
@@ -39,7 +50,18 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
           type="button"
         >
           <i
-            className="fa fa-info-circle"
+            className="
+         fa
+         fa-info-circle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
           />
         </button>
       </div>
@@ -58,7 +80,18 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
       title=""
     >
       <i
-        className="fa fa-exclamation-triangle"
+        className="
+         fa
+         fa-exclamation-triangle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
       />
     </span>
     <span
@@ -87,7 +120,18 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
           title="Replay search"
         >
           <i
-            className="fa fa-play"
+            className="
+         fa
+         fa-play
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
           />
         </a>
       </div>
@@ -102,7 +146,18 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
           type="button"
         >
           <i
-            className="fa fa-info-circle"
+            className="
+         fa
+         fa-info-circle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
           />
         </button>
       </div>
@@ -121,7 +176,18 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
       title=""
     >
       <i
-        className="fa fa-exclamation-triangle"
+        className="
+         fa
+         fa-exclamation-triangle
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
       />
     </span>
     <span
@@ -150,7 +216,18 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
           type="button"
         >
           <i
-            className="fa fa-trash"
+            className="
+         fa
+         fa-trash
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
           />
         </button>
       </div>
@@ -165,7 +242,18 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
           type="button"
         >
           <i
-            className="fa fa-pencil"
+            className="
+         fa
+         fa-pencil
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
           />
         </button>
       </div>

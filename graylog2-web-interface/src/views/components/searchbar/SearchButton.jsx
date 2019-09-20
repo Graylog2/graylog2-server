@@ -2,10 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Icon } from 'components/graylog';
+import { Spinner } from 'components/common';
 
 const SearchButton = ({ running, disabled, glyph }) => (
   <Button type="submit" bsStyle={running ? 'warning' : 'success'} disabled={disabled} className="pull-left search-button-execute">
-    <Icon name={running ? 'spinner' : 'search'} spin={running} pulse={running} fixedWidth={running} />
+    {running ? <Spinner fixedWidth pulse text="" /> : <Icon name={glyph} /> }
   </Button>
 );
 

@@ -117,7 +117,18 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
               className="message-details-title"
             >
               <i
-                className="fa fa-envelope"
+                className="
+         fa
+         fa-envelope
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
               />
                
               <a
@@ -173,15 +184,30 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           type="button"
                         >
                           <i
-                            className="fa fa-search-plus"
+                            className="
+         fa
+         fa-search-plus
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
                           />
                         </button>
                         <button
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <i
-                              className="fa fa-search-plus"
+                            <Icon
+                              fixedWidth={false}
+                              inverse={false}
+                              name="search-plus"
+                              pulse={false}
+                              spin={false}
                             />
                           }
                           className="dropdown-toggle btn btn-xs btn-default"
@@ -377,15 +403,30 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           type="button"
                         >
                           <i
-                            className="fa fa-search-plus"
+                            className="
+         fa
+         fa-search-plus
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
                           />
                         </button>
                         <button
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <i
-                              className="fa fa-search-plus"
+                            <Icon
+                              fixedWidth={false}
+                              inverse={false}
+                              name="search-plus"
+                              pulse={false}
+                              spin={false}
                             />
                           }
                           className="dropdown-toggle btn btn-xs btn-default"
@@ -565,7 +606,18 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           2018-01-22 16:36:02.189 +01:00
                         </time>
                         <i
-                          className="fa fa-fw fa-info timezoneInfo"
+                          className="
+         fa
+         fa-info
+         undefined
+         fa-fw
+         false
+         false
+         undefined
+         undefined
+         false
+         timezoneInfo
+       "
                           onClick={null}
                           onMouseOut={[Function]}
                           onMouseOver={[Function]}
