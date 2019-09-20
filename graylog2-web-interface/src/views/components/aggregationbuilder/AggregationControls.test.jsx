@@ -2,7 +2,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { mount } from 'enzyme';
-// import { render } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AggregationControls from './AggregationControls';
