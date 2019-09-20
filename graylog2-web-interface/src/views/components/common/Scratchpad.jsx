@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { debounce } from 'lodash';
 
 import { Alert } from 'components/graylog';
 
 import isLocalStorageReady from 'util/isLocalStorageReady';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
+const BUTTON_WIDTH = '30px';
+const DEFAULT_OPENED_WIDTH = '300px';
+
+const MIN = 30;
+const MAX = 900;
 
 const ScratchpadBar = styled.div`
-  width: ${({ opened }) => (opened ? '300px' : '30px')};
+  width: ${({ opened, width }) => (opened ? width : BUTTON_WIDTH)};
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
   transition: width 150ms ease-in-out, box-shadow 150ms ease-in-out;
@@ -23,7 +29,7 @@ const ScratchpadBar = styled.div`
 `;
 
 const ToggleButton = styled.button`
-  width: 30px;
+  width: ${BUTTON_WIDTH};
   height: 90vh;
   border: 0;
   padding: 0;
@@ -57,8 +63,8 @@ const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
-  min-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
+  max-width: ${({ width }) => `calc(${width} - ${BUTTON_WIDTH} - 5px)`}; /* Right Padding */
+  min-width: ${({ width }) => `calc(${width} - ${BUTTON_WIDTH} - 5px)`}; /* Right Padding */
   padding-right: 5px;
 `;
 
@@ -83,15 +89,22 @@ const StyledAlert = styled(Alert)`
 
 const Scratchpad = () => {
   const [opened, setOpened] = useState(false);
+  const [resized, setResized] = useState(false);
+  const [padWidth, setPadWidth] = useState(BUTTON_WIDTH);
   const [scratchData, setScratchData] = useState(localStorage.getItem(LOCALSTORAGE_ITEM));
   const [localStorageReady] = useState(isLocalStorageReady());
   const textareaRef = useRef();
+  const barRef = useRef();
 
   const toggleOpened = () => {
     setOpened(!opened);
+
+    if (!resized) {
+      setPadWidth(DEFAULT_OPENED_WIDTH);
+    }
   };
 
-  const onChange = () => {
+  const handleChange = () => {
     const { value } = textareaRef.current;
     setScratchData(value);
 
@@ -100,15 +113,45 @@ const Scratchpad = () => {
     }
   };
 
+
+  const handleMouseMove = debounce((moveEvent) => {
+    const newWidth = window.innerWidth - (moveEvent.pageX + moveEvent.screenX);
+
+    if (newWidth > MIN && newWidth < MAX && newWidth < window.innerWidth) {
+      setPadWidth(`${newWidth}px`);
+    }
+  }, 1);
+
+  const handleMouseUp = () => {
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseDown = (downEvent) => {
+    downEvent.preventDefault();
+    downEvent.stopPropagation();
+    setOpened(true);
+    setResized(true);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mousemove', handleMouseMove);
+  };
+
   useEffect(() => {
     if (textareaRef.current && opened) {
       textareaRef.current.focus();
     }
   }, [opened]);
 
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, []);
+
   return (
-    <ScratchpadBar opened={opened}>
-      <ToggleButton onClick={toggleOpened}>
+    <ScratchpadBar opened={opened} width={padWidth} ref={barRef}>
+      <ToggleButton onClick={toggleOpened}
+                    onMouseDown={() => window.addEventListener('mousedown', handleMouseDown)}>
         <span>{opened ? 'Close' : 'Open'} Scratchpad</span>
       </ToggleButton>
 
@@ -118,7 +161,7 @@ const Scratchpad = () => {
 
         {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
 
-        <Textarea ref={textareaRef} onChange={onChange} value={scratchData} />
+        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
       </ContentArea>
     </ScratchpadBar>
   );
