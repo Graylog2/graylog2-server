@@ -23,8 +23,6 @@ type ViewMetaData = {
 };
 
 type Props = {
-  open: boolean,
-  toggleOpen: () => void,
   children: React.Node,
   queryId: string,
   results: {},
@@ -33,12 +31,11 @@ type Props = {
 
 type State = {
   selectedKey: string,
+  open: boolean,
 };
 
 class SideBar extends React.Component<Props, State> {
   static propTypes = {
-    open: PropTypes.bool.isRequired,
-    toggleOpen: PropTypes.func.isRequired,
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
     queryId: PropTypes.string.isRequired,
     results: PropTypes.object.isRequired,
@@ -55,8 +52,14 @@ class SideBar extends React.Component<Props, State> {
     super(props);
     this.state = {
       selectedKey: 'fields',
+      open: false,
     };
   }
+
+  toggleOpen = () => {
+    const { open } = this.state;
+    this.setState({ open: !open });
+  };
 
   formatViewDescription = (view: ViewMetaData) => {
     const { description } = view;
@@ -110,16 +113,15 @@ class SideBar extends React.Component<Props, State> {
   };
 
   setSelectedKey = (key: string) => {
-    const { toggleOpen, open } = this.props;
+    const { open } = this.state;
     return () => this.setState(
       { selectedKey: key },
-      () => !open && toggleOpen(),
+      () => !open && this.toggleOpen(),
     );
   };
 
   renderNavItem = (key: string) => {
-    const { open } = this.props;
-    const { selectedKey } = this.state;
+    const { selectedKey, open } = this.state;
     const isSelected = selectedKey === key && open;
     const [text, icon, content] = this._getPanelHeader(key);
     const selectedColor = isSelected ? styles.selected : '';
@@ -154,19 +156,22 @@ class SideBar extends React.Component<Props, State> {
   };
 
   render() {
-    const { toggleOpen, open } = this.props;
+    const { open } = this.state;
     const toggleClassName = open ? styles.toggleOpen : styles.toggleClose;
+    const gridClass = open ? 'open' : 'closed';
     return (
-      <div className={styles.sidebarContainer}>
-        <div className="sidebar">
-          <div className={`${styles.sidebarContent}`}>
-            <span role="presentation" onClick={toggleOpen} className={styles.sidebarNav}>
-              <span data-testid="toggle-button" className={toggleClassName}><i className={`fa fa-chevron-left ${styles.sidebarIcon}`} /></span>
-            </span>
-            {this.renderNavItem('viewDescription')}
-            {this.renderNavItem('searchDetails')}
-            {this.renderNavItem('highlighting')}
-            {this.renderNavItem('fields')}
+      <div className={`sidebar-grid ${gridClass}`}>
+        <div className={styles.sidebarContainer}>
+          <div className="sidebar">
+            <div className={`${styles.sidebarContent}`}>
+              <span role="presentation" onClick={this.toggleOpen} className={styles.sidebarNav}>
+                <span data-testid="toggle-button" className={toggleClassName}><i className={`fa fa-chevron-left ${styles.sidebarIcon}`} /></span>
+              </span>
+              {this.renderNavItem('viewDescription')}
+              {this.renderNavItem('searchDetails')}
+              {this.renderNavItem('highlighting')}
+              {this.renderNavItem('fields')}
+            </div>
           </div>
         </div>
       </div>

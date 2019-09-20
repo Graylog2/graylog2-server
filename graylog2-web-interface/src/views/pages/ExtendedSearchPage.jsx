@@ -78,7 +78,6 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
   const results = searches && searches.result;
   const currentResults = results ? results.forId(queryId) : undefined;
   const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
-  const [sideBarOpen, setSideBarOpen] = useState(false);
 
   useEffect(() => {
     style.use();
@@ -109,16 +108,13 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
   const sidebar = currentResults
     ? (
       <ConnectedSideBar queryId={queryId}
-                        results={currentResults}
-                        open={sideBarOpen}
-                        toggleOpen={() => setSideBarOpen(!sideBarOpen)}>
+                        results={currentResults}>
         <ConnectedFieldList allFields={fieldTypes.all}
                             fields={queryFields} />
       </ConnectedSideBar>
     )
     : <Spinner />;
 
-  const gridClass = sideBarOpen ? 'open' : 'closed';
 
   return (
     <CurrentViewTypeProvider>
@@ -126,9 +122,7 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
         <WindowLeaveMessage route={route} />
       </IfDashboard>
       <div id="main-row" className="grid-container">
-        <div className={`sidebar-grid ${gridClass}`}>
-          {sidebar}
-        </div>
+        {sidebar}
         <div className="search-grid">
           <HeaderElements />
           <IfDashboard>
