@@ -108,7 +108,7 @@ class WidgetGrid extends React.Component {
                       onSizeChange={this._onWidgetSizeChange}
                       title={widgetTitle} />
             </AdditionalContext.Provider>
-          </WidgetContext.Provider>,
+          </WidgetContext.Provider>
         </div>,
       );
     });
