@@ -7,11 +7,10 @@ import AddWidgetButton from './AddWidgetButton';
 const mockAggregateActionHandler = jest.fn();
 const mockAddMessageCountActionHandler = jest.fn();
 const mockAddMessageTableActionHandler = jest.fn();
-class MockCreateParameterDialog extends React.Component {
-  render() {
-    return <span>42</span>;
-  }
-}
+
+const MockCreateParameterDialog = () => {
+  return <span>42</span>;
+};
 
 const bindings = {
   creators: [

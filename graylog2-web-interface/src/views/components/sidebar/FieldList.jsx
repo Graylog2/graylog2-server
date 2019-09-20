@@ -168,7 +168,7 @@ const FieldList = createReactClass({
             </Button>
           </div>
         </form>
-        <div style={{ marginTop: '5px', marginBottom: '0px'}}>
+        <div style={{ marginTop: '5px', marginBottom: '0px' }}>
           List fields of{' '}
           {this.showFieldsByLink('current', 'current streams', 'This shows fields which are (prospectively) included in the streams you have selected.')},{' '}
           {this.showFieldsByLink('all', 'all', 'This shows all fields, but no reserved (gl2_*) fields.')} or{' '}

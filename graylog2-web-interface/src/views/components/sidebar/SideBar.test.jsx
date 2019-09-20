@@ -26,7 +26,8 @@ describe('<Sidebar />', () => {
       },
 
       getContainerHeight() {
-        return this.props.maximumHeight;
+        const { maximumHeight } = this.props;
+        return maximumHeight;
       },
 
       render() {

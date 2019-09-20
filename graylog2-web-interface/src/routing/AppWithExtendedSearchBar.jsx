@@ -5,8 +5,6 @@ import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
 
-import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -24,8 +22,9 @@ const AppWithExtendedSearchBar = createReactClass({
 
   propTypes: {
     children: PropTypes.element.isRequired,
-    location: PropTypes.object,
-    params: PropTypes.object,
+    params: PropTypes.shape({
+      streamId: PropTypes.string,
+    }).isRequired,
   },
 
   mixins: [
@@ -36,7 +35,6 @@ const AppWithExtendedSearchBar = createReactClass({
 
   getInitialState() {
     return {
-      forceFetch: false,
       savedSearches: undefined,
       stream: undefined,
       searchesClusterConfig: undefined,
@@ -56,10 +54,6 @@ const AppWithExtendedSearchBar = createReactClass({
 
   componentWillUnmount() {
     SearchStore.unload();
-  },
-
-  _resetForceFetch() {
-    this.setState({ forceFetch: false });
   },
 
   _loadStream(streamId) {
@@ -82,24 +76,8 @@ const AppWithExtendedSearchBar = createReactClass({
   _isLoading() {
     const { stream, savedSearches, searchesClusterConfig } = this.state;
     const { params } = this.props;
-    return !savedSearches || !searchesClusterConfig || (params.streamId && !stream);
-  },
-
-  _decorateChildren(children) {
-    return React.Children.map(children, (child) => {
-      const { searchesClusterConfig, forceFetch } = this.state;
-      return React.cloneElement(child, { searchConfig: searchesClusterConfig, forceFetch: forceFetch });
-    });
-  },
-
-  _searchBarShouldDisplayRefreshControls() {
-    const { location } = this.props;
-    // Hide refresh controls on sources page
-    return location.pathname !== Routes.SOURCES;
-  },
-
-  _onExecuteSearch() {
-    this.setState({ forceFetch: true }, this._resetForceFetch);
+    const { streamId } = params;
+    return !savedSearches || !searchesClusterConfig || (streamId && !stream);
   },
 
   render() {
