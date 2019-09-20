@@ -31,6 +31,7 @@ type Props = {
 type State = {
   selectedKey: string,
   open: boolean,
+  disabledAutoClose: boolean,
 };
 
 class SideBar extends React.Component<Props, State> {
@@ -54,6 +55,7 @@ class SideBar extends React.Component<Props, State> {
     this.state = {
       selectedKey: 'fields',
       open: false,
+      disabledAutoClose: false,
     };
   }
 
@@ -66,9 +68,9 @@ class SideBar extends React.Component<Props, State> {
   }
 
   handleClickOutside = (event: MouseEvent) => {
-    const { open } = this.state;
+    const { open, disabledAutoClose } = this.state;
     // $FlowFixMe: EventTarget and Node do work here :(
-    if (open && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+    if (open && !disabledAutoClose && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
       this.toggleOpen();
     }
   };
@@ -76,6 +78,11 @@ class SideBar extends React.Component<Props, State> {
   toggleOpen = () => {
     const { open } = this.state;
     this.setState({ open: !open });
+  };
+
+  toggleAutoClose = () => {
+    const { disabledAutoClose } = this.state;
+    this.setState({ disabledAutoClose: !disabledAutoClose });
   };
 
   formatViewDescription = (view: ViewMetaData) => {
@@ -110,7 +117,7 @@ class SideBar extends React.Component<Props, State> {
       createWidget: [
         'Create',
         (<i className="fa fa-plus" />),
-        (<AddWidgetButton onClick={this.toggleOpen} queryId={queryId} />),
+        (<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />),
       ],
       highlighting: [
         'Formatting & Highlighting',

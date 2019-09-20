@@ -9,6 +9,7 @@ import View from 'views/logic/views/View';
 
 type Props = {
   onClick: () => void,
+  toggleAutoClose: () => void,
 };
 
 type State = {
@@ -47,7 +48,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
-    const { onClick } = this.props;
+    const { onClick, toggleAutoClose } = this.props;
     const { view } = ViewStore.getInitialState();
     if (creator.func) {
       return () => {
@@ -62,6 +63,8 @@ class AddWidgetButton extends React.Component<Props, State> {
         const onClose = () => this.setState((state) => {
           const { overflowingComponents } = state;
           delete overflowingComponents[id];
+          onClick();
+          toggleAutoClose();
           return { overflowingComponents };
         });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
@@ -69,8 +72,7 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
-        });
-        onClick();
+        }, toggleAutoClose);
       };
     }
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
