@@ -21,13 +21,11 @@
 :local(.selected) {
    color: #FF3633;
    background: #393939;
-   border-radius: 0 4px 0 0;
 }
 
 :local(.navContent) {
     color: #666666;
     background: #FFFFFF;
-    border-radius: 0 0 4px 0;
 
 }
 

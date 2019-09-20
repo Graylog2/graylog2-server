@@ -72,8 +72,7 @@ describe('<Sidebar />', () => {
   it('should render a sidebar', () => {
     const SideBar = loadSUT();
     const wrapper = mount(
-      <SideBar open
-               viewMetadata={viewMetaData}
+      <SideBar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -81,6 +80,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
+    wrapper.find('i.sidebarIcon').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
 
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
@@ -95,8 +95,7 @@ describe('<Sidebar />', () => {
 
     const SideBar = loadSUT();
     const wrapper = mount(
-      <SideBar open
-               viewMetadata={emptyViewMetaData}
+      <SideBar viewMetadata={emptyViewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -104,21 +103,20 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
+    wrapper.find('i.sidebarIcon').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
     expect(wrapper.find('h3').text()).toBe('New View');
     expect(wrapper.find('small').text()).toBe('No summary.');
     expect(wrapper.find('div.viewMetadata').at(1).text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
 
-    wrapper.find('div[children="Search Details"]').simulate('click');
-    expect(wrapper.find('time').at(1).text()).toBe('2018-08-28 14:39:26.192');
-    expect(wrapper.find('time').at(1).props().dateTime).toBe('2018-08-28T14:39:26.192Z');
+    wrapper.find('div[children="Create"]').simulate('click');
+    expect(wrapper.find('ButtonGroup')).toExist();
   });
 
   it('should render passed children', () => {
     const SideBar = loadSUT();
     const wrapper = mount(
-      <SideBar open
-               viewMetadata={viewMetaData}
+      <SideBar viewMetadata={viewMetaData}
                toggleOpen={jest.fn}
                queryId={query.id}
                results={queryResult}>
@@ -126,6 +124,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
+    wrapper.find('i.sidebarIcon').simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
