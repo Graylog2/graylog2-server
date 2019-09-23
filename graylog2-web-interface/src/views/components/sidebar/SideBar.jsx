@@ -1,14 +1,14 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-// $FlowFixMe: could not find types
-import { SizeMe } from 'react-sizeme';
 
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
+import { Spinner } from 'components/common';
 
 import styles from './SideBar.css';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
+import NavItem from './NavItem';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
@@ -93,7 +93,7 @@ class SideBar extends React.Component<Props, State> {
     return <i>No view description.</i>;
   };
 
-  _getPanelHeader = (key: string) => {
+  _getNavContent = (key: string) => {
     const { children, results, viewMetadata, queryId } = this.props;
     const viewDescription = this.formatViewDescription(viewMetadata);
     return {
@@ -140,44 +140,30 @@ class SideBar extends React.Component<Props, State> {
     );
   };
 
-  renderNavItem = (key: string) => {
-    const { selectedKey, open } = this.state;
-    const isSelected = selectedKey === key && open;
-    const [text, icon, content] = this._getPanelHeader(key);
-    const selectedColor = isSelected ? styles.selected : '';
-    // eslint-disable-next-line no-nested-ternary
-    const selected = isSelected
-      ? (key === 'fields'
-        ? styles.openFieldContent
-        : styles.contentOpen)
-      : styles.contentClosed;
-
-    return (
-      <div>
-        <div role="presentation" onClick={this.setSelectedKey(key)} className={`${styles.sidebarNav} ${selectedColor}`}>
-          <div className={styles.sidebarIcon}>{icon}</div>
-          {(open && <div className={styles.sidebarNavFont}>{text}</div>)}
-        </div>
-        <SizeMe monitorHeight refreshRate={100}>
-          {({ size }) => {
-            return (
-              <div className={`${styles.navContent} ${selected}`}>
-                {
-                  isSelected
-                    ? React.cloneElement(content, { listHeight: size.height - 150 })
-                    : <span />
-                }
-              </div>
-            );
-          }}
-        </SizeMe>
-      </div>
-    );
-  };
 
   render() {
-    const { open } = this.state;
+    const { results } = this.props;
+    const { open, selectedKey } = this.state;
     const gridClass = open ? 'open' : 'closed';
+    const resultsEmpty = !results || Object.keys(results).length <= 0;
+    const navItems = [
+      'viewDescription',
+      'createWidget',
+      'highlighting',
+      'fields',
+    ].map((key) => {
+      const [text, icon, content] = this._getNavContent(key);
+      return (
+        <NavItem isSelected={open && selectedKey === key}
+                 text={text}
+                 icon={icon}
+                 onClick={this.setSelectedKey(key)}
+                 isLast={key === 'fields'}
+                 isOpen={open}>
+          {content}
+        </NavItem>
+      );
+    });
 
     const shiftToRight = open
       ? styles.iconRight
@@ -193,10 +179,15 @@ class SideBar extends React.Component<Props, State> {
               <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
                 <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
               </span>
-              {this.renderNavItem('viewDescription')}
-              {this.renderNavItem('createWidget')}
-              {this.renderNavItem('highlighting')}
-              {this.renderNavItem('fields')}
+              {
+                resultsEmpty
+                  ? <Spinner />
+                  : (
+                    <React.Fragment>
+                      {navItems}
+                    </React.Fragment>
+                  )
+              }
             </div>
           </div>
         </div>

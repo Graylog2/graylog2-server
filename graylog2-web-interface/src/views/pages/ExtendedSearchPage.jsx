@@ -29,8 +29,6 @@ import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldList } from 'views/components/sidebar';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 
-import type { QueryId } from 'views/logic/queries/Query';
-import TSearchResult from 'views/logic/SearchResult';
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
@@ -39,15 +37,28 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
-import Spinner from '../../components/common/Spinner';
 
-const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore });
-const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsStore });
+const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
+  props => Object.assign(
+    {},
+    props,
+    {
+      queryId: props.viewMetadata.activeQuery,
+      results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
+    },
+  ));
+const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsStore, fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
+  props => Object.assign(
+    {},
+    props,
+    {
+      allFields: props.fieldTypes.all,
+      fields: props.fieldTypes.queryFields.get(props.viewMetadata.activeQuery, props.fieldTypes.all),
+    },
+  ));
 
 type Props = {
   route: any,
-  queryId: QueryId,
-  searches: TSearchResult,
   searchRefreshHooks: Array<SearchRefreshCondition>,
 };
 
@@ -73,11 +84,8 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 
 const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
-const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefreshHooks }) => {
+const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
-  const results = searches && searches.result;
-  const currentResults = results ? results.forId(queryId) : undefined;
-  const queryFields = fieldTypes.queryFields.get(queryId, fieldTypes.all);
 
   useEffect(() => {
     style.use();
@@ -105,16 +113,11 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
     };
   }, []);
 
-  const sidebar = currentResults
-    ? (
-      <ConnectedSideBar queryId={queryId}
-                        results={currentResults}>
-        <ConnectedFieldList allFields={fieldTypes.all}
-                            fields={queryFields} />
-      </ConnectedSideBar>
-    )
-    : <Spinner />;
-
+  const sidebar = (
+    <ConnectedSideBar>
+      <ConnectedFieldList />
+    </ConnectedSideBar>
+  );
 
   return (
     <CurrentViewTypeProvider>
@@ -147,26 +150,10 @@ const ExtendedSearchPage = ({ fieldTypes, queryId, searches, route, searchRefres
 ExtendedSearchPage.propTypes = {
   route: PropTypes.object.isRequired,
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
-  fieldTypes: PropTypes.object.isRequired,
-  searches: PropTypes.object.isRequired,
-  queryId: PropTypes.string.isRequired,
 };
-
-const ConnectedExtendedSearchPage = connect(ExtendedSearchPage, {
-  fieldTypes: FieldTypesStore,
-  searches: SearchStore,
-  viewMetadata: ViewMetadataStore,
-}, props => Object.assign(
-  {},
-  props,
-  {
-    searches: { result: props.searches.result, widgetMapping: props.searches.widgetMapping },
-    queryId: props.viewMetadata.activeQuery,
-  },
-));
 
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<Props, typeof mapping>(ConnectedExtendedSearchPage, mapping);
+export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPage, mapping);
