@@ -1,0 +1,5 @@
+{
+  "name": "eslint-plugin-graylog-custom-rules",
+  "version": "1.0.0",
+  "main": "index.js"
+}

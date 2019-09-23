@@ -5077,11 +5077,12 @@ eslint-config-airbnb@17.1.1:
     object.entries "^1.1.0"
 
 "eslint-config-graylog@file:packages/eslint-config-graylog":
-  version "1.2.0"
+  version "1.3.0"
   dependencies:
     eslint "5.16.0"
     eslint-config-airbnb "17.1.1"
     eslint-import-resolver-webpack "0.11.1"
+    eslint-plugin-graylog-custom-rules "file:../../../../../../Library/Caches/Yarn/v4/npm-eslint-config-graylog-1.3.0-3b76e17e-c96b-422e-978e-52223ec6c3de-1569266159471/node_modules/eslint-config-graylog/graylog-custom-rules"
     eslint-plugin-import "2.18.2"
     eslint-plugin-jsx-a11y "6.2.3"
     eslint-plugin-react "7.14.3"
@@ -5129,6 +5130,9 @@ eslint-module-utils@^2.4.0:
   dependencies:
     debug "^2.6.8"
     pkg-dir "^2.0.0"
+
+"eslint-plugin-graylog-custom-rules@file:packages/eslint-config-graylog/graylog-custom-rules":
+  version "1.0.0"
 
 eslint-plugin-import@2.18.2:
   version "2.18.2"
@@ -6928,7 +6932,7 @@ gray-matter@^3.0.8:
   dependencies:
     "@babel/preset-env" "7.4.5"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.2.0-SNAPSHOT-cd941ce1-2d61-410f-bff2-fd889ee32f78-1568039012129/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v4/npm-graylog-web-plugin-3.2.0-SNAPSHOT-be4c900e-9953-4101-ac03-fcf3082d3a30-1569266159313/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"

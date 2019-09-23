@@ -9,6 +9,7 @@ module.exports = {
   plugins: [
     'import',
     'react-hooks',
+    'graylog-custom-rules',
   ],
   rules: {
     'arrow-body-style': 'off',
@@ -29,5 +30,6 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
+    'graylog-custom-rules/prevent-import': 2,
   },
 };
