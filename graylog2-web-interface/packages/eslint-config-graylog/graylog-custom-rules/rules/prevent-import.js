@@ -9,6 +9,8 @@ module.exports = function (context) {
         if (bannedItem) {
           return context.report(node, item.loc, `Do not use ${bannedItem.name}, instead use ${bannedItem.alternative}`);
         }
+
+        return null;
       });
 
       return null;
