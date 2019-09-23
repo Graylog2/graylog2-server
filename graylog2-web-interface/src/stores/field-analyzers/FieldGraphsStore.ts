@@ -280,7 +280,9 @@ class FieldGraphsStore {
 
         stackedGraphs.forEach((stackedGraphId) => {
             var stackedGraph = this.fieldGraphs.get(stackedGraphId);
-            series.push(this.getSeriesInformation(stackedGraph));
+            if (stackedGraph) {
+              series.push(this.getSeriesInformation(stackedGraph));
+            }
         }, this);
 
         requestParams['series'] = series;

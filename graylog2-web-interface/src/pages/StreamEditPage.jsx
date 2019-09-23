@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Row, Col } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';

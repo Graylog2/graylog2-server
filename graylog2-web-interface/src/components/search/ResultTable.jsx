@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
 
-import { Button } from 'components/graylog';
+import { Button, ButtonGroup } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';

@@ -2,9 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import moment from 'moment';
-import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { ButtonGroup, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { Pluralize } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';

@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ButtonToolbar } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 
 class AlertsHeaderToolbar extends React.Component {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Label } from 'react-bootstrap';
+import { Label } from 'components/graylog';
 import d3 from 'd3';
 
 import style from './ColorLabel.css';

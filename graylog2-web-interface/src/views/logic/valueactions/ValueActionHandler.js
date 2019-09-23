@@ -11,9 +11,11 @@ export type ValueActionHandlerConditionProps = {
   value: any,
 };
 export type ValueActionHandlerCondition = (ValueActionHandlerConditionProps) => boolean;
+export type ValueActionHideCondition = (ActionContexts) => boolean;
 
 export type ValueActionHandler = ((string, string, any, FieldType) => Promise<*>) & { condition?: ValueActionHandlerCondition };
 export type Conditions = {
   isEnabled?: ValueActionHandlerCondition,
+  hide?: ValueActionHideCondition,
 }
 export type ValueActionHandlerWithContext = ((string, string, any, FieldType, ActionContexts) => Promise<*>) & Conditions;

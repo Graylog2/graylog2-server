@@ -7,7 +7,10 @@ import mockComponent from 'helpers/mocking/MockComponent';
 
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import SearchBarWithStatus from './SearchBarWithStatus';
+import WithSearchStatus from './WithSearchStatus';
+import SearchBar from './SearchBar';
+
+const SearchBarWithStatus = WithSearchStatus(SearchBar);
 
 jest.mock('stores/connect', () => (Component, _, propsMapper) => props => <Component {...(Object.assign({}, props, propsMapper(props)))} />);
 jest.mock('views/stores/SearchConfigStore', () => ({}));

@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Row, Table } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, Alert, Col, Row, Table } from 'components/graylog';
 import { PaginatedList } from 'components/common';
 import SidecarSearchForm from 'components/sidecars/common/SidecarSearchForm';
 

@@ -1,8 +1,7 @@
 import React from 'react';
-import { ButtonToolbar, Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';

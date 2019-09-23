@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'react-bootstrap';
+import { DropdownButton, FormControl, HelpBlock, InputGroup, MenuItem } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
 

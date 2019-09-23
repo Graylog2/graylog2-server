@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Popover, Table } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { OverlayTrigger, Popover, Table, Button } from 'components/graylog';
 import { SearchForm } from 'components/common';
 
 import style from './SidecarSearchForm.css';

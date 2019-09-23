@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Modal } from 'react-bootstrap';
+
+import { Modal } from 'components/graylog';
 
 /**
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal

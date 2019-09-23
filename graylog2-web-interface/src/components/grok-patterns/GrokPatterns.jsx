@@ -1,6 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';

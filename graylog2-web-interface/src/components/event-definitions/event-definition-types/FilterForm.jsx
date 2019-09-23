@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
+import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import moment from 'moment';
 
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';

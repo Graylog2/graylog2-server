@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import lodash from 'lodash';
+
 import {
+  Button,
   ButtonToolbar,
   Col,
   ControlLabel,
@@ -10,11 +14,7 @@ import {
   InputGroup,
   OverlayTrigger,
   Row,
-} from 'react-bootstrap';
-import { PluginStore } from 'graylog-web-plugin/plugin';
-import lodash from 'lodash';
-
-import { Button } from 'components/graylog';
+} from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';

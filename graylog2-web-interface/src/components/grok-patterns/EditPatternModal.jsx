@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Panel } from 'react-bootstrap';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button } from 'components/graylog';
+import { Panel, Button } from 'components/graylog';
 
 import GrokPatternInput from './GrokPatternInput';
 

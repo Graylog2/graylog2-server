@@ -1,8 +1,7 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Row, Col, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';

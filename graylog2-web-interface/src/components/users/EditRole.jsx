@@ -2,9 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { Alert, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, Alert, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import PermissionSelector from 'components/users/PermissionSelector';
 import PermissionsMixin from 'util/PermissionsMixin';

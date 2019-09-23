@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import lodash from 'lodash';
 
+import { Button, Col, Row } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 
 import style from './FiltersSummary.css';

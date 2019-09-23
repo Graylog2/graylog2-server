@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';

@@ -1,6 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import style from './PluginList.css';

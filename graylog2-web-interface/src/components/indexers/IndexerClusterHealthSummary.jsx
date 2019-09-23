@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';

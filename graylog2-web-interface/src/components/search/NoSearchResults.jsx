@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';

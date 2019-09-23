@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Label } from 'react-bootstrap';
+import { Label } from 'components/graylog';
 
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';

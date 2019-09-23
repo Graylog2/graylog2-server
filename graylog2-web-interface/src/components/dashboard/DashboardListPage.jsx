@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import CombinedProvider from 'injection/CombinedProvider';
 

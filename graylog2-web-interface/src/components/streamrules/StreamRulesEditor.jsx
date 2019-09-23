@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';

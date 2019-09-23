@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
-import { NavItem } from 'react-bootstrap';
+import { NavItem } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
 

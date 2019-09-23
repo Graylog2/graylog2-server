@@ -3,7 +3,7 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
-import { Row, Col, Panel, HelpBlock } from 'react-bootstrap';
+import { Row, Col, Panel, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
 import FormsUtils from 'util/FormsUtils';

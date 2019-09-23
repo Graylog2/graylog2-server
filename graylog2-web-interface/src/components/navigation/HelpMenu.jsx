@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MenuItem, NavDropdown } from 'react-bootstrap';
+import { MenuItem, NavDropdown } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import { ExternalLink } from 'components/common';
 

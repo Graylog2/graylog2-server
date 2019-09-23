@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Tooltip, OverlayTrigger } from 'components/graylog';
 import lodash from 'lodash';
 
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';

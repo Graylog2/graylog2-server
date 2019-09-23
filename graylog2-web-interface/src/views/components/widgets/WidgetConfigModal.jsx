@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 
-import { Modal } from 'react-bootstrap';
-import { Button } from 'components/graylog';
+import { Modal, Button } from 'components/graylog';
 
 const WidgetConfigModal = createReactClass({
   propTypes: {

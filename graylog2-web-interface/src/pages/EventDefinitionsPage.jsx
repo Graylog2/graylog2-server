@@ -1,8 +1,7 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { ButtonToolbar, Col, Row } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Row } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EventDefinitionsContainer from 'components/event-definitions/event-definitions/EventDefinitionsContainer';

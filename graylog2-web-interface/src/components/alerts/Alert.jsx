@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 
+import { Col, Label } from 'components/graylog';
 import { EntityListItem, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Pagination } from 'react-bootstrap';
+import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 const defaultPageSizes = [10, 50, 100];

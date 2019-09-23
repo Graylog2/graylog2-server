@@ -3,7 +3,7 @@ import React from 'react';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ValueRefHelper from 'util/ValueRefHelper';
 import ContentPackUtils from './ContentPackUtils';

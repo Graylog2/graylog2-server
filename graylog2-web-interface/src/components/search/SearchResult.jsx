@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { LoadingIndicator } from 'components/common';
 import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';

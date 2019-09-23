@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 

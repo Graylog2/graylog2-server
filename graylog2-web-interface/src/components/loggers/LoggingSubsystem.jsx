@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup, Col } from 'react-bootstrap';
+import { ButtonGroup, Col } from 'components/graylog';
 import lodash from 'lodash';
 
 import { LogLevelDropdown } from 'components/loggers';

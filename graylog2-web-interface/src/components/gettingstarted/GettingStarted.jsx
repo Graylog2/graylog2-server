@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
-import { Grid, Row, Col } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Grid, Row, Col, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 

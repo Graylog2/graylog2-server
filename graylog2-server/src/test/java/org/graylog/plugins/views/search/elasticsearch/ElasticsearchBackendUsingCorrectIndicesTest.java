@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.http.JestHttpClient;
@@ -26,12 +24,10 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESDateHistogram;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchtypes.DateHistogram;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -52,16 +48,10 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -74,8 +64,7 @@ import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBackendTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake()),
-            DateHistogram.NAME, ESDateHistogram::new
+            MessageList.NAME, () -> new ESMessageList(new ESQueryDecorators.Fake())
     );
     private static final QueryStringParser queryStringParser = new QueryStringParser();
 
@@ -135,22 +124,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("");
     }
 
-    private List<String> indicesOf(MultiSearch clientRequest) throws IOException {
-        final ObjectMapper objectMapper = objectMapperProvider.get();
-        final String request = clientRequest.getData(objectMapper);
-        final String[] lines = request.split("\\r?\\n");
-        final int noOfHeaders = lines.length / 2;
-        return IntStream.range(0, noOfHeaders)
-                .mapToObj(headerNumber -> {
-                    try {
-                        final JsonNode headerNode = objectMapper.readTree(lines[headerNumber * 2]);
-                        return headerNode.get("index").asText();
-                    } catch (IOException ignored) {}
-                    return null;
-                })
-                .collect(Collectors.toList());
-    }
-
     @Test
     public void queryUsesCorrectTimerangeWhenDeterminingIndexRanges() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(new TreeSet<>());
@@ -167,16 +140,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
         assertThat(fromCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600))).isTrue();
         assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC))).isTrue();
-    }
-
-    private SortedSet<IndexRange> sortedSetOf(IndexRange... indexRanges) {
-        final Comparator<IndexRange> indexRangeComparator = Comparator.comparing(IndexRange::indexName);
-
-        final TreeSet<IndexRange> indexRangeSets = new TreeSet<>(indexRangeComparator);
-
-        indexRangeSets.addAll(Arrays.asList(indexRanges));
-
-        return indexRangeSets;
     }
 
     private Query dummyQuery(TimeRange timeRange) {
@@ -199,7 +162,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final String streamId = "streamId";
         final Stream stream = mock(Stream.class, RETURNS_DEEP_STUBS);
         when(stream.getId()).thenReturn(streamId);
-        when(streamService.load(streamId)).thenReturn(stream);
+        when(streamService.loadByIds(Collections.singleton(streamId))).thenReturn(Collections.singleton(stream));
 
         final IndexRange indexRange1 = mock(IndexRange.class);
         when(indexRange1.indexName()).thenReturn("index1");
@@ -245,7 +208,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isNotEqualTo("_all");
     }
-    
+
     @Test
     public void queryUsesOnlyIndicesBelongingToStream() throws Exception {
         final String stream1id = "stream1id";
@@ -276,10 +239,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final SortedSet<IndexRange> indexRanges = sortedSetOf(indexRange1, indexRange2);
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
-        when(streamService.load(eq(stream1id))).thenReturn(stream1);
-        when(streamService.load(eq(stream2id))).thenReturn(stream2);
-        when(streamService.load(eq(stream3id))).thenReturn(stream3);
-        when(streamService.load(eq(stream4id))).thenReturn(stream4);
+        when(streamService.loadByIds(any())).thenReturn(ImmutableSet.of(stream1, stream2, stream3, stream4));
 
         final Query query = dummyQuery(RelativeRange.create(600)).toBuilder()
                 .filter(AndFilter.and(StreamFilter.ofId(stream1id), StreamFilter.ofId(stream2id), StreamFilter.ofId(stream3id), StreamFilter.ofId(stream4id)))

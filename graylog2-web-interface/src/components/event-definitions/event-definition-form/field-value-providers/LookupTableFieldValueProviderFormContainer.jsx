@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import connect from 'stores/connect';

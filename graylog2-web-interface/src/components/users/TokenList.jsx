@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { Row, Col, FormControl, ControlLabel, Checkbox, ButtonGroup } from 'react-bootstrap';
 
 import ClipboardButton from 'components/common/ClipboardButton';
-import { Button } from 'components/graylog';
+import { Button, Row, Col, FormControl, ControlLabel, Checkbox, ButtonGroup } from 'components/graylog';
 import TableList from 'components/common/TableList';
 import Spinner from 'components/common/Spinner';
 

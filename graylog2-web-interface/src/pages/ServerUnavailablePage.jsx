@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Modal, Well } from 'react-bootstrap';
+import { Modal, Well } from 'components/graylog';
 import DocumentTitle from 'components/common/DocumentTitle';
 
 import URLUtils from 'util/URLUtils';

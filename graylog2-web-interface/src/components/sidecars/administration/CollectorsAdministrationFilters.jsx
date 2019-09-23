@@ -2,8 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { ButtonToolbar } from 'react-bootstrap';
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { SelectPopover } from 'components/common';

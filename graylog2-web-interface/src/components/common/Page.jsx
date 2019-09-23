@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Pager } from 'react-bootstrap';
+import { Pager } from 'components/graylog';
 
 /**
  * Component that encapsulates react-bootstrap's `Pager.Item`.

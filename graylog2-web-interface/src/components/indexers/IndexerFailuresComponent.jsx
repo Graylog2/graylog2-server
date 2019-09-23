@@ -1,10 +1,9 @@
 import React from 'react';
-import { Alert, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { Button } from 'components/graylog';
+import { Alert, Col, Row, Button } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';

@@ -2,12 +2,11 @@
 import * as React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
+import { Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 
 import { ViewManagementStore, ViewManagementActions } from 'views/stores/ViewManagementStore';

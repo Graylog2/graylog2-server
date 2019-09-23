@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Alert, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
+import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import MessageShow from 'components/search/MessageShow';

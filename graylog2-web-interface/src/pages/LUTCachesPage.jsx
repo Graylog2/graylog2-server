@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ButtonToolbar, Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';

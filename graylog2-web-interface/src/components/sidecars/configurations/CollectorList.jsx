@@ -1,10 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
-import { Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 import CollectorRow from './CollectorRow';

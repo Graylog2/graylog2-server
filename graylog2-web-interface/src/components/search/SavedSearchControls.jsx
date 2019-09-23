@@ -2,9 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Button, DropdownButton, MenuItem } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';

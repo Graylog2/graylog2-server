@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import Immutable from 'immutable';
 import StringUtils from 'util/StringUtils';
 import MessageDetail from './MessageDetail';

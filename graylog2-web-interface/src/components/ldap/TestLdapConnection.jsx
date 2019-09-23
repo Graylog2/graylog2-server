@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Row, Col, Alert, Button } from 'components/graylog';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const LdapActions = ActionsProvider.getActions('Ldap');

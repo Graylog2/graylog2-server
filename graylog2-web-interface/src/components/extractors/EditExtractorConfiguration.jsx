@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Panel } from 'react-bootstrap';
+import { Col, Panel } from 'components/graylog';
 
 import {
   CopyInputExtractorConfiguration,

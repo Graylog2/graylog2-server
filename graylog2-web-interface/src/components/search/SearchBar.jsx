@@ -4,10 +4,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
-import { ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
 import URI from 'urijs';
 
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { DatePicker, Select } from 'components/common';
 import { RefreshControls, QueryInput } from 'components/search';

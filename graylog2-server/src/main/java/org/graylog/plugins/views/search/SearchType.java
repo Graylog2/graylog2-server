@@ -24,10 +24,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * A search type represents parts of a query that generates a {@see Result result}.
@@ -54,6 +59,15 @@ public interface SearchType {
     @Nullable
     @JsonProperty("filter")
     Filter filter();
+
+    @JsonProperty
+    Optional<TimeRange> timerange();
+
+    @JsonProperty
+    Optional<BackendQuery> query();
+
+    @JsonProperty
+    Set<String> streams();
 
     SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
 
@@ -88,6 +102,17 @@ public interface SearchType {
         @JsonProperty
         private Filter filter;
 
+        @Nullable
+        @JsonProperty
+        private TimeRange timeRange;
+
+        @Nullable
+        @JsonProperty
+        private BackendQuery query;
+
+        @JsonProperty
+        private Set<String> streams;
+
         @Override
         public String type() {
             return type;
@@ -101,6 +126,21 @@ public interface SearchType {
         @Override
         public Filter filter() {
             return filter;
+        }
+
+        @Override
+        public Optional<TimeRange> timerange() {
+            return Optional.ofNullable(this.timeRange);
+        }
+
+        @Override
+        public Optional<BackendQuery> query() {
+            return Optional.ofNullable(this.query);
+        }
+
+        @Override
+        public Set<String> streams() {
+            return this.streams == null ? Collections.emptySet() : this.streams;
         }
 
         @Override

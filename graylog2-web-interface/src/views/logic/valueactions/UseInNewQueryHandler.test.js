@@ -6,13 +6,15 @@ import { QueriesActions } from 'views/actions/QueriesActions';
 import UseInNewQueryHandler from './UseInNewQueryHandler';
 import Query from '../queries/Query';
 import FieldType from '../fieldtypes/FieldType';
+import View from '../views/View';
 
 jest.mock('views/actions/QueriesActions', () => ({ QueriesActions: {} }));
 describe('UseInNewQueryHandler', () => {
   it('creates new query with generated query string', () => {
     QueriesActions.create = mockAction(jest.fn(() => Promise.resolve()));
 
-    const promise = UseInNewQueryHandler('queryId', 'foo', 'bar', FieldType.Unknown, {});
+    const view = View.create().toBuilder().type(View.Type.Dashboard).build();
+    const promise = UseInNewQueryHandler('queryId', 'foo', 'bar', FieldType.Unknown, { view });
 
     return promise.then(() => {
       expect(QueriesActions.create).toHaveBeenCalled();

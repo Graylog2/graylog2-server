@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 
-import { Button } from 'components/graylog';
+import { Col, ControlLabel, FormControl, FormGroup, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
