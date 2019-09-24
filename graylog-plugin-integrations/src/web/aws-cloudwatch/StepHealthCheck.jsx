@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Panel } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import { Button, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import FormWrap from '../common/FormWrap';
