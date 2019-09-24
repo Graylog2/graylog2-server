@@ -3,8 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
+import { Button, ButtonToolbar, Col, ControlLabel, FormControl, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { ColorPickerPopover, Select, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import history from 'util/History';
@@ -41,15 +41,17 @@ const ConfigurationForm = createReactClass({
   },
 
   getInitialState() {
+    const { configuration } = this.props;
+
     return {
       error: false,
       validation_errors: {},
       formData: {
-        id: this.props.configuration.id,
-        name: this.props.configuration.name,
-        color: this.props.configuration.color,
-        collector_id: this.props.configuration.collector_id,
-        template: this.props.configuration.template || '',
+        id: configuration.id,
+        name: configuration.name,
+        color: configuration.color,
+        collector_id: configuration.collector_id,
+        template: configuration.template || '',
       },
     };
   },
@@ -69,8 +71,9 @@ const ConfigurationForm = createReactClass({
   },
 
   _hasErrors() {
-    return this.state.error
-      || !this._isTemplateSet(this.state.formData.template);
+    const { error, formData } = this.state;
+
+    return error || !this._isTemplateSet(formData.template);
   },
 
   _validateFormData(nextFormData, checkForRequiredFields) {
@@ -85,23 +88,28 @@ const ConfigurationForm = createReactClass({
   },
 
   _save() {
+    const { action } = this.props;
+    const { formData } = this.state;
+
     if (this._hasErrors()) {
       // Ensure we display an error on the template field, as this is not validated by the browser
-      this._validateFormData(this.state.formData, true);
+      this._validateFormData(formData, true);
       return;
     }
 
-    if (this.props.action === 'create') {
-      CollectorConfigurationsActions.createConfiguration(this.state.formData)
+    if (action === 'create') {
+      CollectorConfigurationsActions.createConfiguration(formData)
         .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
     } else {
-      CollectorConfigurationsActions.updateConfiguration(this.state.formData);
+      CollectorConfigurationsActions.updateConfiguration(formData);
     }
   },
 
   _formDataUpdate(key) {
+    const { formData } = this.state;
+
     return (nextValue, _, hideCallback) => {
-      const nextFormData = lodash.cloneDeep(this.state.formData);
+      const nextFormData = lodash.cloneDeep(formData);
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData, false);
       this.setState({ formData: nextFormData }, hideCallback);
@@ -109,11 +117,13 @@ const ConfigurationForm = createReactClass({
   },
 
   replaceConfigurationVariableName(oldname, newname) {
+    const { formData } = this.state;
+
     if (oldname === '' || oldname === newname) {
       return;
     }
     // replaceAll without having to use a Regex
-    const updatedTemplate = this.state.formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
+    const updatedTemplate = formData.template.split(`\${user.${oldname}}`).join(`\${user.${newname}}`);
     this._onTemplateChange(updatedTemplate);
   },
 
@@ -135,11 +145,14 @@ const ConfigurationForm = createReactClass({
   },
 
   _onCollectorChange(nextId) {
+    const { formData } = this.state;
+
     // Start loading the request to get the default template, so it is available asap.
     const defaultTemplatePromise = this._getCollectorDefaultTemplate(nextId);
 
-    const nextFormData = lodash.cloneDeep(this.state.formData);
+    const nextFormData = lodash.cloneDeep(formData);
     nextFormData.collector_id = nextId;
+    // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to use the default template for the selected Configuration?')) {
       // Wait for the promise to resolve and then update the whole formData state
       defaultTemplatePromise.then((defaultTemplate) => {
@@ -152,7 +165,10 @@ const ConfigurationForm = createReactClass({
   },
 
   _onTemplateImport(nextTemplate) {
-    const nextFormData = lodash.cloneDeep(this.state.formData);
+    const { formData } = this.state;
+
+    const nextFormData = lodash.cloneDeep(formData);
+    // eslint-disable-next-line no-alert
     if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
       this._onTemplateChange(nextTemplate);
     }
@@ -184,10 +200,12 @@ const ConfigurationForm = createReactClass({
   },
 
   _formatCollectorOptions() {
+    const { collectors } = this.state;
+
     const options = [];
 
-    if (this.state.collectors) {
-      this.state.collectors.forEach((collector) => {
+    if (collectors) {
+      collectors.forEach((collector) => {
         options.push({ value: collector.id, label: this._formatCollector(collector) });
       });
     } else {
@@ -198,14 +216,18 @@ const ConfigurationForm = createReactClass({
   },
 
   _formatValidationMessage(fieldName, defaultText) {
-    if (this.state.validation_errors[fieldName]) {
-      return <span>{this.state.validation_errors[fieldName][0]}</span>;
+    const { validation_errors: validationErrors } = this.state;
+
+    if (validationErrors[fieldName]) {
+      return <span>{validationErrors[fieldName][0]}</span>;
     }
     return <span>{defaultText}</span>;
   },
 
   _validationState(fieldName) {
-    if (this.state.validation_errors[fieldName]) {
+    const { validation_errors: validationErrors } = this.state;
+
+    if (validationErrors[fieldName]) {
       return 'error';
     }
     return null;
@@ -241,6 +263,9 @@ const ConfigurationForm = createReactClass({
   },
 
   render() {
+    const { collectors, formData } = this.state;
+    const { action, configurationSidecars } = this.props;
+
     return (
       <div>
         <form onSubmit={this._onSubmit}>
@@ -251,18 +276,18 @@ const ConfigurationForm = createReactClass({
                    onChange={this._onNameChange}
                    bsStyle={this._validationState('name')}
                    help={this._formatValidationMessage('name', 'Required. Name for this configuration')}
-                   value={this.state.formData.name || ''}
+                   value={formData.name || ''}
                    autoFocus
                    required />
 
             <FormGroup controlId="color">
               <ControlLabel>Configuration color</ControlLabel>
               <div>
-                <ColorLabel color={this.state.formData.color} />
+                <ColorLabel color={formData.color} />
                 <div style={{ display: 'inline-block', marginLeft: 15 }}>
                   <ColorPickerPopover id="color"
                                       placement="right"
-                                      color={this.state.formData.color}
+                                      color={formData.color}
                                       triggerNode={<Button bsSize="xsmall">Change color</Button>}
                                       onChange={this._formDataUpdate('color')} />
                 </div>
@@ -272,7 +297,7 @@ const ConfigurationForm = createReactClass({
 
             <FormGroup controlId="collector_id">
               <ControlLabel>Collector</ControlLabel>
-              {this._renderCollectorTypeField(this.state.formData.collector_id, this.state.collectors, this.props.configurationSidecars)}
+              {this._renderCollectorTypeField(formData.collector_id, collectors, configurationSidecars)}
             </FormGroup>
 
             <FormGroup controlId="template"
@@ -280,7 +305,7 @@ const ConfigurationForm = createReactClass({
               <ControlLabel>Configuration</ControlLabel>
               <SourceCodeEditor id="template"
                                 height={400}
-                                value={this.state.formData.template}
+                                value={formData.template}
                                 onChange={this._onTemplateChange} />
               <Button className="pull-right"
                       bsStyle="link"
@@ -305,10 +330,10 @@ const ConfigurationForm = createReactClass({
               <FormGroup>
                 <ButtonToolbar>
                   <Button type="submit" bsStyle="primary" disabled={this._hasErrors()}>
-                    {this.props.action === 'create' ? 'Create' : 'Update'}
+                    {action === 'create' ? 'Create' : 'Update'}
                   </Button>
                   <Button type="button" onClick={this._onCancel}>
-                    {this.props.action === 'create' ? 'Cancel' : 'Back'}
+                    {action === 'create' ? 'Cancel' : 'Back'}
                   </Button>
                 </ButtonToolbar>
               </FormGroup>
@@ -316,7 +341,7 @@ const ConfigurationForm = createReactClass({
           </Row>
         </form>
         <SourceViewModal ref={(c) => { this.previewModal = c; }}
-                         templateString={this.state.formData.template} />
+                         templateString={formData.template} />
         <ImportsViewModal ref={(c) => { this.uploadsModal = c; }}
                           onApply={this._onTemplateImport} />
       </div>

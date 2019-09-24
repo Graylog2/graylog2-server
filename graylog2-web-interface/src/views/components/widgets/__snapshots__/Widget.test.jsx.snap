@@ -33,11 +33,6 @@ exports[`<Widget /> should render with empty props 1`] = `
           />
         </span>
          
-        <i
-          className="fa fa-filter widgetActionDropdownCaret filterNotSet"
-          onClick={[Function]}
-        />
-         
         <span
           onClick={[Function]}
           onMouseDown={[Function]}

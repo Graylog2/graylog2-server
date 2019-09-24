@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
-import { Col } from 'react-bootstrap';
+import { Col } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 
-import { widgetDefinition } from 'views/logic/Widget';
+import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';

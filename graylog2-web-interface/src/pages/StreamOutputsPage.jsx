@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import { Link } from 'react-router';
 import Reflux from 'reflux';
 

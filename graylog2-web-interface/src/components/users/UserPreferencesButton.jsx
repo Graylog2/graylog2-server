@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import UserPreferencesModal from 'components/users/UserPreferencesModal';
 
 class UserPreferencesButton extends React.Component {

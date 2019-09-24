@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 
@@ -24,13 +24,15 @@ class BulkLoadPatternModal extends React.Component {
     evt.preventDefault();
 
     const reader = new FileReader();
+    const { replacePatterns } = this.state;
+    const { onSuccess } = this.props;
 
     reader.onload = (loaded) => {
       const request = loaded.target.result;
-      GrokPatternsStore.bulkImport(request, this.state.replacePatterns).then(() => {
+      GrokPatternsStore.bulkImport(request, replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.modal.close();
-        this.props.onSuccess();
+        onSuccess();
       });
     };
 

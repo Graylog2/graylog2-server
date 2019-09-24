@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { FormControl, HelpBlock } from 'react-bootstrap';
+import { FormControl, HelpBlock } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
 import type { AutoInterval, Interval } from './Interval';

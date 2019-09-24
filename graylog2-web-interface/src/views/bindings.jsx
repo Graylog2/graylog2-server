@@ -96,10 +96,10 @@ export default {
     ...searchPages,
   },
   routes: [
+    ...searchRoutes,
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage },
-    ...searchRoutes,
   ],
   enterpriseWidgets: [
     {
@@ -208,6 +208,7 @@ export default {
       type: 'new-query',
       title: 'Use in new query',
       handler: UseInNewQueryHandler,
+      hide: UseInNewQueryHandler.isEnabled,
     },
     {
       type: 'show-bucket',

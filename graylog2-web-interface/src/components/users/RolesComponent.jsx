@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Button, Col, Row } from 'components/graylog';
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';

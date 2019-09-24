@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { SplitButton, MenuItem } from 'react-bootstrap';
+import { SplitButton, MenuItem } from 'components/graylog';
 import ExtractorUtils from 'util/ExtractorUtils';
 
 class MessageFieldSearchActions extends React.Component {

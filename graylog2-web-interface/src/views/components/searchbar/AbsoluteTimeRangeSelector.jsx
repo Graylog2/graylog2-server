@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 import { DatePicker } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -51,12 +51,15 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (!Immutable.is(nextProps.value, this.props.value)) {
+    const { value } = this.props;
+
+    if (!Immutable.is(nextProps.value, value)) {
       this.setState(_extractStateFromProps(nextProps));
     }
   }
 
   onBlur = (key, onChange) => {
+    // eslint-disable-next-line react/destructuring-assignment
     onChange(key, _formattedDateStringInUserTZ(this.state[key]).toISOString());
   };
 
@@ -66,6 +69,8 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
 
   render() {
     const { from, to } = this.state;
+    const { onChange } = this.props;
+
     return (
       <div className={`timerange-selector absolute ${styles.selectorContainer}`}>
         <input type="hidden" name="from" />
@@ -73,16 +78,16 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
           <DatePicker id="searchFromDatePicker"
                       title="Search start date"
                       date={from}
-                      onChange={date => _onDateSelected(date, 'from', this.props.onChange)}>
+                      onChange={date => _onDateSelected(date, 'from', onChange)}>
             <Input id="fromDateInput"
                    type="text"
                    className="absolute"
                    value={from}
-                   onBlur={() => this.onBlur('from', this.props.onChange)}
+                   onBlur={() => this.onBlur('from', onChange)}
                    onChange={event => this.onChange('from', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button onClick={() => _setDateTimeToNow('from', this.props.onChange)}><i className="fa fa-magic" />
+                     <Button onClick={() => _setDateTimeToNow('from', onChange)}><i className="fa fa-magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(from) ? null : 'error'}
@@ -98,16 +103,16 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
           <DatePicker id="searchToDatePicker"
                       title="Search end date"
                       date={to}
-                      onChange={date => _onDateSelected(date, 'to', this.props.onChange)}>
+                      onChange={date => _onDateSelected(date, 'to', onChange)}>
             <Input id="toDateInput"
                    type="text"
                    className="absolute"
                    value={to}
-                   onBlur={() => this.onBlur('to', this.props.onChange)}
+                   onBlur={() => this.onBlur('to', onChange)}
                    onChange={event => this.onChange('to', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button onClick={() => _setDateTimeToNow('to', this.props.onChange)}><i className="fa fa-magic" />
+                     <Button onClick={() => _setDateTimeToNow('to', onChange)}><i className="fa fa-magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(to) ? null : 'error'}

@@ -2,8 +2,8 @@
 import React, { useEffect } from 'react';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import connect from 'stores/connect';
 import { DocumentTitle, PageHeader } from 'components/common/index';
 import Routes from 'routing/Routes';

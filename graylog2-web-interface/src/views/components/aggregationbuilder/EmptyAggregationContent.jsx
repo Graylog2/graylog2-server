@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { Jumbotron, Button } from 'react-bootstrap';
+import { Jumbotron, Button } from 'components/graylog';
 
 type Props = {|
   toggleEdit: () => void,

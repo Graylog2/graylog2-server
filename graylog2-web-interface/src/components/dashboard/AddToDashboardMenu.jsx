@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ButtonGroup, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonGroup, ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import Immutable from 'immutable';
 
 import CombinedProvider from 'injection/CombinedProvider';

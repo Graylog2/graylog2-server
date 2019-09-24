@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 import uuid from 'uuid/v4';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';

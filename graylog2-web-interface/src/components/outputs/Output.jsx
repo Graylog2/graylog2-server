@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button, Col, Row } from 'react-bootstrap';
 
+import { Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import { IfPermitted, Spinner } from 'components/common';

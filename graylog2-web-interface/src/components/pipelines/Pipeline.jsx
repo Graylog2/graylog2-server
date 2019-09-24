@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, Alert } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Row, Col, Alert } from 'components/graylog';
 
 import { EntityList, Pluralize } from 'components/common';
-import Routes from 'routing/Routes';
+
 import Stage from './Stage';
 import StageForm from './StageForm';
 import PipelineDetails from './PipelineDetails';

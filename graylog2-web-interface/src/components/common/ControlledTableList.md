@@ -1,7 +1,7 @@
 ```js
 const createReactClass = require('create-react-class');
 const Immutable = require('immutable');
-const { Col, Row } = require('react-bootstrap');
+const { Col, Row } = require('components/graylog');
 
 const ControlledTableListExample = createReactClass({
   getInitialState() {
@@ -51,4 +51,3 @@ const ControlledTableListExample = createReactClass({
 
 <ControlledTableListExample />
 ```
-

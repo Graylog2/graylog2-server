@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
+import { Button, DropdownButton } from 'components/graylog';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 

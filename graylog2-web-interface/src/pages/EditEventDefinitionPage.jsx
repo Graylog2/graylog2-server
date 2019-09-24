@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, IfPermitted, PageHeader, Spinner } from 'components/common';
 import EventDefinitionFormContainer
   from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';

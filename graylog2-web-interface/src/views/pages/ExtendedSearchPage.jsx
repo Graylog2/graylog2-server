@@ -1,11 +1,11 @@
 // @flow strict
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
+import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import SearchBarWithStatus from 'views/components/SearchBarWithStatus';
+import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
   SearchRefreshCondition,
@@ -19,14 +19,17 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
+import DashboardSearchBar from 'views/components/DashboardSearchBar';
+import SearchBar from 'views/components/SearchBar';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import IfSearch from 'views/components/search/IfSearch';
+import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
@@ -53,8 +56,13 @@ const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
   });
 };
 
-const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
-  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, executionState, view);
+const SearchBarWithStatus = WithSearchStatus(SearchBar);
+const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
+
+const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
+
+const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
+  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
   useEffect(() => {
     style.use();
 
@@ -83,33 +91,38 @@ const ExtendedSearchPage = ({ executionState, route, searchRefreshHooks }) => {
   }, []);
 
   return (
-    <React.Fragment>
-      <WindowLeaveMessage route={route} />
+    <CurrentViewTypeProvider>
+      <IfDashboard>
+        <WindowLeaveMessage route={route} />
+      </IfDashboard>
       <HeaderElements />
       <Row id="main-row">
         <IfDashboard>
+          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
           <QueryBar />
         </IfDashboard>
-        <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+
+        <IfSearch>
+          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+        </IfSearch>
 
         <QueryBarElements />
 
-        <SearchResult />
+        <ViewAdditionalContextProvider>
+          <SearchResult />
+        </ViewAdditionalContextProvider>
       </Row>
-    </React.Fragment>
+    </CurrentViewTypeProvider>
   );
 };
 
 ExtendedSearchPage.propTypes = {
-  executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
   route: PropTypes.object.isRequired,
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
-
-const ExtendedSearchPageWithExecutionState = connect(ExtendedSearchPage, { executionState: SearchExecutionStateStore });
 
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPageWithExecutionState, mapping);
+export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPage, mapping);

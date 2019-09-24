@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
-} from 'react-bootstrap';
+} from 'components/graylog';
 import { InputWrapper } from 'components/bootstrap';
 
 const OPTIONS = [

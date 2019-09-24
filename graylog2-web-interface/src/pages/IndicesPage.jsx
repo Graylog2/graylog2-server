@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 
+import { Col, Row, Button } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DocumentationLink } from 'components/support';

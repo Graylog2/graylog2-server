@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button, ButtonGroup } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
-
 import ActionsProvider from 'injection/ActionsProvider';
-
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const StreamsStore = StoreProvider.getStore('Streams');

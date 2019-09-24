@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { markdown } from 'markdown';
-import { Row, Col, Well } from 'react-bootstrap';
+import { Row, Col, Well } from 'components/graylog';
 
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';

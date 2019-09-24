@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 import ObjectUtils from 'util/ObjectUtils';

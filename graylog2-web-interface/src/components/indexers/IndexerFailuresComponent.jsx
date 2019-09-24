@@ -1,14 +1,12 @@
 import React from 'react';
-import { Alert, Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
+import { Alert, Col, Row, Button } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
-
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
-
 import { Spinner } from 'components/common';
 import { SmallSupportLink, DocumentationLink } from 'components/support';
 

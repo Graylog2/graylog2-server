@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
+import { Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 

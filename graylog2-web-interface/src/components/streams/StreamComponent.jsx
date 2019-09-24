@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert } from 'components/graylog';
 
 import { IfPermitted, TypeAheadDataFilter } from 'components/common';
 

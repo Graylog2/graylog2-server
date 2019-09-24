@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import SidecarListContainer from 'components/sidecars/sidecars/SidecarListContainer';
 

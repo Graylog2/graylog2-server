@@ -34,7 +34,7 @@ describe('IfDashboard', () => {
   });
 
 
-  it('should render children without context since Dashboard is the default', () => {
+  it('should not render children without context', () => {
     const wrapper = renderer.create(
       <div>
         <span>I must not fear.</span>

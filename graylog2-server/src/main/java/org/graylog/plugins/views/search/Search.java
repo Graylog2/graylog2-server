@@ -87,9 +87,15 @@ public abstract class Search {
                     .collect(ImmutableSet.toImmutableSet());
             builder.parameters(parameters);
         }
-        if (state.hasNonNull("queries")) {
+        if (state.hasNonNull("queries") || state.hasNonNull("global_override")) {
+
             final ImmutableSet<Query> queries = queries().stream()
-                    .map(query -> query.applyExecutionState(objectMapper, state.path("queries").path(query.id())))
+                    .map(query -> {
+                        final JsonNode queryOverride = state.hasNonNull("global_override")
+                                ? state.path("global_override")
+                                : state.path("queries").path(query.id());
+                        return query.applyExecutionState(objectMapper, queryOverride);
+                    })
                     .collect(ImmutableSet.toImmutableSet());
             builder.queries(queries);
         }

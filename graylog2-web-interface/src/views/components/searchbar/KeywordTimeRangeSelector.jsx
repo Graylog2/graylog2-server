@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Row, FormControl, FormGroup, InputGroup } from 'react-bootstrap';
+import { Alert, Col, Row, FormControl, FormGroup, InputGroup } from 'components/graylog';
 import Immutable from 'immutable';
 
 import DateTime from 'logic/datetimes/DateTime';

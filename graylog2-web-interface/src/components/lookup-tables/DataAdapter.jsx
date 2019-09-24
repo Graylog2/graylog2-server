@@ -1,13 +1,15 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
+import { ContentPackMarker } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Routes from 'routing/Routes';
-import { ContentPackMarker } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import Styles from './ConfigSummary.css';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
@@ -27,8 +29,11 @@ class DataAdapter extends React.Component {
   };
 
   _lookupKey = (e) => {
+    const { dataAdapter } = this.props;
+    const { lookupKey } = this.state;
+
     e.preventDefault();
-    LookupTableDataAdaptersActions.lookup(this.props.dataAdapter.name, this.state.lookupKey).then((result) => {
+    LookupTableDataAdaptersActions.lookup(dataAdapter.name, lookupKey).then((result) => {
       this.setState({ lookupResult: result });
     });
   };
@@ -40,6 +45,7 @@ class DataAdapter extends React.Component {
     });
 
     const { dataAdapter } = this.props;
+    const { lookupKey, lookupResult } = this.state;
     const plugin = plugins[dataAdapter.config.type];
     if (!plugin) {
       return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
@@ -81,14 +87,14 @@ class DataAdapter extends React.Component {
                      required
                      onChange={this._onChange}
                      help="Key to look up a value for."
-                     value={this.state.lookupKey} />
+                     value={lookupKey} />
               <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
-          { this.state.lookupResult && (
+          { lookupResult && (
             <div>
               <h4>Lookup result</h4>
-              <pre>{JSON.stringify(this.state.lookupResult, null, 2)}</pre>
+              <pre>{JSON.stringify(lookupResult, null, 2)}</pre>
             </div>
           )}
         </Col>

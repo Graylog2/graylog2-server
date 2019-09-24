@@ -1,6 +1,6 @@
 ```js
 const createReactClass = require('create-react-class');
-const Button = require('react-bootstrap').Button;
+const Button = require('components/graylog').Button;
 
 const items = [
   'Black',
@@ -17,18 +17,18 @@ const SelectPopoverExample = createReactClass({
       selectedColor: undefined,
     };
   },
-  
+
   handleItemSelect(item) {
     this.setState({ selectedColor: item[0] });
   },
-  
+
   render() {
     const selectedColor = this.state.selectedColor;
 
     return (
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
-          <SelectPopover id="example-popover" 
+          <SelectPopover id="example-popover"
                          title="Filter by color"
                          triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
@@ -37,7 +37,7 @@ const SelectPopoverExample = createReactClass({
                          displayDataFilter={false}
                          clearSelectionText="Clear color selection"/>
         </div>
-        
+
         {selectedColor ? `You have selected ${selectedColor}` : 'Please select a color!'}
       </div>
     );
@@ -49,8 +49,8 @@ const SelectPopoverExample = createReactClass({
 
 ```js
 const createReactClass = require('create-react-class');
-const Badge = require('react-bootstrap').Badge;
-const Button = require('react-bootstrap').Button;
+const Badge = require('components/graylog').Badge;
+const Button = require('components/graylog').Button;
 
 const items = [
   'AliceBlue',
@@ -77,11 +77,11 @@ const SelectPopoverFormattedExample = createReactClass({
       selectedColors: [],
     };
   },
-  
+
   handleItemSelect(item) {
     this.setState({ selectedColors: item });
   },
-  
+
   formatItem(item) {
     return (
       <span>
@@ -89,14 +89,14 @@ const SelectPopoverFormattedExample = createReactClass({
       </span>
     )
   },
-  
+
   render() {
     const selectedColors = this.state.selectedColors;
 
     return (
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
-          <SelectPopover id="example-popover-formatted" 
+          <SelectPopover id="example-popover-formatted"
                          title="Filter by color"
                          triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
@@ -106,7 +106,7 @@ const SelectPopoverFormattedExample = createReactClass({
                          multiple={true}
                          selectedItems={selectedColors} />
         </div>
-        
+
         {selectedColors.length > 0 ? `You have selected ${selectedColors.join(', ')}` : 'Please select some colors!'}
       </div>
     );

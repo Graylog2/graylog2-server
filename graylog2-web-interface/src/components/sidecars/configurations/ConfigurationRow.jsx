@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import Routes from 'routing/Routes';
-
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
+
 import CopyConfigurationModal from './CopyConfigurationModal';
 
 import styles from './ConfigurationRow.css';
@@ -25,14 +25,16 @@ class ConfigurationRow extends React.Component {
   };
 
   _handleDelete = () => {
-    const { configuration } = this.props;
+    const { configuration, onDelete } = this.props;
+
+    // eslint-disable-next-line no-alert
     if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
-      this.props.onDelete(configuration);
+      onDelete(configuration);
     }
   };
 
   render() {
-    const { collector, configuration } = this.props;
+    const { collector, configuration, validateConfiguration, onCopy } = this.props;
 
     return (
       <tr>
@@ -52,8 +54,8 @@ class ConfigurationRow extends React.Component {
                             bsSize="xsmall"
                             pullRight>
               <CopyConfigurationModal configuration={configuration}
-                                      validateConfiguration={this.props.validateConfiguration}
-                                      copyConfiguration={this.props.onCopy} />
+                                      validateConfiguration={validateConfiguration}
+                                      copyConfiguration={onCopy} />
               <MenuItem divider />
               <MenuItem onSelect={this._handleDelete}>Delete</MenuItem>
             </DropdownButton>

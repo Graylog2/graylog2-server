@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Table } from 'react-bootstrap';
+import { Alert, Table } from 'components/graylog';
 
 import { IndexerFailure } from 'components/indexers';
 

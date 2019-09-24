@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { Timestamp } from 'components/common';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';

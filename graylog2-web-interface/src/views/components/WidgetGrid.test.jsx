@@ -29,6 +29,7 @@ describe('<WidgetGrid />', () => {
     const wrapper = renderer.create((
       <WidgetGrid allFields={Immutable.List()}
                   data={{}}
+                  errors={{}}
                   onPositionsChange={() => {}}
                   titles={Immutable.Map()}
                   widgets={{}}
@@ -53,6 +54,7 @@ describe('<WidgetGrid />', () => {
     });
     const wrapper = mount((
       <WidgetGrid widgets={widgets}
+                  errors={{}}
                   positions={positions}
                   data={data}
                   titles={titles}
@@ -78,6 +80,7 @@ describe('<WidgetGrid />', () => {
     });
     const wrapper = mount((
       <WidgetGrid widgets={widgets}
+                  errors={{}}
                   positions={positions}
                   data={data}
                   titles={titles}

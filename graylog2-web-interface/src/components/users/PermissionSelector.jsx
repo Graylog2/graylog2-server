@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'react-bootstrap';
 
+import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'components/graylog';
 import { TableList } from 'components/common';
 
 class PermissionSelector extends React.Component {

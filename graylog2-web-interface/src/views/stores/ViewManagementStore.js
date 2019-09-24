@@ -17,11 +17,13 @@ export type SortOrder = 'asc' | 'desc';
 export type SortField = 'id' | 'title' | 'created_at';
 
 export type PaginatedViews = {
-  total: number,
-  page: number,
-  per_page: number,
-  count: number,
-  views: Array<View>,
+  pagination: {
+    total: number,
+    page: number,
+    perPage: number,
+    count: number,
+  },
+  list: Array<View>,
 };
 
 export type ViewSummary = {

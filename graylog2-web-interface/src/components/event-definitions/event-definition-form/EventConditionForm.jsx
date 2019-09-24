@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Clearfix, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import lodash from 'lodash';
 import naturalSort from 'javascript-natural-sort';

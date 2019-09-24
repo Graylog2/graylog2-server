@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Modal } from 'react-bootstrap';
 
 import { BootstrapModalWrapper } from 'components/bootstrap';
 import { Spinner } from 'components/common';
+import { Alert, Modal, Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
+
 import style from './AlertConditionTestModal.css';
 
 const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
@@ -30,8 +31,10 @@ class AlertConditionTestModal extends React.Component {
   };
 
   testCondition = () => {
+    const { stream, condition } = this.props;
+
     this.setState({ isTesting: true, testResults: undefined });
-    AlertConditionsActions.test(this.props.stream.id, this.props.condition.id)
+    AlertConditionsActions.test(stream.id, condition.id)
       .then(
         testResults => this.setState({ testResults: testResults }),
         (error) => {

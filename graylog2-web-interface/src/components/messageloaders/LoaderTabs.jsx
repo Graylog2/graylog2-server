@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Tab, Tabs, Col } from 'react-bootstrap';
+import { Tab, Tabs, Col } from 'components/graylog';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';

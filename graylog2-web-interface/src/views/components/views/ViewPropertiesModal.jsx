@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal } from 'react-bootstrap';
 import { isEqual } from 'lodash';
 
+import { Modal, Button } from 'components/graylog';
 import FormsUtils from 'util/FormsUtils';
 import Input from 'components/bootstrap/Input';
 

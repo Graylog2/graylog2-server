@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Jumbotron, Row } from 'react-bootstrap';
+import { Col, Jumbotron, Row } from 'components/graylog';
 import { DocumentTitle } from 'components/common';
 
 import style from '!style/useable!css!./NotFoundPage.css';

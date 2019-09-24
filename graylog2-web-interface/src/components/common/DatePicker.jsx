@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { OverlayTrigger, Popover } from 'components/graylog';
 import DateTime from 'logic/datetimes/DateTime';
 import DayPicker from 'react-day-picker';
 

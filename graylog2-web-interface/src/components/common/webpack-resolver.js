@@ -9,7 +9,7 @@ const modes = [
 
 modes.forEach((mode) => {
   ace.config.setModuleUrl(
-    `ace/mode/${mode}`, require(`file-loader!ace-builds/src-min-noconflict/mode-${mode}.js`)
+    'ace/mode/' + mode, require('file-loader!ace-builds/src-min-noconflict/mode-' + mode + '.js')
   );
 });
 
@@ -24,6 +24,6 @@ const themes = [
 
 themes.forEach((theme) => {
   ace.config.setModuleUrl(
-    `ace/theme/${theme}`, require(`file-loader!ace-builds/src-min-noconflict/theme-${theme}.js`)
+    'ace/theme/' + theme, require('file-loader!ace-builds/src-min-noconflict/theme-' + theme + '.js')
   );
 });
