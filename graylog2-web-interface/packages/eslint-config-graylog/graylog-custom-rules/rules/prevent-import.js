@@ -1,6 +1,6 @@
 /* eslint-disable func-names */
 module.exports = function (context) {
-  const bannedImports = [{ name: 'react-bootstrap', alternative: 'components/graylog' }];
+  const bannedImports = context.options[0];
   return {
     ImportDeclaration(node) {
       // eslint-disable-next-line no-unused-expressions

@@ -30,6 +30,6 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
-    'graylog-custom-rules/prevent-import': 2,
+    'graylog-custom-rules/prevent-import': ['error', [{ name: 'react-bootstrap', alternative: 'components/graylog' }]],
   },
 };
