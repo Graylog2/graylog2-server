@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Button, Icon } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Alert, Button } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 

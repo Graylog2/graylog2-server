@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Icon } from 'components/graylog';
-import { SortableList } from 'components/common';
+import { Alert } from 'components/graylog';
+import { SortableList, Icon } from 'components/common';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 

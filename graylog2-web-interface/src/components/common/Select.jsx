@@ -4,7 +4,7 @@ import lodash from 'lodash';
 import PropTypes from 'prop-types';
 import ReactSelect, { components as Components, Creatable } from 'react-select';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 const MultiValueRemove = props => (
   <Components.MultiValueRemove {...props}>

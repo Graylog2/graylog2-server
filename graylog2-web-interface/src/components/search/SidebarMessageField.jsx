@@ -3,7 +3,8 @@ import React from 'react';
 
 import createReactClass from 'create-react-class';
 
-import { Panel, Icon } from 'components/graylog';
+import { Panel } from 'components/graylog';
+import { Icon } from 'components/common';
 import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 

@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Icon } from 'components/graylog';
+import { Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { TypeAheadFieldInput } from 'components/common';
+import { TypeAheadFieldInput, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';

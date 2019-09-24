@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ProgressBar, Icon } from 'components/graylog';
-import { LinkToNode, Timestamp } from 'components/common';
+import { ProgressBar } from 'components/graylog';
+import { LinkToNode, Timestamp, Icon } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
 

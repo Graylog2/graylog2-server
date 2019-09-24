@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 /**
  * Adds an icon to an entity that was created by a content pack.

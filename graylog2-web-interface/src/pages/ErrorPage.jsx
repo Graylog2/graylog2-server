@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Col, Jumbotron, Row, Icon } from 'components/graylog';
-import { DocumentTitle } from 'components/common';
+import { Col, Jumbotron, Row } from 'components/graylog';
+import { DocumentTitle, Icon } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./NotFoundPage.css';

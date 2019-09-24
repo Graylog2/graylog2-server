@@ -6,9 +6,9 @@ import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import URI from 'urijs';
 
-import { Button, ButtonToolbar, DropdownButton, MenuItem, Alert, Icon } from 'components/graylog';
+import { Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { DatePicker, Select } from 'components/common';
+import { DatePicker, Select, Icon } from 'components/common';
 import { RefreshControls, QueryInput } from 'components/search';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';

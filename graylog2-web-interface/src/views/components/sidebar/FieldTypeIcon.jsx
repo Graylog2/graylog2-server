@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import styles from './FieldTypeIcon.css';
 import FieldType from '../../logic/fieldtypes/FieldType';

@@ -4,8 +4,8 @@ import createReactClass from 'create-react-class';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Button, Icon, Tooltip } from 'components/graylog';
-import { OverlayElement, Pluralize } from 'components/common';
+import { Button, Tooltip } from 'components/graylog';
+import { OverlayElement, Pluralize, Icon } from 'components/common';
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 

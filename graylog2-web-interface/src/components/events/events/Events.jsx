@@ -4,8 +4,8 @@ import lodash from 'lodash';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Icon, Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
-import { EmptyEntity, IfPermitted, PaginatedList, Timestamp } from 'components/common';
+import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
+import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';

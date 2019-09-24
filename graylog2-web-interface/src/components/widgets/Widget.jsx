@@ -11,7 +11,7 @@ import {
   WidgetHeader,
   WidgetVisualizationNotFound,
 } from 'components/widgets';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import StoreProvider from 'injection/StoreProvider';
 import Routes from 'routing/Routes';

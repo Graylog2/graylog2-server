@@ -3,9 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Spinner } from 'components/common';
+import { Spinner, Icon } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import { Button, Icon } from 'components/graylog';
+import { Button } from 'components/graylog';
 
 import { MapsActions, MapsStore } from 'stores/maps/MapsStore';
 import MapVisualization from 'components/maps/widgets/MapVisualization';

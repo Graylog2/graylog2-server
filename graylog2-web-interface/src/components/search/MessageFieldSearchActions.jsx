@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import ExtractorUtils from 'util/ExtractorUtils';
-import { SplitButton, MenuItem, Icon } from 'components/graylog';
+import { SplitButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 
 class MessageFieldSearchActions extends React.Component {
   static propTypes = {

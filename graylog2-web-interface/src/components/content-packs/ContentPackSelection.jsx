@@ -3,9 +3,9 @@ import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 import { cloneDeep } from 'lodash';
 
-import { Icon, Row, Col, Panel, HelpBlock } from 'components/graylog';
+import { Row, Col, Panel, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
+import { ExpandableList, ExpandableListItem, SearchForm, Icon } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 

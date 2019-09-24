@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Link } from 'react-router';
 
-import { Row, Col, Button, Icon } from 'components/graylog';
+import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { Select, Spinner, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';

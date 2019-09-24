@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon, Button, Modal, ButtonToolbar } from 'components/graylog';
-import { SearchForm, DataTable } from 'components/common';
+import { Button, Modal, ButtonToolbar } from 'components/graylog';
+import { SearchForm, DataTable, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import ContentPackApplyParameter from './ContentPackApplyParameter';

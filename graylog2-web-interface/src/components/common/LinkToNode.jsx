@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import StoreProvider from 'injection/StoreProvider';
 
 import Routes from 'routing/Routes';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import { Spinner } from 'components/common';
 
 const NodesStore = StoreProvider.getStore('Nodes');

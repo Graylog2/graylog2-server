@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Icon } from 'components/graylog';
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 import { SystemJob } from 'components/systemjobs';
 
 class SystemJobsList extends React.Component {

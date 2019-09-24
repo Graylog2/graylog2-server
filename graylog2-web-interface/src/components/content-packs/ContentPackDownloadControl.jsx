@@ -3,7 +3,8 @@ import React from 'react';
 import URI from 'urijs';
 
 import ApiRoutes from 'routing/ApiRoutes';
-import { Icon, Modal, Button } from 'components/graylog';
+import { Modal, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';

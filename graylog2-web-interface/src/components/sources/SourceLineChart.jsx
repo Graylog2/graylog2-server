@@ -5,7 +5,7 @@ import {} from 'jquery-ui/ui/effects/effect-bounce';
 import dc from 'dc';
 import d3 from 'd3';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import UniversalSearch from 'logic/search/UniversalSearch';
 import D3Utils from 'util/D3Utils';
 

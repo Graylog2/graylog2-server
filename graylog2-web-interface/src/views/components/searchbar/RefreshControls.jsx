@@ -7,7 +7,9 @@ import moment from 'moment';
 import connect from 'stores/connect';
 
 // $FlowFixMe: imports from core need to be fixed in flow
-import { MenuItem, ButtonGroup, DropdownButton, Button, Icon } from 'components/graylog';
+import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
+// $FlowFixMe: imports from core need to be fixed in flow
+import { Icon } from 'components/common';
 // $FlowFixMe: imports from core need to be fixed in flow
 import Pluralize from 'components/common/Pluralize';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';

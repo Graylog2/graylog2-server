@@ -1,5 +1,6 @@
 import React from 'react';
-import { ButtonToolbar, DropdownButton, MenuItem, Icon } from 'components/graylog';
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import PropTypes from 'views/components/CustomPropTypes';
 

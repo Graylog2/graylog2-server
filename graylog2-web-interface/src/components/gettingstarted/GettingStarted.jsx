@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Qs from 'qs';
 
-import { Grid, Row, Col, Button, Icon } from 'components/graylog';
-import { Spinner } from 'components/common';
+import { Grid, Row, Col, Button } from 'components/graylog';
+import { Spinner, Icon } from 'components/common';
 import ActionsProvider from 'injection/ActionsProvider';
 
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');

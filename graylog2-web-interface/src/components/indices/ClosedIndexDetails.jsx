@@ -3,7 +3,8 @@ import React from 'react';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
-import { Alert, Button, Icon } from 'components/graylog';
+import { Alert, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import { IndexRangeSummary } from 'components/indices';
 
 const IndicesActions = ActionsProvider.getActions('Indices');

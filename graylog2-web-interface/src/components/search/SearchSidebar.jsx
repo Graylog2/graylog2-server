@@ -7,8 +7,8 @@ import numeral from 'numeral';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
-import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs, Icon } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';

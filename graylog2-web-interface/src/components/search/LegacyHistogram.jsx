@@ -4,7 +4,7 @@ import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 

@@ -3,7 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import { Icon, Alert } from 'components/graylog';
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 import Dashboard from './Dashboard';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from '../../util/PermissionsMixin';

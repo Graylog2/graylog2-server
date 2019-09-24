@@ -3,7 +3,7 @@ import React from 'react';
 
 import createReactClass from 'create-react-class';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';

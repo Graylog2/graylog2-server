@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Row, Col, Panel, Button, Icon } from 'components/graylog';
+import { Row, Col, Panel, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 

@@ -3,7 +3,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
 
-import { Alert, Col, Row, Button, Icon } from 'components/graylog';
+import { Alert, Col, Row, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';

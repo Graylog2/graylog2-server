@@ -5,7 +5,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
-import { Icon, NavDropdown, MenuItem } from 'components/graylog';
+import { NavDropdown, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';

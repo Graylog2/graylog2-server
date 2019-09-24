@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Table, Icon } from 'components/graylog';
+import { Alert, Table } from 'components/graylog';
+import { Icon } from 'components/common';
 import { IndexerFailure } from 'components/indexers';
 
 class IndexerFailuresList extends React.Component {

@@ -2,7 +2,7 @@
 import * as React from 'react';
 
 import ActionDropdown from 'views/components/common/ActionDropdown';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import styles from './Widget.css';
 

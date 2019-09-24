@@ -4,7 +4,8 @@ import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label, Icon } from 'components/graylog';
+import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label } from 'components/graylog';
+import { Icon } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 import StreamLink from 'components/streams/StreamLink';

@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ListGroupItem, Icon } from 'components/graylog';
+import { ListGroupItem } from 'components/graylog';
+import { Icon } from 'components/common';
 import { DragSource, DropTarget } from 'react-dnd';
 
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';

@@ -4,7 +4,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 
-import { Alert, Button, Icon } from 'components/graylog';
+import { Alert, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';

@@ -6,8 +6,8 @@ import * as Immutable from 'immutable';
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { Spinner } from 'components/common';
-import { Col, Row, Icon } from 'components/graylog';
+import { Spinner, Icon } from 'components/common';
+import { Col, Row } from 'components/graylog';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
 import BookmarkControls from 'views/components/searchbar/bookmark/BookmarkControls';

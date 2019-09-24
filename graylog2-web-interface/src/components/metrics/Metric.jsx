@@ -4,7 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { MetricDetails } from 'components/metrics';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 const Metric = createReactClass({
   displayName: 'Metric',

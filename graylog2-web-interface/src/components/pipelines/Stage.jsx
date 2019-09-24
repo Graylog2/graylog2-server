@@ -4,8 +4,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 
-import { Icon, Col, Button } from 'components/graylog';
-import { DataTable, EntityListItem, Spinner } from 'components/common';
+import { Col, Button } from 'components/graylog';
+import { DataTable, EntityListItem, Spinner, Icon } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import { Popover, Icon } from 'components/graylog';
+import { Popover } from 'components/graylog';
+import { Icon } from 'components/common';
 
 class HoverForHelp extends React.Component {
   state = {

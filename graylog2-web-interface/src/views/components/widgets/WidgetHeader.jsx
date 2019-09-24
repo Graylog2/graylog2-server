@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 import CustomPropTypes from '../CustomPropTypes';

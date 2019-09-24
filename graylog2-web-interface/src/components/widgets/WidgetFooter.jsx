@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, Icon } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Button } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 
 class WidgetFooter extends React.Component {
   static propTypes = {

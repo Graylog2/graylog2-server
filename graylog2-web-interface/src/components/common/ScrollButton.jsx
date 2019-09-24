@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import ScrollButtonStyle from './ScrollButton.css';
 
 class ScrollButton extends React.Component {

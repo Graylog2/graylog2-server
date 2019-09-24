@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
-import { Icon, Col, Row, Button } from 'components/graylog';
+import { Col, Row, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 

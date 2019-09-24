@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Icon, Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
+import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import WizardStyle from './Wizard.css';
 

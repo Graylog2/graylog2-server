@@ -8,8 +8,8 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import { ClipboardButton } from 'components/common';
-import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip, Icon } from 'components/graylog';
+import { ClipboardButton, Icon } from 'components/common';
+import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import style from './SourceCodeEditor.css';

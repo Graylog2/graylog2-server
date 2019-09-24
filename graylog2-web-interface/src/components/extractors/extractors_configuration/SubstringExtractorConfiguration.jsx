@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Button, Col, Row, Icon } from 'components/graylog';
+import { Button, Col, Row } from 'components/graylog';
+import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
 

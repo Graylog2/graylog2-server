@@ -3,7 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
-import { Button, DropdownButton, Icon } from 'components/graylog';
+import { Button, DropdownButton } from 'components/graylog';
+import { Icon } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 

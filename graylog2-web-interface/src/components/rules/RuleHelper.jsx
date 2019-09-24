@@ -4,7 +4,8 @@ import Reflux from 'reflux';
 
 import ObjectUtils from 'util/ObjectUtils';
 
-import { Icon, Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
+import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
+import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
 

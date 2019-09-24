@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import styles from './MessageWidgets.css';
 
 const LoadingWidget = () => (

@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Button, ButtonGroup, Icon } from 'components/graylog';
+import { Button, ButtonGroup } from 'components/graylog';
+import { Icon } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';

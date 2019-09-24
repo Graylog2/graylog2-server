@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable, Timestamp } from 'components/common';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 class SidecarStatusFileList extends React.Component {
   static propTypes = {

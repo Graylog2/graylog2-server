@@ -3,8 +3,8 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
-import { Popover, OverlayTrigger, Icon } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Popover, OverlayTrigger } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import DateTime from 'logic/datetimes/DateTime';
 import DecorationStats from 'logic/message/DecorationStats';

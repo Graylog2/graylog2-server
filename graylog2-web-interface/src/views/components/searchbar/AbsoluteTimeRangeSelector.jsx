@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 
-import { Button, Icon } from 'components/graylog';
+import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
-import { DatePicker } from 'components/common';
+import { DatePicker, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import styles from './AbsoluteTimeRangeSelector.css';

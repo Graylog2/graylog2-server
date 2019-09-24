@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, Icon } from 'components/graylog';
+import { Checkbox } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import style from './ExpandableListItem.css';
 

@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon, Row, Col, Button } from 'components/graylog';
+import { Row, Col, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 import ObjectUtils from 'util/ObjectUtils';

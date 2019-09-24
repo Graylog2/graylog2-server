@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BootstrapModalWrapper } from 'components/bootstrap';
-import { Spinner } from 'components/common';
-import { Alert, Modal, Button, Icon } from 'components/graylog';
+import { Spinner, Icon } from 'components/common';
+import { Alert, Modal, Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import style from './AlertConditionTestModal.css';

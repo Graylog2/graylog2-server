@@ -4,7 +4,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 
-import { Button, Icon } from 'components/graylog';
+import { Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 
 import StoreProvider from 'injection/StoreProvider';

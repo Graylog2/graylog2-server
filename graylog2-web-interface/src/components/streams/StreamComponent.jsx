@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Alert, Icon } from 'components/graylog';
-import { IfPermitted, TypeAheadDataFilter } from 'components/common';
+import { Row, Col, Alert } from 'components/graylog';
+import { IfPermitted, TypeAheadDataFilter, Icon } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 

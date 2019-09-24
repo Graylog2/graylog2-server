@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Icon, Panel } from 'components/graylog';
+import { Panel } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import styles from './HelpPanel.css';
 

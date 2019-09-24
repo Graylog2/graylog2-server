@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Tooltip, OverlayTrigger, Icon } from 'components/graylog';
+import { Tooltip, OverlayTrigger } from 'components/graylog';
+import { Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import DateTime from 'logic/datetimes/DateTime';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 /**
  * Simple spinner to use while waiting for something to load.

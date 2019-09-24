@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { DocumentTitle } from 'components/common';
-import { Row, FormGroup, Alert, Button, Icon } from 'components/graylog';
+import { DocumentTitle, Icon } from 'components/common';
+import { Row, FormGroup, Alert, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';

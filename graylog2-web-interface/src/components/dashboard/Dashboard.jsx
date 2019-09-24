@@ -4,7 +4,8 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
 
-import { Icon, DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';

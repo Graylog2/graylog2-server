@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col, Row, Icon } from 'components/graylog';
-import { DocumentTitle, Spinner } from 'components/common';
+import { Col, Row } from 'components/graylog';
+import { DocumentTitle, Spinner, Icon } from 'components/common';
 
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';

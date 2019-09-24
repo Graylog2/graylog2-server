@@ -5,8 +5,8 @@ import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
 
-import { Alert, Row, Col, Panel, Button, Icon } from 'components/graylog';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { Alert, Row, Col, Panel, Button } from 'components/graylog';
+import { DocumentTitle, PageHeader, Spinner, Icon } from 'components/common';
 import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';

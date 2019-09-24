@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Label, Icon } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Label } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import { IndexSizeSummary } from 'components/indices';

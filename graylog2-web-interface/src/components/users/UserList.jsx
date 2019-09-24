@@ -8,8 +8,8 @@ import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
 
-import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem, Icon } from 'components/graylog';
-import { DataTable, Spinner, Timestamp } from 'components/common';
+import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'components/graylog';
+import { DataTable, Spinner, Timestamp, Icon } from 'components/common';
 
 import UserListStyle from '!style!css!./UserList.css';
 

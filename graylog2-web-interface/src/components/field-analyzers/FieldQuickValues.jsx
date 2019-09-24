@@ -5,10 +5,10 @@ import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import crossfilter from 'crossfilter';
 
-import { DropdownButton, MenuItem, Button, Icon } from 'components/graylog';
+import { DropdownButton, MenuItem, Button } from 'components/graylog';
+import { Icon, Spinner } from 'components/common';
 import { QuickValuesVisualization, QuickValuesHistogramVisualization } from 'components/visualizations';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 import CombinedProvider from 'injection/CombinedProvider';
 import QuickValuesOptionsForm from './QuickValuesOptionsForm';

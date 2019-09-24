@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Icon, Alert, Col, Row, Button } from 'components/graylog';
+import { Alert, Col, Row, Button } from 'components/graylog';
 import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
-import { IfPermitted, Spinner } from 'components/common';
+import { IfPermitted, Spinner, Icon } from 'components/common';
 
 class Output extends React.Component {
   static propTypes = {

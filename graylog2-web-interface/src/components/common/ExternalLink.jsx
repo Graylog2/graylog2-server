@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 
 /**
  * Component that renders a link to an external resource.

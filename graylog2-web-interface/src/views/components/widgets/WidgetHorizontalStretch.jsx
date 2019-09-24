@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { widgetDefinition } from 'views/logic/Widgets';
-import { Icon } from 'components/graylog';
+import { Icon } from 'components/common';
 import style from './WidgetHorizontalStretch.css';
 
 class WidgetHorizontalStretch extends React.Component {

@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Icon } from 'components/graylog';
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 

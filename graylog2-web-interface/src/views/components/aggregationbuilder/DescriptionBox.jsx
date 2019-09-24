@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
-import { Icon, Popover } from 'components/graylog';
+import { Popover } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import styles from './DescriptionBox.css';
 import HoverForHelp from './HoverForHelp';
