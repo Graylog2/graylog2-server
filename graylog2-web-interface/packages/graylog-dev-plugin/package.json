@@ -58,8 +58,5 @@
     "webpack-dev-middleware": "3.7.1",
     "webpack-dev-server": "3.8.0",
     "webpack-hot-middleware": "2.25.0"
-  },
-  "devDependencies": {
-    "graylog-web-plugin": "file:../graylog-web-plugin"
   }
 }

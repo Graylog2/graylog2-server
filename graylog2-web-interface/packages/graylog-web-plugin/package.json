@@ -57,8 +57,5 @@
     "twix": "1.1.4",
     "urijs": "1.19.1",
     "uuid": "3.3.3"
-  },
-  "devDependencies": {
-    "graylog-dev-plugin": "file:../graylog-dev-plugin"
   }
 }
