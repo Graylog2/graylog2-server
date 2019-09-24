@@ -202,7 +202,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <Icon
+                            <ForwardRef
                               fixedWidth={false}
                               inverse={false}
                               name="search-plus"
@@ -421,7 +421,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <Icon
+                            <ForwardRef
                               fixedWidth={false}
                               inverse={false}
                               name="search-plus"

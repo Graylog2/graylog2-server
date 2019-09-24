@@ -19,7 +19,7 @@ describe('QueryTitle', () => {
   });
   describe('duplicate action', () => {
     const findAction = (wrapper, name) => {
-      const openMenuTrigger = wrapper.find('Icon[name="chevron-down"]');
+      const openMenuTrigger = wrapper.find('i[data-testid="query-action-dropdown"]');
       openMenuTrigger.simulate('click');
 
       wrapper.update();

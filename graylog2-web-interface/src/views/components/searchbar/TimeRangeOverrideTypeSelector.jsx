@@ -1,6 +1,6 @@
 import React from 'react';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 import PropTypes from 'views/components/CustomPropTypes';
 
 const TimeRangeOverrideTypeSelector = ({ onSelect, value }) => (

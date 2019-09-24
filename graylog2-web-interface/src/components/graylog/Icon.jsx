@@ -10,7 +10,7 @@ import 'font-awesome/css/font-awesome.css';
  * No need to pass `fa` or `fa-` prefixes, just the name of the icon
  */
 
-const Icon = ({
+const Icon = React.forwardRef(({
   className,
   flip,
   fixedWidth,
@@ -21,7 +21,7 @@ const Icon = ({
   size,
   spin,
   ...props
-}) => {
+}, ref) => {
   const cleanIconName = name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
 
   return (
@@ -37,9 +37,10 @@ const Icon = ({
          ${spin && 'fa-spin'}
          ${className}
        `}
-       {...props} />
+       {...props}
+       ref={ref} />
   );
-};
+});
 
 Icon.propTypes = {
   /** Pass through any custom or Font Awesome specific classes */
