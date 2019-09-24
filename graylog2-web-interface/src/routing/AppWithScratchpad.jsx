@@ -20,7 +20,7 @@ const ScratchpadWrapper = styled.div`
   position: sticky;
   top: 50px;
   right: 0;
-  z-index: 2;
+  z-index: 10;
   height: calc(100vh - 50px);
   background-color: #393939;
 `;

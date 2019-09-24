@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { ResizableBox } from 'react-resizable';
 
 import { Alert } from 'components/graylog';
 
@@ -7,7 +8,7 @@ import isLocalStorageReady from 'util/isLocalStorageReady';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
-const ScratchpadBar = styled.div`
+const ScratchpadBar = styled(({ opened, ...props }) => <ResizableBox {...props} />)`
   width: ${({ opened }) => (opened ? '300px' : '30px')};
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
@@ -32,6 +33,8 @@ const ToggleButton = styled.button`
   display: flex;
   align-items: center;
   flex-direction: column;
+  order: 1;
+
   &::before,
   &::after {
     flex: 1;
@@ -42,6 +45,7 @@ const ToggleButton = styled.button`
     border-top: 0;
     border-bottom: 0;
   }
+
   span {
     transform: rotate(90deg);
     display: block;
@@ -51,13 +55,19 @@ const ToggleButton = styled.button`
   }
 `;
 
+const ScratchpadWrapper = styled.div`
+  height: calc(100vh - 50px);
+  position: relative;
+  z-index: 2;
+`;
+
 const ContentArea = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
-  min-width: calc(300px - 30px - 5px); /* Opened Width - Button Width - Right Padding */
+  min-width: 300px;
   padding-right: 5px;
+  order: 2;
 `;
 
 const Title = styled.h3`
@@ -81,9 +91,12 @@ const StyledAlert = styled(Alert)`
 
 const Scratchpad = () => {
   const [opened, setOpened] = useState(false);
+  const [scratchPadHeight, setScratchPadHeight] = useState(0);
   const [scratchData, setScratchData] = useState(localStorage.getItem(LOCALSTORAGE_ITEM));
   const [localStorageReady] = useState(isLocalStorageReady());
+  const scratchPadWrapperRef = useRef();
   const textareaRef = useRef();
+  const toggleButtonRef = useRef();
 
   const toggleOpened = () => {
     setOpened(!opened);
@@ -104,21 +117,35 @@ const Scratchpad = () => {
     }
   }, [opened]);
 
+  useEffect(() => {
+    if (scratchPadWrapperRef.current) {
+      setScratchPadHeight(scratchPadWrapperRef.current.offsetHeight);
+    }
+  }, [scratchPadWrapperRef.current]);
+
   return (
-    <ScratchpadBar opened={opened}>
-      <ToggleButton onClick={toggleOpened}>
-        <span>{opened ? 'Close' : 'Open'} Scratchpad</span>
-      </ToggleButton>
+    <ScratchpadWrapper ref={scratchPadWrapperRef}>
+      <ScratchpadBar opened={opened}
+                     width={opened ? 300 : 30}
+                     height={scratchPadHeight}
+                     minConstraints={[300, scratchPadHeight]}
+                     maxConstraints={[900, scratchPadHeight]}
+                     axis={opened ? 'x' : 'none'}
+                     handle={(
+                       <ToggleButton onClick={toggleOpened} ref={toggleButtonRef}>
+                         <span>{opened ? 'Close' : 'Open'} Scratchpad</span>
+                       </ToggleButton>
+    )}>
+        <ContentArea>
+          <Title>Scratchpad</Title>
+          <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
-      <ContentArea>
-        <Title>Scratchpad</Title>
-        <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
+          {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
 
-        {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
-
-        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
-      </ContentArea>
-    </ScratchpadBar>
+          <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
+        </ContentArea>
+      </ScratchpadBar>
+    </ScratchpadWrapper>
   );
 };
 
