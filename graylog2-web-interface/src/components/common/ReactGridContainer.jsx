@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import lodash from 'lodash';
+import { isEqual } from 'lodash';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -160,7 +160,7 @@ class ReactGridContainer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { positions } = this.props;
-    if (!lodash.isEqual(nextProps.positions, positions)) {
+    if (!isEqual(nextProps.positions, positions)) {
       this.setState({ layout: this.computeLayout(nextProps.positions) });
     }
   }
@@ -183,7 +183,7 @@ class ReactGridContainer extends React.Component {
     // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
     const filteredNewLayout = newLayout.map(item => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
     const { layout } = this.state;
-    if (lodash.isEqual(layout, filteredNewLayout)) {
+    if (isEqual(layout, filteredNewLayout)) {
       return;
     }
 

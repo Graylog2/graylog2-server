@@ -70,9 +70,6 @@ describe('ExtendedSearchPage', () => {
   const SimpleExtendedSearchPage = props => (
     <ExtendedSearchPage route={{}}
                         executionState={SearchExecutionState.empty()}
-                        searches={{ result: new SearchResult({ results: [] }), widgetMapping: Immutable.Map() }}
-                        fieldTypes={{ all: Immutable.List(), queryFields: Immutable.Map() }}
-                        queryId="beef-id"
                         headerElements={[]}
                         searchRefreshHooks={[]}
                         queryBarElements={[]}

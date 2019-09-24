@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 import { Spinner } from 'components/common';
+import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import styles from './SideBar.css';
 import CustomPropTypes from '../CustomPropTypes';
@@ -12,14 +13,6 @@ import NavItem from './NavItem';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
-
-type ViewMetaData = {
-  activeQuery: string,
-  description: string,
-  id: string,
-  summary: string,
-  title: string,
-};
 
 type Props = {
   children: React.Node,
@@ -155,6 +148,7 @@ class SideBar extends React.Component<Props, State> {
       const [text, icon, content] = this._getNavContent(key);
       return (
         <NavItem isSelected={open && selectedKey === key}
+                 key={key}
                  text={text}
                  icon={icon}
                  onClick={this.setSelectedKey(key)}

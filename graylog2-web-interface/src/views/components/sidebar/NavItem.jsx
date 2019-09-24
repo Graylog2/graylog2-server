@@ -12,7 +12,7 @@ type Props = {
   isSelected: boolean,
   isLast: boolean,
   text: string,
-  icon: string,
+  icon: React.Element<any>,
   onClick: (string) => void,
   children: React.Element<any>,
 }
@@ -54,7 +54,7 @@ NavItem.propTypes = {
   isSelected: PropTypes.bool.isRequired,
   isLast: PropTypes.bool,
   text: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
 };
 
