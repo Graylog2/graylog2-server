@@ -9,7 +9,7 @@ import isLocalStorageReady from 'util/isLocalStorageReady';
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
 const ScratchpadBar = styled(({ opened, ...props }) => <ResizableBox {...props} />)`
-  width: ${({ opened }) => (opened ? '300px' : '30px')};
+  width: ${({ opened }) => (opened ? '450px' : '30px')};
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
   transition: width 150ms ease-in-out, box-shadow 150ms ease-in-out;
@@ -62,12 +62,13 @@ const ScratchpadWrapper = styled.div`
 `;
 
 const ContentArea = styled.div`
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-width: 300px;
-  padding-right: 5px;
+  min-width: 420px; /* 450 - 30 */
   order: 2;
+  padding: 0 15px;
 `;
 
 const Title = styled.h3`
@@ -83,6 +84,7 @@ const Textarea = styled.textarea`
   width: 100%;
   resize: none;
   flex: 1;
+  margin-bottom: 15px;
 `;
 
 const StyledAlert = styled(Alert)`
@@ -126,9 +128,9 @@ const Scratchpad = () => {
   return (
     <ScratchpadWrapper ref={scratchPadWrapperRef}>
       <ScratchpadBar opened={opened}
-                     width={opened ? 300 : 30}
+                     width={opened ? 450 : 30}
                      height={scratchPadHeight}
-                     minConstraints={[300, scratchPadHeight]}
+                     minConstraints={[450, scratchPadHeight]}
                      maxConstraints={[900, scratchPadHeight]}
                      axis={opened ? 'x' : 'none'}
                      handle={(
