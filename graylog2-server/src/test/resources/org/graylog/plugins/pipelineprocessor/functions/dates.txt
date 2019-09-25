@@ -29,6 +29,7 @@ then
     let germanDate = parse_date(value: "24. Juli 1983", pattern: "dd. MMM yyyy", locale: "de");
     set_field("german_day", germanDate.dayOfMonth);
     set_field("german_month", germanDate.monthOfYear);
+    set_field("german_weekday", germanDate.dayOfWeek);
     set_field("german_year", germanDate.year);
 
     let englishDate = parse_date(value: "July 24, 1983", pattern: "MMM dd, yyyy", locale: "en");
