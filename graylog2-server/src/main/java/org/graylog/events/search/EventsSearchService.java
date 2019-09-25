@@ -18,14 +18,12 @@ package org.graylog.events.search;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -96,11 +94,7 @@ public class EventsSearchService {
 
         final List<EventsSearchResult.Event> events = result.results().stream()
                 .map(resultMsg -> {
-                    final Message message = resultMsg.getMessage();
-
-                    // Remove the _id field that has been added by our search code
-                    final Map<String, Object> event = Maps.filterEntries(resultMsg.getMessage().getFields(), input -> !"_id".equals(input.getKey()));
-                    final EventDto eventDto = objectMapper.convertValue(event, EventDto.class);
+                    final EventDto eventDto = objectMapper.convertValue(resultMsg.getMessage().getFields(), EventDto.class);
 
                     eventDefinitionIdsBuilder.add((String) resultMsg.getMessage().getField(EventDto.FIELD_EVENT_DEFINITION_ID));
                     streamIdsBuilder.addAll(resultMsg.getMessage().getStreamIds());

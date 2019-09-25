@@ -17,6 +17,7 @@
 package org.graylog.events.event;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -109,6 +110,8 @@ public abstract class EventDto {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
+    // Our legacy search code is adding an "_id" field that we want to ignore because it's the same as the "id".
+    @JsonIgnoreProperties({"_id"})
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
