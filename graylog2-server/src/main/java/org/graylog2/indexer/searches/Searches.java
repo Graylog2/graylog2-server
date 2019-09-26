@@ -914,8 +914,8 @@ public class Searches {
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
         final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
-        final Set<IndexSet> nonEventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
-                .filter(indexSet1 -> !IndexSetConfig.TemplateType.EVENTS.equals(indexSet1.getConfig().indexTemplateType().orElse(IndexSetConfig.TemplateType.MESSAGES)))
+        final Set<IndexSet> eventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
+                .filter(indexSet1 -> IndexSetConfig.TemplateType.EVENTS.equals(indexSet1.getConfig().indexTemplateType().orElse(IndexSetConfig.TemplateType.MESSAGES)))
                 .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
@@ -924,7 +924,7 @@ public class Searches {
                 // See the following issues for details:
                 // - https://github.com/Graylog2/graylog2-server/issues/6384
                 // - https://github.com/Graylog2/graylog2-server/issues/6490
-                if (nonEventIndexSets.stream().noneMatch(set -> set.isManagedIndex(indexRange.indexName()))) {
+                if (eventIndexSets.stream().anyMatch(set -> set.isManagedIndex(indexRange.indexName()))) {
                     continue;
                 }
                 indices.add(indexRange);
