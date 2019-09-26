@@ -84,6 +84,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 // TODO permission system
 @Api(value = "Enterprise/Search", description = "Searching")
@@ -203,6 +204,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 throwStreamAccessForbiddenException();
             }
 
+            // Unless explicitly queried, exclude event indices by default
+            // Having the event indices in every search, makes sorting almost impossible
+            // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
+            // TODO this can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
+            allAvailableStreamIds.removeAll(DEFAULT_EVENT_STREAM_IDS);
 
             final ImmutableSet<Query> newQueries = search.queries().stream().map(query -> {
                 if (query.usedStreamIds().isEmpty()) {
