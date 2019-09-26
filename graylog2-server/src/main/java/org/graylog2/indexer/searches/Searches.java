@@ -52,7 +52,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -61,6 +60,7 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -184,7 +184,6 @@ public class Searches {
     private final IndexSetRegistry indexSetRegistry;
     private final JestClient jestClient;
     private final ScrollResult.Factory scrollResultFactory;
-    private final ElasticsearchConfiguration elasticsearchConfiguration;
 
     @Inject
     public Searches(Configuration configuration,
@@ -194,8 +193,7 @@ public class Searches {
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
                     JestClient jestClient,
-                    ScrollResult.Factory scrollResultFactory,
-                    ElasticsearchConfiguration elasticsearchConfiguration) {
+                    ScrollResult.Factory scrollResultFactory) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
 
@@ -207,7 +205,6 @@ public class Searches {
         this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
         this.jestClient = requireNonNull(jestClient, "jestClient");
         this.scrollResultFactory = requireNonNull(scrollResultFactory, "scrollResultFactory");
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -916,13 +913,18 @@ public class Searches {
 
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
+        final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
+        final Set<IndexSet> nonEventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
+                .filter(indexSet1 -> !IndexSetConfig.TemplateType.EVENTS.equals(indexSet1.getConfig().indexTemplateType().orElse(IndexSetConfig.TemplateType.MESSAGES)))
+                .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
             if (indexSet == null && filter == null) {
-                // Exclude Event indices by name
-                // TODO This will fail if the prefix settings are changed. But it's the only info we have in IndexRanges
-                if (indexRange.indexName().startsWith(elasticsearchConfiguration.getDefaultEventsIndexPrefix()) ||
-                    indexRange.indexName().startsWith(elasticsearchConfiguration.getDefaultSystemEventsIndexPrefix())) {
+                // Don't include the index range if it's for an event index set to avoid sorting issues.
+                // See the following issues for details:
+                // - https://github.com/Graylog2/graylog2-server/issues/6384
+                // - https://github.com/Graylog2/graylog2-server/issues/6490
+                if (nonEventIndexSets.stream().noneMatch(set -> set.isManagedIndex(indexRange.indexName()))) {
                     continue;
                 }
                 indices.add(indexRange);

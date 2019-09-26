@@ -158,8 +158,6 @@ public class SearchesIT extends ElasticsearchBase {
     private MetricRegistry metricRegistry;
     private Searches searches;
 
-    private org.graylog2.configuration.ElasticsearchConfiguration elasticsearchConfiguration;
-
     @Override
     protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
         final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
@@ -173,8 +171,6 @@ public class SearchesIT extends ElasticsearchBase {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
-
-        elasticsearchConfiguration = new org.graylog2.configuration.ElasticsearchConfiguration();
         searches = new Searches(
             new Configuration(),
             indexRangeService,
@@ -192,8 +188,8 @@ public class SearchesIT extends ElasticsearchBase {
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
                     return new ScrollResult(client(), new ObjectMapper(), initialResult, query, scroll, fields);
                 }
-            },
-                elasticsearchConfiguration);
+            }
+        );
     }
 
     @Test
