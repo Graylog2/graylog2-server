@@ -24,6 +24,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Text (TXT) DNS lookup response from {@link DnsClient}.
  */
@@ -68,5 +71,9 @@ public abstract class TxtDnsAnswer implements DnsAnswer {
 
             return autoBuild();
         }
+    }
+
+    public static List<String> convertToStringListValue(List<TxtDnsAnswer> txtDnsAnswer) {
+        return txtDnsAnswer.stream().map(TxtDnsAnswer::value).collect(Collectors.toList());
     }
 }

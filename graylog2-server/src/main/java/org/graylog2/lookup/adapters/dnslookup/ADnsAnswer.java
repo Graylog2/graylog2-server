@@ -26,6 +26,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Address (A/AAAA) DNS lookup response from {@link DnsClient}.
@@ -85,5 +87,9 @@ public abstract class ADnsAnswer implements DnsAnswer {
 
             return autoBuild();
         }
+    }
+
+    public static List<String> convertToStringListValue(List<ADnsAnswer> aDnsAnswers) {
+        return aDnsAnswers.stream().map(ADnsAnswer::ipAddress).collect(Collectors.toList());
     }
 }
