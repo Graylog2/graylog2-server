@@ -3,8 +3,8 @@ import { useContext, useEffect, useState } from 'react';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
-import { FormDataContext } from '../../aws-cloudwatch/context/FormData';
-import { awsAuth } from '../../aws-cloudwatch/context/default_settings';
+import { FormDataContext } from '../../context/FormData';
+import awsAuth from '../awsAuth';
 
 /* useFetch Custom Hook
 

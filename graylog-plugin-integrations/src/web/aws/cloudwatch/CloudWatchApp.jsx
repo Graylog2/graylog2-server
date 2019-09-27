@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 
 import PageHeader from 'components/common/PageHeader';
 
-import { SidebarProvider } from './context/Sidebar';
-import { FormDataProvider } from './context/FormData';
-import { StepsProvider } from './context/Steps';
-import { ApiProvider } from './context/Api';
+import { SidebarProvider } from 'aws/context/Sidebar';
+import { FormDataProvider } from 'aws/context/FormData';
+import { StepsProvider } from 'aws/context/Steps';
+import { ApiProvider } from 'aws/context/Api';
+
 import CloudWatch from './CloudWatch';
+import INITIAL_FORMDATA from './_initialFormData';
 
 const CloudWatchApp = ({ params: { step }, route }) => {
   return (
     <ApiProvider>
       <StepsProvider>
-        <FormDataProvider>
+        <FormDataProvider initialFormData={INITIAL_FORMDATA}>
           <SidebarProvider>
             <PageHeader title="AWS Integrations">
               <span>This feature retrieves log messages from various AWS sources.</span>

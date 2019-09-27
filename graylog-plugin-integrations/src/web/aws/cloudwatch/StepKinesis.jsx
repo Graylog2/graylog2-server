@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-import KinesisStreams from './KinesisStreams';
-import KinesisSetup from './KinesisSetup';
-import { AdvancedOptionsProvider } from './context/AdvancedOptions';
+import { AdvancedOptionsProvider } from 'aws/context/AdvancedOptions';
+
+import ExistingStreams from './kinesis/ExistingStreams';
+import SetupNewStream from './kinesis/SetupNewStream';
 
 const StepKinesis = ({ hasStreams, ...restProps }) => {
   const [renderStreams, toggleRenderStreams] = useState(hasStreams);
@@ -11,8 +12,8 @@ const StepKinesis = ({ hasStreams, ...restProps }) => {
   return (
     <AdvancedOptionsProvider>
       { renderStreams
-        ? <KinesisStreams {...restProps} toggleSetup={() => toggleRenderStreams(false)} />
-        : <KinesisSetup {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />
+        ? <ExistingStreams {...restProps} toggleSetup={() => toggleRenderStreams(false)} />
+        : <SetupNewStream {...restProps} toggleSetup={hasStreams ? () => toggleRenderStreams(true) : null} />
       }
     </AdvancedOptionsProvider>
   );

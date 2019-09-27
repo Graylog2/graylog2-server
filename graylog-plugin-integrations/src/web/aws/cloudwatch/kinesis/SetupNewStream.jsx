@@ -2,18 +2,18 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import ValidatedInput from '../common/ValidatedInput';
-import FormWrap from '../common/FormWrap';
-import { ApiRoutes } from '../common/Routes';
-import { renderOptions } from '../common/Options';
-import useFetch from '../common/hooks/useFetch';
+import ValidatedInput from 'aws/common/ValidatedInput';
+import FormWrap from 'aws/common/FormWrap';
+import { ApiRoutes } from 'aws/common/Routes';
+import { renderOptions } from 'aws/common/Options';
+import useFetch from 'aws/common/hooks/useFetch';
 
-import formValidation from '../utils/formValidation';
+import formValidation from 'aws/utils/formValidation';
 
-import { FormDataContext } from './context/FormData';
-import { ApiContext } from './context/Api';
+import { FormDataContext } from 'aws/context/FormData';
+import { ApiContext } from 'aws/context/Api';
 
-import SetupModal from './auto-setup-steps/SetupModal';
+import SetupModal from './setup-steps/SetupModal';
 
 const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
   const { availableGroups, setGroups, clearLogData } = useContext(ApiContext);

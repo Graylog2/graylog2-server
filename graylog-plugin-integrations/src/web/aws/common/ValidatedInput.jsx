@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 
-import formValidation from '../utils/formValidation';
+import formValidation from 'aws/utils/formValidation';
 
 const Label = ({ label, error }) => {
   if (error) {

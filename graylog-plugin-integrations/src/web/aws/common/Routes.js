@@ -2,6 +2,7 @@ const Routes = {
   INTEGRATIONS: {
     AWS: {
       SERVICES: '/integrations/aws',
+      AUTHORIZE: '/integrations/aws/auth',
       CLOUDWATCH: {
         index: '/integrations/aws/cloudwatch',
         step: step => `/integrations/aws/cloudwatch/${step}`,

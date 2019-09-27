@@ -2,21 +2,20 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { FormDataContext } from './context/FormData';
-import { ApiContext } from './context/Api';
-import { SidebarContext } from './context/Sidebar';
+import { FormDataContext } from 'aws/context/FormData';
+import { ApiContext } from 'aws/context/Api';
+import { SidebarContext } from 'aws/context/Sidebar';
 
-import ValidatedInput from '../common/ValidatedInput';
-import MaskedInput from '../common/MaskedInput';
-import FormWrap from '../common/FormWrap';
-import Permissions from '../common/Permissions';
-import { renderOptions } from '../common/Options';
-import { ApiRoutes } from '../common/Routes';
-import useFetch from '../common/hooks/useFetch';
+import ValidatedInput from 'aws/common/ValidatedInput';
+import MaskedInput from 'aws/common/MaskedInput';
+import FormWrap from 'aws/common/FormWrap';
+import { renderOptions } from 'aws/common/Options';
+import { ApiRoutes } from 'aws/common/Routes';
+import useFetch from 'aws/common/hooks/useFetch';
 
-import formValidation from '../utils/formValidation';
+import formValidation from 'aws/utils/formValidation';
 
-const StepAuthorize = ({ onChange, onSubmit }) => {
+const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
   const { formData } = useContext(FormDataContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);
   const { availableRegions, setRegions, setStreams } = useContext(ApiContext);
@@ -63,7 +62,9 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
   };
 
   useEffect(() => {
-    setSidebar(<Permissions />);
+    if (sidebarComponent) {
+      setSidebar(sidebarComponent);
+    }
 
     return () => {
       clearSidebar();
@@ -138,6 +139,11 @@ const StepAuthorize = ({ onChange, onSubmit }) => {
 StepAuthorize.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onChange: PropTypes.func.isRequired,
+  sidebarComponent: PropTypes.node,
+};
+
+StepAuthorize.defaultProps = {
+  sidebarComponent: null,
 };
 
 const DisappearingInput = styled.input`

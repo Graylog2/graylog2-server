@@ -6,13 +6,13 @@ import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 
-import { FormDataContext } from './context/FormData';
-import { ApiContext } from './context/Api';
+import { FormDataContext } from 'aws/context/FormData';
+import { ApiContext } from 'aws/context/Api';
 
-import useFetch from '../common/hooks/useFetch';
-import FormWrap from '../common/FormWrap';
-import { ApiRoutes } from '../common/Routes';
-import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from '../common/constants';
+import useFetch from 'aws/common/hooks/useFetch';
+import FormWrap from 'aws/common/FormWrap';
+import { ApiRoutes } from 'aws/common/Routes';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
 
 const Default = ({ value }) => {
   return (

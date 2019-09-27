@@ -5,15 +5,15 @@ import styled from 'styled-components';
 import { Button, Panel } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
-import FormWrap from '../common/FormWrap';
-import useFetch from '../common/hooks/useFetch';
-import { ApiRoutes } from '../common/Routes';
-import Countdown from '../common/Countdown';
-import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from '../common/constants';
+import FormWrap from 'aws/common/FormWrap';
+import SkipHealthCheck from 'aws/common/SkipHealthCheck';
+import useFetch from 'aws/common/hooks/useFetch';
+import { ApiRoutes } from 'aws/common/Routes';
+import Countdown from 'aws/common/Countdown';
+import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
 
-import { ApiContext } from './context/Api';
-import { FormDataContext } from './context/FormData';
-import SkipHealthCheck from './auto-setup-steps/SkipHealthCheck';
+import { ApiContext } from 'aws/context/Api';
+import { FormDataContext } from 'aws/context/FormData';
 
 const StepHealthCheck = ({ onChange, onSubmit }) => {
   const { logData, setLogData } = useContext(ApiContext);

@@ -3,20 +3,22 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import ConfirmLeaveDialog from 'components/common/ConfirmLeaveDialog';
-
 import Wizard from 'components/common/Wizard';
+
 import FormUtils from 'util/FormsUtils.js';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
-import StepAuthorize from './StepAuthorize';
+import StepAuthorize from 'aws/StepAuthorize';
+import { StepsContext } from 'aws/context/Steps';
+import { FormDataContext } from 'aws/context/FormData';
+import { ApiContext } from 'aws/context/Api';
+import { SidebarContext } from 'aws/context/Sidebar';
+
 import StepKinesis from './StepKinesis';
 import StepHealthCheck from './StepHealthCheck';
 import StepReview from './StepReview';
-import { StepsContext } from './context/Steps';
-import { FormDataContext } from './context/FormData';
-import { ApiContext } from './context/Api';
-import { SidebarContext } from './context/Sidebar';
+import SidebarPermissions from './SidebarPermissions';
 
 const CloudWatch = ({ route }) => {
   const {
@@ -75,7 +77,9 @@ const CloudWatch = ({ route }) => {
     {
       key: 'authorize',
       title: 'AWS Kinesis Authorize',
-      component: (<StepAuthorize onSubmit={handleSubmit} onChange={handleFieldUpdate} />),
+      component: (<StepAuthorize onSubmit={handleSubmit}
+                                 onChange={handleFieldUpdate}
+                                 sidebarComponent={<SidebarPermissions />} />),
       disabled: isDisabledStep('authorize'),
     },
     {

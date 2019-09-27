@@ -4,18 +4,19 @@ import styled from 'styled-components';
 
 import { Modal, Panel } from 'components/graylog';
 
-import FormAdvancedOptions from './FormAdvancedOptions';
-import { FormDataContext } from './context/FormData';
-import { ApiContext } from './context/Api';
-import { SidebarContext } from './context/Sidebar';
+import { FormDataContext } from 'aws/context/FormData';
+import { ApiContext } from 'aws/context/Api';
+import { SidebarContext } from 'aws/context/Sidebar';
 
-import useFetch from '../common/hooks/useFetch';
-import FormWrap from '../common/FormWrap';
-import ValidatedInput from '../common/ValidatedInput';
-import Routes, { ApiRoutes } from '../common/Routes';
-import { renderOptions } from '../common/Options';
-import formValidation from '../utils/formValidation';
+import useFetch from 'aws/common/hooks/useFetch';
+import FormWrap from 'aws/common/FormWrap';
+import ValidatedInput from 'aws/common/ValidatedInput';
+import Routes, { ApiRoutes } from 'aws/common/Routes';
+import { renderOptions } from 'aws/common/Options';
 
+import formValidation from 'aws/utils/formValidation';
+
+import FormAdvancedOptions from '../FormAdvancedOptions';
 
 const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
   const { formData } = useContext(FormDataContext);

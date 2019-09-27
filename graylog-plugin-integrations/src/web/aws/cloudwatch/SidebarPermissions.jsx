@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import { Panel } from 'components/graylog';
 
-import useFetch from './hooks/useFetch';
-import { ApiRoutes } from './Routes';
+import useFetch from 'aws/common/hooks/useFetch';
+import { ApiRoutes } from 'aws/common/Routes';
 
 function Policies({ title, note, policy }) {
   const [opened, setOpened] = useState(false);
@@ -37,7 +37,7 @@ Policies.propTypes = {
   policy: PropTypes.object.isRequired,
 };
 
-export default function Permissions() {
+export default function SidebarPermissions() {
   const [permissionsStatus] = useFetch(ApiRoutes.INTEGRATIONS.AWS.PERMISSIONS);
 
   return (
