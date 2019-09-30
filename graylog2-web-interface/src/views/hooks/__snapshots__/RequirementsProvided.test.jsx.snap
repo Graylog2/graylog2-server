@@ -105,18 +105,21 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
             >
               <Button
                 action="push"
+                active={false}
                 bsStyle="success"
                 onClick={[Function]}
                 type="submit"
               >
                 <Button__StyledButton
                   action="push"
+                  active={false}
                   bsStyle="success"
                   onClick={[Function]}
                   type="submit"
                 >
                   <StyledComponent
                     action="push"
+                    active={false}
                     bsStyle="success"
                     forwardedComponent={
                       Object {
