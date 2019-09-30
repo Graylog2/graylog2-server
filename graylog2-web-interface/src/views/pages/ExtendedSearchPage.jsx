@@ -27,7 +27,6 @@ import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { FieldList } from 'views/components/sidebar';
-import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';
@@ -47,7 +46,7 @@ const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, sea
       results: props.searches && props.searches.result ? props.searches.result.forId(props.viewMetadata.activeQuery) : undefined,
     },
   ));
-const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsStore, fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
+const ConnectedFieldList = connect(FieldList, { fieldTypes: FieldTypesStore, viewMetadata: ViewMetadataStore },
   props => Object.assign(
     {},
     props,
