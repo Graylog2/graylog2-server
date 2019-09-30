@@ -6,17 +6,25 @@ import { get, isEqual } from 'lodash';
 
 import Widget from 'views/logic/widgets/Widget';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { RefluxActions } from './StoreTypes';
 
+type WidgetId = string;
+
+type Widgets = Immutable.OrderedMap<Widget>;
+
 type WidgetActionsType = RefluxActions<{
   create: (Widget) => Promise<Widget>,
-  duplicate: (string) => Promise<Widget>,
-  filter: (string, string) => Promise<void>,
-  remove: (string) => Promise<void>,
-  update: (string, Widget) => Promise<void>,
-  updateConfig: (string, any) => Promise<void>,
-  updateWidgets: (Map<string, Widget>) => Promise<void>,
+  duplicate: (WidgetId) => Promise<Widget>,
+  filter: (WidgetId, string) => Promise<Widgets>,
+  timerange: (WidgetId, TimeRange) => Promise<Widgets>,
+  query: (WidgetId, QueryString) => Promise<Widgets>,
+  streams: (WidgetId, Array<string>) => Promise<Widgets>,
+  remove: (WidgetId) => Promise<Widgets>,
+  update: (WidgetId, Widget) => Promise<Widgets>,
+  updateConfig: (WidgetId, any) => Promise<Widgets>,
+  updateWidgets: (Map<string, Widget>) => Promise<Widgets>,
 }>;
 
 type WidgetStoreState = {
@@ -29,6 +37,9 @@ export const WidgetActions: WidgetActionsType = singletonActions(
     create: { asyncResult: true },
     duplicate: { asyncResult: true },
     filter: { asyncResult: true },
+    timerange: { asyncResult: true },
+    query: { asyncResult: true },
+    streams: { asyncResult: true },
     remove: { asyncResult: true },
     update: { asyncResult: true },
     updateConfig: { asyncResult: true },
@@ -65,7 +76,7 @@ export const WidgetStore = singletonStore(
       }
     },
 
-    create(widget) {
+    create(widget): Promise<Widget> {
       if (widget.id === undefined) {
         throw new Error('Unable to add widget without id to query.');
       }
@@ -74,7 +85,7 @@ export const WidgetStore = singletonStore(
       WidgetActions.create.promise(promise);
       return widget;
     },
-    duplicate(widgetId) {
+    duplicate(widgetId): Promise<Widget> {
       const widget = this.widgets.get(widgetId);
       if (!widget) {
         throw new Error(`Unable to duplicate widget with id "${widgetId}", it is not found.`);
@@ -85,29 +96,52 @@ export const WidgetStore = singletonStore(
       WidgetActions.duplicate.promise(promise.then(() => duplicatedWidget));
       return duplicatedWidget;
     },
-    filter(widgetId, filter) {
-      const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().filter(filter).build());
+    filter(widgetId, filter): Promise<Widgets> {
+      const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().filter(filter).build());
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.filter.promise(promise);
+      return newWidgets;
     },
-    remove(widgetId) {
+    timerange(widgetId: WidgetId, timerange: TimeRange): Promise<Widgets> {
+      const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().timerange(timerange).build());
+      const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+      WidgetActions.timerange.promise(promise);
+      return newWidgets;
+    },
+    query(widgetId: WidgetId, query: QueryString): Promise<Widgets> {
+      const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().query(query).build());
+      const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+      WidgetActions.query.promise(promise);
+      return newWidgets;
+    },
+    streams(widgetId: WidgetId, streams: Array<string>): Promise<Widgets> {
+      const newWidgets = this.widgets.update(widgetId, (widget: Widget) => widget.toBuilder().streams(streams).build());
+      const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
+      WidgetActions.streams.promise(promise);
+      return newWidgets;
+    },
+    remove(widgetId): Promise<Widgets> {
       const newWidgets = this.widgets.remove(widgetId);
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.remove.promise(promise);
+      return newWidgets;
     },
-    update(widgetId, widget) {
+    update(widgetId, widget): Promise<Widgets> {
       const newWidgets = this.widgets.set(widgetId, widget);
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.update.promise(promise);
+      return newWidgets;
     },
-    updateWidgets(newWidgets) {
+    updateWidgets(newWidgets): Promise<Widgets> {
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.updateWidgets.promise(promise);
+      return newWidgets;
     },
-    updateConfig(widgetId, config) {
+    updateConfig(widgetId, config): Promise<Widgets> {
       const newWidgets = this.widgets.update(widgetId, widget => widget.toBuilder().config(config).build());
       const promise = this._updateWidgets(newWidgets).then(() => newWidgets);
       WidgetActions.updateConfig.promise(promise);
+      return newWidgets;
     },
     _updateWidgets(newWidgets) {
       const widgets = newWidgets.valueSeq().toList();

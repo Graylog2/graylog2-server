@@ -5,7 +5,8 @@ import { ThemeProvider } from 'styled-components';
 // TODO: make `teinte` a dynamic set of colors
 import { teinte, lighten, darken, opposite } from './index';
 
-const ThemeColor = createContext();
+const defaultValues = { colors: teinte, utility: { lighten, darken, opposite } };
+const ThemeColor = createContext(defaultValues);
 export const useTheme = () => useContext(ThemeColor);
 
 const GraylogThemeProvider = ({ children }) => {

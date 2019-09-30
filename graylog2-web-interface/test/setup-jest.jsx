@@ -11,6 +11,7 @@ registerBuiltinStores();
 
 configure({ adapter: new Adapter() });
 
+// eslint-disable-next-line no-console
 console.error = jest.fn((...args) => {
   throw new Error(format(...args));
 });

@@ -1,0 +1,24 @@
+{
+  "_id": "01DNKZVTSWXN3G3GCEWT6ECD99",
+  "id": "01DNKZVTSWXN3G3GCEWT6ECD99",
+  "timestamp": "2019-08-21 07:48:01.326",
+  "timestamp_processing": "2019-09-25 10:35:57.116",
+  "timerange_start": "2019-08-21 07:47:41.213",
+  "timerange_end": "2019-08-21 07:48:41.212",
+  "event_definition_type": "aggregation-v1",
+  "event_definition_id": "5d39b99c635e6d46f820cdb1",
+  "origin_context": null,
+  "alert": true,
+  "key": "",
+  "key_tuple": [],
+  "streams": [
+    "000000000000000000000002"
+  ],
+  "source_streams": [
+    "5d28510a7e8acd3a598da558"
+  ],
+  "message": "Watermark count: count()=13.0",
+  "priority": 2,
+  "source": "node-1",
+  "fields": {}
+}

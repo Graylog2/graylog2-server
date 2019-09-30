@@ -11,6 +11,8 @@ type State = {
 };
 
 class FullSizeContainer extends React.Component<Props, State> {
+  wrapper: ?HTMLDivElement;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -20,17 +22,14 @@ class FullSizeContainer extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    if (this.wrapper) {
-      const height = this.wrapper.offsetHeight;
-      const width = this.wrapper.offsetWidth;
-      const { height: currentHeight, width: currentWidth } = this.state;
-      if (height !== currentHeight || width !== currentWidth) {
-        this.setState({ height, width });
-      }
-    }
+    this._updateDimensions();
   }
 
   componentDidUpdate() {
+    this._updateDimensions();
+  }
+
+  _updateDimensions() {
     if (this.wrapper) {
       const height = this.wrapper.offsetHeight;
       const width = this.wrapper.offsetWidth;
@@ -41,8 +40,6 @@ class FullSizeContainer extends React.Component<Props, State> {
       }
     }
   }
-
-  wrapper: ?HTMLDivElement;
 
   render() {
     const { children } = this.props;

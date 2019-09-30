@@ -9,7 +9,7 @@ import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidg
 import WidgetGrid from './WidgetGrid';
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
-jest.mock('views/logic/Widget', () => ({ widgetDefinition: () => ({}) }));
+jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));
 jest.mock('views/components/widgets/Widget', () => mockComponent('Widget'));
 
 const widgetMapping = Immutable.Map([
