@@ -11,7 +11,7 @@ export const useTheme = () => useContext(ThemeColor);
 
 const GraylogThemeProvider = ({ children }) => {
   return (
-    <ThemeColor.Provider value={{ colors: teinte, utility: { lighten, darken, opposite } }}>
+    <ThemeColor.Provider value={defaultValues}>
       {/* NOTE: mode can be `teinte` or `noire` and will eventually need to come from User Preferences */}
       <ThemeProvider theme={{ mode: 'teinte' }}>
         {children}
