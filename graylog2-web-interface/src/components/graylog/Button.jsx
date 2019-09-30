@@ -1,16 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button as BootstrapButton } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import { useTheme } from 'theme/GraylogThemeContext';
-import buttonStyles from './styles/buttonStyles';
+import buttonStyles from './styles/button';
+import { propTypes, defaultProps } from './props/button';
 
-const Button = ({ bsStyle, ...props }) => {
-  const { colors, utility } = useTheme();
-
+const Button = ({ active, bsStyle, ...props }) => {
   const StyledButton = styled(BootstrapButton)`
-    ${buttonStyles({ colors, utility })};
+    ${buttonStyles({ active })};
   `;
 
   return (
@@ -18,13 +15,8 @@ const Button = ({ bsStyle, ...props }) => {
   );
 };
 
-Button.propTypes = {
-  /* NOTE: need prop so we can set default style */
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
-};
+Button.propTypes = propTypes;
 
-Button.defaultProps = {
-  bsStyle: 'default',
-};
+Button.defaultProps = defaultProps;
 
 export default Button;

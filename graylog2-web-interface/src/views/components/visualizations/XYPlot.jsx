@@ -7,7 +7,6 @@ import { get, merge } from 'lodash';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import { SearchStore } from 'views/stores/SearchStore';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import Query from 'views/logic/queries/Query';
@@ -70,9 +69,7 @@ XYPlot.defaultProps = {
 export default connect(XYPlot, {
   currentQuery: CurrentQueryStore,
   currentUser: CurrentUserStore,
-  searches: SearchStore,
-}, ({ currentQuery, currentUser, searches }) => ({
+}, ({ currentQuery, currentUser }) => ({
   currentQuery,
   timezone: get(currentUser, ['currentUser', 'timezone'], 'UTC'),
-  effectiveTimerange: get(searches.result.forId(currentQuery.id), ['effectiveTimerange'], {}),
 }));

@@ -1,19 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import { useTheme } from 'theme/GraylogThemeContext';
-import buttonStyles from './styles/buttonStyles';
+import buttonStyles from './styles/button';
+import { propTypes, defaultProps } from './props/button';
 
-const SplitButton = ({ bsStyle, ...props }) => {
-  const { colors, utility } = useTheme();
-
+const SplitButton = ({ active, bsStyle, ...props }) => {
   const StyledSplitButton = styled(BootstrapSplitButton)`
-    ${buttonStyles({ colors, utility })};
+    ${buttonStyles({ active })};
 
     ~ .btn.dropdown-toggle {
-      ${buttonStyles({ colors, utility, specific: false })};
+      ${buttonStyles({ active, specific: false })};
     }
   `;
 
@@ -22,13 +19,8 @@ const SplitButton = ({ bsStyle, ...props }) => {
   );
 };
 
-SplitButton.propTypes = {
-  /* NOTE: need prop so we can set default style */
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
-};
+SplitButton.propTypes = propTypes;
 
-SplitButton.defaultProps = {
-  bsStyle: 'default',
-};
+SplitButton.defaultProps = defaultProps;
 
 export default SplitButton;
