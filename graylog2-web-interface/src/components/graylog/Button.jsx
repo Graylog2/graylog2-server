@@ -6,18 +6,24 @@ import theme from 'styled-theming';
 
 import { useTheme } from 'theme/GraylogThemeContext';
 
-const Button = ({ bsStyle, ...props }) => {
+const Button = ({ active, bsStyle, ...props }) => {
   const { colors, utility } = useTheme();
 
   const cssBuilder = (color) => {
+    const darken025 = utility.darken(color, 0.25);
+    const darken050 = utility.darken(color, 0.5);
+    const darken075 = utility.darken(color, 0.75);
+    const darken100 = utility.darken(color, 1);
+    const darken125 = utility.darken(color, 1.25);
+
     return css`
     && {
-      background-color: ${color};
-      border-color: ${utility.darken(color, 0.25)};
+      background-color: ${active ? darken100 : color};
+      border-color: ${active ? darken125 : darken025};
 
       :hover {
-        background-color: ${utility.darken(color, 0.25)};
-        border-color: ${utility.darken(color, 0.5)};
+        background-color: ${active ? darken075 : darken025};
+        border-color: ${active ? darken100 : darken050};
       }
     }`;
   };
@@ -54,16 +60,18 @@ const Button = ({ bsStyle, ...props }) => {
   `;
 
   return (
-    <StyledButton bsStyle={bsStyle} {...props} />
+    <StyledButton active={active} bsStyle={bsStyle} {...props} />
   );
 };
 
 Button.propTypes = {
-  /* NOTE: need prop so we can set default style */
+  /* NOTE: need props so we can set default styles */
+  active: PropTypes.bool,
   bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
 };
 
 Button.defaultProps = {
+  active: false,
   bsStyle: 'default',
 };
 
