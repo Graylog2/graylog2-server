@@ -69,6 +69,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   bsStyle={null}
   buttonAfter={
     <Button
+      active={false}
       bsStyle="default"
     />
   }
@@ -119,12 +120,15 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                   className="input-group-btn"
                 >
                   <Button
+                    active={false}
                     bsStyle="default"
                   >
                     <Button__StyledButton
+                      active={false}
                       bsStyle="default"
                     >
                       <StyledComponent
+                        active={false}
                         bsStyle="default"
                         forwardedComponent={
                           Object {
