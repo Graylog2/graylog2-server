@@ -6,24 +6,26 @@ import styled from 'styled-components';
 import { useTheme } from 'theme/GraylogThemeContext';
 import buttonStyles from './styles/buttonStyles';
 
-const Button = ({ bsStyle, ...props }) => {
+const Button = ({ active, bsStyle, ...props }) => {
   const { colors, utility } = useTheme();
 
   const StyledButton = styled(BootstrapButton)`
-    ${buttonStyles(colors, utility)};
+    ${buttonStyles({ colors, active, utility })};
   `;
 
   return (
-    <StyledButton bsStyle={bsStyle} {...props} />
+    <StyledButton active={active} bsStyle={bsStyle} {...props} />
   );
 };
 
 Button.propTypes = {
-  /* NOTE: need prop so we can set default style */
+  /* NOTE: need props so we can set default styles */
+  active: PropTypes.bool,
   bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
 };
 
 Button.defaultProps = {
+  active: false,
   bsStyle: 'default',
 };
 

@@ -6,11 +6,11 @@ import styled from 'styled-components';
 import { useTheme } from 'theme/GraylogThemeContext';
 import buttonStyles from './styles/buttonStyles';
 
-const DropdownButton = ({ bsStyle, ...props }) => {
+const DropdownButton = ({ active, bsStyle, ...props }) => {
   const { colors, utility } = useTheme();
 
   const StyledDropdownButton = styled(BootstrapDropdownButton)`
-    ${buttonStyles(colors, utility)};
+    ${buttonStyles({ colors, active, utility })};
   `;
 
   return (
@@ -20,10 +20,12 @@ const DropdownButton = ({ bsStyle, ...props }) => {
 
 DropdownButton.propTypes = {
   /* NOTE: need prop so we can set default style */
+  active: PropTypes.bool,
   bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
 };
 
 DropdownButton.defaultProps = {
+  active: false,
   bsStyle: 'default',
 };
 
