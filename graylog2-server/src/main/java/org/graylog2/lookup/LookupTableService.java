@@ -528,12 +528,18 @@ public class LookupTableService extends AbstractIdleService {
             // Otherwise we might hold on to an old lookup table instance when this function object is cached somewhere.
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
-                return LookupResult.empty();
+                return LookupResult.withError();
             }
 
             final LookupResult result = lookupTable.lookup(key);
 
-            if (result == null || result.isEmpty()) {
+            if (result == null) {
+                return LookupResult.empty();
+            }
+            if (result.hasError()) {
+                return result;
+            }
+            if (result.isEmpty()) {
                 return LookupResult.empty();
             }
 

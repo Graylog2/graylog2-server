@@ -220,7 +220,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
 
         if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
@@ -299,7 +299,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
     }
 
@@ -311,7 +311,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
 
         if (dnsResponse != null) {
@@ -351,7 +351,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
 
         if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {

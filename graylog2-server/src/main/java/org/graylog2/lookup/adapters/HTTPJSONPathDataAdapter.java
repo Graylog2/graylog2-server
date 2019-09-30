@@ -157,7 +157,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         if (url == null) {
             LOG.error("Couldn't parse URL <%s> - returning empty result", urlString);
             httpURLErrors.mark();
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
 
         final Request request = new Request.Builder()
@@ -171,14 +171,14 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             if (!response.isSuccessful()) {
                 LOG.warn("HTTP request for key <{}> failed: {}", key, response);
                 httpRequestErrors.mark();
-                return LookupResult.empty();
+                return LookupResult.withError();
             }
 
             return parseBody(singleJsonPath, multiJsonPath, response.body().byteStream());
         } catch (IOException e) {
             LOG.error("HTTP request error for key <{}>", key, e);
             httpRequestErrors.mark();
-            return LookupResult.empty();
+            return LookupResult.withError();
         } finally {
             time.stop();
         }
@@ -220,17 +220,17 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                 }
             } catch (PathNotFoundException e) {
                 LOG.warn("Couldn't read single JSONPath from response - returning empty result ({})", e.getMessage());
-                return LookupResult.empty();
+                return LookupResult.withError();
             }
         } catch (InvalidJsonException e) {
             LOG.error("Couldn't parse JSON response", e);
-            return LookupResult.empty();
+            return LookupResult.withError();
         } catch (ClassCastException e) {
             LOG.error("Couldn't assign value type", e);
-            return LookupResult.empty();
+            return LookupResult.withError();
         } catch (Exception e) {
             LOG.error("Unexpected error parsing JSON response", e);
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
     }
 

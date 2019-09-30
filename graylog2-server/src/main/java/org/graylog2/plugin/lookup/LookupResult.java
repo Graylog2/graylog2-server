@@ -24,6 +24,7 @@ import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 
@@ -42,8 +43,17 @@ import java.util.Map;
  */
 @AutoValue
 public abstract class LookupResult {
+    // Cache erroneous results with a shorter TTL
+    // This has currently no effect, as cacheTTL is not implemented yet.
+    private static final long ERROR_CACHE_TTL = Duration.ofSeconds(5).toMillis();
+
     private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
             .cacheTTL(Long.MAX_VALUE)
+            .build();
+
+    private static final LookupResult ERROR_LOOKUP_RESULT = builder()
+            .cacheTTL(ERROR_CACHE_TTL)
+            .hasError(true)
             .build();
 
     public static final String SINGLE_VALUE_KEY = "value";
@@ -55,6 +65,10 @@ public abstract class LookupResult {
     @JsonProperty("multi_value")
     @Nullable
     public abstract Map<Object, Object> multiValue();
+
+
+    @JsonProperty("has_error")
+    public abstract boolean hasError();
 
     /**
      * The time to live (in milliseconds) for a LookupResult instance. Prevents repeated lookups for the same key
@@ -72,6 +86,10 @@ public abstract class LookupResult {
 
     public static LookupResult empty() {
         return EMPTY_LOOKUP_RESULT;
+    }
+
+    public static LookupResult withError() {
+        return ERROR_LOOKUP_RESULT;
     }
 
     public static LookupResult single(final CharSequence singleValue) {
@@ -129,10 +147,12 @@ public abstract class LookupResult {
     @JsonCreator
     public static LookupResult createFromJSON(@JsonProperty("single_value") final Object singleValue,
                                               @JsonProperty("multi_value") final Map<Object, Object> multiValue,
+                                              @JsonProperty("has_error") final boolean hasError,
                                               @JsonProperty("ttl") final long cacheTTL) {
         return builder()
                 .singleValue(singleValue)
                 .multiValue(multiValue)
+                .hasError(hasError)
                 .cacheTTL(cacheTTL)
                 .build();
     }
@@ -143,7 +163,7 @@ public abstract class LookupResult {
     }
 
     public static Builder builder() {
-        return new AutoValue_LookupResult.Builder();
+        return new AutoValue_LookupResult.Builder().hasError(false);
     }
 
     @AutoValue.Builder
@@ -152,6 +172,7 @@ public abstract class LookupResult {
         abstract Builder singleValue(Object singleValue);
         public abstract Builder multiValue(Map<Object, Object> multiValue);
         public abstract Builder cacheTTL(long cacheTTL);
+        public abstract Builder hasError(boolean hasError);
 
         public Builder single(CharSequence singleValue) {
             return singleValue(singleValue);

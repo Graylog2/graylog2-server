@@ -116,7 +116,7 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
     public LookupResult get(Object key) {
         if (state() == State.FAILED) {
-            return LookupResult.empty();
+            return LookupResult.withError();
         }
         checkState(isRunning(), "Data adapter needs to be started before it can be used");
         try (final Timer.Context ignored = requestTimer.time()) {
