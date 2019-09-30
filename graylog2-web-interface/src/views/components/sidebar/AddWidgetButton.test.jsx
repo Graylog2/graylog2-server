@@ -56,8 +56,8 @@ describe('AddWidgetButton', () => {
   it('renders a dropdown', () => {
     const wrapper = mount(<AddWidgetButton />);
 
-    const dropdownButton = wrapper.find('DropdownButton');
-    expect(dropdownButton).toHaveLength(1).at(1);
+    const dropdownButton = wrapper.find('DropdownButton').at(0);
+    expect(dropdownButton).toHaveLength(1);
     expect(dropdownButton.find('MenuItem')).toHaveLength(5);
   });
   it('contains menu items for all widget types', () => {
