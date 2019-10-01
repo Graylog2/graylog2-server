@@ -1,7 +1,7 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
@@ -32,16 +32,14 @@ class SimulatorPage extends React.Component {
   }
 
   _isLoading = () => {
-    return !this.state.streams;
+    const { streams } = this.state;
+    return !streams;
   };
 
   render() {
-    let content;
-    if (this._isLoading()) {
-      content = <Spinner />;
-    } else {
-      content = <ProcessorSimulator streams={this.state.streams} />;
-    }
+    const { streams } = this.state;
+
+    const content = this._isLoading() ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
     return (
       <DocumentTitle title="Simulate processing">
