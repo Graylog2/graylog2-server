@@ -9,7 +9,7 @@ import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import SearchActions from 'views/actions/SearchActions';
+import { SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';

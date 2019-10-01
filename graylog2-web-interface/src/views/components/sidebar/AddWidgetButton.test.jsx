@@ -60,7 +60,7 @@ describe('AddWidgetButton', () => {
 
     const buttonGroup = wrapper.find('ButtonGroup').at(0);
     expect(buttonGroup).toHaveLength(1);
-    expect(buttonGroup.find('Button')).toHaveLength(4);
+    expect(buttonGroup.find('button')).toHaveLength(4);
   });
   it('contains menu items for all widget types', () => {
     const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
