@@ -110,6 +110,10 @@ const Interactable = ({
     }
   }, [boxRef.current]);
 
+  useEffect(() => {
+    setBoxDimensions({ width, height });
+  }, [width, height]);
+
   return (
     <StyledInteractable ref={boxRef}
                         className={className}
