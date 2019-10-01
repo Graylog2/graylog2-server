@@ -1,21 +1,51 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import interact from 'interactjs';
+import interact from 'interactjs'; // https://interactjs.io/docs/
 import { debounce, merge } from 'lodash';
 import styled from 'styled-components';
 
-const Interactable = ({ className, resizable, draggable, draggableOptions, resizableOptions, children, width, height }) => {
+const StyledInteractable = styled.div.attrs(props => ({
+  style: {
+    width: `${props.width}px`,
+    height: `${props.height}px`,
+    top: `${props['data-y']}px`,
+    left: `${props['data-x']}px`,
+  },
+}))`
+  touch-action: none;
+  position: absolute;
+  z-index: 1001;
+`;
+
+const Interactable = ({
+  children,
+  className,
+  draggable,
+  draggableOptions,
+  height,
+  maxHeight,
+  maxWidth,
+  minHeight,
+  minWidth,
+  resizable,
+  resizableOptions,
+  width,
+}) => {
   const boxRef = useRef();
-  const [boxCoords, setBoxCoords] = useState({ x: 0, y: 0 });
+  const [boxCoords, setBoxCoords] = useState({ x: 5, y: 55 });
+  const [boxDimensions, setBoxDimensions] = useState({ width, height });
   let interactable;
 
+  const parseDelta = (attr, delta = 0) => {
+    return (parseFloat(boxRef.current.getAttribute(attr) || 0)) + delta;
+  };
+
   const defaultDraggableOptions = {
-    // inertia: true,
     autoScroll: true,
 
     modifiers: [
       interact.modifiers.restrict({
-        restriction: window.document.body,
+        restriction: 'html > body',
         elementRect: { top: 0, left: 0, bottom: 1, right: 1 },
         endOnly: true,
       }),
@@ -23,21 +53,53 @@ const Interactable = ({ className, resizable, draggable, draggableOptions, resiz
 
     onmove: debounce((event) => {
       // keep the dragged position in the data-x/data-y attributes
-      console.log('data-x', parseFloat(boxRef.current.getAttribute('data-x')), event.dx);
-      const x = (parseFloat(boxRef.current.getAttribute('data-x')) || 0) + event.dx;
-      const y = (parseFloat(boxRef.current.getAttribute('data-y')) || 0) + event.dy;
+      const x = parseDelta('data-x', event.dx);
+      const y = parseDelta('data-y', event.dy);
 
       // translate the element
       setBoxCoords({ x, y });
-    }, 5),
+    }, 2),
+  };
+
+  const defaultResizableOptions = {
+    // resize from all edges and corners
+    edges: { left: true, right: true, bottom: true, top: true },
+
+    modifiers: [
+      // keep the edges inside the parent
+      interact.modifiers.restrictEdges({
+        outer: 'parent',
+        endOnly: true,
+      }),
+
+      // minimum/maximum sizes
+      interact.modifiers.restrictSize({
+        min: { width: minWidth, height: minHeight },
+        max: { width: maxWidth, height: maxHeight },
+      }),
+    ],
   };
 
   const mergedDraggableOptions = merge(defaultDraggableOptions, draggableOptions);
+  const mergedResizableOptions = merge(defaultResizableOptions, resizableOptions);
 
   const setInteractions = () => {
     if (interactable) {
-      if (draggable) interactable.draggable(mergedDraggableOptions);
-      if (resizable) interactable.resizable(resizableOptions);
+      if (draggable) {
+        interactable.draggable(mergedDraggableOptions);
+      }
+
+      if (resizable) {
+        interactable.resizable(mergedResizableOptions).on('resizemove', debounce((event) => {
+          // translate when resizing from top or left edges
+          const x = parseDelta('data-x', event.deltaRect.left);
+          const y = parseDelta('data-y', event.deltaRect.top);
+
+          // update the element's style
+          setBoxDimensions({ width: event.rect.width, height: event.rect.height });
+          setBoxCoords({ x, y });
+        }), 2);
+      }
     }
   };
 
@@ -51,8 +113,8 @@ const Interactable = ({ className, resizable, draggable, draggableOptions, resiz
   return (
     <StyledInteractable ref={boxRef}
                         className={className}
-                        width={width}
-                        height={height}
+                        width={boxDimensions.width}
+                        height={boxDimensions.height}
                         data-x={boxCoords.x}
                         data-y={boxCoords.y}>
       {children}
@@ -60,24 +122,19 @@ const Interactable = ({ className, resizable, draggable, draggableOptions, resiz
   );
 };
 
-const StyledInteractable = styled.div`
-  touch-action: none;
-  width: ${props => props.width};
-  height: ${props => props.height};
-  position: relative;
-  z-index: 999;
-  transform: translate(${props => props['data-x']}px, ${props => props['data-y']}px);
-`;
-
 Interactable.propTypes = {
   resizable: PropTypes.bool,
   draggable: PropTypes.bool,
-  width: PropTypes.string.isRequired,
-  height: PropTypes.string.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
   draggableOptions: PropTypes.object,
   resizableOptions: PropTypes.object,
   children: PropTypes.any.isRequired,
   className: PropTypes.string,
+  minWidth: PropTypes.number,
+  minHeight: PropTypes.number,
+  maxWidth: PropTypes.number,
+  maxHeight: PropTypes.number,
 };
 
 Interactable.defaultProps = {
@@ -86,6 +143,10 @@ Interactable.defaultProps = {
   draggableOptions: {},
   resizableOptions: {},
   className: undefined,
+  minWidth: 100,
+  minHeight: 100,
+  maxWidth: 900,
+  maxHeight: 500,
 };
 
 export default Interactable;

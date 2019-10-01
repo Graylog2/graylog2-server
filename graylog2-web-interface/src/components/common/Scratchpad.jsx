@@ -8,19 +8,17 @@ import isLocalStorageReady from 'util/isLocalStorageReady';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
-const ScratchpadBar = styled.div`
-  width: ${({ opened }) => (opened ? '450px' : '450px')};
+const ScratchpadInteractable = styled(Interactable)`
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
   transition: width 150ms ease-in-out, box-shadow 150ms ease-in-out;
-  height: 25vh;
   background-color: #393939;
   display: flex;
   align-items: center;
 `;
 
 const ScratchpadWrapper = styled.div`
-  height: calc(100vh - 50px);
+  height: 100%;
   position: relative;
   z-index: 11;
 `;
@@ -85,25 +83,18 @@ const Scratchpad = () => {
   }, [scratchPadWrapperRef.current]);
 
   return (
-    <Interactable draggable width={opened ? '450px' : '450px'} height={`${scratchPadHeight}px`}>
+    <ScratchpadInteractable draggable resizable width={450} height={300}>
       <ScratchpadWrapper ref={scratchPadWrapperRef}>
-        <ScratchpadBar opened={opened}
-                       width={opened ? 450 : 30}
-                       height={scratchPadHeight}
-                       minConstraints={[450, scratchPadHeight]}
-                       maxConstraints={[900, scratchPadHeight]}
-                       axis={opened ? 'x' : 'none'}>
-          <ContentArea>
-            <Title>Scratchpad</Title>
-            <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
+        <ContentArea>
+          <Title>Scratchpad</Title>
+          <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
-            {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
+          {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
 
-            <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
-          </ContentArea>
-        </ScratchpadBar>
+          <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
+        </ContentArea>
       </ScratchpadWrapper>
-    </Interactable>
+    </ScratchpadInteractable>
   );
 };
 
