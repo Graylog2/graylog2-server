@@ -72,13 +72,21 @@ public abstract class LookupCache extends AbstractIdleService {
     public void incrTotalCount() {
         totalCount.mark();
     }
+    public void incrTotalCount(long n) {
+        totalCount.mark(n);
+    }
 
     public void incrHitCount() {
         hitCount.mark();
     }
-
+    public void incrHitCount(long n) {
+        hitCount.mark(n);
+    }
     public void incrMissCount() {
         missCount.mark();
+    }
+    public void incrMissCount(long n) {
+        missCount.mark(n);
     }
 
     public Timer.Context lookupTimer() {

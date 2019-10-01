@@ -2,9 +2,9 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import NullCacheFieldSet from './NullCacheFieldSet';
 import NullCacheSummary from './NullCacheSummary';
-import GuavaCacheFieldSet from './GuavaCacheFieldSet';
-import GuavaCacheSummary from './GuavaCacheSummary';
-import GuavaCacheDocumentation from './GuavaCacheDocumentation';
+import GuavaCaffeineCacheFieldSet from './GuavaCaffeineCacheFieldSet';
+import GuavaCaffeineCacheSummary from './GuavaCaffeineCacheSummary';
+import GuavaCaffeineCacheDocumentation from './GuavaCaffeineCacheDocumentation';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -16,11 +16,18 @@ PluginStore.register(new PluginManifest({}, {
       documentationComponent: null,
     },
     {
+      type: 'caffeine_cache',
+      displayName: 'Node-local, in-memory, Caffeine based cache',
+      formComponent: GuavaCaffeineCacheFieldSet,
+      summaryComponent: GuavaCaffeineCacheSummary,
+      documentationComponent: GuavaCaffeineCacheDocumentation,
+    },
+    {
       type: 'guava_cache',
-      displayName: 'Node-local, in-memory cache',
-      formComponent: GuavaCacheFieldSet,
-      summaryComponent: GuavaCacheSummary,
-      documentationComponent: GuavaCacheDocumentation,
+      displayName: 'Node-local, in-memory, Guava based cache',
+      formComponent: GuavaCaffeineCacheFieldSet,
+      summaryComponent: GuavaCaffeineCacheSummary,
+      documentationComponent: GuavaCaffeineCacheDocumentation,
     },
   ],
 }));

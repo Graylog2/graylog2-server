@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
+import org.graylog2.lookup.caches.CaffeineLookupCache;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
@@ -43,12 +44,13 @@ import java.util.Map;
  */
 @AutoValue
 public abstract class LookupResult {
+    private static final long NO_TTL = Long.MAX_VALUE;
+
     // Cache erroneous results with a shorter TTL
-    // This has currently no effect, as cacheTTL is not implemented yet.
     private static final long ERROR_CACHE_TTL = Duration.ofSeconds(5).toMillis();
 
     private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
-            .cacheTTL(Long.MAX_VALUE)
+            .cacheTTL(NO_TTL)
             .build();
 
     private static final LookupResult ERROR_LOOKUP_RESULT = builder()
@@ -72,9 +74,7 @@ public abstract class LookupResult {
 
     /**
      * The time to live (in milliseconds) for a LookupResult instance. Prevents repeated lookups for the same key
-     * during the time to live period. Data Tables processing does not currently use this functionality, but we
-     * expect to add support for it at some point. Some Data Adaptors may fill this ttl value in anticipation of
-     * future implementation.
+     * during the time to live period. The TTL is only only considered by the {@link CaffeineLookupCache} implementation.
      */
     @JsonProperty("ttl")
     public abstract long cacheTTL();
@@ -82,6 +82,11 @@ public abstract class LookupResult {
     @JsonIgnore
     public boolean isEmpty() {
         return singleValue() == null && multiValue() == null;
+    }
+
+    @JsonIgnore
+    public boolean hasTTL() {
+        return cacheTTL() != NO_TTL;
     }
 
     public static LookupResult empty() {
@@ -159,7 +164,7 @@ public abstract class LookupResult {
 
 
     public static Builder withoutTTL() {
-        return builder().cacheTTL(Long.MAX_VALUE);
+        return builder().cacheTTL(NO_TTL);
     }
 
     public static Builder builder() {
