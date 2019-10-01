@@ -171,6 +171,11 @@ const EventNotificationsStore = Reflux.createStore({
     EventNotificationsActions.test.promise(promise);
   },
 
+  testPersisted(notification) {
+    const promise = fetch('POST', this.eventNotificationsUrl({ segments: [notification.id, 'test'] }));
+    EventNotificationsActions.testPersisted.promise(promise);
+  },
+
   listAllLegacyTypes() {
     const promise = fetch('GET', this.eventNotificationsUrl({ segments: ['legacy', 'types'] }));
 
