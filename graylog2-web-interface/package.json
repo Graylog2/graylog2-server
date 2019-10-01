@@ -75,6 +75,7 @@
     "font-awesome": "^4.7.0",
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "immutable": "^3.8.1",
+    "interactjs": "^1.4.0-rc.13",
     "javascript-natural-sort": "^0.7.1",
     "jquery-ui": "1.12.x",
     "leaflet": "^1.5.1",

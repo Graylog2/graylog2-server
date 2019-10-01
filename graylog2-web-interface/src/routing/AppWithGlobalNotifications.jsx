@@ -2,15 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import AppGlobalNotifications from './AppGlobalNotifications';
-import AppWithScratchpad from './AppWithScratchpad';
+
+import Scratchpad from '../components/common/Scratchpad';
 
 const AppWithGlobalNotifications = ({ children }) => {
   return (
     <div>
       <AppGlobalNotifications />
-      <AppWithScratchpad>
-        {children}
-      </AppWithScratchpad>
+      {children}
+      <Scratchpad />
     </div>
   );
 };

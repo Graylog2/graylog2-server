@@ -1,64 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { ResizableBox } from 'react-resizable';
 
 import { Alert } from 'components/graylog';
+import Interactable from 'components/common/Interactable';
 
 import isLocalStorageReady from 'util/isLocalStorageReady';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
-const ScratchpadBar = styled(({ opened, ...props }) => <ResizableBox {...props} />)`
-  width: ${({ opened }) => (opened ? '450px' : '30px')};
+const ScratchpadBar = styled.div`
+  width: ${({ opened }) => (opened ? '450px' : '300px')};
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
   transition: width 150ms ease-in-out, box-shadow 150ms ease-in-out;
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  height: 100%;
+  height: 25vh;
   background-color: #393939;
   display: flex;
   align-items: center;
 `;
 
-const ToggleButton = styled.button`
-  width: 30px;
-  height: 90vh;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  order: 1;
-
-  &::before,
-  &::after {
-    flex: 1;
-    background: #393939;
-    content: "";
-    width: 5px;
-    border: 1px solid #6C6C6C;
-    border-top: 0;
-    border-bottom: 0;
-  }
-
-  span {
-    transform: rotate(90deg);
-    display: block;
-    white-space: nowrap;
-    background-color: #393939;
-    padding: 0 6px;
-  }
-`;
-
 const ScratchpadWrapper = styled.div`
   height: calc(100vh - 50px);
   position: relative;
-  z-index: 2;
+  z-index: 11;
 `;
 
 const ContentArea = styled.div`
@@ -126,28 +90,25 @@ const Scratchpad = () => {
   }, [scratchPadWrapperRef.current]);
 
   return (
-    <ScratchpadWrapper ref={scratchPadWrapperRef}>
-      <ScratchpadBar opened={opened}
-                     width={opened ? 450 : 30}
-                     height={scratchPadHeight}
-                     minConstraints={[450, scratchPadHeight]}
-                     maxConstraints={[900, scratchPadHeight]}
-                     axis={opened ? 'x' : 'none'}
-                     handle={(
-                       <ToggleButton onClick={toggleOpened} ref={toggleButtonRef}>
-                         <span>{opened ? 'Close' : 'Open'} Scratchpad</span>
-                       </ToggleButton>
-    )}>
-        <ContentArea>
-          <Title>Scratchpad</Title>
-          <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
+    <Interactable draggable width={opened ? '450px' : '300px'} height={`${scratchPadHeight}px`}>
+      <ScratchpadWrapper ref={scratchPadWrapperRef}>
+        <ScratchpadBar opened={opened}
+                       width={opened ? 450 : 30}
+                       height={scratchPadHeight}
+                       minConstraints={[450, scratchPadHeight]}
+                       maxConstraints={[900, scratchPadHeight]}
+                       axis={opened ? 'x' : 'none'}>
+          <ContentArea>
+            <Title>Scratchpad</Title>
+            <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
-          {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
+            {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
 
-          <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
-        </ContentArea>
-      </ScratchpadBar>
-    </ScratchpadWrapper>
+            <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
+          </ContentArea>
+        </ScratchpadBar>
+      </ScratchpadWrapper>
+    </Interactable>
   );
 };
 
