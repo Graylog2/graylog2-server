@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import _ from 'lodash';
-// $FlowFixMe: could not find types
 import { SizeMe } from 'react-sizeme';
 
 import connect from 'stores/connect';
