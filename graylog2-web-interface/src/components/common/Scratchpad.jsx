@@ -9,7 +9,7 @@ import isLocalStorageReady from 'util/isLocalStorageReady';
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
 const ScratchpadBar = styled.div`
-  width: ${({ opened }) => (opened ? '450px' : '300px')};
+  width: ${({ opened }) => (opened ? '450px' : '450px')};
   overflow: hidden;
   box-shadow: -3px 0 3px ${({ opened }) => (opened ? 'rgba(0, 0, 0, .25)' : 'rgba(0, 0, 0, 0)')};
   transition: width 150ms ease-in-out, box-shadow 150ms ease-in-out;
@@ -62,11 +62,6 @@ const Scratchpad = () => {
   const [localStorageReady] = useState(isLocalStorageReady());
   const scratchPadWrapperRef = useRef();
   const textareaRef = useRef();
-  const toggleButtonRef = useRef();
-
-  const toggleOpened = () => {
-    setOpened(!opened);
-  };
 
   const handleChange = () => {
     const { value } = textareaRef.current;
@@ -90,7 +85,7 @@ const Scratchpad = () => {
   }, [scratchPadWrapperRef.current]);
 
   return (
-    <Interactable draggable width={opened ? '450px' : '300px'} height={`${scratchPadHeight}px`}>
+    <Interactable draggable width={opened ? '450px' : '450px'} height={`${scratchPadHeight}px`}>
       <ScratchpadWrapper ref={scratchPadWrapperRef}>
         <ScratchpadBar opened={opened}
                        width={opened ? 450 : 30}

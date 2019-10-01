@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import interact from 'interactjs';
-import { merge } from 'lodash';
+import { debounce, merge } from 'lodash';
 import styled from 'styled-components';
 
 const Interactable = ({ className, resizable, draggable, draggableOptions, resizableOptions, children, width, height }) => {
@@ -10,7 +10,7 @@ const Interactable = ({ className, resizable, draggable, draggableOptions, resiz
   let interactable;
 
   const defaultDraggableOptions = {
-    inertia: true,
+    // inertia: true,
     autoScroll: true,
 
     modifiers: [
@@ -21,14 +21,15 @@ const Interactable = ({ className, resizable, draggable, draggableOptions, resiz
       }),
     ],
 
-    onmove: (event) => {
+    onmove: debounce((event) => {
       // keep the dragged position in the data-x/data-y attributes
+      console.log('data-x', parseFloat(boxRef.current.getAttribute('data-x')), event.dx);
       const x = (parseFloat(boxRef.current.getAttribute('data-x')) || 0) + event.dx;
       const y = (parseFloat(boxRef.current.getAttribute('data-y')) || 0) + event.dy;
 
       // translate the element
       setBoxCoords({ x, y });
-    },
+    }, 5),
   };
 
   const mergedDraggableOptions = merge(defaultDraggableOptions, draggableOptions);
