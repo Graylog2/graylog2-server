@@ -13,6 +13,12 @@ import Routes from 'routing/Routes';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 
+// Events do not work on Pipelines yet, hide Events and System Events Streams.
+const HIDDEN_STREAMS = [
+  '000000000000000000000002',
+  '000000000000000000000003',
+];
+
 class SimulatorPage extends React.Component {
   state = {
     streams: undefined,
@@ -20,7 +26,8 @@ class SimulatorPage extends React.Component {
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
+      const filteredStreams = streams.filter(s => !HIDDEN_STREAMS.includes(s.id));
+      this.setState({ streams: filteredStreams });
     });
   }
 

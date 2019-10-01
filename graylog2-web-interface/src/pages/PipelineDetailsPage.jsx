@@ -19,6 +19,12 @@ const { RulesStore } = CombinedProvider.get('Rules');
 const { PipelineConnectionsStore, PipelineConnectionsActions } = CombinedProvider.get('PipelineConnections');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
+// Events do not work on Pipelines yet, hide Events and System Events Streams.
+const HIDDEN_STREAMS = [
+  '000000000000000000000002',
+  '000000000000000000000003',
+];
+
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;
 }
@@ -47,7 +53,8 @@ const PipelineDetailsPage = createReactClass({
     PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams });
+      const filteredStreams = streams.filter(s => !HIDDEN_STREAMS.includes(s.id));
+      this.setState({ streams: filteredStreams });
     });
   },
 
