@@ -46,8 +46,8 @@ jest.mock('views/stores/SearchStore', () => ({
         }),
       },
     })],
-  )}
-));
+  ),
+}));
 jest.mock('views/stores/FieldTypesStore', () => ({
   FieldTypesActions: {},
   FieldTypesStore: MockStore(
