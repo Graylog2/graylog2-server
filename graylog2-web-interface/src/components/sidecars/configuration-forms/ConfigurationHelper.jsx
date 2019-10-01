@@ -17,6 +17,8 @@ class ConfigurationHelper extends React.Component {
   };
 
   render() {
+    const { onVariableRename } = this.props;
+
     return (
       /* eslint-disable no-template-curly-in-string */
       <Panel header="Collector Configuration Reference">
@@ -38,7 +40,7 @@ class ConfigurationHelper extends React.Component {
                   which shall not act as a variable, you will have to write it as
                   <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
                 </p>
-                <ConfigurationVariablesHelper onVariableRename={this.props.onVariableRename} />
+                <ConfigurationVariablesHelper onVariableRename={onVariableRename} />
               </Tab>
               <Tab eventKey={3} title="Reference">
                 <Row className="row-sm">
