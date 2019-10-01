@@ -33,7 +33,7 @@ class SideBar extends React.Component<Props, State> {
   static propTypes = {
     children: CustomPropTypes.OneOrMoreChildren.isRequired,
     queryId: PropTypes.string.isRequired,
-    results: PropTypes.object.isRequired,
+    results: PropTypes.object,
     viewMetadata: PropTypes.shape({
       activeQuery: PropTypes.string,
       description: PropTypes.string,
@@ -41,6 +41,10 @@ class SideBar extends React.Component<Props, State> {
       summary: PropTypes.string,
       title: PropTypes.string,
     }).isRequired,
+  };
+
+  static defaultProps = {
+    results: {},
   };
 
   constructor(props: Props) {
