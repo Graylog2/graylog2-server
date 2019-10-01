@@ -46,12 +46,12 @@ class ConfigurationHelper extends React.Component {
                     <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
                       We provide collector configuration templates to get you started.<br />
                       For further information please refer to the official documentation of your collector.
-                      <ul className={ConfigurationHelperStyle.ulStyle}>
-                        <li><a href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html" target="_blank" rel="noopener noreferrer">Filebeat Reference</a> </li>
-                        <li><a href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html" target="_blank" rel="noopener noreferrer">Winlogbeat Reference</a> </li>
-                        <li><a href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html" target="_blank" rel="noopener noreferrer">NXLog Reference Manual</a> </li>
-                      </ul>
                     </p>
+                    <ul className={ConfigurationHelperStyle.ulStyle}>
+                      <li><a href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html" target="_blank" rel="noopener noreferrer">Filebeat Reference</a> </li>
+                      <li><a href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html" target="_blank" rel="noopener noreferrer">Winlogbeat Reference</a> </li>
+                      <li><a href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html" target="_blank" rel="noopener noreferrer">NXLog Reference Manual</a> </li>
+                    </ul>
                   </Col>
                 </Row>
               </Tab>
