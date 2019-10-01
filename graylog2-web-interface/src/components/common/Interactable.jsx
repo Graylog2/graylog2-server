@@ -13,7 +13,7 @@ const StyledInteractable = styled.div.attrs(props => ({
   },
 }))`
   touch-action: none;
-  position: absolute;
+  position: fixed;
   z-index: 1001;
 `;
 
@@ -32,12 +32,16 @@ const Interactable = ({
   width,
 }) => {
   const boxRef = useRef();
-  const [boxCoords, setBoxCoords] = useState({ x: 5, y: 55 });
+  const viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  const viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  const coordsX = viewportWidth - width - 25;
+  const coordsY = viewportHeight - height - 25;
+  const [boxCoords, setBoxCoords] = useState({ x: coordsX, y: coordsY });
   const [boxDimensions, setBoxDimensions] = useState({ width, height });
   let interactable;
 
   const parseDelta = (attr, delta = 0) => {
-    return (parseFloat(boxRef.current.getAttribute(attr) || 0)) + delta;
+    return parseFloat(boxRef.current.getAttribute(attr) || 0) + delta;
   };
 
   const defaultDraggableOptions = {
