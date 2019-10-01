@@ -119,7 +119,7 @@ public abstract class LookupResult {
         return withoutTTL().single(singleValue).multiValue(multiValue).build();
     }
 
-    public static LookupResult withDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {
+    public static LookupResult.Builder addDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {
             LookupResult.Builder builder = LookupResult.withoutTTL();
 
             switch (singleValue.valueType()) {
@@ -146,7 +146,7 @@ public abstract class LookupResult {
                 builder = builder.multiValue(Collections.singletonMap(SINGLE_VALUE_KEY, singleValue.value()));
             }
 
-            return builder.build();
+            return builder;
     }
 
     @JsonCreator
