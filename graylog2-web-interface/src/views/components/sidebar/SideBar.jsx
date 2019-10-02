@@ -143,7 +143,7 @@ class SideBar extends React.Component<Props, State> {
                         </React.Fragment>
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'createWidget'}
-                               text="View Description"
+                               text="Create"
                                icon={<i className="fa fa-plus" />}
                                onClick={this.setSelectedKey('createWidget')}
                                isLast={false}
@@ -154,7 +154,7 @@ class SideBar extends React.Component<Props, State> {
 
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'highlighting'}
-                               text="View Description"
+                               text="Formatting & Highlighting"
                                icon={<i className="fa fa-paragraph" />}
                                onClick={this.setSelectedKey('highlighting')}
                                isLast={false}
@@ -162,7 +162,7 @@ class SideBar extends React.Component<Props, State> {
                         <HighlightingRules />
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'fields'}
-                               text="View Description"
+                               text="Fields"
                                icon={<i className="fa fa-paragraph" />}
                                onClick={this.setSelectedKey('fields')}
                                isLast
