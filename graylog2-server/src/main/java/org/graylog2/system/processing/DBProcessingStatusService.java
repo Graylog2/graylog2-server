@@ -35,6 +35,7 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,17 +113,24 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
-        final DBQuery.Query query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+        final DBQuery.Query queryWithoutMetrics = DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
+        final DBQuery.Query queryWithMetrics = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
 
-        // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
-        // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
-        // to return the timestamp of the slowest one.
-        try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
-            if (cursor.hasNext()) {
-                return Optional.of(cursor.next().receiveTimes().postIndexing());
+        // First try to query processing status from nodes that are active (include journal metrics restrictions).
+        // If no result is found, query the processing status again, but without weeding out nodes with a low input volume.
+        // This prevents to completely stall the event processing if the ingestion volume is too low.
+        for (DBQuery.Query query: Arrays.asList(queryWithMetrics, queryWithoutMetrics)) {
+            // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
+            // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
+            // to return the timestamp of the slowest one.
+            try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
+                if (cursor.hasNext()) {
+                    return Optional.of(cursor.next().receiveTimes().postIndexing());
+                }
             }
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     // This has been put into a static method to simplify testing the processing status selection

@@ -271,6 +271,13 @@ public class DBProcessingStatusServiceTest {
     }
 
     @Test
+    @UsingDataSet(locations = "processing-status-single-active-node.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void singleNodeStatus() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:01:00.000Z"));
+        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent();
+    }
+
+    @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void updateProcessingStatusWithJournalDisabled() {
         when(baseConfiguration.isMessageJournalEnabled()).thenReturn(false);
