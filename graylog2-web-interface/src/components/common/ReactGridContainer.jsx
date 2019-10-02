@@ -11,7 +11,7 @@ const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 const WidthProvidedGridLayout = (props) => {
   const { width } = props;
-  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout />;
+  return width ? <Responsive {...props} /> : <WidthAdjustedReactGridLayout {...props} />;
 };
 WidthProvidedGridLayout.propTypes = { width: PropTypes.number };
 WidthProvidedGridLayout.defaultProps = { width: undefined };
