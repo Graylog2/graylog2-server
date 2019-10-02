@@ -59,7 +59,14 @@ import OperatorCompletion from 'views/components/searchbar/completions/OperatorC
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import type { ValueActionHandlerConditionProps } from 'views/logic/valueactions/ValueActionHandler';
 import type { FieldActionHandlerConditionProps } from 'views/logic/fieldactions/FieldActionHandler';
-import { dashboardsPath, extendedSearchPath, newDashboardsPath, showViewsPath, viewsPath } from 'views/Constants';
+import {
+  dashboardsPath,
+  extendedSearchPath,
+  newDashboardsPath,
+  showDashboardsPath,
+  showViewsPath,
+  viewsPath,
+} from 'views/Constants';
 import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from 'views/pages/StreamSearchPage';
 import AppConfig from 'util/AppConfig';
@@ -82,6 +89,7 @@ const searchRoutes = enableNewSearch
     { path: newDashboardsPath, component: NewDashboardPage },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
     { path: dashboardsPath, component: DashboardsPage },
+    { path: showDashboardsPath, component: ShowViewPage },
   ]
   : [];
 
