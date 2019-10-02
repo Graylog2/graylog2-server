@@ -163,7 +163,7 @@ class SideBar extends React.Component<Props, State> {
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'fields'}
                                text="Fields"
-                               icon={<i className="fa fa-paragraph" />}
+                               icon={<i className="fa fa-subscript" />}
                                onClick={this.setSelectedKey('fields')}
                                isLast
                                isOpen={open}>
