@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 import React from 'react';
 
 import { Button } from 'components/graylog';
@@ -26,8 +26,6 @@ class EditConfigurationVariableModal extends React.Component {
     description: '',
     content: '',
   };
-
-  _debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
 
   constructor(props) {
     super(props);
@@ -76,11 +74,15 @@ class EditConfigurationVariableModal extends React.Component {
     });
   };
 
+  // Needs to be after _validateFormData is defined
+  // eslint-disable-next-line react/sort-comp
+  _debouncedValidateFormData = debounce(this._validateFormData, 200);
+
   _formDataUpdate = (key) => {
     const { formData } = this.state;
 
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(formData);
+      const nextFormData = cloneDeep(formData);
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
