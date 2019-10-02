@@ -16,4 +16,5 @@ export const dashboardsPath = '/dashboards';
 export const newDashboardsPath = '/dashboards/new';
 export const extendedSearchPath = '/extendedsearch';
 export const viewsPath = '/views';
-export const showViewsPath = `${dashboardsPath}/:viewId`;
+export const showViewsPath = `${viewsPath}/:viewId`;
+export const showDashboardsPath = `${dashboardsPath}/:viewId`;
