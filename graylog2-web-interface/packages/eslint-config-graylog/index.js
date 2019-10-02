@@ -20,6 +20,10 @@ module.exports = {
     'new-cap': 'off',
     'no-else-return': 'warn',
     'no-nested-ternary': 'warn',
+    'no-restricted-imports': ['error', [{
+      name: 'react-boostrap',
+      message: 'Please use `components/graylog` instead.',
+    }]],
     'no-underscore-dangle': 'off',
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],

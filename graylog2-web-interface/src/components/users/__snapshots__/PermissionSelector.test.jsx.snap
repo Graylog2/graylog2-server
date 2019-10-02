@@ -103,7 +103,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -115,7 +115,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -182,7 +182,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -190,7 +190,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -246,7 +246,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -254,7 +254,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -359,7 +359,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -371,7 +371,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -438,7 +438,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -446,7 +446,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -502,7 +502,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -510,7 +510,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -666,7 +666,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -678,7 +678,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -745,7 +745,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -753,7 +753,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -809,7 +809,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -817,7 +817,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -922,7 +922,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -934,7 +934,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -1001,7 +1001,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1009,7 +1009,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1065,7 +1065,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1073,7 +1073,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"

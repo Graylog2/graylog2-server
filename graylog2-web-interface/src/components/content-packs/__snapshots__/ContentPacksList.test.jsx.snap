@@ -44,7 +44,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </div>
           </div>
           <button
-            className="btn btn-default"
+            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
             disabled={false}
             style={
               Object {
@@ -56,7 +56,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             Filter
           </button>
           <button
-            className="btn btn-default"
+            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
             disabled={true}
             onClick={[Function]}
             style={
@@ -261,7 +261,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -413,7 +413,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -554,7 +554,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -695,7 +695,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -836,7 +836,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -977,7 +977,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1118,7 +1118,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1259,7 +1259,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1400,7 +1400,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1541,7 +1541,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="btn btn-sm btn-info"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1840,7 +1840,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             </div>
           </div>
           <button
-            className="btn btn-default"
+            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
             disabled={false}
             style={
               Object {
@@ -1852,7 +1852,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             Filter
           </button>
           <button
-            className="btn btn-default"
+            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
             disabled={true}
             onClick={[Function]}
             style={

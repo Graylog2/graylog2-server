@@ -90,7 +90,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="btn btn-xs btn-primary"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -122,7 +122,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="btn btn-xs btn-primary"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -154,7 +154,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="btn btn-xs btn-primary"
+              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"

@@ -1,7 +1,6 @@
 export {
   Alert,
   Badge,
-  Button,
   ButtonGroup,
   ButtonToolbar,
   Checkbox,
