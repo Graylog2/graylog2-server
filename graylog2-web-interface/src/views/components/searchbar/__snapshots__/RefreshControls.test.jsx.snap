@@ -8,7 +8,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -154,7 +154,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -300,7 +300,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -455,7 +455,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -610,7 +610,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -765,7 +765,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -920,7 +920,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1075,7 +1075,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1230,7 +1230,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="btn-group"
   >
     <button
-      className="btn btn-default"
+      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"

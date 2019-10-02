@@ -1,107 +1,82 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UserPreferencesButton should load user data when user clicks edit button 1`] = `
-<UserPreferencesButton
-  userName="Full"
->
-  <span>
-    <Button
-      active={false}
-      block={false}
-      bsClass="btn"
-      bsStyle="success"
-      disabled={false}
-      onClick={[Function]}
-    >
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <span>
+        <button
+          class="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+          data-testid="user-preferences-button"
+          type="button"
+        >
+          User preferences
+        </button>
+      </span>
+    </div>
+  </body>,
+  "container": <div>
+    <span>
       <button
-        className="btn btn-success"
-        disabled={false}
-        onClick={[Function]}
+        class="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+        data-testid="user-preferences-button"
         type="button"
       >
         User preferences
       </button>
-    </Button>
-    <UserPreferencesModal
-      userName="Full"
-    >
-      <BootstrapModalForm
-        cancelButtonText="Cancel"
-        formProps={Object {}}
-        onCancel={[Function]}
-        onModalClose={[Function]}
-        onModalOpen={[Function]}
-        onSubmitForm={[Function]}
-        show={false}
-        submitButtonDisabled={false}
-        submitButtonText="Save"
-        title="Preferences for user Full"
-      >
-        <BootstrapModalWrapper
-          backdrop="static"
-          onClose={[Function]}
-          onHide={[Function]}
-          onOpen={[Function]}
-          showModal={false}
-        >
-          <Modal
-            animation={true}
-            autoFocus={true}
-            backdrop="static"
-            bsClass="modal"
-            dialogComponentClass={[Function]}
-            enforceFocus={true}
-            keyboard={true}
-            manager={
-              ModalManager {
-                "add": [Function],
-                "containers": Array [],
-                "data": Array [],
-                "handleContainerOverflow": true,
-                "hideSiblingNodes": true,
-                "isTopModal": [Function],
-                "modals": Array [],
-                "remove": [Function],
-              }
-            }
-            onHide={[Function]}
-            renderBackdrop={[Function]}
-            restoreFocus={true}
-            show={false}
-          >
-            <Modal
-              autoFocus={true}
-              backdrop="static"
-              backdropClassName="modal-backdrop"
-              backdropTransitionTimeout={150}
-              containerClassName="modal-open"
-              dialogTransitionTimeout={300}
-              enforceFocus={true}
-              keyboard={true}
-              manager={
-                ModalManager {
-                  "add": [Function],
-                  "containers": Array [],
-                  "data": Array [],
-                  "handleContainerOverflow": true,
-                  "hideSiblingNodes": true,
-                  "isTopModal": [Function],
-                  "modals": Array [],
-                  "remove": [Function],
-                }
-              }
-              onEntering={[Function]}
-              onExited={[Function]}
-              onHide={[Function]}
-              renderBackdrop={[Function]}
-              restoreFocus={true}
-              show={false}
-              transition={[Function]}
-            />
-          </Modal>
-        </BootstrapModalWrapper>
-      </BootstrapModalForm>
-    </UserPreferencesModal>
-  </span>
-</UserPreferencesButton>
+    </span>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
 `;

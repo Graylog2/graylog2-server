@@ -19,11 +19,14 @@ const highlight = (value: any, idx: number, style = {}) => <span key={`highlight
 type Props = {
   color: string,
   field: string,
-  value: any,
+  value?: any,
   highlightRanges: Ranges,
 };
 
 const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, highlightRanges = {} }: Props) => {
+  if (value === undefined || value == null) {
+    return '';
+  }
   if (!highlightRanges || !highlightRanges[field]) {
     return value;
   }
@@ -31,9 +34,6 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
     backgroundColor: color,
   };
 
-  if (value === undefined) {
-    return '';
-  }
   // Ensure the field is a string for later processing
   const origValue = StringUtils.stringify(value);
 
@@ -61,13 +61,14 @@ const PossiblyHighlight = ({ color = DEFAULT_HIGHLIGHT_COLOR, field, value, high
 PossiblyHighlight.propTypes = {
   color: PropTypes.string,
   field: PropTypes.string.isRequired,
-  value: PropTypes.any.isRequired,
+  value: PropTypes.any,
   highlightRanges: PropTypes.object,
 };
 
 PossiblyHighlight.defaultProps = {
   color: DEFAULT_HIGHLIGHT_COLOR,
   highlightRanges: {},
+  value: undefined,
 };
 
 export default PossiblyHighlight;

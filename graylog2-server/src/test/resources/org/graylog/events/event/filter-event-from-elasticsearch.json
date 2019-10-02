@@ -1,0 +1,25 @@
+{
+  "_id": "01DNM0DVJDV52NA5VEBTYJ6PJY",
+  "id": "01DNM0DVJDV52NA5VEBTYJ6PJY",
+  "timestamp": "2019-09-25T10:42:10.324Z",
+  "timestamp_processing": "2019-09-25 10:45:47.726",
+  "event_definition_type": "aggregation-v1",
+  "event_definition_id": "5d1c930ec62bf712952ce29f",
+  "origin_context": "urn:graylog:message:es:graylog_35:20b09750-df81-11e9-bc2f-6e8b8d2349f7",
+  "alert": false,
+  "key": "",
+  "key_tuple": [],
+  "streams": [
+    "000000000000000000000002"
+  ],
+  "source_streams": [
+    "000000000000000000000001"
+  ],
+  "message": "Test Event",
+  "priority": 1,
+  "source": "node-1",
+  "fields": {
+    "msg": "Nice message",
+    "pid": "2385"
+  }
+}

@@ -443,6 +443,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("german_year")).isEqualTo(1983);
             assertThat(message.getField("german_month")).isEqualTo(7);
             assertThat(message.getField("german_day")).isEqualTo(24);
+            assertThat(message.getField("german_weekday")).isEqualTo(7);
             assertThat(message.getField("english_year")).isEqualTo(1983);
             assertThat(message.getField("english_month")).isEqualTo(7);
             assertThat(message.getField("english_day")).isEqualTo(24);

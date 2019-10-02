@@ -1,26 +1,29 @@
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import { Button } from 'components/graylog';
 import UserPreferencesModal from 'components/users/UserPreferencesModal';
 
-class UserPreferencesButton extends React.Component {
-  static propTypes = {
-    userName: PropTypes.string.isRequired,
+const UserPreferencesButton = ({ userName }) => {
+  const userPreferencesModal = useRef();
+
+  const onClick = () => {
+    userPreferencesModal.current.openModal();
   };
 
-  onClick = () => {
-    this.userPreferencesModal.openModal();
-  };
+  return (
+    <span>
+      <Button onClick={onClick}
+              bsStyle="success"
+              data-testid="user-preferences-button">User preferences
+      </Button>
+      <UserPreferencesModal ref={userPreferencesModal} userName={userName} />
+    </span>
+  );
+};
 
-  render() {
-    return (
-      <span>
-        <Button onClick={this.onClick} bsStyle="success">User preferences</Button>
-        <UserPreferencesModal ref={(userPreferencesModal) => { this.userPreferencesModal = userPreferencesModal; }} userName={this.props.userName} />
-      </span>
-    );
-  }
-}
+UserPreferencesButton.propTypes = {
+  userName: PropTypes.string.isRequired,
+};
 
 export default UserPreferencesButton;

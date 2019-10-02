@@ -100,20 +100,82 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
                       type="submit"
                     >
-                      <button
-                        className="submit-button btn btn-default"
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        Search
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          type="submit"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <button
+                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              type="submit"
+                            >
+                              Search
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                   <div
@@ -126,22 +188,84 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="reset-button"
-                      disabled={false}
                       onClick={[Function]}
                       type="reset"
                     >
-                      <button
-                        className="reset-button btn btn-default"
-                        disabled={false}
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        Reset
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="reset-button"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <button
+                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              Reset
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                 </form>
@@ -647,20 +771,82 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
                       type="submit"
                     >
-                      <button
-                        className="submit-button btn btn-default"
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        Search
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          type="submit"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <button
+                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              type="submit"
+                            >
+                              Search
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                   <div
@@ -673,22 +859,84 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="reset-button"
-                      disabled={false}
                       onClick={[Function]}
                       type="reset"
                     >
-                      <button
-                        className="reset-button btn btn-default"
-                        disabled={false}
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        Reset
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="reset-button"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <button
+                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              Reset
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                 </form>
@@ -1139,20 +1387,82 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
                       type="submit"
                     >
-                      <button
-                        className="submit-button btn btn-default"
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="submit-button"
                         disabled={false}
                         type="submit"
                       >
-                        Search
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          type="submit"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <button
+                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              type="submit"
+                            >
+                              Search
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                   <div
@@ -1165,22 +1475,84 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   >
                     <Button
                       active={false}
-                      block={false}
-                      bsClass="btn"
                       bsStyle="default"
                       className="reset-button"
-                      disabled={false}
                       onClick={[Function]}
                       type="reset"
                     >
-                      <button
-                        className="reset-button btn btn-default"
-                        disabled={false}
+                      <Button__StyledButton
+                        active={false}
+                        bsStyle="default"
+                        className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
-                        Reset
-                      </button>
+                        <StyledComponent
+                          active={false}
+                          bsStyle="default"
+                          className="reset-button"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button__StyledButton-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "cBCVOY",
+                                "rules": Array [
+                                  [Function],
+                                  ";",
+                                ],
+                              },
+                              "displayName": "Button__StyledButton",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <button
+                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              Reset
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button__StyledButton>
                     </Button>
                   </div>
                 </form>
