@@ -25,6 +25,7 @@ import org.bson.types.ObjectId;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -61,6 +62,9 @@ public class DBProcessingStatusServiceTest {
     @Mock
     private NodeId nodeId;
 
+    @Mock
+    private BaseConfiguration baseConfiguration;
+
     private DBProcessingStatusService dbService;
     private JobSchedulerTestClock clock;
     private Duration updateThreshold;
@@ -75,7 +79,7 @@ public class DBProcessingStatusServiceTest {
 
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
         updateThreshold = spy(Duration.minutes(1));
-        dbService = new DBProcessingStatusService(mongoRule.getMongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider);
+        dbService = new DBProcessingStatusService(mongoRule.getMongoConnection(), nodeId, clock, updateThreshold, 1, mapperProvider, baseConfiguration);
         db = JacksonDBCollection.wrap(mongoRule.getMongoConnection().getDatabase().getCollection(DBProcessingStatusService.COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
@@ -264,5 +268,32 @@ public class DBProcessingStatusServiceTest {
 
         assertThat(db.find(query2).toArray().stream().map(ProcessingStatusDto::nodeId).collect(Collectors.toSet()))
                 .containsOnly("abc-123", "abc-456");
+    }
+
+    @Test
+    @UsingDataSet(locations = "processing-status-single-active-node.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void singleNodeStatus() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T00:01:00.000Z"));
+        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void updateProcessingStatusWithJournalDisabled() {
+        when(baseConfiguration.isMessageJournalEnabled()).thenReturn(false);
+        dbService.save(new InMemoryProcessingStatusRecorder());
+        assertThat(dbService.get()).isPresent();
+        assertThat(dbService.get()).satisfies(dto -> {
+           assertThat(dto.get().inputJournal().journalEnabled()).isFalse();
+        });
+    }
+
+    @Test
+    @UsingDataSet(locations = "processing-status-disabled-journal.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void retrieveWithDisabledJournal() {
+        when(clock.nowUTC()).thenReturn(DateTime.parse("2019-01-01T02:01:00.000Z"));
+        when(updateThreshold.toMilliseconds()).thenReturn(Duration.hours(4).toMilliseconds());
+        // Entries with disabled journal should be retrieved, regardless of their metrics being all 0
+        assertThat(dbService.earliestPostIndexingTimestamp()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T00:01:00.000Z"));
     }
 }

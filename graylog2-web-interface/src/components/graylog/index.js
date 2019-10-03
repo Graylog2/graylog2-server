@@ -1,4 +1,5 @@
 import Button from './Button';
+import DropdownButton from './DropdownButton';
 
-export { Button };
+export { Button, DropdownButton };
 export * from './bootstrap-import';
