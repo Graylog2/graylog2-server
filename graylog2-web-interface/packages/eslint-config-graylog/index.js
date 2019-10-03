@@ -9,7 +9,6 @@ module.exports = {
   plugins: [
     'import',
     'react-hooks',
-    'graylog-custom-rules',
   ],
   rules: {
     'arrow-body-style': 'off',
@@ -20,10 +19,12 @@ module.exports = {
     'new-cap': 'off',
     'no-else-return': 'warn',
     'no-nested-ternary': 'warn',
-    'no-restricted-imports': ['error', [{
-      name: 'react-boostrap',
-      message: 'Please use `components/graylog` instead.',
-    }]],
+    'no-restricted-imports': ['error', {
+      paths: [{
+        name: 'react-bootstrap',
+        message: 'Please use `components/graylog` instead.',
+      }],
+    }],
     'no-underscore-dangle': 'off',
     'object-curly-newline': ['error', { multiline: true, consistent: true }],
     'object-shorthand': ['error', 'methods'],
@@ -34,6 +35,5 @@ module.exports = {
     'react/jsx-one-expression-per-line': 'off',
     'react/prefer-es6-class': 'off',
     'react/prefer-stateless-function': 'warn',
-    'graylog-custom-rules/prevent-import': 2,
   },
 };
