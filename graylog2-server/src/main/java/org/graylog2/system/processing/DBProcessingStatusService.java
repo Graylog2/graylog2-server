@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -34,6 +35,7 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,12 +48,14 @@ public class DBProcessingStatusService {
     public static final String COLLECTION_NAME = "processing_status";
     private static final String FIELD_WRITTEN_MESSAGES_1M = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_WRITTEN_MESSAGES_1M_RATE;
     private static final String FIELD_UNCOMMITTED_ENTRIES = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_UNCOMMITTED_ENTRIES;
+    private static final String FIELD_JOURNAL_ENABLED = ProcessingStatusDto.FIELD_INPUT_JOURNAL + "." + ProcessingStatusDto.JournalInfo.FIELD_JOURNAL_ENABLED;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
     private final Duration updateThreshold;
     private final double journalWriteRateThreshold;
     private final JacksonDBCollection<ProcessingStatusDto, ObjectId> db;
+    private final BaseConfiguration baseConfiguration;
 
     @Inject
     public DBProcessingStatusService(MongoConnection mongoConnection,
@@ -59,11 +63,13 @@ public class DBProcessingStatusService {
                                      JobSchedulerClock clock,
                                      @Named(ProcessingStatusConfig.UPDATE_THRESHOLD) Duration updateThreshold,
                                      @Named(ProcessingStatusConfig.JOURNAL_WRITE_RATE_THRESHOLD) int journalWriteRateThreshold,
-                                     MongoJackObjectMapperProvider mapper) {
+                                     MongoJackObjectMapperProvider mapper,
+                                     BaseConfiguration baseConfiguration) {
         this.nodeId = nodeId.toString();
         this.clock = clock;
         this.updateThreshold = updateThreshold;
         this.journalWriteRateThreshold = ((Number) journalWriteRateThreshold).doubleValue();
+        this.baseConfiguration = baseConfiguration;
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 ProcessingStatusDto.class,
                 ObjectId.class,
@@ -107,17 +113,24 @@ public class DBProcessingStatusService {
      */
     public Optional<DateTime> earliestPostIndexingTimestamp() {
         final String sortField = ProcessingStatusDto.FIELD_RECEIVE_TIMES + "." + ProcessingStatusDto.ReceiveTimes.FIELD_POST_INDEXING;
-        final DBQuery.Query query = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
+        final DateTime updateThresholdTimestamp = clock.nowUTC().minus(updateThreshold.toMilliseconds());
+        final DBQuery.Query queryWithoutMetrics = DBQuery.greaterThan(FIELD_UPDATED_AT, updateThresholdTimestamp);
+        final DBQuery.Query queryWithMetrics = getDataSelectionQuery(clock, updateThreshold, journalWriteRateThreshold);
 
-        // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
-        // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
-        // to return the timestamp of the slowest one.
-        try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
-            if (cursor.hasNext()) {
-                return Optional.of(cursor.next().receiveTimes().postIndexing());
+        // First try to query processing status from nodes that are active (include journal metrics restrictions).
+        // If no result is found, query the processing status again, but without weeding out nodes with a low input volume.
+        // This prevents to completely stall the event processing if the ingestion volume is too low.
+        for (DBQuery.Query query: Arrays.asList(queryWithMetrics, queryWithoutMetrics)) {
+            // Get the earliest timestamp of the post-indexing receive timestamp by sorting and returning the first one.
+            // We use the earliest timestamp because some nodes can be faster than others and we need to make sure
+            // to return the timestamp of the slowest one.
+            try (DBCursor<ProcessingStatusDto> cursor = db.find(query).sort(DBSort.asc(sortField)).limit(1)) {
+                if (cursor.hasNext()) {
+                    return Optional.of(cursor.next().receiveTimes().postIndexing());
+                }
             }
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     // This has been put into a static method to simplify testing the processing status selection
@@ -134,7 +147,9 @@ public class DBProcessingStatusService {
                         // ... received a certain amount of messages in the last minute
                         DBQuery.greaterThanEquals(FIELD_WRITTEN_MESSAGES_1M, journalWriteRateThreshold),
                         // ... or has messages left in the journal
-                        DBQuery.greaterThanEquals(FIELD_UNCOMMITTED_ENTRIES, 1L)
+                        DBQuery.greaterThanEquals(FIELD_UNCOMMITTED_ENTRIES, 1L),
+                        // ... or has journaling disabled
+                        DBQuery.is(FIELD_JOURNAL_ENABLED, false)
                 )
         );
     }
@@ -160,7 +175,7 @@ public class DBProcessingStatusService {
                 null,
                 null,
                 false,
-                ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt),
+                ProcessingStatusDto.of(nodeId, processingStatusRecorder, updatedAt, baseConfiguration.isMessageJournalEnabled()),
                 true, // We want to return the updated document to the caller
                 true);
     }
