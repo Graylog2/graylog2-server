@@ -3,10 +3,12 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import lodash from 'lodash';
-import { Col, Row } from 'components/graylog';
 
+import { Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { ControlledTableList, TypeAheadDataFilter } from 'components/common';
+
+import ControlledTableList from './ControlledTableList';
+import TypeAheadDataFilter from './TypeAheadDataFilter';
 
 import style from './TableList.css';
 

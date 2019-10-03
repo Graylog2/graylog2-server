@@ -4,9 +4,9 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import Select from 'components/common/Select';
-import { Spinner } from 'components/common';
-
 import StoreProvider from 'injection/StoreProvider';
+import Spinner from './Spinner';
+
 
 const SystemStore = StoreProvider.getStore('System');
 

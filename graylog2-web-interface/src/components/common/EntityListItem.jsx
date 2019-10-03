@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from './Icon';
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.

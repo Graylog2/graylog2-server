@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ListGroupItem } from 'components/graylog';
-import { Icon } from 'components/common';
 import { DragSource, DropTarget } from 'react-dnd';
 
+import { ListGroupItem } from 'components/graylog';
+import Icon from './Icon';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';
 
 const ItemTypes = {

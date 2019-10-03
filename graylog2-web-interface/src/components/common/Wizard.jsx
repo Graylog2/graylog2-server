@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from './Icon';
 
 import WizardStyle from './Wizard.css';
 

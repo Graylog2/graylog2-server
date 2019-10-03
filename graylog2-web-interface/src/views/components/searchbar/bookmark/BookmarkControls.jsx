@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, ButtonGroup } from 'components/graylog';
+import { Icon } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -138,7 +139,7 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     const loaded = (view && view.id);
-    const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
+    const bookmarkStyle = loaded ? 'bookmark' : 'bookmark-o';
     let bookmarkColor: string = '';
     if (loaded) {
       bookmarkColor = dirty ? '#ffc107' : '#007bff';
@@ -168,16 +169,16 @@ class BookmarkControls extends React.Component<Props, State> {
         <ButtonGroup>
           <React.Fragment>
             <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
-              <i className="fa fa-eraser" />
+              <Icon name="eraser" />
             </Button>
             <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+              <Icon style={{ color: bookmarkColor }} name={bookmarkStyle} />
             </Button>
             {bookmarkForm}
           </React.Fragment>
           <Button title="List of saved searches"
                   onClick={this.toggleListModal}>
-            <i className="fa fa-folder-o" />
+            <Icon name="folder-o" />
           </Button>
           {bookmarkList}
         </ButtonGroup>

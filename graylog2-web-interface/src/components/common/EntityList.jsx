@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Alert } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from './Icon';
 
 /**
  * Component used to represent list of entities in Graylog, where each entity will have a title, description,

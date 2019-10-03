@@ -55,71 +55,310 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
         >
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
             title="Empty search"
           >
-            <button
-              className="btn btn-default"
+            <Button__StyledButton
+              bsStyle="default"
               disabled={false}
               onClick={[Function]}
               title="Empty search"
-              type="button"
             >
-              <i
-                className="fa fa-eraser"
-              />
-            </button>
+              <StyledComponent
+                bsStyle="default"
+                disabled={false}
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Empty search"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Empty search"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Empty search"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="
+         fa
+         fa-eraser
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
-            disabled={false}
             onClick={[Function]}
             title="Unsaved changes"
           >
-            <button
-              className="btn btn-default"
-              disabled={false}
+            <Button__StyledButton
+              bsStyle="default"
               onClick={[Function]}
               title="Unsaved changes"
-              type="button"
             >
-              <i
-                className="fa fa-bookmark"
-                style={
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
                   Object {
-                    "color": "#ffc107",
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
                   }
                 }
-              />
-            </button>
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Unsaved changes"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Unsaved changes"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Unsaved changes"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
+                      style={
+                        Object {
+                          "color": "#ffc107",
+                        }
+                      }
+                    >
+                      <i
+                        className="
+         fa
+         fa-bookmark
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                        style={
+                          Object {
+                            "color": "#ffc107",
+                          }
+                        }
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
-            disabled={false}
             onClick={[Function]}
             title="List of saved searches"
           >
-            <button
-              className="btn btn-default"
-              disabled={false}
+            <Button__StyledButton
+              bsStyle="default"
               onClick={[Function]}
               title="List of saved searches"
-              type="button"
             >
-              <i
-                className="fa fa-folder-o"
-              />
-            </button>
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="List of saved searches"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="List of saved searches"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="List of saved searches"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="
+         fa
+         fa-folder-o
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
         </div>
       </ButtonGroup>
@@ -183,71 +422,310 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
         >
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
             title="Empty search"
           >
-            <button
-              className="btn btn-default"
+            <Button__StyledButton
+              bsStyle="default"
               disabled={false}
               onClick={[Function]}
               title="Empty search"
-              type="button"
             >
-              <i
-                className="fa fa-eraser"
-              />
-            </button>
+              <StyledComponent
+                bsStyle="default"
+                disabled={false}
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Empty search"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Empty search"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Empty search"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="
+         fa
+         fa-eraser
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
-            disabled={false}
             onClick={[Function]}
             title="Saved search"
           >
-            <button
-              className="btn btn-default"
-              disabled={false}
+            <Button__StyledButton
+              bsStyle="default"
               onClick={[Function]}
               title="Saved search"
-              type="button"
             >
-              <i
-                className="fa fa-bookmark"
-                style={
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
                   Object {
-                    "color": "#007bff",
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
                   }
                 }
-              />
-            </button>
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Saved search"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Saved search"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Saved search"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
+                      style={
+                        Object {
+                          "color": "#007bff",
+                        }
+                      }
+                    >
+                      <i
+                        className="
+         fa
+         fa-bookmark
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                        style={
+                          Object {
+                            "color": "#007bff",
+                          }
+                        }
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
           <Button
             active={false}
-            block={false}
-            bsClass="btn"
             bsStyle="default"
-            disabled={false}
             onClick={[Function]}
             title="List of saved searches"
           >
-            <button
-              className="btn btn-default"
-              disabled={false}
+            <Button__StyledButton
+              bsStyle="default"
               onClick={[Function]}
               title="List of saved searches"
-              type="button"
             >
-              <i
-                className="fa fa-folder-o"
-              />
-            </button>
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="List of saved searches"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="List of saved searches"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="List of saved searches"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="
+         fa
+         fa-folder-o
+         undefined
+         false
+         false
+         false
+         undefined
+         undefined
+         false
+         undefined
+       "
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
           </Button>
         </div>
       </ButtonGroup>

@@ -610,54 +610,225 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
           >
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-primary"
+              <Button__StyledButton
+                bsStyle="primary"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Load
-              </button>
+                <StyledComponent
+                  bsStyle="primary"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-primary"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Load
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
+              <Button__StyledButton
+                bsStyle="default"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Delete
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
-              disabled={false}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
-                disabled={false}
+              <Button__StyledButton
+                bsStyle="default"
                 onClick={[Function]}
-                type="button"
               >
-                Cancel
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={false}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
           </div>
         </ModalFooter>
@@ -1222,54 +1393,225 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
           >
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-primary"
+              <Button__StyledButton
+                bsStyle="primary"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Load
-              </button>
+                <StyledComponent
+                  bsStyle="primary"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-primary"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Load
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
+              <Button__StyledButton
+                bsStyle="default"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Delete
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
-              disabled={false}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
-                disabled={false}
+              <Button__StyledButton
+                bsStyle="default"
                 onClick={[Function]}
-                type="button"
               >
-                Cancel
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={false}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
           </div>
         </ModalFooter>
@@ -1889,54 +2231,225 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
           >
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-primary"
+              <Button__StyledButton
+                bsStyle="primary"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Load
-              </button>
+                <StyledComponent
+                  bsStyle="primary"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="primary"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-primary"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Load
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
+              <Button__StyledButton
+                bsStyle="default"
                 disabled={true}
                 onClick={[Function]}
-                type="button"
               >
-                Delete
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  disabled={true}
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={true}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Delete
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
             <Button
               active={false}
-              block={false}
-              bsClass="btn"
               bsStyle="default"
-              disabled={false}
               onClick={[Function]}
             >
-              <button
-                className="btn btn-default"
-                disabled={false}
+              <Button__StyledButton
+                bsStyle="default"
                 onClick={[Function]}
-                type="button"
               >
-                Cancel
-              </button>
+                <StyledComponent
+                  bsStyle="default"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                        "xsmall",
+                      ],
+                      "STYLES": Array [
+                        "success",
+                        "warning",
+                        "danger",
+                        "info",
+                        "default",
+                        "primary",
+                        "link",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "Button__StyledButton-c9cbmb-0",
+                        "isStatic": false,
+                        "lastClassName": "cBCVOY",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "Button__StyledButton",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
+                    }
+                  }
+                  forwardedRef={null}
+                  onClick={[Function]}
+                >
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                    disabled={false}
+                    onClick={[Function]}
+                  >
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    >
+                      Cancel
+                    </button>
+                  </Button>
+                </StyledComponent>
+              </Button__StyledButton>
             </Button>
           </div>
         </ModalFooter>
