@@ -15,6 +15,8 @@ import 'stylesheets/graylog2.less';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 
+import GraylogThemeProvider from '../theme/GraylogThemeContext';
+
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -38,16 +40,22 @@ const AppFacade = createReactClass({
   },
 
   render() {
-    if (!this.state.server.up) {
-      return <ServerUnavailablePage server={this.state.server} />;
+    const { currentUser, server, sessionId } = this.state;
+    let Page = <LoggedInPage />;
+
+    if (!server.up) {
+      Page = <ServerUnavailablePage server={server} />;
+    } else if (!sessionId) {
+      Page = <LoginPage />;
+    } else if (!currentUser) {
+      Page = <LoadingPage text="We are preparing Graylog for you..." />;
     }
-    if (!this.state.sessionId) {
-      return <LoginPage />;
-    }
-    if (!this.state.currentUser) {
-      return <LoadingPage text="We are preparing Graylog for you..." />;
-    }
-    return <LoggedInPage />;
+
+    return (
+      <GraylogThemeProvider>
+        {Page}
+      </GraylogThemeProvider>
+    );
   },
 });
 

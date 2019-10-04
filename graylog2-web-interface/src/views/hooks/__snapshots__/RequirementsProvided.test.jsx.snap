@@ -106,22 +106,85 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
               <Button
                 action="push"
                 active={false}
-                block={false}
-                bsClass="btn"
                 bsStyle="success"
-                disabled={false}
                 onClick={[Function]}
                 type="submit"
               >
-                <button
+                <Button__StyledButton
                   action="push"
-                  className="btn btn-success"
-                  disabled={false}
+                  active={false}
+                  bsStyle="success"
                   onClick={[Function]}
                   type="submit"
                 >
-                  Back
-                </button>
+                  <StyledComponent
+                    action="push"
+                    active={false}
+                    bsStyle="success"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                          "xsmall",
+                        ],
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                          "default",
+                          "primary",
+                          "link",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Button__StyledButton-c9cbmb-0",
+                          "isStatic": false,
+                          "lastClassName": "cBCVOY",
+                          "rules": Array [
+                            [Function],
+                            ";",
+                          ],
+                        },
+                        "displayName": "Button__StyledButton",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    onClick={[Function]}
+                    type="submit"
+                  >
+                    <Button
+                      action="push"
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="success"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="submit"
+                    >
+                      <button
+                        action="push"
+                        className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="submit"
+                      >
+                        Back
+                      </button>
+                    </Button>
+                  </StyledComponent>
+                </Button__StyledButton>
               </Button>
             </LinkContainer>
           </div>

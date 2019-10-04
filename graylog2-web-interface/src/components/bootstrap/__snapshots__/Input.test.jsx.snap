@@ -70,10 +70,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   buttonAfter={
     <Button
       active={false}
-      block={false}
-      bsClass="btn"
       bsStyle="default"
-      disabled={false}
     />
   }
   help=""
@@ -124,16 +121,70 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                 >
                   <Button
                     active={false}
-                    block={false}
-                    bsClass="btn"
                     bsStyle="default"
-                    disabled={false}
                   >
-                    <button
-                      className="btn btn-default"
-                      disabled={false}
-                      type="button"
-                    />
+                    <Button__StyledButton
+                      active={false}
+                      bsStyle="default"
+                    >
+                      <StyledComponent
+                        active={false}
+                        bsStyle="default"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                              "xsmall",
+                            ],
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                              "default",
+                              "primary",
+                              "link",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "Button__StyledButton-c9cbmb-0",
+                              "isStatic": false,
+                              "lastClassName": "cBCVOY",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "Button__StyledButton",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                      >
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
+                          bsStyle="default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                          disabled={false}
+                        >
+                          <button
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                            disabled={false}
+                            type="button"
+                          />
+                        </Button>
+                      </StyledComponent>
+                    </Button__StyledButton>
                   </Button>
                 </span>
               </InputGroupButton>

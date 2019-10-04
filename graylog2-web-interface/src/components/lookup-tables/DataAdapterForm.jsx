@@ -197,7 +197,9 @@ class DataAdapterForm extends React.Component {
         validationState: this._validationState,
       });
       if (p.documentationComponent) {
-        documentationComponent = React.createElement(p.documentationComponent);
+        documentationComponent = React.createElement(p.documentationComponent, {
+          dataAdapterId: dataAdapter.id,
+        });
       }
     }
 

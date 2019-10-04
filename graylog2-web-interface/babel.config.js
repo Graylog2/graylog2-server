@@ -4,6 +4,7 @@ module.exports = {
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-proposal-class-properties',
     'add-module-exports',
+    'babel-plugin-styled-components',
   ],
   env: {
     test: {

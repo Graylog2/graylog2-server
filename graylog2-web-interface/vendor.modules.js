@@ -17,4 +17,6 @@ module.exports = [
   'react',
   'reflux-core',
   'reflux',
+  'styled-components',
+  'styled-theming',
 ];
