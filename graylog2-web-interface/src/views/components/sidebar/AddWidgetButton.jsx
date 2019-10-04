@@ -53,6 +53,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     if (creator.func) {
       return () => {
         onClick();
+        toggleAutoClose();
         creator.func({ view });
       };
     }
@@ -72,7 +73,9 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
-        }, toggleAutoClose);
+        }, () => {
+          toggleAutoClose();
+        });
       };
     }
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);

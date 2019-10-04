@@ -66,8 +66,8 @@ class SideBar extends React.Component<Props, State> {
 
   handleClickOutside = (event: MouseEvent) => {
     const { open, disabledAutoClose } = this.state;
-    // $FlowFixMe: EventTarget and Node do work here :(
-    if (open && !disabledAutoClose && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+    // $FlowFixMe: EventTarget and className work here.
+    if (open && !disabledAutoClose && event.target.className.match(/background/)) {
       this.toggleOpen();
     }
   };
@@ -113,6 +113,7 @@ class SideBar extends React.Component<Props, State> {
       : 'fa-chevron-right';
     return (
       <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
+        {open && <div className={`background ${styles.toggleArea}`} />}
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={`${styles.sidebarContent}`}>
