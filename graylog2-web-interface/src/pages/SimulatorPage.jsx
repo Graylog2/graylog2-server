@@ -1,7 +1,7 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Row, Col, Button } from 'components/graylog';
+import { Button, Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
@@ -13,6 +13,12 @@ import Routes from 'routing/Routes';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 
+// Events do not work on Pipelines yet, hide Events and System Events Streams.
+const HIDDEN_STREAMS = [
+  '000000000000000000000002',
+  '000000000000000000000003',
+];
+
 class SimulatorPage extends React.Component {
   state = {
     streams: undefined,
@@ -20,21 +26,20 @@ class SimulatorPage extends React.Component {
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
+      const filteredStreams = streams.filter(s => !HIDDEN_STREAMS.includes(s.id));
+      this.setState({ streams: filteredStreams });
     });
   }
 
   _isLoading = () => {
-    return !this.state.streams;
+    const { streams } = this.state;
+    return !streams;
   };
 
   render() {
-    let content;
-    if (this._isLoading()) {
-      content = <Spinner />;
-    } else {
-      content = <ProcessorSimulator streams={this.state.streams} />;
-    }
+    const { streams } = this.state;
+
+    const content = this._isLoading() ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
     return (
       <DocumentTitle title="Simulate processing">
