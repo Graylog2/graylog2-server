@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import ReactDOM from 'react-dom';
 
 import { Alert } from 'components/graylog';
 import Mops from 'components/common/Mops';
-
 import isLocalStorageReady from 'util/isLocalStorageReady';
+import { ScratchpadContext } from '../../routing/context/ScratchpadProvider';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 
@@ -17,6 +17,14 @@ const ScratchpadWrapper = styled.div`
   bottom: 0;
   left: 0;
   z-index: 9999;
+`;
+
+const StyledMops = styled(Mops)`
+  box-shadow: 0 0 9px rgba(31, 31, 31, .25),
+              0 0 6px rgba(31, 31, 31, .25),
+              0 0 3px rgba(31, 31, 31, .25);
+  background-color: #393939;
+  border-radius: 3px;
 `;
 
 const ContentArea = styled.div`
@@ -59,51 +67,63 @@ const StyledAlert = styled(Alert)`
 `;
 
 const Scratchpad = () => {
-  const [opened, setOpened] = useState(false);
-  const [scratchData, setScratchData] = useState(localStorage.getItem(LOCALSTORAGE_ITEM));
+  const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
+  const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
+  const [scratchData, setScratchData] = useState((storage && storage.value) || '');
   const [localStorageReady] = useState(isLocalStorageReady());
+  const [size, setSize] = useState((storage && storage.size) || { width: 450, height: 300 });
+  const [position, setPosition] = useState((storage && storage.position) || { x: 25, y: 75 });
   const textareaRef = useRef();
 
-  const handleChange = () => {
-    const { value } = textareaRef.current;
-    setScratchData(value);
-
+  const writeData = (newData) => {
     if (localStorageReady) {
-      localStorage.setItem(LOCALSTORAGE_ITEM, textareaRef.current.value);
+      localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...storage, ...newData }));
     }
   };
 
-  const size = { width: opened ? 450 : 50, height: opened ? 300 : 50 };
+  const handleChange = () => {
+    const { value } = textareaRef.current;
+
+    setScratchData(value);
+    writeData({ value: textareaRef.current.value });
+  };
+
+  const handleMops = ({ size: newSize, position: newPosition }) => {
+    setSize(newSize);
+    setPosition(newPosition);
+    writeData({ size: newSize, position: newPosition });
+  };
 
   useEffect(() => {
-    if (textareaRef.current && opened) {
+    if (textareaRef.current && isScratchpadVisible) {
       textareaRef.current.focus();
     }
-  }, [opened]);
+  }, [isScratchpadVisible]);
+
+  if (!isScratchpadVisible) return null;
 
   return ReactDOM.createPortal(
     (
       <ScratchpadWrapper>
-        <Mops opened={opened}
-              isDraggable
-              isResizable={opened}
-              size={size}
-              minHeight={50}
-              minWidth={50}
-              position={{ x: 25, y: 75 }}>
+        <StyledMops isDraggable
+                    isResizable
+                    size={size}
+                    minHeight={250}
+                    minWidth={250}
+                    position={position}
+                    onResizeEnd={handleMops}
+                    onDragEnd={handleMops}>
 
-          {!opened ? (<ToggleButton type="button" onClick={() => setOpened(true)}><i className="fa fa-pencil fa-2x" /></ToggleButton>) : (
-            <ContentArea>
-              <Title>Scratchpad <ToggleButton type="button" onClick={() => setOpened(false)}><i className="fa fa-times" /></ToggleButton></Title>
-              <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
+          <ContentArea>
+            <Title>Scratchpad <ToggleButton type="button" onClick={() => setScratchpadVisibility(false)}><i className="fa fa-times" /></ToggleButton></Title>
+            <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
-              {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
+            {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
 
-              <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
-            </ContentArea>
-          )}
+            <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
+          </ContentArea>
 
-        </Mops>
+        </StyledMops>
       </ScratchpadWrapper>
     ),
     window.document.body,

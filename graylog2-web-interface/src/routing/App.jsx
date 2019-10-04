@@ -7,6 +7,8 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
+import { ScratchpadProvider } from './context/ScratchpadProvider';
+import Scratchpad from '../components/common/Scratchpad';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
@@ -21,7 +23,7 @@ const App = ({ children, currentUser, location }) => {
   }
 
   return (
-    <div>
+    <ScratchpadProvider>
       <Navigation requestPath={location.pathname}
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
@@ -29,6 +31,7 @@ const App = ({ children, currentUser, location }) => {
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
         <Icon name="arrow-up" />
       </div>
+      <Scratchpad />
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
