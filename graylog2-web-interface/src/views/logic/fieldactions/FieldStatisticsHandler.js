@@ -6,8 +6,6 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import Series from 'views/logic/aggregationbuilder/Series';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
-import FieldType from '../fieldtypes/FieldType';
-import type { ActionContexts } from '../ActionContext';
 
 const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];

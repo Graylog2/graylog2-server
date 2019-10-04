@@ -12,7 +12,6 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
-import type { ActionContexts } from '../ActionContext';
 
 const TIMESTAMP_FIELD = 'timestamp';
 

@@ -58,9 +58,9 @@ class ValueActions extends React.Component<Props, State> {
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
-    const { open } = this.state;
+    const { open, overflowingComponents: components } = this.state;
     // $FlowFixMe: Object.values signature is in the way for this one
-    const overflowingComponents: Array<React.Node> = Object.values(this.state.overflowingComponents);
+    const overflowingComponents: Array<React.Node> = Object.values(components);
     const handlerArgs = { queryId, field, type, value, contexts: this.context };
     const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
       .filter((action: ActionDefinition) => {
