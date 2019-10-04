@@ -2,13 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Navigation from 'components/navigation/Navigation';
-import { Icon, Spinner } from 'components/common';
+import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
 import { ScratchpadProvider } from './context/ScratchpadProvider';
-import Scratchpad from '../components/common/Scratchpad';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
@@ -35,7 +34,11 @@ const App = ({ children, currentUser, location }) => {
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
+<<<<<<< HEAD
     </div>
+=======
+    </ScratchpadProvider>
+>>>>>>> 0147c00ba... cleanup
   );
 };
 

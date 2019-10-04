@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 
 import { Button } from 'components/graylog';
-
-import { ScratchpadContext } from '../../routing/context/ScratchpadProvider';
+import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
 const ScratchpadToggle = () => {
   const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);

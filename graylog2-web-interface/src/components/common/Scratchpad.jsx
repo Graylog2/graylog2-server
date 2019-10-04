@@ -3,11 +3,14 @@ import styled from 'styled-components';
 import ReactDOM from 'react-dom';
 
 import { Alert } from 'components/graylog';
-import Mops from 'components/common/Mops';
+import { Interactable } from 'components/common';
 import isLocalStorageReady from 'util/isLocalStorageReady';
-import { ScratchpadContext } from '../../routing/context/ScratchpadProvider';
+import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
+const DEFAULT_SCRATCHDATA = '';
+const DEFAULT_SIZE = { width: 450, height: 300 };
+const DEFAULT_POSITION = { x: window.document.body.offsetWidth - 250, y: 225 };
 
 const ScratchpadWrapper = styled.div`
   position: fixed;
@@ -19,7 +22,7 @@ const ScratchpadWrapper = styled.div`
   z-index: 9999;
 `;
 
-const StyledMops = styled(Mops)`
+const StyledInteractable = styled(Interactable)`
   box-shadow: 0 0 9px rgba(31, 31, 31, .25),
               0 0 6px rgba(31, 31, 31, .25),
               0 0 3px rgba(31, 31, 31, .25);
@@ -68,12 +71,12 @@ const StyledAlert = styled(Alert)`
 
 const Scratchpad = () => {
   const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
-  const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
-  const [scratchData, setScratchData] = useState((storage && storage.value) || '');
-  const [localStorageReady] = useState(isLocalStorageReady());
-  const [size, setSize] = useState((storage && storage.size) || { width: 450, height: 300 });
-  const [position, setPosition] = useState((storage && storage.position) || { x: 25, y: 75 });
   const textareaRef = useRef();
+  const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
+  const [scratchData, setScratchData] = useState((storage && storage.value) || DEFAULT_SCRATCHDATA);
+  const [localStorageReady] = useState(isLocalStorageReady());
+  const [size, setSize] = useState((storage && storage.size) || DEFAULT_SIZE);
+  const [position, setPosition] = useState((storage && storage.position) || DEFAULT_POSITION);
 
   const writeData = (newData) => {
     if (localStorageReady) {
@@ -88,7 +91,7 @@ const Scratchpad = () => {
     writeData({ value: textareaRef.current.value });
   };
 
-  const handleMops = ({ size: newSize, position: newPosition }) => {
+  const handleInteractable = ({ size: newSize, position: newPosition }) => {
     setSize(newSize);
     setPosition(newPosition);
     writeData({ size: newSize, position: newPosition });
@@ -105,14 +108,14 @@ const Scratchpad = () => {
   return ReactDOM.createPortal(
     (
       <ScratchpadWrapper>
-        <StyledMops isDraggable
-                    isResizable
-                    size={size}
-                    minHeight={250}
-                    minWidth={250}
-                    position={position}
-                    onResizeEnd={handleMops}
-                    onDragEnd={handleMops}>
+        <StyledInteractable isDraggable
+                            isResizable
+                            size={size}
+                            minHeight={250}
+                            minWidth={250}
+                            position={position}
+                            onResizeEnd={handleInteractable}
+                            onDragEnd={handleInteractable}>
 
           <ContentArea>
             <Title>Scratchpad <ToggleButton type="button" onClick={() => setScratchpadVisibility(false)}><i className="fa fa-times" /></ToggleButton></Title>
@@ -123,10 +126,10 @@ const Scratchpad = () => {
             <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
           </ContentArea>
 
-        </StyledMops>
+        </StyledInteractable>
       </ScratchpadWrapper>
     ),
-    window.document.body,
+    document.body,
   );
 };
 
