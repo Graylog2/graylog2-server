@@ -14,7 +14,7 @@ describe('UseInNewQueryHandler', () => {
     QueriesActions.create = mockAction(jest.fn(() => Promise.resolve()));
 
     const view = View.create().toBuilder().type(View.Type.Dashboard).build();
-    const promise = UseInNewQueryHandler('queryId', 'foo', 'bar', FieldType.Unknown, { view });
+    const promise = UseInNewQueryHandler({ queryId: 'queryId', field: 'foo', value: 'bar', type: FieldType.Unknown, contexts: { view } });
 
     return promise.then(() => {
       expect(QueriesActions.create).toHaveBeenCalled();

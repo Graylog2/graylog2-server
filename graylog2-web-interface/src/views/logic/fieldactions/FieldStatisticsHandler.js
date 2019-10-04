@@ -12,7 +12,7 @@ import type { ActionContexts } from '../ActionContext';
 const NUMERIC_FIELD_SERIES = ['count', 'sum', 'avg', 'min', 'max', 'stddev', 'variance', 'card', 'percentile'];
 const NONNUMERIC_FIELD_SERIES = ['count', 'card'];
 
-const handler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+const handler: FieldActionHandler = ({ field, type, contexts: { widget: origWidget = Widget.empty() } }) => {
   const series = ((type && type.isNumeric()) ? NUMERIC_FIELD_SERIES : NONNUMERIC_FIELD_SERIES)
     .map((f) => {
       if (f === 'percentile') {
@@ -26,7 +26,6 @@ const handler: FieldActionHandler = (queryId: string, field: string, type: Field
     .visualization('table')
     .rollup(true)
     .build();
-  const { widget: origWidget = Widget.empty() } = context;
   const widgetBuilder = AggregationWidget.builder()
     .newId()
     .config(config);
