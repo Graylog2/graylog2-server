@@ -15,6 +15,14 @@ import {} from '../event-notification-types';
 
 const { EventNotificationsActions } = CombinedProvider.get('EventNotifications');
 
+const initialValidation = {
+  errors: {},
+};
+
+const initialTestResult = {
+  isLoading: false,
+};
+
 class EventNotificationFormContainer extends React.Component {
   static propTypes = {
     action: PropTypes.oneOf(['create', 'edit']),
@@ -46,18 +54,24 @@ class EventNotificationFormContainer extends React.Component {
 
     this.state = {
       notification: props.notification,
-      validation: {
-        errors: {},
-      },
+      validation: initialValidation,
+      testResult: initialTestResult,
       isDirty: false,
     };
+  }
+
+  componentWillUnmount() {
+    // Test request may take a while to return a result, cancel the promise before leaving the page.
+    if (this.testPromise) {
+      this.testPromise.cancel();
+    }
   }
 
   handleChange = (key, value) => {
     const { notification } = this.state;
     const nextNotification = lodash.cloneDeep(notification);
     nextNotification[key] = value;
-    this.setState({ notification: nextNotification, isDirty: true });
+    this.setState({ notification: nextNotification, isDirty: true, testResult: initialTestResult });
   };
 
   handleCancel = () => {
@@ -110,22 +124,37 @@ class EventNotificationFormContainer extends React.Component {
 
   handleTest = () => {
     const { notification } = this.state;
-    const promise = EventNotificationsActions.test(notification);
-    return promise.then(
-      () => {
-      },
-      (errorResponse) => {
-        const { body } = errorResponse.additional;
-        if (errorResponse.status === 400 && body && body.failed) {
-          this.setState({ validation: body });
-        }
-      },
-    );
+    this.setState({ testResult: { isLoading: true }, validation: initialValidation });
+    const testResult = lodash.clone(initialTestResult);
+
+    this.testPromise = EventNotificationsActions.test(notification);
+    this.testPromise
+      .then(
+        (response) => {
+          testResult.error = false;
+          testResult.message = 'Notification was executed successfully.';
+          return response;
+        },
+        (errorResponse) => {
+          testResult.error = true;
+          const { body } = errorResponse.additional;
+          if (errorResponse.status === 400 && body && body.failed) {
+            testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
+            this.setState({ validation: body });
+          } else {
+            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
+          }
+        },
+      )
+      .finally(() => {
+        this.setState({ testResult: testResult });
+        this.testPromise = undefined;
+      });
   };
 
   render() {
     const { action, embedded, formId, route } = this.props;
-    const { notification, validation, isDirty } = this.state;
+    const { notification, validation, testResult, isDirty } = this.state;
 
     return (
       <React.Fragment>
@@ -136,6 +165,7 @@ class EventNotificationFormContainer extends React.Component {
         <EventNotificationForm action={action}
                                notification={notification}
                                validation={validation}
+                               testResult={testResult}
                                formId={formId}
                                embedded={embedded}
                                onChange={this.handleChange}

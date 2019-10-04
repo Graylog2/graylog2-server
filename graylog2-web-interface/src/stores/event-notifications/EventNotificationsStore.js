@@ -168,22 +168,12 @@ const EventNotificationsStore = Reflux.createStore({
 
   test(notification) {
     const promise = fetch('POST', this.eventNotificationsUrl({ segments: ['test'] }), notification);
-
-    promise.then(
-      (response) => {
-        UserNotification.success(`Notification "${notification.title}" was executed successfully.`,
-          'Notification Test Result');
-        return response;
-      },
-      (error) => {
-        if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-          const errorMessage = error.responseMessage ? `error: ${error.responseMessage}` : 'unknown error';
-          UserNotification.error(`Notification "${notification.title} execution" failed with ${errorMessage}`,
-            'Notification Test Result');
-        }
-      },
-    );
     EventNotificationsActions.test.promise(promise);
+  },
+
+  testPersisted(notification) {
+    const promise = fetch('POST', this.eventNotificationsUrl({ segments: [notification.id, 'test'] }));
+    EventNotificationsActions.testPersisted.promise(promise);
   },
 
   listAllLegacyTypes() {
