@@ -81,7 +81,7 @@ public class ViewRequirementsTest {
                 view
         );
 
-        assertThat(result).containsExactly(
+        assertThat(result).containsOnly(
                 Maps.immutableEntry("aioverlord", plugin),
                 Maps.immutableEntry("parameters", new EnterpriseMetadataSummary())
         );
@@ -98,7 +98,7 @@ public class ViewRequirementsTest {
                 view
         );
 
-        assertThat(result).containsExactly(
+        assertThat(result).containsOnly(
                 Maps.immutableEntry("parameters", plugin)
         );
     }
@@ -120,7 +120,7 @@ public class ViewRequirementsTest {
                 view
         );
 
-        assertThat(result).containsExactly(
+        assertThat(result).contains(
                 Maps.immutableEntry("aioverlord", plugin),
                 Maps.immutableEntry("parameters", plugin)
         );
