@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -152,6 +153,11 @@ if (TARGET === 'start') {
       }),
       new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        reportFilename: path.resolve(ROOT_PATH, 'webpack', 'webpack-stats-report.html'),
+        openAnalyzer: false,
+      }),
     ],
   });
 }
