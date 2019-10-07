@@ -29,7 +29,7 @@ describe('ExcludeFromQueryHandler', () => {
     QueriesStore.getInitialState.mockReturnValue(mockQueries('queryId', ''));
 
     const handler = new ExcludeFromQueryHandler();
-    handler.handle('queryId', 'something', 'other');
+    handler.handle({ queryId: 'queryId', field: 'something', value: 'other' });
 
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT something:other');
   });
@@ -38,7 +38,7 @@ describe('ExcludeFromQueryHandler', () => {
     QueriesStore.getInitialState.mockReturnValue(mockQueries('queryId', '*'));
 
     const handler = new ExcludeFromQueryHandler();
-    handler.handle('queryId', 'foo', 'bar');
+    handler.handle({ queryId: 'queryId', field: 'foo', value: 'bar' });
 
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT foo:bar');
   });
@@ -47,7 +47,7 @@ describe('ExcludeFromQueryHandler', () => {
     QueriesStore.getInitialState.mockReturnValue(mockQueries('queryId', 'answer:42'));
 
     const handler = new ExcludeFromQueryHandler();
-    handler.handle('queryId', 'do', 'panic');
+    handler.handle({ queryId: 'queryId', field: 'do', value: 'panic' });
 
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
   });
@@ -56,7 +56,7 @@ describe('ExcludeFromQueryHandler', () => {
     QueriesStore.getInitialState.mockReturnValue(mockQueries('queryId', '*'));
 
     const handler = new ExcludeFromQueryHandler();
-    handler.handle('queryId', 'something', 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar');
+    handler.handle({ queryId: 'queryId', field: 'something', value: 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar' });
 
     expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'NOT something:"foo && || : \\\\ / + - ! ( ) { } [ ] ^ \\" ~ * ? bar"');
   });

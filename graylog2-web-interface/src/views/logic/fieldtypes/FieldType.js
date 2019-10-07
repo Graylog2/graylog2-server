@@ -16,6 +16,9 @@ export type FieldTypeJSON = {
   index_names: Array<string>
 };
 
+export type FieldName = string;
+export type FieldValue = any;
+
 class FieldType {
   value: Immutable.Map<string, *>;
 

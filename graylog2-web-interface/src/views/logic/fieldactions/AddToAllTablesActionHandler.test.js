@@ -43,7 +43,7 @@ describe('AddToAllTablesActionHandler', () => {
       expect(newWidgets).toEqual(expectedWidgets);
       return Promise.resolve();
     }));
-    AddToAllTablesActionHandler('foo', 'author', FieldTypes.STRING(), {});
+    AddToAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
     expect(WidgetActions.updateWidgets).toBeCalled();
   });
 });
