@@ -5,15 +5,15 @@ import styled from 'styled-components';
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const Button = ({ active, bsStyle, ...props }) => {
+const Button = React.forwardRef(({ active, bsStyle, ...props }, ref) => {
   const StyledButton = styled(BootstrapButton)`
     ${buttonStyles({ active })};
   `;
 
   return (
-    <StyledButton bsStyle={bsStyle} {...props} />
+    <StyledButton bsStyle={bsStyle} {...props} ref={ref} />
   );
-};
+});
 
 Button.propTypes = propTypes;
 
