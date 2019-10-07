@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { useTheme } from 'theme/GraylogThemeContext';
 import buttonStyles from './styles/buttonStyles';
 
-const Button = ({ active, bsStyle, ...props }) => {
+const Button = React.forwardRef(({ active, bsStyle, ...props }, ref) => {
   const { colors, utility } = useTheme();
 
   const StyledButton = styled(BootstrapButton)`
@@ -15,9 +15,9 @@ const Button = ({ active, bsStyle, ...props }) => {
   `;
 
   return (
-    <StyledButton active={active} bsStyle={bsStyle} {...props} />
+    <StyledButton active={active} bsStyle={bsStyle} ref={ref} {...props} />
   );
-};
+});
 
 Button.propTypes = {
   /* NOTE: need props so we can set default styles */
