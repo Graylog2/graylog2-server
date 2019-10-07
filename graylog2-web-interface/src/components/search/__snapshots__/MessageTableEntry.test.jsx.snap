@@ -164,10 +164,10 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                       className="message-field-actions pull-right"
                     >
                       <div
-                        className="dropdown btn-group btn-group-xs"
+                        className="dropdown btn-group btn-group-xs btn-group-default"
                       >
                         <button
-                          className="btn btn-xs btn-default"
+                          className="SplitButton__StyledSplitButton-sc-72s76o-0 iLEGBE btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -368,10 +368,10 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                       className="message-field-actions pull-right"
                     >
                       <div
-                        className="dropdown btn-group btn-group-xs"
+                        className="dropdown btn-group btn-group-xs btn-group-default"
                       >
                         <button
-                          className="btn btn-xs btn-default"
+                          className="SplitButton__StyledSplitButton-sc-72s76o-0 iLEGBE btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
