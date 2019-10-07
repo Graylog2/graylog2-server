@@ -106,12 +106,14 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       type="submit"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -192,12 +194,14 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       type="reset"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="reset-button"
                           forwardedComponent={
@@ -950,12 +954,14 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       type="submit"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -1036,12 +1042,14 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       type="reset"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="reset-button"
                           forwardedComponent={
@@ -1739,12 +1747,14 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       type="submit"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="submit-button"
                         disabled={false}
                         type="submit"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="submit-button"
                           disabled={false}
@@ -1825,12 +1835,14 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       type="reset"
                     >
                       <Button__StyledButton
+                        active={false}
                         bsStyle="default"
                         className="reset-button"
                         onClick={[Function]}
                         type="reset"
                       >
                         <StyledComponent
+                          active={false}
                           bsStyle="default"
                           className="reset-button"
                           forwardedComponent={
