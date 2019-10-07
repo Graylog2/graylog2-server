@@ -11,6 +11,7 @@ import {
   IfPermitted,
   PaginatedList,
   SearchForm,
+  Spinner,
 } from 'components/common';
 import Routes from 'routing/Routes';
 
@@ -21,9 +22,16 @@ class EventNotifications extends React.Component {
     notifications: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
     query: PropTypes.string.isRequired,
+    testResult: PropTypes.shape({
+      isLoading: PropTypes.bool,
+      id: PropTypes.string,
+      error: PropTypes.bool,
+      message: PropTypes.string,
+    }).isRequired,
     onPageChange: PropTypes.func.isRequired,
     onQueryChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    onTest: PropTypes.func.isRequired,
   };
 
   renderEmptyContent = () => {
@@ -54,35 +62,61 @@ class EventNotifications extends React.Component {
   };
 
   formatNotification = (notifications) => {
-    const { onDelete } = this.props;
+    const { testResult } = this.props;
 
     return notifications.map((notification) => {
-      const actions = (
-        <React.Fragment>
-          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
-            <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
-              <Button bsStyle="info">Edit</Button>
-            </IfPermitted>
-          </LinkContainer>
-          <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-            <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
-              <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
-            </DropdownButton>
-          </IfPermitted>
-        </React.Fragment>
-      );
+      const isTestLoading = testResult.id === notification.id && testResult.isLoading;
+      const actions = this.formatActions(notification, isTestLoading);
 
       const plugin = this.getNotificationPlugin(notification.config.type);
+      const content = testResult.id === notification.id ? (
+        <Col md={12}>
+          {testResult.isLoading ? (
+            <Spinner text="Testing Notification..." />
+          ) : (
+            <p className={testResult.error ? 'text-danger' : 'text-success'}>
+              <b>{testResult.error ? 'Error' : 'Success'}:</b> {testResult.message}
+            </p>
+          )}
+        </Col>
+      ) : null;
 
       return (
         <EntityListItem key={`event-definition-${notification.id}`}
                         title={notification.title}
                         titleSuffix={plugin.displayName || notification.config.type}
                         description={notification.description || <em>No description given</em>}
-                        actions={actions} />
+                        actions={actions}
+                        contentRow={content} />
       );
     });
   };
+
+  formatActions(notification, isTestLoading) {
+    const { onDelete, onTest } = this.props;
+    return (
+      <React.Fragment>
+        <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
+          <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
+            <Button bsStyle="info">Edit</Button>
+          </IfPermitted>
+        </LinkContainer>
+        <IfPermitted permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}>
+          <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
+            <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
+              <MenuItem disabled={isTestLoading} onClick={onTest(notification)}>
+                {isTestLoading ? 'Testing...' : 'Test Notification'}
+              </MenuItem>
+            </IfPermitted>
+            <MenuItem divider />
+            <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
+              <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
+            </IfPermitted>
+          </DropdownButton>
+        </IfPermitted>
+      </React.Fragment>
+    );
+  }
 
   render() {
     const { notifications, pagination, query, onPageChange, onQueryChange } = this.props;

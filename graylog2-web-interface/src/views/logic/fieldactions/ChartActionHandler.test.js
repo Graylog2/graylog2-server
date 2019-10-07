@@ -30,7 +30,7 @@ describe('ChartActionHandler', () => {
     it('uses Unknown if FieldTypeStore returns nothing', () => {
       FieldTypesStore.getInitialState.mockReturnValue(undefined);
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -40,7 +40,7 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.Map({}),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -57,7 +57,7 @@ describe('ChartActionHandler', () => {
         }),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
@@ -72,7 +72,7 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.fromJS({}),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
     });
@@ -87,7 +87,7 @@ describe('ChartActionHandler', () => {
         }),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -100,7 +100,7 @@ describe('ChartActionHandler', () => {
         queryFields: Immutable.fromJS({}),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, {});
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
 
       expect(pivotForField).toHaveBeenCalledWith('timestamp', FieldType.Unknown);
     });
@@ -124,7 +124,7 @@ describe('ChartActionHandler', () => {
         }),
       });
 
-      ChartActionHandler('queryId', 'somefield', emptyFieldType, { widget: origWidget });
+      ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: { widget: origWidget } });
 
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 

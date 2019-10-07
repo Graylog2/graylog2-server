@@ -1,17 +1,10 @@
 // @flow strict
-import FieldType from '../fieldtypes/FieldType';
-import type { ActionContexts } from '../ActionContext';
+import type {
+  ActionHandler,
+  ActionHandlerArguments,
+  ActionHandlerConditions,
+} from 'views/components/actions/ActionHandler';
 
-export type FieldActionHandlerConditionProps = {
-  context: ActionContexts,
-  name: string,
-  type: FieldType,
-};
+export type FieldActionHandlerCondition = (ActionHandlerArguments) => boolean;
 
-export type FieldActionHandlerCondition = (FieldActionHandlerConditionProps) => boolean;
-
-type Conditions = {
-  condition?: FieldActionHandlerCondition,
-  hide?: FieldActionHandlerCondition,
-}
-export type FieldActionHandler = ((string, string, FieldType, ActionContexts) => Promise<*>) & Conditions;
+export type FieldActionHandler = ActionHandler & ActionHandlerConditions;

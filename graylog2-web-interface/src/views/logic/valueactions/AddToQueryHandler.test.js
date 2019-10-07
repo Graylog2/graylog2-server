@@ -6,10 +6,12 @@ import { QueriesActions, QueriesStore } from 'views/stores/QueriesStore';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Query from 'views/logic/queries/Query';
 import AddToQueryHandler from './AddToQueryHandler';
+import View from '../views/View';
 
 jest.mock('views/stores/QueriesStore', () => ({ QueriesStore: {}, QueriesActions: {} }));
 
 describe('AddToQueryHandler', () => {
+  const view = View.create().toBuilder().type(View.Type.Search).build();
   let queriesStoreListen;
   let queries;
   beforeEach(() => {
@@ -25,7 +27,13 @@ describe('AddToQueryHandler', () => {
 
     const addToQueryHandler = new AddToQueryHandler();
 
-    return addToQueryHandler.handle('queryId', 'timestamp', '2019-01-17T11:00:09.025Z', new FieldType('date', [], []))
+    return addToQueryHandler.handle({
+      queryId: 'queryId',
+      field: 'timestamp',
+      value: '2019-01-17T11:00:09.025Z',
+      type: new FieldType('date', [], []),
+      contexts: { view },
+    })
       .then(() => {
         expect(QueriesActions.query).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17 11:00:09.025"');
       });
@@ -44,7 +52,7 @@ describe('AddToQueryHandler', () => {
 
     queriesStoreListen(Immutable.Map({ anotherQueryId: newQuery }));
 
-    return addToQueryHandler.handle('anotherQueryId', 'bar', 42, new FieldType('keyword', [], []))
+    return addToQueryHandler.handle({ queryId: 'anotherQueryId', field: 'bar', value: 42, type: new FieldType('keyword', [], []), contexts: { view } })
       .then(() => {
         expect(QueriesActions.query).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
       });

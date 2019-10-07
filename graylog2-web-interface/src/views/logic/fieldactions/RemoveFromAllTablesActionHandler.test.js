@@ -42,7 +42,7 @@ describe('RemoveFromAllTablesActionHandler', () => {
       expect(newWidgets).toEqual(expectedWidgets);
       return Promise.resolve();
     }));
-    RemoveFromAllTablesActionHandler('foo', 'author', FieldTypes.STRING(), {});
+    RemoveFromAllTablesActionHandler({ queryId: 'foo', field: 'author', type: FieldTypes.STRING(), contexts: {} });
     expect(WidgetActions.updateWidgets).toBeCalled();
   });
 });

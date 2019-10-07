@@ -35,7 +35,6 @@ export {
   ProgressBar,
   Radio,
   Row,
-  SplitButton,
   Tab,
   Table,
   Tabs,

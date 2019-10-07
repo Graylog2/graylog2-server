@@ -18,7 +18,7 @@ describe('AggregateActionHandler', () => {
   });
   it('uses field type when generating widget', () => {
     WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
-    AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), {});
+    AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: {} });
 
     expect(WidgetActions.create).toHaveBeenCalled();
     const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
@@ -30,7 +30,7 @@ describe('AggregateActionHandler', () => {
     WidgetActions.create = mockAction(jest.fn((widget: Widget) => Promise.resolve(widget)));
     const filter = "author: 'Vanth'";
     const origWidget = Widget.builder().filter(filter).build();
-    AggregateActionHandler('queryId', 'foo', new FieldType('keyword', [], []), { widget: origWidget });
+    AggregateActionHandler({ queryId: 'queryId', field: 'foo', type: new FieldType('keyword', [], []), contexts: { widget: origWidget } });
 
     expect(WidgetActions.create).toHaveBeenCalled();
     const widget: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
