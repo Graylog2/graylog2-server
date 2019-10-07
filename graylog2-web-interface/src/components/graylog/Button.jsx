@@ -7,7 +7,6 @@ import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
 const Button = React.forwardRef(({ active, bsStyle, ...props }, ref) => {
-
   const StyledButton = styled(BootstrapButton)`
     ${buttonStyles({ active })};
   `;
