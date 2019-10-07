@@ -13,6 +13,7 @@ export type PluginMetadata = {
   url: string,
 };
 export type Requirements = { [string]: PluginMetadata };
+export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
 
 export type ViewType = 'SEARCH' | 'DASHBOARD';
 
@@ -24,7 +25,7 @@ type InternalState = {
   description: string,
   search: Search,
   properties: Properties,
-  state: Immutable.Map<QueryId, ViewState>,
+  state: ViewStateMap,
   createdAt: Date,
   owner: string,
   requires: Requirements,
@@ -60,7 +61,7 @@ export default class View {
     description: string,
     search: Search,
     properties: Properties,
-    state: Immutable.Map<QueryId, ViewState>,
+    state: ViewStateMap,
     createdAt: Date,
     owner: string,
     requires: Requirements) {
@@ -112,7 +113,7 @@ export default class View {
     return this._value.properties;
   }
 
-  get state(): Immutable.Map<QueryId, ViewState> {
+  get state(): ViewStateMap {
     return this._value.state;
   }
 
@@ -171,7 +172,7 @@ export default class View {
   static fromJSON(value: ViewJson): View {
     // eslint-disable-next-line camelcase
     const { id, type, title, summary, description, properties, state, created_at, owner, requires } = value;
-    const viewState: Immutable.Map<QueryId, ViewState> = Immutable.Map(state).map(ViewState.fromJSON);
+    const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON);
     return View.create()
       .toBuilder()
       .id(id)
@@ -233,7 +234,7 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: Immutable.Map<string, ViewState>): Builder {
+  state(value: ViewStateMap): Builder {
     return new Builder(this.value.set('state', Immutable.fromJS(value)));
   }
 
