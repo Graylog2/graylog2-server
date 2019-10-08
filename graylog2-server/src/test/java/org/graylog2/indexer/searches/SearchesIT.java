@@ -69,14 +69,18 @@ import org.mockito.junit.MockitoRule;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
@@ -620,6 +624,32 @@ public class SearchesIT extends ElasticsearchBase {
                 .containsExactly(indexRange0, indexRange1);
         assertThat(searches.determineAffectedIndicesWithRanges(relativeRange, null))
                 .containsExactly(indexRange0, indexRange1);
+    }
+
+    @Test
+    public void determineAffectedIndicesWithRangesExcludeEvents() throws Exception {
+        final Set<IndexSet> eventIndexSets = Arrays.asList("gl-events", "gl-system-events").stream().
+                map(prefix -> new TestIndexSet(indexSet.getConfig().toBuilder()
+                        .indexPrefix(prefix)
+                        .indexTemplateType(IndexSetConfig.TemplateType.EVENTS)
+                        .build())).collect(Collectors.toSet());
+        when(indexSetRegistry.getForIndices(anyCollection())).thenReturn(eventIndexSets);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final MongoIndexRange indexRange0 = MongoIndexRange.create("gl-events_0", now, now.plusDays(1), now, 0);
+        final MongoIndexRange indexRange1 = MongoIndexRange.create("gl-system-events_2", now.plusDays(1), now.plusDays(2), now, 0);
+        final MongoIndexRange indexRange2 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
+        final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)
+                .add(indexRange0)
+                .add(indexRange1)
+                .add(indexRange2)
+                .build();
+
+        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
+
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+
+        assertThat(searches.determineAffectedIndicesWithRanges(absoluteRange, null))
+                .containsExactly(indexRange2);
     }
 
     @Test
