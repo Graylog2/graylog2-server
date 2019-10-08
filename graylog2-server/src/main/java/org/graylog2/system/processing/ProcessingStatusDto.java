@@ -58,7 +58,7 @@ public abstract class ProcessingStatusDto {
     @JsonProperty(FIELD_INPUT_JOURNAL)
     public abstract JournalInfo inputJournal();
 
-    public static ProcessingStatusDto of(String nodeId, ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt) {
+    public static ProcessingStatusDto of(String nodeId, ProcessingStatusRecorder processingStatusRecorder, DateTime updatedAt, boolean messageJournalEnabled) {
         return builder()
                 .nodeId(nodeId)
                 .updatedAt(updatedAt)
@@ -72,6 +72,7 @@ public abstract class ProcessingStatusDto {
                         .uncommittedEntries(processingStatusRecorder.getJournalInfoUncommittedEntries())
                         .readMessages1mRate(processingStatusRecorder.getJournalInfoReadMessages1mRate())
                         .writtenMessages1mRate(processingStatusRecorder.getJournalInfoWrittenMessages1mRate())
+                        .journalEnabled(messageJournalEnabled)
                         .build())
                 .build();
     }
@@ -162,6 +163,7 @@ public abstract class ProcessingStatusDto {
         static final String FIELD_UNCOMMITTED_ENTRIES = "uncommitted_entries";
         private static final String FIELD_READ_MESSAGES_1M_RATE = "read_messages_1m_rate";
         static final String FIELD_WRITTEN_MESSAGES_1M_RATE = "written_messages_1m_rate";
+        static final String FIELD_JOURNAL_ENABLED = "journal_enabled";
 
         @JsonProperty(FIELD_UNCOMMITTED_ENTRIES)
         public abstract long uncommittedEntries();
@@ -171,6 +173,9 @@ public abstract class ProcessingStatusDto {
 
         @JsonProperty(FIELD_WRITTEN_MESSAGES_1M_RATE)
         public abstract double writtenMessages1mRate();
+
+        @JsonProperty(FIELD_JOURNAL_ENABLED)
+        public abstract boolean journalEnabled();
 
         public static Builder builder() {
             return Builder.create();
@@ -183,7 +188,8 @@ public abstract class ProcessingStatusDto {
                 return new AutoValue_ProcessingStatusDto_JournalInfo.Builder()
                         .uncommittedEntries(0)
                         .readMessages1mRate(0d)
-                        .writtenMessages1mRate(0d);
+                        .writtenMessages1mRate(0d)
+                        .journalEnabled(true);
             }
 
             @JsonProperty(FIELD_UNCOMMITTED_ENTRIES)
@@ -194,6 +200,9 @@ public abstract class ProcessingStatusDto {
 
             @JsonProperty(FIELD_WRITTEN_MESSAGES_1M_RATE)
             public abstract Builder writtenMessages1mRate(double writtenMessages1mRate);
+
+            @JsonProperty(FIELD_JOURNAL_ENABLED)
+            public abstract Builder journalEnabled(boolean journalEnabled);
 
             public abstract JournalInfo build();
         }
