@@ -66,7 +66,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -82,7 +82,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -247,7 +247,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -263,7 +263,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -437,7 +437,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -453,7 +453,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -535,7 +535,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -551,7 +551,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
