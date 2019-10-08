@@ -180,7 +180,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -196,7 +196,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -270,7 +270,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -286,7 +286,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -548,7 +548,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -564,7 +564,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -638,7 +638,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -654,7 +654,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 cBCVOY reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
