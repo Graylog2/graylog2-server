@@ -15,7 +15,8 @@
     "flow-check": "flow check",
     "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
-    "build:stats": "disable_plugins=true webpack --profile --json > stats.json",
+    "build:stats": "disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
+    "build:analyze": "echo \"THIS MAY TAKE A FEW MOMENTS\" && yarn build && yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode='static' --report=\"./webpack/stats-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint --ext js,jsx src",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
@@ -178,6 +179,7 @@
     "url-loader": "^1.0.1",
     "webpack": "^4.39.3",
     "webpack-bundle-analyzer": "^3.5.2",
+    "webpack-cli": "^3.3.9",
     "webpack-dev-middleware": "^3.7.1",
     "webpack-dev-server": "^3.8.0",
     "webpack-hot-middleware": "^2.25.0",
