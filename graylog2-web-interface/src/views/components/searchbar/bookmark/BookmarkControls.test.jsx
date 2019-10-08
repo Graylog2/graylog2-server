@@ -4,10 +4,11 @@ import { mount } from 'enzyme';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
-import BookmarkControls from './BookmarkControls';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+
+import BookmarkControls from './BookmarkControls';
 
 describe('BookmarkControls', () => {
   describe('Button handling', () => {
