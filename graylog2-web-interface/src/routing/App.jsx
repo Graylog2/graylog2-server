@@ -17,7 +17,7 @@ import 'dc/dc.css';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const App = ({ children, currentUser, location }) => {
-  if (!currentUser) {
+  if (Object.keys(currentUser).length > 0) {
     return <Spinner />;
   }
 
@@ -52,7 +52,7 @@ App.propTypes = {
 };
 
 App.defaultProps = {
-  currentUser: undefined,
+  currentUser: {},
 };
 
 export default connect(App, { currentUser: CurrentUserStore }, ({ currentUser: { currentUser } = {} }) => ({ currentUser }));
