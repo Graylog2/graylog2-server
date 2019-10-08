@@ -16,7 +16,7 @@
     "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "build:stats": "disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
-    "build:analyze": "echo \"THIS MAY TAKE A FEW MOMENTS\" && yarn build && yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode='static' --report=\"./webpack/stats-$(git rev-parse --abbrev-ref HEAD).html\"",
+    "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint --ext js,jsx src",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"

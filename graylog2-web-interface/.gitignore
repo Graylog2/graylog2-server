@@ -14,3 +14,4 @@ cache
 
 # Webpack Stats & Analysis Files
 webpack/stats-*
+webpack/analysis-*
