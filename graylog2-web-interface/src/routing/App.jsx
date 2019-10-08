@@ -17,7 +17,7 @@ import 'dc/dc.css';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const App = ({ children, currentUser, location }) => {
-  if (Object.keys(currentUser).length === 0) {
+  if (!currentUser) {
     return <Spinner />;
   }
 
