@@ -16,8 +16,8 @@ import 'dc/dc.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const App = ({ children, currentUser: { currentUser }, location }) => {
-  if (!currentUser) {
+const App = ({ children, currentUser, location }) => {
+  if (Object.keys(currentUser).length === 0) {
     return <Spinner />;
   }
 
@@ -44,11 +44,9 @@ App.propTypes = {
     PropTypes.element,
   ]).isRequired,
   currentUser: PropTypes.shape({
-    currentUser: PropTypes.shape({
-      full_name: PropTypes.string,
-      username: PropTypes.string,
-      permissions: PropTypes.array,
-    }),
+    full_name: PropTypes.string,
+    username: PropTypes.string,
+    permissions: PropTypes.array,
   }),
   location: PropTypes.object.isRequired,
 };
@@ -57,4 +55,4 @@ App.defaultProps = {
   currentUser: undefined,
 };
 
-export default connect(App, { currentUser: CurrentUserStore });
+export default connect(App, { currentUser: CurrentUserStore }, ({ currentUser: { currentUser } = {} }) => ({ currentUser }));
