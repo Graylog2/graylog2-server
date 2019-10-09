@@ -151,7 +151,6 @@ class BookmarkControls extends React.Component<Props, State> {
     } else {
       title = loaded ? 'Saved search' : 'Save search';
     }
-
     const bookmarkForm = showForm && (
       <BookmarkForm onChangeTitle={this.onChangeTitle}
                     target={this.formTarget}
@@ -170,9 +169,11 @@ class BookmarkControls extends React.Component<Props, State> {
             <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
               <i className="fa fa-eraser" />
             </Button>
-            <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
-            </Button>
+            <span ref={(elem) => { this.formTarget = elem; }}>
+              <Button title={title} onClick={this.toggleFormModal}>
+                <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+              </Button>
+            </span>
             {bookmarkForm}
           </React.Fragment>
           <Button title="List of saved searches"
