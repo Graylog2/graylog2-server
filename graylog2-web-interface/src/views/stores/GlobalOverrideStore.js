@@ -98,8 +98,7 @@ export const GlobalOverrideStore = singletonStore(
       return promise;
     },
     reset() {
-      const newGlobalOverride = undefined;
-      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+      const promise = this._propagateNewGlobalOverride(undefined);
       GlobalOverrideActions.reset.promise(promise);
       return promise;
     },
