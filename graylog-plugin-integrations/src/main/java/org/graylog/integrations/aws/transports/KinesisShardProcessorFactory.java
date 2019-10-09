@@ -21,6 +21,7 @@ import software.amazon.kinesis.lifecycle.events.LeaseLostInput;
 import software.amazon.kinesis.lifecycle.events.ProcessRecordsInput;
 import software.amazon.kinesis.lifecycle.events.ShardEndedInput;
 import software.amazon.kinesis.lifecycle.events.ShutdownRequestedInput;
+import software.amazon.kinesis.processor.RecordProcessorCheckpointer;
 import software.amazon.kinesis.processor.ShardRecordProcessor;
 import software.amazon.kinesis.processor.ShardRecordProcessorFactory;
 import software.amazon.kinesis.retrieval.KinesisClientRecord;
@@ -109,26 +110,29 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
             // Periodically checkpoint the stream.
             if (lastCheckpoint.plusMinutes(1).isBeforeNow()) {
                 lastCheckpoint = DateTime.now();
-                checkpoint(processRecordsInput, null);
+                checkpoint(processRecordsInput.checkpointer(), null);
             }
         }
 
         @Override
         public void leaseLost(LeaseLostInput leaseLostInput) {
-
+            LOG.debug("Lease lost.");
         }
 
         @Override
         public void shardEnded(ShardEndedInput shardEndedInput) {
-
+            // Checkpointing MUST be performed when the shard ends. See Javadoc on interface.
+            checkpoint(shardEndedInput.checkpointer(), null);
         }
 
         @Override
         public void shutdownRequested(ShutdownRequestedInput shutdownRequestedInput) {
             LOG.debug("Beginning shutdown Kinesis worker for stream [{}].", kinesisStreamName);
+            // The lease is still held, so checkpoint before shutting down.
+            checkpoint(shutdownRequestedInput.checkpointer(), null);
         }
 
-        private void checkpoint(ProcessRecordsInput processRecordsInput, String lastSequence) {
+        private void checkpoint(RecordProcessorCheckpointer checkpointer, String lastSequence ) {
             LOG.debug("Checkpointing stream [{}]", kinesisStreamName);
             final Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
                     .retryIfExceptionOfType(ThrottlingException.class)
@@ -148,9 +152,9 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
                 retryer.call(() -> {
                     try {
                         if (lastSequence != null) {
-                            processRecordsInput.checkpointer().checkpoint(lastSequence);
+                            checkpointer.checkpoint(lastSequence);
                         } else {
-                            processRecordsInput.checkpointer().checkpoint();
+                            checkpointer.checkpoint();
                         }
                     } catch (InvalidStateException e) {
                         LOG.error("Couldn't save checkpoint to DynamoDB table used by the Kinesis client library - check database table", e);
