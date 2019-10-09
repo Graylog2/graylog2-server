@@ -30,7 +30,7 @@ describe('NumberVisualization', () => {
         key: ['sum(lines_add)'],
         rollup: true,
         source: 'row-leaf',
-        value: '2134342',
+        value: 2134342,
       },
     ],
   }];
@@ -46,7 +46,7 @@ describe('NumberVisualization', () => {
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
-  it('should mount a number visualization', () => {
+  it('changes font size upon resize', () => {
     const wrapper = mount(<NumberVisualization data={data}
                                                width={300}
                                                height={300}
@@ -62,5 +62,45 @@ describe('NumberVisualization', () => {
     wrapper.setProps({ height: 125, width: 125 });
 
     expect(wrapper.state().fontSize).toBe(22);
+  });
+  it('renders 0 if value is 0', () => {
+    const dataWithZeroValue = [{
+      key: [],
+      source: 'leaf',
+      values: [
+        {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value: 0,
+        },
+      ],
+    }];
+    const wrapper = mount(<NumberVisualization data={dataWithZeroValue}
+                                               width={300}
+                                               height={300}
+                                               fields={fields}
+                                               currentView={currentView} />);
+    expect(wrapper).toHaveText('0');
+  });
+  it('renders N/A if value is null', () => {
+    const dataWithZeroValue = [{
+      key: [],
+      source: 'leaf',
+      values: [
+        {
+          key: ['count()'],
+          rollup: true,
+          source: 'row-leaf',
+          value: null,
+        },
+      ],
+    }];
+    const wrapper = mount(<NumberVisualization data={dataWithZeroValue}
+                                               width={300}
+                                               height={300}
+                                               fields={fields}
+                                               currentView={currentView} />);
+    expect(wrapper).toHaveText('N/A');
   });
 });
