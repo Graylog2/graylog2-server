@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup } from 'components/graylog';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -170,9 +170,11 @@ class BookmarkControls extends React.Component<Props, State> {
             <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
               <i className="fa fa-eraser" />
             </Button>
-            <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
-            </Button>
+            <span ref={(elem) => { this.formTarget = elem; }}>
+              <Button title={title} onClick={this.toggleFormModal}>
+                <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+              </Button>
+            </span>
             {bookmarkForm}
           </React.Fragment>
           <Button title="List of saved searches"
