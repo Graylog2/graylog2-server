@@ -32,6 +32,7 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
+import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,14 +106,15 @@ public class HTTPEventNotification implements EventNotification {
 
     private EventNotificationModelData getModel(EventNotificationContext ctx, ImmutableList<MessageSummary> backlog) {
         final Optional<EventDefinitionDto> definitionDto = ctx.eventDefinition();
+        final Optional<JobTriggerDto> jobTriggerDto = ctx.jobTrigger();
 
         return EventNotificationModelData.builder()
                 .eventDefinitionId(definitionDto.map(EventDefinitionDto::id).orElse(UNKNOWN))
                 .eventDefinitionType(definitionDto.map(d -> d.config().type()).orElse(UNKNOWN))
                 .eventDefinitionTitle(definitionDto.map(EventDefinitionDto::title).orElse(UNKNOWN))
                 .eventDefinitionDescription(definitionDto.map(EventDefinitionDto::description).orElse(UNKNOWN))
-                .jobDefinitionId(ctx.jobTrigger().jobDefinitionId())
-                .jobTriggerId(ctx.jobTrigger().id())
+                .jobDefinitionId(jobTriggerDto.map(JobTriggerDto::jobDefinitionId).orElse(UNKNOWN))
+                .jobTriggerId(jobTriggerDto.map(JobTriggerDto::id).orElse(UNKNOWN))
                 .event(ctx.event())
                 .backlog(backlog)
                 .build();

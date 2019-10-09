@@ -24,6 +24,7 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.notifications.DBNotificationService;
+import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.NotificationDto;
@@ -51,10 +52,12 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,6 +85,9 @@ public class LegacyAlertConditionMigratorTest {
     private DBNotificationService notificationService;
     private NotificationResourceHandler notificationResourceHandler;
 
+    @Mock
+    private Map<String, EventNotification.Factory> eventNotificationFactories;
+
     @Before
     public void setUp() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -105,7 +111,7 @@ public class LegacyAlertConditionMigratorTest {
 
         this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class));
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
-        this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService));
+        this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
         this.migrator = new LegacyAlertConditionMigrator(mongoConnection, eventDefinitionHandler, notificationResourceHandler, notificationService, CHECK_INTERVAL);
     }
 

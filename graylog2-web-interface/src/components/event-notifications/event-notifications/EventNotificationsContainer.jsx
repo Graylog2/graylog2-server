@@ -21,8 +21,18 @@ class EventNotificationsContainer extends React.Component {
     notifications: undefined,
   };
 
+  state = {
+    testResult: {},
+  };
+
   componentDidMount() {
     this.fetchData({});
+  }
+
+  componentWillUnmount() {
+    if (this.testPromise) {
+      this.testPromise.cancel();
+    }
   }
 
   fetchData = ({ page, pageSize, query }) => {
@@ -44,7 +54,6 @@ class EventNotificationsContainer extends React.Component {
     promise.finally(callback);
   };
 
-
   handleDelete = (definition) => {
     return () => {
       if (window.confirm(`Are you sure you want to delete "${definition.title}"?`)) {
@@ -53,8 +62,44 @@ class EventNotificationsContainer extends React.Component {
     };
   };
 
+  handleTest = (definition) => {
+    return () => {
+      this.setState({ testResult: { isLoading: true, id: definition.id } });
+      let testResult = { isLoading: false };
+
+      if (this.testPromise) {
+        this.testPromise.cancel();
+      }
+      this.testPromise = EventNotificationsActions.testPersisted(definition);
+      this.testPromise
+        .then(
+          (response) => {
+            testResult = {
+              isLoading: false,
+              id: definition.id,
+              error: false,
+              message: 'Notification was executed successfully.',
+            };
+            return response;
+          },
+          (errorResponse) => {
+            testResult = { isLoading: false, id: definition.id, error: true };
+            if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
+              testResult.message = errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
+            }
+            return errorResponse;
+          },
+        )
+        .finally(() => {
+          this.setState({ testResult: testResult });
+          this.testPromise = undefined;
+        });
+    };
+  };
+
   render() {
     const { notifications } = this.props;
+    const { testResult } = this.state;
 
     if (!notifications.notifications) {
       return <Spinner text="Loading Notifications information..." />;
@@ -64,9 +109,11 @@ class EventNotificationsContainer extends React.Component {
       <EventNotifications notifications={notifications.notifications}
                           pagination={notifications.pagination}
                           query={notifications.query}
+                          testResult={testResult}
                           onPageChange={this.handlePageChange}
                           onQueryChange={this.handleQueryChange}
-                          onDelete={this.handleDelete} />
+                          onDelete={this.handleDelete}
+                          onTest={this.handleTest} />
     );
   }
 }
