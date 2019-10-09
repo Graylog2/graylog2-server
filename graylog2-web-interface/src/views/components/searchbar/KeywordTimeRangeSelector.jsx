@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Row, FormControl, FormGroup, InputGroup } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import Immutable from 'immutable';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -10,8 +10,13 @@ const ToolsStore = StoreProvider.getStore('Tools');
 
 export default class KeywordTimeRangeSelector extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     value: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    disabled: false,
   };
 
   constructor(props) {
@@ -53,7 +58,8 @@ export default class KeywordTimeRangeSelector extends React.Component {
     } else {
       ToolsStore.testNaturalDate(value)
         .then((data) => {
-          this.props.onChange('keyword', value);
+          const { onChange } = this.props;
+          onChange('keyword', value);
           this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
         })
         .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
@@ -62,6 +68,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
 
   render() {
     const { keywordPreview, validationState, value } = this.state;
+    const { disabled } = this.props;
     const { from, to } = keywordPreview.toObject();
     const keywordPreviewElement = keywordPreview.size > 0 && (
       <Alert bsStyle="info" style={{ height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0 }}>
@@ -78,6 +85,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
                 <FormControl type="text"
                              className="input-sm"
                              name="keyword"
+                             disabled={disabled}
                              placeholder="Last week"
                              onChange={this._keywordSearchChanged}
                              required
