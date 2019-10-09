@@ -9,6 +9,7 @@ import { ViewStore, ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
@@ -28,6 +29,8 @@ class BookmarkControls extends React.Component<Props, State> {
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
   };
+
+  static contextType = ViewLoaderContext;
 
   formTarget: any;
 
@@ -103,7 +106,7 @@ class BookmarkControls extends React.Component<Props, State> {
 
     ViewManagementActions.create(newView)
       .then(() => {
-        const { loaderFunc } = this.context;
+        const loaderFunc = this.context;
         loaderFunc(newView.id);
       })
       .then(this.toggleFormModal)
