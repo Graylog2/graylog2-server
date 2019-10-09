@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, ControlLabel, FormGroup } from 'react-bootstrap';
+import { Checkbox, ControlLabel, FormGroup } from 'components/graylog';
 
 import TypeSpecificTimeHistogramConfiguration from './TypeSpecificTimeHistogramConfiguration';
 

@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import deepEqual from 'deep-equal';
 
@@ -14,6 +13,7 @@ import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
+import { Row, Col, Alert, Button } from 'components/graylog';
 import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';

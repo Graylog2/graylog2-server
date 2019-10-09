@@ -25,7 +25,7 @@ export const QueriesStore = singletonStore(
       this.listenTo(ViewStore, this.onViewStoreChange, this.onViewStoreChange);
     },
 
-    getInitialState() {
+    getInitialState(): Immutable.OrderedMap<QueryId, Query> {
       return this._state();
     },
 

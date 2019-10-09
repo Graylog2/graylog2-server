@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'react-bootstrap';
+import { Checkbox, Col, FormGroup, HelpBlock, Row } from 'components/graylog';
 import lodash from 'lodash';
 
 import { Input } from 'components/bootstrap';

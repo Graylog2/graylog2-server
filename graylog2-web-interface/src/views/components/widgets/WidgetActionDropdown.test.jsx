@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
-import { MenuItem } from 'react-bootstrap';
+import { MenuItem } from 'components/graylog';
 
 import WidgetActionDropdown from './WidgetActionDropdown';
 

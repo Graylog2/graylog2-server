@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Label, OverlayTrigger, Popover } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
 

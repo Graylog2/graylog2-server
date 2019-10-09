@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { Select } from 'components/common';
+import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import EventNotificationFormContainer
   from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 

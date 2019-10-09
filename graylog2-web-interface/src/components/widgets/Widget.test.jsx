@@ -1,8 +1,3 @@
-import {} from 'jquery-ui/ui/version';
-import {} from 'jquery-ui/ui/effect';
-import {} from 'jquery-ui/ui/plugin';
-import {} from 'jquery-ui/ui/widget';
-import {} from 'jquery-ui/ui/widgets/mouse';
 import React from 'react';
 import { mount } from 'enzyme';
 import Widget from 'components/widgets/Widget';
@@ -28,7 +23,7 @@ describe('<Widget />', () => {
                                     locked
                                     shouldUpdate
                                     streamIds={{ 'stream-1': 'stream-1' }} />);
-      expect(wrapper.find('.widget-replay').find('Button').prop('title')).toEqual('Replay search');
+      expect(wrapper.find('.widget-replay').find('Button').at(0).prop('title')).toEqual('Replay search');
       expect(wrapper.find('.widget-edit').exists()).toBeFalsy();
     });
 
@@ -40,7 +35,7 @@ describe('<Widget />', () => {
                                     locked={false}
                                     shouldUpdate
                                     streamIds={{ 'stream-1': 'stream-1' }} />);
-      expect(wrapper.find('.widget-edit').find('Button').prop('title')).toEqual('Edit widget');
+      expect(wrapper.find('.widget-edit').find('Button').at(0).prop('title')).toEqual('Edit widget');
       expect(wrapper.find('.widget-replay').exists()).toBeFalsy();
     });
   });

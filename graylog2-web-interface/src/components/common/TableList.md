@@ -1,7 +1,7 @@
 ```js
 const createReactClass = require('create-react-class');
 const Immutable = require('immutable');
-const Button = require('react-bootstrap').Button;
+const Button = require('components/graylog').Button;
 
 const TableListExample = createReactClass({
   getInitialState() {
@@ -60,7 +60,7 @@ const TableListExample = createReactClass({
 ```js
 const createReactClass = require('create-react-class');
 const Immutable = require('immutable');
-const Button = require('react-bootstrap').Button;
+const Button = require('components/graylog').Button;
 
 const TableListExampleNoBulkActions = createReactClass({
   getInitialState() {

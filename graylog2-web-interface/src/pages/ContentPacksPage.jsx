@@ -1,11 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
 import createReactClass from 'create-react-class';
-import Routes from 'routing/Routes';
-
-import Spinner from 'components/common/Spinner';
-import { Row, Col, Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { Row, Col, ButtonToolbar, Button } from 'components/graylog';
+import Routes from 'routing/Routes';
+import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ContentPacksList from 'components/content-packs/ContentPacksList';
@@ -23,6 +23,7 @@ const ContentPacksPage = createReactClass({
   },
 
   _deleteContentPack(contentPackId) {
+    // eslint-disable-next-line no-alert
     if (window.confirm('You are about to delete this content pack, are you sure?')) {
       ContentPacksActions.delete(contentPackId).then(() => {
         UserNotification.success('Content Pack deleted successfully.', 'Success');
@@ -50,7 +51,9 @@ const ContentPacksPage = createReactClass({
   },
 
   render() {
-    if (!this.state.contentPacks) {
+    const { contentPacks, contentPackMetadata } = this.state;
+
+    if (!contentPacks) {
       return (<Spinner />);
     }
 
@@ -79,8 +82,8 @@ const ContentPacksPage = createReactClass({
           <Row className="content">
             <Col md={12}>
               <div id="react-configuration-bundles">
-                <ContentPacksList contentPacks={this.state.contentPacks}
-                                  contentPackMetadata={this.state.contentPackMetadata}
+                <ContentPacksList contentPacks={contentPacks}
+                                  contentPackMetadata={contentPackMetadata}
                                   onDeletePack={this._deleteContentPack}
                                   onInstall={this._installContentPack} />
               </div>

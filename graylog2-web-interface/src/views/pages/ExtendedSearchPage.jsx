@@ -1,13 +1,11 @@
 // @flow strict
-import * as React from 'react';
-import createReactClass from 'create-react-class';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
+import { Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import QueryBar from 'views/components/QueryBar';
-import SearchBarWithStatus from 'views/components/SearchBarWithStatus';
+import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
   SearchRefreshCondition,
@@ -21,12 +19,17 @@ import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import { SearchActions } from 'views/stores/SearchStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-import CustomPropTypes from 'views/components/CustomPropTypes';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import withPluginEntities from 'views/logic/withPluginEntities';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
+import QueryBar from 'views/components/QueryBar';
+import DashboardSearchBar from 'views/components/DashboardSearchBar';
+import SearchBar from 'views/components/SearchBar';
+import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
+import IfSearch from 'views/components/search/IfSearch';
+import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
@@ -36,83 +39,90 @@ type Props = {
   searchRefreshHooks: Array<SearchRefreshCondition>,
 };
 
-const ExtendedSearchPage = createReactClass({
-  displayName: 'ExtendedSearchPage',
+const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshConditionArguments) => {
+  if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
+    return true;
+  }
+  return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
+};
 
-  propTypes: {
-    executionState: CustomPropTypes.instanceOf(SearchExecutionState).isRequired,
-    route: PropTypes.object.isRequired,
-    searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
-  },
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
+  return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
+    if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
+      FieldTypesActions.all();
+      return SearchActions.execute(executionState);
+    }
+    return Promise.reject(searchMetadata);
+  });
+};
 
-  componentDidMount() {
+const SearchBarWithStatus = WithSearchStatus(SearchBar);
+const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
+
+const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
+
+const ExtendedSearchPage = ({ route, searchRefreshHooks }) => {
+  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
+  useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
     FieldTypesActions.all();
     const { view } = ViewStore.getInitialState();
-    this._refreshIfNotUndeclared(view).then(() => {
-      this.storeListenersUnsubscribes = this.storeListenersUnsubscribes
+    let storeListenersUnsubscribes = Immutable.List();
+    refreshIfNotUndeclared(view).then(() => {
+      storeListenersUnsubscribes = storeListenersUnsubscribes
         .push(SearchActions.refresh.listen(() => {
           const { view: currentView } = ViewStore.getInitialState();
-          this._refreshIfNotUndeclared(currentView);
+          refreshIfNotUndeclared(currentView);
         }))
-        .push(ViewActions.search.completed.listen(this._refreshIfNotUndeclared));
+        .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
-    }, () => {});
+    }, () => {
+    });
 
     StreamsActions.refresh();
-  },
 
-  componentWillUnmount() {
-    style.unuse();
-    this.storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
-  },
+    // Returning cleanup function used when unmounting
+    return () => {
+      style.unuse();
+      storeListenersUnsubscribes.forEach(unsubscribeFunc => unsubscribeFunc());
+    };
+  }, []);
 
-  storeListenersUnsubscribes: Immutable.List(),
-
-  _searchRefreshConditionChain(state: SearchRefreshConditionArguments) {
-    const { searchRefreshHooks } = this.props;
-    if (!searchRefreshHooks || searchRefreshHooks.length === 0) {
-      return true;
-    }
-    return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
-  },
-
-  _refreshIfNotUndeclared(view) {
-    const { executionState } = this.props;
-    return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
-      if (this._searchRefreshConditionChain({ view, searchMetadata, executionState })) {
-        FieldTypesActions.all();
-        return SearchActions.execute(executionState);
-      }
-      return Promise.reject(searchMetadata);
-    });
-  },
-
-  render() {
-    const { route } = this.props;
-    return (
-      <React.Fragment>
+  return (
+    <CurrentViewTypeProvider>
+      <IfDashboard>
         <WindowLeaveMessage route={route} />
-        <HeaderElements />
-        <Row id="main-row">
+      </IfDashboard>
+      <HeaderElements />
+      <Row id="main-row">
+        <IfDashboard>
+          <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
           <QueryBar />
-          <SearchBarWithStatus onExecute={this._refreshIfNotUndeclared} />
+        </IfDashboard>
 
-          <QueryBarElements />
+        <IfSearch>
+          <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+        </IfSearch>
 
+        <QueryBarElements />
+
+        <ViewAdditionalContextProvider>
           <SearchResult />
-        </Row>
-      </React.Fragment>
-    );
-  },
-});
+        </ViewAdditionalContextProvider>
+      </Row>
+    </CurrentViewTypeProvider>
+  );
+};
 
-const ExtendedSearchPageWithExecutionState = connect(ExtendedSearchPage, { executionState: SearchExecutionStateStore });
+ExtendedSearchPage.propTypes = {
+  route: PropTypes.object.isRequired,
+  searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
+};
 
 const mapping = {
   searchRefreshHooks: 'views.hooks.searchRefresh',
 };
 
-export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPageWithExecutionState, mapping);
+export default withPluginEntities<Props, typeof mapping>(ExtendedSearchPage, mapping);

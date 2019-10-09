@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NavItem } from 'react-bootstrap';
+import { NavItem } from 'components/graylog';
 
 // Don't pass active prop, since NavItem should always be inactive
 // eslint-disable-next-line no-unused-vars

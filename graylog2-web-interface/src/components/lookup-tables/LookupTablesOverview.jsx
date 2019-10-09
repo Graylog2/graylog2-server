@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import Routes from 'routing/Routes';
 
+import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
+import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm } from 'components/common';
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 

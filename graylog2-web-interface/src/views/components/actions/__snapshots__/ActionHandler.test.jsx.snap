@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ActionHandler generates a handler from a component-based definition 1`] = `
+<component
+  field="bar"
+  onClose={[Function]}
+  queryId="foo"
+  type={
+    FieldType {
+      "value": Immutable.Map {
+        "type": "unknown",
+        "properties": Immutable.Set [],
+        "indexNames": Immutable.Set [],
+      },
+    }
+  }
+  value={42}
+>
+  <div>
+    Hello world!
+  </div>
+</component>
+`;

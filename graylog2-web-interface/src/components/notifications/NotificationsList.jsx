@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Row, Col } from 'react-bootstrap';
+import { Alert, Row, Col } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
 

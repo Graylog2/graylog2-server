@@ -46,7 +46,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -62,7 +62,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -100,7 +100,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
   </h2>
   <br />
   <button
-    className="btn btn-sm btn-info"
+    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
     disabled={false}
     onClick={[Function]}
     title="Edit Modal"
@@ -152,7 +152,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -168,7 +168,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -245,7 +245,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -261,7 +261,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -354,7 +354,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
   </h2>
   <br />
   <button
-    className="btn btn-sm btn-info"
+    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
     disabled={false}
     onClick={[Function]}
     title="Edit Modal"
@@ -406,7 +406,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -422,7 +422,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -507,7 +507,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                     role="toolbar"
                   >
                     <button
-                      className="btn btn-xs btn-primary"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
                       disabled={false}
                       onClick={[Function]}
                       title="Delete Parameter"
@@ -516,7 +516,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                       Delete
                     </button>
                     <button
-                      className="btn btn-xs btn-info"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-info"
                       disabled={false}
                       onClick={[Function]}
                       title="Edit Modal"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Pagination, Row } from 'react-bootstrap';
+import { Col, Pagination, Row } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
@@ -20,6 +20,7 @@ const AlertNotificationsComponent = createReactClass({
 
   getInitialState() {
     return {
+      allNotifications: undefined,
       streams: undefined,
     };
   },
@@ -30,7 +31,7 @@ const AlertNotificationsComponent = createReactClass({
 
   _loadData() {
     StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
+      this.setState({ streams });
     });
 
     AlertNotificationsActions.available();
@@ -38,7 +39,9 @@ const AlertNotificationsComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.streams || !this.state.availableNotifications || !this.state.allNotifications;
+    const { streams, allNotifications } = this.state;
+
+    return !streams || !allNotifications;
   },
 
   render() {
@@ -46,7 +49,9 @@ const AlertNotificationsComponent = createReactClass({
       return <Spinner />;
     }
 
-    const notifications = this.state.allNotifications.sort((a1, a2) => {
+    const { allNotifications, streams } = this.state;
+
+    const notifications = allNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
       return naturalSort(t1.toLowerCase(), t2.toLowerCase());
@@ -62,7 +67,7 @@ const AlertNotificationsComponent = createReactClass({
         <h2>Notifications</h2>
         <p>These are all configured alert notifications.</p>
         <AlertNotificationsList alertNotifications={notifications}
-                                streams={this.state.streams}
+                                streams={streams}
                                 onNotificationUpdate={this._loadData}
                                 onNotificationDelete={this._loadData} />
       </div>

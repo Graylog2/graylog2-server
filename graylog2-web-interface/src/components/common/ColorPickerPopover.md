@@ -1,6 +1,6 @@
 ```js
 const createReactClass = require('create-react-class');
-const { Button } = require('react-bootstrap');
+const { Button } = require('components/graylog');
 
 const ColorPickerOverlayExample = createReactClass({
   getInitialState() {

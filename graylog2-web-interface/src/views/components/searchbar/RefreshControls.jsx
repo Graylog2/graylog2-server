@@ -1,12 +1,13 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-import { MenuItem, ButtonGroup, Button, DropdownButton } from 'react-bootstrap';
 import moment from 'moment';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
 
+// $FlowFixMe: imports from core need to be fixed in flow
+import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
 import Pluralize from 'components/common/Pluralize';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';

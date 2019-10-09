@@ -55,15 +55,45 @@ public class ViewService extends PaginatedDbService<ViewDTO> {
         this.viewRequirementsFactory = viewRequirementsFactory;
     }
 
-    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
-                                                  Predicate<ViewDTO> filter, String order,
+    private PaginatedList<ViewDTO> searchPaginated(DBQuery.Query query,
+                                                  Predicate<ViewDTO> filter,
+                                                  String order,
                                                   String sortField,
                                                   int page,
                                                   int perPage) {
-        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter, getSortBuilder(order, sortField), page, perPage);
+        final PaginatedList<ViewDTO> viewsList = findPaginatedWithQueryFilterAndSort(query, filter, getSortBuilder(order, sortField), page, perPage);
         return viewsList.stream()
                 .map(this::requirementsForView)
                 .collect(Collectors.toCollection(() -> new PaginatedList<>(new ArrayList<>(viewsList.size()), viewsList.pagination().total(), page, perPage)));
+    }
+
+    public PaginatedList<ViewDTO> searchPaginated(SearchQuery query,
+                                                  Predicate<ViewDTO> filter,
+                                                  String order,
+                                                  String sortField,
+                                                  int page,
+                                                  int perPage) {
+        return searchPaginated(query.toDBQuery(), filter, order, sortField, page, perPage);
+    }
+
+     public PaginatedList<ViewDTO> searchPaginatedByType(ViewDTO.Type type,
+                                                        SearchQuery query,
+                                                        Predicate<ViewDTO> filter,
+                                                        String order,
+                                                        String sortField,
+                                                        int page,
+                                                        int perPage) {
+        return searchPaginated(
+                DBQuery.and(
+                        DBQuery.or(DBQuery.is(ViewDTO.FIELD_TYPE, type), DBQuery.notExists(ViewDTO.FIELD_TYPE)),
+                        query.toDBQuery()
+                ),
+                filter,
+                order,
+                sortField,
+                page,
+                perPage
+        );
     }
 
     public void saveDefault(ViewDTO dto) {

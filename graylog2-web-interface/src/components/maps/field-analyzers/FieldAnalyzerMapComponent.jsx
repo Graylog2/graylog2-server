@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+
 import { Spinner } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 
 import { MapsActions, MapsStore } from 'stores/maps/MapsStore';
 import MapVisualization from 'components/maps/widgets/MapVisualization';
@@ -17,19 +18,22 @@ const FieldAnalyzerMapComponent = createReactClass({
   displayName: 'FieldAnalyzerMapComponent',
 
   propTypes: {
-    from: PropTypes.any.isRequired,
-    to: PropTypes.any.isRequired,
-    resolution: PropTypes.any.isRequired,
     stream: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
     query: PropTypes.string.isRequired,
-    page: PropTypes.number.isRequired,
     rangeType: PropTypes.string.isRequired,
     rangeParams: PropTypes.object.isRequired,
     forceFetch: PropTypes.bool,
   },
 
   mixins: [Reflux.connect(MapsStore), Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
+
+  getDefaultProps() {
+    return {
+      stream: undefined,
+      forceFetch: false,
+    };
+  },
 
   getInitialState() {
     return {
@@ -42,19 +46,20 @@ const FieldAnalyzerMapComponent = createReactClass({
     window.addEventListener('resize', this._onResize);
   },
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this._onResize);
-  },
-
   componentWillReceiveProps(nextProps) {
+    const { query, rangeParams, rangeType, stream } = this.props;
     // Reload values when executed search changes
-    if (this.props.query !== nextProps.query
-        || this.props.rangeType !== nextProps.rangeType
-        || JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams)
-        || this.props.stream !== nextProps.stream
+    if (query !== nextProps.query
+        || rangeType !== nextProps.rangeType
+        || JSON.stringify(rangeParams) !== JSON.stringify(nextProps.rangeParams)
+        || stream !== nextProps.stream
         || nextProps.forceFetch) {
       this._loadData(nextProps);
     }
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
   },
 
   _setupTimer(refresh) {
@@ -91,14 +96,16 @@ const FieldAnalyzerMapComponent = createReactClass({
   },
 
   _getStreamId() {
-    return this.props.stream ? this.props.stream.id : null;
+    const { stream } = this.props;
+    return stream ? stream.id : null;
   },
 
   _loadData(props) {
-    if (this.state.field !== undefined) {
+    const { field } = this.state;
+    if (field !== undefined) {
       const promise = MapsActions.getMapData(
         props.query,
-        this.state.field,
+        field,
         props.rangeType,
         props.rangeParams,
         this._getStreamId(),
@@ -114,29 +121,31 @@ const FieldAnalyzerMapComponent = createReactClass({
   render() {
     let content;
     let inner;
+    const { field, mapCoordinates, width } = this.state;
+    const { permissions } = this.props;
 
-    if (!this.state.mapCoordinates) {
+    if (!mapCoordinates) {
       inner = <Spinner />;
     } else {
       inner = (
-        <MapVisualization id="1" data={this.state.mapCoordinates} height={400} width={this.state.width} config={{}} />
+        <MapVisualization id="1" data={mapCoordinates} height={400} width={width} config={{}} />
       );
     }
 
-    if (this.state.field !== undefined) {
+    if (field !== undefined) {
       content = (
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                configuration={{ field: this.state.field }}
+                                configuration={{ field: field }}
                                 pullRight
-                                permissions={this.props.permissions}>
+                                permissions={permissions}>
 
               <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Map for field: {this.state.field}</h1>
+          <h1>Map for field: {field}</h1>
 
           <div ref={(mapContainer) => { this.mapContainer = mapContainer; }} style={{ maxHeight: 400, overflow: 'auto', marginTop: 10 }}>{inner}</div>
         </div>

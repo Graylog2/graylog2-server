@@ -6,27 +6,25 @@ import { get, isEqualWith } from 'lodash';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
+import type { Properties, ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
-import DashboardState from 'views/logic/views/DashboardState';
+import type { QuerySet } from 'views/logic/search/Search';
 import Search from 'views/logic/search/Search';
 import ViewState from 'views/logic/views/ViewState';
-import type { Properties } from 'views/logic/views/View';
-import type { QuerySet } from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewManagementActions } from './ViewManagementStore';
 import type { RefluxActions } from './StoreTypes';
 
-type ViewStoreState = {
+export type ViewStoreState = {
   activeQuery: string,
   view: View,
   dirty: boolean,
 };
 
 type ViewActionsType = RefluxActions<{
-  create: () => Promise<ViewStoreState>,
-  dashboardState: (DashboardState) => Promise<void>,
+  create: (ViewType) => Promise<ViewStoreState>,
   description: (string) => Promise<ViewStoreState>,
   load: (View) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
@@ -80,12 +78,11 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create() {
-      const [view] = this._updateSearch(ViewGenerator());
+    create(type: ViewType) {
+      const [view] = this._updateSearch(ViewGenerator(type));
       this.view = view;
       const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
-      const firstQueryId = queries.first().id;
-      this.activeQuery = firstQueryId;
+      this.activeQuery = queries.first().id;
 
       const promise = ViewActions.search(view.search)
         .then(() => {
@@ -119,11 +116,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = (isModified ? ViewActions.search(view.search) : Promise.resolve(view)).then(() => this._trigger());
 
       QueriesActions.create.promise(promise);
-    },
-    dashboardState(newDashboardState: DashboardState) {
-      this.dirty = true;
-      this.view = this.view.toBuilder().dashboardState(newDashboardState).build();
-      this._trigger();
     },
     description(newDescription: string) {
       this.dirty = true;

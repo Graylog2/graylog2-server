@@ -9,7 +9,7 @@ import {
   HelpBlock,
   InputGroup,
   MenuItem,
-} from 'react-bootstrap';
+} from 'components/graylog';
 import lodash from 'lodash';
 import moment from 'moment';
 

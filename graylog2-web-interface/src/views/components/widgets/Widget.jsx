@@ -2,10 +2,11 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
-import { MenuItem } from 'react-bootstrap';
-// $FlowFixMe: imports from core need to be fixed in flow
+
+import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
-import { widgetDefinition } from 'views/logic/Widget';
+
+import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
@@ -17,12 +18,10 @@ import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
-import WidgetFilterMenu from './WidgetFilterMenu';
 import WidgetActionDropdown from './WidgetActionDropdown';
 
 import WidgetHorizontalStretch from './WidgetHorizontalStretch';
 import MeasureDimensions from './MeasureDimensions';
-import styles from './Widget.css';
 import EditWidgetFrame from './EditWidgetFrame';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
@@ -54,8 +53,11 @@ class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
     widget: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
       computationTimeRange: PropTypes.object,
       config: PropTypes.object.isRequired,
+      filter: PropTypes.string,
     }).isRequired,
     data: PropTypes.any,
     editing: PropTypes.bool,
@@ -168,25 +170,22 @@ class Widget extends React.Component<Props, State> {
     return <LoadingWidget />;
   };
 
+  // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
     const { editing } = this.state;
-    const { config, filter } = widget;
+    const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
       const EditComponent = Widget._editComponentForType(widget.type);
       return (
         <WidgetColorContext id={id}>
-          <EditWidgetFrame widgetId={id}>
+          <EditWidgetFrame>
             <MeasureDimensions>
               <WidgetHeader title={title}
                             hideDragHandle
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                            editing={editing}>
-                <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                  <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-                </WidgetFilterMenu>
-              </WidgetHeader>
+                            editing={editing} />
               <EditComponent config={config}
                              fields={fields}
                              editting={editing}
@@ -211,10 +210,6 @@ class Widget extends React.Component<Props, State> {
                                        widgetType={widget.type}
                                        onStretch={onPositionsChange}
                                        position={position} />
-              {' '}
-              <WidgetFilterMenu onChange={newFilter => WidgetActions.filter(id, newFilter)} value={filter}>
-                <i className={`fa fa-filter ${styles.widgetActionDropdownCaret} ${filter ? styles.filterSet : styles.filterNotSet}`} />
-              </WidgetFilterMenu>
               {' '}
               <WidgetActionDropdown>
                 <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>

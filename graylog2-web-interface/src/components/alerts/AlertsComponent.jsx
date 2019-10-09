@@ -1,9 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
 import Promise from 'bluebird';
 
+import { Button } from 'components/graylog';
 import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -47,8 +47,10 @@ const AlertsComponent = createReactClass({
   },
 
   fetchData(pageNo, limit) {
+    const { displayAllAlerts } = this.state;
+
     return [
-      AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'any' : 'unresolved'),
+      AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, displayAllAlerts ? 'any' : 'unresolved'),
       AlertConditionsActions.listAll(),
       AlertConditionsActions.available(),
       StreamsStore.listStreams().then((streams) => {
@@ -62,9 +64,11 @@ const AlertsComponent = createReactClass({
   },
 
   _onToggleAllAlerts() {
+    const { displayAllAlerts } = this.state;
+
     this.currentPage = 1;
     this.pageSize = 10;
-    this.setState({ displayAllAlerts: !this.state.displayAllAlerts }, () => this.loadData(this.currentPage, this.pageSize));
+    this.setState({ displayAllAlerts: !displayAllAlerts }, () => this.loadData(this.currentPage, this.pageSize));
   },
 
   _onChangePaginatedList(page, size) {
@@ -74,9 +78,11 @@ const AlertsComponent = createReactClass({
   },
 
   _formatAlert(alert) {
-    const condition = this.state.allAlertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
-    const stream = this.state.streams.find(s => s.id === alert.stream_id);
-    const conditionType = condition ? this.state.availableConditions[condition.type] : {};
+    const { allAlertConditions, streams, availableConditions } = this.state;
+
+    const condition = allAlertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const stream = streams.find(s => s.id === alert.stream_id);
+    const conditionType = condition ? availableConditions[condition.type] : {};
 
     return (
       <Alert key={alert.id}
@@ -88,7 +94,9 @@ const AlertsComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.alerts || !this.state.allAlertConditions || !this.state.availableConditions || !this.state.streams;
+    const { alerts, allAlertConditions, streams, availableConditions } = this.state;
+
+    return !alerts || !allAlertConditions || !availableConditions || !streams;
   },
 
   render() {
@@ -96,30 +104,32 @@ const AlertsComponent = createReactClass({
       return <Spinner />;
     }
 
+    const { loading, displayAllAlerts, alerts } = this.state;
+
     return (
       <div>
         <div className="pull-right">
-          <Button bsStyle="info" onClick={this.refreshData} disabled={this.state.loading}>
-            {this.state.loading ? 'Refreshing...' : 'Refresh'}
+          <Button bsStyle="info" onClick={this.refreshData} disabled={loading}>
+            {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
           &nbsp;
           <Button bsStyle="info" onClick={this._onToggleAllAlerts}>
-            Show {this.state.displayAllAlerts ? 'unresolved' : 'all'} alerts
+            Show {displayAllAlerts ? 'unresolved' : 'all'} alerts
           </Button>
         </div>
-        <h2>{this.state.displayAllAlerts ? 'Alerts' : 'Unresolved alerts'}</h2>
+        <h2>{displayAllAlerts ? 'Alerts' : 'Unresolved alerts'}</h2>
         <p className="description">
           Check your alerts status from here. Currently displaying{' '}
-          {this.state.displayAllAlerts ? 'all' : 'unresolved'} alerts.
+          {displayAllAlerts ? 'all' : 'unresolved'} alerts.
         </p>
 
-        <PaginatedList totalItems={this.state.alerts.total}
+        <PaginatedList totalItems={alerts.total}
                        pageSize={this.pageSize}
                        onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
-          <EntityList bsNoItemsStyle={this.state.displayAllAlerts ? 'info' : 'success'}
-                      noItemsText={this.state.displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
-                      items={this.state.alerts.alerts.map(alert => this._formatAlert(alert))} />
+          <EntityList bsNoItemsStyle={displayAllAlerts ? 'info' : 'success'}
+                      noItemsText={displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
+                      items={alerts.alerts.map(alert => this._formatAlert(alert))} />
         </PaginatedList>
       </div>
     );

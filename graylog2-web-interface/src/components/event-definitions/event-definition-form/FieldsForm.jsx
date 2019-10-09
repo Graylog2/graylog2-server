@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Alert, Button, Col, OverlayTrigger, Row } from 'react-bootstrap';
 
+import { Alert, Col, OverlayTrigger, Row, Button } from 'components/graylog';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
+
 import FieldForm from './FieldForm';
 import FieldsList from './FieldsList';
 

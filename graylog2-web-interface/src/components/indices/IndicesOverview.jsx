@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
 import { ClosedIndexDetails, IndexDetails, IndexSummary } from 'components/indices';

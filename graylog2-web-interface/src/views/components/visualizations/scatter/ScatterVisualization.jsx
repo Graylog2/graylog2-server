@@ -10,9 +10,10 @@ import XYPlot from '../XYPlot';
 
 const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels, y: values, mode: 'markers' });
 
-const ScatterVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
+const ScatterVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => (
   <XYPlot config={config}
-          chartData={chartData(config, data, 'scatter', seriesGenerator)} />
+          chartData={chartData(config, data, 'scatter', seriesGenerator)}
+          effectiveTimerange={effectiveTimerange} />
 );
 
 ScatterVisualization.propTypes = {

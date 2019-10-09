@@ -88,6 +88,7 @@ import {
   ThreadDumpPage,
   UsersPage,
 } from 'pages';
+import AppConfig from 'util/AppConfig';
 
 const AppRouter = () => {
   const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
@@ -97,19 +98,21 @@ const AppRouter = () => {
              component={pluginRoute.component} />
     );
   });
+  const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
   return (
     <Router history={history}>
       <Route path={Routes.STARTPAGE} component={App}>
         <Route component={AppWithGlobalNotifications}>
           <IndexRoute component={StartPage} />
           <Route component={AppWithSearchBar}>
-            <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
-            <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />
-            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
+            {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+            {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
           </Route>
           <Route component={AppWithoutSearchBar}>
+            {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
             <Route path={Routes.STREAMS} component={StreamsPage} />
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
@@ -129,8 +132,8 @@ const AppRouter = () => {
             <Route path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-            <Route path={Routes.DASHBOARDS} component={DashboardsPage} />
-            <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage} />
+            {enableNewSearch || <Route path={Routes.DASHBOARDS} component={DashboardsPage} />}
+            {enableNewSearch || <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage} />}
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />
             <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />

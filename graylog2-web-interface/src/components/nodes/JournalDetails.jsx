@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
-import { ProgressBar, Row, Col, Alert } from 'react-bootstrap';
+import { ProgressBar, Row, Col, Alert } from 'components/graylog';
 import numeral from 'numeral';
 import moment from 'moment';
 import {} from 'moment-duration-format';

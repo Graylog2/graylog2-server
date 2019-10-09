@@ -2,10 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
-import { Input } from 'components/bootstrap';
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';
@@ -16,6 +14,8 @@ import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
+import { Button, Row, Col, Alert, Panel } from 'components/graylog';
+import { Input } from 'components/bootstrap';
 import TimeoutInput from 'components/users/TimeoutInput';
 import EditRolesForm from 'components/users/EditRolesForm';
 import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/common';

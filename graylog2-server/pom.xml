@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>3.1.0-rc.3-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -962,7 +962,7 @@
                     <plugin>
                         <groupId>com.googlecode.maven-download-plugin</groupId>
                         <artifactId>download-maven-plugin</artifactId>
-                        <version>1.4.1</version>
+                        <version>${download-maven-plugin.version}</version>
                         <executions>
                             <execution>
                                 <id>install-headless-shell</id>

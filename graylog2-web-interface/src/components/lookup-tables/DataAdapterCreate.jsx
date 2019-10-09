@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { DataAdapterForm } from 'components/lookup-tables';

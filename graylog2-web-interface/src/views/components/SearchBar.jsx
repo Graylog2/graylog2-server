@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
@@ -10,6 +10,7 @@ import DocsHelper from 'util/DocsHelper';
 import { Spinner } from 'components/common';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
+import BookmarkControls from 'views/components/searchbar/bookmark/BookmarkControls';
 import TimeRangeInput from 'views/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'views/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
@@ -22,7 +23,6 @@ import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
-
 
 const _performSearch = (onExecute) => {
   const { view } = ViewStore.getInitialState();
@@ -91,7 +91,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                 </Row>
 
                 <Row className="no-bm">
-                  <Col md={12}>
+                  <Col md={10}>
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
@@ -103,6 +103,9 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                                 placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                 onChange={value => QueriesActions.query(id, value).then(performSearch).then(() => value)}
                                 onExecute={performSearch} />
+                  </Col>
+                  <Col md={2}>
+                    <BookmarkControls />
                   </Col>
                 </Row>
               </form>

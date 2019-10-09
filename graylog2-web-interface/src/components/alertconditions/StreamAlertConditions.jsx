@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button } from 'components/graylog';
 import { AlertConditionsList } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';

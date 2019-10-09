@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
 import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';

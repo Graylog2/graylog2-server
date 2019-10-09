@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-interface",
-  "version": "3.1.0-rc.3-SNAPSHOT",
+  "version": "3.2.0-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
   "license": "GPL-3.0",
@@ -29,7 +29,7 @@
       "<rootDir>/test/mock-FetchProvider.js"
     ],
     "setupFilesAfterEnv": [
-      "./node_modules/jest-enzyme/lib/index.js"
+      "jest-enzyme"
     ],
     "moduleDirectories": [
       "src",
@@ -45,7 +45,8 @@
       "^file-loader!(.+)$": "$1",
       "^!style/useable!.*\\.(css|less)$": "<rootDir>/test/css/useable-css-proxy.js",
       "\\.(css|less)$": "identity-obj-proxy",
-      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx"
+      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/fileMock.js"
     },
     "testPathIgnorePatterns": [
       ".fixtures.js$"
@@ -63,6 +64,7 @@
     "chroma-js": "^2.0.3",
     "classnames": "^2.2.0",
     "clipboard": "^2.0.0",
+    "color": "^3.1.2",
     "crossfilter": "1.3.x",
     "d3": "3.5.17",
     "dc": "2.0.5",
@@ -101,6 +103,8 @@
     "react-window": "^1.8.2",
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.1.x",
+    "styled-components": "^4.3.2",
+    "styled-theming": "^2.2.0",
     "superagent": "^3.4.3",
     "superagent-bluebird-promise": "^4.1.0",
     "terser-webpack-plugin": "^1.3.0",
@@ -115,10 +119,13 @@
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@testing-library/dom": "^6.2.0",
+    "@testing-library/react": "^8.0.4",
     "@types/bluebird": "^3.5.8",
     "@types/jquery": "^3.3.30",
     "@types/node": "^11.11.0",
@@ -131,6 +138,7 @@
     "babel-loader": "^8.0.2",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-dynamic-import-node": "^2.2.0",
+    "babel-plugin-styled-components": "^1.10.6",
     "clean-webpack-plugin": "^0.1.19",
     "compression": "^1.7.2",
     "connect-history-api-fallback": "^1.4.0",
@@ -152,24 +160,26 @@
     "jest-environment-enzyme": "^7.0.1",
     "jest-enzyme": "^7.0.2",
     "jest-localstorage-mock": "^2.4.0",
+    "jest-styled-components": "^6.3.3",
     "json-loader": "^0.5.3",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "phantomjs-prebuilt": ">=1.9",
     "puppeteer": "^1.14.0",
     "react-styleguidist": "^7.0.7",
-    "react-test-renderer": "^16.8.6",
+    "react-test-renderer": "^16.9.0",
     "script-loader": "^0.7.0",
     "style-loader": "^0.20.3",
     "ts-jest": "^24.0.2",
     "ts-loader": "^5.3.3",
     "typescript": "^2.7.2",
     "url-loader": "^1.0.1",
-    "webpack": "^4.19.1",
-    "webpack-dev-middleware": "^3.3.0",
-    "webpack-dev-server": "^3.1.8",
-    "webpack-hot-middleware": "^2.24.0",
-    "webpack-merge": "^4.1.4",
+    "webpack": "^4.39.3",
+    "webpack-bundle-analyzer": "^3.4.1",
+    "webpack-dev-middleware": "^3.7.1",
+    "webpack-dev-server": "^3.8.0",
+    "webpack-hot-middleware": "^2.25.0",
+    "webpack-merge": "^4.2.2",
     "yargs": "^10.0.3"
   },
   "resolutions": {

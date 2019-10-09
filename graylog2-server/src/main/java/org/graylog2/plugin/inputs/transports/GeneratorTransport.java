@@ -47,6 +47,8 @@ public abstract class GeneratorTransport extends ThrottleableTransport {
     @Override
     public void doLaunch(final MessageInput input) throws MisfireException {
         generatorService = new AbstractExecutionThreadService() {
+            Thread runThread;
+
             @Override
             protected void run() throws Exception {
                 while (isRunning()) {
@@ -59,6 +61,16 @@ public abstract class GeneratorTransport extends ThrottleableTransport {
                         input.processRawMessage(rawMessage);
                     }
                 }
+            }
+
+            @Override
+            protected void startUp() throws Exception {
+                runThread = Thread.currentThread();
+            }
+
+            @Override
+            protected void triggerShutdown() {
+                runThread.interrupt();
             }
         };
 

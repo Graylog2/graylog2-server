@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { Row, Col, Panel, Button } from 'react-bootstrap';
+import { Row, Col, Panel, Button } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
 import { Input } from 'components/bootstrap';

@@ -4,10 +4,12 @@ module.exports = {
     '@babel/plugin-syntax-dynamic-import',
     '@babel/plugin-proposal-class-properties',
     'add-module-exports',
+    'babel-plugin-styled-components',
   ],
   env: {
     test: {
-      plugins: ['babel-plugin-dynamic-import-node'],
+      presets: ['@babel/env'],
+      plugins: ['babel-plugin-dynamic-import-node', '@babel/plugin-transform-runtime'],
     },
   },
 };

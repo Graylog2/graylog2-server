@@ -399,7 +399,13 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private void registerUncommittedGauge(MetricRegistry metricRegistry, String name) {
         try {
             metricRegistry.register(name,
-                    (Gauge<Long>) () -> Math.max(0, getLogEndOffset() - 1 - committedOffset.get()));
+                    (Gauge<Long>) () -> {
+                        if (getCommittedOffset() == DEFAULT_COMMITTED_OFFSET && size() == 0) {
+                            // nothing committed at all
+                            return 0L;
+                        }
+                        return Math.max(0, getLogEndOffset() - 1 - committedOffset.get());
+                    });
         } catch (IllegalArgumentException ignored) {
             // already registered, we'll ignore that.
         }

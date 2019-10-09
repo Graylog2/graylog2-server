@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 import ConfigurationHelperStyle from './ConfigurationHelper.css';
@@ -32,21 +33,25 @@ class EditConfigurationVariableModal extends React.Component {
   }
 
   _cleanState = () => {
+    const { name, id, description, content } = this.props;
+
     return {
       error: false,
       validation_errors: {},
-      savedName: this.props.name,
+      savedName: name,
       formData: {
-        id: this.props.id,
-        name: this.props.name,
-        description: this.props.description,
-        content: this.props.content,
+        id,
+        name,
+        description,
+        content,
       },
     };
   };
 
   _hasErrors = () => {
-    return this.state.error;
+    const { error } = this.state;
+
+    return error;
   };
 
   openModal = () => {
@@ -55,7 +60,8 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _getId = (prefixIdName) => {
-    return prefixIdName + this.state.id || 'new';
+    const { id } = this.state;
+    return `${prefixIdName} ${id}` || 'new';
   };
 
   _saved = () => {
@@ -68,11 +74,15 @@ class EditConfigurationVariableModal extends React.Component {
     });
   };
 
-  _debouncedValidateFormData = lodash.debounce(this._validateFormData, 200);
+  // Needs to be after _validateFormData is defined
+  // eslint-disable-next-line react/sort-comp
+  _debouncedValidateFormData = debounce(this._validateFormData, 200);
 
   _formDataUpdate = (key) => {
+    const { formData } = this.state;
+
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(this.state.formData);
+      const nextFormData = cloneDeep(formData);
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
@@ -80,13 +90,16 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _save = () => {
+    const { formData, savedName } = this.state;
+    const { saveConfigurationVariable } = this.props;
+
     if (this._hasErrors()) {
       // Ensure we display an error on the content field, as this is not validated by the browser
-      this._validateFormData(this.state.formData);
+      this._validateFormData(formData);
       return;
     }
 
-    this.props.saveConfigurationVariable(this.state.formData, this.state.savedName, this._saved);
+    saveConfigurationVariable(formData, savedName, this._saved);
   };
 
   _handleInputChange = (event) => {
@@ -94,22 +107,28 @@ class EditConfigurationVariableModal extends React.Component {
   };
 
   _formatValidationMessage = (fieldName, defaultText) => {
-    if (this.state.validation_errors[fieldName]) {
-      return <span>{this.state.validation_errors[fieldName][0]}</span>;
+    const { validation_errors: validationErrors } = this.state;
+
+    if (validationErrors[fieldName]) {
+      return <span>{validationErrors[fieldName][0]}</span>;
     }
     return <span>{defaultText}</span>;
   };
 
   _validationState = (fieldName) => {
-    if (this.state.validation_errors[fieldName]) {
+    const { validation_errors: validationErrors } = this.state;
+    if (validationErrors[fieldName]) {
       return 'error';
     }
     return null;
   };
 
   render() {
+    const { create } = this.props;
+    const { formData } = this.state;
+
     let triggerButtonContent;
-    if (this.props.create) {
+    if (create) {
       triggerButtonContent = 'Create Variable';
     } else {
       triggerButtonContent = <span>Edit</span>;
@@ -118,13 +137,13 @@ class EditConfigurationVariableModal extends React.Component {
     return (
       <React.Fragment>
         <Button onClick={this.openModal}
-                bsStyle={this.props.create ? 'success' : 'info'}
-                bsSize={this.props.create ? 'small' : 'xsmall'}
-                className={this.props.create ? 'pull-right' : ''}>
+                bsStyle={create ? 'success' : 'info'}
+                bsSize={create ? 'small' : 'xsmall'}
+                className={create ? 'pull-right' : ''}>
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
-                            title={<React.Fragment>{this.props.create ? 'Create' : 'Edit'} Variable $&#123;user.{this.state.formData.name}&#125;</React.Fragment>}
+                            title={<React.Fragment>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</React.Fragment>}
                             onSubmitForm={this._save}
                             onModalClose={this._cleanState}
                             submitButtonDisabled={this._hasErrors()}
@@ -134,7 +153,7 @@ class EditConfigurationVariableModal extends React.Component {
                    id={this._getId('variable-name')}
                    label="Name"
                    name="name"
-                   defaultValue={this.state.formData.name}
+                   defaultValue={formData.name}
                    onChange={this._handleInputChange}
                    bsStyle={this._validationState('name')}
                    help={this._formatValidationMessage('name', 'Type a name for this variable')}
@@ -145,7 +164,7 @@ class EditConfigurationVariableModal extends React.Component {
                    id={this._getId('variable-description')}
                    label={<span>Description <small className="text-muted">(Optional)</small></span>}
                    name="description"
-                   defaultValue={this.state.formData.description}
+                   defaultValue={formData.description}
                    onChange={this._handleInputChange}
                    help="Type a description for this variable"
                    spellCheck={false} />
@@ -155,7 +174,7 @@ class EditConfigurationVariableModal extends React.Component {
                    name="content"
                    rows="10"
                    className={ConfigurationHelperStyle.monoSpaceFont}
-                   defaultValue={this.state.formData.content}
+                   defaultValue={formData.content}
                    onChange={this._handleInputChange}
                    bsStyle={this._validationState('content')}
                    help={this._formatValidationMessage('content', 'Write your variable content')}

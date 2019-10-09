@@ -18,6 +18,14 @@ const AppConfig = {
     return typeof (DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
   },
 
+  isFeatureEnabled(feature) {
+    // eslint-disable-next-line no-undef
+    return typeof (FEATURES) !== 'undefined' && FEATURES.split(',')
+      .filter(s => typeof s === 'string')
+      .map(s => s.trim().toLowerCase())
+      .includes(feature.toLowerCase());
+  },
+
   rootTimeZone() {
     return this.appConfig().rootTimeZone;
   },

@@ -12,16 +12,18 @@ import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { RefluxActions } from './StoreTypes';
 
-type SortOrder = 'asc' | 'desc';
+export type SortOrder = 'asc' | 'desc';
 
-type SortField = 'id' | 'title' | 'created_at';
+export type SortField = 'id' | 'title' | 'created_at';
 
-type PaginatedViews = {
-  total: number,
-  page: number,
-  per_page: number,
-  count: number,
-  views: Array<View>,
+export type PaginatedViews = {
+  pagination: {
+    total: number,
+    page: number,
+    perPage: number,
+    count: number,
+  },
+  list: Array<View>,
 };
 
 export type ViewSummary = {

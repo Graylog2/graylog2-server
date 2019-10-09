@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col, Table, Popover, OverlayTrigger } from 'react-bootstrap';
-import Routes from 'routing/Routes';
-
-import CombinedProvider from 'injection/CombinedProvider';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
 import { PaginatedList, SearchForm, Spinner } from 'components/common';
-
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
+import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import Styles from './Overview.css';
 
@@ -22,18 +20,23 @@ class DataAdaptersOverview extends React.Component {
   };
 
   _onPageChange = (newPage, newPerPage) => {
-    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage,
-      this.props.pagination.query);
+    const { pagination } = this.props;
+
+    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage, pagination.query);
   };
 
   _onSearch = (query, resetLoadingStateCb) => {
+    const { pagination } = this.props;
+
     LookupTableDataAdaptersActions
-      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .searchPaginated(pagination.page, pagination.per_page, query)
       .then(resetLoadingStateCb);
   };
 
   _onReset = () => {
-    LookupTableDataAdaptersActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
+    const { pagination } = this.props;
+
+    LookupTableDataAdaptersActions.searchPaginated(pagination.page, pagination.per_page);
   };
 
   _helpPopover = () => {
@@ -82,14 +85,17 @@ class DataAdaptersOverview extends React.Component {
   };
 
   render() {
-    if (!this.props.dataAdapters) {
+    const { dataAdapters, errorStates, pagination } = this.props;
+
+    if (!dataAdapters) {
       return <Spinner text="Loading data adapters" />;
     }
-    const dataAdapters = this.props.dataAdapters.map((dataAdapter) => {
+
+    const dataAdapterEntries = dataAdapters.map((dataAdapter) => {
       return (
         <DataAdapterTableEntry key={dataAdapter.id}
                                adapter={dataAdapter}
-                               error={this.props.errorStates.dataAdapters[dataAdapter.name]} />
+                               error={errorStates.dataAdapters[dataAdapter.name]} />
       );
     });
 
@@ -100,10 +106,10 @@ class DataAdaptersOverview extends React.Component {
             <h2>
             Configured lookup Data Adapters
               <span>&nbsp;
-                <small>{this.props.pagination.total} total</small>
+                <small>{pagination.total} total</small>
               </span>
             </h2>
-            <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+            <PaginatedList onChange={this._onPageChange} totalItems={pagination.total}>
               <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
                   <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
@@ -122,7 +128,7 @@ class DataAdaptersOverview extends React.Component {
                     <th className={Styles.rowActions}>Actions</th>
                   </tr>
                 </thead>
-                {dataAdapters}
+                {dataAdapterEntries}
               </Table>
             </PaginatedList>
           </Col>

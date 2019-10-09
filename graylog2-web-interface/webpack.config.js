@@ -84,6 +84,9 @@ const webpackConfig = {
     // you can now require('file') instead of require('file.coffee')
     extensions: ['.js', '.json', '.jsx', '.ts'],
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
+    alias: {
+      theme: path.resolve(APP_PATH, 'theme'),
+    },
   },
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
@@ -125,6 +128,9 @@ const webpackConfig = {
       },
     }),
     new HtmlWebpackPlugin({ filename: 'module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), excludeChunks: ['config'] }),
+    new webpack.DefinePlugin({
+      FEATURES: JSON.stringify(process.env.FEATURES),
+    }),
   ],
 };
 

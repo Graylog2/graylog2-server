@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button } from 'components/graylog';
 import { TypeAheadInput } from 'components/common';
 
 /**

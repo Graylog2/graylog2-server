@@ -3,7 +3,9 @@ import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
+import { ViewStore } from 'views/stores/ViewStore';
+import View from 'views/logic/views/View';
 
 const menuTitle = <React.Fragment><i className="fa fa-plus" />{' '}Create</React.Fragment>;
 
@@ -13,8 +15,11 @@ type State = {
   overflowingComponents: { [string]: React.Node },
 };
 
+export type CreatorProps = {
+  view: View,
+};
 type CreatorType = 'preset' | 'generic';
-type CreatorFunction = () => ?React.Node;
+type CreatorFunction = (CreatorProps) => ?React.Node;
 
 type FunctionalCreator = {|
   func: CreatorFunction,
@@ -42,8 +47,9 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
+    const { view } = ViewStore.getInitialState();
     if (creator.func) {
-      return creator.func;
+      return () => creator.func({ view });
     }
     if (creator.component) {
       const CreatorComponent = creator.component;

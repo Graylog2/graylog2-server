@@ -38,6 +38,11 @@ const dropdownIndicator = (base, state) => ({
   transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
 });
 
+const clearIndicator = base => ({
+  ...base,
+  padding: '5px',
+});
+
 const multiValue = base => ({
   ...base,
   backgroundColor: '#ebf5ff',
@@ -69,7 +74,6 @@ const controlSmall = {
 
 const controlNormal = {
   minHeight: '34px',
-  height: '34px',
 };
 
 const menu = base => ({
@@ -114,7 +118,7 @@ const controlFocus = props => (base, { isFocused }) => {
     borderWidth,
     outline,
     boxShadow,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   };
 };
 
@@ -131,6 +135,7 @@ const _components = {
 
 const _styles = props => ({
   dropdownIndicator,
+  clearIndicator,
   multiValue,
   multiValueLabel,
   multiValueRemove,

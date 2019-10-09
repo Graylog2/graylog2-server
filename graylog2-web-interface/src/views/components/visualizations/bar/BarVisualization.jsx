@@ -27,7 +27,7 @@ const getChartColor = (fullData, name) => {
 
 const setChartColor = (chart, colors) => ({ marker: { color: colors[chart.name] } });
 
-const BarVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
+const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
   const { visualizationConfig } = config;
   const layout = {};
 
@@ -43,6 +43,7 @@ const BarVisualization: VisualizationComponent = ({ config, data }: Visualizatio
   return (
     <XYPlot config={config}
             chartData={chartData(config, data, 'bar', _seriesGenerator)}
+            effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             setChartColor={setChartColor}
             plotLayout={layout} />

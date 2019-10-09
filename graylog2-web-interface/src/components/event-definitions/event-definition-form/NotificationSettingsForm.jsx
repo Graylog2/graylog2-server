@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'react-bootstrap';
+import { ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/graylog';
 import lodash from 'lodash';
 import moment from 'moment';
 

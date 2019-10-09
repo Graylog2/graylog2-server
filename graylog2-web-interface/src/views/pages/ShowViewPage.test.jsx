@@ -37,6 +37,7 @@ jest.mock('./ExtendedSearchPage', () => 'extended-search-page');
 describe('ShowViewPage', () => {
   const viewJson = {
     id: 'foo',
+    type: 'DASHBOARD',
     title: 'Foo',
     summary: 'summary',
     description: 'Foo',

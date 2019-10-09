@@ -378,6 +378,12 @@ public class GelfCodecTest {
     }
 
     @Test
+    public void decodeSucceedsWithTrailingComma() throws Exception {
+        assertThat(codec.decode(new RawMessage("{\"short_message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+        assertThat(codec.decode(new RawMessage("{\"message\":\"0\",}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+    }
+
+    @Test
     public void decodeSucceedsWithValidTimestampIssue4027() throws Exception {
         // https://github.com/Graylog2/graylog2-server/issues/4027
         final String json = "{"

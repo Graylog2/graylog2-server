@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Alert, Button } from 'components/graylog';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';

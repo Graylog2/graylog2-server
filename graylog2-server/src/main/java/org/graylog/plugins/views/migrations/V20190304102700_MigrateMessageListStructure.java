@@ -101,7 +101,7 @@ public class V20190304102700_MigrateMessageListStructure extends Migration {
                 viewIds.add(viewId);
             } catch (Exception e) {
                 final String viewId = view.getObjectId("_id").toString();
-                LOG.error("Could not mirgarte view with ID {}", viewId);
+                LOG.error("Could not migrate view with ID {}", viewId);
             }
         }
 

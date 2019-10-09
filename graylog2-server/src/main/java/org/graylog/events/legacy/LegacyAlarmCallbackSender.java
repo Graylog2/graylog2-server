@@ -135,6 +135,7 @@ public class LegacyAlarmCallbackSender {
     private static class MissingStream extends StreamImpl {
         static Stream create() {
             final ImmutableMap<String, Object> fields = ImmutableMap.<String, Object>builder()
+                    .put("_id", new ObjectId("5400deadbeefdeadbeefaffe"))
                     .put(StreamImpl.FIELD_TITLE, "Missing stream")
                     .put(StreamImpl.FIELD_DESCRIPTION, "We could find a stream")
                     .put(StreamImpl.FIELD_RULES, ImmutableList.<StreamRule>of())

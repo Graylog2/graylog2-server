@@ -3,8 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import lodash from 'lodash';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
+import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Select, SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
 import history from 'util/History';
@@ -35,18 +35,20 @@ const CollectorForm = createReactClass({
   },
 
   getInitialState() {
+    const { collector } = this.props;
+
     return {
       error: false,
       validation_errors: {},
       formData: {
-        id: this.props.collector.id,
-        name: this.props.collector.name,
-        service_type: this.props.collector.service_type,
-        node_operating_system: this.props.collector.node_operating_system,
-        executable_path: this.props.collector.executable_path,
-        execute_parameters: this.props.collector.execute_parameters,
-        validation_parameters: this.props.collector.validation_parameters,
-        default_template: String(this.props.collector.default_template),
+        id: collector.id,
+        name: collector.name,
+        service_type: collector.service_type,
+        node_operating_system: collector.node_operating_system,
+        executable_path: collector.executable_path,
+        execute_parameters: collector.execute_parameters,
+        validation_parameters: collector.validation_parameters,
+        default_template: String(collector.default_template),
       },
     };
   },
@@ -61,23 +63,30 @@ const CollectorForm = createReactClass({
   },
 
   hasErrors() {
-    return this.state.error;
+    const { error } = this.state;
+
+    return error;
   },
 
   _save() {
+    const { action } = this.props;
+    const { formData } = this.state;
+
     if (!this.hasErrors()) {
-      if (this.props.action === 'create') {
-        CollectorsActions.create(this.state.formData)
+      if (action === 'create') {
+        CollectorsActions.create(formData)
           .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
       } else {
-        CollectorsActions.update(this.state.formData);
+        CollectorsActions.update(formData);
       }
     }
   },
 
   _formDataUpdate(key) {
+    const { formData } = this.state;
+
     return (nextValue) => {
-      const nextFormData = lodash.cloneDeep(this.state.formData);
+      const nextFormData = lodash.cloneDeep(formData);
       nextFormData[key] = nextValue;
       this._debouncedValidateFormData(nextFormData);
       this.setState({ formData: nextFormData });
@@ -129,28 +138,38 @@ const CollectorForm = createReactClass({
   },
 
   _formatValidationMessage(fieldName, defaultText) {
-    if (this.state.validation_errors[fieldName]) {
-      return <span>{this.state.validation_errors[fieldName][0]}</span>;
+    const { validation_errors: validationErrors } = this.state;
+
+    if (validationErrors[fieldName]) {
+      return <span>{validationErrors[fieldName][0]}</span>;
     }
+
     return <span>{defaultText}</span>;
   },
 
   _validationState(fieldName) {
-    if (this.state.validation_errors[fieldName]) {
+    const { validation_errors: validationErrors } = this.state;
+
+    if (validationErrors[fieldName]) {
       return 'error';
     }
+
     return null;
   },
 
   render() {
+    const { action } = this.props;
+    const { formData } = this.state;
+
     let validationParameters = '';
     let executeParameters = '';
-    if (this.state.formData.validation_parameters) {
-      validationParameters = this.state.formData.validation_parameters;
+    if (formData.validation_parameters) {
+      validationParameters = formData.validation_parameters;
     }
-    if (this.state.formData.execute_parameters) {
-      executeParameters = this.state.formData.execute_parameters;
+    if (formData.execute_parameters) {
+      executeParameters = formData.execute_parameters;
     }
+
     return (
       <div>
         <form onSubmit={this._onSubmit}>
@@ -161,7 +180,7 @@ const CollectorForm = createReactClass({
                    onChange={this._onNameChange}
                    bsStyle={this._validationState('name')}
                    help={this._formatValidationMessage('name', 'Name for this collector')}
-                   value={this.state.formData.name || ''}
+                   value={formData.name || ''}
                    autoFocus
                    required />
 
@@ -170,7 +189,7 @@ const CollectorForm = createReactClass({
               <ControlLabel>Process management</ControlLabel>
               <Select inputProps={{ id: 'service_type' }}
                       options={this._formatServiceTypes()}
-                      value={this.state.formData.service_type}
+                      value={formData.service_type}
                       onChange={this._formDataUpdate('service_type')}
                       placeholder="Service Type"
                       required />
@@ -182,7 +201,7 @@ const CollectorForm = createReactClass({
               <ControlLabel>Operating System</ControlLabel>
               <Select inputProps={{ id: 'node_operating_system' }}
                       options={this._formatOperatingSystems()}
-                      value={this.state.formData.node_operating_system}
+                      value={formData.node_operating_system}
                       onChange={this._formDataUpdate('node_operating_system')}
                       placeholder="Name"
                       required />
@@ -195,7 +214,7 @@ const CollectorForm = createReactClass({
                    onChange={this._onInputChange('executable_path')}
                    bsStyle={this._validationState('executable_path')}
                    help={this._formatValidationMessage('executable_path', 'Path to the collector executable')}
-                   value={this.state.formData.executable_path || ''}
+                   value={formData.executable_path || ''}
                    required />
 
             <Input type="text"
@@ -215,7 +234,7 @@ const CollectorForm = createReactClass({
             <FormGroup controlId="defaultTemplate">
               <ControlLabel><span>Default Template <small className="text-muted">(Optional)</small></span></ControlLabel>
               <SourceCodeEditor id="template"
-                                value={this.state.formData.default_template}
+                                value={formData.default_template}
                                 onChange={this._formDataUpdate('default_template')} />
               <HelpBlock>The default Collector configuration.</HelpBlock>
             </FormGroup>
@@ -226,10 +245,10 @@ const CollectorForm = createReactClass({
               <FormGroup>
                 <ButtonToolbar>
                   <Button type="submit" bsStyle="primary" disabled={this.hasErrors()}>
-                    {this.props.action === 'create' ? 'Create' : 'Update'}
+                    {action === 'create' ? 'Create' : 'Update'}
                   </Button>
                   <Button type="button" onClick={this._onCancel}>
-                    {this.props.action === 'create' ? 'Cancel' : 'Back'}
+                    {action === 'create' ? 'Cancel' : 'Back'}
                   </Button>
                 </ButtonToolbar>
               </FormGroup>

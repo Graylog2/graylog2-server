@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
-import { Button, Col, Row } from 'react-bootstrap';
+
+import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
@@ -35,28 +36,45 @@ class CacheForm extends React.Component {
     validationErrors: {},
   };
 
+  validationCheckTimer = undefined;
+
+  constructor(props) {
+    super(props);
+
+    this.state = this._initialState(props.cache);
+  }
+
+  componentDidMount() {
+    const { create, cache } = this.props;
+
+    if (!create) {
+      // Validate when mounted to immediately show errors for invalid objects
+      this._validate(cache);
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (_.isEqual(this.props.cache, nextProps.cache)) {
+    const { cache } = this.props;
+
+    if (_.isEqual(cache, nextProps.cache)) {
       // props haven't change, don't update our state from them
       return;
     }
     this.setState(this._initialState(nextProps.cache));
   }
 
-  componentDidMount() {
-    if (!this.props.create) {
-      // Validate when mounted to immediately show errors for invalid objects
-      this._validate(this.props.cache);
-    }
+  componentWillUnmount() {
+    this._clearTimer();
   }
 
   _initialState = (c) => {
+    const { create } = this.props;
     const cache = ObjectUtils.clone(c);
 
     return {
       // when creating always initially auto-generate the adapter name,
       // this will be false if the user changed the adapter name manually
-      generateName: this.props.create,
+      generateName: create,
       cache: {
         id: cache.id,
         title: cache.title,
@@ -67,12 +85,6 @@ class CacheForm extends React.Component {
     };
   };
 
-  componentWillUnmount() {
-    this._clearTimer();
-  }
-
-  validationCheckTimer = undefined;
-
   _clearTimer = () => {
     if (this.validationCheckTimer !== undefined) {
       clearTimeout(this.validationCheckTimer);
@@ -81,15 +93,19 @@ class CacheForm extends React.Component {
   };
 
   _validate = (cache) => {
+    const { validate } = this.props;
+
     // first cancel outstanding validation timer, we have new data
     this._clearTimer();
-    if (this.props.validate) {
-      this.validationCheckTimer = setTimeout(() => this.props.validate(cache), 500);
+    if (validate) {
+      this.validationCheckTimer = setTimeout(() => validate(cache), 500);
     }
   };
 
   _onChange = (event) => {
-    const cache = ObjectUtils.clone(this.state.cache);
+    const { cache: stateCache } = this.state;
+
+    const cache = ObjectUtils.clone(stateCache);
     cache[event.target.name] = FormsUtils.getValueFromInput(event.target);
     let { generateName } = this.state;
     if (generateName && event.target.name === 'title') {
@@ -105,32 +121,39 @@ class CacheForm extends React.Component {
   };
 
   _onConfigChange = (event) => {
-    const cache = ObjectUtils.clone(this.state.cache);
+    const { cache: stateCache } = this.state;
+
+    const cache = ObjectUtils.clone(stateCache);
     cache.config[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this._validate(cache);
     this.setState({ cache: cache });
   };
 
   _updateConfig = (newConfig) => {
-    const cache = ObjectUtils.clone(this.state.cache);
+    const { cache: stateCache } = this.state;
+
+    const cache = ObjectUtils.clone(stateCache);
     cache.config = newConfig;
     this._validate(cache);
     this.setState({ cache: cache });
   };
 
   _save = (event) => {
+    const { cache: stateCache } = this.state;
+    const { create, saved } = this.props;
+
     if (event) {
       event.preventDefault();
     }
 
     let promise;
-    if (this.props.create) {
-      promise = LookupTableCachesActions.create(this.state.cache);
+    if (create) {
+      promise = LookupTableCachesActions.create(stateCache);
     } else {
-      promise = LookupTableCachesActions.update(this.state.cache);
+      promise = LookupTableCachesActions.update(stateCache);
     }
 
-    promise.then(() => { this.props.saved(); });
+    promise.then(() => { saved(); });
   };
 
   _sanitizeTitle = (title) => {
@@ -138,33 +161,36 @@ class CacheForm extends React.Component {
   };
 
   _validationState = (fieldName) => {
-    if (this.props.validationErrors[fieldName]) {
+    const { validationErrors } = this.props;
+
+    if (validationErrors[fieldName]) {
       return 'error';
     }
     return null;
   };
 
   _validationMessage = (fieldName, defaultText) => {
-    if (this.props.validationErrors[fieldName]) {
+    const { validationErrors } = this.props;
+
+    if (validationErrors[fieldName]) {
       return (
         <div>
           <span>{defaultText}</span>
         &nbsp;
-          <span><b>{this.props.validationErrors[fieldName][0]}</b></span>
+          <span><b>{validationErrors[fieldName][0]}</b></span>
         </div>
       );
     }
     return <span>{defaultText}</span>;
   };
 
-  state = this._initialState(this.props.cache);
-
   render() {
     const { cache } = this.state;
+    const { create, type } = this.props;
 
     const cachePlugins = PluginStore.exports('lookupTableCaches');
 
-    const plugin = cachePlugins.filter(p => p.type === this.props.type);
+    const plugin = cachePlugins.filter(p => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
     if (plugin && plugin.length > 0) {
@@ -235,7 +261,7 @@ class CacheForm extends React.Component {
             <fieldset>
               <Row>
                 <Col mdOffset={3} md={9}>
-                  <Button type="submit" bsStyle="success">{this.props.create ? 'Create Cache' : 'Update Cache'}</Button>
+                  <Button type="submit" bsStyle="success">{create ? 'Create Cache' : 'Update Cache'}</Button>
                 </Col>
               </Row>
             </fieldset>

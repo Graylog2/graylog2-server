@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal } from 'react-bootstrap';
 
+import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 /**
@@ -51,17 +51,19 @@ class BootstrapModalConfirm extends React.Component {
     confirmButtonDisabled: false,
     onModalOpen: () => {},
     onModalClose: () => {},
-    onCancel: () => {},
-    onConfirm: () => {},
   };
 
   onCancel = () => {
-    this.props.onCancel();
+    const { onCancel } = this.props;
+
+    onCancel();
     this.close();
   };
 
   onConfirm = () => {
-    this.props.onConfirm(this.close);
+    const { onConfirm } = this.props;
+
+    onConfirm(this.close);
   };
 
   open = () => {
@@ -73,21 +75,35 @@ class BootstrapModalConfirm extends React.Component {
   };
 
   render() {
+    const {
+      showModal,
+      onModalOpen,
+      onModalClose,
+      title,
+      children,
+      cancelButtonDisabled,
+      confirmButtonDisabled,
+      cancelButtonText,
+      confirmButtonText,
+    } = this.props;
+
     return (
       <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
-                             showModal={this.props.showModal}
-                             onOpen={this.props.onModalOpen}
-                             onClose={this.props.onModalClose}
+                             showModal={showModal}
+                             onOpen={onModalOpen}
+                             onClose={onModalClose}
                              onHide={this.onCancel}>
         <Modal.Header closeButton>
-          <Modal.Title>{this.props.title}</Modal.Title>
+          <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
-          {this.props.children}
+          {children}
         </Modal.Body>
+
         <Modal.Footer>
-          <Button type="button" onClick={this.onCancel} disabled={this.props.cancelButtonDisabled}>{this.props.cancelButtonText}</Button>
-          <Button type="button" onClick={this.onConfirm} bsStyle="primary" disabled={this.props.confirmButtonDisabled}>{this.props.confirmButtonText}</Button>
+          <Button type="button" onClick={this.onCancel} disabled={cancelButtonDisabled}>{cancelButtonText}</Button>
+          <Button type="button" onClick={this.onConfirm} bsStyle="primary" disabled={confirmButtonDisabled}>{confirmButtonText}</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );

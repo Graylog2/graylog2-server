@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
 import { Overlay, RootCloseWrapper } from 'react-overlays';
-import { Popover } from 'react-bootstrap';
+import { Popover } from 'components/graylog';
 import ColorPicker from 'components/common/ColorPicker';
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 

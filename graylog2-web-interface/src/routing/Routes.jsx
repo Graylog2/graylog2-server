@@ -1,45 +1,7 @@
 import AppConfig from 'util/AppConfig';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
-
-/*
- * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
- * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
- * to access the routes.
- *
- * Plugin register example:
- * routes: [
- *           { path: '/system/pipelines', component: Foo },
- *           { path: '/system/pipelines/:pipelineId', component: Bar },
- * ]
- *
- * Using routes on plugin components:
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
- *
- */
-const pluginRoutes = {};
-PluginStore.exports('routes').forEach((pluginRoute) => {
-  const uri = new URI(pluginRoute.path);
-  const segments = uri.segment();
-  const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
-  const paramNames = segments.filter(segment => segment.startsWith(':'));
-
-  if (paramNames.length > 0) {
-    pluginRoutes[key] = (...paramValues) => {
-      paramNames.forEach((param, idx) => {
-        const value = String(paramValues[idx]);
-        uri.segment(segments.indexOf(param), value);
-      });
-
-      return uri.pathname();
-    };
-
-    return;
-  }
-
-  pluginRoutes[key] = pluginRoute.path;
-});
+import { extendedSearchPath, viewsPath } from 'views/Constants';
 
 const Routes = {
   STARTPAGE: '/',
@@ -157,10 +119,10 @@ const Routes = {
     },
   },
   VIEWS: {
-    LIST: '/views',
-    VIEWID: id => `/views/${id}`,
+    LIST: viewsPath,
+    VIEWID: id => `${viewsPath}/${id}`,
   },
-  EXTENDEDSEARCH: '/extendedsearch',
+  EXTENDEDSEARCH: extendedSearchPath,
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
@@ -261,14 +223,49 @@ const qualifyUrls = (routes, appPrefix) => {
 };
 
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
-window.pluginRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes;
 
-// Plugin routes need to be prefixed separately, so we add them to the Routes object just at the end.
-defaultExport.pluginRoute = (key) => {
-  const route = window.pluginRoutes[key];
+/*
+ * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
+ * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
+ * to access the routes.
+ *
+ * Plugin register example:
+ * routes: [
+ *           { path: '/system/pipelines', component: Foo },
+ *           { path: '/system/pipelines/:pipelineId', component: Bar },
+ * ]
+ *
+ * Using routes on plugin components:
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
+ *
+ */
+defaultExport.pluginRoute = (routeKey) => {
+  const pluginRoutes = {};
+  PluginStore.exports('routes').forEach((pluginRoute) => {
+    const uri = new URI(pluginRoute.path);
+    const segments = uri.segment();
+    const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
+    const paramNames = segments.filter(segment => segment.startsWith(':'));
+
+    if (paramNames.length > 0) {
+      pluginRoutes[key] = (...paramValues) => {
+        paramNames.forEach((param, idx) => {
+          const value = String(paramValues[idx]);
+          uri.segment(segments.indexOf(param), value);
+        });
+
+        return uri.pathname();
+      };
+
+      return;
+    }
+
+    pluginRoutes[key] = pluginRoute.path;
+  });
+  const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
   if (!route) {
-    // eslint-disable-next-line no-console
-    console.error(`Could not find plugin route '${key}'.`);
+    throw new Error(`Could not find plugin route '${routeKey}'.`);
   }
 
   return route;

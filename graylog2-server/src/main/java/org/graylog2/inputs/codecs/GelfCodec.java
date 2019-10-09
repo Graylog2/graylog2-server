@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -62,7 +63,9 @@ public class GelfCodec extends AbstractCodec {
     public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator) {
         super(configuration);
         this.aggregator = aggregator;
-        this.objectMapper = new ObjectMapper().enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
+        this.objectMapper = new ObjectMapper().enable(
+            JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS,
+            JsonParser.Feature.ALLOW_TRAILING_COMMA);
         this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 
@@ -125,6 +128,9 @@ public class GelfCodec extends AbstractCodec {
 
         try {
             node = objectMapper.readTree(json);
+            if (node == null) {
+                throw new IOException("null result");
+            }
         } catch (final Exception e) {
             log.error("Could not parse JSON, first 400 characters: " +
                               StringUtils.abbreviate(json, 403), e);

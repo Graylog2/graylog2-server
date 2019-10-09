@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Col, Button, Row } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
+import { Button, Alert, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ObjectUtils from 'util/ObjectUtils';
@@ -13,6 +13,7 @@ import StoreProvider from 'injection/StoreProvider';
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
 
 const RolesStore = StoreProvider.getStore('Roles');
@@ -34,12 +35,15 @@ class EditRolesForm extends React.Component {
   }
 
   _updateRoles = (evt) => {
+    const { user } = this.props;
+
     evt.preventDefault();
-    if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Really update roles for "${user.username}"?`)) {
       const roles = this.roles.getValue().filter(value => value !== '');
-      const user = ObjectUtils.clone(this.props.user);
-      user.roles = roles;
-      UsersStore.update(this.props.user.username, user).then(() => {
+      const userClone = ObjectUtils.clone(user);
+      userClone.roles = roles;
+      UsersStore.update(user.username, userClone).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {
@@ -59,12 +63,12 @@ class EditRolesForm extends React.Component {
 
   render() {
     const { user } = this.props;
-    if (!this.state.roles) {
+    const { roles, newRoles } = this.state;
+    if (!roles) {
       return <Spinner />;
     }
     let rolesAlert = null;
-    const roles = this.state.newRoles;
-    if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
+    if (newRoles != null && !(newRoles.includes('Reader') || newRoles.includes('Admin'))) {
       rolesAlert = (
         <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
         You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
@@ -83,7 +87,7 @@ class EditRolesForm extends React.Component {
     const editUserForm = user.read_only ? (
       <Col smOffset={3} sm={9}>
         <Alert bsStyle="warning" role="alert">
-          You cannot edit the admin's user role.
+          You cannot edit the admin&apos;s user role.
         </Alert>
       </Col>
     ) : (
@@ -95,7 +99,10 @@ class EditRolesForm extends React.Component {
                  help="Choose the roles the user should be a member of. All the granted permissions will be combined."
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9">
-            <RolesSelect ref={(roles) => { this.roles = roles; }} userRoles={user.roles} availableRoles={this.state.roles} onValueChange={this._onValueChange} />
+            <RolesSelect ref={(elem) => { this.roles = elem; }}
+                         userRoles={user.roles}
+                         availableRoles={roles}
+                         onValueChange={this._onValueChange} />
           </Input>
           <div className="form-group">
             <Col smOffset={3} sm={9}>

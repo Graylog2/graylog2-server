@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'react-bootstrap';
+import { Popover } from 'components/graylog';
 
 class EventKeyHelpPopover extends React.Component {
   static propTypes = {

@@ -31,7 +31,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchtypes.DateHistogram;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
@@ -72,7 +71,6 @@ public class InMemorySearchJobServiceTest {
                 .put(StreamFilter.NAME, StreamFilter.class)
                 .put(ElasticsearchQueryString.NAME, ElasticsearchQueryString.class)
                 .put(MessageList.NAME, MessageList.class)
-                .put(DateHistogram.NAME, DateHistogram.class)
                 .build();
 
         subtypes.forEach((name, klass) -> objectMapper.registerSubtypes(new NamedType(klass, name)));

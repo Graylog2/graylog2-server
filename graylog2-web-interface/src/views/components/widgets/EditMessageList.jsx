@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Checkbox } from 'react-bootstrap';
+import { Row, Col, Checkbox } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import SortableSelect from 'views/components/aggregationbuilder/SortableSelect';

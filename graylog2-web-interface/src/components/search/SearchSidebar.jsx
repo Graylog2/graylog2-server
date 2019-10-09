@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
 import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 

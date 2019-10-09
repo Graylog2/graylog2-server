@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Table } from 'react-bootstrap';
+
+import { Table, Button } from 'components/graylog';
 
 import styles from './CommonNotificationSummary.css';
 

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ControlLabel, FormGroup } from 'react-bootstrap';
+import { ControlLabel, FormGroup } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { MultiSelect } from 'components/common';
 

@@ -13,12 +13,18 @@ jest.mock('../MapVisualization', () => 'map-visualization');
 describe('WorldMapVisualization', () => {
   // $FlowFixMe: type is always defined
   const config = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
+  const effectiveTimerange = {
+    from: '2019-07-04T13:37:00Z',
+    to: '2019-07-05T13:37:00Z',
+    type: 'absolute',
+  };
 
   it('does not call onChange when not editing', () => {
     const onChange = jest.fn();
     const wrapper = mount(<WorldMapVisualization config={config}
                                                  data={[]}
                                                  editing={false}
+                                                 effectiveTimerange={effectiveTimerange}
                                                  fields={Immutable.List()}
                                                  onChange={onChange}
                                                  toggleEdit={() => {}}
@@ -39,6 +45,7 @@ describe('WorldMapVisualization', () => {
     const wrapper = mount(<WorldMapVisualization config={config}
                                                  data={[]}
                                                  editing
+                                                 effectiveTimerange={effectiveTimerange}
                                                  fields={Immutable.List()}
                                                  onChange={onChange}
                                                  toggleEdit={() => {}}

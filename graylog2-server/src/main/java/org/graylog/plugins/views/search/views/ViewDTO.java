@@ -38,7 +38,13 @@ import java.util.Set;
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
 public abstract class ViewDTO {
+    public enum Type {
+        SEARCH,
+        DASHBOARD
+    }
+
     public static final String FIELD_ID = "id";
+    public static final String FIELD_TYPE = "type";
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_SUMMARY = "summary";
     public static final String FIELD_DESCRIPTION = "description";
@@ -46,7 +52,6 @@ public abstract class ViewDTO {
     public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
-    public static final String FIELD_DASHBOARD_STATE = "dashboard_state";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
 
@@ -57,6 +62,9 @@ public abstract class ViewDTO {
     @Nullable
     @JsonProperty(FIELD_ID)
     public abstract String id();
+
+    @JsonProperty(FIELD_TYPE)
+    public abstract Type type();
 
     @JsonProperty(FIELD_TITLE)
     @NotBlank
@@ -82,9 +90,6 @@ public abstract class ViewDTO {
     @JsonProperty(FIELD_STATE)
     public abstract Map<String, ViewStateDTO> state();
 
-    @JsonProperty(FIELD_DASHBOARD_STATE)
-    public abstract ViewDashboardStateDTO dashboardState();
-
     @JsonProperty(FIELD_OWNER)
     public abstract Optional<String> owner();
 
@@ -103,6 +108,9 @@ public abstract class ViewDTO {
         @Id
         @JsonProperty(FIELD_ID)
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(Type type);
 
         @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
@@ -137,16 +145,13 @@ public abstract class ViewDTO {
         @JsonProperty(FIELD_STATE)
         public abstract Builder state(Map<String, ViewStateDTO> state);
 
-        @JsonProperty(FIELD_DASHBOARD_STATE)
-        public abstract Builder dashboardState(ViewDashboardStateDTO dashboardState);
-
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewDTO.Builder()
+                    .type(Type.DASHBOARD)
                     .summary("")
                     .description("")
                     .properties(ImmutableSet.of())
-                    .dashboardState(ViewDashboardStateDTO.empty())
                     .requires(Collections.emptyMap())
                     .createdAt(DateTime.now(DateTimeZone.UTC));
         }
