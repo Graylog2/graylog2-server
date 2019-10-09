@@ -11,6 +11,7 @@ import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
 } from 'views/logic/hooks/SearchRefreshCondition';
+import Footer from 'components/layout/Footer';
 
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
@@ -112,19 +113,15 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
     };
   }, []);
 
-  const sidebar = (
-    <ConnectedSideBar>
-      <ConnectedFieldList />
-    </ConnectedSideBar>
-  );
-
   return (
     <CurrentViewTypeProvider>
       <IfDashboard>
         <WindowLeaveMessage route={route} />
       </IfDashboard>
       <div id="main-row" className="grid-container">
-        {sidebar}
+        <ConnectedSideBar>
+          <ConnectedFieldList />
+        </ConnectedSideBar>
         <div className="search-grid">
           <HeaderElements />
           <IfDashboard>
@@ -140,6 +137,7 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
           <ViewAdditionalContextProvider>
             <SearchResult />
           </ViewAdditionalContextProvider>
+          <Footer />
         </div>
       </div>
     </CurrentViewTypeProvider>
