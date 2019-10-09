@@ -31,6 +31,7 @@ const BookmarkForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+
   return (
     <Portal>
       <Position container={document.body}
