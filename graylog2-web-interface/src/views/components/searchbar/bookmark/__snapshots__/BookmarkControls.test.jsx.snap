@@ -72,20 +72,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -110,83 +96,87 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 onClick={[Function]}
                 title="Empty search"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="Empty search"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
-          <span>
-            <Button
-              active={false}
+          <Button
+            active={false}
+            bsStyle="default"
+            innerRef={
+              Object {
+                "current": null,
+              }
+            }
+            onClick={[Function]}
+            title="Unsaved changes"
+          >
+            <Button__StyledButton
               bsStyle="default"
               onClick={[Function]}
               title="Unsaved changes"
             >
-              <Button__StyledButton
+              <StyledComponent
                 bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
                 onClick={[Function]}
                 title="Unsaved changes"
               >
-                <StyledComponent
+                <Component
                   bsStyle="default"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                        "xsmall",
-                      ],
-                      "STYLES": Array [
-                        "success",
-                        "warning",
-                        "danger",
-                        "info",
-                        "default",
-                        "primary",
-                        "link",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Button__StyledButton-c9cbmb-0",
-                        "isStatic": false,
-                        "lastClassName": "cBCVOY",
-                        "rules": Array [
-                          [Function],
-                          ";",
-                        ],
-                      },
-                      "displayName": "Button__StyledButton",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   onClick={[Function]}
                   title="Unsaved changes"
                 >
@@ -217,10 +207,10 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                       />
                     </button>
                   </Button>
-                </StyledComponent>
-              </Button__StyledButton>
-            </Button>
-          </span>
+                </Component>
+              </StyledComponent>
+            </Button__StyledButton>
+          </Button>
           <Button
             active={false}
             bsStyle="default"
@@ -237,20 +227,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -275,28 +251,35 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 onClick={[Function]}
                 title="List of saved searches"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
-                  disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="List of saved searches"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
@@ -379,20 +362,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -417,83 +386,87 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 onClick={[Function]}
                 title="Empty search"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="Empty search"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
-          <span>
-            <Button
-              active={false}
+          <Button
+            active={false}
+            bsStyle="default"
+            innerRef={
+              Object {
+                "current": null,
+              }
+            }
+            onClick={[Function]}
+            title="Saved search"
+          >
+            <Button__StyledButton
               bsStyle="default"
               onClick={[Function]}
               title="Saved search"
             >
-              <Button__StyledButton
+              <StyledComponent
                 bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
                 onClick={[Function]}
                 title="Saved search"
               >
-                <StyledComponent
+                <Component
                   bsStyle="default"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                        "xsmall",
-                      ],
-                      "STYLES": Array [
-                        "success",
-                        "warning",
-                        "danger",
-                        "info",
-                        "default",
-                        "primary",
-                        "link",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Button__StyledButton-c9cbmb-0",
-                        "isStatic": false,
-                        "lastClassName": "cBCVOY",
-                        "rules": Array [
-                          [Function],
-                          ";",
-                        ],
-                      },
-                      "displayName": "Button__StyledButton",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   onClick={[Function]}
                   title="Saved search"
                 >
@@ -524,10 +497,10 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                       />
                     </button>
                   </Button>
-                </StyledComponent>
-              </Button__StyledButton>
-            </Button>
-          </span>
+                </Component>
+              </StyledComponent>
+            </Button__StyledButton>
+          </Button>
           <Button
             active={false}
             bsStyle="default"
@@ -544,20 +517,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -582,28 +541,35 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 onClick={[Function]}
                 title="List of saved searches"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
-                  disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="List of saved searches"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
@@ -686,20 +652,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -724,83 +676,87 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 onClick={[Function]}
                 title="Empty search"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   disabled={true}
                   onClick={[Function]}
                   title="Empty search"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={true}
                     onClick={[Function]}
                     title="Empty search"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      title="Empty search"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
-          <span>
-            <Button
-              active={false}
+          <Button
+            active={false}
+            bsStyle="default"
+            innerRef={
+              Object {
+                "current": null,
+              }
+            }
+            onClick={[Function]}
+            title="Save search"
+          >
+            <Button__StyledButton
               bsStyle="default"
               onClick={[Function]}
               title="Save search"
             >
-              <Button__StyledButton
+              <StyledComponent
                 bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "cBCVOY",
+                      "rules": Array [
+                        [Function],
+                        ";",
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
                 onClick={[Function]}
                 title="Save search"
               >
-                <StyledComponent
+                <Component
                   bsStyle="default"
-                  forwardedComponent={
-                    Object {
-                      "$$typeof": Symbol(react.forward_ref),
-                      "SIZES": Array [
-                        "large",
-                        "small",
-                        "xsmall",
-                      ],
-                      "STYLES": Array [
-                        "success",
-                        "warning",
-                        "danger",
-                        "info",
-                        "default",
-                        "primary",
-                        "link",
-                      ],
-                      "attrs": Array [],
-                      "componentStyle": ComponentStyle {
-                        "componentId": "Button__StyledButton-c9cbmb-0",
-                        "isStatic": false,
-                        "lastClassName": "cBCVOY",
-                        "rules": Array [
-                          [Function],
-                          ";",
-                        ],
-                      },
-                      "displayName": "Button__StyledButton",
-                      "foldedComponentIds": Array [],
-                      "render": [Function],
-                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                      "target": [Function],
-                      "toString": [Function],
-                      "warnTooManyClasses": [Function],
-                      "withComponent": [Function],
-                    }
-                  }
-                  forwardedRef={null}
+                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
                   onClick={[Function]}
                   title="Save search"
                 >
@@ -831,10 +787,10 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                       />
                     </button>
                   </Button>
-                </StyledComponent>
-              </Button__StyledButton>
-            </Button>
-          </span>
+                </Component>
+              </StyledComponent>
+            </Button__StyledButton>
+          </Button>
           <Button
             active={false}
             bsStyle="default"
@@ -851,20 +807,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 forwardedComponent={
                   Object {
                     "$$typeof": Symbol(react.forward_ref),
-                    "SIZES": Array [
-                      "large",
-                      "small",
-                      "xsmall",
-                    ],
-                    "STYLES": Array [
-                      "success",
-                      "warning",
-                      "danger",
-                      "info",
-                      "default",
-                      "primary",
-                      "link",
-                    ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
@@ -889,28 +831,35 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 onClick={[Function]}
                 title="List of saved searches"
               >
-                <Button
-                  active={false}
-                  block={false}
-                  bsClass="btn"
+                <Component
                   bsStyle="default"
                   className="Button__StyledButton-c9cbmb-0 cBCVOY"
-                  disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
-                  <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                  <Button
+                    active={false}
+                    block={false}
+                    bsClass="btn"
+                    bsStyle="default"
+                    className="Button__StyledButton-c9cbmb-0 cBCVOY"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
-                    type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
-                  </button>
-                </Button>
+                    <button
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                      disabled={false}
+                      onClick={[Function]}
+                      title="List of saved searches"
+                      type="button"
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </button>
+                  </Button>
+                </Component>
               </StyledComponent>
             </Button__StyledButton>
           </Button>
