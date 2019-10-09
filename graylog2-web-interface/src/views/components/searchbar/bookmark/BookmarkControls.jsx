@@ -34,13 +34,13 @@ class BookmarkControls extends React.Component<Props, State> {
 
   formTarget: any;
 
-  formTarget = React.createRef();
-
   constructor(props: Props) {
     super(props);
 
     const { viewStoreState } = props;
     const { view } = viewStoreState;
+
+    this.formTarget = React.createRef();
 
     this.state = {
       showForm: false,
@@ -172,7 +172,7 @@ class BookmarkControls extends React.Component<Props, State> {
             <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
               <i className="fa fa-eraser" />
             </Button>
-            <Button title={title} onClick={this.toggleFormModal} innerRef={this.formTarget}>
+            <Button title={title} onClick={this.toggleFormModal} ref={this.formTarget}>
               <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
             </Button>
             {bookmarkForm}

@@ -53,7 +53,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
         <div
           className="btn-group"
         >
-          <Button
+          <ForwardRef
             active={false}
             bsStyle="default"
             disabled={false}
@@ -128,15 +128,10 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
-            innerRef={
-              Object {
-                "current": null,
-              }
-            }
             onClick={[Function]}
             title="Unsaved changes"
           >
@@ -210,8 +205,8 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
             onClick={[Function]}
@@ -282,7 +277,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
+          </ForwardRef>
         </div>
       </ButtonGroup>
     </div>
@@ -343,7 +338,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
         <div
           className="btn-group"
         >
-          <Button
+          <ForwardRef
             active={false}
             bsStyle="default"
             disabled={false}
@@ -418,15 +413,10 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
-            innerRef={
-              Object {
-                "current": null,
-              }
-            }
             onClick={[Function]}
             title="Saved search"
           >
@@ -500,8 +490,8 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
             onClick={[Function]}
@@ -572,7 +562,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
+          </ForwardRef>
         </div>
       </ButtonGroup>
     </div>
@@ -633,7 +623,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
         <div
           className="btn-group"
         >
-          <Button
+          <ForwardRef
             active={false}
             bsStyle="default"
             disabled={true}
@@ -708,15 +698,10 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
-            innerRef={
-              Object {
-                "current": null,
-              }
-            }
             onClick={[Function]}
             title="Save search"
           >
@@ -790,8 +775,8 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
-          <Button
+          </ForwardRef>
+          <ForwardRef
             active={false}
             bsStyle="default"
             onClick={[Function]}
@@ -862,7 +847,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                 </Component>
               </StyledComponent>
             </Button__StyledButton>
-          </Button>
+          </ForwardRef>
         </div>
       </ButtonGroup>
     </div>
