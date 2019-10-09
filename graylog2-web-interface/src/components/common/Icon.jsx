@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import 'font-awesome/css/font-awesome.css';
 
@@ -24,21 +25,18 @@ const Icon = React.forwardRef(({
 }, ref) => {
   const cleanIconName = name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
 
+  const iconClasses = classnames('fa', `fa-${cleanIconName}`, {
+    [`fa-flip-${flip}`]: !!flip,
+    [`fa-rotate-${rotate}`]: !!rotate,
+    [`fa-${size}`]: !!size,
+    'fa-fw': !!fixedWidth,
+    'fa-inverse': !!inverse,
+    'fa-pulse': !!pulse,
+    'fa-spin': !!spin,
+  });
+
   return (
-    <i className={`
-         fa
-         fa-${cleanIconName}
-         ${flip && `fa-flip-${flip}`}
-         ${fixedWidth && 'fa-fw'}
-         ${inverse && 'fa-inverse'}
-         ${pulse && 'fa-pulse'}
-         ${rotate && `fa-rotate-${rotate}`}
-         ${size && `fa-${size}`}
-         ${spin && 'fa-spin'}
-         ${className}
-       `}
-       {...props}
-       ref={ref} />
+    <i className={iconClasses} {...props} ref={ref} />
   );
 });
 

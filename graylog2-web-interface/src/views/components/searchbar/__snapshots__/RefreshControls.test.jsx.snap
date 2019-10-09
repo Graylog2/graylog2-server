@@ -14,18 +14,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       type="button"
     >
       <i
-        className="
-         fa
-         fa-play
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-play"
       />
     </button>
     <div
@@ -171,18 +160,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       type="button"
     >
       <i
-        className="
-         fa
-         fa-play
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-play"
       />
     </button>
     <div
@@ -328,18 +306,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -494,18 +461,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -660,18 +616,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -826,18 +771,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -992,18 +926,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -1158,18 +1081,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div
@@ -1324,18 +1236,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       type="button"
     >
       <i
-        className="
-         fa
-         fa-pause
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+        className="fa fa-pause"
       />
     </button>
     <div

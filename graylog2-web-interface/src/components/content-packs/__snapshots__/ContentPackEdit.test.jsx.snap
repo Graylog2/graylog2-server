@@ -473,18 +473,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
 exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
 <span>
   <i
-    className="
-         fa
-         fa-spinner
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         fa-spin
-         undefined
-       "
+    className="fa fa-spinner fa-spin"
   />
    
   Loading...
@@ -867,32 +856,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       tabIndex={0}
                     >
                       <i
-                        className="
-         fa
-         fa-circle-thin
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x iconBackground
-       "
+                        className="fa fa-circle-thin"
                       />
                       <i
-                        className="
-         fa
-         fa-angle-up
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x
-       "
+                        className="fa fa-angle-up"
                       />
                     </div>
                   </div>

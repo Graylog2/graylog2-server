@@ -26,18 +26,7 @@ exports[`<Widget /> should render with empty props 1`] = `
       >
         <span>
           <i
-            className="
-         fa
-         fa-arrows-h
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         button
-       "
+            className="fa fa-arrows-h"
             onClick={[Function]}
             role="link"
             tabIndex={0}
@@ -56,18 +45,7 @@ exports[`<Widget /> should render with empty props 1`] = `
           >
             <span>
               <i
-                className="
-         fa
-         fa-chevron-down
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         widgetActionDropdownCaret tonedDown
-       "
+                className="fa fa-chevron-down"
               />
             </span>
           </span>
@@ -77,18 +55,7 @@ exports[`<Widget /> should render with empty props 1`] = `
         className="spinnerContainer"
       >
         <i
-          className="
-         fa
-         fa-refresh
-         undefined
-         false
-         false
-         false
-         undefined
-         fa-3x
-         false
-         spinner
-       "
+          className="fa fa-refresh fa-3x"
         />
       </div>
     </span>

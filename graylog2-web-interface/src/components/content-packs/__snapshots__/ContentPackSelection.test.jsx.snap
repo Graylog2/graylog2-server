@@ -443,33 +443,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
       >
         You can select between installed entities from the server (
         <i
-          className="
-         fa
-         fa-server
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+          className="fa fa-server"
         />
         ) or entities from the former content pack revision (
         <i
-          className="
-         fa
-         fa-archive
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         contentPackEntity
-       "
+          className="fa fa-archive"
         />
         ).
       </span>
@@ -585,32 +563,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 tabIndex={0}
               >
                 <i
-                  className="
-         fa
-         fa-circle-thin
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x iconBackground
-       "
+                  className="fa fa-circle-thin"
                 />
                 <i
-                  className="
-         fa
-         fa-angle-up
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x
-       "
+                  className="fa fa-angle-up"
                 />
               </div>
             </div>

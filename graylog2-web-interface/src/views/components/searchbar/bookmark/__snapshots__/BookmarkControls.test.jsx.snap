@@ -135,18 +135,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-eraser
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-eraser"
                       />
                     </ForwardRef>
                   </button>
@@ -238,18 +227,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                       }
                     >
                       <i
-                        className="
-         fa
-         fa-bookmark
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-bookmark"
                         style={
                           Object {
                             "color": "#ffc107",
@@ -341,18 +319,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-folder-o
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-folder-o"
                       />
                     </ForwardRef>
                   </button>
@@ -502,18 +469,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-eraser
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-eraser"
                       />
                     </ForwardRef>
                   </button>
@@ -605,18 +561,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                       }
                     >
                       <i
-                        className="
-         fa
-         fa-bookmark
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-bookmark"
                         style={
                           Object {
                             "color": "#007bff",
@@ -708,18 +653,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-folder-o
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-folder-o"
                       />
                     </ForwardRef>
                   </button>
@@ -869,18 +803,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-eraser
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-eraser"
                       />
                     </ForwardRef>
                   </button>
@@ -972,18 +895,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                       }
                     >
                       <i
-                        className="
-         fa
-         fa-bookmark-o
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-bookmark-o"
                         style={
                           Object {
                             "color": "",
@@ -1075,18 +987,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                       spin={false}
                     >
                       <i
-                        className="
-         fa
-         fa-folder-o
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                        className="fa fa-folder-o"
                       />
                     </ForwardRef>
                   </button>

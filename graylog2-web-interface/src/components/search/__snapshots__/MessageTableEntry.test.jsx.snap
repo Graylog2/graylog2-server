@@ -117,18 +117,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
               className="message-details-title"
             >
               <i
-                className="
-         fa
-         fa-envelope
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                className="fa fa-envelope"
               />
                
               <a
@@ -184,18 +173,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           type="button"
                         >
                           <i
-                            className="
-         fa
-         fa-search-plus
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                            className="fa fa-search-plus"
                           />
                         </button>
                         <button
@@ -403,18 +381,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           type="button"
                         >
                           <i
-                            className="
-         fa
-         fa-search-plus
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                            className="fa fa-search-plus"
                           />
                         </button>
                         <button
@@ -606,18 +573,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           2018-01-22 16:36:02.189 +01:00
                         </time>
                         <i
-                          className="
-         fa
-         fa-info
-         undefined
-         fa-fw
-         false
-         false
-         undefined
-         undefined
-         false
-         timezoneInfo
-       "
+                          className="fa fa-info fa-fw"
                           onClick={null}
                           onMouseOut={[Function]}
                           onMouseOver={[Function]}

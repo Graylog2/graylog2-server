@@ -53,18 +53,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                     className="failure badge"
                   >
                     <i
-                      className="
-         fa
-         fa-times
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-times"
                     />
                   </span>
                 </td>
@@ -84,18 +73,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                     className="success badge"
                   >
                     <i
-                      className="
-         fa
-         fa-check
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-check"
                     />
                   </span>
                 </td>
@@ -162,18 +140,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                     className="success badge"
                   >
                     <i
-                      className="
-         fa
-         fa-check
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-check"
                     />
                   </span>
                 </td>
@@ -193,18 +160,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                     className="success badge"
                   >
                     <i
-                      className="
-         fa
-         fa-check
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-check"
                     />
                   </span>
                 </td>
@@ -271,18 +227,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                     className="failure badge"
                   >
                     <i
-                      className="
-         fa
-         fa-times
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-times"
                     />
                   </span>
                 </td>
@@ -302,18 +247,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                     className="failure badge"
                   >
                     <i
-                      className="
-         fa
-         fa-times
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+                      className="fa fa-times"
                     />
                   </span>
                 </td>

@@ -30,32 +30,10 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
           tabIndex={0}
         >
           <i
-            className="
-         fa
-         fa-circle-thin
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x iconBackground
-       "
+            className="fa fa-circle-thin"
           />
           <i
-            className="
-         fa
-         fa-angle-up
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x
-       "
+            className="fa fa-angle-up"
           />
         </div>
       </div>
@@ -108,32 +86,10 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
           tabIndex={0}
         >
           <i
-            className="
-         fa
-         fa-circle-thin
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x iconBackground
-       "
+            className="fa fa-circle-thin"
           />
           <i
-            className="
-         fa
-         fa-angle-down
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x
-       "
+            className="fa fa-angle-down"
           />
         </div>
       </div>
@@ -181,32 +137,10 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                 tabIndex={0}
               >
                 <i
-                  className="
-         fa
-         fa-circle-thin
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x iconBackground
-       "
+                  className="fa fa-circle-thin"
                 />
                 <i
-                  className="
-         fa
-         fa-angle-up
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         fa-stack-1x
-       "
+                  className="fa fa-angle-up"
                 />
               </div>
             </div>

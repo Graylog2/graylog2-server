@@ -21,18 +21,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
           type="button"
         >
           <i
-            className="
-         fa
-         fa-caret-left
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+            className="fa fa-caret-left"
           />
         </button>
         <button
@@ -42,18 +31,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
           type="button"
         >
           <i
-            className="
-         fa
-         fa-caret-right
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+            className="fa fa-caret-right"
           />
         </button>
       </div>
@@ -134,18 +112,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
           type="button"
         >
           <i
-            className="
-         fa
-         fa-caret-left
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+            className="fa fa-caret-left"
           />
         </button>
         <button
@@ -155,18 +122,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
           type="button"
         >
           <i
-            className="
-         fa
-         fa-caret-right
-         undefined
-         false
-         false
-         false
-         undefined
-         undefined
-         false
-         undefined
-       "
+            className="fa fa-caret-right"
           />
         </button>
       </div>
