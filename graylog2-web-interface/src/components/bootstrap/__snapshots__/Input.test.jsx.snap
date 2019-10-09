@@ -68,7 +68,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   addonAfter={null}
   bsStyle={null}
   buttonAfter={
-    <Button
+    <ForwardRef
       active={false}
       bsStyle="default"
     />
@@ -119,7 +119,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                 <span
                   className="input-group-btn"
                 >
-                  <Button
+                  <ForwardRef
                     active={false}
                     bsStyle="default"
                   >
@@ -131,20 +131,6 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
-                            "SIZES": Array [
-                              "large",
-                              "small",
-                              "xsmall",
-                            ],
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
-                              "default",
-                              "primary",
-                              "link",
-                            ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
@@ -167,23 +153,28 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         }
                         forwardedRef={null}
                       >
-                        <Button
-                          active={false}
-                          block={false}
-                          bsClass="btn"
+                        <Component
                           bsStyle="default"
                           className="Button__StyledButton-c9cbmb-0 cBCVOY"
-                          disabled={false}
                         >
-                          <button
-                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY"
                             disabled={false}
-                            type="button"
-                          />
-                        </Button>
+                          >
+                            <button
+                              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              disabled={false}
+                              type="button"
+                            />
+                          </Button>
+                        </Component>
                       </StyledComponent>
                     </Button__StyledButton>
-                  </Button>
+                  </ForwardRef>
                 </span>
               </InputGroupButton>
             </span>
