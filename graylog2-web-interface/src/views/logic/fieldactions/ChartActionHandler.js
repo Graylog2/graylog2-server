@@ -12,7 +12,6 @@ import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
 import FieldType from '../fieldtypes/FieldType';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
-import type { ActionContexts } from '../ActionContext';
 
 const TIMESTAMP_FIELD = 'timestamp';
 
@@ -35,14 +34,13 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
   return mapping.type;
 };
 
-const ChartActionHandler: FieldActionHandler = (queryId: string, field: string, _: FieldType, context: ActionContexts) => {
+const ChartActionHandler: FieldActionHandler = ({ queryId, field, contexts: { widget: origWidget = Widget.empty() } }) => {
   const config = AggregationWidgetConfig.builder()
     .rowPivots([pivotForField(TIMESTAMP_FIELD, fieldTypeFor(TIMESTAMP_FIELD, queryId))])
     .series([Series.forFunction(`avg(${field})`)])
     .visualization('line')
     .rollup(true)
     .build();
-  const { widget: origWidget = Widget.empty() } = context;
   const widgetBuilder = AggregationWidget.builder()
     .newId()
     .config(config);

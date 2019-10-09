@@ -1,11 +1,8 @@
 // @flow strict
 import { WidgetStore, WidgetActions } from 'views/stores/WidgetStore';
-import type { ActionContexts } from 'views/logic/ActionContext';
 import type { FieldActionHandler } from 'views/logic/fieldactions/FieldActionHandler';
-import FieldType from 'views/logic/fieldtypes/FieldType';
 
-/* eslint-disable-next-line no-unused-vars */
-const RemoveFromAllTablesActionHandler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
+const RemoveFromAllTablesActionHandler: FieldActionHandler = ({ field }) => {
   const widgets = WidgetStore.getInitialState();
   const newWidgets = widgets.map((widget) => {
     if (widget.type.toUpperCase() === 'MESSAGES') {

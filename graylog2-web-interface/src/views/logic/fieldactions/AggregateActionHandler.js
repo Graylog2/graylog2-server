@@ -6,12 +6,9 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTable from 'views/components/datatable/DataTable';
-import type { ActionContexts } from '../ActionContext';
-import FieldType from '../fieldtypes/FieldType';
 import type { FieldActionHandler } from './FieldActionHandler';
 
-const AggregateActionHandler: FieldActionHandler = (queryId: string, field: string, type: FieldType, context: ActionContexts) => {
-  const { widget: origWidget = Widget.empty() } = context;
+const AggregateActionHandler: FieldActionHandler = ({ field, type, contexts: { widget: origWidget = Widget.empty() } }) => {
   const newWidgetBuilder = AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()

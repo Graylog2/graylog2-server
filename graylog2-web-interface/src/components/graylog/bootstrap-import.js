@@ -1,16 +1,14 @@
 export {
   Alert,
   Badge,
-  Button,
-  ButtonGroup,
-  ButtonToolbar,
+  ButtonGroup, // no theme needed
+  ButtonToolbar, // no theme needed
   Checkbox,
   Clearfix,
   Col,
   Collapse,
   ControlLabel,
   Dropdown,
-  DropdownButton,
   Form,
   FormControl,
   FormGroup,
@@ -36,7 +34,6 @@ export {
   ProgressBar,
   Radio,
   Row,
-  SplitButton,
   Tab,
   Table,
   Tabs,

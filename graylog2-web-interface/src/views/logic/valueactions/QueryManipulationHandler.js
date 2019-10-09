@@ -2,9 +2,10 @@
 import * as Immutable from 'immutable';
 import { QueriesStore } from 'views/stores/QueriesStore';
 import Query from '../queries/Query';
+import type { QueryId } from '../queries/Query';
 
 export default class QueryManipulationHandler {
-  queries: Immutable.Set<Query>;
+  queries: Immutable.OrderedMap<QueryId, Query>;
 
   constructor() {
     this.queries = QueriesStore.getInitialState();

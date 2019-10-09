@@ -4,6 +4,7 @@ import { mount } from 'enzyme';
 import { AdditionalContext } from 'views/logic/ActionContext';
 
 import SelectExtractorType from './SelectExtractorType';
+import FieldType from '../fieldtypes/FieldType';
 
 jest.mock('logic/datetimes/DateTime', () => ({}));
 
@@ -26,7 +27,7 @@ describe('SelectExtractorType', () => {
   it('should render', () => {
     const wrapper = mount(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} />
+        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
       </AdditionalContext.Provider>,
     );
     const bootstrapModalForm = wrapper.find('BootstrapModalForm');
@@ -37,7 +38,7 @@ describe('SelectExtractorType', () => {
   it('should select a extractor and open a new window', () => {
     const wrapper = mount(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
-        <SelectExtractorType onClose={() => {}} value={value} field={field} />
+        <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
       </AdditionalContext.Provider>,
     );
     const select = wrapper.find('Select');

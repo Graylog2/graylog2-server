@@ -1,0 +1,88 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog.events.event;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
+import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import com.mongodb.DBCollection;
+import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mongojack.Id;
+import org.mongojack.JacksonDBCollection;
+import org.mongojack.ObjectId;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class ESMongoDateTimeDeserializerTest {
+    @ClassRule
+    public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule().build();
+
+    @Rule
+    public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+
+    private ObjectMapper objectMapper;
+
+    @Before
+    public void setUp() throws Exception {
+        objectMapper = new ObjectMapperProvider().get();
+    }
+
+    @Test
+    public void deserializeDateTime() throws Exception {
+        final String json = "{\"date_time\":\"2016-12-13 14:00:00.000\"}";
+        final DTO value = objectMapper.readValue(json, DTO.class);
+        assertThat(value.dateTime).isEqualTo(new DateTime(2016, 12, 13, 14, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    public void deserializeIsoDateTime() throws Exception {
+        final String json = "{\"date_time\":\"2016-12-13T14:00:00.000\"}";
+        final DTO value = objectMapper.readValue(json, DTO.class);
+        assertThat(value.dateTime).isEqualTo(new DateTime(2016, 12, 13, 14, 0, DateTimeZone.UTC));
+    }
+
+    @Test
+    @UsingDataSet(locations = "DateTime.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deserializeMongoDateTime() throws Exception {
+        final DBCollection date_collection = mongoRule.getMongoConnection().getDatabase().getCollection("date_collection");
+        final JacksonDBCollection<DTO, ObjectId> db = JacksonDBCollection.wrap(date_collection, DTO.class, ObjectId.class, objectMapper, null);
+
+        final DTO value = db.findOne();
+        assertThat(value.dateTime).isEqualTo(new DateTime(2019, 1, 13, 14, 0, DateTimeZone.UTC));
+    }
+
+    private static class DTO {
+        @Id
+        @ObjectId
+        @JsonProperty
+        String id;
+
+        @JsonProperty
+        @JsonDeserialize(using = ESMongoDateTimeDeserializer.class)
+        DateTime dateTime;
+    }
+}

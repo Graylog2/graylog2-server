@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.indexer.MongoIndexSet.RESTORED_ARCHIVE_SUFFIX;
 
 /**
  * This class is being used in plugins for testing, DO NOT move it to the test/ directory without changing the plugins.
@@ -33,9 +37,18 @@ public class TestIndexSet implements IndexSet {
     private static final String DEFLECTOR_SUFFIX = "deflector";
 
     private final IndexSetConfig config;
+    private final Pattern indexPattern;
 
     public TestIndexSet(IndexSetConfig config) {
         this.config = config;
+        // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
+        if (isNullOrEmpty(config.indexMatchPattern())) {
+            // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
+            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+        } else {
+            // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
+            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+        }
     }
 
     @Override
@@ -85,7 +98,7 @@ public class TestIndexSet implements IndexSet {
 
     @Override
     public boolean isManagedIndex(String index) {
-        return false;
+        return !isNullOrEmpty(index) && !isWriteIndexAlias(index) && indexPattern.matcher(index).matches();
     }
 
     @Override

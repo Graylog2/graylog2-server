@@ -25,6 +25,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -40,12 +41,13 @@ public abstract class ViewStateDTO {
     static final String FIELD_FORMATTING = "formatting";
     static final String FIELD_DISPLAY_MODE_SETTINGS = "display_mode_settings";
 
+    @Nullable
     @JsonProperty(FIELD_SELECTED_FIELDS)
-    public abstract Set<String> fields();
+    public abstract Optional<Set<String>> fields();
 
     @Nullable
     @JsonProperty(FIELD_STATIC_MESSAGE_LIST_ID)
-    public abstract String staticMessageListId();
+    public abstract Optional<String> staticMessageListId();
 
     @JsonProperty(FIELD_TITLES)
     public abstract Map<String, Map<String, String>> titles();
@@ -68,6 +70,7 @@ public abstract class ViewStateDTO {
 
     @AutoValue.Builder
     public static abstract class Builder {
+        @Nullable
         @JsonProperty(FIELD_SELECTED_FIELDS)
         public abstract Builder fields(Set<String> fields);
 

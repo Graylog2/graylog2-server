@@ -30,13 +30,13 @@ describe('ShowDocumentsHandler', () => {
     jest.clearAllMocks();
   });
   it('adds a new message widget', () => {
-    return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
       });
   });
   it('adds a new message widget for an empty value path', () => {
-    return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widget, valuePath: [] })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
@@ -44,7 +44,7 @@ describe('ShowDocumentsHandler', () => {
       });
   });
   it('adds the given value path as widget filter for new message widget', () => {
-    return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widget, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
@@ -53,7 +53,7 @@ describe('ShowDocumentsHandler', () => {
   });
   it('adds the given value path to an existing widget filter', () => {
     const widgetWithFilter = widget.toBuilder().filter('baz:23').build();
-    return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
@@ -62,7 +62,7 @@ describe('ShowDocumentsHandler', () => {
   });
   it('deduplicates widget filter', () => {
     const widgetWithFilter = widget.toBuilder().filter('bar:42').build();
-    return ShowDocumentsHandler(queryId, field, 42, FieldType.Unknown, { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] })
+    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];

@@ -33,7 +33,7 @@ describe('FieldStatisticsHandler', () => {
     jest.clearAllMocks();
   });
   it('creates field statistics widget for given numeric field', () => {
-    return handler(queryId, fieldName, numericFieldType, {}).then(() => {
+    return handler({ queryId, field: fieldName, type: numericFieldType, contexts: {} }).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
@@ -51,7 +51,7 @@ describe('FieldStatisticsHandler', () => {
     });
   });
   it('creates field statistics widget for given non-numeric field', () => {
-    return handler(queryId, fieldName, nonNumericFieldType, {}).then(() => {
+    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
@@ -64,7 +64,7 @@ describe('FieldStatisticsHandler', () => {
   it('creates field statistics widget and copies the widget filter of original widget', () => {
     const filter = "author: 'Vanth'";
     const origWidget = Widget.builder().filter(filter).build();
-    return handler(queryId, fieldName, nonNumericFieldType, { widget: origWidget }).then(() => {
+    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: { widget: origWidget } }).then(() => {
       expect(WidgetActions.create).toHaveBeenCalled();
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
@@ -72,7 +72,7 @@ describe('FieldStatisticsHandler', () => {
     });
   });
   it('adds title to generated widget', () => {
-    return handler(queryId, fieldName, nonNumericFieldType, {}).then(() => {
+    return handler({ queryId, field: fieldName, type: nonNumericFieldType, contexts: {} }).then(() => {
       const widget = asMock(WidgetActions.create).mock.calls[0][0];
 
       expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, widget.id, `Field Statistics for ${fieldName}`);

@@ -3,15 +3,15 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { MenuItem } from 'components/graylog';
-import uuid from 'uuid/v4';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { ActionContext } from 'views/logic/ActionContext';
 import type { QueryId } from 'views/logic/queries/Query';
-import type { ValueActionHandlerWithContext } from 'views/logic/valueactions/ValueActionHandler';
 import OverlayDropdown from '../OverlayDropdown';
 import style from '../Value.css';
 import CustomPropTypes from '../CustomPropTypes';
+import { createHandlerFor } from './ActionHandler';
+import type { ActionDefinition, ActionHandlerCondition } from './ActionHandler';
 
 type Props = {
   children: React.Node,
@@ -27,17 +27,6 @@ type State = {
   open: boolean,
   overflowingComponents: { [string]: React.Node },
 }
-
-type HandlerValueAction = {|
-  handler: ValueActionHandlerWithContext,
-|}
-
-type ComponentValueAction = {|
-  title: string,
-  component: React.AbstractComponent<*>,
-|}
-
-type ValueActionDefinition = HandlerValueAction | ComponentValueAction;
 
 class ValueActions extends React.Component<Props, State> {
   static propTypes = {
@@ -65,52 +54,29 @@ class ValueActions extends React.Component<Props, State> {
     };
   }
 
-  _createHandlerFor = (action: ValueActionDefinition): ValueActionHandlerWithContext => {
-    if (action.handler) {
-      return action.handler;
-    }
-    if (action.component) {
-      const ActionComponent = action.component;
-      return (queryId, field, value) => {
-        const id = uuid();
-        const onClose = () => this.setState((state) => {
-          const { overflowingComponents } = state;
-          delete overflowingComponents[id];
-          return { overflowingComponents };
-        });
-        const renderedComponent = <ActionComponent key={action.title} onClose={onClose} queryId={queryId} field={field} value={value} />;
-        this.setState((state) => {
-          const { overflowingComponents } = state;
-          overflowingComponents[id] = renderedComponent;
-          return { overflowingComponents };
-        });
-        return Promise.resolve();
-      };
-    }
-    throw new Error(`Invalid binding for action: ${String(action)} - has neither 'handler' nor 'component'.`);
-  };
-
   _onMenuToggle = () => this.setState(state => ({ open: !state.open }));
 
   render() {
     const { children, element, field, menuContainer, queryId, type, value } = this.props;
-    const { overflowingComponents: overflowingComponents1, open } = this.state;
+    const { open, overflowingComponents: components } = this.state;
     // $FlowFixMe: Object.values signature is in the way for this one
-    const overflowingComponents: Array<React.Node> = Object.values(overflowingComponents1);
-    const valueActions = PluginStore.exports('valueActions')
-      .filter((action) => {
-        const hide = action.hide || (() => false);
-        return !hide(this.context);
+    const overflowingComponents: Array<React.Node> = Object.values(components);
+    const handlerArgs = { queryId, field, type, value, contexts: this.context };
+    const valueActions: Array<ActionDefinition> = PluginStore.exports('valueActions')
+      .filter((action: ActionDefinition) => {
+        const { isHidden = (() => false: ActionHandlerCondition) } = action;
+        return !isHidden(handlerArgs);
       })
-      .map((action) => {
-        const handler = this._createHandlerFor(action);
-        const onSelect = (event) => {
+      .map((action: ActionDefinition) => {
+        const setActionComponents = fn => this.setState(({ overflowingComponents: actionComponents }) => ({ overflowingComponents: fn(actionComponents) }));
+        const handler = createHandlerFor(action, setActionComponents);
+        const onSelect = () => {
           this._onMenuToggle();
-          handler(queryId, event.field, event.value, type, this.context);
+          handler(handlerArgs);
         };
 
-        const condition = action.condition || (() => true);
-        const actionDisabled = !condition({ field, type, value, context: this.context });
+        const { isEnabled = (() => true: ActionHandlerCondition) } = action;
+        const actionDisabled = !isEnabled(handlerArgs);
         return (
           <MenuItem key={`value-action-${field}-${action.type}`}
                     disabled={actionDisabled}

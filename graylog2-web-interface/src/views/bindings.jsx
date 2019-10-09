@@ -57,12 +57,18 @@ import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandle
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
-import type { ValueActionHandlerConditionProps } from 'views/logic/valueactions/ValueActionHandler';
-import type { FieldActionHandlerConditionProps } from 'views/logic/fieldactions/FieldActionHandler';
-import { dashboardsPath, extendedSearchPath, newDashboardsPath, showViewsPath, viewsPath } from 'views/Constants';
+import {
+  dashboardsPath,
+  extendedSearchPath,
+  newDashboardsPath,
+  showDashboardsPath,
+  showViewsPath,
+  viewsPath,
+} from 'views/Constants';
 import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from 'views/pages/StreamSearchPage';
 import AppConfig from 'util/AppConfig';
+import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -82,6 +88,7 @@ const searchRoutes = enableNewSearch
     { path: newDashboardsPath, component: NewDashboardPage },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage },
     { path: dashboardsPath, component: DashboardsPage },
+    { path: showDashboardsPath, component: ShowViewPage },
   ]
   : [];
 
@@ -153,13 +160,13 @@ export default {
       type: 'chart',
       title: 'Chart',
       handler: ChartActionHandler,
-      condition: ({ type }: FieldActionHandlerConditionProps) => type.isNumeric(),
+      isEnabled: (({ type }) => type.isNumeric(): ActionHandlerCondition),
     },
     {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      condition: ({ type }: FieldActionHandlerConditionProps) => !type.isCompound(),
+      isEnabled: (({ type }) => !type.isCompound(): ActionHandlerCondition),
     },
     {
       type: 'statistics',
@@ -170,15 +177,15 @@ export default {
       type: 'add-to-table',
       title: 'Add to table',
       handler: AddToTableActionHandler,
-      condition: AddToTableActionHandler.condition,
-      hide: AddToTableActionHandler.hide,
+      isEnabled: AddToTableActionHandler.isEnabled,
+      isHidden: AddToTableActionHandler.isHidden,
     },
     {
       type: 'remove-to-table',
       title: 'Remove from table',
       handler: RemoveFromTableActionHandler,
-      condition: RemoveFromTableActionHandler.condition,
-      hide: RemoveFromTableActionHandler.hide,
+      isEnabled: RemoveFromTableActionHandler.isEnabled,
+      isHidden: RemoveFromTableActionHandler.isHidden,
     },
     {
       type: 'add-to-all-tables',
@@ -196,37 +203,37 @@ export default {
       type: 'exclude',
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
-      condition: ({ field }: ValueActionHandlerConditionProps) => !isFunction(field),
+      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
-      condition: ({ field }: ValueActionHandlerConditionProps) => !isFunction(field),
+      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
     },
     {
       type: 'new-query',
       title: 'Use in new query',
       handler: UseInNewQueryHandler,
-      hide: UseInNewQueryHandler.isEnabled,
+      isHidden: UseInNewQueryHandler.isEnabled,
     },
     {
       type: 'show-bucket',
       title: 'Show documents for value',
       handler: ShowDocumentsHandler,
-      condition: ShowDocumentsHandler.isEnabled,
+      isEnabled: ShowDocumentsHandler.isEnabled,
     },
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      condition: ({ type }: ValueActionHandlerConditionProps) => type.type === 'string',
+      isEnabled: (({ type }) => type.type === 'string': ActionHandlerCondition),
       component: SelectExtractorType,
     },
     {
       type: 'highlight-value',
       title: 'Highlight this value',
       handler: HighlightValueHandler,
-      condition: HighlightValueHandler.condition,
+      isEnabled: HighlightValueHandler.isEnabled,
     },
   ],
   visualizationTypes: [
