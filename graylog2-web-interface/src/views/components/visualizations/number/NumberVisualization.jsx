@@ -105,8 +105,8 @@ class NumberVisualization extends React.Component<Props, State> {
     const { currentView, fields, data } = this.props;
     const { activeQuery } = currentView;
     const { value, field } = this._extractValueAndField(data);
-    if (!value || !field) {
-      return '';
+    if (!field || (value !== 0 && !value)) {
+      return 'N/A';
     }
 
     return (

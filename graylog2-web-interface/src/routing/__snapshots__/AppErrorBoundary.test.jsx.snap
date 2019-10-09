@@ -4,19 +4,7 @@ exports[`AppErrorBoundary displays child component if there is no error 1`] = `
 <AppErrorBoundary
   router={
     Object {
-      "listen": [MockFunction] {
-        "calls": Array [
-          Array [
-            [Function],
-          ],
-        ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-        ],
-      },
+      "listen": [Function],
     }
   }
 >
