@@ -7,7 +7,7 @@ Object {
     <div>
       <span>
         <button
-          class="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+          class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
           data-testid="user-preferences-button"
           type="button"
         >
@@ -19,7 +19,7 @@ Object {
   "container": <div>
     <span>
       <button
-        class="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+        class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
         data-testid="user-preferences-button"
         type="button"
       >

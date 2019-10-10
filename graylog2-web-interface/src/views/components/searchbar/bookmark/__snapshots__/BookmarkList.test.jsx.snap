@@ -98,7 +98,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="submit-button"
@@ -136,10 +136,9 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -160,12 +159,12 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -174,7 +173,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                   <div
                     className="form-group"
@@ -184,7 +183,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="reset-button"
@@ -221,10 +220,9 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -246,13 +244,13 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -262,7 +260,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                 </form>
               </div>
@@ -765,7 +763,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="submit-button"
@@ -803,10 +801,9 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -827,12 +824,12 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -841,7 +838,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                   <div
                     className="form-group"
@@ -851,7 +848,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="reset-button"
@@ -888,10 +885,9 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -913,13 +909,13 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -929,7 +925,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                 </form>
               </div>
@@ -1377,7 +1373,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="submit-button"
@@ -1415,10 +1411,9 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -1439,12 +1434,12 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -1453,7 +1448,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                   <div
                     className="form-group"
@@ -1463,7 +1458,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       }
                     }
                   >
-                    <Button
+                    <ForwardRef
                       active={false}
                       bsStyle="default"
                       className="reset-button"
@@ -1500,10 +1495,9 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "Button__StyledButton-c9cbmb-0",
                                 "isStatic": false,
-                                "lastClassName": "cBCVOY",
+                                "lastClassName": "kRDLih",
                                 "rules": Array [
                                   [Function],
-                                  ";",
                                 ],
                               },
                               "displayName": "Button__StyledButton",
@@ -1525,13 +1519,13 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -1541,7 +1535,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                           </Button>
                         </StyledComponent>
                       </Button__StyledButton>
-                    </Button>
+                    </ForwardRef>
                   </div>
                 </form>
               </div>
