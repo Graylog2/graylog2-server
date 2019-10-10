@@ -92,7 +92,7 @@ const CenteredBox = styled.div`
 const ResetOverrideHint = () => (
   <CenteredBox>
     These controls are disabled because a filter is applied to all widgets.{' '}
-    <Button bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter.</Button>
+    <Button bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter</Button>
   </CenteredBox>
 );
 
@@ -103,7 +103,8 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
   const rangeParams = Immutable.Map(rest || { range: 300 });
   const { id } = widget;
   const performSearch = () => { };
-  const isGloballyOverridden: boolean = globalOverride !== undefined && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
+  const isGloballyOverridden: boolean = globalOverride !== undefined && globalOverride !== null
+    && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
   return (
     <React.Fragment>
