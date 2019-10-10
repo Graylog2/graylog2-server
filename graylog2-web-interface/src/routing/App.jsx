@@ -2,11 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Navigation from 'components/navigation/Navigation';
-import Spinner from 'components/common/Spinner';
+import { Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
-
-import { Icon } from 'components/graylog';
 
 import AppErrorBoundary from './AppErrorBoundary';
 
@@ -29,7 +27,7 @@ const App = ({ children, currentUser, location }) => {
                   loginName={currentUser.username}
                   permissions={currentUser.permissions} />
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
-        <Icon nameame="arrow-up" />
+        <Icon name="arrow-up" />
       </div>
       <AppErrorBoundary>
         {children}
