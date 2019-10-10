@@ -7,9 +7,11 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
   const selectedStreams = value.join(',');
   return (
     <div style={{ position: 'relative', zIndex: 10 }}>
+      <label htmlFor="streams-filter" style={{ display: 'none' }}>Streams Filter</label>
       <Select placeholder="Select streams the search should include. Searches in all streams if empty."
               disabled={disabled}
               displayKey="key"
+              inputId="streams-filter"
               onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
               options={streams}
               multi

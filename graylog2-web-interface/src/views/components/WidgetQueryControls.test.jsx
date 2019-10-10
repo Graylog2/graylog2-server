@@ -1,6 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import { render, waitForElement, cleanup, fireEvent } from '@testing-library/react';
+import selectEvent from 'react-select-event';
+import '@testing-library/jest-dom/extend-expect'
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import Widget from 'views/logic/widgets/Widget';
@@ -10,6 +12,7 @@ import { WidgetActions } from '../stores/WidgetStore';
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     timerange: jest.fn(),
+    streams: jest.fn(),
   },
 }));
 jest.mock('views/stores/GlobalOverrideStore', () => ({
@@ -35,15 +38,15 @@ describe('WidgetQueryControls', () => {
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
   const renderSUT = (props = {}, renderer = render) => renderer(
-    <WidgetQueryControls {...props}
-                         widget={
+    <WidgetQueryControls widget={
                            Widget.builder()
                              .id('deadbeef')
                              .type('foo')
                              .build()
                          }
                          availableStreams={[]}
-                         config={config} />,
+                         config={config}
+                         {...props} />,
   );
   it('should do something', () => {
     const { container } = renderSUT();
@@ -76,6 +79,12 @@ describe('WidgetQueryControls', () => {
       renderSUT({ globalOverride: emptyGlobalOverride }, rerender);
 
       expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+    });
+
+    it('disables timerange controls when global override is present', () => {
+      const { getByDisplayValue } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const timeRangeSelect = getByDisplayValue('Search in last day');
+      expect(timeRangeSelect).toBeDisabled();
     });
   });
 
@@ -110,5 +119,17 @@ describe('WidgetQueryControls', () => {
     fireEvent.click(absoluteTimeRangeSelect);
 
     expect(WidgetActions.timerange).toHaveBeenLastCalledWith('deadbeef', { type: 'absolute', from: '2019-10-10T12:21:31.146Z', to: '2019-10-10T12:26:31.146Z' });
+  });
+
+  it('changes the widget\'s streams when using stream filter', async () => {
+    const { getByLabelText } = renderSUT({
+      availableStreams: [
+        { key: 'PFLog', value: '5c2e27d6ba33a9681ad62775' },
+        { key: 'DNS Logs', value: '5d2d9649e117dc4df84cf83c' },
+      ],
+    });
+    await selectEvent.select(getByLabelText('Streams Filter'), 'PFLog');
+
+    expect(WidgetActions.streams).toHaveBeenCalledWith('deadbeef', ['5c2e27d6ba33a9681ad62775']);
   });
 });

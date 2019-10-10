@@ -189,7 +189,7 @@ class QueryInput extends Component<Props, State> {
     const { disabled, onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;
     const { value } = this.state;
     return (
-      <div className="query" style={{ display: 'flex' }}>
+      <div className="query" style={{ display: 'flex' }} data-testid="query-input">
         <AceEditor mode="lucene"
                    ref={editor => editor && this._bindEditor(editor)}
                    readOnly={disabled}
