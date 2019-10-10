@@ -131,6 +131,20 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         forwardedComponent={
                           Object {
                             "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                              "xsmall",
+                            ],
+                            "STYLES": Array [
+                              "success",
+                              "warning",
+                              "danger",
+                              "info",
+                              "default",
+                              "primary",
+                              "link",
+                            ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
                               "componentId": "Button__StyledButton-c9cbmb-0",
@@ -153,25 +167,20 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                         }
                         forwardedRef={null}
                       >
-                        <Component
+                        <Button
+                          active={false}
+                          block={false}
+                          bsClass="btn"
                           bsStyle="default"
                           className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                          disabled={false}
                         >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                          <button
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                             disabled={false}
-                          >
-                            <button
-                              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              type="button"
-                            />
-                          </Button>
-                        </Component>
+                            type="button"
+                          />
+                        </Button>
                       </StyledComponent>
                     </Button__StyledButton>
                   </ForwardRef>

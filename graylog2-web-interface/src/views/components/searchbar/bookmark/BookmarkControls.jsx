@@ -169,11 +169,9 @@ class BookmarkControls extends React.Component<Props, State> {
             <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
               <i className="fa fa-eraser" />
             </Button>
-            <span ref={(elem) => { this.formTarget = elem; }}>
-              <Button title={title} onClick={this.toggleFormModal}>
-                <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
-              </Button>
-            </span>
+            <Button ref={(elem) => { this.formTarget = elem; }} title={title} onClick={this.toggleFormModal}>
+              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+            </Button>
             {bookmarkForm}
           </React.Fragment>
           <Button title="List of saved searches"

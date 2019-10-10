@@ -122,6 +122,20 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                     forwardedComponent={
                       Object {
                         "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                          "xsmall",
+                        ],
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                          "default",
+                          "primary",
+                          "link",
+                        ],
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
@@ -146,35 +160,27 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                     onClick={[Function]}
                     type="submit"
                   >
-                    <Component
+                    <Button
                       action="push"
+                      active={false}
+                      block={false}
+                      bsClass="btn"
                       bsStyle="success"
                       className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                      disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
-                      <Button
+                      <button
                         action="push"
-                        active={false}
-                        block={false}
-                        bsClass="btn"
-                        bsStyle="success"
-                        className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                        className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
                         disabled={false}
                         onClick={[Function]}
                         type="submit"
                       >
-                        <button
-                          action="push"
-                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="submit"
-                        >
-                          Back
-                        </button>
-                      </Button>
-                    </Component>
+                        Back
+                      </button>
+                    </Button>
                   </StyledComponent>
                 </Button__StyledButton>
               </ForwardRef>
