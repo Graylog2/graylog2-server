@@ -91,7 +91,7 @@ const CenteredBox = styled.div`
 
 const ResetOverrideHint = () => (
   <CenteredBox>
-    These controls are disabled because a filter is applied to all widgets. <Button onClick={GlobalOverrideActions.reset}>Reset filter.</Button>
+    These controls are disabled because a filter is applied to all widgets. <Button data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter.</Button>
   </CenteredBox>
 );
 
@@ -102,7 +102,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
   const rangeParams = Immutable.Map(rest || { range: 300 });
   const { id } = widget;
   const performSearch = () => { };
-  const isGloballyOverridden = globalOverride && (globalOverride.query || globalOverride.timerange);
+  const isGloballyOverridden: boolean = globalOverride !== undefined && (globalOverride.query !== undefined || globalOverride.timerange !== undefined);
   const Wrapper = isGloballyOverridden ? BlurredWrapper : React.Fragment;
   return (
     <React.Fragment>
@@ -158,7 +158,7 @@ export default connect(
     configurations: SearchConfigStore,
     globalOverride: GlobalOverrideStore,
   },
-  ({ availableStreams: { streams }, configurations, ...rest }) => ({
+  ({ availableStreams: { streams = [] }, configurations, ...rest }) => ({
     ...rest,
     availableStreams: streams.map(stream => ({ key: stream.title, value: stream.id })),
     config: configurations.searchesClusterConfig,
