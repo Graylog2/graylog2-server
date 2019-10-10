@@ -413,6 +413,21 @@ body #header {
     font-size: 14px;
 }
 
+.warning-box {
+    color: #9F6000;
+    background-color: #FEEFB3;
+    vertical-align:middle;
+    position: fixed;
+    top: 75px;
+    left: 20px;
+    width: 250px;
+    margin: 5px;
+    padding: 20px;
+    font-size: 14px;
+    border-radius:.5em;
+    box-shadow: 6px 6px 11px -4px rgba(0,0,0,0.43);
+}
+
 body #header a#logo {
     font-size: 1.5em;
     font-weight: bold;

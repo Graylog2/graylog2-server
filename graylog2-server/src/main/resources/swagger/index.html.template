@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>Graylog REST API browser</title>
-  <base href="${baseUri}api-browser/">
+  <base href="${baseUri}api-browser/${globalModePath}">
   <link href='css/fonts.css' rel='stylesheet' type='text/css'/>
   <link href='css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
@@ -22,7 +23,7 @@
     var apiTarget = "${baseUri}";
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: apiTarget + "api-docs",
+      url: apiTarget + "api-docs" + "${globalUriMarker}",
       dom_id: "swagger-ui-container",
       supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
       onComplete: function(swaggerApi, swaggerUi){
@@ -37,6 +38,10 @@
           console.log("Loaded SwaggerUI")
         }
         $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+
+        if ("${showWarning}") {
+          $('.warning-box').css('visibility', '');
+        }
       },
       onFailure: function(data) {
         if(console) {
@@ -67,6 +72,13 @@
 </head>
 
 <body>
+<div class="warning-box" style="visibility:hidden;">
+  <h3>Attention</h3>
+  <p>
+  The API browser is running in global mode. API requests made against this URI will not be bound to a specific node,
+  but might end up on any random node in your Graylog cluster. Keep that in mind when using node specific API requests.
+  </p>
+</div>
 <div id='header'>
   <div class="swagger-ui-wrap">
     <img src="images/toplogo.png">

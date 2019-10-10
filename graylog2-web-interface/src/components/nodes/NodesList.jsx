@@ -9,7 +9,6 @@ import { Spinner, EntityList, Pluralize } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import NodeListItem from './NodeListItem';
 
-const NodesStore = StoreProvider.getStore('Nodes');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 const NodesList = createReactClass({
@@ -17,12 +16,13 @@ const NodesList = createReactClass({
 
   propTypes: {
     permissions: PropTypes.array.isRequired,
+    nodes: PropTypes.array.isRequired,
   },
 
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(ClusterOverviewStore)],
+  mixins: [Reflux.connect(ClusterOverviewStore)],
 
   _isLoading() {
-    return !(this.state.nodes && this.state.clusterOverview);
+    return !(this.props.nodes && this.state.clusterOverview);
   },
 
   _formatNodes(nodes, clusterOverview) {
@@ -38,7 +38,7 @@ const NodesList = createReactClass({
       return <Spinner />;
     }
 
-    const nodesNo = Object.keys(this.state.nodes).length;
+    const nodesNo = Object.keys(this.props.nodes).length;
 
     return (
       <Row className="content">
@@ -48,7 +48,7 @@ const NodesList = createReactClass({
           </h2>
           <EntityList bsNoItemsStyle="info"
                       noItemsText="There are no active nodes."
-                      items={this._formatNodes(this.state.nodes, this.state.clusterOverview)} />
+                      items={this._formatNodes(this.props.nodes, this.state.clusterOverview)} />
         </Col>
       </Row>
     );
