@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { TypeAheadDataFilter } from 'components/common';
+
+import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter'; // cannot destruct because eslint(import/no-cycle)
 import DataTableElement from './DataTableElement';
 
 /**

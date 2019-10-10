@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Select } from 'components/common';
+import Select from 'components/common/Select'; // cannot destruct because eslint(import/no-cycle)
 import { Button, ListGroup, ListGroupItem } from 'components/graylog';
 
 /**

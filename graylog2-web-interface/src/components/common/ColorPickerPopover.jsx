@@ -1,8 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
+
 import { OverlayTrigger, Popover } from 'components/graylog';
-import { ColorPicker } from 'components/common';
+import ColorPicker from 'components/common/ColorPicker'; // cannot destruct because eslint(import/no-cycle)
 
 import style from './ColorPickerPopover.css';
 
