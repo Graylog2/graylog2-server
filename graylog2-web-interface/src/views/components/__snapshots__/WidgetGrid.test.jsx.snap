@@ -1,16 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<WidgetGrid /> should render with minimal props 1`] = `
-<div
-  className="row"
->
+<div>
   <div
     className="dashboard"
-    style={
-      Object {
-        "marginLeft": "-20px",
-      }
-    }
-  />
+  >
+    <span
+      width={200}
+    />
+  </div>
 </div>
 `;

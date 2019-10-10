@@ -3,7 +3,6 @@ import React from 'react';
 
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
-import Footer from 'components/layout/Footer';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
@@ -33,7 +32,6 @@ const App = ({ children, currentUser, location }) => {
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
-      <Footer />
     </div>
   );
 };

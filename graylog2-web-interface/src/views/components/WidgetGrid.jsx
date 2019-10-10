@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Row } from 'components/graylog';
 import _ from 'lodash';
+import { SizeMe } from 'react-sizeme';
 
 import connect from 'stores/connect';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -107,7 +107,7 @@ class WidgetGrid extends React.Component {
                       onSizeChange={this._onWidgetSizeChange}
                       title={widgetTitle} />
             </AdditionalContext.Provider>
-          </WidgetContext.Provider>,
+          </WidgetContext.Provider>
         </div>,
       );
     });
@@ -120,7 +120,7 @@ class WidgetGrid extends React.Component {
     // eslint-disable-next-line react/destructuring-assignment
     const { widgets, positions } = this._renderWidgets(this.props.widgets, this.props.positions, data, errors);
     const grid = widgets && widgets.length > 0 ? (
-      <ReactGridContainer animate={false}
+      <ReactGridContainer animate
                           locked={locked}
                           columns={{
                             xxl: 12,
@@ -136,14 +136,18 @@ class WidgetGrid extends React.Component {
                           useDragHandle=".widget-drag-handle">
         {widgets}
       </ReactGridContainer>
-    ) : null;
+    ) : <span />;
     return (
-      <Row>
-        <div className="dashboard" style={{ marginLeft: '-20px' }}>
-          {grid}
-          {staticWidgets}
-        </div>
-      </Row>
+      <SizeMe monitorWidth refreshRate={100}>
+        {({ size }) => {
+          return (
+            <div className="dashboard">
+              {React.cloneElement(grid, { width: size.width })}
+              {staticWidgets}
+            </div>
+          );
+        }}
+      </SizeMe>
     );
   }
 }

@@ -1,8 +1,17 @@
+// @flow strict
 import Reflux from 'reflux';
 import { isEqual } from 'lodash';
 
 import { singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
+
+export type ViewMetaData = {
+  activeQuery: string,
+  description: string,
+  id: string,
+  summary: string,
+  title: string,
+};
 
 // eslint-disable-next-line import/prefer-default-export
 export const ViewMetadataStore = singletonStore(
