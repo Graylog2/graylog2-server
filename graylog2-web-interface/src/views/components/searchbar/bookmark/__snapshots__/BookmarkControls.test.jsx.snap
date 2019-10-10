@@ -90,10 +90,9 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -102,6 +101,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -115,13 +115,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -177,10 +177,9 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -189,6 +188,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -202,13 +202,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="Unsaved changes"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Unsaved changes"
@@ -274,10 +274,9 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -286,6 +285,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -299,13 +299,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -424,10 +424,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -436,6 +435,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -449,13 +449,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -511,10 +511,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -523,6 +522,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -536,13 +536,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="Saved search"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Saved search"
@@ -608,10 +608,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -620,6 +619,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -633,13 +633,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -758,10 +758,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -770,6 +769,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -783,13 +783,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={true}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={true}
                     onClick={[Function]}
                     title="Empty search"
@@ -845,10 +845,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -857,6 +856,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -870,13 +870,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="Save search"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Save search"
@@ -942,10 +942,9 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "cBCVOY",
+                      "lastClassName": "kRDLih",
                       "rules": Array [
                         [Function],
-                        ";",
                       ],
                     },
                     "displayName": "Button__StyledButton",
@@ -954,6 +953,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
+                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -967,13 +967,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
