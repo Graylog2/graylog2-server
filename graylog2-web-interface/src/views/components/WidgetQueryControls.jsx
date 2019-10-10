@@ -91,7 +91,8 @@ const CenteredBox = styled.div`
 
 const ResetOverrideHint = () => (
   <CenteredBox>
-    These controls are disabled because a filter is applied to all widgets. <Button data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter.</Button>
+    These controls are disabled because a filter is applied to all widgets.{' '}
+    <Button bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter.</Button>
   </CenteredBox>
 );
 
