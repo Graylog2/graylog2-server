@@ -8,7 +8,7 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import { ClipboardButton } from 'components/common';
+import ClipboardButton from 'components/common/ClipboardButton'; // cannot destruct because eslint(import/no-cycle)
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
