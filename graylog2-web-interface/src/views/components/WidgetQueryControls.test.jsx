@@ -3,11 +3,14 @@ import * as React from 'react';
 import { render, waitForElement, cleanup, fireEvent } from '@testing-library/react';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import Widget from 'views/logic/widgets/Widget';
 import WidgetQueryControls from './WidgetQueryControls';
-import Widget from '../logic/widgets/Widget';
+import { WidgetActions } from '../stores/WidgetStore';
 
 jest.mock('views/stores/WidgetStore', () => ({
-  WidgetActions: {},
+  WidgetActions: {
+    timerange: jest.fn(),
+  },
 }));
 jest.mock('views/stores/GlobalOverrideStore', () => ({
   GlobalOverrideActions: {
@@ -16,14 +19,26 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
 }));
 jest.mock('stores/connect', () => x => x);
 
+jest.mock('moment', () => {
+  const mockMoment = jest.requireActual('moment');
+  return Object.assign(() => mockMoment('2019-10-10T12:26:31.146Z'), mockMoment);
+});
+
 describe('WidgetQueryControls', () => {
   afterEach(cleanup);
 
-  const config = { relative_timerange_options: {}, query_time_range_limit: '' };
-  const renderSUT = (props) => render(
+  const config = {
+    relative_timerange_options: { PT1D: 'Search in last day', PT0S: 'Search in all messages' },
+    query_time_range_limit: 'PT0S',
+  };
+  const emptyGlobalOverride = {};
+  const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
+
+  const renderSUT = (props = {}, renderer = render) => renderer(
     <WidgetQueryControls {...props}
                          widget={
                            Widget.builder()
+                             .id('deadbeef')
                              .type('foo')
                              .build()
                          }
@@ -35,35 +50,65 @@ describe('WidgetQueryControls', () => {
     expect(container).toMatchSnapshot();
   });
 
-  it('shows an indicator if global override is set', async () => {
-    const { getByText, getByTestId } = renderSUT({
-      globalOverride: {
-        query: {
-          type: 'elasticsearch',
-          query_string: 'source:foo',
-        },
-      },
+  describe('displays if global override is set', () => {
+    it('shows an indicator if global override is set', async () => {
+      const { getByText, getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
+      await waitForElement(() => getByTestId('reset-filter'));
     });
-    await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
-    await waitForElement(() => getByTestId('reset-filter'));
+
+    it('does not show an indicator if global override is not set', async () => {
+      const { queryByText } = renderSUT({ globalOverride: emptyGlobalOverride });
+      expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+    });
+
+    it('triggers resetting the global override store when reset filter button is clicked', async () => {
+      const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
+      fireEvent.click(resetFilterButton);
+      expect(GlobalOverrideActions.reset).toHaveBeenCalled();
+    });
+
+    it('emptying `globalOverride` prop removes notification', async () => {
+      const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
+      await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
+
+      renderSUT({ globalOverride: emptyGlobalOverride }, rerender);
+
+      expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+    });
   });
 
-  it('does not show an indicator if global override is not set', async () => {
-    const { queryByText } = renderSUT({ globalOverride: {} });
-    expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+  it('changes the widget\'s timerange when time range input is used', () => {
+    const { getByDisplayValue, getByText } = renderSUT();
+    const timeRangeSelect = getByDisplayValue('Search in last day');
+    expect(timeRangeSelect).not.toBeNull();
+
+    const optionForAllMessages = getByText('Search in all messages');
+
+    fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
+
+    expect(WidgetActions.timerange).toHaveBeenCalledWith('deadbeef', { range: '0' });
+    expect(getByDisplayValue('Search in all messages')).not.toBeNull();
   });
-  
-  it('reset filter button triggers resetting the global override store', async () => {
-    const { getByTestId } = renderSUT({
-      globalOverride: {
-        query: {
-          type: 'elasticsearch',
-          query_string: 'source:foo',
-        },
-      },
-    });
-    const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
-    fireEvent.click(resetFilterButton);
-    expect(GlobalOverrideActions.reset).toHaveBeenCalled();
+
+  it('changes the widget\'s timerange type when switching to absolute time range', () => {
+    const { getByText } = renderSUT();
+    const absoluteTimeRangeSelect = getByText('Absolute');
+    expect(absoluteTimeRangeSelect).not.toBeNull();
+
+    fireEvent.click(absoluteTimeRangeSelect);
+
+    expect(WidgetActions.timerange).toHaveBeenLastCalledWith('deadbeef', { type: 'absolute', from: '2019-10-10T12:21:31.146Z', to: '2019-10-10T12:26:31.146Z' });
+  });
+
+  it('changes the widget\'s timerange type when switching to absolute time range', () => {
+    const { getByText } = renderSUT();
+    const absoluteTimeRangeSelect = getByText('Absolute');
+    expect(absoluteTimeRangeSelect).not.toBeNull();
+
+    fireEvent.click(absoluteTimeRangeSelect);
+
+    expect(WidgetActions.timerange).toHaveBeenLastCalledWith('deadbeef', { type: 'absolute', from: '2019-10-10T12:21:31.146Z', to: '2019-10-10T12:26:31.146Z' });
   });
 });
