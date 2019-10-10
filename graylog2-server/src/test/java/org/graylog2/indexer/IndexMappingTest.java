@@ -40,6 +40,7 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -131,7 +132,7 @@ public class IndexMappingTest {
         indices = new Indices(jestClient, objectMapper, indexMappingFactory, null, nodeId, auditEventSender, null);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(metricRegistry, jestClient);
+        messages = new Messages(metricRegistry, jestClient, mock(ProcessingStatusRecorder.class));
         indices.create(currentIndex, indexSet);
     }
 
