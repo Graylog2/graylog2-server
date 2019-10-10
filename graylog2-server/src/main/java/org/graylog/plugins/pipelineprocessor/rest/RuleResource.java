@@ -217,6 +217,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Update rule metrics configuration")
     @Path("/config/metrics")
     @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_METRICS_UPDATE)
     public RuleMetricsConfigDto updateMetricsConfig(RuleMetricsConfigDto config) {
         return ruleMetricsConfigService.save(config);
     }
