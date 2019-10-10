@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { render, waitForElement, cleanup, fireEvent } from '@testing-library/react';
 import selectEvent from 'react-select-event';
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom/extend-expect';
 
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import Widget from 'views/logic/widgets/Widget';
