@@ -34,18 +34,21 @@ describe('WidgetQueryControls', () => {
     relative_timerange_options: { PT1D: 'Search in last day', PT0S: 'Search in all messages' },
     query_time_range_limit: 'PT0S',
   };
+
+  const defaultProps = {
+    widget: Widget.builder()
+      .id('deadbeef')
+      .type('foo')
+      .build(),
+    availableStreams: [],
+    config,
+  };
+
   const emptyGlobalOverride = {};
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
-  const renderSUT = (props = {}, renderer = render) => renderer(
-    <WidgetQueryControls widget={
-                           Widget.builder()
-                             .id('deadbeef')
-                             .type('foo')
-                             .build()
-                         }
-                         availableStreams={[]}
-                         config={config}
+  const renderSUT = (props = {}) => render(
+    <WidgetQueryControls {...defaultProps}
                          {...props} />,
   );
   it('should do something', () => {
@@ -76,7 +79,7 @@ describe('WidgetQueryControls', () => {
       const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
       await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
 
-      renderSUT({ globalOverride: emptyGlobalOverride }, rerender);
+      rerender(<WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />);
 
       expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
     });
@@ -93,7 +96,8 @@ describe('WidgetQueryControls', () => {
     const timeRangeSelect = getByDisplayValue('Search in last day');
     expect(timeRangeSelect).not.toBeNull();
 
-    const optionForAllMessages = getByText('Search in all messages');
+    // $FlowFixMe: We know it is an input, not a plain HTML element
+    const optionForAllMessages: HTMLInputElement = getByText('Search in all messages');
 
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
 
