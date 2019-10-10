@@ -2,13 +2,14 @@
 import * as React from 'react';
 import { mount } from 'enzyme';
 
+import { StoreMock as MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import { QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import SearchActions from 'views/actions/SearchActions';
+import { SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
@@ -22,16 +23,56 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
+jest.mock('components/layout/Footer', () => <div />);
+jest.mock('views/stores/ViewMetadataStore', () => ({
+  ViewMetadataStore: MockStore(
+    ['listen', () => jest.fn()],
+    'get',
+    ['getInitialState', () => ({
+      activeQuery: 'beef-dead',
+    })],
+  ),
+}));
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    execute: jest.fn(() => Promise.resolve()),
+  },
+  SearchStore: MockStore(
+    ['listen', () => jest.fn()],
+    'get',
+    ['getInitialState', () => ({
+      result: {
+        forId: jest.fn(() => {
+          return {};
+        }),
+      },
+    })],
+  ),
+}));
+jest.mock('views/stores/FieldTypesStore', () => ({
+  FieldTypesActions: {},
+  FieldTypesStore: MockStore(
+    ['listen', () => jest.fn()],
+    'get',
+    ['getInitialState', () => ({
+      all: {},
+      queryFields: {
+        get: jest.fn(() => {
+          return {};
+        }),
+      },
+    })],
+  ),
+}));
+jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore', () => ({ StreamsActions: { refresh: jest.fn() } }));
 jest.mock('views/components/common/WindowLeaveMessage', () => mockComponent('WindowLeaveMessage'));
-jest.mock('stores/connect', () => x => x);
 jest.mock('views/components/WithSearchStatus', () => x => x);
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 jest.mock('views/components/DashboardSearchBar', () => mockComponent('DashboardSearchBar'));
 jest.mock('views/stores/SearchConfigStore', () => ({ SearchConfigStore: {}, SearchConfigActions: {} }));
-jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesActions: {} }));
 jest.mock('views/stores/SearchMetadataStore', () => ({ SearchMetadataActions: {}, SearchMetadataStore: {} }));
 jest.mock('views/logic/withPluginEntities', () => x => x);
 jest.mock('views/components/views/CurrentViewTypeProvider', () => jest.fn());

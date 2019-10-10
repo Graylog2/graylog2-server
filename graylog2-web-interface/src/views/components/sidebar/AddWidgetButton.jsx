@@ -3,13 +3,14 @@ import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { ButtonGroup, Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
-const menuTitle = <React.Fragment><i className="fa fa-plus" />{' '}Create</React.Fragment>;
-
-type Props = {};
+type Props = {
+  onClick: () => void,
+  toggleAutoClose: () => void,
+};
 
 type State = {
   overflowingComponents: { [string]: React.Node },
@@ -47,9 +48,14 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createHandlerFor = (creator: Creator): CreatorFunction => {
+    const { onClick, toggleAutoClose } = this.props;
     const { view } = ViewStore.getInitialState();
     if (creator.func) {
-      return () => creator.func({ view });
+      return () => {
+        onClick();
+        toggleAutoClose();
+        creator.func({ view });
+      };
     }
     if (creator.component) {
       const CreatorComponent = creator.component;
@@ -58,6 +64,8 @@ class AddWidgetButton extends React.Component<Props, State> {
         const onClose = () => this.setState((state) => {
           const { overflowingComponents } = state;
           delete overflowingComponents[id];
+          onClick();
+          toggleAutoClose();
           return { overflowingComponents };
         });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
@@ -65,6 +73,8 @@ class AddWidgetButton extends React.Component<Props, State> {
           const { overflowingComponents } = state;
           overflowingComponents[id] = renderedComponent;
           return { overflowingComponents };
+        }, () => {
+          toggleAutoClose();
         });
       };
     }
@@ -72,11 +82,11 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
-    <MenuItem key={creator.title}
-              onSelect={this._createHandlerFor(creator)}
-              disabled={creator.condition ? !creator.condition() : false}>
+    <Button key={creator.title}
+            onClick={this._createHandlerFor(creator)}
+            disabled={creator.condition ? !creator.condition() : false}>
       {creator.title}
-    </MenuItem>
+    </Button>
   );
 
   render() {
@@ -90,11 +100,10 @@ class AddWidgetButton extends React.Component<Props, State> {
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <React.Fragment>
-        <DropdownButton title={menuTitle} id="add-widget-button-dropdown" bsStyle="info" pullRight>
+        <ButtonGroup vertical block>
           {presets}
-          <MenuItem divider />
           {generic}
-        </DropdownButton>
+        </ButtonGroup>
         {components}
       </React.Fragment>
     );

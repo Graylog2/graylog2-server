@@ -46,19 +46,19 @@ describe('Create a new view', () => {
   afterEach(cleanup);
 
   it('using Views Page', async () => {
-    const { getByText, getAllByText } = render(<AppRouter />);
+    const { getByTestId, getAllByText } = render(<AppRouter />);
     history.push(Routes.VIEWS.LIST);
 
     const button = await waitForElement(() => getAllByText('Create new view')[0]);
     fireEvent.click(button);
-    await waitForElement(() => getByText('New View'));
+    await waitForElement(() => getByTestId('toggle-button'));
   });
 
   it('by going to the new view endpoint', async () => {
-    const { getByText } = render(<AppRouter />);
+    const { getByTestId } = render(<AppRouter />);
 
     history.push(Routes.EXTENDEDSEARCH);
 
-    await waitForElement(() => getByText('New View'));
+    await waitForElement(() => getByTestId('toggle-button'));
   });
 });
