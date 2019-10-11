@@ -112,14 +112,9 @@ exports[`WidgetQueryControls should do something 1`] = `
       class="col-md-8"
     >
       <div
+        data-testid="streams-filter"
         style="position: relative; z-index: 10;"
       >
-        <label
-          for="streams-filter"
-          style="display: none;"
-        >
-          Streams Filter
-        </label>
         <div
           class="css-1pcexqc-container"
         >

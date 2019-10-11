@@ -116,6 +116,6 @@ export const GlobalOverrideStore = singletonStore(
       return newGlobalOverride !== this.globalOverride
         ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
         : Promise.resolve(this.globalOverride);
-    }
+    },
   }),
 );

@@ -126,13 +126,17 @@ describe('WidgetQueryControls', () => {
   });
 
   it('changes the widget\'s streams when using stream filter', async () => {
-    const { getByLabelText } = renderSUT({
+    const { container } = renderSUT({
       availableStreams: [
         { key: 'PFLog', value: '5c2e27d6ba33a9681ad62775' },
         { key: 'DNS Logs', value: '5d2d9649e117dc4df84cf83c' },
       ],
     });
-    await selectEvent.select(getByLabelText('Streams Filter'), 'PFLog');
+    const streamFilter = container.querySelector('div[data-testid="streams-filter"] > div');
+    expect(streamFilter).not.toBeNull();
+
+    // $FlowFixMe: `streamFilter` cannot be `null` at this point
+    await selectEvent.select(streamFilter, 'PFLog');
 
     expect(WidgetActions.streams).toHaveBeenCalledWith('deadbeef', ['5c2e27d6ba33a9681ad62775']);
   });
