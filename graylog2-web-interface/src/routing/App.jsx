@@ -34,11 +34,7 @@ const App = ({ children, currentUser, location }) => {
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
-<<<<<<< HEAD
-    </div>
-=======
     </ScratchpadProvider>
->>>>>>> 0147c00ba... cleanup
   );
 };
 
