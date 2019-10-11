@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import TypeAheadDataFilter from './TypeAheadDataFilter';
+
+import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
 /**

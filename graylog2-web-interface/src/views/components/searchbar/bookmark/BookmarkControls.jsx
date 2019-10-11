@@ -122,7 +122,7 @@ class BookmarkControls extends React.Component<Props, State> {
   deleteBookmark = (view) => {
     return ViewManagementActions.delete(view)
       .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
-      .then(ViewActions.create)
+      .then(() => ViewActions.create(View.Type.Search))
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
@@ -168,7 +168,7 @@ class BookmarkControls extends React.Component<Props, State> {
       <div className={`${styles.position} pull-right`}>
         <ButtonGroup>
           <React.Fragment>
-            <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
+            <Button disabled={disableReset} title="Empty search" onClick={() => ViewActions.create(View.Type.Search)}>
               <Icon name="eraser" />
             </Button>
             <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>

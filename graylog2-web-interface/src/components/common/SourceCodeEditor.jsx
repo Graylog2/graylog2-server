@@ -8,10 +8,11 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-import { ClipboardButton, Icon } from 'components/common';
 import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'components/graylog';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
+import ClipboardButton from './ClipboardButton';
+import Icon from './Icon';
 import style from './SourceCodeEditor.css';
 import './webpack-resolver';
 
