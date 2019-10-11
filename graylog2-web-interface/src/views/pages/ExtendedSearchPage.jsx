@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
-import SideBar from 'views/components/sidebar/SideBar';
+import { FieldList, SideBar } from 'views/components/sidebar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
 import type {
@@ -27,7 +27,6 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import QueryBar from 'views/components/QueryBar';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
-import { FieldList } from 'views/components/sidebar';
 
 import DashboardSearchBar from 'views/components/DashboardSearchBar';
 import SearchBar from 'views/components/SearchBar';

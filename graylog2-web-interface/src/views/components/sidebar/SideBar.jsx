@@ -2,14 +2,16 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 import { Spinner } from 'components/common';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
-import styles from './SideBar.css';
-import CustomPropTypes from '../CustomPropTypes';
+import AddWidgetButton from './AddWidgetButton';
+import SearchResultOverview from './SearchResultOverview';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
+import styles from './SideBar.css';
+
+import CustomPropTypes from '../CustomPropTypes';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
@@ -122,16 +124,15 @@ class SideBar extends React.Component<Props, State> {
               </span>
               {
                 resultsEmpty
-                  ? <Spinner />
+                  ? <Spinner text="" />
                   : (
-                    <React.Fragment>
+                    <>
                       <NavItem isSelected={open && selectedKey === 'viewDescription'}
                                text="View Description"
                                icon={<i className="fa fa-info" />}
                                onClick={this.setSelectedKey('viewDescription')}
-                               isLast={false}
                                isOpen={open}>
-                        <React.Fragment>
+                        <>
                           <div className={styles.viewMetadata}>
                             <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
                             <small>{viewMetadata.summary || defaultNewViewSummary}</small>
@@ -141,13 +142,12 @@ class SideBar extends React.Component<Props, State> {
                             <SearchResultOverview results={results} />
                           </div>
                           {this.formatViewDescription(viewMetadata)}
-                        </React.Fragment>
+                        </>
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'createWidget'}
                                text="Create"
                                icon={<i className="fa fa-plus" />}
                                onClick={this.setSelectedKey('createWidget')}
-                               isLast={false}
                                isOpen={open}>
                         <AddWidgetButton onClick={this.toggleOpen}
                                          toggleAutoClose={this.toggleAutoClose}
@@ -158,7 +158,6 @@ class SideBar extends React.Component<Props, State> {
                                text="Formatting & Highlighting"
                                icon={<i className="fa fa-paragraph" />}
                                onClick={this.setSelectedKey('highlighting')}
-                               isLast={false}
                                isOpen={open}>
                         <HighlightingRules />
                       </NavItem>
@@ -170,7 +169,7 @@ class SideBar extends React.Component<Props, State> {
                                isOpen={open}>
                         {children}
                       </NavItem>
-                    </React.Fragment>
+                    </>
                   )
               }
             </div>
