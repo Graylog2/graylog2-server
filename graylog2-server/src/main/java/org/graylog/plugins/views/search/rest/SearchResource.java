@@ -180,19 +180,13 @@ public class SearchResource extends RestResource implements PluginRestResource {
         throw new ForbiddenException("The search is referencing at least one stream you are not permitted to see.");
     }
 
-    @POST
-    @ApiOperation(value = "Execute the referenced search query asynchronously",
-            notes = "Starts a new search, irrespective whether or not another is already running")
-    @Path("{id}/execute")
-    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_JOB_CREATE)
-    public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
-                                 @ApiParam Map<String, Object> executionState) {
-        Search search = getSearch(id);
-
+    private void checkStreamPermissions(Search search) {
         final Optional<Set<String>> usedStreamIds = search.queries().stream().map(Query::usedStreamIds).reduce(Sets::union);
 
         checkUserIsPermittedToSeeStreams(usedStreamIds.orElse(Collections.emptySet()));
+    }
 
+    private Search addUsersStreamsToQueriesWithoutStreams(Search search) {
         final boolean isAnyQueryWithoutStreams = search.queries()
                 .stream()
                 .anyMatch(query -> query.usedStreamIds().isEmpty());
@@ -217,8 +211,24 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 return query;
             }).collect(ImmutableSet.toImmutableSet());
 
-            search = search.toBuilder().queries(newQueries).build();
+            return search.toBuilder().queries(newQueries).build();
         }
+
+        return search;
+    }
+
+    @POST
+    @ApiOperation(value = "Execute the referenced search query asynchronously",
+            notes = "Starts a new search, irrespective whether or not another is already running")
+    @Path("{id}/execute")
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_JOB_CREATE)
+    public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
+                                 @ApiParam Map<String, Object> executionState) {
+        Search search = getSearch(id);
+
+        checkStreamPermissions(search);
+
+        search = addUsersStreamsToQueriesWithoutStreams(search);
 
         final Map<String, PluginMetadataSummary> missingRequirements = missingRequirementsForEach(search);
         if (!missingRequirements.isEmpty()) {
@@ -240,6 +250,49 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
+    }
+
+    @POST
+    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
+    @Path("sync")
+    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_EXECUTE)
+    public Response executeSyncJob(@ApiParam Search search,
+                                    @ApiParam(name = "timeout", defaultValue = "60000")
+                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
+        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+
+        checkStreamPermissions(search);
+
+        search = addUsersStreamsToQueriesWithoutStreams(search);
+
+        final Map<String, PluginMetadataSummary> missingRequirements = missingRequirementsForEach(search);
+        if (!missingRequirements.isEmpty()) {
+            final Map<String, Object> error = ImmutableMap.of(
+                    "error", "Unable to execute this search, the following capabilities are missing:",
+                    "missing", missingRequirements
+            );
+            return Response.status(Response.Status.CONFLICT).entity(error).build();
+        }
+
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
+
+        final Optional<Set<String>> usedStreamIds = search.queries().stream().map(Query::usedStreamIds).reduce(Sets::union);
+
+        checkUserIsPermittedToSeeStreams(usedStreamIds.orElse(Collections.emptySet()));
+
+        try {
+            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException  e) {
+            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
+            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
+        } catch (TimeoutException e) {
+            throw new InternalServerErrorException("Timeout while executing search job");
+        } catch (Exception e) {
+            LOG.error("Other error", e);
+            throw e;
+        }
+
+        return Response.ok(searchJob).build();
     }
 
     private Map<String, PluginMetadataSummary> missingRequirementsForEach(Search search) {
@@ -283,31 +336,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(),5, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | TimeoutException ignore) {
         }
-        return searchJob;
-    }
-
-    @POST
-    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
-    @Path("sync")
-    @AuditEvent(type = ViewsAuditEventTypes.SEARCH_EXECUTE)
-    public SearchJob executeSyncJob(@ApiParam Search search,
-                                    @ApiParam(name = "timeout", defaultValue = "60000")
-                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
-
-        try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException  e) {
-            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
-            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
-        } catch (TimeoutException e) {
-            throw new InternalServerErrorException("Timeout while executing search job");
-        } catch (Exception e) {
-            LOG.error("Other error", e);
-            throw e;
-        }
-
         return searchJob;
     }
 

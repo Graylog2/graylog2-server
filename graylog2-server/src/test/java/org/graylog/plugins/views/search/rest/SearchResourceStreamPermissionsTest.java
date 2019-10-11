@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.rest.SearchResource;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.streams.Stream;
@@ -193,6 +192,30 @@ public class SearchResourceStreamPermissionsTest {
     }
 
     @Test
+    public void executingSyncSearchWithoutAccessToAnyStreamsFails() {
+        final String queryId = "someQuery";
+        when(query.usedStreamIds()).thenReturn(ImmutableSet.of());
+        when(query.toBuilder()).thenReturn(Query.builder().id(queryId).query(new BackendQuery.Fallback()).timerange(mock(RelativeRange.class)));
+        when(query.id()).thenReturn(queryId);
+
+        final String searchId = "searchId";
+        final Search search = Search.Builder.create().id(searchId).queries(ImmutableSet.of(query)).build();
+
+        when(streamService.loadAll()).thenReturn(Collections.emptyList());
+
+        thrown.expect(ForbiddenException.class);
+
+        try {
+            searchResource.executeSyncJob(search, 60000);
+        } catch (ForbiddenException e) {
+            verify(searchJobService, never()).create(any(), any());
+            verify(queryEngine, never()).execute(any());
+
+            throw e;
+        }
+    }
+
+    @Test
     public void referencingNonpermittedStreamsFails() {
         final String searchId = "searchId";
         when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
@@ -208,6 +231,23 @@ public class SearchResourceStreamPermissionsTest {
                 Matchers.not(Matchers.containsString("disallowedstream"))));
 
         searchResource.executeQuery(searchId, Collections.emptyMap());
+    }
+
+    @Test
+    public void referencingNonpermittedStreamsFailsForSyncSearch() {
+        final String searchId = "searchId";
+        when(search.queries()).thenReturn(ImmutableSet.of(query));
+        when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "disallowedstream"));
+
+        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream1")).thenReturn(true);
+        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream2")).thenReturn(true);
+        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":disallowedstream")).thenReturn(false);
+
+        thrown.expect(ForbiddenException.class);
+        thrown.expectMessage(Matchers.describedAs("Disallowed stream id must not leak.",
+                Matchers.not(Matchers.containsString("disallowedstream"))));
+
+        searchResource.executeSyncJob(search, 60000);
     }
 
     @Test
