@@ -100,7 +100,6 @@ public abstract class LegacyContentPack implements ContentPack {
                 .description(description())
                 .vendor(vendor())
                 .url(url())
-                .requires(requires())
                 .parameters(parameters())
                 .entities(entities())
                 .build();

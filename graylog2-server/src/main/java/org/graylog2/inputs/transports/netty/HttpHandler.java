@@ -22,7 +22,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -63,7 +63,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
             // send on to raw message handler
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.ACCEPTED, origin);
-            ctx.fireChannelRead(buffer);
+            ctx.fireChannelRead(buffer.retain());
         } else {
             writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.NOT_FOUND, origin);
         }
@@ -74,7 +74,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
                                HttpVersion httpRequestVersion,
                                HttpResponseStatus status,
                                String origin) {
-        final HttpResponse response = new DefaultHttpResponse(httpRequestVersion, status);
+        final HttpResponse response = new DefaultFullHttpResponse(httpRequestVersion, status);
 
         response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
         response.headers().set(HttpHeaderNames.CONNECTION, keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
@@ -87,8 +87,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<HttpRequest> {
 
         final ChannelFuture channelFuture = channel.writeAndFlush(response);
 
-        if (!keepAlive) {
-            channelFuture.addListener(ChannelFutureListener.CLOSE);
-        }
+        channelFuture.addListener(keepAlive ? ChannelFutureListener.CLOSE_ON_FAILURE : ChannelFutureListener.CLOSE);
     }
 }

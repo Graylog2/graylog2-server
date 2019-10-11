@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { SelectPopover } from 'components/common';
@@ -19,20 +19,24 @@ const CollectorsAdministrationFilters = createReactClass({
   },
 
   onFilterChange(name, value, callback) {
-    this.props.filter(name, value);
+    const { filter } = this.props;
+
+    filter(name, value);
     callback();
   },
 
   getCollectorsFilter() {
+    const { collectors, filters } = this.props;
     const collectorMapper = collector => `${collector.id};${collector.name}`;
-    const collectors = this.props.collectors
+
+    const collectorItems = collectors
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
       // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
       .map(collectorMapper);
 
     const collectorFormatter = (collectorId) => {
       const [id] = collectorId.split(';');
-      const collector = lodash.find(this.props.collectors, { id: id });
+      const collector = lodash.find(collectors, { id: id });
       return <CollectorIndicator collector={collector.name} operatingSystem={collector.node_operating_system} />;
     };
 
@@ -42,8 +46,8 @@ const CollectorsAdministrationFilters = createReactClass({
     };
 
     let collectorFilter;
-    if (this.props.filters.collector) {
-      const collector = this.props.collectors.find(c => c.id === this.props.filters.collector);
+    if (filters.collector) {
+      const collector = collectors.find(c => c.id === filters.collector);
       collectorFilter = collector ? collectorMapper(collector) : undefined;
     }
 
@@ -51,7 +55,7 @@ const CollectorsAdministrationFilters = createReactClass({
       <SelectPopover id="collector-filter"
                      title="Filter by collector"
                      triggerNode={<Button bsSize="small" bsStyle="link">Collector <span className="caret" /></Button>}
-                     items={collectors}
+                     items={collectorItems}
                      itemFormatter={collectorFormatter}
                      onItemSelect={filter}
                      selectedItems={collectorFilter ? [collectorFilter] : []}
@@ -60,15 +64,17 @@ const CollectorsAdministrationFilters = createReactClass({
   },
 
   getConfigurationFilter() {
+    const { configurations, filters } = this.props;
+
     const configurationMapper = configuration => `${configuration.id};${configuration.name}`;
-    const configurations = this.props.configurations
+    const configurationItems = configurations
       .sort((c1, c2) => naturalSortIgnoreCase(c1.name, c2.name))
       // TODO: Hack to be able to filter in SelectPopover. We should change that to avoid this hack.
       .map(configurationMapper);
 
     const configurationFormatter = (configurationId) => {
       const [id] = configurationId.split(';');
-      const configuration = lodash.find(this.props.configurations, { id: id });
+      const configuration = lodash.find(configurations, { id: id });
       return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
     };
 
@@ -78,8 +84,8 @@ const CollectorsAdministrationFilters = createReactClass({
     };
 
     let configurationFilter;
-    if (this.props.filters.configuration) {
-      const configuration = this.props.configurations.find(c => c.id === this.props.filters.configuration);
+    if (filters.configuration) {
+      const configuration = configurations.find(c => c.id === filters.configuration);
       configurationFilter = configuration ? configurationMapper(configuration) : undefined;
     }
 
@@ -87,7 +93,7 @@ const CollectorsAdministrationFilters = createReactClass({
       <SelectPopover id="configuration-filter"
                      title="Filter by configuration"
                      triggerNode={<Button bsSize="small" bsStyle="link">Configuration <span className="caret" /></Button>}
-                     items={configurations}
+                     items={configurationItems}
                      itemFormatter={configurationFormatter}
                      onItemSelect={filter}
                      selectedItems={configurationFilter ? [configurationFilter] : []}
@@ -96,13 +102,15 @@ const CollectorsAdministrationFilters = createReactClass({
   },
 
   getOSFilter() {
+    const { collectors, filters } = this.props;
+
     const operatingSystems = lodash
-      .uniq(this.props.collectors.map(collector => lodash.upperFirst(collector.node_operating_system)))
+      .uniq(collectors.map(collector => lodash.upperFirst(collector.node_operating_system)))
       .sort(naturalSortIgnoreCase);
 
     const filter = ([os], callback) => this.onFilterChange('os', os, callback);
 
-    const osFilter = this.props.filters.os;
+    const osFilter = filters.os;
 
     return (
       <SelectPopover id="os-filter"
@@ -116,11 +124,11 @@ const CollectorsAdministrationFilters = createReactClass({
   },
 
   getStatusFilter() {
-    // 0: running, 1: unknown, 2: failing
-    const status = ['0', '1', '2'];
+    const { filters } = this.props;
+    const status = Object.keys(SidecarStatusEnum.properties).map(key => String(key));
     const filter = ([statusCode], callback) => this.onFilterChange('status', statusCode, callback);
 
-    const statusFilter = this.props.filters.status;
+    const statusFilter = filters.status;
     const statusFormatter = statusCode => lodash.upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (

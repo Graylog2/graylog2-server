@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { PageHeader } from 'components/common';
@@ -8,10 +8,10 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 import DocsHelper from 'util/DocsHelper';
 
+import Routes from 'routing/Routes';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
-import Routes from 'routing/Routes';
 
 class Rule extends React.Component {
   static propTypes = {
@@ -45,24 +45,27 @@ class Rule extends React.Component {
           </span>
 
           <span>
-              <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-                <Button bsStyle="info">Manage pipelines</Button>
-              </LinkContainer>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
+              <Button bsStyle="info">Manage pipelines</Button>
+            </LinkContainer>
             &nbsp;
             <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
-                <Button bsStyle="info" className="active">Manage rules</Button>
-              </LinkContainer>
+              <Button bsStyle="info" className="active">Manage rules</Button>
+            </LinkContainer>
             &nbsp;
             <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
-                <Button bsStyle="info">Simulator</Button>
-              </LinkContainer>
-            </span>
+              <Button bsStyle="info">Simulator</Button>
+            </LinkContainer>
+          </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={6}>
-            <RuleForm rule={this.props.rule} usedInPipelines={this.props.usedInPipelines} create={this.props.create}
-                      onSave={this.props.onSave} validateRule={this.props.validateRule} />
+            <RuleForm rule={this.props.rule}
+                      usedInPipelines={this.props.usedInPipelines}
+                      create={this.props.create}
+                      onSave={this.props.onSave}
+                      validateRule={this.props.validateRule} />
           </Col>
           <Col md={6}>
             <RuleHelper />

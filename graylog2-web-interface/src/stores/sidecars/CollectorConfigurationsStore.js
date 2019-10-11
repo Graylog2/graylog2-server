@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
+import lodash from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -44,6 +45,17 @@ const CollectorConfigurationsStore = Reflux.createStore({
     return fetch('GET', URLUtils.qualifyUrl(uri));
   },
 
+  _fetchUploads({ page }) {
+    const baseUrl = `${this.sourceUrl}/configurations/uploads`;
+    const search = {
+      page: page,
+    };
+
+    const uri = URI(baseUrl).search(search).toString();
+
+    return fetch('GET', URLUtils.qualifyUrl(uri));
+  },
+
   all() {
     const promise = this._fetchConfigurations({ pageSize: 0 });
     promise
@@ -57,7 +69,8 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
             'Could not retrieve configurations');
-        });
+        },
+      );
 
     CollectorConfigurationsActions.all.promise(promise);
   },
@@ -82,9 +95,23 @@ const CollectorConfigurationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
             'Could not retrieve configurations');
-        });
+        },
+      );
 
     CollectorConfigurationsActions.list.promise(promise);
+  },
+
+  listUploads({ page = 1 }) {
+    const promise = this._fetchUploads({ page: page });
+    promise
+      .catch(
+        (error) => {
+          UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
+            'Could not retrieve configurations');
+        },
+      );
+
+    CollectorConfigurationsActions.listUploads.promise(promise);
   },
 
   refreshList() {
@@ -123,13 +150,15 @@ const CollectorConfigurationsStore = Reflux.createStore({
     const promise = fetch(
       'POST',
       URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/render/preview`),
-      requestTemplate);
+      requestTemplate,
+    );
     promise
       .catch(
         (error) => {
           UserNotification.error(`Fetching configuration preview failed with status: ${error}`,
             'Could not retrieve preview');
-        });
+        },
+      );
     CollectorConfigurationsActions.renderPreview.promise(promise);
   },
 
@@ -201,15 +230,25 @@ const CollectorConfigurationsStore = Reflux.createStore({
     CollectorConfigurationsActions.delete.promise(promise);
   },
 
-  validate(name) {
-    const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate/?name=${name}`));
+  validate(configuration) {
+    // set minimum api defaults for faster validation feedback
+    const payload = {
+      name: ' ',
+      collector_id: ' ',
+      color: ' ',
+      template: ' ',
+    };
+    lodash.merge(payload, configuration);
+
+    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
     promise
       .then(
         response => response,
         error => (
-          UserNotification.error(`Validating configuration with name "${name}" failed with status: ${error.message}`,
+          UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
             'Could not validate configuration')
-        ));
+        ),
+      );
 
     CollectorConfigurationsActions.validate.promise(promise);
   },

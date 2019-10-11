@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Modal } from 'react-bootstrap';
+
+import { Modal } from 'components/graylog';
 
 /**
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
@@ -12,6 +13,7 @@ class BootstrapModalWrapper extends React.Component {
     onClose: () => {},
     onHide: () => {},
     bsSize: undefined,
+    backdrop: 'static',
   };
 
   static propTypes = {
@@ -26,6 +28,7 @@ class BootstrapModalWrapper extends React.Component {
     bsSize: PropTypes.oneOf([
       'large', 'lg', 'small', 'sm',
     ]),
+    backdrop: PropTypes.oneOf(['static', true, false]),
   };
 
   state = {
@@ -46,7 +49,10 @@ class BootstrapModalWrapper extends React.Component {
 
   render() {
     return (
-      <Modal show={this.state.showModal} onHide={this.hide} bsSize={this.props.bsSize}>
+      <Modal show={this.state.showModal}
+             onHide={this.hide}
+             bsSize={this.props.bsSize}
+             backdrop={this.props.backdrop}>
         {this.props.children}
       </Modal>
     );

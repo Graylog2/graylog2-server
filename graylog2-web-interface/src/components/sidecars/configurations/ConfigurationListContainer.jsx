@@ -21,17 +21,17 @@ const ConfigurationListContainer = createReactClass({
     CollectorsActions.all();
   },
 
-  validateConfiguration(name) {
-    return CollectorConfigurationsActions.validate(name);
+  validateConfiguration(configuration) {
+    return CollectorConfigurationsActions.validate(configuration);
   },
 
   handlePageChange(page, pageSize) {
-    const query = this.state.configurations.query;
+    const { query } = this.state.configurations;
     CollectorConfigurationsActions.list({ query: query, page: page, pageSize: pageSize });
   },
 
   handleQueryChange(query = '', callback = () => {}) {
-    const pageSize = this.state.configurations.pagination.pageSize;
+    const { pageSize } = this.state.configurations.pagination;
     CollectorConfigurationsActions.list({ query: query, pageSize: pageSize }).finally(callback);
   },
 

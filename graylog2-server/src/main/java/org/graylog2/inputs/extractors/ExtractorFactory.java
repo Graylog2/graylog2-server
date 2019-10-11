@@ -18,7 +18,7 @@ package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.ConfigurationException;
-import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -29,13 +29,13 @@ import java.util.Map;
 
 public class ExtractorFactory {
     private final MetricRegistry metricRegistry;
-    private final GrokPatternService grokPatternService;
+    private final GrokPatternRegistry grokPatternRegistry;
     private final LookupTableService lookupTableService;
 
     @Inject
-    public ExtractorFactory(MetricRegistry metricRegistry, GrokPatternService grokPatternService, LookupTableService lookupTableService) {
+    public ExtractorFactory(MetricRegistry metricRegistry, GrokPatternRegistry grokPatternRegistry, LookupTableService lookupTableService) {
         this.metricRegistry = metricRegistry;
-        this.grokPatternService = grokPatternService;
+        this.grokPatternRegistry = grokPatternRegistry;
         this.lookupTableService = lookupTableService;
     }
 
@@ -65,7 +65,7 @@ public class ExtractorFactory {
             case REGEX_REPLACE:
                 return new RegexReplaceExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case GROK:
-                return new GrokExtractor(metricRegistry, grokPatternService.loadAll(), id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new GrokExtractor(metricRegistry, grokPatternRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case JSON:
                 return new JsonExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case LOOKUP_TABLE:

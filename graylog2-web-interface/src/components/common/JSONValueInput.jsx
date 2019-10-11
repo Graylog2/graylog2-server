@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {
   InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
-} from 'react-bootstrap';
+} from 'components/graylog';
 import { InputWrapper } from 'components/bootstrap';
 
 const OPTIONS = [
@@ -72,7 +72,7 @@ class JSONValueInput extends React.Component {
   };
 
   _onUpdate = (e) => {
-    const value = e.target.value;
+    const { value } = e.target;
     this.setState({ value: value }, this._propagateState);
   };
 

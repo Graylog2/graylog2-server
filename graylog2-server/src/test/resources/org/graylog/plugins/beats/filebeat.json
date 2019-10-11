@@ -17,5 +17,6 @@
     "foobar",
     "test"
   ],
-  "type": "log"
+  "type": "log",
+  "gl2_source_collector": "1234-5678-1234-5678"
 }

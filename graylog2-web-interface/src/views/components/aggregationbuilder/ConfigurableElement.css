@@ -1,0 +1,5 @@
+:local(.labelAsLink):hover {
+    color: unset;
+    text-decoration: underline;
+    cursor: pointer;
+}

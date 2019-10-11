@@ -13,29 +13,27 @@ class SidecarStatusFileList extends React.Component {
   };
 
   _activityFormatter = (time) => {
-    var now = new Date().getTime();
-    var modDate = new Date(time).getTime();
+    const now = new Date().getTime();
+    const modDate = new Date(time).getTime();
     if (modDate > (now - 60000)) {
-      return("info");
-    } else {
-      return("");
+      return ('info');
     }
+    return ('');
   };
 
   _dirFormatter = (file) => {
-    if(file.is_dir) {
-      return(<span><i className="fa fa-folder-open"/>&nbsp;&nbsp;{file.path}</span>);
-    } else {
-      return(<span><i className="fa fa-file-o"/>&nbsp;&nbsp;{file.path}</span>);
+    if (file.is_dir) {
+      return (<span><i className="fa fa-folder-open" />&nbsp;&nbsp;{file.path}</span>);
     }
+    return (<span><i className="fa fa-file-o" />&nbsp;&nbsp;{file.path}</span>);
   };
 
   _fileListFormatter = (file) => {
-    const format = "YYYY-MM-DD HH:mm:ss";
+    const format = 'YYYY-MM-DD HH:mm:ss';
 
     return (
       <tr key={file.path} className={this._activityFormatter(file.mod_time)}>
-        <td className="limited"><Timestamp dateTime={file.mod_time} format={format}/></td>
+        <td className="limited"><Timestamp dateTime={file.mod_time} format={format} /></td>
         <td className="limited">{file.size}</td>
         <td>{this._dirFormatter(file)}</td>
       </tr>
@@ -43,8 +41,8 @@ class SidecarStatusFileList extends React.Component {
   };
 
   render() {
-    var filterKeys = [];
-    var headers = ["Modified", "Size", "Path"];
+    const filterKeys = [];
+    const headers = ['Modified', 'Size', 'Path'];
 
     return (
       <div>
@@ -55,8 +53,7 @@ class SidecarStatusFileList extends React.Component {
                    rows={this.props.files}
                    dataRowFormatter={this._fileListFormatter}
                    filterLabel="Filter Files"
-                   filterKeys={filterKeys}>
-        </DataTable>
+                   filterKeys={filterKeys} />
       </div>
     );
   }

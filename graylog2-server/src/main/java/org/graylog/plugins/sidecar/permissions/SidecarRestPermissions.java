@@ -29,17 +29,17 @@ public class SidecarRestPermissions implements PluginPermissions {
     public static final String SIDECARS_READ = "sidecars:read";
     public static final String SIDECARS_CREATE = "sidecars:create";
     public static final String SIDECARS_UPDATE = "sidecars:update";
-    public static final String SIDECARS_DELETE = "sidecar:delete";
+    public static final String SIDECARS_DELETE = "sidecars:delete";
 
-    public static final String COLLECTORS_READ = "sidecars:read";
-    public static final String COLLECTORS_CREATE = "sidecars:create";
-    public static final String COLLECTORS_UPDATE = "sidecars:update";
-    public static final String COLLECTORS_DELETE = "sidecars:delete";
+    public static final String COLLECTORS_READ = "sidecar_collectors:read";
+    public static final String COLLECTORS_CREATE = "sidecar_collectors:create";
+    public static final String COLLECTORS_UPDATE = "sidecar_collectors:update";
+    public static final String COLLECTORS_DELETE = "sidecar_collectors:delete";
 
-    public static final String CONFIGURATIONS_READ = "configurations:read";
-    public static final String CONFIGURATIONS_CREATE = "configurations:create";
-    public static final String CONFIGURATIONS_UPDATE = "configurations:update";
-    public static final String CONFIGURATIONS_DELETE = "configurations:delete";
+    public static final String CONFIGURATIONS_READ = "sidecar_collector_configurations:read";
+    public static final String CONFIGURATIONS_CREATE = "sidecar_collector_configurations:create";
+    public static final String CONFIGURATIONS_UPDATE = "sidecar_collector_configurations:update";
+    public static final String CONFIGURATIONS_DELETE = "sidecar_collector_configurations:delete";
 
     private final ImmutableSet<Permission> permissions = ImmutableSet.of(
             create(SIDECARS_READ, "Read sidecars"),
@@ -47,10 +47,10 @@ public class SidecarRestPermissions implements PluginPermissions {
             create(SIDECARS_UPDATE, "Update sidecars"),
             create(SIDECARS_DELETE, "Delete sidecars"),
 
-            create(COLLECTORS_READ, "Read sidecars"),
-            create(COLLECTORS_CREATE, "Create sidecars"),
-            create(COLLECTORS_UPDATE, "Update sidecars"),
-            create(COLLECTORS_DELETE, "Delete sidecars"),
+            create(COLLECTORS_READ, "Read collectors"),
+            create(COLLECTORS_CREATE, "Create collectors"),
+            create(COLLECTORS_UPDATE, "Update collectors"),
+            create(COLLECTORS_DELETE, "Delete collectors"),
 
             create(CONFIGURATIONS_READ, "Read configurations"),
             create(CONFIGURATIONS_CREATE, "Create configurations"),

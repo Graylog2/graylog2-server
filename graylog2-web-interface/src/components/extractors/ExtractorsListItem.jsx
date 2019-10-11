@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Row, Col, Well } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import numeral from 'numeral';
+
+import { Button, Row, Col, Well } from 'components/graylog';
 import EntityListItem from 'components/common/EntityListItem';
 import ExtractorUtils from 'util/ExtractorUtils';
 import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
+
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 class ExtractorsListItem extends React.Component {
@@ -21,28 +23,37 @@ class ExtractorsListItem extends React.Component {
   };
 
   _toggleDetails = () => {
-    this.setState({ showDetails: !this.state.showDetails });
+    const { showDetails } = this.state;
+
+    this.setState({ showDetails: !showDetails });
   };
 
   _deleteExtractor = () => {
-    if (window.confirm(`Really remove extractor "${this.props.extractor.title}?"`)) {
-      ExtractorsActions.delete.triggerPromise(this.props.inputId, this.props.extractor);
+    const { extractor, inputId } = this.props;
+
+    // eslint-disable-next-line no-alert
+    if (window.confirm(`Really remove extractor "${extractor.title}?"`)) {
+      ExtractorsActions.delete.triggerPromise(inputId, extractor);
     }
   };
 
   _formatExtractorSubtitle = () => {
+    const { extractor } = this.props;
+
     return (
       <span>
-        Trying to extract data from <em>{this.props.extractor.source_field}</em> into{' '}
-        <em>{this.props.extractor.target_field}</em>,{' '}
-        {this.props.extractor.cursor_strategy === 'cut' && 'not'}{' '}
+        Trying to extract data from <em>{extractor.source_field}</em> into{' '}
+        <em>{extractor.target_field}</em>,{' '}
+        {extractor.cursor_strategy === 'cut' && 'not'}{' '}
         leaving the original intact.
       </span>
     );
   };
 
   _formatCondition = () => {
-    if (this.props.extractor.condition_type === 'none') {
+    const { extractor } = this.props;
+
+    if (extractor.condition_type === 'none') {
       return <div />;
     }
 
@@ -52,8 +63,8 @@ class ExtractorsListItem extends React.Component {
         <ul>
           <li>
             Will only attempt to run if the message{' '}
-            {this.props.extractor.condition_type === 'string' ? 'includes the string' : 'matches the regular expression'}{' '}
-            <em>{this.props.extractor.condition_value}</em>
+            {extractor.condition_type === 'string' ? 'includes the string' : 'matches the regular expression'}{' '}
+            <em>{extractor.condition_value}</em>
           </li>
         </ul>
       </div>
@@ -62,27 +73,30 @@ class ExtractorsListItem extends React.Component {
 
   _formatActions = () => {
     const actions = [];
+    const { extractor, nodeId, inputId } = this.props;
 
     actions.push(
-      <Button key={`extractor-details-${this.props.extractor.id}`} bsStyle="info" onClick={this._toggleDetails}>
+      <Button key={`extractor-details-${extractor.id}`} bsStyle="info" onClick={this._toggleDetails}>
         Details
       </Button>,
     );
     actions.push(
-      <LinkContainer key={`edit-extractor-${this.props.extractor.id}`}
-                     to={Routes.edit_input_extractor(this.props.nodeId, this.props.inputId, this.props.extractor.id)}>
+      <LinkContainer key={`edit-extractor-${extractor.id}`}
+                     to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
         <Button bsStyle="info">Edit</Button>
       </LinkContainer>,
     );
-    actions.push(<Button key={'delete-extractor-'} bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
+    actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
 
     return actions;
   };
 
   _formatOptions = (options) => {
+    const { extractor } = this.props;
+
     const attributes = Object.keys(options);
     return attributes.map((attribute) => {
-      return <li key={`${attribute}-${this.props.extractor.id}`}>{attribute}: {options[attribute]}</li>;
+      return <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>;
     });
   };
 
@@ -231,19 +245,21 @@ class ExtractorsListItem extends React.Component {
   };
 
   _formatDetails = () => {
+    const { extractor } = this.props;
+
     return (
       <div>
         <Col md={8}>
           <Well bsSize="small" className="configuration-well">
             {this._formatCondition()}
-            {this._formatConfiguration(this.props.extractor.extractor_config)}
-            {this._formatConverters(this.props.extractor.converters)}
+            {this._formatConfiguration(extractor.extractor_config)}
+            {this._formatConverters(extractor.converters)}
           </Well>
         </Col>
         <Col md={4}>
           <div className="graylog-input-metrics">
             <h3>Metrics</h3>
-            {this._formatMetrics(this.props.extractor.metrics)}
+            {this._formatMetrics(extractor.metrics)}
           </div>
         </Col>
       </div>
@@ -251,13 +267,16 @@ class ExtractorsListItem extends React.Component {
   };
 
   render() {
+    const { extractor } = this.props;
+    const { showDetails } = this.state;
+
     return (
-      <EntityListItem key={`entry-list-${this.props.extractor.id}`}
-                      title={this.props.extractor.title}
-                      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(this.props.extractor.type)}
+      <EntityListItem key={`entry-list-${extractor.id}`}
+                      title={extractor.title}
+                      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
                       description={this._formatExtractorSubtitle()}
                       actions={this._formatActions()}
-                      contentRow={this.state.showDetails ? this._formatDetails() : null} />
+                      contentRow={showDetails ? this._formatDetails() : null} />
     );
   }
 }

@@ -4,10 +4,10 @@ const path = require('path');
 const Clean = require('clean-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 const merge = require('webpack-merge');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
-const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
@@ -34,7 +34,8 @@ const webpackConfig = {
       path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
-    new AssetsPlugin({ filename: 'vendor-module.json',
+    new AssetsPlugin({
+      filename: 'vendor-module.json',
       path: BUILD_PATH,
       processOutput(assets) {
         const jsfiles = [];
@@ -60,7 +61,8 @@ const webpackConfig = {
             chunks: chunks,
           },
         });
-      } }),
+      },
+    }),
   ],
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
@@ -69,10 +71,9 @@ if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
-      minimizer: [new UglifyJsPlugin({
-        uglifyOptions: {
-          minimize: true,
-          sourceMap: true,
+      minimizer: [new TerserPlugin({
+        sourceMap: true,
+        terserOptions: {
           compress: {
             warnings: false,
           },

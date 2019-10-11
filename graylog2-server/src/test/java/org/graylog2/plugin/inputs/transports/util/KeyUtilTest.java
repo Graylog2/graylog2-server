@@ -17,6 +17,7 @@
 package org.graylog2.plugin.inputs.transports.util;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Resources;
 import io.netty.handler.ssl.SslHandler;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,7 +37,6 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,7 +97,7 @@ public class KeyUtilTest {
     }
 
     private File resourceToFile(String fileName) throws URISyntaxException {
-        return new File(getClass().getResource(fileName).toURI());
+        return new File(Resources.getResource("org/graylog2/plugin/inputs/transports/util/" + fileName).toURI());
     }
 
     @Test
@@ -106,6 +106,16 @@ public class KeyUtilTest {
         final Collection<? extends Certificate> certificates = KeyUtil.loadCertificates(certFile.toPath());
         assertThat(certificates)
                 .isNotEmpty()
+                .hasOnlyElementsOfType(X509Certificate.class);
+    }
+
+    @Test
+    public void testLoadCertificatesDir() throws Exception {
+        final File certDir = resourceToFile("certs");
+        final Collection<? extends Certificate> certificates = KeyUtil.loadCertificates(certDir.toPath());
+        assertThat(certificates)
+                .isNotEmpty()
+                .hasSize(2)
                 .hasOnlyElementsOfType(X509Certificate.class);
     }
 

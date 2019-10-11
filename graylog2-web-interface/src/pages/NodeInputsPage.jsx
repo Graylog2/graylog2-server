@@ -5,14 +5,15 @@ import Reflux from 'reflux';
 import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
-const NodesStore = StoreProvider.getStore('Nodes');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const InputStatesStore = StoreProvider.getStore('InputStates');
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InputsList } from 'components/inputs';
 
 import Routes from 'routing/Routes';
+
+const NodesStore = StoreProvider.getStore('Nodes');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const InputStatesStore = StoreProvider.getStore('InputStates');
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

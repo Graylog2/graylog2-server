@@ -28,29 +28,33 @@ const ErroneusComponent = () => {
 
 const WorkingComponent = () => <div>Hello World!</div>;
 
+const router = {
+  listen: () => {},
+};
+
 describe('AppErrorBoundary', () => {
   it('registers to router upon mount', () => {
-    const router = {
+    const mockRouter = {
       listen: jest.fn(),
     };
 
     mount((
-      <AppErrorBoundary router={router}>
+      <AppErrorBoundary router={mockRouter}>
         <WorkingComponent />
       </AppErrorBoundary>
     ));
 
-    expect(router.listen).toHaveBeenCalled();
+    expect(mockRouter.listen).toHaveBeenCalled();
   });
 
   it('unregisters from router upon unmount', () => {
     const unlisten = jest.fn();
-    const router = {
+    const mockRouter = {
       listen: () => unlisten,
     };
 
     const wrapper = mount((
-      <AppErrorBoundary router={router}>
+      <AppErrorBoundary router={mockRouter}>
         <WorkingComponent />
       </AppErrorBoundary>
     ));
@@ -60,9 +64,6 @@ describe('AppErrorBoundary', () => {
   });
 
   it('displays child component if there is no error', () => {
-    const router = {
-      listen: jest.fn(),
-    };
     const wrapper = mount((
       <AppErrorBoundary router={router}>
         <WorkingComponent />
@@ -74,10 +75,6 @@ describe('AppErrorBoundary', () => {
   });
 
   it('displays error after catching', () => {
-    const router = {
-      listen: jest.fn(),
-    };
-
     suppressConsole(() => {
       const wrapper = mount((
         <AppErrorBoundary router={router}>
@@ -85,18 +82,23 @@ describe('AppErrorBoundary', () => {
         </AppErrorBoundary>
       ));
 
-      expect(wrapper).toMatchSnapshot();
+      const errorPage = wrapper.find('ErrorPage');
+      expect(errorPage).toExist();
+      expect(errorPage).toHaveProp('error', {
+        message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
+        stack: 'This the stack trace.',
+      });
+      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in WrapperComponent' });
     });
   });
 
   it('resets error when navigation changes', () => {
-    const router = {
-      listen: jest.fn(),
-    };
-
     suppressConsole(() => {
+      const mockRouter = {
+        listen: jest.fn(),
+      };
       const wrapper = mount((
-        <AppErrorBoundary router={router}>
+        <AppErrorBoundary router={mockRouter}>
           <ErroneusComponent />
         </AppErrorBoundary>
       ));
@@ -104,7 +106,7 @@ describe('AppErrorBoundary', () => {
       expect(wrapper).toIncludeText('banana peel');
 
       wrapper.setProps({ children: <WorkingComponent /> });
-      const listenCallback = router.listen.mock.calls[0][0];
+      const listenCallback = mockRouter.listen.mock.calls[0][0];
       listenCallback();
       // force update of component to reflect state changes
       wrapper.update();

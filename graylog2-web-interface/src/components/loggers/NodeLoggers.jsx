@@ -2,15 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import { LinkToNode, IfPermitted } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
-
 import StoreProvider from 'injection/StoreProvider';
+
+const MetricsActions = ActionsProvider.getActions('Metrics');
 const MetricsStore = StoreProvider.getStore('Metrics');
 
 const NodeLoggers = createReactClass({
@@ -41,7 +41,7 @@ const NodeLoggers = createReactClass({
     const { metrics } = this.state;
     const { nodeId } = this.props;
     if (metrics && metrics[nodeId] && metrics[nodeId][this.metric_name]) {
-      const metric = metrics[nodeId][this.metric_name].metric;
+      const { metric } = metrics[nodeId][this.metric_name];
       return metric.rate.total;
     }
     return 'n/a';
@@ -50,10 +50,12 @@ const NodeLoggers = createReactClass({
   render() {
     const { nodeId } = this.props;
     const subsystems = Object.keys(this.props.subsystems)
-      .map(subsystem => <LoggingSubsystem name={subsystem}
-                                            nodeId={nodeId}
-                                            key={`logging-subsystem-${nodeId}-${subsystem}`}
-                                            subsystem={this.props.subsystems[subsystem]} />);
+      .map(subsystem => (
+        <LoggingSubsystem name={subsystem}
+                          nodeId={nodeId}
+                          key={`logging-subsystem-${nodeId}-${subsystem}`}
+                          subsystem={this.props.subsystems[subsystem]} />
+      ));
 
     const logLevelMetrics = <LogLevelMetricsOverview nodeId={this.props.nodeId} />;
     return (
@@ -62,7 +64,9 @@ const NodeLoggers = createReactClass({
           <IfPermitted permissions="loggers:read">
             <div style={{ marginBottom: '20' }}>
               <div className="pull-right">
-                <Button bsSize="sm" bsStyle="primary" className="trigger-log-level-metrics"
+                <Button bsSize="sm"
+                        bsStyle="primary"
+                        className="trigger-log-level-metrics"
                         onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
                   <i className="fa fa-dashboard" />{' '}
                   {this.state.showDetails ? 'Hide' : 'Show'} log level metrics

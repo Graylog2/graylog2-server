@@ -1,16 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Alert, Button } from 'components/graylog';
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
+
+const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 
 class AlertMessages extends React.Component {
   static propTypes = {
@@ -35,7 +36,7 @@ class AlertMessages extends React.Component {
   };
 
   _getTo = () => {
-    const alert = this.props.alert;
+    const { alert } = this.props;
     let momentTo;
     if (alert.is_interval) {
       momentTo = (alert.resolved_at ? DateTime.parseFromString(alert.resolved_at).toMoment().add(1, 'minute') : DateTime.now());
@@ -129,7 +130,7 @@ class AlertMessages extends React.Component {
       );
     }
 
-    const messages = this.state.messages;
+    const { messages } = this.state;
 
     if (messages.length === 0) {
       return (
@@ -143,7 +144,9 @@ class AlertMessages extends React.Component {
     return (
       <div>
         {title}
-        <PaginatedList pageSize={this.PAGE_SIZE} onChange={this._onPageChange} totalItems={this.state.totalMessages}
+        <PaginatedList pageSize={this.PAGE_SIZE}
+                       onChange={this._onPageChange}
+                       totalItems={this.state.totalMessages}
                        showPageSizeSelect={false}>
           <div className="table-responsive">
             <table className="table table-striped table-hover table-condensed">

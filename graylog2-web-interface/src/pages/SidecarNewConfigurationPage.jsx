@@ -1,8 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 
@@ -11,6 +11,10 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 
 const SidecarNewConfigurationPage = createReactClass({
   displayName: 'SidecarNewConfigurationPage',
+
+  _variableRenameHandler(oldname, newname) {
+    this.configurationForm.replaceConfigurationVariableName(oldname, newname);
+  },
 
   render() {
     return (
@@ -40,10 +44,11 @@ const SidecarNewConfigurationPage = createReactClass({
 
           <Row className="content">
             <Col md={6}>
-              <ConfigurationForm action="create" />
+              <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
+                                 action="create" />
             </Col>
             <Col md={6}>
-              <ConfigurationHelper type="filebeat" />
+              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
             </Col>
           </Row>
         </span>

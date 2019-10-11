@@ -1,16 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button, ButtonGroup } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
+import ActionsProvider from 'injection/ActionsProvider';
+import { MessageTableEntry, MessageTablePaginator } from 'components/search';
+
 const StreamsStore = StoreProvider.getStore('Streams');
 const SearchStore = StoreProvider.getStore('Search');
-
-import ActionsProvider from 'injection/ActionsProvider';
 const RefreshActions = ActionsProvider.getActions('Refresh');
-
-import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 class ResultTable extends React.Component {
   static propTypes = {
@@ -152,7 +151,8 @@ class ResultTable extends React.Component {
           <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
           <Button title="Collapse all messages"
                   onClick={this.collapseAll}
-                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" /></Button>
+                  disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" />
+          </Button>
         </ButtonGroup>
 
         <MessageTablePaginator currentPage={Number(this.props.page)}
@@ -212,7 +212,8 @@ class ResultTable extends React.Component {
             <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
             <Button title="Collapse all messages"
                     onClick={this.collapseAll}
-                    disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" /></Button>
+                    disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" />
+            </Button>
           </ButtonGroup>
         </MessageTablePaginator>
       </div>

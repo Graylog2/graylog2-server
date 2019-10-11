@@ -14,9 +14,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
         </h2>
         <br />
         <button
-          className="btn btn-sm btn-info"
+          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
+          title="Edit Modal"
           type="button"
         >
           Create parameter
@@ -65,7 +66,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -81,7 +82,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -123,6 +124,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         Default Value
                       </th>
                       <th>
+                        Used
+                      </th>
+                      <th>
                         Action
                       </th>
                     </tr>
@@ -149,22 +153,33 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         test
                       </td>
                       <td>
+                        <span
+                          className="failure badge"
+                        >
+                          <i
+                            className="fa fa-times"
+                          />
+                        </span>
+                      </td>
+                      <td>
                         <div
                           className="btn-toolbar"
                           role="toolbar"
                         >
                           <button
-                            className="btn btn-xs btn-primary"
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
                             disabled={false}
                             onClick={[Function]}
+                            title="Delete Parameter"
                             type="button"
                           >
                             Delete
                           </button>
                           <button
-                            className="btn btn-xs btn-info"
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
+                            title="Edit Modal"
                             type="button"
                           >
                             Edit
@@ -232,7 +247,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -248,7 +263,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
               }
             >
               <button
-                className="reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -284,7 +299,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         Description
                       </th>
                       <th>
-                        Applied Parameter
+                        Origin
+                      </th>
+                      <th>
+                        Used Parameters
                       </th>
                       <th>
                         Action
@@ -307,6 +325,14 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         
                       </td>
                       <td>
+                        <span>
+                          <i
+                            className="fa fa-archive contentPackEntity"
+                            title="Content Pack"
+                          />
+                        </span>
+                      </td>
+                      <td>
                         0
                       </td>
                       <td>
@@ -315,15 +341,15 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           role="toolbar"
                         >
                           <button
-                            className="btn btn-xs btn-primary"
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
                           >
-                            Apply Parameter
+                            Edit
                           </button>
                           <button
-                            className="btn btn-xs btn-info"
+                            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -359,9 +385,10 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
         </h2>
         <br />
         <button
-          className="btn btn-sm btn-info"
+          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
+          title="Edit Modal"
           type="button"
         >
           Create parameter
@@ -410,7 +437,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -426,7 +453,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -508,7 +535,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="submit-button btn btn-default"
+                className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -524,7 +551,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
               }
             >
               <button
-                className="reset-button btn btn-default"
+                className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"

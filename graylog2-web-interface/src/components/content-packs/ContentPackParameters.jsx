@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import lodash from 'lodash';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -94,7 +94,8 @@ class ContentPackParameters extends React.Component {
                              onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
                              onCancel={this._closeConfirmModal}>
         {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
-      </BootstrapModalConfirm>);
+      </BootstrapModalConfirm>
+    );
   };
 
   _openConfirmModal = (parameter) => {
@@ -115,7 +116,7 @@ class ContentPackParameters extends React.Component {
             <ContentPackParameterList contentPack={this.props.contentPack}
                                       onAddParameter={this._addNewParameter}
                                       onDeleteParameter={this._openConfirmModal}
-            />
+                                      appliedParameter={this.props.appliedParameter} />
             {this._confirmationModal()}
           </Col>
         </Row>

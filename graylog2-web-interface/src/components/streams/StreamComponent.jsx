@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert } from 'components/graylog';
 
 import { IfPermitted, TypeAheadDataFilter } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
-import StreamList from './StreamList';
 import Spinner from 'components/common/Spinner';
+import StreamList from './StreamList';
 
 import CreateStreamButton from './CreateStreamButton';
+
+const StreamsStore = StoreProvider.getStore('Streams');
+const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 class StreamComponent extends React.Component {
   static propTypes = {
@@ -77,7 +78,9 @@ class StreamComponent extends React.Component {
     if (this.state.streams.length === 0) {
       const createStreamButton = (
         <IfPermitted permissions="streams:create">
-          <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
+          <CreateStreamButton bsSize="small"
+                              bsStyle="link"
+                              className="btn-text"
                               buttonText="Create one now"
                               indexSets={this.props.indexSets}
                               onSave={this.props.onStreamSave} />
@@ -91,9 +94,14 @@ class StreamComponent extends React.Component {
       );
     }
 
-    const streamsList = this.state.filteredStreams ? (<StreamList streams={this.state.filteredStreams} streamRuleTypes={this.state.streamRuleTypes}
-                                                                  permissions={this.props.currentUser.permissions} user={this.props.currentUser}
-                                                                  onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />) : <Spinner />;
+    const streamsList = this.state.filteredStreams ? (
+      <StreamList streams={this.state.filteredStreams}
+                  streamRuleTypes={this.state.streamRuleTypes}
+                  permissions={this.props.currentUser.permissions}
+                  user={this.props.currentUser}
+                  onStreamSave={this.props.onStreamSave}
+                  indexSets={this.props.indexSets} />
+    ) : <Spinner />;
 
     return (
       <div>
@@ -103,7 +111,7 @@ class StreamComponent extends React.Component {
                                  ref={(streamFilter) => { this.streamFilter = streamFilter; }}
                                  label="Filter streams"
                                  data={this.state.streams}
-                                 displayKey={'title'}
+                                 displayKey="title"
                                  filterSuggestions={[]}
                                  searchInKeys={['title', 'description']}
                                  onDataFiltered={this._updateFilteredStreams} />

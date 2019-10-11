@@ -25,8 +25,11 @@ class MessageFields extends React.Component {
         .sort()
         .map((key) => {
           return (
-            <MessageField key={key} {...this.props} fieldName={key} value={fields[key]}
-                               disableFieldActions={this.props.disableFieldActions || decoratedFields.indexOf(key) !== -1} />
+            <MessageField key={key}
+                          {...this.props}
+                          fieldName={key}
+                          value={fields[key]}
+                          disableFieldActions={this.props.disableFieldActions || decoratedFields.indexOf(key) !== -1} />
           );
         });
     }
@@ -38,16 +41,20 @@ class MessageFields extends React.Component {
         return <ChangedMessageField key={key} fieldName={key} newValue={fields[key]} />;
       }
       if (decorationStats.changed_fields[key]) {
-        return (<ChangedMessageField key={key}
-                                     fieldName={key}
-                                     originalValue={decorationStats.changed_fields[key]}
-                                     newValue={fields[key]} />);
+        return (
+          <ChangedMessageField key={key}
+                               fieldName={key}
+                               originalValue={decorationStats.changed_fields[key]}
+                               newValue={fields[key]} />
+        );
       }
 
       if (decorationStats.removed_fields[key]) {
-        return (<ChangedMessageField key={key}
-                                     fieldName={key}
-                                     originalValue={decorationStats.removed_fields[key]} />);
+        return (
+          <ChangedMessageField key={key}
+                               fieldName={key}
+                               originalValue={decorationStats.removed_fields[key]} />
+        );
       }
 
       return <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} disableFieldActions />;

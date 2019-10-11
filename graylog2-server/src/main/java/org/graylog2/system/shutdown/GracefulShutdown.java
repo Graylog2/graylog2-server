@@ -49,6 +49,7 @@ public class GracefulShutdown implements Runnable {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final JerseyService jerseyService;
+    private final GracefulShutdownService gracefulShutdownService;
     private final AuditEventSender auditEventSender;
     private final JournalReader journalReader;
 
@@ -60,6 +61,7 @@ public class GracefulShutdown implements Runnable {
                             PeriodicalsService periodicalsService,
                             InputSetupService inputSetupService,
                             JerseyService jerseyService,
+                            GracefulShutdownService gracefulShutdownService,
                             AuditEventSender auditEventSender,
                             JournalReader journalReader) {
         this.serverStatus = serverStatus;
@@ -69,6 +71,7 @@ public class GracefulShutdown implements Runnable {
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
         this.jerseyService = jerseyService;
+        this.gracefulShutdownService = gracefulShutdownService;
         this.auditEventSender = auditEventSender;
         this.journalReader = journalReader;
     }
@@ -114,8 +117,15 @@ public class GracefulShutdown implements Runnable {
         // Try to flush all remaining messages from the system
         bufferSynchronizerService.stopAsync().awaitTerminated();
 
+        // Stop all services that registered with the shutdown service (e.g. plugins)
+        // This must run after the BufferSynchronizerService shutdown to make sure the buffers are empty.
+        gracefulShutdownService.stopAsync();
+
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
+
+        // Wait until the shutdown service is done
+        gracefulShutdownService.awaitTerminated();
 
         auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), NODE_SHUTDOWN_COMPLETE);
 

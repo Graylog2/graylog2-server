@@ -2,12 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
-import NodeListItem from './NodeListItem';
 import { Spinner, EntityList, Pluralize } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
+import NodeListItem from './NodeListItem';
+
 const NodesStore = StoreProvider.getStore('Nodes');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
@@ -45,7 +46,8 @@ const NodesList = createReactClass({
           <h2>
             There <Pluralize value={nodesNo} singular="is" plural="are" /> {nodesNo} active <Pluralize value={nodesNo} singular="node" plural="nodes" />
           </h2>
-          <EntityList bsNoItemsStyle="info" noItemsText="There are no active nodes."
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText="There are no active nodes."
                       items={this._formatNodes(this.state.nodes, this.state.clusterOverview)} />
         </Col>
       </Row>

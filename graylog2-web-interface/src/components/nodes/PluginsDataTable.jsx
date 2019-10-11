@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 
@@ -45,7 +45,7 @@ class PluginsDataTable extends React.Component {
                  className="table-hover table-condensed table-striped"
                  headers={headers}
                  headerCellFormatter={this._headerCellFormatter}
-                 sortByKey={'name'}
+                 sortByKey="name"
                  rows={this.props.plugins}
                  dataRowFormatter={this._pluginInfoFormatter}
                  filterLabel="Filter"

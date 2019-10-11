@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const DeflectorActions = ActionsProvider.getActions('Deflector');
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 
 import StoreProvider from 'injection/StoreProvider';
+
+const DeflectorActions = ActionsProvider.getActions('Deflector');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
 const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-line no-unused-vars
 
 class IndicesMaintenanceDropdown extends React.Component {

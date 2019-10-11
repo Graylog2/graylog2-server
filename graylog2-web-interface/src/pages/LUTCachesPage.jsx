@@ -2,8 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -13,7 +14,8 @@ import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
-  'LookupTableCaches');
+  'LookupTableCaches',
+);
 
 const LUTCachesPage = createReactClass({
   displayName: 'LUTCachesPage',
@@ -90,17 +92,20 @@ const LUTCachesPage = createReactClass({
       if (!this.state.types) {
         content = <Spinner text="Loading data cache types" />;
       } else {
-        content =
-          (<CacheCreate types={this.state.types}
-                        saved={this._saved}
-                        validate={this._validateCache}
-                        validationErrors={this.state.validationErrors} />);
+        content = (
+          <CacheCreate types={this.state.types}
+                       saved={this._saved}
+                       validate={this._validateCache}
+                       validationErrors={this.state.validationErrors} />
+        );
       }
     } else if (!this.state.caches) {
       content = <Spinner text="Loading caches" />;
     } else {
-      content = (<CachesOverview caches={this.state.caches}
-                                 pagination={this.state.pagination} />);
+      content = (
+        <CachesOverview caches={this.state.caches}
+                        pagination={this.state.pagination} />
+      );
     }
 
     return (

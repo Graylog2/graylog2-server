@@ -4,14 +4,15 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const NodesStore = StoreProvider.getStore('Nodes');
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
+
+const NodesStore = StoreProvider.getStore('Nodes');
+const MetricsStore = StoreProvider.getStore('Metrics');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const ShowMetricsPage = createReactClass({
   displayName: 'ShowMetricsPage',
@@ -32,7 +33,7 @@ const ShowMetricsPage = createReactClass({
       return <Spinner />;
     }
 
-    let nodeId = this.props.params.nodeId;
+    let { nodeId } = this.props.params;
     // "master" node ID is a placeholder for master node, get first master node ID
     if (nodeId === 'master') {
       const nodeIDs = Object.keys(this.state.nodes);
@@ -42,9 +43,9 @@ const ShowMetricsPage = createReactClass({
 
     const node = this.state.nodes[nodeId];
     const title = <span>Metrics of node {node.short_node_id} / {node.hostname}</span>;
-    const namespace = MetricsStore.namespace;
+    const { namespace } = MetricsStore;
     const names = this.state.metricsNames[nodeId];
-    const filter = this.props.location.query.filter;
+    const { filter } = this.props.location.query;
     return (
       <DocumentTitle title={`Metrics of node ${node.short_node_id} / ${node.hostname}`}>
         <span>

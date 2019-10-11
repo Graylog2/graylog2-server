@@ -1,0 +1,1158 @@
+[
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 2696,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 239622,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 866,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 81082,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 118,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 6580,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 3680,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 327284,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 650,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 48344,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 650,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 48344,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 160,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 9114,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 160,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 9114,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:03:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 4490,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 384742,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:04:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 4976,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 416328,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1612,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 113494,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 256,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 14024,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6844,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 543846,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:04:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1370,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 120588,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1370,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 120588,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:04:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 350,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 21064,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 350,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 21064,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:04:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8572,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 685498,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:05:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 4116,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 324634,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1284,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 98342,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 180,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 9502,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 5580,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 432478,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:05:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1050,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 70628,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1050,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 70628,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:05:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 278,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 28304,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 278,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 28304,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:05:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6911,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 531410,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:06:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 4376,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 365608,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1468,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 106826,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 234,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 14754,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6078,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 487188,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:06:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1220,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 93726,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1220,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 93726,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:06:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 290,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 16740,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 290,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 16740,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:06:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 7591,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 597654,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:07:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 4994,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 348632,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 1564,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 93924,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 272,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 26008,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 6830,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 468564,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:07:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 1348,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 97570,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 1348,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 97570,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:07:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 326,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 29552,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 326,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 29552,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:07:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 8507,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 595686,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:08:00.000Z",
+      "PostsController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 2354,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 188596,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "count()"
+        ],
+        "value": 744,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "show",
+          "sum(took_ms)"
+        ],
+        "value": 43342,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "count()"
+        ],
+        "value": 92,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "edit",
+          "sum(took_ms)"
+        ],
+        "value": 5758,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 3190,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 237696,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:08:00.000Z",
+      "LoginController"
+    ],
+    "values": [
+      {
+        "key": [
+          "login",
+          "count()"
+        ],
+        "value": 608,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "login",
+          "sum(took_ms)"
+        ],
+        "value": 46502,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 608,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 46502,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:08:00.000Z",
+      "UsersController"
+    ],
+    "values": [
+      {
+        "key": [
+          "index",
+          "count()"
+        ],
+        "value": 200,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "index",
+          "sum(took_ms)"
+        ],
+        "value": 21690,
+        "rollup": false,
+        "source": "col-leaf"
+      },
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 200,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 21690,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  },
+  {
+    "key": [
+      "2018-05-24T14:08:00.000Z"
+    ],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 4002,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 305888,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  },
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "count()"
+        ],
+        "value": 40073,
+        "rollup": true,
+        "source": "row-inner"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 3100878,
+        "rollup": true,
+        "source": "row-inner"
+      }
+    ],
+    "source": "non-leaf"
+  }
+]

@@ -68,8 +68,11 @@ public class NetFlowFormatter {
 
     private static String toMessageString(NetFlowV9BaseRecord record) {
         final ImmutableMap<String, Object> fields = record.fields();
-        final long packetCount = (long) fields.get("in_pkts");
-        final long octetCount = (long) fields.get("in_bytes");
+        final long packetCount = (long) fields.getOrDefault("in_pkts", 0L);
+        long octetCount = (long) fields.getOrDefault("in_bytes", 0L);
+        if (octetCount == 0L) {
+            octetCount = (long) fields.getOrDefault("fwd_flow_delta_bytes", 0L);
+        }
         final String srcAddr = (String) fields.get("ipv4_src_addr");
         final String dstAddr = (String) fields.get("ipv4_dst_addr");
         final Integer srcPort = (Integer) fields.get("l4_src_port");

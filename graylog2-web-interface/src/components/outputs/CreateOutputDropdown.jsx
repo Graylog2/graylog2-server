@@ -30,7 +30,7 @@ class CreateOutputDropdown extends React.Component {
                            key="configuration-form-output"
                            configFields={this.state.typeDefinition}
                            title="Create new Output"
-                           helpBlock={'Select a name of your new output that describes it.'}
+                           helpBlock="Select a name of your new output that describes it."
                            typeName={this.state.typeName}
                            submitAction={this.props.onSubmit} />
       </div>

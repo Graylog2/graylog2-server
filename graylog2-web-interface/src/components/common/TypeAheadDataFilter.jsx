@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import { Button } from 'components/graylog';
 import { TypeAheadInput } from 'components/common';
 
 /**
@@ -175,7 +175,9 @@ class TypeAheadDataFilter extends React.Component {
                           label={this.props.label}
                           displayKey={this.props.displayKey} />
           <Button type="submit" style={{ marginLeft: 5 }}>Filter</Button>
-          <Button type="button" style={{ marginLeft: 5 }} onClick={this._resetFilters}
+          <Button type="button"
+                  style={{ marginLeft: 5 }}
+                  onClick={this._resetFilters}
                   disabled={this.state.filters.count() === 0 && this.state.filterText === ''}>
             Reset
           </Button>

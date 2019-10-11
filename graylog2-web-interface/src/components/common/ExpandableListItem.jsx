@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Checkbox } from 'react-bootstrap';
+import { Checkbox } from 'components/graylog';
 
 import style from './ExpandableListItem.css';
 
@@ -35,6 +35,8 @@ class ExpandableListItem extends React.Component {
       PropTypes.element,
       PropTypes.arrayOf(PropTypes.element),
     ]),
+    /** Leave space before and after list item */
+    padded: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -46,6 +48,7 @@ class ExpandableListItem extends React.Component {
     children: [],
     subheader: undefined,
     stayExpanded: false,
+    padded: true,
   };
 
   state = {
@@ -81,7 +84,7 @@ class ExpandableListItem extends React.Component {
   };
 
   _filterInputProps = (props) => {
-    const { expanded, indetermined, stayExpanded, ...inputProps } = props;
+    const { expanded, indetermined, stayExpanded, padded, ...inputProps } = props;
     return inputProps;
   };
 
@@ -96,18 +99,21 @@ class ExpandableListItem extends React.Component {
     const { checked, expandable, selectable, header, subheader, children, ...otherProps } = this.props;
     const headerToRender = selectable ? (<span role="button" tabIndex={0} onClick={this._clickOnHeader}>{header}</span>) : header;
     const inputProps = this._filterInputProps(otherProps);
+    const liClassName = this.props.padded ? style.listItemPadding : '';
 
     return (
-      <li className={style.listItem}>
+      <li className={liClassName}>
         <div className={style.listItemContainer}>
           {selectable && <Checkbox inputRef={(c) => { this._checkbox = c; }} inline checked={checked} {...inputProps} />}
-          {expandable &&
+          {expandable
+          && (
           <div className={style.expandBoxContainer}>
             <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
               <i className={`fa fa-circle-thin fa-stack-1x ${style.iconBackground}`} />
               <i className={`fa fa-stack-1x fa-angle-${expanded ? 'down' : 'up'}`} />
             </div>
           </div>
+          )
           }
           <span className={style.header}>{headerToRender}{subheader && <span className={style.subheader}>{subheader}</span>}</span>
         </div>

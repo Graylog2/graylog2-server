@@ -6,6 +6,10 @@ import Immutable from 'immutable';
 import moment from 'moment';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
+import { DocumentTitle, Spinner } from 'components/common';
+import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'components/search';
+
 const { NodesStore, NodesActions } = CombinedProvider.get('Nodes');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
@@ -15,9 +19,6 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 const { SearchStore } = CombinedProvider.get('Search');
 const { DecoratorsStore } = CombinedProvider.get('Decorators');
-
-import { DocumentTitle, Spinner } from 'components/common';
-import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'components/search';
 
 const SearchPage = createReactClass({
   displayName: 'SearchPage',
@@ -91,7 +92,7 @@ const SearchPage = createReactClass({
   },
 
   _refreshDataFromDecoratorStore() {
-    const searchInStream = this.props.searchInStream;
+    const { searchInStream } = this.props;
     this._refreshData(searchInStream);
   },
 
@@ -113,7 +114,7 @@ const SearchPage = createReactClass({
           const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
           if (!RefreshStore.enabled || RefreshStore.enabled && parseInt(RefreshStore.interval) > 5000) {
-             this.setState({ updatingHistogram: true });
+            this.setState({ updatingHistogram: true });
           }
           UniversalSearchStore.histogram(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), interval, streamId)
             .then((histogram) => {
@@ -220,15 +221,21 @@ const SearchPage = createReactClass({
       return <Spinner />;
     }
 
-    const searchResult = this.state.searchResult;
+    const { searchResult } = this.state;
     searchResult.all_fields = this.state.fields;
     return (
       <DocumentTitle title="Search">
-        <SearchResult query={SearchStore.originalQuery} page={SearchStore.page} builtQuery={searchResult.built_query}
-                      result={searchResult} histogram={this.state.histogram}
+        <SearchResult query={SearchStore.originalQuery}
+                      page={SearchStore.page}
+                      builtQuery={searchResult.built_query}
+                      result={searchResult}
+                      histogram={this.state.histogram}
                       formattedHistogram={this.state.histogram.histogram}
-                      streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                      searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
+                      streams={this.state.streams}
+                      inputs={this.state.inputs}
+                      nodes={Immutable.Map(this.state.nodes)}
+                      searchInStream={this.props.searchInStream}
+                      permissions={this.state.currentUser.permissions}
                       searchConfig={this.props.searchConfig}
                       loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}
                       forceFetch={this.props.forceFetch} />

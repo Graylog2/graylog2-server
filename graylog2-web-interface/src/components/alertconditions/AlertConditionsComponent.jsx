@@ -1,10 +1,10 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertConditionsList } from 'components/alertconditions';
 
@@ -39,7 +39,9 @@ const AlertConditionsComponent = createReactClass({
   },
 
   _isLoading() {
-    return !this.state.streams || !this.state.allAlertConditions || !this.state.availableConditions;
+    const { streams, allAlertConditions, availableConditions } = this.state;
+
+    return !streams || !allAlertConditions || !availableConditions;
   },
 
   render() {
@@ -47,7 +49,9 @@ const AlertConditionsComponent = createReactClass({
       return <Spinner />;
     }
 
-    const alertConditions = this.state.allAlertConditions.sort((a1, a2) => {
+    const { streams, allAlertConditions, availableConditions } = this.state;
+
+    const alertConditions = allAlertConditions.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
       return naturalSort(t1.toLowerCase(), t2.toLowerCase());
@@ -56,15 +60,15 @@ const AlertConditionsComponent = createReactClass({
     return (
       <div>
         <div className="pull-right">
-          <LinkContainer to={Routes.ALERTS.NEW_CONDITION}>
+          <LinkContainer to={Routes.LEGACY_ALERTS.NEW_CONDITION}>
             <Button bsStyle="success">Add new condition</Button>
           </LinkContainer>
         </div>
         <h2>Conditions</h2>
         <p>These are all configured alert conditions.</p>
         <AlertConditionsList alertConditions={alertConditions}
-                             availableConditions={this.state.availableConditions}
-                             streams={this.state.streams}
+                             availableConditions={availableConditions}
+                             streams={streams}
                              onConditionUpdate={this._loadData}
                              onConditionDelete={this._loadData} />
       </div>

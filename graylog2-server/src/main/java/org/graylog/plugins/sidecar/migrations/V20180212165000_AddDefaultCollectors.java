@@ -60,14 +60,14 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
         final String beatsPreambel =
                 "# Needed for Graylog\n" +
                 "fields_under_root: true\n" +
-                "fields.collector_node_id: ${nodeName}\n" +
-                "fields.gl2_source_collector: ${nodeId}\n\n";
+                "fields.collector_node_id: ${sidecar.nodeName}\n" +
+                "fields.gl2_source_collector: ${sidecar.nodeId}\n\n";
 
         ensureCollector(
                 "filebeat",
                 "exec",
                 "linux",
-                "/usr/lib/graylog-sidecar/filebeat",
+                "/usr/share/filebeat/bin/filebeat",
                 "-c  %s",
                 "test config -c %s",
                 beatsPreambel +
@@ -79,8 +79,8 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "output.logstash:\n" +
                         "   hosts: [\"192.168.1.1:5044\"]\n" +
                         "path:\n" +
-                        "  data: /var/cache/graylog-sidecar/filebeat/data\n" +
-                        "  logs: /var/log/graylog-sidecar"
+                        "  data: /var/lib/graylog-sidecar/collectors/filebeat/data\n" +
+                        "  logs: /var/lib/graylog-sidecar/collectors/filebeat/log"
         );
         ensureCollector(
                 "winlogbeat",
@@ -107,10 +107,172 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                 "nxlog",
                 "exec",
                 "linux",
-                "/usr/lib/graylog-sidecar/nxlog",
+                "/usr/bin/nxlog",
                 "-f -c %s",
                 "-v -c %s",
-                ""
+                "define ROOT /usr/bin\n" +
+                        "\n" +
+                        "<Extension gelfExt>\n" +
+                        "  Module xm_gelf\n" +
+                        "  # Avoid truncation of the short_message field to 64 characters.\n" +
+                        "  ShortMessageLength 65536\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "<Extension syslogExt>\n" +
+                        "  Module xm_syslog\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "User nxlog\n" +
+                        "Group nxlog\n" +
+                        "\n" +
+                        "Moduledir /usr/lib/nxlog/modules\n" +
+                        "CacheDir /var/spool/nxlog/data\n" +
+                        "PidFile /var/run/nxlog/nxlog.pid\n" +
+                        "LogFile /var/log/nxlog/nxlog.log\n" +
+                        "LogLevel INFO\n" +
+                        "\n" +
+                        "\n" +
+                        "<Input file>\n" +
+                        "\tModule im_file\n" +
+                        "\tFile '/var/log/*.log'\n" +
+                        "\tPollInterval 1\n" +
+                        "\tSavePos\tTrue\n" +
+                        "\tReadFromLast True\n" +
+                        "\tRecursive False\n" +
+                        "\tRenameCheck False\n" +
+                        "\tExec $FileName = file_name(); # Send file name with each message\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "#<Input syslog-udp>\n" +
+                        "#\tModule im_udp\n" +
+                        "#\tHost 127.0.0.1\n" +
+                        "#\tPort 514\n" +
+                        "#\tExec parse_syslog_bsd();\n" +
+                        "#</Input>\n" +
+                        "\n" +
+                        "<Output gelf>\n" +
+                        "\tModule om_tcp\n" +
+                        "\tHost 192.168.1.1\n" +
+                        "\tPort 12201\n" +
+                        "\tOutputType  GELF_TCP\n" +
+                        "\t<Exec>\n" +
+                        "\t  # These fields are needed for Graylog\n" +
+                        "\t  $gl2_source_collector = '${sidecar.nodeId}';\n" +
+                        "\t  $collector_node_id = '${sidecar.nodeName}';\n" +
+                        "\t</Exec>\n" +
+                        "</Output>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Route route-1>\n" +
+                        "  Path file => gelf\n" +
+                        "</Route>\n" +
+                        "#<Route route-2>\n" +
+                        "#  Path syslog-udp => gelf\n" +
+                        "#</Route>\n" +
+                        "\n" +
+                        "\n"
+        );
+        ensureCollector(
+                "nxlog",
+                "svc",
+                "windows",
+                "C:\\Program Files (x86)\\nxlog\\nxlog.exe",
+                "-c \"%s\"",
+                "-v -f -c \"%s\"",
+                "define ROOT C:\\Program Files (x86)\\nxlog\n" +
+                        "\n" +
+                        "Moduledir %ROOT%\\modules\n" +
+                        "CacheDir %ROOT%\\data\n" +
+                        "Pidfile %ROOT%\\data\\nxlog.pid\n" +
+                        "SpoolDir %ROOT%\\data\n" +
+                        "LogFile %ROOT%\\data\\nxlog.log\n" +
+                        "LogLevel INFO\n" +
+                        "\n" +
+                        "<Extension logrotate>\n" +
+                        "    Module  xm_fileop\n" +
+                        "    <Schedule>\n" +
+                        "        When    @daily\n" +
+                        "        Exec    file_cycle('%ROOT%\\data\\nxlog.log', 7);\n" +
+                        "     </Schedule>\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Extension gelfExt>\n" +
+                        "  Module xm_gelf\n" +
+                        "  # Avoid truncation of the short_message field to 64 characters.\n" +
+                        "  ShortMessageLength 65536\n" +
+                        "</Extension>\n" +
+                        "\n" +
+                        "<Input eventlog>\n" +
+                        "        Module im_msvistalog\n" +
+                        "        PollInterval 1\n" +
+                        "        SavePos True\n" +
+                        "        ReadFromLast True\n" +
+                        "        \n" +
+                        "        #Channel System\n" +
+                        "        #<QueryXML>\n" +
+                        "        #  <QueryList>\n" +
+                        "        #   <Query Id='1'>\n" +
+                        "        #    <Select Path='Security'>*[System/Level=4]</Select>\n" +
+                        "        #    </Query>\n" +
+                        "        #  </QueryList>\n" +
+                        "        #</QueryXML>\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Input file>\n" +
+                        "\tModule im_file\n" +
+                        "\tFile 'C:\\Windows\\MyLogDir\\\\*.log'\n" +
+                        "\tPollInterval 1\n" +
+                        "\tSavePos\tTrue\n" +
+                        "\tReadFromLast True\n" +
+                        "\tRecursive False\n" +
+                        "\tRenameCheck False\n" +
+                        "\tExec $FileName = file_name(); # Send file name with each message\n" +
+                        "</Input>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Output gelf>\n" +
+                        "\tModule om_tcp\n" +
+                        "\tHost 192.168.1.1\n" +
+                        "\tPort 12201\n" +
+                        "\tOutputType  GELF_TCP\n" +
+                        "\t<Exec>\n" +
+                        "\t  # These fields are needed for Graylog\n" +
+                        "\t  $gl2_source_collector = '${sidecar.nodeId}';\n" +
+                        "\t  $collector_node_id = '${sidecar.nodeName}';\n" +
+                        "\t</Exec>\n" +
+                        "</Output>\n" +
+                        "\n" +
+                        "\n" +
+                        "<Route route-1>\n" +
+                        "  Path eventlog => gelf\n" +
+                        "</Route>\n" +
+                        "<Route route-2>\n" +
+                        "  Path file => gelf\n" +
+                        "</Route>\n" +
+                        "\n"
+        );
+        ensureCollector(
+                "filebeat",
+                "svc",
+                "windows",
+                "C:\\Program Files\\Graylog\\sidecar\\filebeat.exe",
+                "-c \"%s\"",
+                "test config -c \"%s\"",
+                beatsPreambel +
+                        "output.logstash:\n" +
+                        "   hosts: [\"192.168.1.1:5044\"]\n" +
+                        "path:\n" +
+                        "  data: C:\\Program Files\\Graylog\\sidecar\\cache\\filebeat\\data\n" +
+                        "  logs: C:\\Program Files\\Graylog\\sidecar\\logs\n" +
+                        "tags:\n" +
+                        " - windows\n" +
+                        "filebeat.inputs:\n" +
+                        "  type: log\n" +
+                        "  enabled: true\n" +
+                        "  paths:\n" +
+                        "    - C:\\logs\\log.log\n"
         );
     }
 
@@ -138,14 +300,14 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                                    String defaultTemplate) {
         Collector collector = null;
         try {
-            collector = collectorService.findByName(collectorName);
+            collector = collectorService.findByNameAndOs(collectorName, nodeOperatingSystem);
             if (collector == null) {
-                final String msg = "Couldn't find collector '" + collectorName + "' fixing it.";
-                LOG.error(msg);
-                throw new IllegalArgumentException(msg);
+                final String msg = "Couldn't find collector '{} on {}' fixing it.";
+                LOG.error(msg, collectorName, nodeOperatingSystem);
+                throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException ignored) {
-            LOG.info("{} collector is missing, adding it.", collectorName);
+            LOG.info("{} collector on {} is missing, adding it.", collectorName, nodeOperatingSystem);
             final Collector newCollector;
             newCollector = Collector.create(
                     null,

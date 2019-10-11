@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { AlertsHeaderToolbar } from 'components/alerts';
@@ -9,6 +9,7 @@ import { AlertNotificationsComponent } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const AlertNotificationsPage = createReactClass({
@@ -30,7 +31,7 @@ const AlertNotificationsPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.NOTIFICATIONS} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.NOTIFICATIONS} />
             </span>
           </PageHeader>
 

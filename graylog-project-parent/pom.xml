@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>3.0.0-alpha.5-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -336,9 +336,14 @@
             </dependency>
 
             <dependency>
-                <groupId>com.eaio.uuid</groupId>
+                <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>uuid</artifactId>
                 <version>${uuid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.huxhorn.sulky</groupId>
+                <artifactId>de.huxhorn.sulky.ulid</artifactId>
+                <version>${ulid.version}</version>
             </dependency>
 
             <dependency>
@@ -388,6 +393,12 @@
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>${javax.inject.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
             </dependency>
 
             <dependency>
@@ -447,8 +458,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>io.krakens</groupId>
-                <artifactId>java-grok</artifactId>
+                <groupId>org.graylog2.repackaged</groupId>
+                <artifactId>grok</artifactId>
                 <version>${grok.version}</version>
             </dependency>
             <dependency>
@@ -510,6 +521,16 @@
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>one.util</groupId>
+                <artifactId>streamex</artifactId>
+                <version>${streamex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.leadinglight</groupId>
+                <artifactId>jdot</artifactId>
+                <version>${jdot.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

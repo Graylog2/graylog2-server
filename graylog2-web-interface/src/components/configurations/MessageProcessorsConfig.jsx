@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Alert, Table } from 'react-bootstrap';
+import naturalSort from 'javascript-natural-sort';
+
+import { Button, Alert, Table } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted, SortableList } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
-import naturalSort from 'javascript-natural-sort';
 
 const MessageProcessorsConfig = createReactClass({
   displayName: 'MessageProcessorsConfig',
@@ -70,7 +71,7 @@ const MessageProcessorsConfig = createReactClass({
     return () => {
       const disabledProcessors = this.state.config.disabled_processors;
       const update = ObjectUtils.clone(this.state.config);
-      const checked = this.inputs[className].checked;
+      const { checked } = this.inputs[className];
 
       if (checked) {
         update.disabled_processors = disabledProcessors.filter(p => p !== className);

@@ -29,15 +29,11 @@ import java.util.Collection;
 @JsonAutoDetect
 @AutoValue
 public abstract class CatalogResolveResponse {
-    @JsonProperty("constraints")
-    public abstract ImmutableSet<Constraint> constraints();
-
     @JsonProperty("entities")
     public abstract ImmutableSet<Entity> entities();
 
     @JsonCreator
-    public static CatalogResolveResponse create(@JsonProperty("constraints") Collection<Constraint> constraints,
-                                                @JsonProperty("entities") Collection<Entity> entities) {
-        return new AutoValue_CatalogResolveResponse(ImmutableSet.copyOf(constraints), ImmutableSet.copyOf(entities));
+    public static CatalogResolveResponse create(@JsonProperty("entities") Collection<Entity> entities) {
+        return new AutoValue_CatalogResolveResponse(ImmutableSet.copyOf(entities));
     }
 }

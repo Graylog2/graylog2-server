@@ -12,4 +12,3 @@ PluginStore.register(new PluginManifest({}, {
     },
   ],
 }));
-

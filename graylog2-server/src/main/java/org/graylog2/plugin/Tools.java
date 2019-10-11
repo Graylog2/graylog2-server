@@ -644,6 +644,9 @@ public final class Tools {
         try {
             final JsonParser jp = OBJECT_MAPPER.getFactory().createParser(query);
             final JsonNode rootNode = OBJECT_MAPPER.readTree(jp);
+            if (rootNode == null) {
+                throw new IOException("null result");
+            }
             final JsonNode timestampNode = rootNode.findValue("range").findValue("timestamp");
             final String from = elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText());
             final String to = elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText());

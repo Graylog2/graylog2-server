@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Tooltip, OverlayTrigger } from 'components/graylog';
 import lodash from 'lodash';
 
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
@@ -29,7 +29,7 @@ class StatusIndicator extends React.Component {
 
     let icon;
     let className;
-    let message = this.props.message;
+    let { message } = this.props;
 
     switch (this.props.status) {
       case SidecarStatusEnum.RUNNING:

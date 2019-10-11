@@ -25,16 +25,16 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -71,44 +71,48 @@ public class SidecarCollectorFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportNativeEntity() {
         final Collector collector = collectorService.find("5b4c920b4b900a0024af0001");
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(collector);
+        final EntityDescriptor descriptor = EntityDescriptor.create(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(collector, entityDescriptorIds);
 
-        assertThat(entityWithConstraints.constraints()).isEmpty();
-        final Entity expectedEntity = EntityV1.builder()
-                .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
-                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
-                        ValueReference.of("filebeat"),
-                        ValueReference.of("exec"),
-                        ValueReference.of("linux"),
-                        ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("-c %s"),
-                        ValueReference.of("test config -c %s"),
-                        ValueReference.of("")), JsonNode.class))
-                .build();
-        assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.SIDECAR_COLLECTOR_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entityV1.data(), SidecarCollectorEntity.class);
+
+        assertThat(collectorEntity.name()).isEqualTo(ValueReference.of("filebeat"));
+        assertThat(collectorEntity.serviceType()).isEqualTo(ValueReference.of("exec"));
+        assertThat(collectorEntity.nodeOperatingSystem()).isEqualTo(ValueReference.of("linux"));
+        assertThat(collectorEntity.executablePath()).isEqualTo(ValueReference.of("/usr/lib/graylog-sidecar/filebeat"));
+        assertThat(collectorEntity.executeParameters()).isEqualTo(ValueReference.of("-c %s"));
+        assertThat(collectorEntity.validationParameters()).isEqualTo(ValueReference.of("test config -c %s"));
+        assertThat(collectorEntity.defaultTemplate()).isEqualTo(ValueReference.of(""));
     }
 
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/sidecar_collectors.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntity() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5b4c920b4b900a0024af0001", ModelTypes.SIDECAR_COLLECTOR_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
 
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        assertThat(entityWithConstraints.constraints()).isEmpty();
-        final Entity expectedEntity = EntityV1.builder()
-                .id(ModelId.of("5b4c920b4b900a0024af0001"))
-                .type(ModelTypes.SIDECAR_COLLECTOR_V1)
-                .data(objectMapper.convertValue(SidecarCollectorEntity.create(
-                        ValueReference.of("filebeat"),
-                        ValueReference.of("exec"),
-                        ValueReference.of("linux"),
-                        ValueReference.of("/usr/lib/graylog-sidecar/filebeat"),
-                        ValueReference.of("-c %s"),
-                        ValueReference.of("test config -c %s"),
-                        ValueReference.of("")), JsonNode.class))
-                .build();
-        assertThat(entityWithConstraints.entity()).isEqualTo(expectedEntity);
+        final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.SIDECAR_COLLECTOR_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entityV1.data(), SidecarCollectorEntity.class);
+
+        assertThat(collectorEntity.name()).isEqualTo(ValueReference.of("filebeat"));
+        assertThat(collectorEntity.serviceType()).isEqualTo(ValueReference.of("exec"));
+        assertThat(collectorEntity.nodeOperatingSystem()).isEqualTo(ValueReference.of("linux"));
+        assertThat(collectorEntity.executablePath()).isEqualTo(ValueReference.of("/usr/lib/graylog-sidecar/filebeat"));
+        assertThat(collectorEntity.executeParameters()).isEqualTo(ValueReference.of("-c %s"));
+        assertThat(collectorEntity.validationParameters()).isEqualTo(ValueReference.of("test config -c %s"));
+        assertThat(collectorEntity.defaultTemplate()).isEqualTo(ValueReference.of(""));
     }
 
     @Test
@@ -135,7 +139,7 @@ public class SidecarCollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name(), false);
         assertThat(nativeEntity.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(nativeEntity.entity()).isEqualTo(collector);
     }
@@ -162,7 +166,7 @@ public class SidecarCollectorFacadeTest {
         final Collector collector = collectorService.findByName("filebeat");
         assertThat(collector).isNotNull();
 
-        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name());
+        final NativeEntityDescriptor expectedDescriptor = NativeEntityDescriptor.create(entity.id(), collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1, collector.name(), false);
         assertThat(existingCollector.descriptor()).isEqualTo(expectedDescriptor);
         assertThat(existingCollector.entity()).isEqualTo(collector);
     }

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { AddSearchCountToDashboard, SavedSearchControls, ShowQueryModal } from 'components/search';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -10,6 +10,7 @@ import { ContactUs, DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 const NoSearchResults = createReactClass({
@@ -71,7 +72,8 @@ const NoSearchResults = createReactClass({
               <Col md={8}>
                 <div className="actions">
                   <AddSearchCountToDashboard searchInStream={this.props.searchInStream}
-                                             permissions={this.props.permissions} pullRight />
+                                             permissions={this.props.permissions}
+                                             pullRight />
                   <AddToDashboardMenu title="Add histogram to dashboard"
                                       widgetType="SEARCH_RESULT_CHART"
                                       configuration={{ interval: this.props.histogram.interval }}

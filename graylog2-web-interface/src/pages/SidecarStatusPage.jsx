@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Button, ButtonToolbar } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -53,8 +53,8 @@ class SidecarStatusPage extends React.Component {
   };
 
   render() {
-    const sidecar = this.state.sidecar;
-    const collectors = this.state.collectors;
+    const { sidecar } = this.state;
+    const { collectors } = this.state;
     const isLoading = !sidecar || !collectors;
 
     if (isLoading) {

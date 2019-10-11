@@ -177,6 +177,9 @@ public class StreamRouterEngineTest {
         final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
         final Message message = getMessage();
 
+        // Without the field
+        assertTrue(engine.match(message).isEmpty());
+
         // With wrong value for field.
         message.addField("testfield", "no-foobar");
 
@@ -186,6 +189,39 @@ public class StreamRouterEngineTest {
         message.addField("testfield", "hello testvalue");
 
         assertEquals(Lists.newArrayList(stream), engine.match(message));
+    }
+
+    @Test
+    public void testInvertedContainsMatch() throws Exception {
+        final StreamMock stream = getStreamMock("test");
+        final StreamRuleMock rule = new StreamRuleMock(
+            ImmutableMap.<String, Object>builder()
+                .put("_id", new ObjectId())
+                .put("field", "testfield")
+                .put("inverted", true)
+                .put("value", "testvalue")
+                .put("type", StreamRuleType.CONTAINS.toInteger())
+                .put("stream_id", stream.getId())
+                .build()
+        );
+
+        stream.setStreamRules(Lists.newArrayList(rule));
+
+        final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
+        final Message message = getMessage();
+
+        // Without the field
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
+
+        // Without the matching value in the field
+        message.addField("testfield", "no-foobar");
+
+        assertEquals(Lists.newArrayList(stream), engine.match(message));
+
+        // With matching value in the field.
+        message.addField("testfield", "hello testvalue");
+
+        assertTrue(engine.match(message).isEmpty());
     }
 
     @Test

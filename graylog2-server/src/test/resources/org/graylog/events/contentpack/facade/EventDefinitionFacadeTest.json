@@ -1,0 +1,60 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "5d4032513d2746703d1467f6"
+      },
+      "title" : "title",
+      "description" : "description",
+      "priority" : 1,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "author: \"Konrad Merz\"",
+        "streams" : [
+          "5cdab2293d27467fbe9e8a72"
+        ],
+        "group_by" : [
+          "project"
+        ],
+        "series" : [
+          {
+            "id" : "3d11e33b-318b-40c6-9da1-7c14c10b511a",
+            "function" : "avg",
+            "field" : "files_changed"
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : "<",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "3d11e33b-318b-40c6-9da1-7c14c10b511a"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 4.0
+            }
+          }
+        },
+        "search_within_ms" : 36000000000,
+        "execute_every_ms" : 36000000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 0,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ]
+    }
+  ]
+}

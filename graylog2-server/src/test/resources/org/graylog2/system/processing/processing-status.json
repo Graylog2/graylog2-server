@@ -1,0 +1,76 @@
+{
+  "processing_status": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0000"
+      },
+      "node_id": "abc-123",
+      "node_lifecycle_status": "RUNNING",
+      "updated_at": {
+        "$date": "2019-01-01T00:01:00.000Z"
+      },
+      "receive_times": {
+        "ingest": {
+          "$date": "2019-01-01T00:03:00.000Z"
+        },
+        "post_processing": {
+          "$date": "2019-01-01T00:02:00.000Z"
+        },
+        "post_indexing": {
+          "$date": "2019-01-01T00:01:00.000Z"
+        }
+      },
+      "input_journal": {
+        "uncommitted_entries": 0,
+        "read_messages_1m_rate": 12,
+        "written_messages_1m_rate": 12
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "node_id": "abc-456",
+      "updated_at": {
+        "$date": "2019-01-01T02:01:00.000Z"
+      },
+      "receive_times": {
+        "ingest": {
+          "$date": "2019-01-01T01:03:00.000Z"
+        },
+        "post_processing": {
+          "$date": "2019-01-01T01:02:00.000Z"
+        },
+        "post_indexing": {
+          "$date": "2019-01-01T02:01:00.000Z"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "node_id": "abc-789",
+      "node_lifecycle_status": "STARTING",
+      "updated_at": {
+        "$date": "2019-01-01T01:01:00.000Z"
+      },
+      "receive_times": {
+        "ingest": {
+          "$date": "2019-01-01T02:03:00.000Z"
+        },
+        "post_processing": {
+          "$date": "2019-01-01T02:02:00.000Z"
+        },
+        "post_indexing": {
+          "$date": "2019-01-01T01:01:00.000Z"
+        }
+      },
+      "input_journal": {
+        "uncommitted_entries": 42,
+        "read_messages_1m_rate": 2,
+        "written_messages_1m_rate": 4
+      }
+    }
+  ]
+}

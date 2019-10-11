@@ -1,19 +1,23 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
-import { DocumentTitle } from 'components/common';
 
+import { DocumentTitle } from 'components/common';
+import { Row, FormGroup, Alert, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import LoadingPage from './LoadingPage';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
 
+import LoadingPage from './LoadingPage';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
+
+const SessionStore = StoreProvider.getStore('Session');
+const SessionActions = ActionsProvider.getActions('Session');
 
 const LoginPage = createReactClass({
   displayName: 'LoginPage',
@@ -66,7 +70,7 @@ const LoginPage = createReactClass({
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <a className="close" onClick={this.resetLastError}>×</a>{error}
+            <button type="button" className="close" onClick={this.resetLastError}>&times;</button>{error}
           </Alert>
         </div>
       );
@@ -79,13 +83,15 @@ const LoginPage = createReactClass({
   },
 
   render() {
-    if (this.state.validatingSession) {
+    const { lastError, loading, validatingSession } = this.state;
+
+    if (validatingSession) {
       return (
         <LoadingPage />
       );
     }
 
-    const alert = this.formatLastError(this.state.lastError);
+    const alert = this.formatLastError(lastError);
     return (
       <DocumentTitle title="Sign in">
         <div>
@@ -101,8 +107,8 @@ const LoginPage = createReactClass({
                 <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
 
                 <FormGroup>
-                  <Button type="submit" bsStyle="info" disabled={this.state.loading}>
-                    {this.state.loading ? 'Signing in...' : 'Sign in'}
+                  <Button type="submit" bsStyle="info" disabled={loading}>
+                    {loading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </FormGroup>
 
@@ -116,4 +122,3 @@ const LoginPage = createReactClass({
 });
 
 export default LoginPage;
-

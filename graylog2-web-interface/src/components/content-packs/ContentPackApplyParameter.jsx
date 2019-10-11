@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { findIndex } from 'lodash';
 
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
+import naturalSort from 'javascript-natural-sort';
 
 import Style from './ContentPackApplyParameter.css';
 
@@ -34,11 +36,16 @@ class ContentPackApplyParameter extends React.Component {
   }
 
   _configKeyRowFormatter = (paramMap) => {
+    const enableClear = findIndex(this.props.appliedParameter,
+      { paramName: paramMap.paramName, configKey: paramMap.configKey, readOnly: true }) < 0;
+    const lastCol = enableClear
+      ? <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
+      : <td />;
     return (
       <tr key={paramMap.configKey}>
         <td>{paramMap.configKey}</td>
         <td>{paramMap.paramName}</td>
-        <td><Button bsStyle="info" bsSize="small" onClick={() => { this._parameterClear(paramMap.configKey); }}>Clear</Button></td>
+        { lastCol }
       </tr>
     );
   };
@@ -73,10 +80,12 @@ class ContentPackApplyParameter extends React.Component {
   };
 
   render() {
-    const typeRegExp = RegExp(/\.type$/);
-    const configKeys = ObjectUtils.getPaths(this.props.entity.data)
-      .filter(configKey => typeRegExp.test(configKey))
-      .map((configKey) => { return configKey.replace(typeRegExp, ''); })
+    const vRefData = new ValueReferenceData(this.props.entity.data);
+    const configPaths = vRefData.getPaths();
+
+    const configKeys = Object.keys(configPaths)
+      .sort(naturalSort)
+      .filter(configKey => configPaths[configKey].isValueRef()) // Only allow value-refs as parameters
       .filter((configKey) => {
         return this.props.appliedParameter.findIndex((paramMap) => {
           return configKey === paramMap.configKey;
@@ -84,10 +93,10 @@ class ContentPackApplyParameter extends React.Component {
       });
     const emptyOption = (name) => { return (<option key="EMPTY" value="">{name}</option>); };
     const configOptions = [emptyOption('Choose Config Key')].concat(configKeys.map(key => <option key={key} value={key}>{key}</option>));
-    let parameters = this.props.parameters;
+    let { parameters } = this.props;
     let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
     if (this.state.config_key !== '' && parameters.length > 0) {
-      const configKeyType = ObjectUtils.getValue(this.props.entity.data, this.state.config_key).type;
+      const configKeyType = configPaths[this.state.config_key].getValueType();
       if (['string', 'integer', 'boolean', 'double'].findIndex(type => type === configKeyType) >= 0) {
         parameters = parameters.filter(parameter => parameter.type === configKeyType);
       }
@@ -131,13 +140,11 @@ class ContentPackApplyParameter extends React.Component {
         </form>
         <Row>
           <Col smOffset={1} sm={10}>
-            <DataTable
-              id="config-key-list"
-              headers={['Config Key', 'Parameter', 'Action']}
-              filterKeys={[]}
-              rows={this.props.appliedParameter}
-              dataRowFormatter={this._configKeyRowFormatter}
-            />
+            <DataTable id="config-key-list"
+                       headers={['Config Key', 'Parameter', 'Action']}
+                       filterKeys={[]}
+                       rows={this.props.appliedParameter}
+                       dataRowFormatter={this._configKeyRowFormatter} />
           </Col>
         </Row>
       </div>

@@ -25,7 +25,7 @@ const URLUtils = {
   },
   getParsedHash(location) {
     let result = {};
-    let hash = location.hash;
+    let { hash } = location;
     if (hash) {
       if (hash.indexOf('#') === 0 && hash.length > 1) {
         hash = hash.substr(1, hash.length - 1);

@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
-import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
@@ -41,7 +41,7 @@ class StreamAlertNotifications extends React.Component {
       return <Spinner />;
     }
 
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     const notifications = this.state.conditionNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';

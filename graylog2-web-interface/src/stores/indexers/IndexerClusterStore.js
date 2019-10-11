@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const IndexerClusterActions = ActionsProvider.getActions('IndexerCluster');
 
 const IndexerClusterStore = Reflux.createStore({

@@ -1,0 +1,9 @@
+:local(.component) {
+    text-align: center;
+    font-size: 1.1em;
+}
+
+:local(.component) h3 {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}

@@ -26,18 +26,13 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
-import org.graylog2.bindings.providers.BundleExporterProvider;
-import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
-import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.rest.GenericErrorCsvWriter;
-import org.graylog2.users.UserPermissionsCleanupListener;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
@@ -62,6 +57,7 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.ElasticsearchExceptionMapper;
+import org.graylog2.rest.GenericErrorCsvWriter;
 import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.QueryParsingExceptionMapper;
@@ -120,6 +116,10 @@ public class ServerBindings extends Graylog2Module {
         install(new GrokModule());
         install(new LookupModule());
         install(new FieldTypesModule());
+
+        // Just to create the binders so they are present in the injector. Prevents a server startup error when no
+        // outputs are bound that implement MessageOutput.Factory2.
+        outputsMapBinder2();
     }
 
     private void bindProviders() {
@@ -164,9 +164,6 @@ public class ServerBindings extends Graylog2Module {
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
-        bind(BundleService.class).in(Scopes.SINGLETON);
-        bind(BundleImporterProvider.class).in(Scopes.SINGLETON);
-        bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);

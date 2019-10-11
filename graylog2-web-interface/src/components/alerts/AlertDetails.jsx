@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
 
+import { Col, Row } from 'components/graylog';
 import { AlertMessages, AlertTimeline } from 'components/alerts';
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
 
 import CombinedProvider from 'injection/CombinedProvider';
+
 const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
@@ -27,8 +28,8 @@ class AlertDetails extends React.Component {
   };
 
   render() {
-    const alert = this.props.alert;
-    const stream = this.props.stream;
+    const { alert } = this.props;
+    const { stream } = this.props;
 
     return (
       <div>
@@ -39,7 +40,9 @@ class AlertDetails extends React.Component {
               This is a timeline of events occurred during the alert, you can see more information about some events
               below.
             </p>
-            <AlertTimeline alert={alert} stream={stream} condition={this.props.condition}
+            <AlertTimeline alert={alert}
+                           stream={stream}
+                           condition={this.props.condition}
                            conditionType={this.props.conditionType} />
           </Col>
         </Row>

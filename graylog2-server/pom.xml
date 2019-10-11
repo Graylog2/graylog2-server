@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>3.0.0-alpha.5-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -242,6 +242,10 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
@@ -288,8 +292,12 @@
         </dependency>
 
         <dependency>
-            <groupId>com.eaio.uuid</groupId>
+            <groupId>org.graylog2.repackaged</groupId>
             <artifactId>uuid</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.huxhorn.sulky</groupId>
+            <artifactId>de.huxhorn.sulky.ulid</artifactId>
         </dependency>
 
         <dependency>
@@ -298,8 +306,8 @@
         </dependency>
 
         <dependency>
-            <groupId>io.krakens</groupId>
-            <artifactId>java-grok</artifactId>
+            <groupId>org.graylog2.repackaged</groupId>
+            <artifactId>grok</artifactId>
         </dependency>
 
         <dependency>
@@ -313,6 +321,11 @@
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
 
         <!-- Logging dependencies -->
@@ -560,6 +573,15 @@
             <groupId>org.graylog.autovalue</groupId>
             <artifactId>auto-value-javabean</artifactId>
         </dependency>
+        <dependency>
+            <groupId>info.leadinglight</groupId>
+            <artifactId>jdot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>one.util</groupId>
+            <artifactId>streamex</artifactId>
+        </dependency>
+
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>junit</groupId>
@@ -602,7 +624,7 @@
         <finalName>graylog</finalName>
         <resources>
             <resource>
-                <directory>${webInterface.path}/build</directory>
+                <directory>${webInterface.path}/target/web/build</directory>
                 <targetPath>web-interface/assets</targetPath>
             </resource>
             <resource>
@@ -670,6 +692,16 @@
                                 <exclude>org/apache/commons/collections/functors/InvokerTransformer.class</exclude>
                             </excludes>
                         </filter>
+                        <!-- Bouncycastle's JARs are signed. When building a shaded JAR, either remove the signatures, or
+                             add dependency to the main JAR's manifest. Otherwise running the application will fail. -->
+                        <filter>
+                            <artifact>org.bouncycastle:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
                     </filters>
                 </configuration>
                 <executions>
@@ -715,6 +747,35 @@
                         </manifest>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!-- Building a test-jar allows us to share common test infrastructure classes like
+                              ~  elasticsearch test base classes in other maven modules. (e.g. plugins)
+                              ~
+                              ~  A module that wants to use the test-jar classes needs to define an additional
+                              ~  graylog2-server dependency in it's pom.xml:
+                              ~
+                              ~     <dependency>
+                              ~         <groupId>org.graylog2</groupId>
+                              ~         <artifactId>graylog2-server</artifactId>
+                              ~         <version>${graylog.version}</version>
+                              ~         <type>test-jar</type>
+                              ~         <scope>test</scope>
+                              ~     </dependency>
+                              ~
+                              ~ One problem with this is, that transitive test-scoped dependencies will be lost so
+                              ~ the module's pom.xml needs to explicitly add them.
+                              ~
+                              ~ More details:
+                              ~   - https://maven.apache.org/plugins/maven-jar-plugin/examples/create-test-jar.html
+                              ~     (don't use the "<classifier>" though)
+                              ~   - https://stackoverflow.com/a/174670
+                              -->
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -818,7 +879,7 @@
                                 <fileset>
                                     <directory>${webInterface.path}</directory>
                                     <includes>
-                                        <include>build/**/*</include>
+                                        <include>target/**/*</include>
                                         <include>node_modules/**/*</include>
                                     </includes>
                                     <followSymlinks>false</followSymlinks>
@@ -866,6 +927,17 @@
                             </execution>
 
                             <execution>
+                                <id>yarn run check-production-build</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>run check-production-build</arguments>
+                                </configuration>
+                            </execution>
+
+                            <execution>
                                 <id>yarn test</id>
                                 <goals>
                                     <goal>yarn</goal>
@@ -873,6 +945,38 @@
                                 <phase>test</phase>
                                 <configuration>
                                     <arguments>test</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>yarn flow-check</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <phase>test</phase>
+                                <configuration>
+                                    <arguments>flow-check</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.googlecode.maven-download-plugin</groupId>
+                        <artifactId>download-maven-plugin</artifactId>
+                        <version>${download-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>install-headless-shell</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>wget</goal>
+                                </goals>
+                                <configuration>
+                                    <url>
+                                        https://packages.graylog2.org/releases/graylog-plugin-artifacts/report/chrome/72.0.3583.1/headless_shell
+                                    </url>
+                                    <unpack>false</unpack>
+                                    <outputDirectory>${project.basedir}/../graylog2-web-interface/test/bin</outputDirectory>
+                                    <md5>22e07d7f108fcf6cb3e296d9802a9897</md5>
                                 </configuration>
                             </execution>
                         </executions>

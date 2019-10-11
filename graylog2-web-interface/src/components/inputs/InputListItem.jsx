@@ -2,22 +2,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { DropdownButton, MenuItem, Col, Button } from 'components/graylog';
 import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
-
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-
 import StoreProvider from 'injection/StoreProvider';
-const InputTypesStore = StoreProvider.getStore('InputTypes');
-
 import ActionsProvider from 'injection/ActionsProvider';
-const InputsActions = ActionsProvider.getActions('Inputs');
 
 import { InputForm, InputStateBadge, InputStateControl, InputStaticFields, InputThroughput, StaticFieldForm } from 'components/inputs';
+
+const InputTypesStore = StoreProvider.getStore('InputTypes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 const InputListItem = createReactClass({
   displayName: 'InputListItem',
@@ -53,7 +51,7 @@ const InputListItem = createReactClass({
       return <Spinner />;
     }
 
-    const input = this.props.input;
+    const { input } = this.props;
     const definition = this.state.inputDescriptions[input.type];
 
     const titleSuffix = (
@@ -140,14 +138,20 @@ const InputListItem = createReactClass({
       );
     }
 
-    const inputForm = definition ?
-      (<InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} key={`edit-form-input-${input.id}`}
-                   globalValue={input.global} nodeValue={input.node}
+    const inputForm = definition
+      ? (
+        <InputForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}
+                   key={`edit-form-input-${input.id}`}
+                   globalValue={input.global}
+                   nodeValue={input.node}
                    configFields={definition.requested_configuration}
                    title={`Editing Input ${input.title}`}
                    titleValue={input.title}
-                   typeName={input.type} includeTitleField
-                   submitAction={this._updateInput} values={input.attributes} />) : null;
+                   typeName={input.type}
+                   includeTitleField
+                   submitAction={this._updateInput}
+                   values={input.attributes} />
+      ) : null;
 
     const additionalContent = (
       <div>

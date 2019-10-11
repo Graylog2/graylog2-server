@@ -92,9 +92,9 @@ public class HttpTransport extends AbstractTcpTransport {
         }
 
         handlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
-        handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-        handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("decompressor", HttpContentDecompressor::new);
+        handlers.put("encoder", HttpResponseEncoder::new);
+        handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
         handlers.put("http-handler", () -> new HttpHandler(enableCors));
         handlers.putAll(super.getCustomChildChannelHandlers(input));
 

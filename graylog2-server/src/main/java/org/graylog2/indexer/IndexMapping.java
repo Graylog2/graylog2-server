@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.Tools;
 
 import java.util.List;
@@ -27,8 +28,13 @@ import java.util.Map;
  * Representing the message type mapping in Elasticsearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  */
-public abstract class IndexMapping {
+public abstract class IndexMapping implements IndexMappingTemplate {
     public static final String TYPE_MESSAGE = "message";
+
+    @Override
+    public Map<String, Object> toTemplate(IndexSetConfig indexSetConfig, String indexPattern, int order) {
+        return messageTemplate(indexPattern, indexSetConfig.indexAnalyzer(), order);
+    }
 
     public Map<String, Object> messageTemplate(final String template, final String analyzer) {
         return messageTemplate(template, analyzer, -1);
@@ -60,6 +66,7 @@ public abstract class IndexMapping {
     protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
         final Map<String, Object> defaultInternal = ImmutableMap.of(
                 "match", "gl2_*",
+                "match_mapping_type", "string",
                 "mapping", notAnalyzedString());
         final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
 

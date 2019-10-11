@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
@@ -157,7 +157,7 @@ const ProcessingTimelineComponent = createReactClass({
                    className="table-hover"
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
-                   sortByKey={'title'}
+                   sortByKey="title"
                    rows={this.state.pipelines}
                    dataRowFormatter={this._pipelineFormatter}
                    filterLabel="Filter pipelines"

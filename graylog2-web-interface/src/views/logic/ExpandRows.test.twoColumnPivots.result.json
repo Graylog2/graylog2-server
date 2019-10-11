@@ -1,0 +1,312 @@
+[
+  {
+    "timestamp": "2018-05-25T10:35:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 4942,
+            "sum(took_ms)": 435742
+          },
+          "UsersController": {
+            "count()": 334,
+            "sum(took_ms)": 30016
+          }
+        },
+        "count()": 5276,
+        "sum(took_ms)": 465758
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 1456,
+            "sum(took_ms)": 138716
+          }
+        },
+        "count()": 1456,
+        "sum(took_ms)": 138716
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 1340,
+            "sum(took_ms)": 105948
+          }
+        },
+        "count()": 1340,
+        "sum(took_ms)": 105948
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 238,
+            "sum(took_ms)": 24160
+          }
+        },
+        "count()": 238,
+        "sum(took_ms)": 24160
+      }
+    },
+    "count()": 8314,
+    "sum(took_ms)": 734582
+  },
+  {
+    "timestamp": "2018-05-25T10:36:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 5114,
+            "sum(took_ms)": 370602
+          },
+          "UsersController": {
+            "count()": 430,
+            "sum(took_ms)": 24190
+          }
+        },
+        "count()": 5544,
+        "sum(took_ms)": 394792
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 1582,
+            "sum(took_ms)": 134140
+          }
+        },
+        "count()": 1582,
+        "sum(took_ms)": 134140
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 1308,
+            "sum(took_ms)": 107398
+          }
+        },
+        "count()": 1308,
+        "sum(took_ms)": 107398
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 220,
+            "sum(took_ms)": 12642
+          }
+        },
+        "count()": 220,
+        "sum(took_ms)": 12642
+      }
+    },
+    "count()": 8658,
+    "sum(took_ms)": 648972
+  },
+  {
+    "timestamp": "2018-05-25T10:37:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 4998,
+            "sum(took_ms)": 392122
+          },
+          "UsersController": {
+            "count()": 370,
+            "sum(took_ms)": 31762
+          }
+        },
+        "count()": 5368,
+        "sum(took_ms)": 423884
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 1620,
+            "sum(took_ms)": 105150
+          }
+        },
+        "count()": 1620,
+        "sum(took_ms)": 105150
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 1444,
+            "sum(took_ms)": 115202
+          }
+        },
+        "count()": 1444,
+        "sum(took_ms)": 115202
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 250,
+            "sum(took_ms)": 24670
+          }
+        },
+        "count()": 250,
+        "sum(took_ms)": 24670
+      }
+    },
+    "count()": 8686,
+    "sum(took_ms)": 668906
+  },
+  {
+    "timestamp": "2018-05-25T10:38:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 5068,
+            "sum(took_ms)": 428178
+          },
+          "UsersController": {
+            "count()": 402,
+            "sum(took_ms)": 24810
+          }
+        },
+        "count()": 5470,
+        "sum(took_ms)": 452988
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 1578,
+            "sum(took_ms)": 118682
+          }
+        },
+        "count()": 1578,
+        "sum(took_ms)": 118682
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 1372,
+            "sum(took_ms)": 111332
+          }
+        },
+        "count()": 1372,
+        "sum(took_ms)": 111332
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 212,
+            "sum(took_ms)": 12180
+          }
+        },
+        "count()": 212,
+        "sum(took_ms)": 12180
+      }
+    },
+    "count()": 8635,
+    "sum(took_ms)": 695182
+  },
+  {
+    "timestamp": "2018-05-25T10:39:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 4994,
+            "sum(took_ms)": 397446
+          },
+          "UsersController": {
+            "count()": 356,
+            "sum(took_ms)": 21814
+          }
+        },
+        "count()": 5350,
+        "sum(took_ms)": 419260
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 1684,
+            "sum(took_ms)": 136228
+          }
+        },
+        "count()": 1684,
+        "sum(took_ms)": 136228
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 1330,
+            "sum(took_ms)": 78042
+          }
+        },
+        "count()": 1330,
+        "sum(took_ms)": 78042
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 252,
+            "sum(took_ms)": 24262
+          }
+        },
+        "count()": 252,
+        "sum(took_ms)": 24262
+      }
+    },
+    "count()": 8617,
+    "sum(took_ms)": 657792
+  },
+  {
+    "timestamp": "2018-05-25T10:40:00.000Z",
+    "action": {
+      "index": {
+        "controller": {
+          "PostsController": {
+            "count()": 58,
+            "sum(took_ms)": 3474
+          },
+          "UsersController": {
+            "count()": 2,
+            "sum(took_ms)": 86
+          }
+        },
+        "count()": 60,
+        "sum(took_ms)": 3560
+      },
+      "show": {
+        "controller": {
+          "PostsController": {
+            "count()": 16,
+            "sum(took_ms)": 818
+          }
+        },
+        "count()": 16,
+        "sum(took_ms)": 818
+      },
+      "login": {
+        "controller": {
+          "LoginController": {
+            "count()": 12,
+            "sum(took_ms)": 968
+          }
+        },
+        "count()": 12,
+        "sum(took_ms)": 968
+      },
+      "edit": {
+        "controller": {
+          "PostsController": {
+            "count()": 2,
+            "sum(took_ms)": 90
+          }
+        },
+        "count()": 2,
+        "sum(took_ms)": 90
+      }
+    },
+    "count()": 90,
+    "sum(took_ms)": 5436
+  },
+  {
+    "count()": 43000,
+    "sum(took_ms)": 3410870
+  }
+]

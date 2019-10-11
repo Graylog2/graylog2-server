@@ -4,6 +4,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
+import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
@@ -12,109 +13,142 @@ import URLUtils from 'util/URLUtils';
 import Routes from 'routing/Routes';
 
 import {
-  StartPage,
-  DelegatedSearchPage,
-  ShowMessagePage,
-  StreamsPage,
-  AlertsPage,
-  ShowAlertPage,
   AlertConditionsPage,
   AlertNotificationsPage,
+  AlertsPage,
+  AuthenticationPage,
+  ConfigurationsPage,
+  ContentPacksPage,
+  CreateContentPackPage,
+  CreateEventDefinitionPage,
+  CreateEventNotificationPage,
+  CreateExtractorsPage,
+  CreateUsersPage,
+  DashboardsPage,
+  DelegatedSearchPage,
+  EditAlertConditionPage,
+  EditEventDefinitionPage,
+  EditEventNotificationPage,
+  EditContentPackPage,
+  EditExtractorsPage,
+  EditTokensPage,
+  EditUsersPage,
+  EnterprisePage,
+  EventDefinitionsPage,
+  EventNotificationsPage,
+  EventsPage,
+  ExportExtractorsPage,
+  ExtractorsPage,
+  GettingStartedPage,
+  GrokPatternsPage,
+  ImportExtractorsPage,
+  IndexerFailuresPage,
+  IndexSetConfigurationPage,
+  IndexSetCreationPage,
+  IndexSetPage,
+  IndicesPage,
+  InputsPage,
+  LoggersPage,
+  LUTCachesPage,
+  LUTDataAdaptersPage,
+  LUTTablesPage,
   NewAlertConditionPage,
   NewAlertNotificationPage,
-  EditAlertConditionPage,
+  NodeInputsPage,
+  NodesPage,
+  NotFoundPage,
+  PipelineDetailsPage,
+  PipelinesOverviewPage,
+  RolesPage,
+  RuleDetailsPage,
+  RulesPage,
+  ShowAlertPage,
+  ShowContentPackPage,
+  ShowDashboardPage,
+  ShowMessagePage,
+  ShowMetricsPage,
+  ShowNodePage,
+  SidecarAdministrationPage,
+  SidecarConfigurationPage,
+  SidecarEditCollectorPage,
+  SidecarEditConfigurationPage,
+  SidecarNewCollectorPage,
+  SidecarNewConfigurationPage,
+  SidecarsPage,
+  SidecarStatusPage,
+  SimulatorPage,
+  SourcesPage,
+  StartPage,
+  StreamAlertsOverviewPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamSearchPage,
-  DashboardsPage,
-  ShowDashboardPage,
-  SourcesPage,
-  InputsPage,
-  NodeInputsPage,
-  ExtractorsPage,
-  CreateExtractorsPage,
-  EditExtractorsPage,
-  ImportExtractorsPage,
-  ExportExtractorsPage,
+  StreamsPage,
   SystemOutputsPage,
-  RolesPage,
-  ContentPacksPage,
-  ShowContentPackPage,
-  CreateContentPackPage,
-  EditContentPackPage,
-  UsersPage,
-  CreateUsersPage,
-  EditUsersPage,
-  EditTokensPage,
-  GrokPatternsPage,
   SystemOverviewPage,
-  IndexerFailuresPage,
-  IndicesPage,
-  LoggersPage,
-  GettingStartedPage,
-  ShowMetricsPage,
-  ShowNodePage,
-  NodesPage,
   ThreadDumpPage,
-  ConfigurationsPage,
-  NotFoundPage,
-  AuthenticationPage,
-  IndexSetPage,
-  IndexSetConfigurationPage,
-  IndexSetCreationPage,
-  LUTTablesPage,
-  LUTCachesPage,
-  LUTDataAdaptersPage,
-  PipelinesOverviewPage,
-  PipelineDetailsPage,
-  SimulatorPage,
-  RulesPage,
-  RuleDetailsPage,
-  EnterprisePage,
-  SidecarEditConfigurationPage,
-  SidecarStatusPage,
-  SidecarAdministrationPage,
-  SidecarEditCollectorPage,
-  SidecarNewCollectorPage,
-  SidecarsPage,
-  SidecarConfigurationPage,
-  SidecarNewConfigurationPage,
-  StreamAlertsOverviewPage,
+  UsersPage,
 } from 'pages';
+import AppConfig from 'util/AppConfig';
 
 const AppRouter = () => {
-  const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
-    return (<Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
-                  path={URLUtils.appPrefixed(pluginRoute.path)}
-                  component={pluginRoute.component} />);
+  const pluginRoutes = PluginStore.exports('routes');
+  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map((pluginRoute) => {
+    return (
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+             component={pluginRoute.parentComponent}>
+        <Route path={URLUtils.appPrefixed(pluginRoute.path)}
+               component={pluginRoute.component} />
+      </Route>
+    );
   });
+  const standardPluginRoutes = pluginRoutes.filter(route => !route.parentComponent).map((pluginRoute) => {
+    return (
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+             path={URLUtils.appPrefixed(pluginRoute.path)}
+             component={pluginRoute.component} />
+    );
+  });
+  const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+
   return (
     <Router history={history}>
       <Route path={Routes.STARTPAGE} component={App}>
         <Route component={AppWithGlobalNotifications}>
           <IndexRoute component={StartPage} />
+          {pluginRoutesWithParent}
           <Route component={AppWithSearchBar}>
-            <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
-            <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />
-            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
+            {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+            {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
+          </Route>
+          <Route component={AppWithExtendedSearchBar}>
+            {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
           </Route>
           <Route component={AppWithoutSearchBar}>
+            <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
             <Route path={Routes.STREAMS} component={StreamsPage} />
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage} />
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage} />
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsOverviewPage} />
-            <Route path={Routes.ALERTS.LIST} component={AlertsPage} />
-            <Route path={Routes.ALERTS.CONDITIONS} component={AlertConditionsPage} />
-            <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
-            <Route path={Routes.ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
-            <Route path={Routes.ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+            <Route path={Routes.LEGACY_ALERTS.LIST} component={AlertsPage} />
+            <Route path={Routes.LEGACY_ALERTS.CONDITIONS} component={AlertConditionsPage} />
+            <Route path={Routes.LEGACY_ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
+            <Route path={Routes.LEGACY_ALERTS.NOTIFICATIONS} component={AlertNotificationsPage} />
+            <Route path={Routes.LEGACY_ALERTS.NEW_NOTIFICATION} component={NewAlertNotificationPage} />
+            <Route path={Routes.ALERTS.LIST} component={EventsPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.LIST} component={EventDefinitionsPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.CREATE} component={CreateEventDefinitionPage} />
+            <Route path={Routes.ALERTS.DEFINITIONS.edit(':definitionId')} component={EditEventDefinitionPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.LIST} component={EventNotificationsPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.CREATE} component={CreateEventNotificationPage} />
+            <Route path={Routes.ALERTS.NOTIFICATIONS.edit(':notificationId')} component={EditEventNotificationPage} />
             <Route path={Routes.show_alert_condition(':streamId', ':conditionId')} component={EditAlertConditionPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
-            <Route path={Routes.DASHBOARDS} component={DashboardsPage} />
-            <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage} />
+            {enableNewSearch || <Route path={Routes.DASHBOARDS} component={DashboardsPage} />}
+            {enableNewSearch || <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage} />}
             <Route path={Routes.SYSTEM.INPUTS} component={InputsPage} />
             <Route path={Routes.node_inputs(':nodeId')} component={NodeInputsPage} />
             <Route path={Routes.global_input_extractors(':inputId')} component={ExtractorsPage} />
@@ -183,7 +217,7 @@ const AppRouter = () => {
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')} component={SidecarEditConfigurationPage} />
             <Route path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')} component={SidecarEditCollectorPage} />
-            {pluginRoutes}
+            {standardPluginRoutes}
           </Route>
         </Route>
         <Route component={AppWithoutSearchBar}>

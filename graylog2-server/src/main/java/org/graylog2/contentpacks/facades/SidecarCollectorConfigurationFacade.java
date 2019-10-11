@@ -18,23 +18,24 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorConfigurationEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,20 +62,19 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
         this.configurationService = configurationService;
     }
 
-    @Override
-    public EntityWithConstraints exportNativeEntity(Configuration configuration) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Configuration configuration, EntityDescriptorIds entityDescriptorIds) {
         final SidecarCollectorConfigurationEntity configurationEntity = SidecarCollectorConfigurationEntity.create(
-                ValueReference.of(configuration.collectorId()),
+                ValueReference.of(entityDescriptorIds.getOrThrow(configuration.collectorId(), ModelTypes.SIDECAR_COLLECTOR_V1)),
                 ValueReference.of(configuration.name()),
                 ValueReference.of(configuration.color()),
                 ValueReference.of(configuration.template()));
         final JsonNode data = objectMapper.convertValue(configurationEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(configuration.id()))
+        return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(configuration.id(), ModelTypes.SIDECAR_COLLECTOR_CONFIGURATION_V1)))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         final Configuration configuration = configurationService.find(modelId.id());
         if (isNull(configuration)) {
@@ -143,7 +143,7 @@ public class SidecarCollectorConfigurationFacade implements EntityFacade<Configu
             return Optional.empty();
         }
 
-        return Optional.of(exportNativeEntity(configuration));
+        return Optional.of(exportNativeEntity(configuration, entityDescriptorIds));
     }
 
     @Override

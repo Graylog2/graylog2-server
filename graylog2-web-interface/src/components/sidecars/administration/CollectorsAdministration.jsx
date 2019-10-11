@@ -2,7 +2,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
+import { Link } from 'react-router';
+import Routes from 'routing/Routes';
 
 import { ControlledTableList, PaginatedList } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -142,9 +144,9 @@ const CollectorsAdministration = createReactClass({
 
   handleSidecarCollectorSelect(sidecarCollectorId) {
     return (event) => {
-      const newSelection = (event.target.checked ?
-        lodash.union(this.state.selected, [sidecarCollectorId]) :
-        lodash.without(this.state.selected, sidecarCollectorId));
+      const newSelection = (event.target.checked
+        ? lodash.union(this.state.selected, [sidecarCollectorId])
+        : lodash.without(this.state.selected, sidecarCollectorId));
       this.setState({ selected: newSelection });
     };
   },
@@ -154,9 +156,9 @@ const CollectorsAdministration = createReactClass({
   },
 
   toggleSelectAll(event) {
-    const newSelection = (event.target.checked ?
-      this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector)) :
-      []);
+    const newSelection = (event.target.checked
+      ? this.state.enabledCollectors.map(({ sidecar, collector }) => this.sidecarCollectorId(sidecar, collector))
+      : []);
     this.setState({ selected: newSelection });
   },
 
@@ -223,7 +225,7 @@ const CollectorsAdministration = createReactClass({
         </Col>
         <Col lg={1} md={2} xs={3}>
           <span className={style.additionalContent}>
-            {configuration && <ColorLabel color={configuration.color} text={configuration.name} />}
+            {configuration && <Link to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}><ColorLabel color={configuration.color} text={configuration.name} />  </Link>}
           </span>
         </Col>
       </Row>

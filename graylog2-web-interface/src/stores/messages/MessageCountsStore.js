@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const MessageCountsActions = ActionsProvider.getActions('MessageCounts');
 
 const MessageCountsStore = Reflux.createStore({

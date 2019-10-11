@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`NumberVisualization should render a number visualization 1`] = `
+<div
+  className="container"
+  style={
+    Object {
+      "fontSize": "20px",
+    }
+  }
+>
+  <div>
+    <div>
+      2134342
+    </div>
+  </div>
+</div>
+`;

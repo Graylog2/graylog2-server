@@ -4,7 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
@@ -81,10 +81,12 @@ const GraylogClusterOverview = createReactClass({
           <Row>
             <Col md={12}>
               <h3 ref={(container) => { this._container = container; }} style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
-              {!this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.output}
-                                                                 from={this.state.traffic.from}
-                                                                 to={this.state.traffic.to}
-                                                                 width={this.state.graphWidth} />
+              {!this.state.traffic ? <Spinner /> : (
+                <TrafficGraph traffic={this.state.traffic.output}
+                              from={this.state.traffic.from}
+                              to={this.state.traffic.to}
+                              width={this.state.graphWidth} />
+              )
               }
             </Col>
           </Row>

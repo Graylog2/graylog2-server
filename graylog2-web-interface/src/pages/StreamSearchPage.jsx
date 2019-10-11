@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import SearchPage from './SearchPage';
 import { DocumentTitle, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
+import SearchPage from './SearchPage';
+
 const StreamsStore = StoreProvider.getStore('Streams');
 
 class StreamSearchPage extends React.Component {

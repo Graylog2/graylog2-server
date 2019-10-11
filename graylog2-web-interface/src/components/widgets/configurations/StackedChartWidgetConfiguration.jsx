@@ -8,6 +8,7 @@ import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 class StackedChartWidgetConfiguration extends React.Component {

@@ -95,6 +95,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           className="form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
+                          name="filter-streams-data-filter"
                           placeholder=""
                           type="text"
                         />
@@ -102,7 +103,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -114,7 +115,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -156,6 +157,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                             checked={false}
                             disabled={false}
                             label="Select all"
+                            name="select-all-checkbox"
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
@@ -180,7 +182,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -188,7 +190,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -213,6 +215,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -243,7 +246,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -251,7 +254,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -276,6 +279,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -347,6 +351,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           className="form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
+                          name="filter-dashboards-data-filter"
                           placeholder=""
                           type="text"
                         />
@@ -354,7 +359,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -366,7 +371,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -408,6 +413,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                             checked={false}
                             disabled={false}
                             label="Select all"
+                            name="select-all-checkbox"
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
@@ -432,7 +438,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -440,7 +446,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -465,6 +471,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -495,7 +502,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -503,7 +510,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -528,6 +535,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -650,6 +658,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           className="form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
+                          name="filter-streams-data-filter"
                           placeholder=""
                           type="text"
                         />
@@ -657,7 +666,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -669,7 +678,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -711,6 +720,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                             checked={false}
                             disabled={false}
                             label="Select all"
+                            name="select-all-checkbox"
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
@@ -735,7 +745,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -743,7 +753,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -768,6 +778,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -798,7 +809,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -806,7 +817,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -831,6 +842,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -902,6 +914,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           className="form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
+                          name="filter-dashboards-data-filter"
                           placeholder=""
                           type="text"
                         />
@@ -909,7 +922,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -921,7 +934,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="btn btn-default"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -963,6 +976,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                             checked={false}
                             disabled={false}
                             label="Select all"
+                            name="select-all-checkbox"
                             onChange={[Function]}
                             placeholder=""
                             type="checkbox"
@@ -987,7 +1001,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -995,7 +1009,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1020,6 +1034,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"
@@ -1050,7 +1065,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="btn btn-info active"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-info"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1058,7 +1073,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="btn btn-default"
+                          className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1083,6 +1098,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                               checked={false}
                               disabled={false}
                               label=""
+                              name="id-checkbox"
                               onChange={[Function]}
                               placeholder=""
                               type="checkbox"

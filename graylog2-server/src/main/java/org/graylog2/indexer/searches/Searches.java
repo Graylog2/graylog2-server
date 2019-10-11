@@ -60,6 +60,7 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -95,7 +96,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -697,19 +697,14 @@ public class Searches {
         final double failedShards = shards.path("failed").asDouble();
 
         if (failedShards > 0) {
-            final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
-                .map(failure -> failure.path("reason").path("reason").asText())
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+            final SearchFailure searchFailure = new SearchFailure(shards);
+            final List<String> nonNumericFieldErrors = searchFailure.getNonNumericFieldErrors();
 
-            final List<String> nonNumericFieldErrors = errors.stream()
-                .filter(error -> error.startsWith("Expected numeric type on field"))
-                .collect(Collectors.toList());
             if (!nonNumericFieldErrors.isEmpty()) {
                 throw new FieldTypeException("Unable to perform search query", nonNumericFieldErrors);
             }
 
-            throw new ElasticsearchException("Unable to perform search query", errors);
+            throw new ElasticsearchException("Unable to perform search query", searchFailure.getErrors());
         }
 
         return result;
@@ -812,7 +807,7 @@ public class Searches {
         return standardSearchRequest(query, limit, offset, range, filter, sort, true);
     }
 
-    private long tookMsFromSearchResult(JestResult searchResult) {
+    protected long tookMsFromSearchResult(JestResult searchResult) {
         final JsonNode tookMs = searchResult.getJsonObject().path("took");
         if (tookMs.isNumber()) {
             return tookMs.asLong();
@@ -918,9 +913,20 @@ public class Searches {
 
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(range.getFrom(), range.getTo());
+        final Set<String> affectedIndexNames = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
+        final Set<IndexSet> eventIndexSets = indexSetRegistry.getForIndices(affectedIndexNames).stream()
+                .filter(indexSet1 -> IndexSetConfig.TemplateType.EVENTS.equals(indexSet1.getConfig().indexTemplateType().orElse(IndexSetConfig.TemplateType.MESSAGES)))
+                .collect(Collectors.toSet());
         for (IndexRange indexRange : indexRanges) {
             // if we aren't in a stream search, we look at all the ranges matching the time range.
             if (indexSet == null && filter == null) {
+                // Don't include the index range if it's for an event index set to avoid sorting issues.
+                // See the following issues for details:
+                // - https://github.com/Graylog2/graylog2-server/issues/6384
+                // - https://github.com/Graylog2/graylog2-server/issues/6490
+                if (eventIndexSets.stream().anyMatch(set -> set.isManagedIndex(indexRange.indexName()))) {
+                    continue;
+                }
                 indices.add(indexRange);
                 continue;
             }
@@ -940,7 +946,7 @@ public class Searches {
         return indices.build();
     }
 
-    private io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
+    protected io.searchbox.core.SearchResult wrapInMultiSearch(Search search, Supplier<String> errorMessage) {
         final MultiSearch multiSearch = new MultiSearch.Builder(search).build();
         final MultiSearchResult multiSearchResult = JestUtils.execute(jestClient, multiSearch, errorMessage);
 

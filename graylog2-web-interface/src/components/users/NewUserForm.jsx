@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Row, Col, Button } from 'react-bootstrap';
+import { Alert, Row, Col, Button } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
@@ -8,9 +8,10 @@ import TimeoutInput from 'components/users/TimeoutInput';
 import { TimezoneSelect } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
-const UsersStore = StoreProvider.getStore('Users');
 
 import ValidationsUtils from 'util/ValidationsUtils';
+
+const UsersStore = StoreProvider.getStore('Users');
 
 class NewUserForm extends React.Component {
   static propTypes = {
@@ -76,24 +77,48 @@ class NewUserForm extends React.Component {
     const roles = this.state.newRoles;
     let rolesAlert = null;
     if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
-      rolesAlert = (<Alert bsStyle="danger" role="alert">
+      rolesAlert = (
+        <Alert bsStyle="danger" role="alert">
         You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
-      </Alert>);
+        </Alert>
+      );
     }
     return (
       <form id="create-user-form" className="form-horizontal" onSubmit={this._onSubmit}>
-        <Input ref={(elem) => { this.inputs['username'] = elem; }} name="username" id="username" type="text" maxLength={100}
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10"
-               label="Username" help="Select a unique user name used to log in with." required
-               onChange={this._onUsernameChange} autoFocus />
+        <Input ref={(elem) => { this.inputs.username = elem; }}
+               name="username"
+               id="username"
+               type="text"
+               maxLength={100}
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10"
+               label="Username"
+               help="Select a unique user name used to log in with."
+               required
+               onChange={this._onUsernameChange}
+               autoFocus />
 
-        <Input ref={(elem) => { this.inputs['full_name'] = elem; }} name="fullname" id="fullname" type="text" maxLength={200}
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10"
-               label="Full Name" help="Give a descriptive name for this account, e.g. the full name." required />
+        <Input ref={(elem) => { this.inputs.full_name = elem; }}
+               name="fullname"
+               id="fullname"
+               type="text"
+               maxLength={200}
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10"
+               label="Full Name"
+               help="Give a descriptive name for this account, e.g. the full name."
+               required />
 
-        <Input ref={(elem) => { this.inputs['email'] = elem; }} name="email" id="email" type="email" maxLength={254}
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10"
-               label="Email Address" help="Give the contact email address." required />
+        <Input ref={(elem) => { this.inputs.email = elem; }}
+               name="email"
+               id="email"
+               type="email"
+               maxLength={254}
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10"
+               label="Email Address"
+               help="Give the contact email address."
+               required />
 
         <Input id="password-field"
                label="Password"
@@ -102,12 +127,25 @@ class NewUserForm extends React.Component {
                wrapperClassName="col-sm-10">
           <Row>
             <Col sm={6}>
-              <input className="form-control" ref={(elem) => { this.inputs['password'] = elem; }} name="password" id="password" type="password"
-                     placeholder="Password" required minLength="6" onChange={this._onPasswordChange} />
+              <input className="form-control"
+                     ref={(elem) => { this.inputs.password = elem; }}
+                     name="password"
+                     id="password"
+                     type="password"
+                     placeholder="Password"
+                     required
+                     minLength="6"
+                     onChange={this._onPasswordChange} />
             </Col>
             <Col sm={6}>
-              <input className="form-control" ref={(elem) => { this.inputs['password_repeat'] = elem; }} id="password-repeat" type="password"
-                     placeholder="Repeat password" required minLength="6" onChange={this._onPasswordChange} />
+              <input className="form-control"
+                     ref={(elem) => { this.inputs.password_repeat = elem; }}
+                     id="password-repeat"
+                     type="password"
+                     placeholder="Repeat password"
+                     required
+                     minLength="6"
+                     onChange={this._onPasswordChange} />
             </Col>
           </Row>
         </Input>
@@ -118,20 +156,23 @@ class NewUserForm extends React.Component {
                labelClassName="col-sm-2"
                wrapperClassName="col-sm-10">
           <span>
-            <RolesSelect ref={(elem) => { this.inputs['roles'] = elem; }} availableRoles={this.props.roles} userRoles={['Reader']}
-                         className="form-control" onValueChange={this._onValueChange} />
+            <RolesSelect ref={(elem) => { this.inputs.roles = elem; }}
+                         availableRoles={this.props.roles}
+                         userRoles={['Reader']}
+                         className="form-control"
+                         onValueChange={this._onValueChange} />
             {rolesAlert}
           </span>
         </Input>
 
-        <TimeoutInput ref={(elem) => { this.inputs['session_timeout_ms'] = elem; }} />
+        <TimeoutInput ref={(elem) => { this.inputs.session_timeout_ms = elem; }} />
 
         <Input id="timezone-select"
                label="Time Zone"
                help="Choose the timezone to use to display times, or leave it as it is to use the system's default."
                labelClassName="col-sm-2"
                wrapperClassName="col-sm-10">
-          <TimezoneSelect ref={(elem) => { this.inputs['timezone'] = elem; }} className="timezone-select" />
+          <TimezoneSelect ref={(elem) => { this.inputs.timezone = elem; }} className="timezone-select" />
         </Input>
 
         <div className="form-group">

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import { NavDropdown } from 'react-bootstrap';
+import { NavDropdown } from 'components/graylog';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import naturalSort from 'javascript-natural-sort';
 
@@ -72,11 +72,12 @@ const SystemMenu = ({ location }) => {
   const pluginSystemNavigations = PluginStore.exports('systemnavigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
     .map(({ description, path, permissions }) => {
-      const link = <NavigationLink description={description} path={path} />;
+      const prefixedPath = URLUtils.appPrefixed(path);
+      const link = <NavigationLink description={description} path={prefixedPath} />;
       if (permissions) {
         return <IfPermitted key={description} permissions={permissions}>{link}</IfPermitted>;
       }
-      return <NavigationLink key={description} path={path} description={description} />;
+      return <NavigationLink key={description} path={prefixedPath} description={description} />;
     });
 
   return (

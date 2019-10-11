@@ -1,16 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const IndicesActions = ActionsProvider.getActions('Indices');
-const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
-import StoreProvider from 'injection/StoreProvider';
-StoreProvider.getStore('IndexRanges'); // To make IndexRangesActions work.
+import StoreProvider from 'injection/StoreProvider'; // To make IndexRangesActions work.
 
 import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
+
+const IndicesActions = ActionsProvider.getActions('Indices');
+const IndexRangesActions = ActionsProvider.getActions('IndexRanges');
+StoreProvider.getStore('IndexRanges');
 
 class IndexDetails extends React.Component {
   static propTypes = {

@@ -5,9 +5,9 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';
-const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
-
 import ActionsProvider from 'injection/ActionsProvider';
+
+const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
 const InputsActions = ActionsProvider.getActions('Inputs');
 
 const InputsStore = Reflux.createStore({
@@ -17,8 +17,16 @@ const InputsStore = Reflux.createStore({
   input: undefined,
 
   init() {
-    this.trigger({ inputs: this.inputs, input: this.input });
+    this.trigger(this._state());
     this.listenTo(InputStaticFieldsStore, this.list);
+  },
+
+  getInitialState() {
+    return this._state();
+  },
+
+  _state() {
+    return { inputs: this.inputs, input: this.input };
   },
 
   list() {
@@ -27,14 +35,15 @@ const InputsStore = Reflux.createStore({
       .then(
         (response) => {
           this.inputs = response.inputs;
-          this.trigger({ inputs: this.inputs });
+          this.trigger(this._state());
 
           return this.inputs;
         },
         (error) => {
           UserNotification.error(`Fetching Inputs failed with status: ${error}`,
             'Could not retrieve Inputs');
-        });
+        },
+      );
 
     InputsActions.list.promise(promise);
   },
@@ -50,18 +59,19 @@ const InputsStore = Reflux.createStore({
       .then(
         (response) => {
           this.input = response;
-          this.trigger({ input: this.input });
+          this.trigger(this._state());
 
           return this.input;
         },
         (error) => {
           if (showError) {
             UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
-                                   'Could not retrieve input');
+              'Could not retrieve input');
           } else {
-            this.trigger({ input: {} });
+            this.trigger(this._state());
           }
-        });
+        },
+      );
 
     InputsActions.get.promise(promise);
   },
@@ -77,7 +87,8 @@ const InputsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
             'Could not launch input');
-        });
+        },
+      );
 
     InputsActions.create.promise(promise);
   },
@@ -96,7 +107,8 @@ const InputsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
             'Could not delete input');
-        });
+        },
+      );
 
     InputsActions.delete.promise(promise);
   },
@@ -112,7 +124,8 @@ const InputsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
             'Could not update input');
-        });
+        },
+      );
 
     InputsActions.update.promise(promise);
   },

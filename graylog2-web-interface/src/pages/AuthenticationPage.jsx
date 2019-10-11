@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -30,7 +30,8 @@ const AuthenticationPage = createReactClass({
         <PageHeader title="Authentication Management">
           <span>Configure Graylog's authentication providers and manage the active users of this Graylog cluster.</span>
           <span>Read more authentication in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES}
-                                                                   text="documentation" />.</span>
+                                                                   text="documentation" />.
+          </span>
         </PageHeader>
 
         <Row className="content">

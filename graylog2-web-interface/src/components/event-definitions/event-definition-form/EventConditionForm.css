@@ -1,0 +1,8 @@
+:local(.conditionTypesInfo) {
+    margin-top: 35px;
+}
+
+:local(.hr) {
+    margin-left: 15px;
+    margin-right: 15px;
+}

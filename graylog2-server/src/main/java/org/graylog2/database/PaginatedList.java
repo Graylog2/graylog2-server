@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class PaginatedList<E> extends ForwardingList<E> {
 
@@ -34,9 +35,16 @@ public class PaginatedList<E> extends ForwardingList<E> {
 
     private final PaginationInfo paginationInfo;
 
+    private final Long grandTotal;
+
     public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage) {
+        this(delegate, total, page, perPage, null);
+    }
+
+    public PaginatedList(@Nonnull List<E> delegate, int total, int page, int perPage, Long grandTotal) {
         this.delegate = delegate;
         this.paginationInfo = PaginationInfo.create(total, delegate.size(), page, perPage);
+        this.grandTotal = grandTotal;
     }
 
     @Override
@@ -48,18 +56,23 @@ public class PaginatedList<E> extends ForwardingList<E> {
         return paginationInfo;
     }
 
+    public Optional<Long> grandTotal() {
+        return Optional.ofNullable(grandTotal);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PaginatedList)) return false;
         PaginatedList<?> that = (PaginatedList<?>) o;
         return Objects.equals(pagination(), that.pagination()) &&
-                Objects.equals(delegate(), that.delegate());
+                Objects.equals(delegate(), that.delegate()) &&
+                Objects.equals(grandTotal(), that.grandTotal());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(delegate(), pagination());
+        return Objects.hash(delegate(), pagination(), grandTotal());
     }
 
     @Override
@@ -67,15 +80,16 @@ public class PaginatedList<E> extends ForwardingList<E> {
         return MoreObjects.toStringHelper(this)
                 .add("content", delegate)
                 .add("pagination_info", pagination())
+                .add("grand_total", grandTotal())
                 .toString();
     }
 
     public static <T> PaginatedList<T> emptyList(int page, int perPage) {
-        return new PaginatedList<>(Collections.emptyList(), 0, page, perPage);
+        return new PaginatedList<>(Collections.emptyList(), 0, page, perPage, 0L);
     }
 
     public static <T> PaginatedList<T> singleton(T entry, int page, int perPage) {
-        return new PaginatedList<T>(Collections.singletonList(entry), 1, page, perPage);
+        return new PaginatedList<>(Collections.singletonList(entry), 1, page, perPage, 1L);
     }
 
     @JsonAutoDetect

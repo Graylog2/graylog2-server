@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -10,6 +10,7 @@ import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const ToolsStore = StoreProvider.getStore('Tools');
 
 class RegexExtractorConfiguration extends React.Component {
@@ -76,7 +77,9 @@ class RegexExtractorConfiguration extends React.Component {
                help={helpMessage}>
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text" id="regex_value" className="form-control"
+              <input type="text"
+                     id="regex_value"
+                     className="form-control"
                      defaultValue={this.props.configuration.regex_value}
                      placeholder="^.*string(.+)$"
                      onChange={this._onChange('regex_value')}

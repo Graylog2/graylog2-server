@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Promise from 'bluebird';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { Spinner } from 'components/common';
 
 import style from './SearchForm.css';
@@ -42,9 +43,9 @@ class SearchForm extends React.Component {
     /** bsStyle for search button. */
     searchBsStyle: PropTypes.string,
     /** Text to display in the search button. */
-    searchButtonLabel: PropTypes.string,
+    searchButtonLabel: PropTypes.node,
     /** Text to display in the reset button. */
-    resetButtonLabel: PropTypes.string,
+    resetButtonLabel: PropTypes.node,
     /**
      * Text to display in the search button while the search is loading. This
      * will only be used if `useLoadingState` is true.
@@ -169,8 +170,8 @@ class SearchForm extends React.Component {
                    className="query form-control"
                    autoComplete="off"
                    spellCheck="false" />
-            {this.props.queryHelpComponent &&
-              <span className={`form-control-feedback ${style.helpFeedback}`}>{this.props.queryHelpComponent}</span>}
+            {this.props.queryHelpComponent
+              && <span className={`form-control-feedback ${style.helpFeedback}`}>{this.props.queryHelpComponent}</span>}
           </div>
 
           <div className="form-group" style={{ marginLeft: this.props.buttonLeftMargin }}>
@@ -181,12 +182,14 @@ class SearchForm extends React.Component {
               {this.state.isLoading ? <Spinner text={this.props.loadingLabel} /> : this.props.searchButtonLabel}
             </Button>
           </div>
-          {this.props.onReset &&
+          {this.props.onReset
+            && (
             <div className="form-group" style={{ marginLeft: this.props.buttonLeftMargin }}>
               <Button type="reset" className="reset-button" onClick={this._onReset}>
                 {this.props.resetButtonLabel}
               </Button>
             </div>
+            )
           }
           {this.props.children}
         </form>

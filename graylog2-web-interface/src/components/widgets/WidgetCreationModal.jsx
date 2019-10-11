@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Input } from 'components/bootstrap';
+import lodash from 'lodash';
+import Input from 'components/bootstrap/Input';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -10,6 +11,31 @@ import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 import StringUtils from 'util/StringUtils';
 
+/**
+ * Widget plugins that want to customize the create modal by adding some inputs need to additionally set the
+ * initial configuration for them. This can be achieved in two different ways:
+ *
+ * ## Setting `initialConfiguration` class property
+ * This is preferred, and it should be used every time configuration does not depend on any external state or props.
+ * Example:
+ * ```
+ *    static initialConfiguration = { shouldShowChart: true, description: 'Initial description' };
+ * ```
+ *
+ * ## Calling `setInitialConfiguration` prop
+ * This component passes a function called `setInitialConfiguration` to the `configurationCreateComponent` defined
+ * for the widget. That function can be called on `constructor` or `componentDidMount` to set the initial configuration
+ * values if any of them is derived from state or other props.
+ * Note that any configuration key set through this function will have precedence over configuration keys set by
+ * `initialConfiguration`.
+ * Example:
+ * ```
+ *    constructor(props) {
+ *      super(props);
+ *      props.setInitialConfiguration({ field: props.fields[0] });
+ *    }
+ * ```
+ */
 const WidgetCreationModal = createReactClass({
   displayName: 'WidgetCreationModal',
 
@@ -23,21 +49,27 @@ const WidgetCreationModal = createReactClass({
 
   getDefaultProps() {
     return {
+      fields: [],
       loading: false,
+      onModalHidden: () => {},
     };
   },
 
   getInitialState() {
-    this.widgetPlugin = this._getWidgetPlugin(this.props.widgetType);
+    const { widgetType } = this.props;
+    this.widgetPlugin = this._getWidgetPlugin(widgetType);
+
     return {
       title: this._getDefaultWidgetTitle(this.widgetPlugin),
-      config: {},
+      config: this._getInitialConfiguration(this.widgetPlugin),
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.widgetType !== nextProps.widgetType) {
+    const { widgetType } = this.props;
+    if (widgetType !== nextProps.widgetType) {
       this.widgetPlugin = this._getWidgetPlugin(nextProps.widgetType);
+      this.setState({ config: this._getInitialConfiguration(this.widgetPlugin) });
     }
   },
 
@@ -45,15 +77,14 @@ const WidgetCreationModal = createReactClass({
     return PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === widgetType.toUpperCase())[0];
   },
 
-  _getInitialConfiguration() {
-    if (!this.pluginConfiguration) {
-      return;
-    }
+  _getInitialConfiguration(widgetPlugin) {
+    return lodash.get(widgetPlugin.configurationCreateComponent, 'initialConfiguration', {});
+  },
 
-    const configKeys = Object.keys(this.state.config);
-    if (configKeys.length === 0) {
-      this.setState({ config: this.pluginConfiguration.getInitialConfiguration() });
-    }
+  _setInitialDerivedConfiguration(initialConfig) {
+    const { config } = this.state;
+    const nextConfig = Object.assign({}, config, initialConfig);
+    this.setState({ config: nextConfig });
   },
 
   open() {
@@ -65,7 +96,9 @@ const WidgetCreationModal = createReactClass({
   },
 
   save() {
-    this.props.onConfigurationSaved(this.state.title, this.state.config);
+    const { title, config } = this.state;
+    const { onConfigurationSaved } = this.props;
+    onConfigurationSaved(title, config);
   },
 
   saved() {
@@ -84,7 +117,8 @@ const WidgetCreationModal = createReactClass({
   },
 
   _setConfigurationSetting(key, value) {
-    const newConfig = ObjectUtils.clone(this.state.config);
+    const { config } = this.state;
+    const newConfig = ObjectUtils.clone(config);
     newConfig[key] = value;
     this.setState({ config: newConfig });
   },
@@ -93,18 +127,13 @@ const WidgetCreationModal = createReactClass({
     this._setConfigurationSetting(event.target.name, FormsUtils.getValueFromInput(event.target));
   },
 
-  _onConfigurationValueChange() {
-    switch (arguments.length) {
-      // When a single value is passed, we treat it as an event handling
-      case 1:
-        this._bindConfigurationValue(arguments[0]);
-        break;
-      // When two arguments are given, treat it as a configuration key-value
-      case 2:
-        this._setConfigurationSetting(arguments[0], arguments[1]);
-        break;
-      default:
-        throw new Error('Wrong number of arguments, method only accepts an event or a configuration key-value pair');
+  _onConfigurationValueChange(key, value) {
+    // When a single value is passed, we treat it as an event handling
+    // When two arguments are given, treat it as a configuration key-value
+    if (value !== undefined) {
+      this._setConfigurationSetting(key, value);
+    } else {
+      this._bindConfigurationValue(key);
     }
   },
 
@@ -112,24 +141,14 @@ const WidgetCreationModal = createReactClass({
     return (widgetPlugin.displayName ? StringUtils.capitalizeFirstLetter(widgetPlugin.displayName) : '');
   },
 
-  _getSpecificWidgetInputs() {
-    if (this.widgetPlugin.configurationCreateComponent) {
-      return React.createElement(this.widgetPlugin.configurationCreateComponent, {
-        ref: (elem) => { this.pluginConfiguration = elem; },
-        config: this.state.config,
-        fields: this.props.fields,
-        onChange: this._onConfigurationValueChange,
-      });
-    }
-  },
-
   render() {
-    const loading = this.props.loading;
+    const { loading, fields, onModalHidden } = this.props;
+    const CustomCreateDialog = this.widgetPlugin.configurationCreateComponent;
+    const { title, config } = this.state;
     return (
       <BootstrapModalForm ref={(createModal) => { this.createModal = createModal; }}
                           title="Create Dashboard Widget"
-                          onModalOpen={this._getInitialConfiguration}
-                          onModalClose={this.props.onModalHidden}
+                          onModalClose={onModalHidden}
                           onSubmitForm={this.save}
                           submitButtonText={loading ? 'Creating...' : 'Create'}
                           submitButtonDisabled={loading}>
@@ -139,11 +158,16 @@ const WidgetCreationModal = createReactClass({
                  name="title"
                  id="widget-title"
                  required
-                 defaultValue={this.state.title}
+                 defaultValue={title}
                  onChange={this._bindValue}
                  help="Type a name that describes your widget."
                  autoFocus />
-          {this._getSpecificWidgetInputs()}
+          {CustomCreateDialog && (
+            <CustomCreateDialog config={config}
+                                fields={fields}
+                                onChange={this._onConfigurationValueChange}
+                                setInitialConfiguration={this._setInitialDerivedConfiguration} />
+          )}
         </fieldset>
       </BootstrapModalForm>
     );

@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import commonStyles from 'components/sidecars/common/CommonSidecarStyles.css';
 
@@ -36,9 +36,9 @@ const SidecarStatus = createReactClass({
         <dt>Load</dt>
         <dd>{lodash.defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
-        {metrics.disks_75 === undefined ?
-          <dd>Not available</dd> :
-          <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>
+        {metrics.disks_75 === undefined
+          ? <dd>Not available</dd>
+          : <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>
         }
       </dl>
     );
@@ -119,7 +119,7 @@ const SidecarStatus = createReactClass({
   },
 
   render() {
-    const sidecar = this.props.sidecar;
+    const { sidecar } = this.props;
 
     const logFileList = sidecar.node_details.log_file_list || [];
 

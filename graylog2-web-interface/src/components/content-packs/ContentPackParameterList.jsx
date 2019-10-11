@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { findIndex } from 'lodash';
 
-import { Button, Modal, ButtonToolbar } from 'react-bootstrap';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
 import { DataTable, SearchForm } from 'components/common';
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ObjectUtils from 'util/ObjectUtils';
-import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
 import ContentPackUtils from './ContentPackUtils';
@@ -17,12 +18,14 @@ class ContentPackParameterList extends React.Component {
     readOnly: PropTypes.bool,
     onDeleteParameter: PropTypes.func,
     onAddParameter: PropTypes.func,
+    appliedParameter: PropTypes.object,
   };
 
   static defaultProps = {
     readOnly: false,
     onDeleteParameter: () => {},
     onAddParameter: () => {},
+    appliedParameter: {},
   };
 
   constructor(props) {
@@ -35,10 +38,32 @@ class ContentPackParameterList extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    this._filterParameters(this.state.filter, newProps.contentPack.parameters);
+    const { filter } = this.state;
+
+    this._filterParameters(filter, newProps.contentPack.parameters);
   }
 
+  _parameterApplied = (paramName) => {
+    const { appliedParameter } = this.props;
+
+    const entityIds = Object.keys(appliedParameter);
+    /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
+    for (const i in entityIds) {
+      const params = appliedParameter[entityIds[i]];
+      if (findIndex(params, { paramName: paramName }) >= 0) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   _parameterRowFormatter = (parameter) => {
+    const { onDeleteParameter, readOnly } = this.props;
+    const parameterApplied = this._parameterApplied(parameter.name);
+    const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
+    const icon = parameterApplied ? 'fa fa-check' : 'fa fa-times';
+    const bsStyle = parameterApplied ? 'success' : 'failure';
+
     return (
       <tr key={parameter.title}>
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.title}</td>
@@ -46,22 +71,46 @@ class ContentPackParameterList extends React.Component {
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
-        {!this.props.readOnly &&
+        <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
+        {!readOnly
+        && (
         <td>
           <ButtonToolbar>
-            <Button bsStyle="primary" bsSize="xs" onClick={() => { this.props.onDeleteParameter(parameter); }}>
+            <Button bsStyle="primary"
+                    bsSize="xs"
+                    title={buttonTitle}
+                    disabled={parameterApplied}
+                    onClick={() => { onDeleteParameter(parameter); }}>
               Delete
             </Button>{this._parameterModal(parameter)}
           </ButtonToolbar>
         </td>
+        )
         }
       </tr>
     );
   };
 
+  _filterParameters = (filter, parametersArg) => {
+    const { contentPack } = this.props;
+    const parameters = ObjectUtils.clone(parametersArg || contentPack.parameters);
+    if (!filter || filter.length <= 0) {
+      this.setState({ filteredParameters: parameters, filter: undefined });
+      return;
+    }
+    const regexp = RegExp(filter, 'i');
+    const filteredParameters = parameters.filter((parameter) => {
+      return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
+    });
+
+    this.setState({ filteredParameters: filteredParameters, filter: filter });
+  };
+
   _parameterModal(parameter) {
     let modalRef;
     let editParameter;
+
+    const { contentPack, onAddParameter } = this.props;
 
     const closeModal = () => {
       modalRef.close();
@@ -85,9 +134,9 @@ class ContentPackParameterList extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <ContentPackEditParameter ref={(node) => { editParameter = node; }}
-                                    parameters={this.props.contentPack.parameters}
+                                    parameters={contentPack.parameters}
                                     onUpdateParameter={(newParameter) => {
-                                      this.props.onAddParameter(newParameter, parameter);
+                                      onAddParameter(newParameter, parameter);
                                       closeModal();
                                     }}
                                     parameterToEdit={parameter} />
@@ -107,6 +156,7 @@ class ContentPackParameterList extends React.Component {
       <React.Fragment>
         <Button bsStyle="info"
                 bsSize={size}
+                title="Edit Modal"
                 onClick={openModal}>
           {name}
         </Button>
@@ -115,45 +165,30 @@ class ContentPackParameterList extends React.Component {
     );
   }
 
-  _filterParameters = (filter, parametersArg) => {
-    const parameters = ObjectUtils.clone(parametersArg || this.props.contentPack.parameters);
-    if (!filter || filter.length <= 0) {
-      this.setState({ filteredParameters: parameters, filter: undefined });
-      return;
-    }
-    const regexp = RegExp(filter, 'i');
-    const filteredParameters = parameters.filter((parameter) => {
-      return regexp.test(parameter.title) || regexp.test(parameter.description) || regexp.test(parameter.name);
-    });
-
-    this.setState({ filteredParameters: filteredParameters, filter: filter });
-  };
-
   render() {
-    const headers = this.props.readOnly ?
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value'] :
-      ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Action'];
+    const { readOnly } = this.props;
+    const { filteredParameters } = this.state;
+
+    const headers = readOnly
+      ? ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used']
+      : ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
     return (
       <div>
         <h2>Parameters list</h2>
         <br />
-        { !this.props.readOnly && this._parameterModal() }
-        { !this.props.readOnly && (<span><br /><br /></span>) }
-        <SearchForm
-          onSearch={this._filterParameters}
-          onReset={() => { this._filterParameters(''); }}
-          searchButtonLabel="Filter"
-        />
-        <DataTable
-          id="parameter-list"
-          headers={headers}
-          className={ContentPackParameterListStyle.scrollable}
-          sortByKey="title"
-          noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
-          filterKeys={[]}
-          rows={this.state.filteredParameters}
-          dataRowFormatter={this._parameterRowFormatter}
-        />
+        { !readOnly && this._parameterModal() }
+        { !readOnly && (<span><br /><br /></span>) }
+        <SearchForm onSearch={this._filterParameters}
+                    onReset={() => { this._filterParameters(''); }}
+                    searchButtonLabel="Filter" />
+        <DataTable id="parameter-list"
+                   headers={headers}
+                   className={ContentPackParameterListStyle.scrollable}
+                   sortByKey="title"
+                   noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+                   filterKeys={[]}
+                   rows={filteredParameters}
+                   dataRowFormatter={this._parameterRowFormatter} />
       </div>
     );
   }

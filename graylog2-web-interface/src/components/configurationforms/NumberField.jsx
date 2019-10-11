@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
+import FormsUtils from 'util/FormsUtils';
 import FieldHelpers from './FieldHelpers';
 
-import FormsUtils from 'util/FormsUtils';
 
 const NumberField = createReactClass({
   displayName: 'NumberField',
@@ -50,8 +50,8 @@ const NumberField = createReactClass({
   },
 
   render() {
-    const typeName = this.props.typeName;
-    const field = this.props.field;
+    const { typeName } = this.props;
+    const { field } = this.props;
     const isRequired = !field.is_optional;
     const validationSpecs = this.validationSpec(field);
 
@@ -63,9 +63,14 @@ const NumberField = createReactClass({
           {FieldHelpers.optionalMarker(field)}
         </label>
 
-        <input id={field.title} type="number" required={isRequired} onChange={this.handleChange}
-               value={this.props.value} className="input-xlarge validatable form-control"
-          {...validationSpecs} autoFocus={this.props.autoFocus} />
+        <input id={field.title}
+               type="number"
+               required={isRequired}
+               onChange={this.handleChange}
+               value={this.props.value}
+               className="input-xlarge validatable form-control"
+               {...validationSpecs}
+               autoFocus={this.props.autoFocus} />
 
         <p className="help-block">{field.description}</p>
       </div>

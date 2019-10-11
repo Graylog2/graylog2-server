@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,10 +32,17 @@ public class IndexMappingFactory {
         this.node = node;
     }
 
-    public IndexMapping createIndexMapping() {
+    public IndexMappingTemplate createIndexMapping(IndexSetConfig.TemplateType templateType) {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
+
+        if (IndexSetConfig.TemplateType.EVENTS.equals(templateType)) {
+            return new EventsIndexMapping(elasticsearchVersion);
+        }
+
         if (elasticsearchVersion.satisfies("^5.0.0")) {
             return new IndexMapping5();
+        } else if (elasticsearchVersion.satisfies("^6.0.0")) {
+            return new IndexMapping6();
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }

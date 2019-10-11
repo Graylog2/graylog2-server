@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.db;
 import org.graylog2.database.NotFoundException;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public interface RuleService {
     RuleDao save(RuleDao rule);
@@ -26,6 +27,15 @@ public interface RuleService {
     RuleDao load(String id) throws NotFoundException;
 
     RuleDao loadByName(String name) throws NotFoundException;
+
+    default Optional<RuleDao> findByName(String name) {
+        try {
+           RuleDao ruleDao = this.loadByName(name);
+           return Optional.of(ruleDao);
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
 
     Collection<RuleDao> loadAll();
 

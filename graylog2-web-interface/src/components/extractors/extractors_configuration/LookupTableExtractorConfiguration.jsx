@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 import { Link } from 'react-router';
 
 import { Input } from 'components/bootstrap';
@@ -104,7 +104,7 @@ class LookupTableExtractorConfiguration extends React.Component {
               <Select placeholder="Select a lookup table"
                       clearable={false}
                       options={lookupTables}
-                      matchProp="value"
+                      matchProp="label"
                       onChange={this._onSelect('lookup_table_name')}
                       value={this.props.configuration.lookup_table_name} />
             </Col>

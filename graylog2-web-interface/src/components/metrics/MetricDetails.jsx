@@ -45,9 +45,9 @@ const MetricDetails = createReactClass({
 
   render() {
     const metricName = this.props.metric.full_name;
-    const nodeId = this.props.nodeId;
-    const metric = this.state.metrics && this.state.metrics[nodeId] && this.state.metrics[nodeId][metricName] ?
-      this.state.metrics[nodeId][metricName] : this.props.metric;
+    const { nodeId } = this.props;
+    const metric = this.state.metrics && this.state.metrics[nodeId] && this.state.metrics[nodeId][metricName]
+      ? this.state.metrics[nodeId][metricName] : this.props.metric;
     const type = lodash.capitalize(metric.type);
     const details = this._formatDetailsForType(type, metric);
     return (

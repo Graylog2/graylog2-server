@@ -1,0 +1,48 @@
+[
+  {
+    "key": [],
+    "values": [
+      {
+        "key": [
+          "avg(took_ms)"
+        ],
+        "value": 80.65076335877863,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "min(took_ms)"
+        ],
+        "value": 36,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "max(took_ms)"
+        ],
+        "value": 5850,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "sum(took_ms)"
+        ],
+        "value": 3465402,
+        "rollup": true,
+        "source": "row-leaf"
+      },
+      {
+        "key": [
+          "stddev(took_ms)"
+        ],
+        "value": 331.44857900293187,
+        "rollup": true,
+        "source": "row-leaf"
+      }
+    ],
+    "source": "leaf"
+  }
+]

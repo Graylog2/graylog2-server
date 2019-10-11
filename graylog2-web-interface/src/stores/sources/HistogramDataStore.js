@@ -7,6 +7,7 @@ import URI from 'urijs';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const HistogramDataActions = ActionsProvider.getActions('HistogramData');
 
 const HistogramDataStore = Reflux.createStore({

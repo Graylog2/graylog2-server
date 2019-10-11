@@ -1,5 +1,5 @@
 import React from 'react';
-import { Panel } from 'react-bootstrap';
+import { Panel } from 'components/graylog';
 
 class CopyInputExtractorConfiguration extends React.Component {
   render() {

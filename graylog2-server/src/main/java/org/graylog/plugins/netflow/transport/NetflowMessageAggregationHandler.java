@@ -24,12 +24,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 import org.graylog.plugins.netflow.codecs.RemoteAddressCodecAggregator;
+import org.graylog2.inputs.transports.netty.SenderEnvelope;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public class NetflowMessageAggregationHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private static final Logger LOG = LoggerFactory.getLogger(NetflowMessageAggregationHandler.class);
@@ -46,7 +46,7 @@ public class NetflowMessageAggregationHandler extends SimpleChannelInboundHandle
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-        final SocketAddress remoteAddress = msg.sender();
+        final InetSocketAddress remoteAddress = msg.sender();
         final CodecAggregator.Result result;
         try (Timer.Context ignored = aggregationTimer.time()) {
             result = aggregator.addChunk(msg.content(), remoteAddress);
@@ -54,7 +54,7 @@ public class NetflowMessageAggregationHandler extends SimpleChannelInboundHandle
         final ByteBuf completeMessage = result.getMessage();
         if (completeMessage != null) {
             LOG.debug("Message aggregation completion, forwarding {}", completeMessage);
-            ctx.fireChannelRead(completeMessage);
+            ctx.fireChannelRead(SenderEnvelope.of(completeMessage, remoteAddress));
         } else if (result.isValid()) {
             LOG.debug("More chunks necessary to complete this message");
         } else {

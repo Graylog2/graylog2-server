@@ -23,14 +23,17 @@ import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WorkHandler;
+import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +52,23 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final OrderedMessageProcessors orderedMessageProcessors;
 
     private final OutputBuffer outputBuffer;
+    private final ProcessingStatusRecorder processingStatusRecorder;
+    private final ULID ulid;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
 
     @AssistedInject
-    public ProcessBufferProcessor(MetricRegistry metricRegistry, OrderedMessageProcessors orderedMessageProcessors, OutputBuffer outputBuffer,
-                                  @Assisted DecodingProcessor decodingProcessor, @DefaultStream Provider<Stream> defaultStreamProvider) {
+    public ProcessBufferProcessor(MetricRegistry metricRegistry,
+                                  OrderedMessageProcessors orderedMessageProcessors,
+                                  OutputBuffer outputBuffer,
+                                  ProcessingStatusRecorder processingStatusRecorder,
+                                  ULID ulid,
+                                  @Assisted DecodingProcessor decodingProcessor,
+                                  @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
+        this.processingStatusRecorder = processingStatusRecorder;
+        this.ulid = ulid;
         this.decodingProcessor = decodingProcessor;
         this.defaultStreamProvider = defaultStreamProvider;
 
@@ -114,6 +126,14 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             messages = messageProcessor.process(messages);
         }
         for (Message message : messages) {
+            // Set the message ID once all message processors have finished
+            // See documentation of Message.FIELD_GL2_MESSAGE_ID for details
+            message.addField(Message.FIELD_GL2_MESSAGE_ID, ulid.nextULID());
+
+            // The processing time should only be set once all message processors have finished
+            message.setProcessingTime(Tools.nowUTC());
+            processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
+
             outputBuffer.insertBlocking(message);
         }
     }

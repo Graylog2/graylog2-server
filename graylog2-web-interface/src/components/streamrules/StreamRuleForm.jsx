@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col } from 'react-bootstrap';
+import { Col } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -25,8 +25,11 @@ class StreamRuleForm extends React.Component {
   };
 
   state = this.props.streamRule;
+
   FIELD_PRESENCE_RULE_TYPE = 5;
+
   ALWAYS_MATCH_RULE_TYPE = 7;
+
   modal = undefined;
 
   _resetValues = () => {
@@ -47,7 +50,8 @@ class StreamRuleForm extends React.Component {
   _formatStreamRuleType = (streamRuleType) => {
     return (
       <option key={`streamRuleType${streamRuleType.id}`}
-              value={streamRuleType.id}>{streamRuleType.short_desc}</option>
+              value={streamRuleType.id}>{streamRuleType.short_desc}
+      </option>
     );
   };
 
@@ -70,10 +74,10 @@ class StreamRuleForm extends React.Component {
     const { field, type, value, inverted, description } = this.state;
 
     const streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
-    const fieldBox = (String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus /> : '');
-    const valueBox = (String(type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} /> : '');
+    const fieldBox = (String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
+      ? <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus /> : '');
+    const valueBox = (String(type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
+      ? <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} /> : '');
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
                           title={this.props.title}

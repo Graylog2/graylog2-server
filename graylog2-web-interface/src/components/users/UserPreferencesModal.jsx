@@ -3,9 +3,10 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const PreferencesStore = StoreProvider.getStore('Preferences');
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+
+const PreferencesStore = StoreProvider.getStore('Preferences');
 
 class UserPreferencesModal extends React.Component {
   static propTypes = {
@@ -15,7 +16,7 @@ class UserPreferencesModal extends React.Component {
   state = { preferences: [] };
 
   _onPreferenceChanged = (event) => {
-    const name = event.target.name;
+    const { name } = event.target;
     const preferenceToChange = this.state.preferences.filter(preference => preference.name === name)[0];
     // TODO: we need the type of the preference to set it properly
     if (preferenceToChange) {

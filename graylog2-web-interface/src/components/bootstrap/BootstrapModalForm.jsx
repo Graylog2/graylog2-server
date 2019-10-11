@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
 import $ from 'jquery';
 
+import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import { validate } from 'legacy/validations.js';
@@ -65,8 +65,8 @@ class BootstrapModalForm extends React.Component {
     const formDOMNode = this.form;
     const $formDOMNode = $(formDOMNode);
 
-    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
-      (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
+    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())
+      || (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
       event.preventDefault();
       return;
     }

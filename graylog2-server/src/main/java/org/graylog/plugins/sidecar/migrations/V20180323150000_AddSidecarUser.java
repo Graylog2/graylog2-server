@@ -22,7 +22,6 @@ import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.users.RoleService;
 
 import javax.inject.Inject;
@@ -51,18 +50,17 @@ public class V20180323150000_AddSidecarUser extends Migration {
     @Override
     public void upgrade() {
         final String roleId = helpers.ensureBuiltinRole(
-                "Sidecar Node",
-                "Grants access to register and pull configurations for a Sidecar node (built-in)",
+                "Sidecar System (Internal)",
+                "Internal technical role. Grants access to register and pull configurations for a Sidecar node (built-in)",
                 ImmutableSet.of(
                         SidecarRestPermissions.COLLECTORS_READ,
                         SidecarRestPermissions.CONFIGURATIONS_READ,
-                        SidecarRestPermissions.SIDECARS_UPDATE,
-                        RestPermissions.USERS_LIST));
+                        SidecarRestPermissions.SIDECARS_UPDATE));
 
         helpers.ensureUser(
                 sidecarUser,
                 UUID.randomUUID().toString(),
-                "Sidecar System User (build-in)",
+                "Sidecar System User (built-in)",
                 "sidecar@graylog.local",
                 Sets.newHashSet(
                         roleId,

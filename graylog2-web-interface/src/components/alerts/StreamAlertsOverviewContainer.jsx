@@ -1,10 +1,10 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'react-bootstrap';
 import Reflux from 'reflux';
 import Promise from 'bluebird';
 
+import { Col, Row } from 'components/graylog';
 import { Spinner } from 'components/common';
 import { StreamAlerts } from 'components/alerts';
 import { StreamAlertConditions } from 'components/alertconditions';
@@ -48,7 +48,7 @@ const StreamAlertsOverviewContainer = createReactClass({
       return <Spinner />;
     }
 
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const { alertConditions, availableConditions } = this.state;
 
     return (

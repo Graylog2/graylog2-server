@@ -8,19 +8,21 @@ class MaxmindAdapterSummary extends React.Component {
   };
 
   render() {
-    const config = this.props.dataAdapter.config;
+    const { config } = this.props.dataAdapter;
     const databaseTypes = {
       MAXMIND_CITY: 'City database',
       MAXMIND_COUNTRY: 'Country database',
     };
-    return (<dl>
-      <dt>Database file path</dt>
-      <dd>{config.path}</dd>
-      <dt>Database type</dt>
-      <dd>{databaseTypes[config.database_type]}</dd>
-      <dt>Check interval</dt>
-      <dd><TimeUnit value={config.check_interval} unit={config.check_interval_unit} /></dd>
-    </dl>);
+    return (
+      <dl>
+        <dt>Database file path</dt>
+        <dd>{config.path}</dd>
+        <dt>Database type</dt>
+        <dd>{databaseTypes[config.database_type]}</dd>
+        <dt>Check interval</dt>
+        <dd><TimeUnit value={config.check_interval} unit={config.check_interval_unit} /></dd>
+      </dl>
+    );
   }
 }
 

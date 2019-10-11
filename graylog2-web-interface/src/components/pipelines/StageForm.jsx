@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, FormGroup, ControlLabel } from 'react-bootstrap';
 import { Link } from 'react-router';
 
+import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -126,12 +126,12 @@ const StageForm = createReactClass({
             </FormGroup>
 
             <Input type="radio"
-                     id="match_all"
-                     name="match_all"
-                     value="true"
-                     label="All rules on this stage match the message"
-                     onChange={this._onChange}
-                     checked={this.state.stage.match_all} />
+                   id="match_all"
+                   name="match_all"
+                   value="true"
+                   label="All rules on this stage match the message"
+                   onChange={this._onChange}
+                   checked={this.state.stage.match_all} />
 
             <Input type="radio"
                    id="match_any"

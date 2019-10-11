@@ -71,6 +71,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -176,8 +177,6 @@ public class Indices {
 
                 bulkRequestBuilder.addAction(messages.prepareIndexRequest(target, doc, id));
             }
-
-            bulkRequestBuilder.setParameter(Parameters.CONSISTENCY, "one");
 
             final BulkResult bulkResult = JestUtils.execute(jestClient, bulkRequestBuilder.build(), () -> "Couldn't bulk index messages into index " + target);
 
@@ -298,11 +297,19 @@ public class Indices {
         }
     }
 
+    /**
+     * Returns index names and their aliases. This only returns indices which actually have an alias.
+     */
     @NotNull
     public Map<String, Set<String>> getIndexNamesAndAliases(String indexPattern) {
         // only request indices matching the name or pattern in `indexPattern` and only get the alias names for each index,
         // not the settings or mappings
-        final GetAliases request = new GetAliases.Builder().addIndex(indexPattern).build();
+        final GetAliases request = new GetAliases.Builder()
+                .addIndex(indexPattern)
+                // ES 6 changed the "expand_wildcards" default value for the /_alias API from "open" to "all".
+                // Since our code expects only open indices to be returned, we have to explicitly set the parameter now.
+                .setParameter("expand_wildcards", "open")
+                .build();
 
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect aliases for index pattern " + indexPattern);
 
@@ -310,10 +317,11 @@ public class Indices {
         final Iterator<Map.Entry<String, JsonNode>> it = jestResult.getJsonObject().fields();
         while (it.hasNext()) {
             final Map.Entry<String, JsonNode> entry = it.next();
-            final JsonNode aliasMetaData = entry.getValue();
+            final String indexName = entry.getKey();
+            final JsonNode aliasMetaData = entry.getValue().path("aliases");
             if (aliasMetaData.isObject()) {
-                final ImmutableSet<String> aliasesBuilder = ImmutableSet.copyOf(aliasMetaData.fieldNames());
-                indexAliasesBuilder.put(entry.getKey(), aliasesBuilder);
+                final ImmutableSet<String> aliasNames = ImmutableSet.copyOf(aliasMetaData.fieldNames());
+                indexAliasesBuilder.put(indexName, aliasNames);
             }
         }
 
@@ -321,6 +329,9 @@ public class Indices {
     }
 
     public Optional<String> aliasTarget(String alias) throws TooManyAliasesException {
+        // TODO: This is basically getting all indices and later we filter out the alias we want to check for.
+        //       This can be done in a more efficient way by either using the /_cat/aliases/<alias-name> API or
+        //       the regular /_alias/<alias-name> API.
         final GetAliases request = new GetAliases.Builder().build();
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
 
@@ -347,11 +358,11 @@ public class Indices {
         return indices.stream().findFirst();
     }
 
-    private void ensureIndexTemplate(IndexSet indexSet) {
+    public void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndexMapping indexMapping = indexMappingFactory.createIndexMapping();
-        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer(), -1);
+        final IndexMappingTemplate indexMapping = indexMappingFactory.createIndexMapping(indexSetConfig.indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE));
+        final Map<String, Object> template = indexMapping.toTemplate(indexSetConfig, indexSet.getIndexWildcard(), -1);
 
         final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
 
@@ -360,6 +371,18 @@ public class Indices {
         if (jestResult.isSucceeded()) {
             LOG.info("Successfully created index template {}", templateName);
         }
+    }
+
+    /**
+     * Returns the generated Elasticsearch index template for the given index set.
+     *
+     * @param indexSet the index set
+     * @return the generated index template
+     */
+    public Map<String, Object> getIndexTemplate(IndexSet indexSet) {
+        final String indexWildcard = indexSet.getIndexWildcard();
+
+        return indexMappingFactory.createIndexMapping(indexSet.getConfig().indexTemplateType().orElse(IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE)).toTemplate(indexSet.getConfig(), indexWildcard);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {

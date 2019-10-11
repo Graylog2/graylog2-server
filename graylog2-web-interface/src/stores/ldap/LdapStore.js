@@ -5,6 +5,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const LdapActions = ActionsProvider.getActions('Ldap');
 
 const LdapStore = Reflux.createStore({

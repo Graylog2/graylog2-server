@@ -40,10 +40,10 @@ public class ValueTypeDeserializerTest {
         assertThat(objectMapper.readValue("\"parameter\"", ValueType.class)).isEqualTo(ValueType.PARAMETER);
         assertThatThrownBy(() -> objectMapper.readValue("\"\"", ValueType.class))
                 .isInstanceOf(JsonMappingException.class)
-                .hasMessageStartingWith("Can not deserialize value of type org.graylog2.contentpacks.model.entities.references.ValueType from String \"\": No enum constant org.graylog2.contentpacks.model.entities.references.ValueType");
+                .hasMessageStartingWith("Cannot deserialize value of type `org.graylog2.contentpacks.model.entities.references.ValueType` from String \"\": No enum constant org.graylog2.contentpacks.model.entities.references.ValueType");
         assertThatThrownBy(() -> objectMapper.readValue("\"UNKNOWN\"", ValueType.class))
                 .isInstanceOf(JsonMappingException.class)
-                .hasMessageStartingWith("Can not deserialize value of type org.graylog2.contentpacks.model.entities.references.ValueType from String \"UNKNOWN\": No enum constant org.graylog2.contentpacks.model.entities.references.ValueType");
+                .hasMessageStartingWith("Cannot deserialize value of type `org.graylog2.contentpacks.model.entities.references.ValueType` from String \"UNKNOWN\": No enum constant org.graylog2.contentpacks.model.entities.references.ValueType");
         assertThatThrownBy(() -> objectMapper.readValue("0", ValueType.class))
                 .isInstanceOf(JsonMappingException.class)
                 .hasMessageStartingWith("Unexpected token (VALUE_NUMBER_INT), expected VALUE_STRING: expected String");

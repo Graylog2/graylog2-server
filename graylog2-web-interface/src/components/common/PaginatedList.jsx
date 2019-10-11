@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Pagination } from 'react-bootstrap';
+import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 const defaultPageSizes = [10, 50, 100];
@@ -46,8 +46,13 @@ class PaginatedList extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.activePage !== nextProps.activePage) {
+    const { pageSize, activePage } = this.props;
+
+    if (activePage !== nextProps.activePage) {
       this.setState({ currentPage: nextProps.activePage });
+    }
+    if (pageSize !== nextProps.pageSize) {
+      this.setState({ pageSize: nextProps.pageSize });
     }
   }
 

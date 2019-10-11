@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Label } from 'react-bootstrap';
+import { Label } from 'components/graylog';
 
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -43,7 +43,7 @@ class IndexSummary extends React.Component {
     const sizes = this.props.index.size;
     if (sizes) {
       const count = sizes.events;
-      const deleted = sizes.deleted;
+      const { deleted } = sizes;
       if (count === 0 || count - deleted === 0) {
         return 'Index does not contain any messages.';
       }
@@ -78,7 +78,7 @@ class IndexSummary extends React.Component {
   };
 
   render() {
-    const index = this.props.index;
+    const { index } = this.props;
     return (
       <span>
         <h2>

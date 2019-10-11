@@ -5,13 +5,14 @@ import Reflux from 'reflux';
 import numeral from 'numeral';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
 
 import NumberUtils from 'util/NumberUtils';
 import { LinkToNode, Spinner } from 'components/common';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
+const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const InputThroughput = createReactClass({
   displayName: 'InputThroughput',
@@ -50,7 +51,7 @@ const InputThroughput = createReactClass({
   },
 
   _prefix(metric) {
-    const input = this.props.input;
+    const { input } = this.props;
     return `${input.type}.${input.id}.${metric}`;
   },
 

@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
-import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.rateDeviation;
 
 public class RandomMessageTransport extends GeneratorTransport {
@@ -74,10 +72,11 @@ public class RandomMessageTransport extends GeneratorTransport {
 
             final RawMessage raw = new RawMessage(payload);
 
-            sleepUninterruptibly(rateDeviation(sleepMs, maxSleepDeviation, rand), MILLISECONDS);
+            Thread.sleep(rateDeviation(sleepMs, maxSleepDeviation, rand));
             return raw;
         } catch (JsonProcessingException e) {
             log.error("Unable to serialize generator state", e);
+        } catch (InterruptedException ignored) {
         }
         return null;
     }

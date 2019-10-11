@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'react-bootstrap';
+import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'components/graylog';
 import lodash from 'lodash';
 import IsolatedScroll from 'react-isolated-scroll';
 
@@ -98,7 +98,7 @@ const SelectPopover = createReactClass({
 
   handleItemSelection(item) {
     return () => {
-      const selectedItems = this.state.selectedItems;
+      const { selectedItems } = this.state;
       let nextSelectedItems;
       if (this.props.multiple) {
         // Clicking on a selected value on a multiselect input will toggle the item's select status

@@ -1,0 +1,11 @@
+:local(.definitionList) {
+    margin-top: 10px;
+}
+
+:local(.inline) {
+    display: inline-block;
+}
+
+:local(.createButton) {
+    margin-left: 5px;
+}

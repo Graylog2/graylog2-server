@@ -4,9 +4,10 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const LoggersStore = StoreProvider.getStore('Loggers');
 
 import { LogLevelMetrics } from 'components/loggers';
+
+const LoggersStore = StoreProvider.getStore('Loggers');
 
 const LogLevelMetricsOverview = createReactClass({
   displayName: 'LogLevelMetricsOverview',

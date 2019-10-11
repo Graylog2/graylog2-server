@@ -1,53 +1,191 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import createReactClass from 'create-react-class';
-import ReactSelect from 'react-select';
+// @flow strict
+import * as React from 'react';
 import lodash from 'lodash';
+import PropTypes from 'prop-types';
 
-import AppConfig from 'util/AppConfig';
-import reactSelectStyles from '!style/useable!css!react-select/dist/react-select.css';
-import reactSelectSmStyles from '!style/useable!css!./Select.css';
+import ReactSelect, { components as Components, Creatable } from 'react-select';
 
+const MultiValueRemove = props => (
+  <Components.MultiValueRemove {...props}>
+    &times;
+  </Components.MultiValueRemove>
+);
 
-// Pass all props react-select accepts, except those we want to override
-const filteredProps = ['onChange', 'value', 'labelKey'];
-const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), ...filteredProps);
+const IndicatorSeparator = () => null;
 
-/**
- * Component that abstracts a react-select input field. Compared to an standard
- * select field, this one adds the possibility of searching options, which makes
- * it convenient when showing a large number of options. It is also possible to
- * use it as multi-value select, and even to create new options on the fly.
- *
- * You may also pass props directly into react-select, please look at
- * https://github.com/JedWatson/react-select/tree/v1.0.0#usage
- * for more information about the accepted props.
- */
-const Select = createReactClass({
-  displayName: 'Select',
+const DropdownIndicator = (props) => {
+  const {
+    /* eslint-disable react/prop-types */
+    children = <i className="fa fa-caret-down" />,
+    getStyles,
+    innerProps: { ref, ...restInnerProps },
+    /* eslint-enable react/prop-types */
+  } = props;
+  return (
+    <div style={getStyles('dropdownIndicator', props)}
+         ref={ref}
+         {...restInnerProps}>
+      {children}
+    </div>
+  );
+};
 
-  propTypes: {
+const dropdownIndicator = (base, state) => ({
+  ...base,
+  padding: '0px',
+  fontSize: '150%',
+  marginRight: '1rem',
+  transform: state.selectProps.menuIsOpen && 'rotate(180deg)',
+});
+
+const clearIndicator = base => ({
+  ...base,
+  padding: '5px',
+});
+
+const multiValue = base => ({
+  ...base,
+  backgroundColor: '#ebf5ff',
+  color: '#007eff',
+  border: '1px solid rgba(0,126,255,.24)',
+});
+
+const multiValueLabel = base => ({
+  ...base,
+  color: 'unset',
+  paddingLeft: '5px',
+  paddingRight: '5px',
+});
+
+const multiValueRemove = base => ({
+  ...base,
+  borderLeft: '1px solid rgba(0,126,255,.24)',
+  paddingLeft: '5px',
+  paddingRight: '5px',
+  ':hover': {
+    backgroundColor: 'rgba(0,113,230,.08)',
+  },
+});
+
+const controlSmall = {
+  minHeight: '30px',
+  height: '30px',
+};
+
+const controlNormal = {
+  minHeight: '34px',
+};
+
+const menu = base => ({
+  ...base,
+  zIndex: 5,
+  border: '1px solid rgba(102, 175, 233, 0.5)',
+  boxShadow: '0 0 4px rgba(102, 175, 233, 0.3)',
+});
+
+const singleValueAndPlaceholder = base => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#666',
+});
+
+const placeholder = base => ({
+  ...base,
+  lineHeight: '28px',
+  fontFamily: '"Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontSize: '14px',
+  fontWeight: 400,
+  color: '#999',
+});
+
+const controlFocus = props => (base, { isFocused }) => {
+  const { size } = props;
+
+  const borderColor = isFocused ? '#66afe9' : base.borderColor;
+  const borderWidth = isFocused ? 1 : base.borderWidth;
+  const outline = isFocused ? 0 : base.outline;
+  const boxShadow = isFocused ? 'inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6)' : 'inset 0 1px 1px rgba(0, 0, 0, 0.075)';
+
+  const controlSize = size === 'small' ? controlSmall : controlNormal;
+
+  return {
+    ...base,
+    ...controlSize,
+    borderColor,
+    borderWidth,
+    outline,
+    boxShadow,
+    alignItems: 'center',
+  };
+};
+
+const valueContainer = base => ({
+  ...base,
+  padding: '2px 12px',
+});
+
+const _components = {
+  DropdownIndicator,
+  MultiValueRemove,
+  IndicatorSeparator,
+};
+
+const _styles = props => ({
+  dropdownIndicator,
+  clearIndicator,
+  multiValue,
+  multiValueLabel,
+  multiValueRemove,
+  menu,
+  singleValue: singleValueAndPlaceholder,
+  placeholder,
+  control: controlFocus(props),
+  valueContainer,
+});
+
+type Option = { [string]: any };
+type Props = {
+  onChange: (string) => void,
+  placeholder: string,
+  clearable: boolean,
+  displayKey?: string,
+  valueKey?: string,
+  delimiter?: string,
+  options: Array<Option>,
+  components: ?{string: React.Node},
+  matchProp?: string,
+  value?: string,
+  autoFocus?: boolean,
+  size?: 'normal' | 'small',
+  optionRenderer: (any) => React.Node,
+  disabled?: boolean,
+  addLabelText?: string,
+  allowCreate?: boolean,
+  multi?: boolean,
+  onReactSelectChange?: (Option | Array<Option>) => void,
+};
+
+type State = {
+  value: any,
+};
+
+class Select extends React.Component<Props, State> {
+  static propTypes = {
     /**
      * Callback when selected option changes. It receives the value of the
      * selected option as an argument. If `multi` is enabled, the passed
      * argument will be a string separated by `delimiter` with all selected
      * options.
      */
-    onChange: PropTypes.func,
-    /**
-     * @deprecated Please use `onChange` instead.
-     */
-    onValueChange: PropTypes.func,
-    /**
-     * Callback when selected option changes. Use this if you want to
-     * use react-select directly, receiving the whole option in the callback.
-     */
-    onReactSelectChange: PropTypes.func,
+    onChange: PropTypes.func.isRequired,
     /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
     /**
      * String containing the selected value. If `multi` is enabled, it must
-     * be a string containig all values separated by the `delimiter`.
+     * be a string containing all values separated by the `delimiter`.
      */
     value: PropTypes.string,
     /** Specifies if multiple values can be selected or not. */
@@ -66,115 +204,129 @@ const Select = createReactClass({
      * (specified in `valueKey`).
      */
     options: PropTypes.array.isRequired,
-  },
+    /**
+     * A collection of custom `react-select` components from https://react-select.com/components
+     */
+    components: PropTypes.arrayOf(PropTypes.node),
+  };
 
-  getDefaultProps() {
-    return {
-      multi: false,
-      size: 'normal',
-      displayKey: 'label',
-      valueKey: 'value',
-      delimiter: ',',
-      allowCreate: false,
+  static defaultProps = {
+    multi: false,
+    size: 'normal',
+    displayKey: 'label',
+    valueKey: 'value',
+    delimiter: ',',
+    allowCreate: false,
+    value: undefined,
+    matchProp: undefined,
+    autoFocus: false,
+    disabled: false,
+    addLabelText: undefined,
+    onReactSelectChange: undefined,
+    components: null,
+  };
+
+  constructor(props: Props) {
+    super(props);
+    const { value } = props;
+    this.state = {
+      value,
     };
-  },
+  }
 
-  getInitialState() {
-    return {
-      value: this.props.value,
-    };
-  },
-
-  componentDidMount() {
-    reactSelectStyles.use();
-    reactSelectSmStyles.use();
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value) {
+  componentWillReceiveProps = (nextProps: Props) => {
+    const { value } = this.props;
+    if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
-  },
+  };
 
-  componentWillUnmount() {
-    reactSelectStyles.unuse();
-    reactSelectSmStyles.unuse();
-  },
+  getValue = () => {
+    const { value } = this.state;
+    return value;
+  };
 
-  getValue() {
-    return this.state.value;
-  },
+  clearValue = () => {
+    this.setState({ value: undefined });
+  };
 
-  clearValue() {
-    // Clear value needs an event, so we just give it one :grumpy:
-    // As someone said: "This can't do any more harm that we already do"
-    this._select.clearValue(new CustomEvent('fake'));
-  },
-
-  // This helps us emulate the behaviour of react-select < 1.0:
-  //  - On simple selects it returns the value
-  //  - On multi selects it returns all selected values split by a delimiter (',' by default)
-  _extractOptionValue(option) {
+  _extractOptionValue = (option: Option) => {
     const { multi, valueKey, delimiter } = this.props;
 
     if (option) {
-      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey];
+      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey || ''];
     }
     return '';
-  },
+  };
 
-  _onChange(selectedOption) {
+  _onChange = (selectedOption: Option) => {
     const value = this._extractOptionValue(selectedOption);
     this.setState({ value: value });
 
-    if (this.props.onChange) {
-      this.props.onChange(value);
-    } else if (this.props.onValueChange) {
-      if (AppConfig.gl2DevMode()) {
-        console.error('Select prop `onValueChange` is deprecated. Please use `onChange` instead.');
-      }
-      this.props.onValueChange(value);
-    }
-  },
+    // eslint-disable-next-line no-unused-vars
+    const { onChange = (v: string) => {} } = this.props;
 
-  _select: undefined,
+    onChange(value);
+  };
 
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
-  _formatInputValue(value) {
+  _formatInputValue = (value: string): Array<Option> => {
     const { options, displayKey, valueKey, delimiter } = this.props;
-
-    return value.split(delimiter).map((v) => {
-      const predicate = {};
-      predicate[valueKey] = v;
+    return value.split(delimiter).map((v: string) => {
+      const predicate: Option = {
+        [valueKey || '']: v,
+        [displayKey || '']: v,
+      };
       const option = lodash.find(options, predicate);
 
-      predicate[displayKey] = v;
       return option || predicate;
     });
-  },
+  };
 
   render() {
-    const { allowCreate, displayKey, size, onReactSelectChange, multi } = this.props;
-    const value = this.state.value;
-    const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
-    const SelectComponent = allowCreate ? ReactSelect.Creatable : ReactSelect;
+    const {
+      allowCreate = false,
+      delimiter,
+      displayKey,
+      components,
+      options,
+      valueKey,
+      onReactSelectChange,
+    } = this.props;
+    const { value } = this.state;
+    const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
-    if (value && multi && allowCreate) {
+    if (value && allowCreate) {
       formattedValue = this._formatInputValue(value);
+    } else {
+      formattedValue = (value || '').split(delimiter).map(v => options.find(option => option[valueKey || ''] === v));
     }
 
+    const {
+      multi: isMulti = false,
+      disabled: isDisabled = false,
+      ...rest
+    } = this.props;
+
     return (
-      <div className={`${size === 'small' ? 'select-sm' : ''} ${reactSelectSmStyles.locals.increaseZIndex}`}>
-        <SelectComponent ref={(c) => { this._select = c; }}
-                         onChange={onReactSelectChange || this._onChange}
-                         {...reactSelectProps}
-                         labelKey={displayKey}
-                         value={formattedValue} />
-      </div>
+      <SelectComponent {...rest}
+                       onChange={onReactSelectChange || this._onChange}
+                       isMulti={isMulti}
+                       isDisabled={isDisabled}
+                       getOptionLabel={option => option[displayKey]}
+                       getOptionValue={option => option[valueKey]}
+                       components={{
+                         ..._components,
+                         ...components,
+                       }}
+                       styles={{
+                         ..._styles(this.props),
+                       }}
+                       value={formattedValue} />
     );
-  },
-});
+  }
+}
 
 export default Select;

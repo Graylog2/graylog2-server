@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { AlertConditionForm, AlertConditionSummary, AlertConditionTestModal, UnknownAlertCondition } from 'components/alertconditions';
@@ -41,14 +41,19 @@ const AlertCondition = createReactClass({
   },
 
   _onUpdate(request) {
-    AlertConditionsActions.update(this.props.stream.id, this.props.alertCondition.id, request)
-      .then(() => this.props.onUpdate(this.props.stream.id, this.props.alertCondition.id));
+    const { stream, alertCondition, onUpdate } = this.props;
+
+    AlertConditionsActions.update(stream.id, alertCondition.id, request)
+      .then(() => onUpdate(stream.id, alertCondition.id));
   },
 
   _onDelete() {
+    const { stream, alertCondition, onDelete } = this.props;
+
+    // eslint-disable-next-line no-alert
     if (window.confirm('Really delete alert condition?')) {
-      AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id)
-        .then(() => this.props.onDelete(this.props.stream.id, this.props.alertCondition.id));
+      AlertConditionsActions.delete(stream.id, alertCondition.id)
+        .then(() => onDelete(stream.id, alertCondition.id));
     }
   },
 
@@ -57,15 +62,13 @@ const AlertCondition = createReactClass({
   },
 
   render() {
-    const stream = this.props.stream;
-    const condition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { stream, alertCondition, conditionType, isDetailsView, isStreamView } = this.props;
+    const { currentUser: { permissions } } = this.state;
 
     if (!conditionType) {
-      return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
+      return <UnknownAlertCondition alertCondition={alertCondition} onDelete={this._onDelete} stream={stream} />;
     }
 
-    const permissions = this.state.currentUser.permissions;
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
@@ -73,8 +76,8 @@ const AlertCondition = createReactClass({
         <DropdownButton key="more-actions-button"
                         title="More actions"
                         pullRight
-                        id={`more-actions-dropdown-${condition.id}`}>
-          {!this.props.isStreamView && (
+                        id={`more-actions-dropdown-${alertCondition.id}`}>
+          {!isStreamView && (
             <LinkContainer to={Routes.stream_alerts(stream.id)}>
               <MenuItem>Alerting overview for Stream</MenuItem>
             </LinkContainer>
@@ -90,16 +93,16 @@ const AlertCondition = createReactClass({
       <React.Fragment>
         <AlertConditionForm ref={(updateForm) => { this.updateForm = updateForm; }}
                             conditionType={conditionType}
-                            alertCondition={condition}
+                            alertCondition={alertCondition}
                             onSubmit={this._onUpdate} />
         <AlertConditionTestModal ref={(c) => { this.modal = c; }}
                                  stream={stream}
-                                 condition={condition} />
-        <AlertConditionSummary alertCondition={condition}
+                                 condition={alertCondition} />
+        <AlertConditionSummary alertCondition={alertCondition}
                                conditionType={conditionType}
                                stream={stream}
                                actions={actions}
-                               isDetailsView={this.props.isDetailsView} />
+                               isDetailsView={isDetailsView} />
       </React.Fragment>
     );
   },

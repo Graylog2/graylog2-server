@@ -1,0 +1,136 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+
+import { Spinner } from 'components/common';
+
+import connect from 'stores/connect';
+import CombinedProvider from 'injection/CombinedProvider';
+
+import Events from './Events';
+
+import {} from 'components/event-definitions/event-definition-types';
+
+const { EventsStore, EventsActions } = CombinedProvider.get('Events');
+const { EventDefinitionsStore, EventDefinitionsActions } = CombinedProvider.get('EventDefinitions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
+class EventsContainer extends React.Component {
+  static propTypes = {
+    events: PropTypes.object.isRequired,
+    eventDefinitions: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
+    streamId: PropTypes.string,
+  };
+
+  static defaultProps = {
+    streamId: '',
+  };
+
+  componentDidMount() {
+    const { streamId } = this.props;
+    const params = {};
+    if (streamId) {
+      params.query = `source_streams:${streamId}`;
+    }
+
+    this.fetchEvents(params);
+    this.fetchEventDefinitions();
+  }
+
+  fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
+    return EventsActions.search({
+      query: query,
+      page: page,
+      pageSize: pageSize,
+      filter: filter,
+      timerange: timerange,
+    });
+  };
+
+  fetchEventDefinitions = () => {
+    return EventDefinitionsActions.listPaginated({});
+  };
+
+  handlePageChange = (nextPage, nextPageSize) => {
+    const { events } = this.props;
+    this.fetchEvents({
+      page: nextPage,
+      pageSize: nextPageSize,
+      query: events.parameters.query,
+      filter: events.parameters.filter,
+      timerange: events.parameters.timerange,
+    });
+  };
+
+  handleQueryChange = (nextQuery, callback = () => {}) => {
+    const { events } = this.props;
+    const promise = this.fetchEvents({
+      query: nextQuery,
+      pageSize: events.parameters.pageSize,
+      filter: events.parameters.filter,
+      timerange: events.parameters.timerange,
+    });
+    promise.finally(callback);
+  };
+
+  handleAlertFilterChange = (nextAlertFilter) => {
+    return () => {
+      const { events } = this.props;
+      this.fetchEvents({
+        query: events.parameters.query,
+        pageSize: events.parameters.pageSize,
+        filter: { alerts: nextAlertFilter },
+        timerange: events.parameters.timerange,
+      });
+    };
+  };
+
+  handleTimeRangeChange = (timeRangeType, range) => {
+    const { events } = this.props;
+    this.fetchEvents({
+      query: events.parameters.query,
+      pageSize: events.parameters.pageSize,
+      filter: events.parameters.filter,
+      timerange: { type: timeRangeType, range: range },
+    });
+  };
+
+  handleSearchReload = (callback = () => {}) => {
+    const { events } = this.props;
+    const promise = this.fetchEvents(events.parameters);
+    promise.finally(callback);
+  };
+
+  render() {
+    const { events, eventDefinitions, currentUser } = this.props;
+    const isLoading = !events.events || !eventDefinitions.eventDefinitions;
+
+    if (isLoading) {
+      return <Spinner text="Loading Events information..." />;
+    }
+
+    return (
+      <Events events={events.events}
+              parameters={events.parameters}
+              totalEvents={events.totalEvents}
+              currentUser={currentUser}
+              totalEventDefinitions={eventDefinitions.pagination.grandTotal}
+              context={events.context}
+              onQueryChange={this.handleQueryChange}
+              onPageChange={this.handlePageChange}
+              onAlertFilterChange={this.handleAlertFilterChange}
+              onTimeRangeChange={this.handleTimeRangeChange}
+              onSearchReload={this.handleSearchReload} />
+    );
+  }
+}
+
+export default connect(EventsContainer, {
+  events: EventsStore,
+  eventDefinitions: EventDefinitionsStore,
+  currentUser: CurrentUserStore,
+},
+({ currentUser, ...otherProps }) => ({
+  ...otherProps,
+  currentUser: currentUser.currentUser,
+}));

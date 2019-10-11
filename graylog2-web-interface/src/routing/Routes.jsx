@@ -1,57 +1,32 @@
-import AppConfig from "util/AppConfig";
-import {PluginStore} from "graylog-web-plugin/plugin";
-import URI from "urijs";
-
-/*
- * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
- * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
- * to access the routes.
- *
- * Plugin register example:
- * routes: [
- *           { path: '/system/pipelines', component: Foo },
- *           { path: '/system/pipelines/:pipelineId', component: Bar },
- * ]
- *
- * Using routes on plugin components:
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
- *
- */
-const pluginRoutes = {};
-PluginStore.exports('routes').forEach((pluginRoute) => {
-  const uri = new URI(pluginRoute.path);
-  const segments = uri.segment();
-  const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
-  const paramNames = segments.filter(segment => segment.startsWith(':'));
-
-  if (paramNames.length > 0) {
-    pluginRoutes[key] = (...paramValues) => {
-      paramNames.forEach((param, idx) => {
-        const value = String(paramValues[idx]);
-        uri.segment(segments.indexOf(param), value);
-      });
-
-      return uri.pathname();
-    };
-
-    return;
-  }
-
-  pluginRoutes[key] = pluginRoute.path;
-});
+import AppConfig from 'util/AppConfig';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import URI from 'urijs';
+import { extendedSearchPath, viewsPath } from 'views/Constants';
 
 const Routes = {
   STARTPAGE: '/',
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
+  LEGACY_ALERTS: {
+    LIST: '/legacy/alerts',
+    CONDITIONS: '/legacy/alerts/conditions',
+    NEW_CONDITION: '/legacy/alerts/conditions/new',
+    NOTIFICATIONS: '/legacy/alerts/notifications',
+    NEW_NOTIFICATION: '/legacy/alerts/notifications/new',
+  },
   ALERTS: {
     LIST: '/alerts',
-    CONDITIONS: '/alerts/conditions',
-    NEW_CONDITION: '/alerts/conditions/new',
-    NOTIFICATIONS: '/alerts/notifications',
-    NEW_NOTIFICATION: '/alerts/notifications/new',
+    DEFINITIONS: {
+      LIST: '/alerts/definitions',
+      CREATE: '/alerts/definitions/new',
+      edit: definitionId => `/alerts/definitions/${definitionId}/edit`,
+    },
+    NOTIFICATIONS: {
+      LIST: '/alerts/notifications',
+      CREATE: '/alerts/notifications/new',
+      edit: notificationId => `/alerts/notifications/${notificationId}/edit`,
+    },
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
@@ -143,6 +118,11 @@ const Routes = {
       EDIT_COLLECTOR: collectorId => `/system/sidecars/collector/edit/${collectorId}`,
     },
   },
+  VIEWS: {
+    LIST: viewsPath,
+    VIEWID: id => `${viewsPath}/${id}`,
+  },
+  EXTENDEDSEARCH: extendedSearchPath,
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
     const queryParams = {
@@ -180,13 +160,13 @@ const Routes = {
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  stream_alerts: streamId => `/streams/${streamId}/alerts`,
+  stream_alerts: streamId => `/alerts/?stream_id=${streamId}`,
 
   legacy_stream_search: streamId => `/streams/${streamId}/messages`,
-  show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
-  show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
-  new_alert_condition_for_stream: streamId => `${Routes.ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
-  new_alert_notification_for_stream: streamId => `${Routes.ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
+  show_alert: alertId => `${Routes.LEGACY_ALERTS.LIST}/${alertId}`,
+  show_alert_condition: (streamId, conditionId) => `${Routes.LEGACY_ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
+  new_alert_condition_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_CONDITION}?stream_id=${streamId}`,
+  new_alert_notification_for_stream: streamId => `${Routes.LEGACY_ALERTS.NEW_NOTIFICATION}?stream_id=${streamId}`,
 
   dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
 
@@ -243,13 +223,49 @@ const qualifyUrls = (routes, appPrefix) => {
 };
 
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
-window.pluginRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes;
 
-// Plugin routes need to be prefixed separately, so we add them to the Routes object just at the end.
-defaultExport.pluginRoute = (key) => {
-  const route = window.pluginRoutes[key];
+/*
+ * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
+ * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
+ * to access the routes.
+ *
+ * Plugin register example:
+ * routes: [
+ *           { path: '/system/pipelines', component: Foo },
+ *           { path: '/system/pipelines/:pipelineId', component: Bar },
+ * ]
+ *
+ * Using routes on plugin components:
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
+ *
+ */
+defaultExport.pluginRoute = (routeKey) => {
+  const pluginRoutes = {};
+  PluginStore.exports('routes').forEach((pluginRoute) => {
+    const uri = new URI(pluginRoute.path);
+    const segments = uri.segment();
+    const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
+    const paramNames = segments.filter(segment => segment.startsWith(':'));
+
+    if (paramNames.length > 0) {
+      pluginRoutes[key] = (...paramValues) => {
+        paramNames.forEach((param, idx) => {
+          const value = String(paramValues[idx]);
+          uri.segment(segments.indexOf(param), value);
+        });
+
+        return uri.pathname();
+      };
+
+      return;
+    }
+
+    pluginRoutes[key] = pluginRoute.path;
+  });
+  const route = (AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes)[routeKey];
   if (!route) {
-    console.error(`Could not find plugin route '${key}'.`);
+    throw new Error(`Could not find plugin route '${routeKey}'.`);
   }
 
   return route;

@@ -3,11 +3,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import CombinedProvider from 'injection/CombinedProvider';
-
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -17,6 +15,8 @@ import Spinner from 'components/common/Spinner';
 import PageHeader from 'components/common/PageHeader';
 import DashboardList from './DashboardList';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 
 const DashboardListPage = createReactClass({
   displayName: 'DashboardListPage',
@@ -40,8 +40,8 @@ const DashboardListPage = createReactClass({
   render() {
     const { dashboards } = this.state.dashboards;
     const filteredDashboards = dashboards;
-    const createDashboardButton = this.isPermitted(this.props.permissions, ['dashboards:create']) ?
-      <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg" /> : null;
+    const createDashboardButton = this.isPermitted(this.props.permissions, ['dashboards:create'])
+      ? <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg" /> : null;
 
     const pageHeader = (
       <PageHeader title="Dashboards">
@@ -64,15 +64,13 @@ const DashboardListPage = createReactClass({
 
     if (!dashboards) {
       dashboardList = <Spinner />;
+    } else if (dashboards && dashboards.count() > 0 && filteredDashboards.isEmpty()) {
+      dashboardList = <div>No dashboards matched your filter criteria.</div>;
     } else {
-      if (dashboards && dashboards.count() > 0 && filteredDashboards.isEmpty()) {
-        dashboardList = <div>No dashboards matched your filter criteria.</div>;
-      } else {
-        dashboardList = (
-          <DashboardList dashboards={filteredDashboards}
-                         permissions={this.props.permissions}/>
-        );
-      }
+      dashboardList = (
+        <DashboardList dashboards={filteredDashboards}
+                       permissions={this.props.permissions} />
+      );
     }
 
     return (

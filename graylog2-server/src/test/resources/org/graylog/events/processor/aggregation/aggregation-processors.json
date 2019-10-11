@@ -1,0 +1,74 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefaffe"
+      },
+      "title": "SSH Login Failure",
+      "description": "All SSH login failure events",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "aggregation-v1",
+        "query": "application_name:sshd AND Failed",
+        "streams": ["stream-a", "stream-b"],
+        "group_by": [],
+        "series": [],
+        "conditions": {
+          "expression": null
+        },
+        "search_within_ms": 300000,
+        "execute_every_ms": 300000
+      },
+      "field_spec": {},
+      "key_spec": [],
+      "notifications": [],
+      "storage": [
+        {
+          "type": "persist-to-streams-v1",
+          "streams": [
+            "000000000000000000000002"
+          ]
+        }
+      ]
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefafff"
+      },
+      "title": "SSH Login Success",
+      "description": "All SSH login success events",
+      "priority": 2,
+      "alert": true,
+      "notification_settings": {
+        "grace_period_ms": 60000
+      },
+      "config": {
+        "type": "aggregation-v1",
+        "query": "application_name:sshd AND Success",
+        "streams": [],
+        "group_by": [],
+        "series": [],
+        "conditions": {
+          "expression": null
+        },
+        "search_within_ms": 300000,
+        "execute_every_ms": 300000
+      },
+      "field_spec": {},
+      "key_spec": [],
+      "notifications": [],
+      "storage": [
+        {
+          "type": "persist-to-streams-v1",
+          "streams": [
+            "000000000000000000000002"
+          ]
+        }
+      ]
+    }
+  ]
+}

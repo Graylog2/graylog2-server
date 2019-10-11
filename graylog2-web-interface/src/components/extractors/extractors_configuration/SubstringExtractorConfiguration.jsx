@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Button, Col, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
-const ToolsStore = StoreProvider.getStore('Tools');
 
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
+
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const SubstringExtractorConfiguration = createReactClass({
   displayName: 'SubstringExtractorConfiguration',
@@ -96,7 +97,7 @@ const SubstringExtractorConfiguration = createReactClass({
   },
 
   _isTryButtonDisabled() {
-    const configuration = this.state.configuration;
+    const { configuration } = this.state;
     return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0 || !this.props.exampleMessage;
   },
 

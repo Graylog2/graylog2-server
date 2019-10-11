@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,10 +56,19 @@ public abstract class PaginatedDbService<DTO> {
                                  MongoJackObjectMapperProvider mapper,
                                  Class<DTO> dtoClass,
                                  String collectionName) {
+        this(mongoConnection, mapper, dtoClass, collectionName, null);
+    }
+
+    protected PaginatedDbService(MongoConnection mongoConnection,
+                                 MongoJackObjectMapperProvider mapper,
+                                 Class<DTO> dtoClass,
+                                 String collectionName,
+                                 Class<?> view) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(collectionName),
                 dtoClass,
                 ObjectId.class,
-                mapper.get());
+                mapper.get(),
+                view);
     }
 
     /**
@@ -103,7 +111,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param query the query to execute
      * @param sort the sort builder for the query
      * @param page the page number that should be returned
-     * @param perPage the number of entries per page
+     * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
     protected PaginatedList<DTO> findPaginatedWithQueryAndSort(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
@@ -111,7 +119,8 @@ public abstract class PaginatedDbService<DTO> {
                 .sort(sort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1))) {
-            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+            final long grandTotal = db.count();
+            return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage, grandTotal);
         }
     }
 
@@ -135,7 +144,7 @@ public abstract class PaginatedDbService<DTO> {
      * @param filter the filter to apply to each database entry
      * @param sort the sort builder for the query
      * @param page the page number that should be returned
-     * @param perPage the number of entries per page
+     * @param perPage the number of entries per page, 0 is unlimited
      * @return the paginated list
      */
     protected PaginatedList<DTO> findPaginatedWithQueryFilterAndSort(DBQuery.Query query,
@@ -143,24 +152,24 @@ public abstract class PaginatedDbService<DTO> {
                                                                      DBSort.SortBuilder sort,
                                                                      int page,
                                                                      int perPage) {
-        final AtomicInteger total = new AtomicInteger(0);
-
+        // Calculate the total amount of items matching the query/filter, but before pagination
+        final long total;
         try (final Stream<DTO> cursor = streamQueryWithSort(query, sort)) {
-            // First created a filtered stream
-            final Stream<DTO> dtoStream = cursor
-                    .filter(filter)
-                    .peek(dto -> total.incrementAndGet());
-
-            // Then use that filtered stream and only collect the entries according to page and perPage
-            final List<DTO> list = Stream.of(dtoStream)
-                    .flatMap(stream -> stream)
-                    .skip(perPage * Math.max(0, page - 1))
-                    .limit(perPage)
-                    .collect(Collectors.toList());
-
-            return new PaginatedList<>(list, total.get(), page, perPage);
+            total = cursor.filter(filter).count();
         }
-    }
+
+        // Then create another filtered stream and only collect the entries according to page and perPage
+        try (final Stream<DTO> resultStream = streamQueryWithSort(query, sort)) {
+            Stream<DTO> filteredResultStream = resultStream.filter(filter);
+            if (perPage > 0) {
+                filteredResultStream = filteredResultStream.skip(perPage * Math.max(0, page - 1)).limit(perPage);
+            }
+
+            final long grandTotal = db.count();
+
+            return new PaginatedList<>(filteredResultStream.collect(Collectors.toList()), Math.toIntExact(total), page, perPage, grandTotal);
+        }
+}
 
     /**
      * Returns an unordered stream of all entries in the database.

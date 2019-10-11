@@ -45,7 +45,10 @@ public class RawMessageEncoderHandler implements WorkHandler<RawMessageEvent> {
             log.trace("Serialized message {} for journal, size {} bytes",
                       event.getRawMessage().getId(), event.getEncodedRawMessage().length);
         }
-        
+
+        // Set timestamp in event to retain access to it after we clear the raw message object below
+        event.setMessageTimestamp(event.getRawMessage().getTimestamp());
+
         // clear for gc and to avoid promotion to tenured space
         event.setRawMessage(null);
     }

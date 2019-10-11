@@ -2,30 +2,33 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
 import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
+import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'components/graylog';
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-const SearchStore = StoreProvider.getStore('Search');
 
-import { AddSearchCountToDashboard,
+import {
+  AddSearchCountToDashboard,
   DecoratorSidebar,
   FieldAnalyzersSidebar,
   SavedSearchControls,
-  ShowQueryModal } from 'components/search';
+  ShowQueryModal,
+} from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
+
+const SessionStore = StoreProvider.getStore('Session');
+const SearchStore = StoreProvider.getStore('Search');
 
 const SearchSidebar = createReactClass({
   displayName: 'SearchSidebar',
@@ -148,10 +151,10 @@ const SearchSidebar = createReactClass({
   },
 
   _getExportModal() {
-    const infoText = (URLUtils.areCredentialsInURLSupported() ?
-      'Please right click the download link below and choose "Save Link As..." to download the CSV file.' :
-      'Please click the download link below. Your browser may ask for your username and password to ' +
-      'download the CSV file.');
+    const infoText = (URLUtils.areCredentialsInURLSupported()
+      ? 'Please right click the download link below and choose "Save Link As..." to download the CSV file.'
+      : 'Please click the download link below. Your browser may ask for your username and password to '
+      + 'download the CSV file.');
     return (
       <BootstrapModalWrapper ref={(ref) => { this.exportModal = ref; }}>
         <Modal.Header closeButton>
@@ -186,7 +189,8 @@ const SearchSidebar = createReactClass({
         <Modal.Body>
           <p>Graylog is intelligently selecting the indices it needs to search upon based on the time frame
             you selected.
-            This list of indices is mainly useful for debugging purposes.</p>
+            This list of indices is mainly useful for debugging purposes.
+          </p>
           <h4>Indices used for this search:</h4>
 
           <ul className="index-list">

@@ -2,24 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import deepEqual from 'deep-equal';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
-const StreamsStore = StoreProvider.getStore('Streams');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
-const FocusStore = StoreProvider.getStore('Focus');
-const WidgetsStore = StoreProvider.getStore('Widgets');
-
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 import Routes from 'routing/Routes';
 
+import { Row, Col, Alert, Button } from 'components/graylog';
 import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -27,6 +21,12 @@ import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTr
 import Widget from 'components/widgets/Widget';
 
 import style from './ShowDashboardPage.css';
+
+const StreamsStore = StoreProvider.getStore('Streams');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const FocusStore = StoreProvider.getStore('Focus');
+const WidgetsStore = StoreProvider.getStore('Widgets');
 
 const ShowDashboardPage = createReactClass({
   displayName: 'ShowDashboardPage',
@@ -76,7 +76,7 @@ const ShowDashboardPage = createReactClass({
   DEFAULT_WIDTH: 4,
 
   loadData() {
-    const dashboardId = this.props.params.dashboardId;
+    const { dashboardId } = this.props.params;
     this.promise = DashboardsStore.get(dashboardId)
       .then((dashboard) => {
         if (this.promise.isCancelled()) {
@@ -112,8 +112,7 @@ const ShowDashboardPage = createReactClass({
       <Row className="content">
         <Col md={12}>
           <Alert className="no-widgets">
-            This dashboard has no widgets yet. Learn how to add widgets in the <DocumentationLink
-            page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />.
+            This dashboard has no widgets yet. Learn how to add widgets in the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />.
           </Alert>
         </Col>
       </Row>
@@ -171,8 +170,13 @@ const ShowDashboardPage = createReactClass({
     }).map((widget) => {
       return (
         <div key={widget.id} className={style.widgetContainer}>
-          <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
-                  locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds} />
+          <Widget id={widget.id}
+                  key={`widget-${widget.id}`}
+                  widget={widget}
+                  dashboardId={dashboard.id}
+                  locked={this.state.locked}
+                  shouldUpdate={this.shouldUpdate()}
+                  streamIds={this.state.streamIds} />
         </div>
       );
     });
@@ -231,7 +235,7 @@ const ShowDashboardPage = createReactClass({
       return <Spinner />;
     }
 
-    const dashboard = this.state.dashboard;
+    const { dashboard } = this.state;
 
     let actions;
     if (!this._dashboardIsEmpty(dashboard)) {
@@ -256,21 +260,24 @@ const ShowDashboardPage = createReactClass({
         <IfPermitted permissions={`${this.DASHBOARDS_EDIT}:${dashboard.id}`}>
           <div id="drag-widgets-description">
             Drag widgets to any position you like in <a href="#" role="button" onClick={this._unlockDashboard}>
-            unlock / edit</a> mode.
+            unlock / edit
+            </a> mode.
           </div>
         </IfPermitted>
       );
     }
 
-    const editDashboardTrigger = !this.state.locked && !this._dashboardIsEmpty(dashboard) ?
-      (<EditDashboardModalTrigger id={dashboard.id}
-                                  action="edit"
-                                  title={dashboard.title}
-                                  description={dashboard.description}
-                                  onSaved={this._handleDashboardUpdate}
-                                  buttonClass="btn-info btn-xs">
-        <i className="fa fa-pencil" />
-      </EditDashboardModalTrigger>) : null;
+    const editDashboardTrigger = !this.state.locked && !this._dashboardIsEmpty(dashboard)
+      ? (
+        <EditDashboardModalTrigger id={dashboard.id}
+                                   action="edit"
+                                   title={dashboard.title}
+                                   description={dashboard.description}
+                                   onSaved={this._handleDashboardUpdate}
+                                   buttonClass="btn-info btn-xs">
+          <i className="fa fa-pencil" />
+        </EditDashboardModalTrigger>
+      ) : null;
     const dashboardTitle = (
       <span>
         {dashboard.title}

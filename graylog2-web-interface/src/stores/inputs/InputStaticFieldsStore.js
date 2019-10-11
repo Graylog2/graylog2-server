@@ -22,7 +22,8 @@ const InputStaticFieldsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Adding static field to input failed with: ${error}`,
             `Could not add static field to input '${input.title}'`);
-        });
+        },
+      );
 
     return promise;
   },
@@ -40,7 +41,8 @@ const InputStaticFieldsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Removing static field from input failed with: ${error}`,
             `Could not remove static field '${name} from input '${input.title}'`);
-        });
+        },
+      );
 
     return promise;
   },

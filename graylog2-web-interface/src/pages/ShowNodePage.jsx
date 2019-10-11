@@ -4,14 +4,15 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
+import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
+
 const NodesStore = StoreProvider.getStore('Nodes');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 const PluginsStore = StoreProvider.getStore('Plugins');
 const InputStatesStore = StoreProvider.getStore('InputStates');
 const InputTypesStore = StoreProvider.getStore('InputTypes');
-
-import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
-import { DocumentTitle, PageErrorOverview, PageHeader, Spinner } from 'components/common';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;
@@ -73,7 +74,7 @@ const ShowNodePage = createReactClass({
     if (this._isLoading()) {
       return <Spinner />;
     }
-    const node = this.state.node;
+    const { node } = this.state;
     const title = <span>Node {node.short_node_id} / {node.hostname}</span>;
 
     return (
@@ -88,9 +89,12 @@ const ShowNodePage = createReactClass({
             </span>
             <span><NodeMaintenanceDropdown node={node} /></span>
           </PageHeader>
-          <NodeOverview node={node} systemOverview={this.state.systemOverview}
-                        jvmInformation={this.state.jvmInformation} plugins={this.state.plugins}
-                        inputStates={this.state.inputStates} inputDescriptions={this.state.inputDescriptions} />
+          <NodeOverview node={node}
+                        systemOverview={this.state.systemOverview}
+                        jvmInformation={this.state.jvmInformation}
+                        plugins={this.state.plugins}
+                        inputStates={this.state.inputStates}
+                        inputDescriptions={this.state.inputDescriptions} />
         </div>
       </DocumentTitle>
     );

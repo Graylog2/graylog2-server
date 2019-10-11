@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ConfigurableElement renders something for minimal props 1`] = `
+<span
+  onKeyDown={[Function]}
+  onMouseDown={[Function]}
+>
+  <span
+    className="labelAsLink"
+    onClick={[Function]}
+  >
+    Hello World!
+  </span>
+</span>
+`;

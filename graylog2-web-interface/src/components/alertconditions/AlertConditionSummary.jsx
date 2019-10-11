@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
-
+import { Col } from 'components/graylog';
 import { EntityListItem } from 'components/common';
-
 import { GenericAlertConditionSummary } from 'components/alertconditions';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -25,14 +23,14 @@ class AlertConditionSummary extends React.Component {
   };
 
   render() {
-    const stream = this.props.stream;
+    const { stream } = this.props;
     const condition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { conditionType } = this.props;
     const conditionPlugin = PluginStore.exports('alertConditions').find(c => c.type === condition.type) || {};
     const SummaryComponent = conditionPlugin.summaryComponent || GenericAlertConditionSummary;
 
-    const description = (stream ?
-      <span>Alerting on stream <em>{stream.title}</em></span> : 'Not alerting on any stream');
+    const description = (stream
+      ? <span>Alerting on stream <em>{stream.title}</em></span> : 'Not alerting on any stream');
 
     const content = (
       <Col md={12}>

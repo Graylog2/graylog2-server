@@ -6,8 +6,17 @@ import 'jquery-ui/ui/widgets/mouse';
 import React from 'react';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
+
+import { StoreMock as MockStore } from 'helpers/mocking';
 import PermissionsMixin from 'util/PermissionsMixin';
 import AddToDashboardMenu from './AddToDashboardMenu';
+
+jest.mock('stores/dashboards/DashboardsStore', () => MockStore('listen'));
+jest.mock('stores/widgets/WidgetsStore', () => ({
+  addWidget: jest.fn(),
+}));
+const mockUser = { timezone: 'UTC' };
+jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', ['get', () => mockUser], ['getInitialState', () => ({ mockUser })]));
 
 describe('<AddToDashboardMenu />', () => {
   const exampleProps = {
@@ -32,10 +41,9 @@ describe('<AddToDashboardMenu />', () => {
     let wrapper;
     const permissions = ['*'];
     beforeEach(() => {
-      wrapper = mount(<AddToDashboardMenu
-        widgetType={exampleProps.widgetType}
-        title={exampleProps.title}
-        permissions={permissions} />);
+      wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                          title={exampleProps.title}
+                                          permissions={permissions} />);
     });
 
     it('should see all dashboards', () => {
@@ -58,10 +66,9 @@ describe('<AddToDashboardMenu />', () => {
       let wrapper;
       const permissions = ['dashboards:read:1', 'dashboards:read:2', 'dashboards:edit:2', 'dashboards:read:3'];
       beforeEach(() => {
-        wrapper = mount(<AddToDashboardMenu
-          widgetType={exampleProps.widgetType}
-          title={exampleProps.title}
-          permissions={permissions} />);
+        wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                            title={exampleProps.title}
+                                            permissions={permissions} />);
       });
 
       it('should only see the dashboards that can edit', () => {
@@ -83,10 +90,9 @@ describe('<AddToDashboardMenu />', () => {
       let wrapper;
       const permissions = ['dashboards:create', 'dashboards:read:1', 'dashboards:read:2', 'dashboards:edit:2', 'dashboards:read:3'];
       beforeEach(() => {
-        wrapper = mount(<AddToDashboardMenu
-          widgetType={exampleProps.widgetType}
-          title={exampleProps.title}
-          permissions={permissions} />);
+        wrapper = mount(<AddToDashboardMenu widgetType={exampleProps.widgetType}
+                                            title={exampleProps.title}
+                                            permissions={permissions} />);
       });
 
       it('should only see the dashboards that can edit', () => {

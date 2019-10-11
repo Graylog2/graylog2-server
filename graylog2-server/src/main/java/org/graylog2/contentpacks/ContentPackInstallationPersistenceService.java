@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.models.system.contenpacks.responses.ContentPackMetadata;
 import org.mongojack.DBCursor;
@@ -33,8 +34,10 @@ import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -125,5 +128,26 @@ public class ContentPackInstallationPersistenceService {
             installationMetaData.put(installation.contentPackId(), metadataMap);
         }
         return installationMetaData;
+    }
+
+    /**
+     * Returns the number of installations the given content pack entity ID is used in.
+     *
+     * @param entityId the native entity ID
+     * @return number of installations
+     */
+    public long countInstallationOfEntityById(ModelId entityId) {
+        final String field = String.format(Locale.ROOT, "%s.%s", ContentPackInstallation.FIELD_ENTITIES, NativeEntityDescriptor.FIELD_META_ID);
+
+        return dbCollection.getCount(DBQuery.is(field, entityId));
+    }
+
+    public long countInstallationOfEntityByIdAndFoundOnSystem(ModelId entityId) {
+        final DBQuery.Query query = DBQuery.elemMatch(ContentPackInstallation.FIELD_ENTITIES,
+                DBQuery.and(
+                        DBQuery.is(NativeEntityDescriptor.FIELD_ENTITY_FOUND_ON_SYSTEM, true),
+                        DBQuery.is(NativeEntityDescriptor.FIELD_META_ID, entityId.id())));
+
+        return dbCollection.getCount(query);
     }
 }

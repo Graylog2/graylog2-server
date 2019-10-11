@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Alert, Button } from 'react-bootstrap';
+import { Row, Col, Alert, Button } from 'components/graylog';
 
 import { IfPermitted } from 'components/common';
 import { DocumentationLink } from 'components/support';
@@ -10,6 +10,7 @@ import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
 
 class SystemOverviewDetails extends React.Component {
@@ -29,7 +30,7 @@ class SystemOverviewDetails extends React.Component {
   };
 
   render() {
-    const information = this.props.information;
+    const { information } = this.props;
     const lbStatus = information.lb_status.toUpperCase();
     let processingStatus;
 

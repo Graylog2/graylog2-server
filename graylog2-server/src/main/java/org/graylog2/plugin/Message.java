@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
 import java.time.Instant;
@@ -68,7 +69,14 @@ import static org.joda.time.DateTimeZone.UTC;
 public class Message implements Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
+    /**
+     * The "_id" is used as document ID to address the document in Elasticsearch.
+     * TODO: We might want to use the "gl2_message_id" for this in the future to reduce storage and avoid having
+     *       basically two different message IDs. To do that we have to check if switching to a different ID format
+     *       breaks anything with regard to expectations in other code and existing data in Elasticsearch.
+     */
     public static final String FIELD_ID = "_id";
+
     public static final String FIELD_MESSAGE = "message";
     public static final String FIELD_FULL_MESSAGE = "full_message";
     public static final String FIELD_SOURCE = "source";
@@ -76,21 +84,117 @@ public class Message implements Messages {
     public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
 
+    /**
+     * Graylog is writing internal metadata to messages using this field prefix. Users must not use this prefix for
+     * custom message fields.
+     */
+    public static final String INTERNAL_FIELD_PREFIX = "gl2_";
+
+    /**
+     * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
+     * <p></p>
+     * <b>Attention:</b> This is currently NOT the "_id" field which is used as ID for the document in Elasticsearch!
+     * <p></p>
+     * <h3>Implementation notes</h3>
+     * We are not using the UUID in "_id" for this field because of the following reasons:
+     * <ul>
+     *     <li>Using ULIDs results in shorter IDs (26 characters for ULID vs 36 for UUID) and thus reduced storage usage</li>
+     *     <li>They are guaranteed to be lexicographically sortable (UUIDs are only lexicographically sortable when time-based ones are used)</li>
+     * </ul>
+     *
+     * See: https://github.com/Graylog2/graylog2-server/issues/5994
+     */
+    public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
+
+    /**
+     * Can be set when a message timestamp gets modified to preserve the original timestamp. (e.g. "clone_message" pipeline function)
+     */
+    public static final String FIELD_GL2_ORIGINAL_TIMESTAMP = "gl2_original_timestamp";
+
+    /**
+     * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
+     */
+    public static final String FIELD_GL2_PROCESSING_ERROR = "gl2_processing_error";
+
+    /**
+     * Will be set to the message processing time after all message processors have been run.
+     * TODO: To be done in Graylog 3.2
+     */
+    public static final String FIELD_GL2_PROCESSING_TIMESTAMP = "gl2_processing_timestamp";
+
+    /**
+     * Will be set to the message receive time at the input.
+     * TODO: To be done in Graylog 3.2
+     */
+    public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
+
+    /**
+     * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
+     */
+    public static final String FIELD_GL2_REMOTE_HOSTNAME = "gl2_remote_hostname";
+
+    /**
+     * Will be set to the IP address of the source node that sent a message.
+     */
+    public static final String FIELD_GL2_REMOTE_IP = "gl2_remote_ip";
+
+    /**
+     * Will be set to the socket port of the source node that sent a message.
+     */
+    public static final String FIELD_GL2_REMOTE_PORT = "gl2_remote_port";
+
+    /**
+     * Can be set to the collector ID that sent a message. (e.g. used in the beats codec)
+     */
+    public static final String FIELD_GL2_SOURCE_COLLECTOR = "gl2_source_collector";
+
+    /**
+     * @deprecated This was used in the legacy collector/sidecar system and contained the database ID of the collector input.
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_COLLECTOR_INPUT = "gl2_source_collector_input";
+
+    /**
+     * Will be set to the ID of the input that received the message.
+     */
+    public static final String FIELD_GL2_SOURCE_INPUT = "gl2_source_input";
+
+    /**
+     * Will be set to the ID of the node that received the message.
+     */
+    public static final String FIELD_GL2_SOURCE_NODE = "gl2_source_node";
+
+    /**
+     * @deprecated This was used with the now removed radio system and contained the ID of a radio node.
+     * TODO: Due to be removed in Graylog 3.x
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_RADIO = "gl2_source_radio";
+
+    /**
+     * @deprecated This was used with the now removed radio system and contained the input ID of a radio node.
+     * TODO: Due to be removed in Graylog 3.x
+     */
+    @Deprecated
+    public static final String FIELD_GL2_SOURCE_RADIO_INPUT = "gl2_source_radio_input";
+
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-        "gl2_source_node",
-        "gl2_source_input",
-        // TODO Due to be removed in Graylog 3.x
-        "gl2_source_radio",
-        "gl2_source_radio_input",
-
-        "gl2_source_collector",
-        "gl2_source_collector_input",
-        "gl2_remote_ip",
-        "gl2_remote_port",
-        "gl2_remote_hostname"
+        FIELD_GL2_ORIGINAL_TIMESTAMP,
+        FIELD_GL2_PROCESSING_ERROR,
+        FIELD_GL2_PROCESSING_TIMESTAMP,
+        FIELD_GL2_RECEIVE_TIMESTAMP,
+        FIELD_GL2_REMOTE_HOSTNAME,
+        FIELD_GL2_REMOTE_IP,
+        FIELD_GL2_REMOTE_PORT,
+        FIELD_GL2_SOURCE_COLLECTOR,
+        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+        FIELD_GL2_SOURCE_INPUT,
+        FIELD_GL2_SOURCE_NODE,
+        FIELD_GL2_SOURCE_RADIO,
+        FIELD_GL2_SOURCE_RADIO_INPUT
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -146,6 +250,9 @@ public class Message implements Messages {
      * was involved.
      */
     private long journalOffset = Long.MIN_VALUE;
+
+    private DateTime receiveTime;
+    private DateTime processingTime;
 
     private ArrayList<Recording> recordings;
 
@@ -651,14 +758,14 @@ public class Message implements Messages {
     // drools seems to need the "get" prefix
     @Deprecated
     public boolean getIsSourceInetAddress() {
-        return fields.containsKey("gl2_remote_ip");
+        return fields.containsKey(FIELD_GL2_REMOTE_IP);
     }
 
     public InetAddress getInetAddress() {
-        if (!fields.containsKey("gl2_remote_ip")) {
+        if (!fields.containsKey(FIELD_GL2_REMOTE_IP)) {
             return null;
         }
-        final String ipAddr = (String) fields.get("gl2_remote_ip");
+        final String ipAddr = (String) fields.get(FIELD_GL2_REMOTE_IP);
         try {
             return InetAddresses.forString(ipAddr);
         } catch (IllegalArgumentException ignored) {
@@ -672,6 +779,30 @@ public class Message implements Messages {
 
     public long getJournalOffset() {
         return journalOffset;
+    }
+
+    @Nullable
+    public DateTime getReceiveTime() {
+        return receiveTime;
+    }
+
+    public void setReceiveTime(DateTime receiveTime) {
+        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
+        if (receiveTime != null) {
+            this.receiveTime = receiveTime;
+        }
+    }
+
+    @Nullable
+    public DateTime getProcessingTime() {
+        return processingTime;
+    }
+
+    public void setProcessingTime(DateTime processingTime) {
+        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
+        if (processingTime != null) {
+            this.processingTime = processingTime;
+        }
     }
 
     // helper methods to optionally record timing information per message, useful for debugging or benchmarking

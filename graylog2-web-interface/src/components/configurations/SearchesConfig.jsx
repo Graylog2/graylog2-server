@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, ISODurationInput } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
@@ -164,7 +164,7 @@ const SearchesConfig = createReactClass({
   },
 
   render() {
-    const config = this.state.config;
+    const { config } = this.state;
     const duration = moment.duration(config.query_time_range_limit);
     const limit = this._isEnabled() ? `${config.query_time_range_limit} (${duration.format()})` : 'disabled';
 
@@ -190,7 +190,8 @@ const SearchesConfig = createReactClass({
           <dt>Query time range limit</dt>
           <dd>{limit}</dd>
           <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries which
-            span a lot of data and would need a long time and many resources to complete (if at all).</dd>
+            span a lot of data and would need a long time and many resources to complete (if at all).
+          </dd>
         </dl>
 
         <Row>
@@ -229,7 +230,8 @@ const SearchesConfig = createReactClass({
                    name="enabled"
                    checked={this._isEnabled()}
                    onChange={this._onChecked} />
-            {this._isEnabled() &&
+            {this._isEnabled()
+            && (
             <ISODurationInput id="query-timerange-limit-field"
                               duration={config.query_time_range_limit}
                               update={this._onUpdate('query_time_range_limit')}
@@ -237,6 +239,7 @@ const SearchesConfig = createReactClass({
                               help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
                               validator={this.queryTimeRangeLimitValidator}
                               required />
+            )
             }
 
             <TimeRangeOptionsForm options={this.state.relativeTimeRangeOptionsUpdate || this._buildTimeRangeOptions(this.state.config.relative_timerange_options)}

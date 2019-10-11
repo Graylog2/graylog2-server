@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -48,7 +48,7 @@ const EditAlertConditionPage = createReactClass({
   },
 
   _handleDelete() {
-    history.push(Routes.ALERTS.CONDITIONS);
+    history.push(Routes.LEGACY_ALERTS.CONDITIONS);
   },
 
   _isLoading() {
@@ -62,7 +62,7 @@ const EditAlertConditionPage = createReactClass({
 
     const condition = this.state.alertCondition;
     const conditionType = this.state.availableConditions[condition.type];
-    const stream = this.state.stream;
+    const { stream } = this.state;
 
     return (
       <DocumentTitle title={`Condition ${condition.title || 'Untitled'}`}>
@@ -79,7 +79,7 @@ const EditAlertConditionPage = createReactClass({
             </span>
 
             <span>
-              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
+              <AlertsHeaderToolbar active={Routes.LEGACY_ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 

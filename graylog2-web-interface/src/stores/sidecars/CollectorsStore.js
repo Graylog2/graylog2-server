@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import URI from 'urijs';
+import lodash from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -73,7 +74,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
 
     CollectorsActions.all.promise(promise);
   },
@@ -98,7 +100,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
 
     CollectorsActions.list.promise(promise);
   },
@@ -121,7 +124,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
     CollectorsActions.create.promise(promise);
   },
 
@@ -139,7 +143,8 @@ const CollectorsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching collectors failed with status: ${error}`,
             'Could not retrieve collectors');
-        });
+        },
+      );
     CollectorsActions.update.promise(promise);
   },
 
@@ -177,23 +182,26 @@ const CollectorsStore = Reflux.createStore({
     CollectorsActions.copy.promise(promise);
   },
 
-  validate(name, collectorId) {
-    const search = {
-      name: name,
+  validate(collector) {
+    // set minimum api defaults for faster validation feedback
+    const payload = {
+      id: ' ',
+      service_type: 'exec',
+      executable_path: ' ',
+      default_template: ' ',
     };
-    if (collectorId) {
-      search.id = collectorId;
-    }
-    const url = URI(`${this.sourceUrl}/collectors/validate`).search(search).toString();
-    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+    lodash.merge(payload, collector);
+
+    const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/collectors/validate`), payload);
 
     promise
       .then(
         response => response,
         error => (
-          UserNotification.error(`Validating collector with name "${name}" failed with status: ${error.message}`,
+          UserNotification.error(`Validating collector "${payload.name}" failed with status: ${error.message}`,
             'Could not validate collector')
-        ));
+        ),
+      );
 
     CollectorsActions.validate.promise(promise);
   },

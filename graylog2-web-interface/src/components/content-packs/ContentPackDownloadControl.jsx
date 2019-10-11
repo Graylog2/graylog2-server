@@ -3,7 +3,7 @@ import React from 'react';
 import URI from 'urijs';
 
 import ApiRoutes from 'routing/ApiRoutes';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal, Button } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
@@ -23,8 +23,10 @@ class ContentPackDownloadControl extends React.Component {
   }
 
   _getDownloadUrl() {
+    const { contentPackId, revision } = this.props;
+
     const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.ContentPacksController.downloadRev(this.props.contentPackId, this.props.revision).url,
+      ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url,
     ));
 
     if (URLUtils.areCredentialsInURLSupported()) {
@@ -45,10 +47,10 @@ class ContentPackDownloadControl extends React.Component {
   }
 
   render() {
-    const infoText = (URLUtils.areCredentialsInURLSupported() ?
-      'Please right click the download link below and choose "Save Link As..." to download the JSON file.' :
-      'Please click the download link below. Your browser may ask for your username and password to ' +
-      'download the JSON file.');
+    const infoText = (URLUtils.areCredentialsInURLSupported()
+      ? 'Please right click the download link below and choose "Save Link As..." to download the JSON file.'
+      : 'Please click the download link below. Your browser may ask for your username and password to '
+      + 'download the JSON file.');
     return (
       <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }} bsSize="large">
         <Modal.Header closeButton>
@@ -57,9 +59,8 @@ class ContentPackDownloadControl extends React.Component {
         <Modal.Body>
           <p>{infoText}</p>
           <p>
-            <a href={this._getDownloadUrl()} target="_blank">
-              <i className="fa fa-cloud-download" />&nbsp;
-              Download
+            <a href={this._getDownloadUrl()} target="_blank" rel="noopener noreferrer">
+              <i className="fa fa-cloud-download" />{' '}Download
             </a>
           </p>
         </Modal.Body>

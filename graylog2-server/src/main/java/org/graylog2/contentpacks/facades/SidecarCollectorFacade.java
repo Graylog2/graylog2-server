@@ -18,20 +18,20 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.services.CollectorService;
-import org.graylog2.contentpacks.exceptions.DivergingEntityConfigurationException;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         this.collectorService = collectorService;
     }
 
-    @Override
-    public EntityWithConstraints exportNativeEntity(Collector collector) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Collector collector, EntityDescriptorIds entityDescriptorIds) {
         final SidecarCollectorEntity collectorEntity = SidecarCollectorEntity.create(
                 ValueReference.of(collector.name()),
                 ValueReference.of(collector.serviceType()),
@@ -71,12 +71,11 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         );
 
         final JsonNode data = objectMapper.convertValue(collectorEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(collector.id()))
+        return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(collector.id(), ModelTypes.SIDECAR_COLLECTOR_V1)))
                 .type(TYPE_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
     @Override
@@ -121,17 +120,10 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
         final SidecarCollectorEntity collectorEntity = objectMapper.convertValue(entity.data(), SidecarCollectorEntity.class);
 
         final String name = collectorEntity.name().asString(parameters);
-        final String serviceType = collectorEntity.serviceType().asString(parameters);
-        final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByName(name));
-        existingCollector.ifPresent(collector -> compareCollectors(name, serviceType, collector));
+        final String os = collectorEntity.nodeOperatingSystem().asString(parameters);
+        final Optional<Collector> existingCollector = Optional.ofNullable(collectorService.findByNameAndOs(name, os));
 
         return existingCollector.map(collector -> NativeEntity.create(entity.id(), collector.id(), TYPE_V1, collector.name(), collector));
-    }
-
-    private void compareCollectors(String name, String serviceType, Collector existingCollector) {
-        if (!name.equals(existingCollector.name()) || !serviceType.equals(existingCollector.serviceType())) {
-            throw new DivergingEntityConfigurationException("Expected service type for Collector with name \"" + name + "\": <" + serviceType + ">; actual service type: <" + existingCollector.serviceType() + ">");
-        }
     }
 
     @Override
@@ -162,7 +154,7 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         final Collector collector = collectorService.find(modelId.id());
         if (isNull(collector)) {
@@ -170,6 +162,6 @@ public class SidecarCollectorFacade implements EntityFacade<Collector> {
             return Optional.empty();
         }
 
-        return Optional.of(exportNativeEntity(collector));
+        return Optional.of(exportNativeEntity(collector, entityDescriptorIds));
     }
 }

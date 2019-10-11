@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
@@ -32,7 +32,7 @@ const SidecarEditConfigurationPage = createReactClass({
   },
 
   _reloadConfiguration() {
-    const configurationId = this.props.params.configurationId;
+    const { configurationId } = this.props.params;
 
     CollectorConfigurationsActions.getConfiguration(configurationId).then(
       (configuration) => {
@@ -50,6 +50,10 @@ const SidecarEditConfigurationPage = createReactClass({
 
   _isLoading() {
     return !this.state.configuration || !this.state.configurationSidecars;
+  },
+
+  _variableRenameHandler(oldname, newname) {
+    this.configurationForm.replaceConfigurationVariableName(oldname, newname);
   },
 
   render() {
@@ -84,11 +88,12 @@ const SidecarEditConfigurationPage = createReactClass({
 
           <Row className="content">
             <Col md={6}>
-              <ConfigurationForm configuration={this.state.configuration}
+              <ConfigurationForm ref={(c) => { this.configurationForm = c; }}
+                                 configuration={this.state.configuration}
                                  configurationSidecars={this.state.configurationSidecars} />
             </Col>
             <Col md={6}>
-              <ConfigurationHelper type="filebeat" />
+              <ConfigurationHelper onVariableRename={this._variableRenameHandler} />
             </Col>
           </Row>
         </span>

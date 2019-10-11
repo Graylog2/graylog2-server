@@ -2,34 +2,42 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
+import { Alert, Nav, NavItem, Row, Col } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-import AuthProvidersConfig from './AuthProvidersConfig';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const AuthenticationActions = ActionsProvider.getActions('Authentication');
 
 import StoreProvider from 'injection/StoreProvider';
+import AuthProvidersConfig from './AuthProvidersConfig';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
+
+const AuthenticationActions = ActionsProvider.getActions('Authentication');
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
-import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
 
 const AuthenticationComponent = createReactClass({
   displayName: 'AuthenticationComponent',
 
   propTypes: {
-    location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
     children: PropTypes.element,
   },
 
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+
+  getDefaultProps() {
+    return {
+      children: null,
+    };
+  },
 
   componentDidMount() {
     AuthenticationActions.load();
@@ -44,15 +52,15 @@ const AuthenticationComponent = createReactClass({
   authenticatorConfigurations: {},
 
   _pluginPane() {
-    const name = this.props.params.name;
-    const auth = this.authenticatorConfigurations[name];
+    const { params } = this.props;
+    const auth = this.authenticatorConfigurations[params.name];
 
     if (auth) {
       return React.createElement(auth.component, {
-        key: `auth-configuration-${name}`,
+        key: `auth-configuration-${params.name}`,
       });
     }
-    return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{name}</code>, this is an error.</Alert>);
+    return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{params.name}</code>, this is an error.</Alert>);
   },
 
   _onUpdateProviders(config) {
@@ -60,30 +68,39 @@ const AuthenticationComponent = createReactClass({
   },
 
   _contentComponent() {
-    if (!this.state.authenticators) {
+    const { authenticators } = this.state;
+    const { params } = this.props;
+
+    if (!authenticators) {
       return <Spinner />;
     }
-    if (this.props.params.name === undefined) {
-      return (<AuthProvidersConfig config={this.state.authenticators}
-                                   descriptors={this.authenticatorConfigurations}
-                                   updateConfig={this._onUpdateProviders} />);
+    if (params.name === undefined) {
+      return (
+        <AuthProvidersConfig config={authenticators}
+                             descriptors={this.authenticatorConfigurations}
+                             updateConfig={this._onUpdateProviders} />
+      );
     }
     return this._pluginPane();
   },
 
   render() {
+    const { authenticators: auths, currentUser } = this.state;
+    const { children } = this.props;
     let authenticators = [];
-    const auths = this.state.authenticators;
+
     if (auths) {
       // only show the entries if the user is permitted to change them, makes no sense otherwise
-      if (this.isPermitted(this.state.currentUser.permissions, ['authentication:edit'])) {
+      if (this.isPermitted(currentUser.permissions, ['authentication:edit'])) {
         authenticators = auths.realm_order.map((name, idx) => {
           const auth = this.authenticatorConfigurations[name];
           const title = (auth || { displayName: name }).displayName;
           const numberedTitle = `${idx + 1}. ${title}`;
-          return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
-            <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
-          </LinkContainer>);
+          return (
+            <LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
+              <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
+            </LinkContainer>
+          );
         });
 
         authenticators.unshift(
@@ -96,18 +113,18 @@ const AuthenticationComponent = createReactClass({
         );
       }
     } else {
-      authenticators = [<NavItem key={'loading'} disabled title="Loading...">Loading...</NavItem>];
+      authenticators = [<NavItem key="loading" disabled title="Loading...">Loading...</NavItem>];
     }
 
     // add submenu items based on permissions
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
+    if (this.isPermitted(currentUser.permissions, ['roles:read'])) {
       authenticators.unshift(
         <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
           <NavItem title="Roles">Roles</NavItem>
         </LinkContainer>,
       );
     }
-    if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
+    if (this.isPermitted(currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
           <NavItem title="Users">Users</NavItem>
@@ -118,10 +135,10 @@ const AuthenticationComponent = createReactClass({
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
       authenticators = [
-        <LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
+        <LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(currentUser.username))}>
           <NavItem title="Edit Profile">Edit Profile</NavItem>
         </LinkContainer>,
-        <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(this.state.currentUser.username))}>
+        <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(currentUser.username))}>
           <NavItem title="Edit Tokens">Edit Tokens</NavItem>
         </LinkContainer>,
       ];
@@ -132,12 +149,14 @@ const AuthenticationComponent = createReactClass({
       </Nav>
     );
 
-    const contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
+    const contentComponent = React.Children.count(children) === 1 ? React.Children.only(children) : this._contentComponent();
 
-    return (<Row>
-      <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
-      <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
-    </Row>);
+    return (
+      <Row>
+        <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
+        <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
+      </Row>
+    );
   },
 });
 

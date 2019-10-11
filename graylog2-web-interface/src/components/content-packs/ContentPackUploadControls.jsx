@@ -2,7 +2,7 @@ import React from 'react';
 
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { Button } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import style from './ContentPackUploadControls.css';
@@ -48,15 +48,16 @@ class ContentPackUploadControls extends React.Component {
             ContentPacksActions.list();
           },
           (response) => {
-            const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-              'Graylog logs for more information.';
+            const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
+              + 'Graylog logs for more information.';
             const title = 'Could not import content pack';
             let smallMessage = '';
             if (response.additional && response.additional.body && response.additional.body.message) {
               smallMessage = `<br /><small>${response.additional.body.message}</small>`;
             }
             UserNotification.error(message + smallMessage, title);
-          });
+          },
+        );
     };
 
     reader.readAsText(this.uploadInput.getInputDOMNode().files[0]);
@@ -64,21 +65,26 @@ class ContentPackUploadControls extends React.Component {
   }
 
   render() {
+    const { isOpen } = this.state;
+
     return (
       <span>
-        <Button className={style.button} active={this.state.isOpen} id="upload-content-pack-button" bsStyle="success" onClick={this._openModal}>Upload</Button>
-        <BootstrapModalForm
-          onModalClose={() => { this.setState({ isOpen: false }); }}
-          ref={(node) => { this.uploadModal = node; }}
-          onSubmitForm={this._save}
-          title="Upload Content Pack"
-          submitButtonText="Upload">
-          <Input
-            ref={(node) => { this.uploadInput = node; }}
-            id="upload-content-pack"
-            label="Choose File"
-            type="file"
-            help="Choose Content Pack from disk" />
+        <Button className={style.button}
+                active={isOpen}
+                id="upload-content-pack-button"
+                bsStyle="success"
+                onClick={this._openModal}>Upload
+        </Button>
+        <BootstrapModalForm onModalClose={() => { this.setState({ isOpen: false }); }}
+                            ref={(node) => { this.uploadModal = node; }}
+                            onSubmitForm={this._save}
+                            title="Upload Content Pack"
+                            submitButtonText="Upload">
+          <Input ref={(node) => { this.uploadInput = node; }}
+                 id="upload-content-pack"
+                 label="Choose File"
+                 type="file"
+                 help="Choose Content Pack from disk" />
         </BootstrapModalForm>
       </span>
     );

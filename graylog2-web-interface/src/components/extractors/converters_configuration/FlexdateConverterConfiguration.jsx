@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
@@ -45,8 +45,7 @@ class FlexdateConverterConfiguration extends React.Component {
   render() {
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the <DocumentationLink
-        page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
+        Time zone to apply to date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 

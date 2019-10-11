@@ -2,16 +2,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { LoadingIndicator } from 'components/common';
 import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import {} from 'components/field-analyzers'; // Make sure to load all field analyzer plugins!
+import {} from 'components/field-analyzers';
+
+const SearchStore = StoreProvider.getStore('Search'); // Make sure to load all field analyzer plugins!
 
 class SearchResult extends React.Component {
   static propTypes = {
@@ -109,7 +110,7 @@ class SearchResult extends React.Component {
 
   _fieldAnalyzers = (filter) => {
     return PluginStore.exports('fieldAnalyzers')
-      .filter(analyzer => filter !== undefined ? filter(analyzer) : true);
+      .filter(analyzer => (filter !== undefined ? filter(analyzer) : true));
   };
 
   _fieldAnalyzerComponents = (filter) => {
@@ -122,7 +123,7 @@ class SearchResult extends React.Component {
       }
     });
 
-    const fieldAnalyzers = this.fieldAnalyzers;
+    const { fieldAnalyzers } = this;
 
     return this._fieldAnalyzers(filter)
       .map((analyzer, idx) => {
@@ -175,8 +176,10 @@ class SearchResult extends React.Component {
     if (this.props.result.total_results === 0) {
       return (
         <div>
-          <NoSearchResults builtQuery={this.props.builtQuery} histogram={this.props.histogram}
-                           permissions={this.props.permissions} searchInStream={this.props.searchInStream} />
+          <NoSearchResults builtQuery={this.props.builtQuery}
+                           histogram={this.props.histogram}
+                           permissions={this.props.permissions}
+                           searchInStream={this.props.searchInStream} />
           {loadingIndicator}
         </div>
       );
@@ -202,8 +205,7 @@ class SearchResult extends React.Component {
                          searchInStream={this.props.searchInStream}
                          permissions={this.props.permissions}
                          loadingSearch={this.props.loadingSearch}
-                         searchConfig={this.props.searchConfig}
-          />
+                         searchConfig={this.props.searchConfig} />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">
           {this._fieldAnalyzerComponents(analyzer => this._shouldRenderAboveHistogram(analyzer))}

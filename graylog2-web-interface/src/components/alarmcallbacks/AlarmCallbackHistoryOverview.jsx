@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { sortByDate } from 'util/SortUtils';
 
+import { Row, Col } from 'components/graylog';
 import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
@@ -44,7 +44,8 @@ const AlarmCallbackHistoryOverview = createReactClass({
     return (
       <Row>
         <Col md={12}>
-          <EntityList bsNoItemsStyle="info" noItemsText="No notifications were triggered during the alert."
+          <EntityList bsNoItemsStyle="info"
+                      noItemsText="No notifications were triggered during the alert."
                       items={histories} />
         </Col>
       </Row>

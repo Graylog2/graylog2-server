@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -79,7 +79,7 @@ class MessageFieldDescription extends React.Component {
   };
 
   render() {
-    const fieldName = this.props.fieldName;
+    const { fieldName } = this.props;
     const className = fieldName === 'message' || fieldName === 'full_message' ? 'message-field' : '';
     const isDecorated = DecorationStats.isFieldDecorated(this.props.message, fieldName);
 
@@ -87,10 +87,12 @@ class MessageFieldDescription extends React.Component {
       <dd className={className} key={`${fieldName}dd`}>
         {this._getFormattedFieldActions()}
         <div className="field-value">{this.props.renderForDisplay(this.props.fieldName)}</div>
-        {this._shouldShowTerms() &&
+        {this._shouldShowTerms()
+        && (
         <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
           Field terms: &nbsp;{this._getFormattedTerms()}
         </Alert>
+        )
         }
         {isDecorated && <DecoratedMessageFieldMarker />}
       </dd>

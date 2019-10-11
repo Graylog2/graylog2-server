@@ -2,16 +2,17 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
+
+import DateTime from 'logic/datetimes/DateTime';
+
 const NodesStore = StoreProvider.getStore('Nodes');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
-
-import DateTime from 'logic/datetimes/DateTime';
 
 function nodeFilter(state) {
   return state.nodes ? state.nodes[this.props.params.nodeId] : state.nodes;

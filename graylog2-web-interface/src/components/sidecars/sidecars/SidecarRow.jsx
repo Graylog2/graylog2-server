@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar } from 'react-bootstrap';
 import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Button, ButtonToolbar } from 'components/graylog';
 import Routes from 'routing/Routes';
 import { Timestamp } from 'components/common';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
@@ -23,7 +23,7 @@ class SidecarRow extends React.Component {
   };
 
   render() {
-    const sidecar = this.props.sidecar;
+    const { sidecar } = this.props;
     const sidecarClass = sidecar.active ? '' : commonStyle.greyedOut;
     const annotation = sidecar.active ? '' : ' (inactive)';
     let sidecarStatus = { status: null, message: null, id: null };
@@ -38,11 +38,13 @@ class SidecarRow extends React.Component {
     return (
       <tr className={sidecarClass}>
         <td className={style.sidecarName}>
-          {sidecar.active ?
-            <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-              {sidecar.node_name}
-            </Link> :
-            sidecar.node_name
+          {sidecar.active
+            ? (
+              <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
+                {sidecar.node_name}
+              </Link>
+            )
+            : sidecar.node_name
           }
         </td>
         <td>

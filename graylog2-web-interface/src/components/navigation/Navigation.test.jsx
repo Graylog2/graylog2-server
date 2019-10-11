@@ -4,12 +4,18 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import Routes from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 jest.mock('./SystemMenu', () => mockComponent('SystemMenu'));
 jest.mock('./NavigationBrand', () => mockComponent('NavigationBrand'));
 jest.mock('./NavigationLink', () => mockComponent('NavigationLink'));
 jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('components/navigation/NotificationBadge', () => mockComponent('NotificationBadge'));
+jest.mock('util/AppConfig', () => ({
+  gl2AppPathPrefix: jest.fn(() => ''),
+  gl2ServerUrl: jest.fn(() => undefined),
+  gl2DevMode: jest.fn(() => false),
+}));
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);
 
@@ -74,6 +80,7 @@ describe('Navigation', () => {
       },
     };
     beforeEach(() => {
+      AppConfig.gl2AppPathPrefix = jest.fn(() => '');
       PluginStore.register(plugin);
     });
     afterEach(() => {
@@ -81,24 +88,32 @@ describe('Navigation', () => {
     });
     it('contains top-level navigation element', () => {
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Perpetuum Mobile')).toExist();
+    });
+    it('prefix plugin navigation item paths with app prefix', () => {
+      AppConfig.gl2AppPathPrefix.mockReturnValue('/my/crazy/prefix');
+      const wrapper = mount(<Navigation permissions={[]}
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
+      expect(findLink(wrapper, 'Perpetuum Mobile')).toHaveProp('path', '/my/crazy/prefix/something');
     });
     it('does not contain navigation elements from plugins where permissions are missing', () => {
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Archives')).not.toExist();
     });
     it('contains restricted navigation elements from plugins if permissions are present', () => {
       currentUser.permissions = ['archive:read'];
       const wrapper = mount(<Navigation permissions={[]}
-                                  fullName="Sam Lowry"
-                                  location={{ pathname: '/' }}
-                                  loginName="slowry" />);
+                                        fullName="Sam Lowry"
+                                        location={{ pathname: '/' }}
+                                        loginName="slowry" />);
       expect(findLink(wrapper, 'Archives')).toExist();
     });
     it('does not render dropdown contributed by plugin if permissions for all elements are missing', () => {

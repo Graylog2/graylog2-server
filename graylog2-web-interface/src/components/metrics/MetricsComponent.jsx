@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
 
@@ -13,6 +13,7 @@ class MetricsComponent extends React.Component {
   };
 
   static defaultProps = { filter: '' };
+
   state = { filter: this.props.filter };
 
   componentWillReceiveProps(nextProps) {

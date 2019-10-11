@@ -18,10 +18,13 @@ class SourceTitle extends React.Component {
       <h3 className="sources-title">
         {this.props.children}
         <span style={{ marginLeft: 10 }}>
-          <button id={this.props.resetFilterId} className={`btn btn-info btn-xs ${this.props.className}`}
-                    onClick={this.props.resetFilters} title="Reset filter" style={{ display: 'none' }}>
+          <button id={this.props.resetFilterId}
+                  className={`btn btn-info btn-xs ${this.props.className}`}
+                  onClick={this.props.resetFilters}
+                  title="Reset filter"
+                  style={{ display: 'none' }}>
               Reset
-            </button>
+          </button>
         </span>
       </h3>
     );

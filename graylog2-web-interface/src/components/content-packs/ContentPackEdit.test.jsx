@@ -56,18 +56,19 @@ describe('<ContentPackEdit />', () => {
 
   it('should render empty content pack for create', () => {
     const wrapper = renderer.create(<ContentPackEdit contentPack={emptyContentPack}
-                       selectedEntities={{}}
-                       appliedParameter={{}}
-                       entityIndex={{}} />);
+                                                     selectedEntities={{}}
+                                                     appliedParameter={{}}
+                                                     entityIndex={{}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with content pack for edit', () => {
     const wrapper = renderer.create(
       <ContentPackEdit contentPack={filledContentPack}
-      appliedParameter={appliedParameter}
-      entityIndex={serverEntities}
-      selectedEntities={selectedEntities} />);
+                       appliedParameter={appliedParameter}
+                       entityIndex={serverEntities}
+                       selectedEntities={selectedEntities} />,
+    );
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -78,7 +79,8 @@ describe('<ContentPackEdit />', () => {
                        appliedParameter={appliedParameter}
                        entityIndex={serverEntities}
                        onSave={saveFn}
-                       selectedEntities={selectedEntities} />);
+                       selectedEntities={selectedEntities} />,
+    );
     wrapper.find('button[children="Next"]').simulate('click');
     expect(wrapper.find('h2[children="Parameters list"]').exists()).toBe(true);
     wrapper.find('button[children="Next"]').simulate('click');

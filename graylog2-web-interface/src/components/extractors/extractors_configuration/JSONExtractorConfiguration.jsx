@@ -1,14 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
-const ToolsStore = StoreProvider.getStore('Tools');
 
 import ExtractorUtils from 'util/ExtractorUtils';
 import FormUtils from 'util/FormsUtils';
+
+const ToolsStore = StoreProvider.getStore('Tools');
 
 const JSONExtractorConfiguration = createReactClass({
   displayName: 'JSONExtractorConfiguration',
@@ -60,7 +61,7 @@ const JSONExtractorConfiguration = createReactClass({
   _onTryClick() {
     this.setState({ trying: true });
 
-    const configuration = this.state.configuration;
+    const { configuration } = this.state;
     const promise = ToolsStore.testJSON(configuration.flatten, configuration.list_separator,
       configuration.key_separator, configuration.kv_separator, configuration.replace_key_whitespace,
       configuration.key_whitespace_replacement, configuration.key_prefix, this.props.exampleMessage);

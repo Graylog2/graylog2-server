@@ -1,14 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, ButtonToolbar, Row, Col } from 'react-bootstrap';
-import { Input } from 'components/bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
-import Routes from 'routing/Routes';
 
+import { ButtonToolbar, Row, Col, Button } from 'components/graylog';
+import { Input } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 import FormsUtils from 'util/FormsUtils';
 import { ContentPackMarker } from 'components/common';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
@@ -74,13 +73,15 @@ class LookupTable extends React.Component {
             <Button bsStyle="success">Edit</Button>
           </LinkContainer>
           {
-            (this.props.table.default_single_value || this.props.table.default_multi_value) &&
+            (this.props.table.default_single_value || this.props.table.default_multi_value)
+            && (
             <dl>
               <dt>Default single value</dt>
               <dd><code>{this.props.table.default_single_value}</code>{' '}({this.props.table.default_single_value_type.toLowerCase()})</dd>
               <dt>Default multi value</dt>
               <dd><code>{this.props.table.default_multi_value}</code>{' '}({this.props.table.default_multi_value_type.toLowerCase()})</dd>
             </dl>
+            )
           }
           <hr />
           <h2>Purge Cache</h2>

@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.sidecar.rest.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.Hashing;
 import io.swagger.annotations.Api;
@@ -25,27 +26,32 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
+import org.graylog.plugins.sidecar.rest.models.CollectorUpload;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
 import org.graylog.plugins.sidecar.rest.models.ConfigurationSummary;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.rest.requests.ConfigurationPreviewRequest;
+import org.graylog.plugins.sidecar.rest.responses.CollectorUploadListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationListResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationPreviewRenderResponse;
 import org.graylog.plugins.sidecar.rest.responses.ConfigurationSidecarsResponse;
-import org.graylog.plugins.sidecar.rest.responses.ValidationResponse;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.EtagService;
+import org.graylog.plugins.sidecar.services.ImportService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -70,6 +76,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -80,9 +88,15 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class ConfigurationResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigurationResource.class);
+
+    // a file is created by the Sidecar based on the configuration name so we basically check for invalid paths here
+    private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[^;*?\"<>|&]+$");
+
     private final ConfigurationService configurationService;
     private final SidecarService sidecarService;
     private final EtagService etagService;
+    private final ImportService importService;
     private final SearchQueryParser searchQueryParser;
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create(Configuration.FIELD_ID))
@@ -93,10 +107,12 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Inject
     public ConfigurationResource(ConfigurationService configurationService,
                                  SidecarService sidecarService,
-                                 EtagService etagService) {
+                                 EtagService etagService,
+                                 ImportService importService) {
         this.configurationService = configurationService;
         this.sidecarService = sidecarService;
         this.etagService = etagService;
+        this.importService = importService;
         this.searchQueryParser = new SearchQueryParser(Configuration.FIELD_NAME, SEARCH_FIELD_MAPPING);;
     }
 
@@ -122,6 +138,20 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 .collect(Collectors.toList());
 
         return ConfigurationListResponse.create(query, configurations.pagination(), total, sort, order, result);
+    }
+
+    @GET
+    @Path("/uploads")
+    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "List all uploaded configurations")
+    public CollectorUploadListResponse listImports(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page) {
+        // sort by creation date, latest on top of the list
+        final PaginatedList<CollectorUpload> uploads = this.importService.findPaginated(page, 10, "created", "desc");
+        final long total = this.importService.count();
+        final List<CollectorUpload> result = new ArrayList<>(uploads);
+
+        return CollectorUploadListResponse.create(uploads.pagination(), total, result);
     }
 
     @GET
@@ -156,20 +186,18 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         return ConfigurationSidecarsResponse.create(configuration.id(), sidecarsWithConfiguration);
     }
 
-    @GET
+    @POST
     @Path("/validate")
+    @NoAuditEvent("Validation only")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Validates configuration name")
-    public ValidationResponse validateConfiguration(@ApiParam(name = "name", required = true) @QueryParam("name") String name) {
-        final Configuration configuration = this.configurationService.findByName(name);
-        if (configuration == null) {
-            return ValidationResponse.create(false, null);
-        }
-        return ValidationResponse.create(true, "Configuration with name \"" + name + "\" already exists");
+    @ApiOperation(value = "Validates configuration parameters")
+    public ValidationResult validateConfiguration(@Valid @ApiParam("configuration") Configuration toValidate) {
+        return validate(toValidate);
     }
 
     @GET
+    @Timed
     @Path("/render/{sidecarId}/{configurationId}")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
@@ -246,20 +274,30 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create new configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
-    public Configuration createConfiguration(@ApiParam(name = "JSON body", required = true)
+    public Response createConfiguration(@ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
-        return persistConfiguration(null, request);
+        final Configuration configuration = configurationFromRequest(null, request);
+        final ValidationResult validationResult = validate(configuration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
+
+        return Response.ok().entity(configurationService.save(configuration)).build();
     }
 
     @POST
     @Path("/{id}/{name}")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
+    @RequiresPermissions({SidecarRestPermissions.CONFIGURATIONS_READ, SidecarRestPermissions.CONFIGURATIONS_CREATE})
     @ApiOperation(value = "Copy a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CLONE)
     public Response copyConfiguration(@ApiParam(name = "id", required = true)
                                       @PathParam("id") String id,
                                       @PathParam("name") String name) throws NotFoundException {
         final Configuration configuration = configurationService.copyConfiguration(id, name);
+        final ValidationResult validationResult = validate(configuration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         configurationService.save(configuration);
         return Response.accepted().build();
     }
@@ -270,7 +308,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
-    public Configuration updateConfiguration(@ApiParam(name = "id", required = true)
+    public Response updateConfiguration(@ApiParam(name = "id", required = true)
                                              @PathParam("id") String id,
                                              @ApiParam(name = "JSON body", required = true)
                                              @Valid @NotNull Configuration request) {
@@ -286,15 +324,19 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             }
         }
 
-        final Configuration updatedConfiguration = persistConfiguration(id, request);
+        final Configuration updatedConfiguration = configurationFromRequest(id, request);
+        final ValidationResult validationResult = validate(updatedConfiguration);
+        if (validationResult.failed()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
+        }
         etagService.invalidateAll();
 
-        return updatedConfiguration;
+        return Response.ok().entity(configurationService.save(updatedConfiguration)).build();
     }
 
     @DELETE
     @Path("/{id}")
-    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
+    @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete a configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_DELETE)
@@ -312,6 +354,47 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         return Response.accepted().build();
     }
 
+    private ValidationResult validate(Configuration toValidate) {
+        final Optional<Configuration> configurationOptional;
+        final Configuration configuration;
+        final ValidationResult validation = new ValidationResult();
+
+        configurationOptional = Optional.ofNullable(configurationService.findByName(toValidate.name()));
+        if (configurationOptional.isPresent()) {
+            configuration = configurationOptional.get();
+            if (!configuration.id().equals(toValidate.id())) {
+                // a configuration exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
+            }
+        }
+
+        if (toValidate.name().isEmpty()) {
+            validation.addError("name", "Configuration name cannot be empty.");
+        } else if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
+                validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
+        }
+
+        if (toValidate.collectorId().isEmpty()) {
+            validation.addError("collector_id", "Associated collector ID cannot be empty.");
+        }
+
+        if (toValidate.color().isEmpty()) {
+            validation.addError("color", "Collector color cannot be empty.");
+        }
+
+        if (toValidate.template().isEmpty()) {
+            validation.addError("template", "Collector template cannot be empty.");
+        }
+
+        try {
+            this.configurationService.renderPreview(toValidate.template());
+        } catch (RenderTemplateException e) {
+            validation.addError("template", "Template error: " + e.getMessage());
+        }
+
+        return validation;
+    }
+
     private boolean isConfigurationInUse(String configurationId) {
         return sidecarService.all().stream().anyMatch(sidecar -> isConfigurationAssignedToSidecar(configurationId, sidecar));
     }
@@ -327,19 +410,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                 .toString();
     }
 
-    private Configuration persistConfiguration(String id, Configuration request) {
-        try {
-            this.configurationService.renderPreview(request.template());
-        } catch (RenderTemplateException e) {
-            throw new BadRequestException("Configuration template validation failed: " + e.getMessage());
-        }
-
+    private Configuration configurationFromRequest(String id, Configuration request) {
         Configuration configuration;
         if (id == null) {
             configuration = configurationService.fromRequest(request);
         } else {
             configuration = configurationService.fromRequest(id, request);
         }
-        return configurationService.save(configuration);
+        return configuration;
     }
 }

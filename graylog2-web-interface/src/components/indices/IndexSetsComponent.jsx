@@ -3,15 +3,13 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
-import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { Col, Label, DropdownButton, MenuItem, Button } from 'components/graylog';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
-
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
-
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { IndexSetsStore, IndexSetsActions } = CombinedProvider.get('IndexSets');
@@ -69,9 +67,9 @@ const IndexSetsComponent = createReactClass({
         </LinkContainer>
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
-          <MenuItem
-            onSelect={this._onSetDefault(indexSet)}
-            disabled={!indexSet.writable || indexSet.default}>Set as default</MenuItem>
+          <MenuItem onSelect={this._onSetDefault(indexSet)}
+                    disabled={!indexSet.writable || indexSet.default}>Set as default
+          </MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
@@ -94,7 +92,7 @@ const IndexSetsComponent = createReactClass({
 
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
     const isReadOnly = !indexSet.writable ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
-    let description = indexSet.description;
+    let { description } = indexSet;
     if (indexSet.default) {
       description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
     }

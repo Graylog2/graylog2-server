@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
+
 const InputStatesStore = StoreProvider.getStore('InputStates');
 
 function inputStateFilter(state) {

@@ -1,0 +1,276 @@
+{
+  "views": [
+    {
+      "_id" : {
+        "$oid": "5b3b465394e43d551d8a2ac5"
+      },
+      "title" : "Test",
+      "summary" : "",
+      "description" : "",
+      "search_id" : "5b3b44ca77196aa4679e4da0",
+      "properties" : [],
+      "state" : {
+        "0d6caa41-09cf-4ad2-8c3a-248056e72a3e" : {
+          "static_message_list_id" : "5b3b44ca77196aa4679e4dee",
+          "selected_fields" : [
+            "source",
+            "message"
+          ],
+          "titles" : {
+            "widget" : {}
+          },
+          "widgets" : [],
+          "widget_mapping" : {},
+          "positions" : {}
+        }
+      },
+     "created_at" : { "$date" : "2018-07-03T09:48:03.389Z" }
+    }
+  ],
+  "searches": [
+    {
+      "_id": {
+        "$oid": "5b3b44ca77196aa4679e4da0"
+      },
+      "queries": [
+        {
+          "id": "9513b089-6586-4523-8e35-7387f664a94c",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "*"
+          },
+          "search_types": [
+            {
+              "id": "8adc3177-9bc8-410d-9a9f-85c4f59a9076",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "time",
+                  "field": "timestamp",
+                  "interval": "1m"
+                }
+              ],
+              "column_groups": []
+            },
+            {
+              "id": "41722cf1-16cd-4e83-9983-c15506a5ac0f",
+              "limit": 150,
+              "offset": 0,
+              "type": "messages"
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "created_at": {
+        "$date": "2018-06-03T09:41:45.353Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "5b3b465394e43d551d8a2ac4"
+      },
+      "queries": [
+        {
+          "id": "0d6caa41-09cf-4ad2-8c3a-248056e72a3e",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "*"
+          },
+          "search_types": [
+            {
+              "id": "6235649d-8ff6-414a-a3cc-c3be75c315b1",
+              "limit": 150,
+              "offset": 0,
+              "type": "messages"
+            },
+            {
+              "id": "e9703bab-b880-43e4-8674-c6ca52a8d860",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "values",
+                  "field": "action",
+                  "limit": 5
+                }
+              ],
+              "column_groups": []
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "created_at": {
+        "$date": "2018-07-03T09:49:20.187Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "5b3b44ca77196aa4679e4da1"
+      },
+      "queries": [
+        {
+          "id": "9513b089-6586-4523-8e35-7387f664a94c",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "*"
+          },
+          "search_types": [
+            {
+              "id": "8adc3177-9bc8-410d-9a9f-85c4f59a9076",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "time",
+                  "field": "timestamp",
+                  "interval": "1m"
+                }
+              ],
+              "column_groups": []
+            },
+            {
+              "id": "41722cf1-16cd-4e83-9983-c15506a5ac0f",
+              "limit": 150,
+              "offset": 0,
+              "type": "messages"
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "created_at": {
+        "$date": "2018-06-03T09:41:45.353Z"
+      }
+    },    {
+      "_id": {
+        "$oid": "5b3b44ca77196aa4679e4da2"
+      },
+      "queries": [
+        {
+          "id": "9513b089-6586-4523-8e35-7387f664a94c",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "*"
+          },
+          "search_types": [
+            {
+              "id": "8adc3177-9bc8-410d-9a9f-85c4f59a9076",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "time",
+                  "field": "timestamp",
+                  "interval": "1m"
+                }
+              ],
+              "column_groups": []
+            },
+            {
+              "id": "41722cf1-16cd-4e83-9983-c15506a5ac0f",
+              "limit": 150,
+              "offset": 0,
+              "type": "messages"
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "created_at": {
+        "$date": "2018-06-03T09:41:45.353Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "5b3b465394e43d551d8a2ac5"
+      },
+      "queries": [
+        {
+          "id": "0d6caa41-09cf-4ad2-8c3a-248056e72a3e",
+          "timerange": {
+            "type": "relative",
+            "range": 300
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "*"
+          },
+          "search_types": [
+            {
+              "id": "6235649d-8ff6-414a-a3cc-c3be75c315b1",
+              "limit": 150,
+              "offset": 0,
+              "type": "messages"
+            },
+            {
+              "id": "e9703bab-b880-43e4-8674-c6ca52a8d860",
+              "series": [
+                {
+                  "type": "count",
+                  "id": "count()"
+                }
+              ],
+              "rollup": true,
+              "type": "pivot",
+              "row_groups": [
+                {
+                  "type": "values",
+                  "field": "action",
+                  "limit": 5
+                }
+              ],
+              "column_groups": []
+            }
+          ]
+        }
+      ],
+      "parameters": [],
+      "created_at": {
+        "$date": "2018-07-03T09:49:20.187Z"
+      }
+    }
+  ]
+}

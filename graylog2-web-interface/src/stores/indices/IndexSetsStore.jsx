@@ -7,6 +7,7 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const IndexSetsStore = Reflux.createStore({
@@ -25,7 +26,8 @@ const IndexSetsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching index sets list failed: ${error.message}`,
             'Could not retrieve index sets.');
-        });
+        },
+      );
 
     IndexSetsActions.list.promise(promise);
   },
@@ -43,7 +45,8 @@ const IndexSetsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
             'Could not retrieve index sets.');
-        });
+        },
+      );
 
     IndexSetsActions.listPaginated.promise(promise);
   },
@@ -138,12 +141,13 @@ const IndexSetsStore = Reflux.createStore({
             indices: response.indices,
             documents: response.documents,
             size: response.size,
-          }
+          },
         }),
         (error) => {
           UserNotification.error(`Fetching global index stats failed: ${error.message}`,
             'Could not retrieve global index stats.');
-        });
+        },
+      );
 
     IndexSetsActions.stats.promise(promise);
   },

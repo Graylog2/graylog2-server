@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Row, Col, Label, OverlayTrigger, Tooltip } from 'components/graylog';
 import lodash from 'lodash';
 
 import SupportLink from 'components/support/SupportLink';
@@ -69,34 +69,42 @@ class PageHeader extends React.Component {
       <div>
         <Row className={topLevelClassNames}>
           <Col sm={12}>
-            {children[2] &&
+            {children[2]
+            && (
             <div className="actions-lg visible-lg visible-md">
               <div className="actions-container">
                 {children[2]}
               </div>
             </div>
+            )
             }
 
             <h1>
               {this.props.title} <small>{this.renderLifecycleIndicator()}</small>
             </h1>
-            {children[0] &&
+            {children[0]
+            && (
             <p className="description">
               {children[0]}
             </p>
+            )
             }
 
-            {children[1] &&
+            {children[1]
+            && (
             <SupportLink>
               {children[1]}
             </SupportLink>
+            )
             }
           </Col>
 
-          {children[2] &&
+          {children[2]
+            && (
             <Col sm={12} lgHidden mdHidden className="actions-sm">
               {children[2]}
             </Col>
+            )
           }
         </Row>
       </div>

@@ -1,9 +1,9 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Col, Row, Button } from 'components/graylog';
 import { DataTable, PaginatedList, SearchForm } from 'components/common';
 import Routes from 'routing/Routes';
 import CollectorRow from './CollectorRow';
@@ -30,10 +30,12 @@ const CollectorList = createReactClass({
 
   collectorFormatter(collector) {
     const { onClone, onDelete, validateCollector } = this.props;
-    return (<CollectorRow collector={collector}
-                          onClone={onClone}
-                          onDelete={onDelete}
-                          validateCollector={validateCollector} />);
+    return (
+      <CollectorRow collector={collector}
+                    onClone={onClone}
+                    onDelete={onDelete}
+                    validateCollector={validateCollector} />
+    );
   },
 
   render() {

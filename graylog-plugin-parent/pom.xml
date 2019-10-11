@@ -26,7 +26,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>3.0.0-alpha.5-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.graylog.plugins</groupId>
@@ -37,12 +37,13 @@
 
     <properties>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
+        <web.build-dir>${project.build.directory}/web/build</web.build-dir>
 
         <!-- Dependencies -->
         <auto-service.version>1.0-rc4</auto-service.version>
 
         <!-- Plugin versions -->
-        <jdeb.version>1.6</jdeb.version>
+        <jdeb.version>1.7</jdeb.version>
         <rpm-maven.version>2.2.0</rpm-maven.version>
     </properties>
 
@@ -100,7 +101,6 @@
                         <fileset>
                             <directory>${basedir}</directory>
                             <includes>
-                                <include>build/**/*</include>
                                 <include>node_modules/**/*</include>
                             </includes>
                             <followSymlinks>false</followSymlinks>

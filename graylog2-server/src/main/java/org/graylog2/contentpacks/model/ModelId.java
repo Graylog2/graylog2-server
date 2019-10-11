@@ -22,7 +22,6 @@ import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.StringUtils;
 
-import java.util.UUID;
 
 @AutoValue
 public abstract class ModelId {

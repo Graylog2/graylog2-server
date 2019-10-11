@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 
 class MaxmindAdapterDocumentation extends React.Component {
   render() {
@@ -34,29 +34,31 @@ class MaxmindAdapterDocumentation extends React.Component {
     }
 }`;
 
-    return (<div>
-      <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
+    return (
+      <div>
+        <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
 
-      <Alert style={{ marginBottom: 10 }} bsStyle="info">
-        <h4 style={{ marginBottom: 10 }}>Limitations</h4>
-        <p>Currently the city and country databases are supported.</p>
-        <p>For support of additional database types, please visit our support channels.</p>
-      </Alert>
+        <Alert style={{ marginBottom: 10 }} bsStyle="info">
+          <h4 style={{ marginBottom: 10 }}>Limitations</h4>
+          <p>Currently the city and country databases are supported.</p>
+          <p>For support of additional database types, please visit our support channels.</p>
+        </Alert>
 
-      <hr />
+        <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Country database fields</h3>
+        <h3 style={{ marginBottom: 10 }}>Country database fields</h3>
 
-      <pre>{countryFields}</pre>
+        <pre>{countryFields}</pre>
 
-      <h3 style={{ marginBottom: 10 }}>City database fields</h3>
+        <h3 style={{ marginBottom: 10 }}>City database fields</h3>
 
-      <p>In addition to the fields provided by the country database, the city database also includes the following fields:</p>
+        <p>In addition to the fields provided by the country database, the city database also includes the following fields:</p>
 
-      <pre>{cityFields}</pre>
+        <pre>{cityFields}</pre>
 
-      <p>For a complete documentation of the fields, please see MaxMind's <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">developer documentation</a></p>
-    </div>);
+        <p>For a complete documentation of the fields, please see MaxMind's <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">developer documentation</a></p>
+      </div>
+    );
   }
 }
 

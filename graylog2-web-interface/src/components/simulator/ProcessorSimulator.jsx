@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 import { Link } from 'react-router';
 
@@ -98,7 +98,8 @@ class ProcessorSimulator extends React.Component {
             <p>
               Build an example message that will be used in the simulation.{' '}
               <strong>No real messages stored in Graylog will be changed. All actions are purely simulated on the
-                temporary input you provide below.</strong>
+                temporary input you provide below.
+              </strong>
             </p>
             <Row className="row-sm">
               <Col md={7}>

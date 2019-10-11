@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import StreamForm from 'components/streams/StreamForm';
 
 class CreateStreamButton extends React.Component {
@@ -15,6 +16,9 @@ class CreateStreamButton extends React.Component {
 
   static defaultProps = {
     buttonText: 'Create Stream',
+    bsSize: undefined,
+    bsStyle: undefined,
+    className: undefined,
   };
 
   onClick = () => {
@@ -22,14 +26,20 @@ class CreateStreamButton extends React.Component {
   };
 
   render() {
+    const { bsSize, bsStyle, buttonText, className, indexSets, onSave } = this.props;
+
     return (
       <span>
-        <Button bsSize={this.props.bsSize} bsStyle={this.props.bsStyle} className={this.props.className}
+        <Button bsSize={bsSize}
+                bsStyle={bsStyle}
+                className={className}
                 onClick={this.onClick}>
-          {this.props.buttonText}
+          {buttonText}
         </Button>
-        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }} title="Creating Stream" indexSets={this.props.indexSets}
-                    onSubmit={this.props.onSave} />
+        <StreamForm ref={(streamForm) => { this.streamForm = streamForm; }}
+                    title="Creating Stream"
+                    indexSets={indexSets}
+                    onSubmit={onSave} />
       </span>
     );
   }

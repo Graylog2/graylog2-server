@@ -4,8 +4,8 @@ import numeral from 'numeral';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import SourceTitle from './SourceTitle';
 import D3Utils from 'util/D3Utils';
+import SourceTitle from './SourceTitle';
 
 class SourcePieChart extends React.Component {
   static propTypes = {

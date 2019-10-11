@@ -3,8 +3,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, ButtonToolbar, Label, Tooltip } from 'react-bootstrap';
 
+import { ButtonToolbar, Label, Tooltip, Button } from 'components/graylog';
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
 
@@ -72,11 +72,11 @@ const ShowAlertPage = createReactClass({
       return <Spinner />;
     }
 
-    const alert = this.state.alert;
+    const { alert } = this.state;
     const condition = this.state.alertCondition;
     const conditionExists = Object.keys(condition).length > 0;
     const conditionType = this.state.availableConditions[condition.type] || {};
-    const stream = this.state.stream;
+    const { stream } = this.state;
 
     let statusLabel;
     let resolvedState;
@@ -131,7 +131,7 @@ const ShowAlertPage = createReactClass({
 
             <span>
               <ButtonToolbar>
-                <LinkContainer to={Routes.ALERTS.LIST}>
+                <LinkContainer to={Routes.LEGACY_ALERTS.LIST}>
                   <Button bsStyle="info" className="active">Alerts</Button>
                 </LinkContainer>
                 <OverlayElement overlay={conditionDetailsTooltip}

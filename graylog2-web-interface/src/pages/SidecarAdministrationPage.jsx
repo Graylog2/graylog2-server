@@ -2,9 +2,9 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import DocsHelper from 'util/DocsHelper';
 
 import { DocumentTitle, PageHeader } from 'components/common';

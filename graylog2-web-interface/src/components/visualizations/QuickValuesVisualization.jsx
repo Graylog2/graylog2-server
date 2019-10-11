@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
-import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
+import { ListGroup, ListGroupItem, Panel } from 'components/graylog';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
@@ -145,13 +145,12 @@ const QuickValuesVisualization = createReactClass({
 
     if (Object.prototype.hasOwnProperty.call(config, key)) {
       return config[key];
-    } else if (Object.prototype.hasOwnProperty.call(propsConfig, key)) {
+    } if (Object.prototype.hasOwnProperty.call(propsConfig, key)) {
       return propsConfig[key];
-    } else if (Object.prototype.hasOwnProperty.call(defaultConfig, key)) {
+    } if (Object.prototype.hasOwnProperty.call(defaultConfig, key)) {
       return defaultConfig[key];
-    } else {
-      throw new Error(`Couldn't find config key "${key}" in any data source`);
     }
+    throw new Error(`Couldn't find config key "${key}" in any data source`);
   },
 
   _formatProps(newProps) {
@@ -199,9 +198,8 @@ const QuickValuesVisualization = createReactClass({
       const anyKey = Object.keys(this.props.data.terms_mapping)[0];
       const fields = this.props.data.terms_mapping[anyKey].map(a => a.field);
       return fields[i];
-    } else {
-      return this.props.fields[i];
     }
+    return this.props.fields[i];
   },
 
   _getDataTableColumns() {
@@ -258,9 +256,8 @@ const QuickValuesVisualization = createReactClass({
     return (d) => {
       if (sortOrder === 'asc') {
         return d * -1;
-      } else {
-        return d;
       }
+      return d;
     };
   },
 
@@ -488,8 +485,8 @@ const QuickValuesVisualization = createReactClass({
                       <th style={{ width: '60%' }}>Value</th>
                       <th>%</th>
                       <th>Count</th>
-                      {displayAddToSearchButton &&
-                      <th style={{ width: 30 }}>&nbsp;</th>
+                      {displayAddToSearchButton
+                      && <th style={{ width: 30 }}>&nbsp;</th>
                       }
                     </tr>
                   </thead>

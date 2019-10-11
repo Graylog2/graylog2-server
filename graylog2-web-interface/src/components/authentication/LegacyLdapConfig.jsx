@@ -1,15 +1,16 @@
 import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import LdapComponent from 'components/ldap/LdapComponent';
 import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
 
 import history from 'util/History';
 import CombinedProvider from 'injection/CombinedProvider';
-const { LdapActions } = CombinedProvider.get('Ldap');
 
 import Routes from 'routing/Routes';
+
+const { LdapActions } = CombinedProvider.get('Ldap');
 
 class LegacyLdapConfig extends React.Component {
   state = {
@@ -34,9 +35,9 @@ class LegacyLdapConfig extends React.Component {
 
   render() {
     const toggleButtonText = this.state.showSettings ? 'LDAP Group Mapping' : 'LDAP Settings';
-    const activeComponent = (this.state.showSettings ?
-      <LdapComponent onCancel={this._onCancel} onShowGroups={this._toggleButton} /> :
-      <LdapGroupsComponent onCancel={this._onSettingsCancel} onShowConfig={this._toggleButton} />);
+    const activeComponent = (this.state.showSettings
+      ? <LdapComponent onCancel={this._onCancel} onShowGroups={this._toggleButton} />
+      : <LdapGroupsComponent onCancel={this._onSettingsCancel} onShowConfig={this._toggleButton} />);
 
     return (
       <DocumentTitle title="LDAP Settings">

@@ -18,6 +18,7 @@ package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -49,16 +50,16 @@ public class Beats2Codec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(Beats2Codec.class);
     private static final String MAP_KEY_SEPARATOR = "_";
     private static final String BEATS_UNKNOWN = "unknown";
-    private static final String CK_BEATS_PREFIX = "beats_prefix";
+    private static final String CK_NO_BEATS_PREFIX = "no_beats_prefix";
 
     private final ObjectMapper objectMapper;
-    private final boolean useBeatPrefix;
+    private final boolean noBeatsPrefix;
 
     @Inject
     public Beats2Codec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
         super(configuration);
 
-        this.useBeatPrefix = configuration.getBoolean(CK_BEATS_PREFIX, false);
+        this.noBeatsPrefix = configuration.getBoolean(CK_NO_BEATS_PREFIX, false);
         this.objectMapper = requireNonNull(objectMapper);
     }
 
@@ -69,6 +70,9 @@ public class Beats2Codec extends AbstractCodec {
         final JsonNode event;
         try {
             event = objectMapper.readTree(payload);
+            if (event == null) {
+                throw new IOException("null result");
+            }
         } catch (IOException e) {
             LOG.error("Couldn't decode raw message {}", rawMessage);
             return null;
@@ -79,7 +83,7 @@ public class Beats2Codec extends AbstractCodec {
 
     private Message parseEvent(JsonNode event) {
         final String beatsType = event.path("@metadata").path("beat").asText("beat");
-        final String rootPath = useBeatPrefix ? beatsType : "";
+        final String rootPath = noBeatsPrefix ? "" : beatsType;
         final String message = event.path("message").asText("-");
         final String timestampField = event.path("@timestamp").asText();
         final DateTime timestamp = Tools.dateTimeFromString(timestampField);
@@ -89,8 +93,19 @@ public class Beats2Codec extends AbstractCodec {
 
         final Message gelfMessage = new Message(message, hostname, timestamp);
         gelfMessage.addField("beats_type", beatsType);
-        gelfMessage.addField("facility", "beats");
 
+        // This field should be stored without a prefix
+        final String gl2SourceCollector = event.path(Message.FIELD_GL2_SOURCE_COLLECTOR).asText();
+        if (!gl2SourceCollector.isEmpty()) {
+            gelfMessage.addField(Message.FIELD_GL2_SOURCE_COLLECTOR, gl2SourceCollector);
+        }
+
+        // Remove fields that should not be duplicated with a prefix
+        if (event.isObject()) {
+            ObjectNode onode = (ObjectNode) event;
+            onode.remove("message");
+            onode.remove(Message.FIELD_GL2_SOURCE_COLLECTOR);
+        }
         addFlattened(gelfMessage, rootPath, event);
         return gelfMessage;
     }
@@ -159,10 +174,10 @@ public class Beats2Codec extends AbstractCodec {
             final ConfigurationRequest configurationRequest = super.getRequestedConfiguration();
 
             configurationRequest.addField(new BooleanField(
-                    CK_BEATS_PREFIX,
-                    "Add Beats type as prefix",
+                    CK_NO_BEATS_PREFIX,
+                    "Do not add Beats type as prefix",
                     false,
-                    "Use the Beats type as prefix for each field, e. g. \"filebeat_source\"."
+                    "Do not prefix each field with the Beats type, e. g. \"source\" -> \"filebeat_source\"."
             ));
 
             return configurationRequest;

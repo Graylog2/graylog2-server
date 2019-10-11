@@ -2,20 +2,20 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import { Link } from 'react-router';
 
-import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
 
+import Routes from 'routing/Routes';
+import EditDashboardModalTrigger from './EditDashboardModalTrigger';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const StartpageStore = StoreProvider.getStore('Startpage');
-
-import Routes from 'routing/Routes';
 
 const Dashboard = createReactClass({
   displayName: 'Dashboard',
@@ -46,8 +46,11 @@ const Dashboard = createReactClass({
     if (this.isPermitted(this.props.permissions, [`dashboards:edit:${this.props.dashboard.id}`])) {
       dashboardActions = (
         <div className="stream-actions">
-          <EditDashboardModalTrigger id={this.props.dashboard.id} action="edit" title={this.props.dashboard.title}
-                                     description={this.props.dashboard.description} buttonClass="btn-info" />
+          <EditDashboardModalTrigger id={this.props.dashboard.id}
+                                     action="edit"
+                                     title={this.props.dashboard.title}
+                                     description={this.props.dashboard.description}
+                                     buttonClass="btn-info" />
           &nbsp;
           <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
             {setAsStartpageMenuItem}
@@ -70,8 +73,8 @@ const Dashboard = createReactClass({
   },
 
   render() {
-    const createdFromContentPack = (this.props.dashboard.content_pack ?
-      <i className="fa fa-cube" title="Created from content pack" /> : null);
+    const createdFromContentPack = (this.props.dashboard.content_pack
+      ? <i className="fa fa-cube" title="Created from content pack" /> : null);
 
     return (
       <li className="stream">

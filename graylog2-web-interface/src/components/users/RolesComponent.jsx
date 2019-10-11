@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import { Button, Col, Row } from 'react-bootstrap';
 
+import { Button, Col, Row } from 'components/graylog';
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';
@@ -80,16 +80,19 @@ export default createReactClass({
     if (!this.state.rolesLoaded) {
       content = <span>Loading roles...</span>;
     } else if (this.state.showEditRole) {
-      content =
-        (<EditRole initialRole={this.state.editRole}
-                   streams={this.state.streams}
-                   dashboards={this.state.dashboards.dashboards}
-                   onSave={this._saveRole}
-                   cancelEdit={this._clearEditRole} />);
+      content = (
+        <EditRole initialRole={this.state.editRole}
+                  streams={this.state.streams}
+                  dashboards={this.state.dashboards.dashboards}
+                  onSave={this._saveRole}
+                  cancelEdit={this._clearEditRole} />
+      );
     } else {
-      content = (<RoleList roles={this.state.roles}
-                           showEditRole={this._showEditRole}
-                           deleteRole={this._deleteRole} />);
+      content = (
+        <RoleList roles={this.state.roles}
+                  showEditRole={this._showEditRole}
+                  deleteRole={this._deleteRole} />
+      );
     }
 
     let actionButton;

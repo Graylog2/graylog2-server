@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
+import { Button, ButtonGroup, Row, Col, DropdownButton, MenuItem, Label } from 'components/graylog';
 import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
 
 import StreamLink from 'components/streams/StreamLink';
 import MessageFields from 'components/search/MessageFields';
@@ -14,6 +13,8 @@ import { Spinner, ClipboardButton, Timestamp } from 'components/common';
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 import Routes from 'routing/Routes';
+
+const StreamsStore = StoreProvider.getStore('Streams');
 
 class MessageDetail extends React.Component {
   static propTypes = {
@@ -72,8 +73,8 @@ class MessageDetail extends React.Component {
         <a href={nodeURL}>
           <i className="fa fa-code-fork" />
           &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span
-          style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
+          </span>
         </a>
       );
     } else {
@@ -107,7 +108,7 @@ class MessageDetail extends React.Component {
         streamList.push(
           <LinkContainer key={stream.id}
                          to={Routes.stream_edit_example(stream.id, this.props.message.index,
-                                                        this.props.message.id)}>
+                           this.props.message.id)}>
             <MenuItem>{stream.title}</MenuItem>
           </LinkContainer>,
         );
@@ -115,11 +116,16 @@ class MessageDetail extends React.Component {
     });
 
     return (
-      <DropdownButton pullRight bsSize="small" title="Test against stream"
+      <DropdownButton pullRight
+                      bsSize="small"
+                      title="Test against stream"
                       id="select-stream-dropdown">
         { streamList }
-        { (!streamList && !this.props.allStreamsLoaded) && <MenuItem header><i className="fa fa-spin fa-spinner" />
-          Loading streams</MenuItem> }
+        { (!streamList && !this.props.allStreamsLoaded) && (
+        <MenuItem header><i className="fa fa-spin fa-spinner" />
+          Loading streams
+        </MenuItem>
+        ) }
         { (!streamList && this.props.allStreamsLoaded) && <MenuItem header>No streams available</MenuItem> }
       </DropdownButton>
     );
@@ -232,48 +238,51 @@ class MessageDetail extends React.Component {
       messageTitle = <span>{this.props.message.id} <Label bsStyle="warning">Not stored</Label></span>;
     }
 
-    return (<div>
-      <Row className="row-sm">
-        <Col md={12}>
-          {this._formatMessageActions()}
-          <h3 className="message-details-title">
-            <i className="fa fa-envelope" />
+    return (
+      <div>
+        <Row className="row-sm">
+          <Col md={12}>
+            {this._formatMessageActions()}
+            <h3 className="message-details-title">
+              <i className="fa fa-envelope" />
             &nbsp;
-            {messageTitle}
-          </h3>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={3}>
-          <dl className="message-details">
-            {timestamp}
-            {receivedBy}
+              {messageTitle}
+            </h3>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={3}>
+            <dl className="message-details">
+              {timestamp}
+              {receivedBy}
 
-            <dt>Stored in index</dt>
-            <dd>{this.props.message.index ? this.props.message.index : 'Message is not stored'}</dd>
+              <dt>Stored in index</dt>
+              <dd>{this.props.message.index ? this.props.message.index : 'Message is not stored'}</dd>
 
-            { streamIds.size > 0 && <dt>Routed into streams</dt> }
-            { streamIds.size > 0 &&
+              { streamIds.size > 0 && <dt>Routed into streams</dt> }
+              { streamIds.size > 0
+            && (
             <dd className="stream-list">
               <ul>
                 {streams}
               </ul>
             </dd>
+            )
             }
-          </dl>
-        </Col>
-        <Col md={9}>
-          <div>
-            <MessageFields message={this.props.message}
-                           renderForDisplay={this.props.renderForDisplay}
-                           disableFieldActions={this.props.disableFieldActions}
-                           customFieldActions={this.props.customFieldActions}
-                           showDecoration={this.state.showOriginal}
-            />
-          </div>
-        </Col>
-      </Row>
-    </div>);
+            </dl>
+          </Col>
+          <Col md={9}>
+            <div>
+              <MessageFields message={this.props.message}
+                             renderForDisplay={this.props.renderForDisplay}
+                             disableFieldActions={this.props.disableFieldActions}
+                             customFieldActions={this.props.customFieldActions}
+                             showDecoration={this.state.showOriginal} />
+            </div>
+          </Col>
+        </Row>
+      </div>
+    );
   }
 }
 

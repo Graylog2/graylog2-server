@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Badge } from 'react-bootstrap';
+import { Badge } from 'components/graylog';
 import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 
@@ -26,9 +26,11 @@ class ContentPackStatus extends React.Component {
 
   render() {
     const badges = this.props.states.map((state) => {
-      return (<Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(this.props.contentPackId)}>
-        <Badge key={state} bsClass={`badge ${ContentPackStatus.styleMap[state]}`}>{state}</Badge>
-      </Link>);
+      return (
+        <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(this.props.contentPackId)}>
+          <Badge key={state} bsClass={`badge ${ContentPackStatus.styleMap[state]}`}>{state}</Badge>
+        </Link>
+      );
     });
     return (
       <span>

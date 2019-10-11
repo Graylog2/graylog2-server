@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'components/graylog';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 import ObjectUtils from 'util/ObjectUtils';
@@ -54,7 +54,7 @@ class TimeRangeOptionsForm extends React.Component {
 
       options.forEach((o, idx) => {
         if (idx === changedIdx) {
-          let value = e.target.value;
+          let { value } = e.target;
 
           if (field === 'period') {
             value = value.toUpperCase();
@@ -73,8 +73,8 @@ class TimeRangeOptionsForm extends React.Component {
 
   _buildTimeRangeOptions = () => {
     return this.props.options.map((option, idx) => {
-      const period = option.period;
-      const description = option.description;
+      const { period } = option;
+      const { description } = option;
       const errorStyle = ISODurationUtils.durationStyle(period, this.props.validator, 'has-error');
 
       return (

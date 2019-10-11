@@ -1,12 +1,13 @@
 import Reflux from 'reflux';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const AlertNotificationsActions = ActionsProvider.getActions('AlertNotifications');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+
+const AlertNotificationsActions = ActionsProvider.getActions('AlertNotifications');
 
 const AlertNotificationsStore = Reflux.createStore({
   listenables: [AlertNotificationsActions],
@@ -33,7 +34,8 @@ const AlertNotificationsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching available alert notification types failed with status: ${error.message}`,
             'Could not retrieve available alert notifications');
-        });
+        },
+      );
 
     AlertNotificationsActions.available.promise(promise);
   },
@@ -50,7 +52,8 @@ const AlertNotificationsStore = Reflux.createStore({
       (error) => {
         UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
           'Could not retrieve alert notifications');
-      });
+      },
+    );
 
     AlertNotificationsActions.listAll.promise(promise);
   },

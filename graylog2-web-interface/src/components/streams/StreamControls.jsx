@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 import { IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -58,7 +58,7 @@ const StreamControls = createReactClass({
   },
 
   render() {
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     return (
       <span>

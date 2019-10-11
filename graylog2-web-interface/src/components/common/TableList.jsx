@@ -3,7 +3,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import lodash from 'lodash';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
 import { ControlledTableList, TypeAheadDataFilter } from 'components/common';
@@ -134,10 +134,12 @@ class TableList extends React.Component {
 
     return (
       <ControlledTableList.Header>
-        {selectedItems > 0 &&
+        {selectedItems > 0
+        && (
         <div className={style.headerComponentsWrapper}>
           {this.props.bulkActionsFactory(selected)}
         </div>
+        )
         }
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"

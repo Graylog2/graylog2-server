@@ -1,21 +1,23 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import StoreProvider from 'injection/StoreProvider';
-const ConfigurationsStore = StoreProvider.getStore('Configurations');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
+import EventsConfig from 'components/configurations/EventsConfig';
 
-import {} from 'components/maps/configurations'
+import {} from 'components/maps/configurations';
+
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
+const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const ConfigurationsPage = createReactClass({
   displayName: 'ConfigurationsPage',
@@ -32,6 +34,7 @@ const ConfigurationsPage = createReactClass({
     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
     ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
     ConfigurationActions.list(this.SIDECAR_CONFIG);
+    ConfigurationActions.list(this.EVENTS_CONFIG);
 
     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
       ConfigurationActions.list(systemConfig.configType);
@@ -46,6 +49,7 @@ const ConfigurationsPage = createReactClass({
   SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
   MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
   SIDECAR_CONFIG: 'org.graylog.plugins.sidecar.system.SidecarConfiguration',
+  EVENTS_CONFIG: 'org.graylog.events.configuration.EventsConfiguration',
 
   _getConfig(configType) {
     if (this.state.configuration && this.state.configuration[configType]) {
@@ -102,9 +106,11 @@ const ConfigurationsPage = createReactClass({
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
+    const eventsConfig = this._getConfig(this.EVENTS_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
+    let eventsConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -129,6 +135,14 @@ const ConfigurationsPage = createReactClass({
     } else {
       sidecarConfigComponent = (<Spinner />);
     }
+    if (eventsConfig) {
+      eventsConfigComponent = (
+        <EventsConfig config={eventsConfig}
+                      updateConfig={this._onUpdate(this.EVENTS_CONFIG)} />
+      );
+    } else {
+      eventsConfigComponent = (<Spinner />);
+    }
 
     const pluginConfigRows = this._pluginConfigRows();
 
@@ -151,9 +165,13 @@ const ConfigurationsPage = createReactClass({
             <Col md={6}>
               {sidecarConfigComponent}
             </Col>
+            <Col md={6}>
+              {eventsConfigComponent}
+            </Col>
           </Row>
 
-          {pluginConfigRows.length > 0 && <Row className="content">
+          {pluginConfigRows.length > 0 && (
+          <Row className="content">
             <Col md={12}>
               <h2>Plugins</h2>
               <p className="description">Configuration for installed plugins.</p>
@@ -162,7 +180,8 @@ const ConfigurationsPage = createReactClass({
                 {pluginConfigRows}
               </div>
             </Col>
-          </Row>}
+          </Row>
+          )}
         </span>
       </DocumentTitle>
     );

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { FormGroup, ControlLabel } from 'react-bootstrap';
+import { FormGroup, ControlLabel } from 'components/graylog';
 import { Select } from 'components/common';
 import SearchUtils from 'util/SearchUtils';
 

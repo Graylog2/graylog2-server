@@ -2,25 +2,50 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import numeral from 'numeral';
+import { NavItem } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
-const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 import { Spinner } from 'components/common';
+
+import styles from './GlobalThroughput.css';
+
+const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 
 const GlobalThroughput = createReactClass({
   displayName: 'GlobalThroughput',
   mixins: [Reflux.connect(GlobalThroughputStore)],
 
+  getInitialState() {
+    return { throughput: { loading: true } };
+  },
+
   render() {
-    if (!this.state.throughput) {
-      return <Spinner />;
+    const { throughput } = this.state;
+    let output = <Spinner text="" />;
+
+    if (!throughput.loading) {
+      const inputNumeral = numeral(throughput.input).format('0,0');
+      const outputNumeral = numeral(throughput.output).format('0,0');
+
+      output = (
+        <strong className={styles['total-throughput__content']}
+                aria-label={`In ${inputNumeral} / Out ${outputNumeral} msg/s`}>
+          <span className={`${styles['total-throughput__data']} ${styles['total-throughput__data--in']}`}>
+            <span>{inputNumeral}</span> <i>in</i>
+          </span>
+          <span className={styles['total-throughput__data']}>
+            <span>{outputNumeral}</span> <i>out</i>
+          </span>
+        </strong>
+      );
     }
+
+
     return (
-      <span>
-        In <strong className="total-throughput">{numeral(this.state.throughput.input).format('0,0')}</strong>{' '}
-        / Out <strong className="total-throughput">{numeral(this.state.throughput.output).format('0,0')}</strong> msg/s
-      </span>
+      <NavItem className={styles['total-throughput']} {...this.props}>
+        {output}
+      </NavItem>
     );
   },
 });

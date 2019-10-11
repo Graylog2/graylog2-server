@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
@@ -12,6 +12,7 @@ import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 import Spinner from 'components/common/Spinner';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
@@ -82,12 +83,14 @@ class StreamRulesEditor extends React.Component {
         return (
           <span>
             <i className="fa fa-check" style={{ color: 'green' }} /> This message would be routed to this stream.
-          </span>);
+          </span>
+        );
       }
       return (
         <span>
           <i className="fa fa-remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
-          </span>);
+        </span>
+      );
     }
     return ('Please load a message to check if it would match against these rules and therefore be routed into this stream.');
   };
@@ -106,8 +109,9 @@ class StreamRulesEditor extends React.Component {
               <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded} />
             </div>
 
-            <div className="spinner" style={{ display: 'none' }}><h2><i
-              className="fa fa-spinner fa-spin" /> &nbsp;Loading message</h2></div>
+            <div className="spinner" style={{ display: 'none' }}><h2><i className="fa fa-spinner fa-spin" /> &nbsp;Loading message
+            </h2>
+            </div>
 
             <div className="sample-message-display" style={{ display: 'none', marginTop: '5px' }}>
               <strong>Next step:</strong>
@@ -121,8 +125,10 @@ class StreamRulesEditor extends React.Component {
               <button className="btn btn-success show-stream-rule" onClick={this._onAddStreamRule}>
                 Add stream rule
               </button>
-              <StreamRuleForm ref={(newStreamRuleForm) => { this.newStreamRuleForm = newStreamRuleForm; }} title="New Stream Rule"
-                              streamRuleTypes={this.state.streamRuleTypes} onSubmit={this._onStreamRuleFormSubmit} />
+              <StreamRuleForm ref={(newStreamRuleForm) => { this.newStreamRuleForm = newStreamRuleForm; }}
+                              title="New Stream Rule"
+                              streamRuleTypes={this.state.streamRuleTypes}
+                              onSubmit={this._onStreamRuleFormSubmit} />
             </div>
 
             <h2>
@@ -133,8 +139,10 @@ class StreamRulesEditor extends React.Component {
 
             <MatchingTypeSwitcher stream={this.state.stream} onChange={this.loadData} />
             <Alert bsStyle={styles}>
-              <StreamRuleList stream={this.state.stream} streamRuleTypes={this.state.streamRuleTypes}
-                              permissions={this.props.currentUser.permissions} matchData={this.state.matchData} />
+              <StreamRuleList stream={this.state.stream}
+                              streamRuleTypes={this.state.streamRuleTypes}
+                              permissions={this.props.currentUser.permissions}
+                              matchData={this.state.matchData} />
             </Alert>
 
             <p style={{ marginTop: '10px' }}>

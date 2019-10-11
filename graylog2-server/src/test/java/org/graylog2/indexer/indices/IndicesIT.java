@@ -47,6 +47,7 @@ import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -103,7 +104,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
         indices = new Indices(client(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), client()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);
@@ -294,7 +295,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
             assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
 
             final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
-            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
+            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES).toTemplate(indexSetConfig, indexSet.getIndexWildcard());
             assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
         } finally {
             deleteTemplate(templateName);

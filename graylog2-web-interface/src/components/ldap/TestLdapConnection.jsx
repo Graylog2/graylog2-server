@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button, Alert } from 'react-bootstrap';
 
+import { Row, Col, Alert, Button } from 'components/graylog';
 import ActionsProvider from 'injection/ActionsProvider';
+
 const LdapActions = ActionsProvider.getActions('Ldap');
 
 class TestLdapConnection extends React.Component {
@@ -58,7 +59,7 @@ class TestLdapConnection extends React.Component {
   };
 
   render() {
-    const serverConnectionStatus = this.state.serverConnectionStatus;
+    const { serverConnectionStatus } = this.state;
     const isDisabled = this.props.disabled || this.props.ldapUri.hostname() === '' || serverConnectionStatus.loading;
 
     let serverConnectionResult;
@@ -73,13 +74,14 @@ class TestLdapConnection extends React.Component {
       <div className="form-group">
         <Row>
           <Col sm={9} smOffset={3}>
-            <Button id="ldap-test-connection" bsStyle={this._getServerConnectionStyle()}
+            <Button id="ldap-test-connection"
+                    bsStyle={this._getServerConnectionStyle()}
                     disabled={isDisabled}
                     onClick={this._testServerConnection}>
               {serverConnectionStatus.loading ? 'Testing...' : 'Test Server Connection'}
             </Button>
-            <span
-              className="help-block">Performs a background connection check with the address and credentials above.</span>
+            <span className="help-block">Performs a background connection check with the address and credentials above.
+            </span>
             {serverConnectionResult}
           </Col>
         </Row>

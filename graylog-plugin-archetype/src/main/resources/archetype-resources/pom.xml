@@ -92,11 +92,19 @@
             <version>${graylog.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Include source from test-jar to reuse test classes. -->
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-server</artifactId>
+            <version>${graylog.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
         <resources>
-            <resource><directory>build</directory></resource>
+            <resource><directory>${web.build-dir}</directory></resource>
             <resource>
               <directory>src/main/resources</directory>
               <filtering>true</filtering>

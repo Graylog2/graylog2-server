@@ -1,16 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Alert, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
+import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import MessageShow from 'components/search/MessageShow';
 
+import NumberUtils from 'util/NumberUtils';
 import SimulationChanges from './SimulationChanges';
 import SimulationPreview from './SimulationPreview';
 import SimulationTrace from './SimulationTrace';
 
-import NumberUtils from 'util/NumberUtils';
 
 const SimulationResults = createReactClass({
   displayName: 'SimulationResults',
@@ -136,16 +136,20 @@ const SimulationResults = createReactClass({
         </Col>
         <Col md={6}>
           <div className="pull-right">
-            <DropdownButton id="simulation-view-options" title="More results" onSelect={this._changeViewOptions}
-                            bsStyle="default" bsSize="small" pullRight>
+            <DropdownButton id="simulation-view-options"
+                            title="More results"
+                            onSelect={this._changeViewOptions}
+                            bsStyle="default"
+                            bsSize="small"
+                            pullRight>
               {this._getViewOptionsMenuItems()}
             </DropdownButton>
           </div>
           <h1>Simulation results</h1>
           <p>
-            {this.props.isLoading ?
-              'Simulating message processing, please wait a moment.' :
-              `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(this.props.simulationResults.took_microseconds)} µs.`}
+            {this.props.isLoading
+              ? 'Simulating message processing, please wait a moment.'
+              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(this.props.simulationResults.took_microseconds)} µs.`}
           </p>
           {errorMessage}
           {this._getViewComponent(streams)}

@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs.transports.netty;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -31,7 +30,6 @@ public class DatagramPacketHandler extends MessageToMessageDecoder<DatagramPacke
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket msg, List<Object> out) throws Exception {
-        final ByteBuf content = msg.content();
-        out.add(ReferenceCountUtil.retain(content));
+        out.add(ReferenceCountUtil.retain(SenderEnvelope.of(msg.content(), msg.sender())));
     }
 }

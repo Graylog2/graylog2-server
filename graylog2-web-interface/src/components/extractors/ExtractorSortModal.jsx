@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Modal, Button } from 'react-bootstrap';
+import { Row, Col, Modal, Button } from 'components/graylog';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SortableList from 'components/common/SortableList';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
 
 class ExtractorSortModal extends React.Component {

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { OverlayTrigger, Popover } from 'react-bootstrap';
+import { OverlayTrigger, Popover } from 'components/graylog';
 
 import Styles from './ErrorPopover.css';
 
@@ -18,9 +18,11 @@ class ErrorPopover extends React.Component {
   };
 
   render() {
-    const overlay = (<Popover id="error-popover" title={this.props.title} className={Styles.overlay}>
-      {this.props.errorText}
-    </Popover>);
+    const overlay = (
+      <Popover id="error-popover" title={this.props.title} className={Styles.overlay}>
+        {this.props.errorText}
+      </Popover>
+    );
 
     return (
       <OverlayTrigger trigger={['hover', 'focus']} placement={this.props.placement} overlay={overlay}>

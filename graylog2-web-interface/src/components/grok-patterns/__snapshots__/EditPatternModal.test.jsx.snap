@@ -5,6 +5,7 @@ exports[`<EditPatternModal /> should render a modal button with as create 1`] = 
   <button
     className="btn btn-success"
     onClick={[Function]}
+    type="button"
   >
     Create pattern
   </button>
@@ -16,6 +17,7 @@ exports[`<EditPatternModal /> should render a modal button with as edit 1`] = `
   <button
     className="btn btn-info btn-xs"
     onClick={[Function]}
+    type="button"
   >
     <span>
       Edit

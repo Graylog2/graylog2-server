@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const DecoratorsStore = Reflux.createStore({

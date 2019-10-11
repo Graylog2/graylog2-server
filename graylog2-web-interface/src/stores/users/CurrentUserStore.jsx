@@ -28,7 +28,7 @@ const CurrentUserStore = Reflux.createStore({
 
   sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
-      const username = sessionInfo.username;
+      const { username } = sessionInfo;
       this.update(username);
     } else {
       this.currentUser = undefined;

@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert, Button } from 'components/graylog';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const IndicesActions = ActionsProvider.getActions('Indices');
 
 import { IndexRangeSummary } from 'components/indices';
+
+const IndicesActions = ActionsProvider.getActions('Indices');
 
 class ClosedIndexDetails extends React.Component {
   static propTypes = {
@@ -29,7 +30,8 @@ class ClosedIndexDetails extends React.Component {
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />
         <Alert bsStyle="info"><i className="fa fa-info-circle" /> This index is closed. Index information is not available{' '}
-          at the moment, please reopen the index and try again.</Alert>
+          at the moment, please reopen the index and try again.
+        </Alert>
 
         <hr style={{ marginBottom: '5', marginTop: '10' }} />
 

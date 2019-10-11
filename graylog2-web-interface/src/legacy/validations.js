@@ -1,5 +1,6 @@
 import DateTime from 'logic/datetimes/DateTime';
 import $ from 'jquery';
+
 global.jQuery = $;
 require('bootstrap/js/tooltip');
 require('bootstrap/js/popover');
@@ -7,7 +8,7 @@ require('bootstrap/js/popover');
 export function validate(formContainer) {
   let errors = false;
   $('.validatable', formContainer).each(function () {
-        // Do not check disabled form fields.
+    // Do not check disabled form fields.
     if (!$(this).is(':disabled')) {
       const dataValidations = $(this).attr('data-validate');
       if (dataValidations !== undefined) {
@@ -134,7 +135,7 @@ function validateDatetimeFormat(el) {
     DateTime.parseFromString(dateString);
     return true;
   } catch (e) {
-        // Do nothing
+    // Do nothing
   }
   return false;
 }
@@ -149,7 +150,7 @@ function validateAbsoluteTimerange(el) {
 
     return (from.isBefore(to) || from.isSame(to));
   } catch (e) {
-        // Do nothing
+    // Do nothing
   }
 
   return false;

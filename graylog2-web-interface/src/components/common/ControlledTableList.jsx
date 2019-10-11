@@ -1,7 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup } from 'components/graylog';
 
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';

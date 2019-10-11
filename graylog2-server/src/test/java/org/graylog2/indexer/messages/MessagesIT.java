@@ -23,6 +23,7 @@ import io.searchbox.core.Index;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,14 +32,13 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assume.assumeTrue;
 
 public class MessagesIT extends ElasticsearchBaseTest {
     private Messages messages;
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), client());
+        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder());
     }
 
     @Test
@@ -50,7 +50,8 @@ public class MessagesIT extends ElasticsearchBaseTest {
         source.put("timestamp", "2017-04-13 15:29:00.000");
         final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
         final DocumentResult indexResponse = client().execute(indexRequest);
-        assumeTrue(indexResponse.isSucceeded());
+
+        assertThat(indexResponse.isSucceeded()).isTrue();
 
         final ResultMessage resultMessage = messages.get("1", index);
         final Message message = resultMessage.getMessage();

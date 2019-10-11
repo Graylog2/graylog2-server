@@ -5,9 +5,10 @@ import Reflux from 'reflux';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
-const NodesStore = StoreProvider.getStore('Nodes');
 
 import { Spinner } from 'components/common';
+
+const NodesStore = StoreProvider.getStore('Nodes');
 
 const NodeOrGlobalSelect = createReactClass({
   displayName: 'NodeOrGlobalSelect',

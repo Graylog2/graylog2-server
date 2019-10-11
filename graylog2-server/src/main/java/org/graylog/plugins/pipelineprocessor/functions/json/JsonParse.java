@@ -50,7 +50,11 @@ public class JsonParse extends AbstractFunction<JsonNode> {
     public JsonNode evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
         try {
-            return objectMapper.readTree(value);
+            final JsonNode node = objectMapper.readTree(value);
+            if (node == null) {
+                throw new IOException("null result");
+            }
+            return node;
         } catch (IOException e) {
             log.warn("Unable to parse JSON", e);
         }

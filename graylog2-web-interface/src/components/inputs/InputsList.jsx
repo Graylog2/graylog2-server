@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
-import naturalSort from 'javascript-natural-sort';
+import { Row, Col } from 'components/graylog';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 
 import EntityList from 'components/common/EntityList';
 import { IfPermitted, Spinner, SearchForm } from 'components/common';
@@ -53,13 +53,13 @@ const InputsList = createReactClass({
   },
 
   _splitInputs(state) {
-    const inputs = state.inputs;
+    const { inputs } = state;
     const globalInputs = inputs
       .filter(input => input.global === true)
-      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
+      .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
     let localInputs = inputs
       .filter(input => input.global === false)
-      .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
+      .sort((inputA, inputB) => naturalSortIgnoreCase(inputA.title, inputB.title));
 
     if (this.props.node) {
       localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
@@ -73,8 +73,8 @@ const InputsList = createReactClass({
   },
 
   _isLoading() {
-    return !(this.state.localInputs && this.state.globalInputs && this.state.node && this.state.filteredLocalInputs &&
-      this.state.filteredGlobalInputs);
+    return !(this.state.localInputs && this.state.globalInputs && this.state.node && this.state.filteredLocalInputs
+      && this.state.filteredGlobalInputs);
   },
 
   _formatInput(input) {
@@ -139,10 +139,12 @@ const InputsList = createReactClass({
 
     return (
       <div>
-        {!this.props.node &&
+        {!this.props.node
+        && (
         <IfPermitted permissions="inputs:create">
           <CreateInputControl />
         </IfPermitted>
+        )
         }
 
         <Row id="filter-input" className="content input-list">
@@ -159,8 +161,8 @@ const InputsList = createReactClass({
               <small>{this.state.globalInputs.length} configured{this._nodeAffix()}</small>
             </h2>
             <EntityList bsNoItemsStyle="info"
-                        noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.' :
-                          'No global inputs match the filter'}
+                        noItemsText={this.state.globalInputs.length <= 0 ? 'There are no global inputs.'
+                          : 'No global inputs match the filter'}
                         items={this.state.filteredGlobalInputs.map(input => this._formatInput(input))} />
             <br />
             <br />
@@ -170,8 +172,8 @@ const InputsList = createReactClass({
               <small>{this.state.localInputs.length} configured{this._nodeAffix()}</small>
             </h2>
             <EntityList bsNoItemsStyle="info"
-                        noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.' :
-                          'No local inputs match the filter'}
+                        noItemsText={this.state.localInputs.length <= 0 ? 'There are no local inputs.'
+                          : 'No local inputs match the filter'}
                         items={this.state.filteredLocalInputs.map(input => this._formatInput(input))} />
           </Col>
         </Row>

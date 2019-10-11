@@ -2,17 +2,18 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
+import { Button, DropdownButton } from 'components/graylog';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import GraphVisualization from 'components/visualizations/GraphVisualization';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
-const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 import StringUtils from 'util/StringUtils';
+
+const SearchStore = StoreProvider.getStore('Search');
+const FieldGraphsStore = StoreProvider.getStore('FieldGraphs');
 
 const LegacyFieldGraph = createReactClass({
   displayName: 'LegacyFieldGraph',
@@ -64,8 +65,8 @@ const LegacyFieldGraph = createReactClass({
   },
 
   _getWidgetConfiguration() {
-    return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId) :
-      FieldGraphsStore.getFieldGraphAsCreateWidgetRequestParams(this.props.graphId);
+    return this.props.stacked ? FieldGraphsStore.getStackedGraphAsCreateWidgetRequestParams(this.props.graphId)
+      : FieldGraphsStore.getFieldGraphAsCreateWidgetRequestParams(this.props.graphId);
   },
 
   _submenuItemClassName(configKey, value) {

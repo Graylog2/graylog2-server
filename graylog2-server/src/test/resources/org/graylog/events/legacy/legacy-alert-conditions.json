@@ -1,0 +1,325 @@
+{
+  "streams": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "title" : "Test Stream 1",
+      "alert_conditions" : [
+        {
+          "id" : "00000000-0000-0000-0000-000000000001",
+          "type" : "message_count",
+          "title" : "Message Count - MORE",
+          "parameters" : {
+            "backlog" : 10,
+            "repeat_notifications" : false,
+            "query" : "hello:world",
+            "grace" : 2,
+            "threshold_type" : "MORE",
+            "threshold" : 1,
+            "time" : 10
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000002",
+          "type" : "message_count",
+          "title" : "Message Count - LESS",
+          "parameters" : {
+            "backlog" : 0,
+            "repeat_notifications" : false,
+            "query" : "",
+            "grace" : 0,
+            "threshold_type" : "LESS",
+            "threshold" : 42,
+            "time" : 4
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        }
+      ],
+      "description" : "A test stream.",
+      "content_pack" : null,
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin",
+      "disabled" : false,
+      "index_set_id" : "54e3deadbeefdeadbeefaffe",
+      "matching_type" : "AND",
+      "outputs" : [],
+      "remove_matches_from_default_stream" : false
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "title" : "Test Stream 2",
+      "alert_conditions" : [
+        {
+          "id" : "00000000-0000-0000-0000-000000000003",
+          "type" : "field_value",
+          "title" : "Field Value - HIGHER - MEAN",
+          "parameters" : {
+            "backlog" : 15,
+            "repeat_notifications" : false,
+            "field" : "test_field_1",
+            "query" : "*",
+            "grace" : 1,
+            "threshold_type" : "HIGHER",
+            "threshold" : 23,
+            "time" : 5,
+            "type" : "MEAN"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000004",
+          "type" : "field_value",
+          "title" : "Field Value - LOWER - SUM",
+          "parameters" : {
+            "backlog" : 15,
+            "repeat_notifications" : false,
+            "field" : "test_field_1",
+            "query" : "*",
+            "grace" : 1,
+            "threshold_type" : "LOWER",
+            "threshold" : 23,
+            "time" : 5,
+            "type" : "SUM"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000005",
+          "type" : "field_value",
+          "title" : "Field Value - LOWER - MIN",
+          "parameters" : {
+            "backlog" : 15,
+            "repeat_notifications" : false,
+            "field" : "test_field_1",
+            "query" : "*",
+            "grace" : 1,
+            "threshold_type" : "LOWER",
+            "threshold" : 23,
+            "time" : 5,
+            "type" : "MIN"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000006",
+          "type" : "field_value",
+          "title" : "Field Value - LOWER - MAX",
+          "parameters" : {
+            "backlog" : 15,
+            "repeat_notifications" : false,
+            "field" : "test_field_1",
+            "query" : "*",
+            "grace" : 1,
+            "threshold_type" : "LOWER",
+            "threshold" : 23,
+            "time" : 5,
+            "type" : "MAX"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000007",
+          "type" : "field_value",
+          "title" : "Field Value - LOWER - STDDEV",
+          "parameters" : {
+            "backlog" : 15,
+            "repeat_notifications" : false,
+            "field" : "test_field_1",
+            "query" : "*",
+            "grace" : 1,
+            "threshold_type" : "HIGHER",
+            "threshold" : 23,
+            "time" : 5,
+            "type" : "STDDEV"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        }
+      ],
+      "description" : "A test stream.",
+      "content_pack" : null,
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin",
+      "disabled" : false,
+      "index_set_id" : "54e3deadbeefdeadbeefaffe",
+      "matching_type" : "AND",
+      "outputs" : [],
+      "remove_matches_from_default_stream" : false
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "title" : "Test Stream 3",
+      "alert_conditions" : [
+        {
+          "id" : "00000000-0000-0000-0000-000000000008",
+          "type" : "field_content_value",
+          "title" : "Field Content - WITHOUT QUERY",
+          "parameters" : {
+            "backlog" : 100,
+            "repeat_notifications" : false,
+            "field" : "test_field_2",
+            "query" : "",
+            "grace" : 2,
+            "value" : "hello"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000009",
+          "type" : "field_content_value",
+          "title" : "Field Content - WITH QUERY",
+          "parameters" : {
+            "backlog" : 0,
+            "repeat_notifications" : false,
+            "field" : "test_field_3",
+            "query" : "foo:bar",
+            "grace" : 0,
+            "value" : "foo"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        },
+        {
+          "id" : "00000000-0000-0000-0000-000000000010",
+          "type" : "field_content_value",
+          "parameters" : {
+            "backlog" : 0,
+            "repeat_notifications" : false,
+            "field" : "test_field_3",
+            "query" : "foo:bar",
+            "grace" : 0,
+            "value" : "foo"
+          },
+          "creator_user_id" : "admin",
+          "created_at": {
+            "$date": "2019-01-01T00:00:00.000Z"
+          }
+        }
+      ],
+      "description" : "A test stream.",
+      "content_pack" : null,
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin",
+      "disabled" : false,
+      "index_set_id" : "54e3deadbeefdeadbeefaffe",
+      "matching_type" : "AND",
+      "outputs" : [],
+      "remove_matches_from_default_stream" : false
+    }
+  ],
+  "alarmcallbackconfigurations": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "stream_id" : "54e3deadbeefdeadbeef0001",
+      "type" : "org.graylog2.alarmcallbacks.HTTPAlarmCallback",
+      "title" : "HTTP Callback Test",
+      "configuration" : {
+        "url" : "http://localhost:11000/"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "stream_id" : "54e3deadbeefdeadbeef0003",
+      "type" : "org.graylog2.alarmcallbacks.EmailAlarmCallback",
+      "title" : "Email Callback Test",
+      "configuration" : {
+        "user_receivers" : [],
+        "body" : "##########\nAlert Description: ${check_result.resultDescription}\nDate: ${check_result.triggeredAt}\nStream ID: ${stream.id}\nStream title: ${stream.title}\nStream description: ${stream.description}\nAlert Condition Title: ${alertCondition.title}\n${if stream_url}Stream URL: ${stream_url}${end}\n\nTriggered condition: ${check_result.triggeredCondition}\n##########\n\n${if backlog}Last messages accounting for this alert:\n${foreach backlog message}${message}\n\n${end}${else}<No backlog>\n${end}\n",
+        "sender" : "graylog@example.org",
+        "subject" : "Graylog alert for stream: ${stream.title}: ${check_result.resultDescription}",
+        "email_receivers" : ["jane@example.org"]
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "local:admin"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "stream_id" : "54e3deadbeefdeadbeef0003",
+      "type" : "org.graylog2.plugins.slack.callback.SlackAlarmCallback",
+      "title" : "Slack Callback Test",
+      "configuration" : {
+        "icon_url" : "",
+        "graylog2_url" : "",
+        "link_names" : true,
+        "webhook_url" : "http://example.com/slack-hook",
+        "color" : "#FF0000",
+        "icon_emoji" : "",
+        "user_name" : "Graylog",
+        "backlog_items" : 5,
+        "custom_fields" : "",
+        "proxy_address" : "",
+        "channel" : "#channel",
+        "notify_channel" : false,
+        "add_attachment" : true,
+        "short_mode" : false
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "jane"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0004"
+      },
+      "stream_id" : "54e3deadbeefdeadbeef0001",
+      "type" : "org.graylog2.alarmcallbacks.HTTPAlarmCallback",
+      "configuration" : {
+        "url" : "http://localhost:11000/"
+      },
+      "created_at": {
+        "$date": "2019-01-01T00:00:00.000Z"
+      },
+      "creator_user_id" : "admin"
+    }
+  ]
+}

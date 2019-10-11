@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Widget /> should render with empty props 1`] = `
+<div
+  className="widget"
+  data-widget-id="widgetId"
+  style={
+    Object {
+      "overflow": "hidden",
+    }
+  }
+>
+  <div
+    style={
+      Object {
+        "height": "95%",
+        "padding": "5px",
+      }
+    }
+  >
+    <span>
+      <widget-header
+        editing={false}
+        onRename={[Function]}
+        title="Widget Title"
+      >
+        <span>
+          <i
+            className="fa fa-arrows-h button"
+            onClick={[Function]}
+            role="link"
+            tabIndex={0}
+          />
+        </span>
+         
+        <span
+          onClick={[Function]}
+          onMouseDown={[Function]}
+          role="presentation"
+        >
+          <span
+            onClick={[Function]}
+            onKeyDown={[Function]}
+            role="presentation"
+          >
+            <span>
+              <i
+                className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+              />
+            </span>
+          </span>
+        </span>
+      </widget-header>
+      <div
+        className="spinnerContainer"
+      >
+        <i
+          className="fa fa-spin fa-3x fa-refresh spinner"
+        />
+      </div>
+    </span>
+  </div>
+</div>
+`;

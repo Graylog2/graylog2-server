@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { markdown } from 'markdown';
-import { Row, Col, Well } from 'react-bootstrap';
+import { Row, Col, Well } from 'components/graylog';
 
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
 import ContentPackConstraints from 'components/content-packs/ContentPackConstraints';
@@ -12,8 +12,8 @@ import 'components/content-packs/ContentPackDetails.css';
 
 const ContentPackDetails = (props) => {
   const markdownDescription = markdown.toHTML(props.contentPack.description || '');
-  const contentPack = props.contentPack;
-  const constraints = props.constraints;
+  const { contentPack } = props;
+  const { constraints } = props;
 
   return (
     <Row>
@@ -33,7 +33,8 @@ const ContentPackDetails = (props) => {
               { contentPack.entities && !props.verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>) }
             </dl>
           </div>
-          { contentPack.description &&
+          { contentPack.description
+          && (
           <div>
             <h2>Description</h2>
             <br />
@@ -41,22 +42,25 @@ const ContentPackDetails = (props) => {
               {/* eslint-disable-next-line react/no-danger */}
               <div dangerouslySetInnerHTML={{ __html: markdownDescription }} />
             </Well>
-          </div> }
+          </div>
+          ) }
           <br />
           { contentPack.status && <ContentPackStatus states={contentPack.states} /> }
           <br />
           <br />
-          { contentPack.requires && props.showConstraints &&
+          { contentPack.constraints && props.showConstraints
+          && (
           <div>
             <ContentPackConstraints constraints={constraints} />
             <br />
           </div>
+          )
           }
-          { contentPack.entities && contentPack.entities.length > 0 && props.verbose &&
-          <ContentPackEntitiesList contentPack={props.contentPack} readOnly />
+          { contentPack.entities && contentPack.entities.length > 0 && props.verbose
+          && <ContentPackEntitiesList contentPack={props.contentPack} readOnly />
           }
-          { contentPack.parameters && contentPack.parameters.length > 0 && props.verbose &&
-          <ContentPackParameterList contentPack={props.contentPack} readOnly />
+          { contentPack.parameters && contentPack.parameters.length > 0 && props.verbose
+          && <ContentPackParameterList contentPack={props.contentPack} readOnly />
           }
         </div>
       </Col>

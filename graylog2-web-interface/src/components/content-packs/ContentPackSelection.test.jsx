@@ -5,6 +5,7 @@ import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
+import Entity from 'logic/content-packs/Entity';
 
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
@@ -22,22 +23,24 @@ describe('<ContentPackSelection />', () => {
       .url('http://example.com')
       .build();
 
+    const entity = Entity.builder()
+      .v('1')
+      .type({ name: 'spaceship', version: '1' })
+      .id('beef123')
+      .data({
+        title: { value: 'breq', type: 'string' },
+      })
+      .build();
     const entities = {
-      spaceship: [{
-        title: 'breq',
-        type: {
-          name: 'spaceship',
-          version: '1',
-        },
-        id: 'beef123',
-      }],
+      spaceship: [entity],
     };
 
     const wrapper = renderer.create(
       <ContentPackSelection contentPack={contentPack}
+                            edit
                             entities={entities}
-                            selectedEntities={{}}
-      />);
+                            selectedEntities={{}} />,
+    );
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -83,8 +86,8 @@ describe('<ContentPackSelection />', () => {
       <ContentPackSelection contentPack={contentPack}
                             selectedEntities={{}}
                             onStateChange={changeFn}
-                            entities={entities}
-      />);
+                            entities={entities} />,
+    );
     wrapper.find('input[type="checkbox"]').at(0).simulate('change', { target: { checked: true } });
     expect(changeFn.mock.calls.length).toBe(1);
   });
@@ -118,8 +121,8 @@ describe('<ContentPackSelection />', () => {
       <ContentPackSelection contentPack={contentPack}
                             selectedEntities={selectedEntities}
                             onStateChange={changeFn}
-                            entities={entities}
-      />);
+                            entities={entities} />,
+    );
     wrapper.find('div.fa-stack').simulate('click');
     wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
     expect(changeFn.mock.calls.length).toBe(1);
@@ -147,7 +150,8 @@ describe('<ContentPackSelection />', () => {
     const entities = { spaceship: [breq, falcon] };
     const wrapper = mount(
       <ContentPackSelection contentPack={contentPack}
-                            entities={entities} />);
+                            entities={entities} />,
+    );
 
     /*
      * Search for falcon

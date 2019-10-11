@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
@@ -35,6 +36,7 @@ import org.graylog2.contentpacks.model.parameters.LongParameter;
 import org.graylog2.contentpacks.model.parameters.StringParameter;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,11 +62,24 @@ public class ContentPackTest {
     }
 
     private ContentPack createTestContentPack() {
-        final ObjectNode entityData = objectMapper.createObjectNode()
-                .put("bool", true)
-                .put("double", 1234.5678D)
-                .put("long", 1234L)
-                .put("string", "foobar");
+        final ObjectNode boolData = objectMapper.createObjectNode()
+                .put("@type", "boolean")
+                .put("@value", true);
+        final ObjectNode doubleData = objectMapper.createObjectNode()
+                .put("@type", "double")
+                .put("@value", 1234.5678D);
+        final ObjectNode longData = objectMapper.createObjectNode()
+                .put("@type", "long")
+                .put("@value", 1234L);
+        final ObjectNode stringData = objectMapper.createObjectNode()
+                .put("@type", "string")
+                .put("@value", "foobar");
+
+        final ObjectNode entityData = objectMapper.createObjectNode();
+                entityData.set("bool", boolData);
+                entityData.set("double", doubleData);
+                entityData.set("long", longData);
+                entityData.set("string", stringData);
 
         return ContentPackV1.builder()
                 .id(ModelId.of("a7917ee5-3e1a-4f89-951d-aeb604616998"))
@@ -74,17 +89,18 @@ public class ContentPackTest {
                 .description("Description")
                 .vendor("Graylog, Inc.")
                 .url(URI.create("https://www.graylog.org"))
-                .requires(ImmutableSet.of(
-                        GraylogVersionConstraint.builder().version("^3.0.0").build(),
-                        PluginVersionConstraint.builder().pluginId("org.example.TestPlugin").version("^1.2.3").build()))
+                .createdAt(DateTime.parse("2018-12-17T16:18:12.000Z"))
+                .serverVersion(Version.valueOf("3.0.0-alpha.6-SNAPSHOT"))
                 .parameters(ImmutableSet.of(
                         BooleanParameter.builder().name("MY_BOOLEAN").title("My Boolean").description("Some description").build(),
                         DoubleParameter.builder().name("MY_DOUBLE").title("My Double").description("Some description").defaultValue(Optional.of(12.34D)).build(),
                         IntegerParameter.builder().name("MY_INTEGER").title("My Integer").description("Some description").defaultValue(Optional.of(23)).build(),
                         LongParameter.builder().name("MY_LONG").title("My Long").description("Some description").defaultValue(Optional.of(42L)).build(),
                         StringParameter.builder().name("MY_STRING").title("My String").description("Some description").defaultValue(Optional.of("Default Value")).build()))
-                .entities(ImmutableSet.of(
-                        EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData).build()))
+                .entities(ImmutableSet.of(EntityV1.builder().id(ModelId.of("fafd32d1-7f71-41a8-89f5-53c9b307d4d5")).type(ModelTypes.INPUT_V1).version(ModelVersion.of("1")).data(entityData)
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version("^3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.example.TestPlugin").version("^1.2.3").build())).build()))
                 .build();
     }
 
@@ -102,8 +118,6 @@ public class ContentPackTest {
         assertThat(jsonNode.path("description").asText()).isEqualTo("Description");
         assertThat(jsonNode.path("vendor").asText()).isEqualTo("Graylog, Inc.");
         assertThat(jsonNode.path("url").asText()).isEqualTo("https://www.graylog.org");
-        final JsonNode requiresNode = jsonNode.withArray("requires");
-        assertThat(requiresNode).hasSize(2);
         final JsonNode parametersNode = jsonNode.withArray("parameters");
         assertThat(parametersNode).hasSize(5);
         final JsonNode entitiesNode = jsonNode.withArray("entities");
@@ -116,10 +130,10 @@ public class ContentPackTest {
         assertThat(entityNode.path("v").asText()).isEqualTo("1");
         final JsonNode entityDataNode = entityNode.path("data");
         assertThat(entityDataNode.isObject()).isTrue();
-        assertThat(entityDataNode.path("bool").asBoolean()).isEqualTo(true);
-        assertThat(entityDataNode.path("double").asDouble()).isEqualTo(1234.5678D);
-        assertThat(entityDataNode.path("long").asLong()).isEqualTo(1234L);
-        assertThat(entityDataNode.path("string").asText()).isEqualTo("foobar");
+        assertThat(entityDataNode.path("bool").path("@value").asBoolean()).isEqualTo(true);
+        assertThat(entityDataNode.path("double").path("@value").asDouble()).isEqualTo(1234.5678D);
+        assertThat(entityDataNode.path("long").path("@value").asLong()).isEqualTo(1234L);
+        assertThat(entityDataNode.path("string").path("@value").asText()).isEqualTo("foobar");
     }
 
     @Test
@@ -179,9 +193,6 @@ public class ContentPackTest {
         assertThat(contentPackV1.description()).isEqualTo("## Description\\n- Free text description in markdown format");
         assertThat(contentPackV1.vendor()).isEqualTo("Graylog, Inc. <hello@graylog.com>");
         assertThat(contentPackV1.url()).isEqualTo(URI.create("https://github.com/graylog-labs/awesome-content-pack.git"));
-        assertThat(contentPackV1.requires()).containsExactly(
-                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
-                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build());
         assertThat(contentPackV1.parameters()).containsExactly(
                 IntegerParameter.builder()
                         .name("GELF_PORT")
@@ -200,12 +211,18 @@ public class ContentPackTest {
                         .id(ModelId.of("311d9e16-e4d9-485d-a916-337fb4ca0e8b"))
                         .type(ModelTypes.LOOKUP_TABLE_V1)
                         .data(objectMapper.convertValue(expectedLookupTable, JsonNode.class))
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build()))
                         .build(),
                 EntityV1.builder()
                         .version(ModelVersion.of("1"))
                         .id(ModelId.of("2562ac46-65f1-454c-89e1-e9be96bfd5e7"))
                         .type(ModelTypes.LOOKUP_ADAPTER_V1)
                         .data(objectMapper.convertValue(expectedLookupDataAdapter, JsonNode.class))
+                        .constraints(ImmutableSet.of(
+                                GraylogVersionConstraint.builder().version(">=3.0.0").build(),
+                                PluginVersionConstraint.builder().pluginId("org.graylog.plugins.threatintel.ThreatIntelPlugin").version(">=3.0.0").build()))
                         .build()
         );
     }
@@ -426,7 +443,6 @@ public class ContentPackTest {
         assertThat(contentPack.vendor()).isEqualTo("[auto-generated]");
         assertThat(contentPack.url()).isEqualTo(URI.create("https://www.graylog.org/"));
         assertThat(contentPack.parameters()).isEmpty();
-        assertThat(contentPack.requires()).isEmpty();
         assertThat(contentPack.entities()).contains(
                 EntityV1.builder()
                         .id(ModelId.of("53794eebe4b03cdadeadbeef"))

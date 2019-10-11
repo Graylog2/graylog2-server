@@ -111,7 +111,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @POST
     @Timed
     @ApiOperation(value = "Lists existing Sidecar registrations including compatible sidecars using pagination")
-    @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
+    @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.CONFIGURATIONS_READ})
     @NoAuditEvent("this is not changing any data")
     public SidecarListResponse administration(@ApiParam(name = "JSON body", required = true)
                                                 @Valid @NotNull AdministrationRequest request) {
@@ -152,7 +152,7 @@ public class AdministrationResource extends RestResource implements PluginRestRe
     @PUT
     @Timed
     @Path("/action")
-    @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
+    @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @ApiOperation(value = "Set collector actions in bulk")
     @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)

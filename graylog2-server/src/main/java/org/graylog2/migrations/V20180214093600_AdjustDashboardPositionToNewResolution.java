@@ -64,7 +64,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
             return;
         }
 
-        Map<String, String> dashboardIds = new HashMap();
+        Map<String, String> dashboardIds = new HashMap<>();
         for (Dashboard dashboard : dashboardService.all()) {
             final List<WidgetPosition> oldPositions = dashboard.getPositions();
             if (oldPositions.isEmpty()) {
@@ -74,10 +74,10 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
             final List<WidgetPosition> widgetPositions = new ArrayList<>(oldPositions.size());
 
             for (WidgetPosition position : oldPositions) {
-                Integer newWidth = position.width() * 2;
-                Integer newHeight = position.height() * 2;
-                Integer newCol = adjustPosition(position.col());
-                Integer newRow = adjustPosition(position.row());
+                int newWidth = position.width() * 2;
+                int newHeight = position.height() * 2;
+                int newCol = adjustPosition(position.col());
+                int newRow = adjustPosition(position.row());
                 widgetPositions.add(WidgetPosition.builder()
                         .id(position.id())
                         .width(newWidth)
@@ -99,7 +99,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
     /* We double the resolution in space starting with 1.
        To keep widgets on the same position we need to subtract 1 from the result. */
-    private Integer adjustPosition(Integer value) {
+    private int adjustPosition(int value) {
         return value * 2 - 1;
     }
 

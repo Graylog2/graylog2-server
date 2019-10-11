@@ -1,0 +1,8 @@
+:local(.filterPreview) .panel-body {
+    padding: 20px 10px;
+}
+
+:local(.filterPreview) table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}

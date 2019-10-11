@@ -21,6 +21,7 @@ import com.google.common.base.MoreObjects;
 import com.lmax.disruptor.EventFactory;
 import com.lmax.disruptor.EventTranslatorOneArg;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
 
 import java.nio.ByteBuffer;
 
@@ -32,6 +33,9 @@ public class RawMessageEvent {
     // once these fields are set, do NOT rely on rawMessage still being non-null!
     private byte[] messageIdBytes;
     private byte[] encodedRawMessage;
+
+    // We need access to the raw message timestamp after the raw message has been cleared
+    private DateTime messageTimestamp;
 
     public static final EventFactory<RawMessageEvent> FACTORY = new EventFactory<RawMessageEvent>() {
         @Override
@@ -77,6 +81,14 @@ public class RawMessageEvent {
 
     public byte[] getMessageIdBytes() {
         return messageIdBytes;
+    }
+
+    public DateTime getMessageTimestamp() {
+        return messageTimestamp;
+    }
+
+    public void setMessageTimestamp(DateTime messageTimestamp) {
+        this.messageTimestamp = messageTimestamp;
     }
 
     // performance doesn't matter, it's only being called during tracing

@@ -1,6 +1,7 @@
 import moment from 'moment-timezone';
 import AppConfig from 'util/AppConfig';
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 let currentUser = CurrentUserStore.get();
@@ -62,9 +63,8 @@ class DateTime {
   static getUserTimezone() {
     if (currentUser && currentUser.timezone) {
       return currentUser.timezone;
-    } else {
-      return this.getBrowserTimezone() || AppConfig.rootTimeZone() || 'UTC';
     }
+    return this.getBrowserTimezone() || AppConfig.rootTimeZone() || 'UTC';
   }
 
   static getBrowserTimezone() {

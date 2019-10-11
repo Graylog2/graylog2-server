@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Alert, Button, Col, Row, Table } from 'react-bootstrap';
+
+import { Alert, Col, Row, Table, Button } from 'components/graylog';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { DocumentTitle, IfPermitted, PageHeader, SortableList } from 'components/common';
 import Routes from 'routing/Routes';
@@ -18,20 +19,13 @@ const AuthProvidersConfig = createReactClass({
     updateConfig: PropTypes.func.isRequired,
   },
 
-  getDefaultProps() {
-    return {
-      config: {
-        disabled_realms: [],
-        realm_order: [],
-      },
-    };
-  },
-
   getInitialState() {
+    const { config } = this.props;
+
     return {
       config: {
-        disabled_realms: this.props.config.disabled_realms,
-        realm_order: this.props.config.realm_order,
+        disabled_realms: config.disabled_realms,
+        realm_order: config.realm_order,
       },
     };
   },
@@ -47,8 +41,11 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _saveConfig() {
+    const { updateConfig } = this.props;
+    const { config } = this.state;
+
     if (!this._hasNoActiveRealm()) {
-      this.props.updateConfig(this.state.config).then(() => {
+      updateConfig(config).then(() => {
         this._closeModal();
       });
     }
@@ -64,7 +61,8 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _updateSorting(newSorting) {
-    const update = ObjectUtils.clone(this.state.config);
+    const { config } = this.state;
+    const update = ObjectUtils.clone(config);
 
     update.realm_order = newSorting.map(entry => entry.id);
 
@@ -72,10 +70,11 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _toggleStatus(realmName) {
+    const { config } = this.state;
     return () => {
-      const disabledProcessors = this.state.config.disabled_realms;
-      const update = ObjectUtils.clone(this.state.config);
-      const checked = this.inputs[realmName].checked;
+      const disabledProcessors = config.disabled_realms;
+      const update = ObjectUtils.clone(config);
+      const { checked } = this.inputs[realmName];
 
       if (checked) {
         update.disabled_realms = disabledProcessors.filter(p => p !== realmName);
@@ -88,7 +87,9 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _hasNoActiveRealm() {
-    return this.state.config.disabled_realms.length >= this.state.config.realm_order.length;
+    const { config } = this.state;
+
+    return config.disabled_realms.length >= config.realm_order.length;
   },
 
   _noActiveRealmWarning() {
@@ -103,11 +104,15 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _summary() {
-    return this.state.config.realm_order.map((name, idx) => {
-      const status = this.state.config.disabled_realms.filter(disabledName => disabledName === name).length > 0 ? 'disabled' : 'active';
-      const realm = (this.props.descriptors[name] || { id: name, title: 'Unavailable' });
+    const { config } = this.state;
+    const { descriptors } = this.props;
+
+    return config.realm_order.map((name, idx) => {
+      const status = config.disabled_realms.filter(disabledName => disabledName === name).length > 0 ? 'disabled' : 'active';
+      const realm = (descriptors[name] || { id: name, title: 'Unavailable' });
+
       return (
-        <tr key={idx}>
+        <tr key={name.replace(/[\W_]+/g, '')}>
           <td>{idx + 1}</td>
           <td>{realm.displayName}</td>
           <td>{realm.description}</td>
@@ -118,19 +123,25 @@ const AuthProvidersConfig = createReactClass({
   },
 
   _sortableItems() {
-    return this.state.config.realm_order.map((name) => {
-      const realm = (this.props.descriptors[name] || { id: name, title: 'Unavailable' });
+    const { config } = this.state;
+    const { descriptors } = this.props;
+
+    return config.realm_order.map((name) => {
+      const realm = (descriptors[name] || { id: name, title: 'Unavailable' });
       return { id: realm.name, title: realm.displayName };
     });
   },
 
   _statusForm() {
-    return ObjectUtils.clone(this.state.config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName, idx) => {
-      const enabled = this.state.config.disabled_realms.filter(disabledName => disabledName === realmName).length < 1;
-      const realm = (this.props.descriptors[realmName] || { id: realmName, displayName: 'Unavailable' });
+    const { config } = this.state;
+    const { descriptors } = this.props;
+
+    return ObjectUtils.clone(config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName) => {
+      const enabled = config.disabled_realms.filter(disabledName => disabledName === realmName).length < 1;
+      const realm = (descriptors[realmName] || { id: realmName, displayName: 'Unavailable' });
 
       return (
-        <tr key={idx}>
+        <tr key={realm.displayName.replace(/[\W_]+/g, '')}>
           <td>{realm.displayName}</td>
           <td>
             <input ref={(elem) => { this.inputs[realm.name] = elem; }}

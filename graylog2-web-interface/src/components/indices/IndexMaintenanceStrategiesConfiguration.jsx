@@ -37,7 +37,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
       // If the newly selected strategy is the current active strategy, we use the active configuration.
       return this.state.activeConfig;
     }
-      // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
+    // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
     return this._getDefaultStrategyConfig(selectedStrategy);
   };
 
@@ -111,7 +111,7 @@ class IndexMaintenanceStrategiesConfiguration extends React.Component {
         <Input id="strategy-select" label={this.props.selectPlaceholder}>
           <Select placeholder={this.props.selectPlaceholder}
                   options={this._availableSelectOptions()}
-                  matchProp="value"
+                  matchProp="label"
                   value={this._activeSelection()}
                   onChange={this._onSelect} />
         </Input>

@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Col, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 
+import { Col, Label } from 'components/graylog';
 import { EntityListItem, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';
@@ -60,9 +60,9 @@ class Alert extends React.Component {
       alertTime = (
         <span>
           Triggered at {alertTime},&nbsp;
-          {alert.resolved_at ?
-            <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} />.</span> :
-            <span><strong>still ongoing</strong>.</span>}
+          {alert.resolved_at
+            ? <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} />.</span>
+            : <span><strong>still ongoing</strong>.</span>}
         </span>
       );
     } else {

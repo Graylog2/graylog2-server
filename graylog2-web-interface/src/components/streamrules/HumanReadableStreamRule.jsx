@@ -8,7 +8,9 @@ class HumanReadableStreamRule extends React.Component {
   };
 
   EMPTY_TAG = '<empty>';
+
   FIELD_PRESENCE_RULE_TYPE = 5;
+
   ALWAYS_MATCH_RULE_TYPE = 7;
 
   _getTypeForInteger = (type, streamRuleTypes) => {
@@ -39,7 +41,7 @@ class HumanReadableStreamRule extends React.Component {
   };
 
   render() {
-    const streamRule = this.props.streamRule;
+    const { streamRule } = this.props;
     const streamRuleType = this._getTypeForInteger(streamRule.type, this.props.streamRuleTypes);
     const negation = (streamRule.inverted ? 'not ' : null);
     const longDesc = (streamRuleType ? streamRuleType.long_desc : null);

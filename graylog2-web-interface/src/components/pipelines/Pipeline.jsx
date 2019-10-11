@@ -1,17 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Button, Row, Col, Alert } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Row, Col, Alert } from 'components/graylog';
 
 import { EntityList, Pluralize } from 'components/common';
+
 import Stage from './Stage';
 import StageForm from './StageForm';
 import PipelineDetails from './PipelineDetails';
 import PipelineConnectionsForm from './PipelineConnectionsForm';
 import PipelineConnectionsList from './PipelineConnectionsList';
 
-import Routes from 'routing/Routes';
 
 const Pipeline = createReactClass({
   displayName: 'Pipeline',
@@ -36,13 +35,13 @@ const Pipeline = createReactClass({
   style: require('!style/useable!css!./Pipeline.css'),
 
   _connections_warning() {
-    if(this.props.connections.length == 0) {
+    if (this.props.connections.length == 0) {
       return (
-          <Alert bsStyle="danger" className="pipeline-no-connections-warning">
+        <Alert bsStyle="danger" className="pipeline-no-connections-warning">
             This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
             stream to make it process incoming messages. Note that this is not required if you intend to use this
             pipeline only for search result transformation using decorators.
-          </Alert>
+        </Alert>
       );
     }
   },
@@ -84,13 +83,17 @@ const Pipeline = createReactClass({
 
   _formatStage(stage, maxStage) {
     return (
-      <Stage key={`stage-${stage.stage}`} pipeline={this.props.pipeline} stage={stage} isLastStage={stage.stage === maxStage}
-             onUpdate={this._updateStage(stage)} onDelete={this._deleteStage(stage)} />
+      <Stage key={`stage-${stage.stage}`}
+             pipeline={this.props.pipeline}
+             stage={stage}
+             isLastStage={stage.stage === maxStage}
+             onUpdate={this._updateStage(stage)}
+             onDelete={this._deleteStage(stage)} />
     );
   },
 
   render() {
-    const pipeline = this.props.pipeline;
+    const { pipeline } = this.props;
 
     const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
     const formattedStages = pipeline.stages
@@ -104,16 +107,20 @@ const Pipeline = createReactClass({
         <Row className="row-sm row-margin-top">
           <Col md={12}>
             <div className="pull-right">
-              <PipelineConnectionsForm pipeline={pipeline} connections={this.props.connections}
-                                       streams={this.props.streams} save={this.props.onConnectionsChange} />
+              <PipelineConnectionsForm pipeline={pipeline}
+                                       connections={this.props.connections}
+                                       streams={this.props.streams}
+                                       save={this.props.onConnectionsChange} />
             </div>
             <h2>Pipeline connections</h2>
             <p className="description-margin-top">
-              <PipelineConnectionsList pipeline={pipeline} connections={this.props.connections}
-                                       streams={this.props.streams} streamsFormatter={this._formatConnectedStreams}
-                                       noConnectionsMessage="Select streams that will be processed by this pipeline."/>
+              <PipelineConnectionsList pipeline={pipeline}
+                                       connections={this.props.connections}
+                                       streams={this.props.streams}
+                                       streamsFormatter={this._formatConnectedStreams}
+                                       noConnectionsMessage="Select streams that will be processed by this pipeline." />
             </p>
-            <hr/>
+            <hr />
           </Col>
         </Row>
         <Row className="row-sm row-margin-top">

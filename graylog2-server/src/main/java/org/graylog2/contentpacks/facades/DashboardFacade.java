@@ -18,11 +18,13 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -33,7 +35,6 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.TimeRangeEntity;
@@ -92,34 +93,41 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
         this.timeRangeFactory = timeRangeFactory;
     }
 
-    @Override
-    public EntityWithConstraints exportNativeEntity(Dashboard dashboard) {
+    @VisibleForTesting
+    Entity exportNativeEntity(Dashboard dashboard, EntityDescriptorIds entityDescriptorIds) {
         final Map<String, WidgetPosition> positionsById = dashboard.getPositions().stream()
                 .collect(Collectors.toMap(WidgetPosition::id, v -> v));
         final List<DashboardWidgetEntity> dashboardWidgets = dashboard.getWidgets().entrySet().stream()
-                .map(widget -> encodeWidget(widget.getValue(), positionsById.get(widget.getKey())))
+                .map(widget -> encodeWidget(widget.getValue(), positionsById.get(widget.getKey()), entityDescriptorIds))
                 .collect(Collectors.toList());
         final DashboardEntity dashboardEntity = DashboardEntity.create(
                 ValueReference.of(dashboard.getTitle()),
                 ValueReference.of(dashboard.getDescription()),
                 dashboardWidgets);
         final JsonNode data = objectMapper.convertValue(dashboardEntity, JsonNode.class);
-        final EntityV1 entity = EntityV1.builder()
-                .id(ModelId.of(dashboard.getId()))
+        return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(dashboard.getId(), ModelTypes.DASHBOARD_V1))))
                 .type(ModelTypes.DASHBOARD_V1)
                 .data(data)
                 .build();
-        return EntityWithConstraints.create(entity);
     }
 
-    private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position) {
+    private DashboardWidgetEntity encodeWidget(DashboardWidget widget, @Nullable WidgetPosition position,
+                                               EntityDescriptorIds entityDescriptorIds) {
+        final Map<String, Object> config = widget.getConfig();
+        final String streamId = (String) config.getOrDefault("stream_id", "");
+
+        if (!streamId.isEmpty()) {
+            entityDescriptorIds.get(streamId, ModelTypes.STREAM_V1).ifPresent(e -> config.put("stream_id", e));
+        }
+
         return DashboardWidgetEntity.create(
                 ValueReference.of(widget.getId()),
                 ValueReference.of(widget.getDescription()),
                 ValueReference.of(widget.getType()),
                 ValueReference.of(widget.getCacheTime()),
                 TimeRangeEntity.of(widget.getTimeRange()),
-                toReferenceMap(widget.getConfig()),
+                toReferenceMap(config),
                 encodePosition(position));
     }
 
@@ -288,11 +296,11 @@ public class DashboardFacade implements EntityFacade<Dashboard> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Dashboard dashboard = dashboardService.load(modelId.id());
-            return Optional.of(exportNativeEntity(dashboard));
+            return Optional.of(exportNativeEntity(dashboard, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find dashboard {}", entityDescriptor, e);
             return Optional.empty();

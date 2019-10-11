@@ -34,6 +34,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -76,7 +77,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         final Indices indices = new Indices(client(),
                 new ObjectMapperProvider().get(),
                 new IndexMappingFactory(new Node(client())),
-                new Messages(new MetricRegistry(), client()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));
@@ -115,6 +116,8 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                     FieldTypeDTO.create("http_status", "keyword"),
                     FieldTypeDTO.create("http_response_time", "long"),
                     FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
                     FieldTypeDTO.create("streams", "keyword")
             );
         } finally {
@@ -141,6 +144,8 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                     FieldTypeDTO.create("http_status", "keyword"),
                     FieldTypeDTO.create("http_response_time", "long"),
                     FieldTypeDTO.create("timestamp", "date"),
+                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
                     FieldTypeDTO.create("streams", "keyword")
             );
         } finally {

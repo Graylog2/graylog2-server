@@ -2,8 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button, Panel } from 'react-bootstrap';
 
+import { Button, Panel } from 'components/graylog';
 import { Pluralize, SelectPopover } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 
@@ -32,11 +32,15 @@ const CollectorProcessControl = createReactClass({
   },
 
   confirmProcessAction(doneCallback) {
+    const { onProcessAction, selectedSidecarCollectorPairs } = this.props;
+    const { selectedAction } = this.state;
+
     const callback = () => {
       doneCallback();
       this.resetSelectedAction();
     };
-    this.props.onProcessAction(this.state.selectedAction, this.props.selectedSidecarCollectorPairs, callback);
+
+    onProcessAction(selectedAction, selectedSidecarCollectorPairs, callback);
   },
 
   cancelProcessAction() {
@@ -72,7 +76,8 @@ const CollectorProcessControl = createReactClass({
           {lodash.capitalize(selectedAction)}ing a Collector without Configuration will have no effect.
         </p>
         <Button bsSize="xsmall" bsStyle="primary" onClick={this.hideConfigurationWarning}>Understood, continue
-          anyway</Button>
+          anyway
+        </Button>
       </Panel>
     );
   },
@@ -96,9 +101,9 @@ const CollectorProcessControl = createReactClass({
                              onConfirm={this.confirmProcessAction}
                              onCancel={this.cancelProcessAction}>
         <div>
-          {shouldShowConfigurationWarning ?
-            this.renderConfigurationWarning(selectedAction) :
-            this.renderSummaryContent(selectedAction, selectedSidecars)}
+          {shouldShowConfigurationWarning
+            ? this.renderConfigurationWarning(selectedAction)
+            : this.renderSummaryContent(selectedAction, selectedSidecars)}
         </div>
       </BootstrapModalConfirm>
     );
@@ -114,8 +119,11 @@ const CollectorProcessControl = createReactClass({
       <span>
         <SelectPopover id="process-management-action"
                        title="Manage collector processes"
-                       triggerNode={<Button bsSize="small"
-                                            bsStyle="link">Process <span className="caret" /></Button>}
+                       triggerNode={(
+                         <Button bsSize="small"
+                                 bsStyle="link">Process <span className="caret" />
+                         </Button>
+)}
                        items={PROCESS_ACTIONS}
                        itemFormatter={actionFormatter}
                        selectedItems={selectedAction ? [selectedAction] : []}

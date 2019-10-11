@@ -1,72 +1,86 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import Immutable from 'immutable';
 import MessageShow from 'components/search/MessageShow';
-import { DocumentTitle, Spinner } from 'components/common';
+import DocumentTitle from 'components/common/DocumentTitle';
+import Spinner from 'components/common/Spinner';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+import StoreProvider from 'injection/StoreProvider';
+import connect from 'stores/connect';
+
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
-
-import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
-const InputsStore = StoreProvider.getStore('Inputs');
-// eslint-disable-next-line no-unused-vars
-const MessagesStore = StoreProvider.getStore('Messages');
+
+const ConnectedMessageShow = connect(MessageShow, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
 
 const ShowMessagePage = createReactClass({
   displayName: 'ShowMessagePage',
 
   propTypes: {
-    params: PropTypes.object,
+    params: PropTypes.shape({
+      index: PropTypes.string.isRequired,
+      messageId: PropTypes.string.isRequired,
+    }).isRequired,
     searchConfig: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(NodesStore), Reflux.listenTo(InputsStore, '_formatInput')],
-
   getInitialState() {
     return {
-      streams: undefined,
-      inputs: undefined,
+      streams: Immutable.Map(),
       message: undefined,
+      inputs: Immutable.Map(),
     };
   },
 
   componentDidMount() {
-    MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then((message) => {
-      this.setState({ message: message });
-      InputsActions.getOptional.triggerPromise(message.source_input_id);
-    });
+    const { params: { index, messageId } } = this.props;
+    MessagesActions.loadMessage(index, messageId)
+      .then((message) => {
+        this.setState({ message });
+        return message.source_input_id ? InputsActions.get(message.source_input_id) : Promise.resolve();
+      })
+      .then(this._formatInput);
     StreamsStore.listStreams().then((streams) => {
       const streamsMap = {};
-      streams.forEach((stream) => {
-        streamsMap[stream.id] = stream;
-      });
-      this.setState({ streams: Immutable.Map(streamsMap) });
+      if (streams) {
+        streams.forEach((stream) => {
+          streamsMap[stream.id] = stream;
+        });
+        this.setState({ streams: Immutable.Map(streamsMap) });
+      }
     });
-    NodesActions.list.triggerPromise();
+    NodesActions.list();
   },
 
-  _formatInput(state) {
-    const input = {};
-    input[state.input.id] = state.input;
-    this.setState({ inputs: Immutable.Map(input) });
+  _formatInput(input) {
+    if (input) {
+      const inputs = Immutable.Map({ [input.id]: input });
+      this.setState({ inputs });
+    }
   },
 
   _isLoaded() {
-    return this.state.message && this.state.streams && this.state.nodes && this.state.inputs;
+    const { message, streams, inputs } = this.state;
+    return message && streams && inputs;
   },
 
   render() {
     if (this._isLoaded()) {
+      const { params, searchConfig } = this.props;
+      const { streams, inputs, message } = this.state;
       return (
-        <DocumentTitle title={`Message ${this.props.params.messageId} on ${this.props.params.index}`}>
-          <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                       streams={this.state.streams} allStreamsLoaded searchConfig={this.props.searchConfig} />
+        <DocumentTitle title={`Message ${params.messageId} on ${params.index}`}>
+          <ConnectedMessageShow message={message}
+                                inputs={inputs}
+                                streams={streams}
+                                allStreamsLoaded
+                                searchConfig={searchConfig} />
         </DocumentTitle>
       );
     }

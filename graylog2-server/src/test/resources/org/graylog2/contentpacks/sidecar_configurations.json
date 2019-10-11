@@ -1,0 +1,27 @@
+{
+  "sidecar_collectors": [
+    {
+      "_id": {
+        "$oid": "5b4c920b4b900a0024af0001"
+      },
+      "name": "filebeat",
+      "service_type": "exec",
+      "node_operating_system": "linux",
+      "executable_path": "/usr/lib/graylog-sidecar/filebeat",
+      "execute_parameters": "-c %s",
+      "validation_parameters": "test config -c %s",
+      "default_template": ""
+    }
+  ],
+  "sidecar_configurations": [
+    {
+      "_id": {
+        "$oid": "5b17e1a53f3ab8204eea1051"
+      },
+      "collector_id": "5b4c920b4b900a0024af0001",
+      "name": "filebeat config",
+      "color": "#ffffff",
+      "template": "empty template"
+    }
+  ]
+}

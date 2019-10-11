@@ -17,12 +17,12 @@
 package org.graylog2.contentpacks.facades;
 
 import com.google.common.graph.Graph;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -35,11 +35,6 @@ import java.util.Set;
 
 public class RootEntityFacade implements EntityFacade<Void> {
     public static final ModelType TYPE = ModelTypes.ROOT;
-
-    @Override
-    public EntityWithConstraints exportNativeEntity(Void nativeEntity) {
-        throw new UnsupportedOperationException("Unsupported operation for root entity");
-    }
 
     @Override
     public NativeEntity<Void> createNativeEntity(Entity entity,
@@ -69,7 +64,7 @@ public class RootEntityFacade implements EntityFacade<Void> {
     }
 
     @Override
-    public Optional<EntityWithConstraints> exportEntity(EntityDescriptor entityDescriptor) {
+    public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor, EntityDescriptorIds entityDescriptorIds) {
         return Optional.empty();
     }
 

@@ -38,7 +38,8 @@ const IndicesConfigurationStore = Reflux.createStore({
       },
       (error) => {
         UserNotification.error(`Fetching rotation strategies failed: ${error}`, 'Could not retrieve rotation strategies');
-      });
+      },
+    );
 
     IndicesConfigurationActions.loadRotationStrategies.promise(promise);
   },
@@ -53,7 +54,8 @@ const IndicesConfigurationStore = Reflux.createStore({
       },
       (error) => {
         UserNotification.error(`Fetching retention strategies failed: ${error}`, 'Could not retrieve retention strategies');
-      });
+      },
+    );
 
     IndicesConfigurationActions.loadRetentionStrategies.promise(promise);
   },

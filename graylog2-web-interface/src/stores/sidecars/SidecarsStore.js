@@ -73,7 +73,8 @@ const SidecarsStore = Reflux.createStore({
       (error) => {
         UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
           'Could not retrieve Sidecars');
-      });
+      },
+    );
 
     SidecarsActions.listPaginated.promise(promise);
   },
@@ -101,7 +102,8 @@ const SidecarsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Restarting Sidecar failed with status: ${error}`,
             'Could not restart Sidecar');
-        });
+        },
+      );
     SidecarsActions.restartCollector.promise(promise);
   },
 
@@ -112,7 +114,8 @@ const SidecarsStore = Reflux.createStore({
         (error) => {
           UserNotification.error(`Fetching Sidecar actions failed with status: ${error}`,
             'Could not retrieve Sidecar actions');
-        });
+        },
+      );
     SidecarsActions.getSidecarActions.promise(promise);
   },
 

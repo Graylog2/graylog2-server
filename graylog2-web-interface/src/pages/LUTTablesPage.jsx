@@ -2,13 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -113,22 +113,28 @@ const LUTTablesPage = createReactClass({
           </Row>
         );
       } else {
-        content = (<LookupTable dataAdapter={this.state.dataAdapter}
-                                cache={this.state.cache}
-                                table={this.state.table} />);
+        content = (
+          <LookupTable dataAdapter={this.state.dataAdapter}
+                       cache={this.state.cache}
+                       table={this.state.table} />
+        );
       }
     } else if (this._isCreating(this.props)) {
-      content = (<LookupTableCreate saved={this._saved}
-                                    validate={this._validateTable}
-                                    validationErrors={this.state.validationErrors} />);
+      content = (
+        <LookupTableCreate saved={this._saved}
+                           validate={this._validateTable}
+                           validationErrors={this.state.validationErrors} />
+      );
     } else if (!this.state || !this.state.tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
-      content = (<LookupTablesOverview tables={this.state.tables}
-                                       caches={this.state.caches}
-                                       dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination}
-                                       errorStates={this.state.errorStates} />);
+      content = (
+        <LookupTablesOverview tables={this.state.tables}
+                              caches={this.state.caches}
+                              dataAdapters={this.state.dataAdapters}
+                              pagination={this.state.pagination}
+                              errorStates={this.state.errorStates} />
+      );
     }
 
     return (

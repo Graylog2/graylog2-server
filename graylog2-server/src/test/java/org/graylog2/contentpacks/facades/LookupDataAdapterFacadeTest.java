@@ -23,13 +23,13 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
-import org.graylog2.contentpacks.model.entities.EntityWithConstraints;
 import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
@@ -91,11 +91,12 @@ public class LookupDataAdapterFacadeTest {
                 .description("Data Adapter Description")
                 .config(new FallbackAdapterConfig())
                 .build();
-        final EntityWithConstraints entityWithConstraints = facade.exportNativeEntity(dataAdapterDto);
-        final Entity entity = entityWithConstraints.entity();
+        final EntityDescriptor descriptor = EntityDescriptor.create(dataAdapterDto.id(), ModelTypes.LOOKUP_ADAPTER_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportNativeEntity(dataAdapterDto, entityDescriptorIds);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("1234567890"));
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -110,11 +111,11 @@ public class LookupDataAdapterFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void exportEntityDescriptor() {
         final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
-        final EntityWithConstraints entityWithConstraints = facade.exportEntity(descriptor).orElseThrow(AssertionError::new);
-        final Entity entity = entityWithConstraints.entity();
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
 
         assertThat(entity).isInstanceOf(EntityV1.class);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24a04b900a0fdb4e52c8"));
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
 
         final EntityV1 entityV1 = (EntityV1) entity;
@@ -141,7 +142,7 @@ public class LookupDataAdapterFacadeTest {
 
         final NativeEntity<DataAdapterDto> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), Collections.emptyMap(), "username");
 
-        assertThat(nativeEntity.descriptor().id()).isEqualTo(ModelId.of("http-dsv"));
+        assertThat(nativeEntity.descriptor().id()).isNotNull();
         assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
         assertThat(nativeEntity.entity().name()).isEqualTo("http-dsv");
         assertThat(nativeEntity.entity().title()).isEqualTo("HTTP DSV");
@@ -238,7 +239,7 @@ public class LookupDataAdapterFacadeTest {
                 .build();
         final EntityExcerpt excerpt = facade.createExcerpt(dataAdapterDto);
 
-        assertThat(excerpt.id()).isEqualTo(ModelId.of("data-adapter-name"));
+        assertThat(excerpt.id()).isEqualTo(ModelId.of("1234567890"));
         assertThat(excerpt.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
         assertThat(excerpt.title()).isEqualTo("Data Adapter Title");
     }
@@ -247,7 +248,7 @@ public class LookupDataAdapterFacadeTest {
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void listEntityExcerpts() {
         final EntityExcerpt expectedEntityExcerpt = EntityExcerpt.builder()
-                .id(ModelId.of("http-dsv"))
+                .id(ModelId.of("5adf24a04b900a0fdb4e52c8"))
                 .type(ModelTypes.LOOKUP_ADAPTER_V1)
                 .title("HTTP DSV")
                 .build();
@@ -259,14 +260,15 @@ public class LookupDataAdapterFacadeTest {
     @Test
     @UsingDataSet(locations = "/org/graylog2/contentpacks/lut_data_adapters.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void collectEntity() {
-        final Optional<EntityWithConstraints> collectedEntity = facade.exportEntity(EntityDescriptor.create("http-dsv", ModelTypes.LOOKUP_ADAPTER_V1));
+        final EntityDescriptor descriptor = EntityDescriptor.create("5adf24a04b900a0fdb4e52c8", ModelTypes.LOOKUP_ADAPTER_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor);
+        final Optional<Entity> collectedEntity = facade.exportEntity(descriptor, entityDescriptorIds);
         assertThat(collectedEntity)
                 .isPresent()
-                .map(EntityWithConstraints::entity)
                 .containsInstanceOf(EntityV1.class);
 
-        final EntityV1 entity = (EntityV1) collectedEntity.map(EntityWithConstraints::entity).orElseThrow(AssertionError::new);
-        assertThat(entity.id()).isEqualTo(ModelId.of("5adf24a04b900a0fdb4e52c8"));
+        final EntityV1 entity = (EntityV1) collectedEntity.orElseThrow(AssertionError::new);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
         assertThat(entity.type()).isEqualTo(ModelTypes.LOOKUP_ADAPTER_V1);
         final LookupDataAdapterEntity lookupDataAdapterEntity = objectMapper.convertValue(entity.data(), LookupDataAdapterEntity.class);
         assertThat(lookupDataAdapterEntity.name()).isEqualTo(ValueReference.of("http-dsv"));

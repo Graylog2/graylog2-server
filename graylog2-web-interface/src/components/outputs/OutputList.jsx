@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Col, Row } from 'react-bootstrap';
+import { Alert, Col, Row } from 'components/graylog';
 import naturalSort from 'javascript-natural-sort';
 
 import { Spinner } from 'components/common';
@@ -23,9 +23,13 @@ class OutputList extends React.Component {
 
   _formatOutput = (output) => {
     return (
-      <Output key={output.id} output={output} streamId={this.props.streamId}
-              removeOutputFromStream={this.props.onRemove} removeOutputGlobally={this.props.onTerminate}
-              onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition}
+      <Output key={output.id}
+              output={output}
+              streamId={this.props.streamId}
+              removeOutputFromStream={this.props.onRemove}
+              removeOutputGlobally={this.props.onTerminate}
+              onUpdate={this.props.onUpdate}
+              getTypeDefinition={this.props.getTypeDefinition}
               types={this.props.types} />
     );
   };

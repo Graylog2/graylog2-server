@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Pager } from 'react-bootstrap';
+import { Pager } from 'components/graylog';
 
 /**
  * Component that encapsulates react-bootstrap's `Pager.Item`.
@@ -32,9 +32,9 @@ class Page extends React.Component {
 
     return (
       <Pager.Item href={this.props.href}
-                className={className}
-                disabled={this.props.isDisabled}
-                onSelect={() => this.props.onPageChanged(this.props.page)}>
+                  className={className}
+                  disabled={this.props.isDisabled}
+                  onSelect={() => this.props.onPageChanged(this.props.page)}>
         {this.props.page}
       </Pager.Item>
     );

@@ -3,7 +3,7 @@ import React from 'react';
 
 import { AutoAffix } from 'react-overlays';
 import { Spinner, Wizard, ScrollButton } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
+import ValueReferenceData from 'util/ValueReferenceData';
 
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
@@ -20,9 +20,11 @@ class ContentPackEdit extends React.Component {
     entityIndex: PropTypes.object,
     selectedEntities: PropTypes.object,
     appliedParameter: PropTypes.object,
+    edit: PropTypes.bool,
   };
 
   static defaultProps = {
+    edit: false,
     contentPack: undefined,
     onGetEntities: () => {},
     onStateChange: () => {},
@@ -54,26 +56,20 @@ class ContentPackEdit extends React.Component {
   }
 
   _prepareForPreview() {
-    const typeRegExp = RegExp(/\.type$/);
     const newEntities = this.props.fetchedEntities.map((entity) => {
       const parameters = this.props.appliedParameter[entity.id] || [];
-      const newEntity = ObjectUtils.clone(entity);
-      const entityData = newEntity.data;
-      const configKeys = ObjectUtils.getPaths(entityData)
-        .filter(configKey => typeRegExp.test(configKey))
-        .map((configKey) => { return configKey.replace(typeRegExp, ''); });
-      configKeys.forEach((path) => {
+      const newEntityBuilder = entity.toBuilder();
+      const entityData = new ValueReferenceData(entity.data);
+      const configPaths = entityData.getPaths();
+
+      Object.keys(configPaths).forEach((path) => {
         const index = parameters.findIndex((paramMap) => { return paramMap.configKey === path; });
-        let newValue;
         if (index >= 0) {
-          newValue = { type: 'parameter', value: parameters[index].paramName };
-        } else {
-          newValue = ObjectUtils.getValue(entityData, path);
+          configPaths[path].setParameter(parameters[index].paramName);
         }
-        ObjectUtils.setValue(entityData, path, newValue);
       });
-      newEntity.data = entityData;
-      return newEntity;
+      newEntityBuilder.data(entityData.getData()).parameters(this.props.contentPack.parameters);
+      return newEntityBuilder.build();
     });
     const newContentPack = this.props.contentPack.toBuilder()
       .entities(newEntities)
@@ -113,15 +109,19 @@ class ContentPackEdit extends React.Component {
     const selectionComponent = (
       <ContentPackSelection contentPack={this.props.contentPack}
                             selectedEntities={this.props.selectedEntities}
+                            edit={this.props.edit}
                             onStateChange={this.props.onStateChange}
-                            entities={this.props.entityIndex} />);
+                            entities={this.props.entityIndex} />
+    );
     const parameterComponent = (
       <ContentPackParameters contentPack={this.props.contentPack}
                              onStateChange={this.props.onStateChange}
-                             appliedParameter={this.props.appliedParameter} />);
+                             appliedParameter={this.props.appliedParameter} />
+    );
     const previewComponent = (
       <ContentPackPreview contentPack={this.props.contentPack}
-                          onSave={this.props.onSave} />);
+                          onSave={this.props.onSave} />
+    );
     const steps = [
       { key: 'selection', title: 'Content Selection', component: selectionComponent },
       { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableParameters() },
@@ -131,11 +131,13 @@ class ContentPackEdit extends React.Component {
     return (
       <div>
         <Wizard steps={steps} onStepChange={this._stepChanged} affixed>
-          {this.state.selectedStep !== 'preview' ? <AutoAffix viewportOffsetTop={65}>
-            <div>
-              <ContentPackDetails contentPack={this.props.contentPack} />
-            </div>
-          </AutoAffix> : undefined}
+          {this.state.selectedStep !== 'preview' ? (
+            <AutoAffix viewportOffsetTop={65}>
+              <div>
+                <ContentPackDetails contentPack={this.props.contentPack} />
+              </div>
+            </AutoAffix>
+          ) : undefined}
         </Wizard>
         <ScrollButton possition="middle" />
       </div>

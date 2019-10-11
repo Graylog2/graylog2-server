@@ -2,18 +2,19 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-
 import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
-  'LookupTableDataAdapters');
+  'LookupTableDataAdapters',
+);
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LUTDataAdaptersPage = createReactClass({
@@ -122,16 +123,21 @@ const LUTDataAdaptersPage = createReactClass({
       if (!this.state.types) {
         content = <Spinner text="Loading data adapter types" />;
       } else {
-        content = (<DataAdapterCreate types={this.state.types}
-                                      saved={this._saved}
-                                      validate={this._validateAdapter}
-                                      validationErrors={this.state.validationErrors} />);
+        content = (
+          <DataAdapterCreate types={this.state.types}
+                             saved={this._saved}
+                             validate={this._validateAdapter}
+                             validationErrors={this.state.validationErrors} />
+        );
       }
     } else if (!this.state.dataAdapters) {
       content = <Spinner text="Loading data adapters" />;
     } else {
-      content = (<DataAdaptersOverview dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination} errorStates={this.state.tableStore.errorStates} />);
+      content = (
+        <DataAdaptersOverview dataAdapters={this.state.dataAdapters}
+                              pagination={this.state.pagination}
+                              errorStates={this.state.tableStore.errorStates} />
+      );
     }
 
     return (

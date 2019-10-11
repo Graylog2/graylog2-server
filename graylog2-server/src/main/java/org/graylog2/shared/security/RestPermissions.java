@@ -33,9 +33,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
     public static final String BUFFERS_READ = "buffers:read";
-    public static final String BUNDLE_EXPORT = "bundle:export";
-    public static final String BUNDLE_IMPORT = "bundle:import";
-    public static final String BUNDLE_UPDATE = "bundle:update";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
     public static final String CLUSTER_CONFIG_ENTRY_CREATE = "clusterconfigentry:create";
@@ -55,6 +52,15 @@ public class RestPermissions implements PluginPermissions {
     public static final String DECORATORS_READ = "decorators:read";
     public static final String DEFLECTOR_CYCLE = "deflector:cycle";
     public static final String DEFLECTOR_READ = "deflector:read";
+    public static final String EVENT_DEFINITIONS_CREATE = "eventdefinitions:create";
+    public static final String EVENT_DEFINITIONS_DELETE = "eventdefinitions:delete";
+    public static final String EVENT_DEFINITIONS_EDIT = "eventdefinitions:edit";
+    public static final String EVENT_DEFINITIONS_EXECUTE = "eventdefinitions:execute";
+    public static final String EVENT_DEFINITIONS_READ = "eventdefinitions:read";
+    public static final String EVENT_NOTIFICATIONS_CREATE = "eventnotifications:create";
+    public static final String EVENT_NOTIFICATIONS_DELETE = "eventnotifications:delete";
+    public static final String EVENT_NOTIFICATIONS_EDIT = "eventnotifications:edit";
+    public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
@@ -144,10 +150,7 @@ public class RestPermissions implements PluginPermissions {
         .add(create(BUFFERS_READ, ""))
         .add(create(CONTENT_PACK_CREATE, ""))
         .add(create(CONTENT_PACK_DELETE, ""))
-        .add(create(BUNDLE_EXPORT, ""))
-        .add(create(BUNDLE_IMPORT, ""))
         .add(create(CONTENT_PACK_READ, ""))
-        .add(create(BUNDLE_UPDATE, ""))
         .add(create(CATALOG_LIST, ""))
         .add(create(CATALOG_RESOLVE, ""))
         .add(create(CLUSTER_CONFIG_ENTRY_CREATE, ""))
@@ -162,6 +165,15 @@ public class RestPermissions implements PluginPermissions {
         .add(create(DECORATORS_READ, ""))
         .add(create(DEFLECTOR_CYCLE, ""))
         .add(create(DEFLECTOR_READ, ""))
+        .add(create(EVENT_DEFINITIONS_CREATE, ""))
+        .add(create(EVENT_DEFINITIONS_DELETE, ""))
+        .add(create(EVENT_DEFINITIONS_EDIT, ""))
+        .add(create(EVENT_DEFINITIONS_EXECUTE, ""))
+        .add(create(EVENT_DEFINITIONS_READ, ""))
+        .add(create(EVENT_NOTIFICATIONS_CREATE, ""))
+        .add(create(EVENT_NOTIFICATIONS_DELETE, ""))
+        .add(create(EVENT_NOTIFICATIONS_EDIT, ""))
+        .add(create(EVENT_NOTIFICATIONS_READ, ""))
         .add(create(FIELDNAMES_READ, ""))
         .add(create(INDEXERCLUSTER_READ, ""))
         .add(create(INDEXRANGES_READ, ""))

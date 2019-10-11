@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import history from 'util/History';
+import Routes from 'routing/Routes';
 import PipelineDetails from './PipelineDetails';
 
-import Routes from 'routing/Routes';
 
 class NewPipeline extends React.Component {
   static propTypes = {

@@ -1,52 +1,68 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
+import { Button } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 
 class EditOutputButton extends React.Component {
   static propTypes = {
-    output: PropTypes.object,
+    output: PropTypes.object.isRequired,
     disabled: PropTypes.bool,
     getTypeDefinition: PropTypes.func.isRequired,
     onUpdate: PropTypes.func,
   };
 
-  state = {
-    typeDefinition: undefined,
-    typeName: undefined,
-    configurationForm: '',
-  };
+  static defaultProps = {
+    disabled: false,
+    onUpdate: () => {},
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      typeDefinition: undefined,
+    };
+
+    this.handleClick = this.handleClick.bind(null, props.output);
+  }
 
   handleClick = () => {
-    this.props.getTypeDefinition(this.props.output.type, (definition) => {
+    const { getTypeDefinition, output } = this.props;
+
+    getTypeDefinition(output.type, (definition) => {
       this.setState({ typeDefinition: definition.requested_configuration });
       this.configurationForm.open();
     });
   };
 
   _handleSubmit = (data) => {
-    this.props.onUpdate(this.props.output, data);
+    const { onUpdate, output } = this.props;
+    onUpdate(output, data);
   };
 
   render() {
-    const typeDefinition = this.state.typeDefinition;
-    const output = this.props.output;
+    const { typeDefinition } = this.state;
+    const { disabled, output } = this.props;
     let configurationForm;
 
     if (typeDefinition) {
       configurationForm = (
-        <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }} key={`configuration-form-output-${output.id}`}
-                           configFields={this.state.typeDefinition}
+        <ConfigurationForm ref={(form) => { this.configurationForm = form; }}
+                           key={`configuration-form-output-${output.id}`}
+                           configFields={typeDefinition}
                            title={`Editing Output ${output.title}`}
                            typeName={output.type}
-                           helpBlock={'Select a name of your new output that describes it.'}
-                           submitAction={this._handleSubmit} values={output.configuration} titleValue={output.title} />
+                           helpBlock="Select a name of your new output that describes it."
+                           submitAction={this._handleSubmit}
+                           values={output.configuration}
+                           titleValue={output.title} />
       );
     }
 
     return (
       <span>
-        <Button disabled={this.props.disabled} bsStyle="info" onClick={this.handleClick.bind(null, output)}>
+        <Button disabled={disabled} bsStyle="info" onClick={this.handleClick}>
           Edit
         </Button>
         {configurationForm}

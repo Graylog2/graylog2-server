@@ -2,15 +2,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Label, OverlayTrigger, Popover } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
-const InputStatesStore = StoreProvider.getStore('InputStates');
-const NodesStore = StoreProvider.getStore('Nodes');
 
 import { LinkToNode, Spinner } from 'components/common';
 
 import InputStateComparator from 'logic/inputs/InputStateComparator';
+
+const InputStatesStore = StoreProvider.getStore('InputStates');
+const NodesStore = StoreProvider.getStore('Nodes');
 
 const InputStateBadge = createReactClass({
   displayName: 'InputStateBadge',
@@ -31,7 +32,7 @@ const InputStateBadge = createReactClass({
       return 'warning';
     }
 
-    const state = sortedStates[0].state;
+    const { state } = sortedStates[0];
     switch (state) {
       case 'RUNNING':
         return 'success';
@@ -60,13 +61,13 @@ const InputStateBadge = createReactClass({
       return <Spinner />;
     }
 
-    const input = this.props.input;
+    const { input } = this.props;
     const inputId = input.id;
 
     const inputStates = {};
     if (this.state.inputStates[inputId]) {
       Object.keys(this.state.inputStates[inputId]).forEach((node) => {
-        const state = this.state.inputStates[inputId][node].state;
+        const { state } = this.state.inputStates[inputId][node];
         if (!inputStates[state]) {
           inputStates[state] = [];
         }
@@ -91,8 +92,11 @@ const InputStateBadge = createReactClass({
       );
       return (
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose>
-          <Label bsStyle={this._labelClassForState(sorted)} title="Click to show details"
-                 bsSize="xsmall" style={{ cursor: 'pointer' }}>{this._textForState(sorted)}</Label>
+          <Label bsStyle={this._labelClassForState(sorted)}
+                 title="Click to show details"
+                 bsSize="xsmall"
+                 style={{ cursor: 'pointer' }}>{this._textForState(sorted)}
+          </Label>
         </OverlayTrigger>
       );
     }

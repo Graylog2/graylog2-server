@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 
 import { Timestamp } from 'components/common';
+import { MetricContainer, CounterRate } from 'components/metrics';
 import PipelineForm from './PipelineForm';
 
-import { MetricContainer, CounterRate } from 'components/metrics';
 
 class PipelineDetails extends React.Component {
   static propTypes = {
@@ -20,7 +20,7 @@ class PipelineDetails extends React.Component {
       return <PipelineForm create save={this.props.onChange} onCancel={this.props.onCancel} modal={false} />;
     }
 
-    const pipeline = this.props.pipeline;
+    const { pipeline } = this.props;
     return (
       <div>
         <Row>

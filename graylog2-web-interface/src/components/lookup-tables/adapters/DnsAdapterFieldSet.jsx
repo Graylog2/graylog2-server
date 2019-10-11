@@ -5,7 +5,6 @@ import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
 
-
 class DnsAdapterFieldSet extends React.Component {
   static propTypes = {
     config: PropTypes.shape({
@@ -19,9 +18,11 @@ class DnsAdapterFieldSet extends React.Component {
   };
 
   _onLookupTypeSelect = (id) => {
-    const config = ObjectUtils.clone(this.props.config);
-    config.lookup_type = id;
-    this.props.updateConfig(config);
+    const { config, updateConfig } = this.props;
+    const newConfig = ObjectUtils.clone(config);
+
+    newConfig.lookup_type = id;
+    updateConfig(newConfig);
   };
 
   updateCacheTTLOverride = (value, unit, enabled) => {
@@ -29,23 +30,29 @@ class DnsAdapterFieldSet extends React.Component {
   };
 
   _updateCacheTTLOverride = (value, unit, enabled, fieldPrefix) => {
-    const config = ObjectUtils.clone(this.props.config);
+    const { config, updateConfig } = this.props;
+    const newConfig = ObjectUtils.clone(config);
 
     // If Cache TTL Override box is checked, then save the value. If not, then do not save it.
     if (enabled && value) {
-      config[fieldPrefix] = enabled && value ? value : null;
-      config[`${fieldPrefix}_enabled`] = enabled;
+      newConfig[fieldPrefix] = enabled && value ? value : null;
+      newConfig[`${fieldPrefix}_enabled`] = enabled;
     } else {
-      config[fieldPrefix] = null;
-      config[`${fieldPrefix}_enabled`] = false;
+      newConfig[fieldPrefix] = null;
+      newConfig[`${fieldPrefix}_enabled`] = false;
     }
 
-    config[`${fieldPrefix}_unit`] = enabled ? unit : null;
-    this.props.updateConfig(config);
+    newConfig[`${fieldPrefix}_unit`] = enabled ? unit : null;
+    updateConfig(newConfig);
   };
 
   render() {
-    const { config } = this.props;
+    const {
+      config,
+      handleFormEvent,
+      validationMessage,
+      validationState,
+    } = this.props;
     const lookupTypes = [
       { label: 'Resolve hostname to IPv4 address (A)', value: 'A' },
       { label: 'Resolve hostname to IPv6 address (AAAA)', value: 'AAAA' },
@@ -66,7 +73,7 @@ class DnsAdapterFieldSet extends React.Component {
           <Select placeholder="Select the type of DNS lookup"
                   clearable={false}
                   options={lookupTypes}
-                  matchProp="value"
+                  matchProp="label"
                   onChange={this._onLookupTypeSelect}
                   value={config.lookup_type} />
         </Input>
@@ -74,9 +81,12 @@ class DnsAdapterFieldSet extends React.Component {
                id="server_ips"
                name="server_ips"
                label="DNS Server IP Address"
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('server_ips', 'An optional comma-separated list of DNS server IP addresses.')}
-               bsStyle={this.props.validationState('server_ips')}
+               onChange={handleFormEvent}
+               help={validationMessage(
+                 'server_ips',
+                 'An optional comma-separated list of DNS server IP addresses.',
+               )}
+               bsStyle={validationState('server_ips')}
                value={config.server_ips}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9" />
@@ -85,14 +95,17 @@ class DnsAdapterFieldSet extends React.Component {
                name="request_timeout"
                label="DNS Request Timeout"
                required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('request_timeout', 'DNS request timeout in milliseconds.')}
-               bsStyle={this.props.validationState('request_timeout')}
+               onChange={handleFormEvent}
+               help={validationMessage(
+                 'request_timeout',
+                 'DNS request timeout in milliseconds.',
+               )}
+               bsStyle={validationState('request_timeout')}
                value={config.request_timeout}
                labelClassName="col-sm-3"
                wrapperClassName="col-sm-9" />
         <TimeUnitInput label="Cache TTL Override"
-                       help="If enabled, the TTL for this adapter&amp;s cache will be overridden with the specified value."
+                       help="If enabled, the cache TTL will be overridden with the specified value."
                        update={this.updateCacheTTLOverride}
                        value={config.cache_ttl_override}
                        unit={config.cache_ttl_override_unit || 'MINUTES'}

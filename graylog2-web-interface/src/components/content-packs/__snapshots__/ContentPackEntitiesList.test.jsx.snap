@@ -46,7 +46,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -62,7 +62,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -139,7 +139,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
         }
       >
         <button
-          className="submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -155,7 +155,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
         }
       >
         <button
-          className="reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -191,7 +191,10 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   Description
                 </th>
                 <th>
-                  Applied Parameter
+                  Origin
+                </th>
+                <th>
+                  Used Parameters
                 </th>
                 <th>
                   Action
@@ -203,7 +206,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 <td
                   className="bigColumns"
                 >
-                  A good input
+                  test
                 </td>
                 <td>
                   Input
@@ -214,6 +217,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   
                 </td>
                 <td>
+                  <span>
+                    <i
+                      className="fa fa-archive contentPackEntity"
+                      title="Content Pack"
+                    />
+                  </span>
+                </td>
+                <td>
                   1
                 </td>
                 <td>
@@ -222,15 +233,15 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     role="toolbar"
                   >
                     <button
-                      className="btn btn-xs btn-primary"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
                       disabled={false}
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
-                      className="btn btn-xs btn-info"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-info"
                       disabled={false}
                       onClick={[Function]}
                       type="button"
@@ -255,6 +266,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                   
                 </td>
                 <td>
+                  <span>
+                    <i
+                      className="fa fa-server"
+                      title="Server"
+                    />
+                  </span>
+                </td>
+                <td>
                   0
                 </td>
                 <td>
@@ -263,15 +282,15 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     role="toolbar"
                   >
                     <button
-                      className="btn btn-xs btn-primary"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
                       disabled={false}
                       onClick={[Function]}
                       type="button"
                     >
-                      Apply Parameter
+                      Edit
                     </button>
                     <button
-                      className="btn btn-xs btn-info"
+                      className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-info"
                       disabled={false}
                       onClick={[Function]}
                       type="button"

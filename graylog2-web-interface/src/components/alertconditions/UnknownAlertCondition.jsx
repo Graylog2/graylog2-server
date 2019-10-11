@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { Alert, Col, DropdownButton, MenuItem } from 'components/graylog';
 import { EntityListItem } from 'components/common';
 
 class UnknownAlertCondition extends React.Component {
@@ -13,7 +13,7 @@ class UnknownAlertCondition extends React.Component {
 
   render() {
     const condition = this.props.alertCondition;
-    const stream = this.props.stream;
+    const { stream } = this.props;
 
     const actions = [
       <DropdownButton key="actions-button" title="Actions" pullRight id={`more-actions-dropdown-${condition.id}`}>

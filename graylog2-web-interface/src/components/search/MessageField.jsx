@@ -21,7 +21,7 @@ const MessageField = createReactClass({
   SPECIAL_FIELDS: ['full_message', 'level'],
 
   render() {
-    const message = this.props.message;
+    const { message } = this.props;
     let innerValue = this.props.value;
     const key = this.props.fieldName;
     if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {

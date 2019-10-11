@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { DataAdapterForm } from 'components/lookup-tables';
@@ -55,28 +55,29 @@ class DataAdapterCreate extends React.Component {
       return { value: type.type, label: adapterPlugins[type.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
-    return (<div>
-      <Row className="content">
-        <Col lg={8}>
-          <form className="form form-horizontal" onSubmit={() => {}}>
-            <Input id="data-adapter-type-select"
-                   label="Data Adapter Type"
-                   required
-                   autoFocus
-                   help="The type of data adapter to configure."
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Select placeholder="Select Data Adapter Type"
-                      clearable={false}
-                      options={sortedAdapters}
-                      matchProp="value"
-                      onChange={this._onTypeSelect}
-                      value={null} />
-            </Input>
-          </form>
-        </Col>
-      </Row>
-      {this.state.dataAdapter && (
+    return (
+      <div>
+        <Row className="content">
+          <Col lg={8}>
+            <form className="form form-horizontal" onSubmit={() => {}}>
+              <Input id="data-adapter-type-select"
+                     label="Data Adapter Type"
+                     required
+                     autoFocus
+                     help="The type of data adapter to configure."
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <Select placeholder="Select Data Adapter Type"
+                        clearable={false}
+                        options={sortedAdapters}
+                        matchProp="label"
+                        onChange={this._onTypeSelect}
+                        value={null} />
+              </Input>
+            </form>
+          </Col>
+        </Row>
+        {this.state.dataAdapter && (
         <Row className="content">
           <Col lg={12}>
             <h3>Configure Adapter</h3>
@@ -88,8 +89,9 @@ class DataAdapterCreate extends React.Component {
                              saved={this.props.saved} />
           </Col>
         </Row>
-      )}
-    </div>);
+        )}
+      </div>
+    );
   }
 }
 

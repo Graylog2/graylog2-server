@@ -4,12 +4,12 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const UniqueChunkIdPlugin = require('./webpack/UniqueChunkIdPlugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
-const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
+const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const TARGET = process.env.npm_lifecycle_event;
@@ -17,7 +17,7 @@ process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, 'babel.config.js');
 const BABELOPTIONS = {
-  cacheDirectory: 'cache',
+  cacheDirectory: 'target/web/cache',
   extends: BABELRC,
 };
 
@@ -68,20 +68,25 @@ const webpackConfig = {
         ],
       },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
-      { test: /\.css$/,
+      {
+        test: /\.css$/,
         use: [
           'style-loader',
           {
             loader: 'css-loader',
             options: getCssLoaderOptions(),
           },
-        ] },
+        ],
+      },
     ],
   },
   resolve: {
     // you can now require('file') instead of require('file.coffee')
     extensions: ['.js', '.json', '.jsx', '.ts'],
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
+    alias: {
+      theme: path.resolve(APP_PATH, 'theme'),
+    },
   },
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
@@ -98,7 +103,7 @@ const webpackConfig = {
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
-      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(ROOT_PATH, 'build/vendor-module.json'), 'utf8')),
+      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(BUILD_PATH, 'vendor-module.json'), 'utf8')),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {
@@ -123,6 +128,9 @@ const webpackConfig = {
       },
     }),
     new HtmlWebpackPlugin({ filename: 'module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), excludeChunks: ['config'] }),
+    new webpack.DefinePlugin({
+      FEATURES: JSON.stringify(process.env.FEATURES),
+    }),
   ],
 };
 
@@ -155,10 +163,9 @@ if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     mode: 'production',
     optimization: {
-      minimizer: [new UglifyJsPlugin({
-        uglifyOptions: {
-          minimize: true,
-          sourceMap: true,
+      minimizer: [new TerserPlugin({
+        sourceMap: true,
+        terserOptions: {
           compress: {
             warnings: false,
           },
@@ -172,6 +179,8 @@ if (TARGET === 'build') {
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
+      // Looking at https://webpack.js.org/plugins/loader-options-plugin, this plugin seems to not
+      // be needed any longer. We should try deleting it next time we clean up this configuration.
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),

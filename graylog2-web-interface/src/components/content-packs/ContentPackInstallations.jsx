@@ -2,10 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { DataTable } from 'components/common';
-import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
+import { Button, ButtonToolbar, Modal } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import Spinner from 'components/common/Spinner';
-
 import ContentPackInstallationView from 'components/content-packs/ContentPackInstallView';
 
 class ContentPackInstallations extends React.Component {
@@ -21,6 +20,9 @@ class ContentPackInstallations extends React.Component {
 
   rowFormatter = (item) => {
     let showModalRef;
+
+    const { onUninstall } = this.props;
+
     const closeShowModal = () => {
       showModalRef.close();
     };
@@ -54,7 +56,7 @@ class ContentPackInstallations extends React.Component {
             <ButtonToolbar>
               <Button bsStyle="primary"
                       bsSize="small"
-                      onClick={() => { this.props.onUninstall(item.content_pack_id, item._id); }}>
+                      onClick={() => { onUninstall(item.content_pack_id, item._id); }}>
                 Uninstall
               </Button>
               <Button bsStyle="info"
@@ -78,21 +80,22 @@ class ContentPackInstallations extends React.Component {
   };
 
   render() {
-    if (!this.props.installations) {
+    const { installations } = this.props;
+
+    if (!installations) {
       return (<Spinner />);
     }
 
     const headers = ['Comment', 'Version', 'Action'];
     return (
-      <DataTable
-        id="content-packs-versions"
-        headers={headers}
-        headerCellFormatter={this.headerFormater}
-        sortByKey="comment"
-        dataRowFormatter={this.rowFormatter}
-        rows={this.props.installations}
-        filterKeys={[]}
-      />);
+      <DataTable id="content-packs-versions"
+                 headers={headers}
+                 headerCellFormatter={this.headerFormater}
+                 sortByKey="comment"
+                 dataRowFormatter={this.rowFormatter}
+                 rows={installations}
+                 filterKeys={[]} />
+    );
   }
 }
 

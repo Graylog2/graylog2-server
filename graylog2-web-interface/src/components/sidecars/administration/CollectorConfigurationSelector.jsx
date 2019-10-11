@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { SelectPopover } from 'components/common';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -30,13 +30,18 @@ class CollectorConfigurationSelector extends React.Component {
   };
 
   handleConfigurationSelect = (configurationIds, hideCallback) => {
+    const { configurations } = this.props;
+
     hideCallback();
-    const configurations = this.props.configurations.filter(c => configurationIds.includes(c.id));
-    this.setState({ nextAssignedConfigurations: configurations }, this.modal.open);
+    const nextAssignedConfigurations = configurations.filter(c => configurationIds.includes(c.id));
+    this.setState({ nextAssignedConfigurations }, this.modal.open);
   };
 
   confirmConfigurationChange = (doneCallback) => {
-    this.props.onConfigurationSelectionChange(this.state.nextAssignedConfigurations, doneCallback);
+    const { onConfigurationSelectionChange } = this.props;
+    const { nextAssignedConfigurations } = this.state;
+
+    onConfigurationSelectionChange(nextAssignedConfigurations, doneCallback);
   };
 
   cancelConfigurationChange = () => {
@@ -51,10 +56,12 @@ class CollectorConfigurationSelector extends React.Component {
       <span>
         <ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}&emsp;
         <small>
-          {collector ?
-            <CollectorIndicator collector={collector.name}
-                                operatingSystem={collector.node_operating_system} /> :
-            <em>Unknown collector</em>
+          {collector
+            ? (
+              <CollectorIndicator collector={collector.name}
+                                  operatingSystem={collector.node_operating_system} />
+            )
+            : <em>Unknown collector</em>
           }
         </small>
       </span>

@@ -10,6 +10,7 @@ insert_final_newline = true
 
 [*.java]
 indent_size = 4
+ij_continuation_indent_size = 8
 trim_trailing_whitespace = true
 
 [*.{js,jsx}]

@@ -1,5 +1,5 @@
 :local(.marginQuickReferenceText) {
-    margin-top: 5px;
+    margin-top: 20px;
 }
 
 :local(.marginTab) {
@@ -12,4 +12,22 @@
 
 .panel-body h3 {
     margin-bottom: 5px;
+}
+
+:local(.tableMaxHeight) {
+	max-height: 400px;
+}
+
+:local(.monoSpaceFont) {
+    font-family: monospace;
+}
+
+:local(.ulStyle) {
+    list-style-type: disc;
+    padding-left: 20px;
+    padding-top: 20px;
+}
+
+:local(.actionsColumn) {
+    width: 120px;
 }

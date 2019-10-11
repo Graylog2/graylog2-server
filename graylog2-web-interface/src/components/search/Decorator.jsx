@@ -3,21 +3,22 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 import StoreProvider from 'injection/StoreProvider';
-const DecoratorsStore = StoreProvider.getStore('Decorators');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import ActionsProvider from 'injection/ActionsProvider';
-const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
+const DecoratorsStore = StoreProvider.getStore('Decorators');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const Decorator = createReactClass({
   displayName: 'Decorator',
@@ -79,8 +80,8 @@ const Decorator = createReactClass({
   },
 
   _formatActionsMenu() {
-    const permissions = this.state.currentUser.permissions;
-    const decorator = this.props.decorator;
+    const { permissions } = this.state.currentUser;
+    const { decorator } = this.props;
     const editPermission = this.isPermitted(permissions, `decorators:edit:${decorator.stream}`);
     return (
       <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
@@ -95,7 +96,7 @@ const Decorator = createReactClass({
     if (!this.state.types || !this.state.currentUser) {
       return <Spinner />;
     }
-    const decorator = this.props.decorator;
+    const { decorator } = this.props;
     const config = this._resolveConfigurationIds(decorator.config);
     const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
 

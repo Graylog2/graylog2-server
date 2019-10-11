@@ -4,6 +4,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const urlPrefix = '/system/cluster_config';
@@ -47,6 +48,15 @@ const ConfigurationsStore = Reflux.createStore({
     ConfigurationActions.listMessageProcessorsConfig.promise(promise);
   },
 
+  listEventsClusterConfig() {
+    const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then((response) => {
+      this.trigger({ eventsClusterConfig: response });
+      return response;
+    });
+
+    ConfigurationActions.listEventsClusterConfig.promise(promise);
+  },
+
   update(configType, config) {
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
@@ -59,7 +69,8 @@ const ConfigurationsStore = Reflux.createStore({
       },
       (error) => {
         UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
-      });
+      },
+    );
 
     ConfigurationActions.update.promise(promise);
   },
@@ -76,7 +87,8 @@ const ConfigurationsStore = Reflux.createStore({
       },
       (error) => {
         UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
-      });
+      },
+    );
 
     ConfigurationActions.updateMessageProcessorsConfig.promise(promise);
   },

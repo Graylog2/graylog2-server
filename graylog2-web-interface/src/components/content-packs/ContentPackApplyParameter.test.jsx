@@ -2,38 +2,44 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import 'helpers/mocking/react-dom_mock';
+import Entity from 'logic/content-packs/Entity';
 
 import ContentPackApplyParameter from 'components/content-packs/ContentPackApplyParameter';
 
 describe('<ContentPackApplyParameter />', () => {
-  const entity = {
-    id: '111-beef',
-    v: '1.0',
-    data: {
-      name: { type: 'string', value: 'Input' },
-      title: { type: 'string', value: 'A good input' },
+  const entity = Entity.builder()
+    .id('111-beef')
+    .v('1.0')
+    .data({
+      name: { '@type': 'string', '@value': 'Input' },
+      title: { '@type': 'string', '@value': 'A good input' },
       configuration: {
-        listen_address: { type: 'string', value: '1.2.3.4' },
-        port: { type: 'integer', value: '23' },
+        listen_address: { '@type': 'string', '@value': '1.2.3.4' },
+        port: { '@type': 'integer', '@value': '23' },
       },
-    },
-  };
+    })
+    .build();
+
   const parameter = { title: 'Port', name: 'PORT', type: 'integer', default_value: '23' };
   const appliedParameter = { configKey: 'configuration.port', paramName: parameter.name };
+  const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
   it('should render with full props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[appliedParameter]}
-    />);
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
+                                                               parameters={[parameter]}
+                                                               appliedParameter={[appliedParameter]} />);
+    expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('should render with readOnly', () => {
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
+                                                               parameters={[parameter]}
+                                                               appliedParameter={[appliedParameterReadOnly]} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('should render with minimal props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter
-      entity={entity}
-    />);
+    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
@@ -43,12 +49,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(paramName).toEqual('PORT');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[]}
-      onParameterApply={applyFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[]}
+                                                     onParameterApply={applyFn} />);
 
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
@@ -62,12 +66,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(paramName).toEqual('PORT');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
-      onParameterApply={applyFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[{ configKey: 'configuration.port', paramName: 'PORT' }]}
+                                                     onParameterApply={applyFn} />);
 
     wrapper.find('select#config_key').simulate('change', { target: { name: 'config_key', value: 'configuration.port' } });
     wrapper.find('select#parameter').simulate('change', { target: { name: 'parameter', value: 'PORT' } });
@@ -80,12 +82,10 @@ describe('<ContentPackApplyParameter />', () => {
       expect(configKey).toEqual('configuration.port');
     });
 
-    const wrapper = mount(<ContentPackApplyParameter
-      entity={entity}
-      parameters={[parameter]}
-      appliedParameter={[appliedParameter]}
-      onParameterClear={clearFn}
-    />);
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[appliedParameter]}
+                                                     onParameterClear={clearFn} />);
 
     wrapper.find('button[children="Clear"]').simulate('click');
     expect(clearFn.mock.calls.length).toBe(1);

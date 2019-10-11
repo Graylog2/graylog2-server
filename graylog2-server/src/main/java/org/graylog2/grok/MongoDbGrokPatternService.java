@@ -134,6 +134,27 @@ public class MongoDbGrokPatternService implements GrokPatternService {
     }
 
     @Override
+    public GrokPattern update(GrokPattern pattern) throws ValidationException {
+        try {
+            if (!validate(pattern)) {
+                throw new ValidationException("Invalid pattern " + pattern);
+            }
+        } catch (GrokException | PatternSyntaxException e) {
+            throw new ValidationException("Invalid pattern " + pattern + "\n" + e.getMessage());
+        }
+
+        if (pattern.id() == null) {
+            throw new ValidationException("Invalid pattern " + pattern);
+        }
+        WriteResult<GrokPattern, ObjectId> result = dbCollection.update(DBQuery.is("_id", new ObjectId(pattern.id())), pattern);
+        if (result.isUpdateOfExisting()) {
+            clusterBus.post(GrokPatternsUpdatedEvent.create(ImmutableSet.of(pattern.name())));
+            return pattern;
+        }
+        throw new ValidationException("Invalid pattern " + pattern);
+    }
+
+    @Override
     public List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException {
         if (!replace) {
             for (GrokPattern pattern : loadAll()) {
@@ -177,7 +198,7 @@ public class MongoDbGrokPatternService implements GrokPatternService {
         }
         grokCompiler.register(pattern.name(), pattern.pattern());
         Grok grok = grokCompiler.compile("%{" + pattern.name() + "}");
-        return grok.capture(sampleData);
+        return grok.match(sampleData).captureFlattened();
     }
 
     @Override

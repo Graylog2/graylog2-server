@@ -16,6 +16,11 @@ const DateTime = require('logic/datetimes/DateTime');
 <Timestamp dateTime={new Date().toISOString()} format={DateTime.Formats.COMPLETE} />
 ```
 
+Showing date/time of Unix Timestamp (in millis):
+```js
+<Timestamp datetime={1554121284687} />
+```
+
 Time zone conversions:
 ```js
 const moment = require('moment');

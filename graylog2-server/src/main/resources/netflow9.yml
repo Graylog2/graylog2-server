@@ -226,9 +226,8 @@
 94:
 - :string
 - :application_description
-95:
-- :application_id
-- :application_id
+95: # TODO: Add support for parsing application Ids
+- :skip
 96:
 - :string
 - :application_name
@@ -361,6 +360,9 @@
 367:
 - :mac_addr
 - :wtpMacAddress
+372:
+- :string
+- :application_category_name
 8192:
 - :uint32
 - :streamcore_wan_rtt
@@ -445,12 +447,10 @@
 8393:
 - :uint32
 - :streamcore_id_rule_10
-33000:
-- :acl_id_asa
-- :ingress_acl_id
+33000: # TODO: Parse ASA ACL http://www.cisco.com/c/en/us/td/docs/security/asa/special/netflow/guide/asa_netflow.html#pgfId-1331620
+- :skip
 33001:
-- :acl_id_asa
-- egress_acl_id
+- :skip
 33002:
 - :uint16
 - :fw_ext_event

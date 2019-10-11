@@ -5,6 +5,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
+
 const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
 const ServerAvailabilityStore = Reflux.createStore({

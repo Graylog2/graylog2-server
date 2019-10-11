@@ -15,9 +15,9 @@ class FieldContentConditionSummary extends React.Component {
   };
 
   render() {
-    const alertCondition = this.props.alertCondition;
-    const field = alertCondition.parameters.field;
-    const value = alertCondition.parameters.value;
+    const { alertCondition } = this.props;
+    const { field } = alertCondition.parameters;
+    const { value } = alertCondition.parameters;
 
     return (
       <span>

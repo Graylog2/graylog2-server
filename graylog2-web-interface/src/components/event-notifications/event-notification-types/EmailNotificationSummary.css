@@ -1,0 +1,6 @@
+:local(.bodyPreview) {
+    font-family: monospace;
+    font-size: 12px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}

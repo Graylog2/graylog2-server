@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 
+import { Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -127,12 +127,22 @@ class KeyValueTable extends React.Component {
     return (
       <tr>
         <td>
-          <Input type="text" name="newKey" id="newKey" bsSize="small" placeholder={this.props.headers[0]} value={this.state.newKey}
+          <Input type="text"
+                 name="newKey"
+                 id="newKey"
+                 bsSize="small"
+                 placeholder={this.props.headers[0]}
+                 value={this.state.newKey}
                  onChange={this._bindValue} />
         </td>
         <td>
-          <Input type="text" name="newValue" id="newValue" bsSize="small" placeholder={this.props.headers[1]}
-                 value={this.state.newValue} onChange={this._bindValue} />
+          <Input type="text"
+                 name="newValue"
+                 id="newValue"
+                 bsSize="small"
+                 placeholder={this.props.headers[1]}
+                 value={this.state.newValue}
+                 onChange={this._bindValue} />
         </td>
         <td>
           <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>

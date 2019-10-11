@@ -5,6 +5,7 @@ import { Input } from 'components/bootstrap';
 import { QueryConfiguration, CountWidgetEditConfiguration } from 'components/widgets/configurations';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const FieldStatisticsStore = StoreProvider.getStore('FieldStatistics');
 
 class StatisticalCountWidgetConfiguration extends React.Component {

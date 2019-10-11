@@ -38,7 +38,7 @@ public class ReferenceConverterTest {
     }
 
     private Reference createReference(String type, Object value) {
-        return converter.convert(om.convertValue(ImmutableMap.of("type", type, "value", value), JsonNode.class));
+        return converter.convert(om.convertValue(ImmutableMap.of("@type", type, "@value", value), JsonNode.class));
     }
 
     @Test

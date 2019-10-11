@@ -48,7 +48,8 @@ const PipelineConnectionsStore = Reflux.createStore({
         this.trigger({ connections: this.connections });
         UserNotification.success('Pipeline connections updated successfully');
       },
-      this._failUpdateCallback);
+      this._failUpdateCallback,
+    );
   },
 
   connectToPipeline(reverseConnection) {
@@ -71,7 +72,8 @@ const PipelineConnectionsStore = Reflux.createStore({
         this.trigger({ connections: this.connections });
         UserNotification.success('Pipeline connections updated successfully');
       },
-      this._failUpdateCallback);
+      this._failUpdateCallback,
+    );
   },
 
   _failUpdateCallback(error) {

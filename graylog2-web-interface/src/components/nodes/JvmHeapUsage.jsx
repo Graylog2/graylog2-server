@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ProgressBar } from 'react-bootstrap';
+import { ProgressBar } from 'components/graylog';
 
 import { Spinner } from 'components/common';
 
@@ -10,9 +10,10 @@ import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const JvmHeapUsage = createReactClass({
@@ -39,7 +40,7 @@ const JvmHeapUsage = createReactClass({
   },
 
   _extractMetricValues() {
-    const nodeId = this.props.nodeId;
+    const { nodeId } = this.props;
     const nodeMetrics = this.state.metrics[nodeId];
     const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
 

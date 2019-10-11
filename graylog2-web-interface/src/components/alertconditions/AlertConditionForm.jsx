@@ -2,8 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 
+import { ControlLabel, FormControl, FormGroup } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -59,8 +59,8 @@ const AlertConditionForm = createReactClass({
   },
 
   render() {
-    const alertCondition = this.props.alertCondition;
-    const conditionType = this.props.conditionType;
+    const { alertCondition } = this.props;
+    const { conditionType } = this.props;
 
     return (
       <ConfigurationForm ref={(configurationForm) => { this.configurationForm = configurationForm; }}

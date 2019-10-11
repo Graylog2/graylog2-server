@@ -16,15 +16,19 @@
  */
 package org.graylog.plugins.sidecar.rest.models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
+@WithBeanGetter
+@JsonAutoDetect
 public abstract class Configuration {
     public static final String FIELD_ID = "id";
     public static final String FIELD_COLLECTOR_ID = "collector_id";
@@ -56,7 +60,13 @@ public abstract class Configuration {
                                        @JsonProperty(FIELD_NAME) String name,
                                        @JsonProperty(FIELD_COLOR) String color,
                                        @JsonProperty(FIELD_TEMPLATE) String template) {
-        return new AutoValue_Configuration(id, collectorId, name, color, template);
+        return builder()
+                .id(id)
+                .collectorId(collectorId)
+                .name(name)
+                .color(color)
+                .template(template)
+                .build();
     }
 
     public static Configuration create(String collectorId,
@@ -68,5 +78,26 @@ public abstract class Configuration {
                 name,
                 color,
                 template);
+    }
+
+    public static Builder builder() {
+        return new AutoValue_Configuration.Builder();
+    }
+
+    public abstract Builder toBuilder();
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder id(String id);
+
+        public abstract Builder collectorId(String collectorId);
+
+        public abstract Builder name(String name);
+
+        public abstract Builder color(String color);
+
+        public abstract Builder template(String template);
+
+        public abstract Configuration build();
     }
 }

@@ -1,9 +1,10 @@
 import Reflux from 'reflux';
 
 import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
 
 import ActionsProvider from 'injection/ActionsProvider';
+
+const MetricsStore = StoreProvider.getStore('Metrics');
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
 const GlobalThroughputStore = Reflux.createStore({
@@ -11,6 +12,7 @@ const GlobalThroughputStore = Reflux.createStore({
   metrics: {
     input: 'org.graylog2.throughput.input.1-sec-rate',
     output: 'org.graylog2.throughput.output.1-sec-rate',
+    loading: true,
   },
 
   init() {
@@ -27,6 +29,7 @@ const GlobalThroughputStore = Reflux.createStore({
     const throughput = {
       input: 0,
       output: 0,
+      loading: false,
     };
     Object.keys(update.metrics).forEach((nodeId) => {
       const inputMetric = update.metrics[nodeId][this.metrics.input];

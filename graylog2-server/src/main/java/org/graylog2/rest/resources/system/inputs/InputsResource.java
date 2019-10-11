@@ -17,6 +17,8 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,6 +31,9 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
@@ -59,6 +64,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,19 +75,18 @@ import java.util.stream.Collectors;
 @Path("/system/inputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class InputsResource extends RestResource {
+public class InputsResource extends AbstractInputsResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
     private final InputService inputService;
     private final MessageInputFactory messageInputFactory;
-    private final Map<String, InputDescription> availableInputs;
 
     @Inject
     public InputsResource(InputService inputService, MessageInputFactory messageInputFactory) {
+        super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
-        this.availableInputs = messageInputFactory.getAvailableInputs();
     }
 
     @GET
@@ -91,7 +97,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input.")
     })
     public InputSummary get(@ApiParam(name = "inputId", required = true)
-                                      @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+                            @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
@@ -195,22 +201,5 @@ public class InputsResource extends RestResource {
                 .build(input.getId());
 
         return Response.created(inputUri).entity(InputCreated.create(input.getId())).build();
-    }
-
-    private InputSummary getInputSummary(Input input) {
-        final InputDescription inputDescription = this.availableInputs.get(input.getType());
-        final String name = inputDescription != null ? inputDescription.getName() : "Unknown Input (" + input.getType() + ")";
-        return InputSummary.create(input.getTitle(),
-                input.isGlobal(),
-                name,
-                input.getContentPack(),
-                input.getId(),
-                input.getCreatedAt(),
-                input.getType(),
-                input.getCreatorUserId(),
-                input.getConfiguration(),
-                input.getStaticFields(),
-                input.getNodeId()
-        );
     }
 }

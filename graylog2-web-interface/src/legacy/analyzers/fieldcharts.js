@@ -1,4 +1,8 @@
 import jQuery from 'jquery';
+import {} from 'jquery-ui';
+import {} from 'jquery-ui/ui/version';
+import {} from 'jquery-ui/ui/plugin';
+import {} from 'jquery-ui/ui/widgets/mouse';
 import {} from 'jquery-ui/ui/widgets/draggable';
 import {} from 'jquery-ui/ui/widgets/droppable';
 import moment from 'moment';
@@ -17,6 +21,7 @@ import StringUtils from 'util/StringUtils';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
 
 function generateShortId() {
@@ -300,7 +305,7 @@ export const FieldChart = {
   },
 
   _fetchData(opts, timeRangeParams) {
-    const url = ApiRoutes.UniversalSearchApiController.fieldHistogram(
+    const { url } = ApiRoutes.UniversalSearchApiController.fieldHistogram(
       opts.rangetype,
       opts.query || '*',
       opts.field,
@@ -308,7 +313,7 @@ export const FieldChart = {
       timeRangeParams,
       opts.streamid,
       opts.valuetype === 'cardinality',
-    ).url;
+    );
 
     return fetch('GET', URLUtils.qualifyUrl(url))
       .then((response) => {
