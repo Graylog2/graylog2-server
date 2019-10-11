@@ -3,7 +3,7 @@ import React from 'react';
 import Immutable from 'immutable';
 
 import { Button } from 'components/graylog';
-import TypeAheadInput from 'components/common/TypeAheadInput'; // cannot destruct because eslint(import/no-cycle)
+import TypeAheadInput from 'components/common/TypeAheadInput';
 
 /**
  * Component that renders a data filter input with suggestion capabilities.

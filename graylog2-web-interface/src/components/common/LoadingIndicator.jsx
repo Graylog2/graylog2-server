@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'components/graylog';
 
-import Spinner from 'components/common/Spinner'; // cannot destruct because eslint(import/no-cycle)
+import Spinner from 'components/common/Spinner';
 
 import loadingIndicatorStyle from './LoadingIndicator.css';
 

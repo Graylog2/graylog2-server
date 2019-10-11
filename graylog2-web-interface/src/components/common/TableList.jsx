@@ -6,8 +6,8 @@ import lodash from 'lodash';
 import { Col, Row } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
-import ControlledTableList from 'components/common/ControlledTableList'; // cannot destruct because eslint(import/no-cycle)
-import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter'; // cannot destruct because eslint(import/no-cycle)
+import ControlledTableList from 'components/common/ControlledTableList';
+import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
 import style from './TableList.css';
 
