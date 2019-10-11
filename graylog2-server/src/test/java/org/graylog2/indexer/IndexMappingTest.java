@@ -72,18 +72,26 @@ public class IndexMappingTest {
     private static final String indexName = "testmessages";
     private static final String currentIndex = "testmessages_0";
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private final EmbeddedElastic embeddedElastic;
-    private final JestClient jestClient;
+    private EmbeddedElastic embeddedElastic;
+    private JestClient jestClient;
 
-    private final IndexSet indexSet;
-    private Indices indices;
+    private IndexSet indexSet;
+    private final String esVersion;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> provideData() {
         return Arrays.asList(new Object[][]{{"5.3.0"}, {"6.2.0"}});
     }
 
-    public IndexMappingTest(String esVersion) throws IOException, InterruptedException {
+    public IndexMappingTest(String esVersion) {
+        this.esVersion = esVersion;
+    }
+
+    private Messages messages;
+
+    @Before
+    public void setUpClasses() throws IOException, InterruptedException {
+
         embeddedElastic = EmbeddedElastic.builder()
                 .withElasticVersion(esVersion)
                 .withSetting(TRANSPORT_TCP_PORT, 0)
@@ -119,20 +127,14 @@ public class IndexMappingTest {
         when(indexSetConfig.indexWildcard()).thenReturn(indexName + "_*");
         when(indexSetConfig.replicas()).thenReturn(1);
         when(indexSetConfig.shards()).thenReturn(1);
-    }
 
-    private Messages messages;
-
-    @Before
-    public void setUpClasses() {
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(new Node(jestClient));
         final NodeId nodeId = mock(NodeId.class);
         when(nodeId.toString()).thenReturn("deadbeef");
         final AuditEventSender auditEventSender = mock(AuditEventSender.class);
-        indices = new Indices(jestClient, objectMapper, indexMappingFactory, null, nodeId, auditEventSender, null);
+        Indices indices = new Indices(jestClient, objectMapper, indexMappingFactory, null, nodeId, auditEventSender, null);
 
-        final MetricRegistry metricRegistry = new MetricRegistry();
-        messages = new Messages(metricRegistry, jestClient, mock(ProcessingStatusRecorder.class));
+        messages = new Messages(new MetricRegistry(), jestClient, mock(ProcessingStatusRecorder.class));
         indices.create(currentIndex, indexSet);
     }
 
@@ -175,7 +177,7 @@ public class IndexMappingTest {
         return mappingResult.getJsonString();
     }
 
-    private void indexMessage(Map<String, Object> additionalFields) throws InterruptedException, IOException {
+    private void indexMessage(Map<String, Object> additionalFields) {
         final Message message = new Message("foo", "bar", DateTime.now(DateTimeZone.UTC));
         additionalFields.forEach(message::addField);
         final List<Map.Entry<IndexSet, Message>> messageList = Collections.singletonList(new AbstractMap.SimpleEntry<>(indexSet, message));
