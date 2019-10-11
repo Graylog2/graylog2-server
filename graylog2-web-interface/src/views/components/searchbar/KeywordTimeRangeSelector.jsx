@@ -80,7 +80,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
       <div className="timerange-selector keyword" style={{ width: 650 }}>
         <Row className="no-bm" style={{ marginLeft: 50 }}>
           <Col md={3} style={{ padding: 0 }}>
-            <FormGroup key={name} controlId={`form-inline-${name}`} style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
+            <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
               <InputGroup>
                 <FormControl type="text"
                              className="input-sm"
