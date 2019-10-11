@@ -3305,9 +3305,9 @@ chownr@^1.1.1:
   integrity sha512-GkfeAQh+QNy3wquu9oIZr6SS5x7wGdSgNQvD10X3r+AZr1Oys22HW8kAmDMvNg2+Dm0TeGaEuO8gFwdBXxwO8A==
 
 chroma-js@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.0.3.tgz#2521d4f80c4e786e00064c4a62824e38ff6557c4"
-  integrity sha512-2kTvZZOFSV1O81/rm99t9vmkh9jQxsHqsRRoZevDVz/VCC3yKMyPuMK8M5yHG+UMg2tV6cRoqtZtgcD92udcBw==
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.0.6.tgz#2d4b761be09bf142b541f0011f64f213ecf6c8b6"
+  integrity sha512-IiiClbBRkRwuXNl6impq5ssEhUGpmWvc5zzImZbDUWLWcFbj6ZbtsdZEx6sIXMKes7azgYaUpnmsY1T8BL6PqQ==
 
 chrome-trace-event@^1.0.2:
   version "1.0.2"
