@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.rest.SearchResource;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -189,6 +188,7 @@ public class SearchResourceTest {
         when(searchJobService.create(any(), any())).thenReturn(searchJob);
         when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
+        when(search.queries()).thenReturn(ImmutableSet.of());
 
         this.searchResource.executeSyncJob(search, 100);
 
