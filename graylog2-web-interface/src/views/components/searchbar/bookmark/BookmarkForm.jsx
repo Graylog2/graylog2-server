@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'react-bootstrap';
+import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
