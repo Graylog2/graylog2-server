@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button } from 'components/graylog';
-import { ExternalLink } from 'components/common';
+import ExternalLink from 'components/common/ExternalLink';
 
 /**
  * Component that renders a link to an external resource as a button.

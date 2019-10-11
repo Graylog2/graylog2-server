@@ -7,7 +7,7 @@ import { Link } from 'react-router';
 import StoreProvider from 'injection/StoreProvider';
 
 import Routes from 'routing/Routes';
-import { Spinner } from 'components/common';
+import Spinner from 'components/common/Spinner';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 
