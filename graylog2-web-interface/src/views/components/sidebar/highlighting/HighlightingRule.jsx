@@ -3,8 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 // $FlowFixMe: imports from core need to be fixed in flow
-import ColorPickerPopover from 'components/common/ColorPickerPopover';
-import { Icon } from 'components/common';
+import { ColorPickerPopover, Icon } from 'components/common';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';

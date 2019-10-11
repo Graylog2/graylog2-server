@@ -9,9 +9,8 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
-import { Icon } from 'components/common';
+import { Icon, Pluralize } from 'components/common';
 // $FlowFixMe: imports from core need to be fixed in flow
-import Pluralize from 'components/common/Pluralize';
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
 import styles from './RefreshControls.css';

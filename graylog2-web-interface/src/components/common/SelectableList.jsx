@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/graylog';
-import Select from './Select';
 
 /**
  * Component that renders a `Select` component above a list of selected
