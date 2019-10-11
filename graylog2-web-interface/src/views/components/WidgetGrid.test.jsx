@@ -24,6 +24,11 @@ jest.mock('graylog-web-plugin/plugin', () => ({
   },
 }));
 
+jest.mock('react-sizeme', () => ({
+  // eslint-disable-next-line react/prop-types
+  SizeMe: ({ children }) => <div>{children({ size: { width: 200 } })}</div>,
+}));
+
 describe('<WidgetGrid />', () => {
   it('should render with minimal props', () => {
     const wrapper = renderer.create((

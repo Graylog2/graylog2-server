@@ -112,14 +112,12 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
               >
                 <Button__StyledButton
                   action="push"
-                  active={false}
                   bsStyle="success"
                   onClick={[Function]}
                   type="submit"
                 >
                   <StyledComponent
                     action="push"
-                    active={false}
                     bsStyle="success"
                     forwardedComponent={
                       Object {
@@ -142,10 +140,9 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
-                          "lastClassName": "cBCVOY",
+                          "lastClassName": "kRDLih",
                           "rules": Array [
                             [Function],
-                            ";",
                           ],
                         },
                         "displayName": "Button__StyledButton",
@@ -168,14 +165,14 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       block={false}
                       bsClass="btn"
                       bsStyle="success"
-                      className="Button__StyledButton-c9cbmb-0 cBCVOY"
+                      className="Button__StyledButton-c9cbmb-0 kRDLih"
                       disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
                       <button
                         action="push"
-                        className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-success"
+                        className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
                         disabled={false}
                         onClick={[Function]}
                         type="submit"

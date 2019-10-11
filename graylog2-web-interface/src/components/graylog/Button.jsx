@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import styled from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Button as BootstrapButton } from 'react-bootstrap';
@@ -6,13 +6,13 @@ import { Button as BootstrapButton } from 'react-bootstrap';
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const Button = React.forwardRef(({ active, bsStyle, ...props }, ref) => {
-  const StyledButton = styled(btnProps => <BootstrapButton {...btnProps} ref={ref} />)`
-    ${buttonStyles({ active })};
-  `;
+const Button = forwardRef(({ active, bsStyle, ...props }, ref) => {
+  const StyledButton = useCallback(styled(BootstrapButton)`
+    ${buttonStyles({ active })}
+  `, [active]);
 
   return (
-    <StyledButton active={active} bsStyle={bsStyle} ref={ref} {...props} />
+    <StyledButton bsStyle={bsStyle} ref={ref} {...props} />
   );
 });
 

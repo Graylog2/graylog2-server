@@ -4,6 +4,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
+import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
 import history from 'util/History';
@@ -91,7 +92,17 @@ import {
 import AppConfig from 'util/AppConfig';
 
 const AppRouter = () => {
-  const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
+  const pluginRoutes = PluginStore.exports('routes');
+  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map((pluginRoute) => {
+    return (
+      <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
+             component={pluginRoute.parentComponent}>
+        <Route path={URLUtils.appPrefixed(pluginRoute.path)}
+               component={pluginRoute.component} />
+      </Route>
+    );
+  });
+  const standardPluginRoutes = pluginRoutes.filter(route => !route.parentComponent).map((pluginRoute) => {
     return (
       <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
              path={URLUtils.appPrefixed(pluginRoute.path)}
@@ -99,19 +110,23 @@ const AppRouter = () => {
     );
   });
   const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+
   return (
     <Router history={history}>
       <Route path={Routes.STARTPAGE} component={App}>
         <Route component={AppWithGlobalNotifications}>
           <IndexRoute component={StartPage} />
+          {pluginRoutesWithParent}
           <Route component={AppWithSearchBar}>
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
             {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
             {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
           </Route>
-          <Route component={AppWithoutSearchBar}>
+          <Route component={AppWithExtendedSearchBar}>
             {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
+          </Route>
+          <Route component={AppWithoutSearchBar}>
             <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
             <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
             <Route path={Routes.STREAMS} component={StreamsPage} />
@@ -202,7 +217,7 @@ const AppRouter = () => {
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(':configurationId')} component={SidecarEditConfigurationPage} />
             <Route path={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR} component={SidecarNewCollectorPage} />
             <Route path={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId')} component={SidecarEditCollectorPage} />
-            {pluginRoutes}
+            {standardPluginRoutes}
           </Route>
         </Route>
         <Route component={AppWithoutSearchBar}>
