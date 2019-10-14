@@ -3,14 +3,12 @@ import * as React from 'react';
 import { withRouter } from 'react-router';
 
 export type BigDisplayModeQuery = {|
-  cycle?: ?boolean,
   tabs?: Array<number>,
   interval?: ?number,
   refresh?: ?number,
 |};
 
 export type UntypedBigDisplayModeQuery = {|
-  cycle?: string,
   tabs?: string,
   interval?: string,
   refresh?: string,
@@ -22,8 +20,7 @@ type Props = {
   },
 };
 
-const castQueryWithDefaults = ({ cycle, tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
-  cycle: cycle !== undefined ? JSON.parse(cycle) : false,
+const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({
   tabs: tabs !== undefined ? tabs.split(',').map(tab => Number.parseInt(tab, 10)) : undefined,
   interval: interval !== undefined ? Number.parseInt(interval, 10) : undefined,
   refresh: refresh !== undefined ? Number.parseInt(refresh, 10) : undefined,

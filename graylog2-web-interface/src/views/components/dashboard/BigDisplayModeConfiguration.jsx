@@ -7,8 +7,8 @@ import { Button, Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem, Modal }
 import Input from 'components/bootstrap/Input';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
-import type { BigDisplayModeQuery } from 'views/pages/ShowDashboardInBigDisplayMode';
 import queryTitle from 'views/logic/queries/QueryTitle';
+import type { UntypedBigDisplayModeQuery } from 'views/pages/ShowDashboardInBigDisplayMode';
 
 type Configuration = {
   refreshInterval: number,
@@ -89,16 +89,16 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
   );
 };
 
-const redirectToBigDisplayMode = (view: View, config: BigDisplayModeQuery): void => history.push(
+const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery): void => history.push(
   new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
     .search(config)
     .toString(),
 );
 
-const createQueryFromConfiguration = ({ queryCycleInterval: interval, queryTabs, refreshInterval: refresh }: Configuration): BigDisplayModeQuery => ({
-  interval,
+const createQueryFromConfiguration = ({ queryCycleInterval, queryTabs, refreshInterval }: Configuration): UntypedBigDisplayModeQuery => ({
+  interval: Number(queryCycleInterval).toString(),
   tabs: queryTabs !== undefined ? queryTabs.join(',') : undefined,
-  refresh,
+  refresh: Number(refreshInterval).toString(),
 });
 
 type Props = {
