@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Immutable from 'immutable';
+import DocsHelper from 'util/DocsHelper';
 
+import { Col, Row, Jumbotron } from 'components/graylog';
+import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
-
 import { widgetDefinition } from 'views/logic/Widgets';
+import DocumentationLink from 'components/support/DocumentationLink';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 
 const MAXIMUM_GRID_SIZE = 12;
@@ -56,7 +58,27 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   );
 };
 
+const _emptyDashboardInfo = () => {
+  return (
+    <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Col md={12}>
+        <Jumbotron style={{ marginBottom: 0 }}>
+          <h2>This dashboard has no widgets yet</h2>
+          <p>
+            You can create a new widget by selecting a wdget type in the left sidebar section &quot;Create&quot;.<br />
+            Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" /> to learn more about the widget creation.
+          </p>
+        </Jumbotron>
+      </Col>
+    </Row>
+  );
+};
+
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
+  if (!widgets || widgets.size === 0) {
+    return _emptyDashboardInfo();
+  }
+
   if (results) {
     const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
     return (<span>{content}</span>);

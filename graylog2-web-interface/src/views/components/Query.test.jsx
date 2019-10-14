@@ -134,4 +134,42 @@ describe('Query', () => {
     expect(widgetGrid).toHaveProp('data', { widget1: [], widget2: [] });
     expect(widgetGrid).toHaveProp('widgets', { widget1, widget2 });
   });
+
+  it('renders widget creation explanation, if no widget is defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={Immutable.Map()}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()} />
+    ));
+
+    expect(wrapper.contains('This dashboard has no widgets yet')).toEqual(true);
+  });
+
+  it('renders no widget creation explanation, if there are some widgets defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()} />
+    ));
+
+    expect(wrapper.contains('This dashboard has no widgets yet')).toEqual(false);
+  });
 });
