@@ -16,13 +16,15 @@ const NodesList = createReactClass({
 
   propTypes: {
     permissions: PropTypes.array.isRequired,
-    nodes: PropTypes.array.isRequired,
+    nodes: PropTypes.arrayOf(PropTypes.object).isRequired,
   },
 
   mixins: [Reflux.connect(ClusterOverviewStore)],
 
   _isLoading() {
-    return !(this.props.nodes && this.state.clusterOverview);
+    const { nodes } = this.props;
+    const { clusterOverview } = this.state;
+    return !(nodes && clusterOverview);
   },
 
   _formatNodes(nodes, clusterOverview) {
