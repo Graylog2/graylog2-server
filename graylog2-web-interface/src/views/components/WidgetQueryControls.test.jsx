@@ -57,15 +57,16 @@ describe('WidgetQueryControls', () => {
   });
 
   describe('displays if global override is set', () => {
+    const indicatorText = 'These controls are disabled, because a filter is applied to all widgets.';
     it('shows an indicator if global override is set', async () => {
       const { getByText, getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
+      await waitForElement(() => getByText(indicatorText));
       await waitForElement(() => getByTestId('reset-filter'));
     });
 
     it('does not show an indicator if global override is not set', async () => {
       const { queryByText } = renderSUT({ globalOverride: emptyGlobalOverride });
-      expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+      expect(queryByText(indicatorText)).toBeNull();
     });
 
     it('triggers resetting the global override store when reset filter button is clicked', async () => {
@@ -77,11 +78,11 @@ describe('WidgetQueryControls', () => {
 
     it('emptying `globalOverride` prop removes notification', async () => {
       const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
-      await waitForElement(() => getByText('These controls are disabled because a filter is applied to all widgets.'));
+      await waitForElement(() => getByText(indicatorText));
 
       rerender(<WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />);
 
-      expect(queryByText('These controls are disabled because a filter is applied to all widgets.')).toBeNull();
+      expect(queryByText(indicatorText)).toBeNull();
     });
 
     it('disables timerange controls when global override is present', () => {
