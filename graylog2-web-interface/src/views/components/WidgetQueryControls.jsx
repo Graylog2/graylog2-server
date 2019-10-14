@@ -76,7 +76,7 @@ const BlurredWrapper = styled.div`
 const CenteredBox = styled.div`
   position: absolute;
   background: white;
-  padding: 5px 10px 5px 10px;
+  padding: 10px 15px 10px 15px;
   border-color: lightgray;
   border-radius: 2px;
   border-width: 1px;
@@ -89,10 +89,16 @@ const CenteredBox = styled.div`
   margin: 0 auto;
 `;
 
+// TODO: Remove `!important`, find other way to overcome specificity issue
+const ResetFilterButton = styled.button`
+  margin-left: 5px;
+  vertical-align: initial !important;
+`;
+
 const ResetOverrideHint = () => (
   <CenteredBox>
-    These controls are disabled because a filter is applied to all widgets.{' '}
-    <Button bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter</Button>
+    These controls are disabled, because a filter is applied to all widgets.{' '}
+    <ResetFilterButton bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter</ResetFilterButton>
   </CenteredBox>
 );
 
