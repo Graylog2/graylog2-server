@@ -8,6 +8,7 @@ import Input from 'components/bootstrap/Input';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import type { BigDisplayModeQuery } from 'views/pages/ShowDashboardInBigDisplayMode';
+import queryTitle from 'views/logic/queries/QueryTitle';
 
 type Configuration = {
   refreshInterval: number,
@@ -23,7 +24,10 @@ type ConfigurationModalProps = {
 };
 
 const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps) => {
-  const availableTabs = view.search.queries.keySeq().map((q, idx) => [idx, view.state.getIn([q.id]).titles.getIn(['tab', 'title'], `Query#${idx}`)]).toJS();
+  const availableTabs = view.search.queries.keySeq().map((query, idx) => [
+    idx,
+    queryTitle(view, query),
+  ]).toJS();
 
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [cycleTabs, setCycleTabs] = useState(true);
