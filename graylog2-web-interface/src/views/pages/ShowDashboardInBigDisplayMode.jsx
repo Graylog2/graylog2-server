@@ -4,7 +4,7 @@ import { withRouter } from 'react-router';
 
 export type BigDisplayModeQuery = {|
   cycle?: ?boolean,
-  tabs?: string,
+  tabs?: Array<number>,
   interval?: ?number,
   refresh?: ?number,
 |};

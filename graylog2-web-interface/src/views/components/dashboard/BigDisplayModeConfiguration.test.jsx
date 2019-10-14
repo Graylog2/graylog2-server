@@ -79,22 +79,6 @@ describe('BigDisplayModeConfiguration', () => {
   // $FlowFixMe: Force subclassing of element;
   const castElement = <C>(e: HTMLElement): C => e;
 
-  it('disables cycle tabs if only single tab is present', () => {
-    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} open />);
-
-    const cycleTabs = castElement<HTMLInputElement>(getByLabelText('Cycle Tabs?'));
-
-    expect(cycleTabs.checked).toEqual(false);
-  });
-
-  it('enables cycle tabs if multiple tabs are present', () => {
-    const { getByLabelText } = render(<BigDisplayModeConfiguration view={createViewWithQueries()} open />);
-
-    const cycleTabs = castElement<HTMLInputElement>(getByLabelText('Cycle Tabs?'));
-
-    expect(cycleTabs.checked).toEqual(true);
-  });
-
   describe('redirects to tv mode page', () => {
     beforeEach(() => {
       history.push = jest.fn();
@@ -109,7 +93,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=&refresh=10');
     });
 
     it('including changed refresh interval', () => {
@@ -123,28 +107,11 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=42');
-    });
-
-    it('including cycle tabs setting', () => {
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
-
-      const cycleTabs = getByLabelText('Cycle Tabs?');
-
-      fireEvent.click(cycleTabs);
-
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=&refresh=42');
     });
 
     it('including tab cycle interval setting', () => {
       const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
-
-      const cycleTabs = getByLabelText('Cycle Tabs?');
-      fireEvent.click(cycleTabs);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
       fireEvent.change(cycleInterval, { target: { value: 4242 } });
@@ -153,7 +120,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=4242&tabs=&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&tabs=&refresh=10');
     });
 
     it('including selected tabs', () => {
@@ -167,48 +134,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=1%2C2&refresh=10');
-    });
-
-    it('includes tabs and cycle interval if cycle tabs is checked', () => {
-      const viewWithQueries = createViewWithQueries();
-      const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
-
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=0%2C1%2C2&refresh=10');
-    });
-
-    it('does not include tabs and cycle interval if cycle tabs is unchecked', () => {
-      const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
-
-      const cycleTabs = getByLabelText('Cycle Tabs?');
-      fireEvent.click(cycleTabs);
-
-      const saveButton = getByText('Save');
-      fireEvent.click(saveButton);
-
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=10');
-    });
-
-    it('disables tabs and cycle interval if cycle tabs is unchecked', () => {
-      const viewWithQueries = createViewWithQueries();
-      const { getByLabelText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
-
-      const cycleTabs = getByLabelText('Cycle Tabs?');
-      fireEvent.click(cycleTabs);
-
-      expect(castElement<HTMLInputElement>(cycleTabs).checked).toEqual(false);
-
-      const cycleInterval = getByLabelText('Tab cycle interval');
-      expect(cycleInterval).toBeDisabled();
-
-      const query1 = getByLabelText('Query#1');
-      expect(query1).toBeDisabled();
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=1%2C2&refresh=10');
     });
   });
 });

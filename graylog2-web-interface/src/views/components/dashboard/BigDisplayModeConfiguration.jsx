@@ -12,7 +12,6 @@ import queryTitle from 'views/logic/queries/QueryTitle';
 
 type Configuration = {
   refreshInterval: number,
-  cycleTabs: boolean,
   queryTabs?: Array<number>,
   queryCycleInterval?: number,
 };
@@ -29,24 +28,16 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
     queryTitle(view, query),
   ]).toJS();
 
-  const multipleTabs = view.search.queries.size > 1;
   const [refreshInterval, setRefreshInterval] = useState(10);
-  const [cycleTabs, setCycleTabs] = useState(multipleTabs);
   const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx]) => idx));
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
   const addQueryTab = useCallback(idx => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
   const removeQueryTab = useCallback(idx => setQueryTabs(queryTabs.filter(tab => tab !== idx)), [queryTabs, setQueryTabs]);
-  const _onSave = useCallback(() => onSave(cycleTabs
-    ? {
-      refreshInterval,
-      cycleTabs,
-      queryTabs,
-      queryCycleInterval,
-    }
-    : {
-      cycleTabs,
-      refreshInterval,
-    }), [onSave, refreshInterval, cycleTabs, queryTabs, queryCycleInterval]);
+  const _onSave = useCallback(() => onSave({
+    refreshInterval,
+    queryTabs,
+    queryCycleInterval,
+  }), [onSave, refreshInterval, queryTabs, queryCycleInterval]);
 
   return (
     <Modal show bsSize="large" onHide={onCancel}>
@@ -60,43 +51,35 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
                label="Refresh Interval"
                help="After how many seconds should the dashboard refresh?"
                onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
+               required
                value={refreshInterval} />
-        <Input id="cycle-tabs"
-               type="checkbox"
-               name="cycle-tabs"
-               label="Cycle Tabs?"
-               help="Should we cycle through existing tabs?"
-               onChange={event => setCycleTabs(event.target.checked)}
-               checked={cycleTabs} />
+
+        <FormGroup>
+          <ControlLabel>Tabs</ControlLabel>
+          <ul>
+            {availableTabs.map(([idx, title]) => (
+              <li key={`${idx}-${title}`}>
+                <Checkbox inline
+                          checked={queryTabs.includes(idx)}
+                          onChange={event => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
+                  {title}
+                </Checkbox>
+              </li>
+            ))}
+          </ul>
+          <HelpBlock>
+            Select the query tabs to include in rotation.
+          </HelpBlock>
+        </FormGroup>
+
         <Input id="query-cycle-interval"
-               disabled={!cycleTabs}
                type="number"
                name="query-cycle-interval"
                label="Tab cycle interval"
                help="After how many seconds should the next tab be shown?"
                onChange={({ target: { value } }) => setQueryCycleInterval(value)}
+               required
                value={queryCycleInterval} />
-
-        <FormGroup>
-          <ControlLabel>Widgets</ControlLabel>
-          <HelpBlock>
-            Select the query tabs to include.
-          </HelpBlock>
-        </FormGroup>
-
-        <ul>
-          {availableTabs.map(([idx, title]) => (
-            <li key={`${idx}-${title}`}>
-              <Checkbox inline
-                        disabled={cycleTabs !== true}
-                        checked={queryTabs.includes(idx)}
-                        onChange={event => (event.target.checked ? addQueryTab(idx) : removeQueryTab(idx))}>
-                {title}
-              </Checkbox>
-            </li>
-          ))}
-        </ul>
-
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={_onSave} bsStyle="success">Save</Button>
@@ -112,8 +95,7 @@ const redirectToBigDisplayMode = (view: View, config: BigDisplayModeQuery): void
     .toString(),
 );
 
-const createQueryFromConfiguration = ({ cycleTabs: cycle, queryCycleInterval: interval, queryTabs, refreshInterval: refresh }: Configuration): BigDisplayModeQuery => ({
-  cycle,
+const createQueryFromConfiguration = ({ queryCycleInterval: interval, queryTabs, refreshInterval: refresh }: Configuration): BigDisplayModeQuery => ({
   interval,
   tabs: queryTabs !== undefined ? queryTabs.join(',') : undefined,
   refresh,
