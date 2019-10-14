@@ -13,8 +13,8 @@ import queryTitle from 'views/logic/queries/QueryTitle';
 type Configuration = {
   refreshInterval: number,
   cycleTabs: boolean,
-  queryTabs: Array<number>,
-  queryCycleInterval: number,
+  queryTabs?: Array<number>,
+  queryCycleInterval?: number,
 };
 
 type ConfigurationModalProps = {
@@ -36,12 +36,17 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
   const addQueryTab = useCallback(idx => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
   const removeQueryTab = useCallback(idx => setQueryTabs(queryTabs.filter(tab => tab !== idx)), [queryTabs, setQueryTabs]);
-  const _onSave = useCallback(() => onSave({
-    refreshInterval,
-    cycleTabs,
-    queryTabs,
-    queryCycleInterval,
-  }), [onSave]);
+  const _onSave = useCallback(() => onSave(cycleTabs
+    ? {
+      refreshInterval,
+      cycleTabs,
+      queryTabs,
+      queryCycleInterval,
+    }
+    : {
+      cycleTabs,
+      refreshInterval,
+    }), [onSave, refreshInterval, cycleTabs, queryTabs, queryCycleInterval]);
 
   return (
     <Modal show bsSize="large" onHide={onCancel}>
@@ -54,7 +59,7 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
                name="refresh-interval"
                label="Refresh Interval"
                help="After how many seconds should the dashboard refresh?"
-               onChange={setRefreshInterval}
+               onChange={({ target: { value } }) => setRefreshInterval(Number.parseInt(value, 10))}
                value={refreshInterval} />
         <Input id="cycle-tabs"
                type="checkbox"
@@ -69,7 +74,7 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
                name="query-cycle-interval"
                label="Tab cycle interval"
                help="After how many seconds should the next tab be shown?"
-               onChange={setQueryCycleInterval}
+               onChange={({ target: { value } }) => setQueryCycleInterval(value)}
                value={queryCycleInterval} />
 
         <FormGroup>
@@ -107,15 +112,20 @@ const redirectToBigDisplayMode = (view: View, config: BigDisplayModeQuery): void
     .toString(),
 );
 
-const createQueryFromConfiguration = (config: Configuration): BigDisplayModeQuery => ({
-  cycle: config.cycleTabs,
-  interval: config.queryCycleInterval,
-  tabs: config.queryTabs,
-  refresh: config.refreshInterval,
+const createQueryFromConfiguration = ({ cycleTabs: cycle, queryCycleInterval: interval, queryTabs, refreshInterval: refresh }: Configuration): BigDisplayModeQuery => ({
+  cycle,
+  interval,
+  tabs: queryTabs !== undefined ? queryTabs.join(',') : undefined,
+  refresh,
 });
 
-const BigDisplayModeConfiguration = ({ view }: { view: View }) => {
-  const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+type Props = {
+  view: View,
+  open?: boolean
+};
+
+const BigDisplayModeConfiguration = ({ view, open }: Props) => {
+  const [showConfigurationModal, setShowConfigurationModal] = useState(open);
   const onCancel = useCallback(() => setShowConfigurationModal(false), [setShowConfigurationModal]);
 
   const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config));
@@ -126,6 +136,10 @@ const BigDisplayModeConfiguration = ({ view }: { view: View }) => {
       <MenuItem onSelect={() => setShowConfigurationModal(true)}><i className="fa fa-desktop" /> Full Screen</MenuItem>
     </React.Fragment>
   );
+};
+
+BigDisplayModeConfiguration.defaultProps = {
+  open: false,
 };
 
 export default BigDisplayModeConfiguration;
