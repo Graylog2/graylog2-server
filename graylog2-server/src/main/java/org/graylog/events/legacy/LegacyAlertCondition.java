@@ -40,7 +40,7 @@ public class LegacyAlertCondition extends AbstractAlertCondition {
                 eventDefinition.config().type(),
                 eventDto.processingTimestamp(),
                 "admin",
-                ImmutableMap.of("backlog", 50), // TODO: Use value from notification config once it's configurable
+                ImmutableMap.of("backlog", eventDefinition.notificationSettings().backlogSize()),
                 eventDefinition.title()
         );
         this.description = eventDefinition.title();
