@@ -1,27 +1,52 @@
 // @flow strict
 import * as React from 'react';
 import { render, cleanup, fireEvent, waitForElement } from '@testing-library/react';
+import * as Immutable from 'immutable';
+import { toBeDisabled } from '@testing-library/jest-dom';
 
 import history from 'util/History';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import Query from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
-import Query from '../../logic/queries/Query';
+
+expect.extend({ toBeDisabled });
 
 jest.mock('util/History', () => ({}));
 jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 
+const search = Search.create();
+const view = View.create()
+  .toBuilder()
+  .id('deadbeef')
+  .type(View.Type.Dashboard)
+  .search(search)
+  .build();
+
+const createViewWithQueries = () => {
+  const queries = [
+    Query.builder().id('query-id-1').build(),
+    Query.builder().id('query-id-2').build(),
+    Query.builder().id('other-query-id').build(),
+  ];
+  const states = {
+    'query-id-1': ViewState.create(),
+    'query-id-2': ViewState.builder().titles(Immutable.fromJS({ tab: { title: 'My awesome Query tab' } })).build(),
+    'other-query-id': ViewState.create(),
+  };
+  const searchWithQueries = search.toBuilder()
+    .queries(queries)
+    .build();
+  return view.toBuilder()
+    .state(states)
+    .search(searchWithQueries)
+    .build();
+};
+
 describe('BigDisplayModeConfiguration', () => {
   afterEach(cleanup);
-
-  const search = Search.create();
-  const view = View.create()
-    .toBuilder()
-    .id('deadbeef')
-    .type(View.Type.Dashboard)
-    .search(search)
-    .build();
 
   it('generates markup that matches snapshot', () => {
     const { container } = render(<BigDisplayModeConfiguration view={view} />);
@@ -43,30 +68,147 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('shows all query titles in modal', () => {
-    const queries = [
-      Query.builder().build(),
-      Query.builder().build(),
-    ];
-    const searchWithQueries = search.toBuilder()
-      .queries(queries)
-      .build();
-    const viewWithQueries = view.toBuilder().search(searchWithQueries).build();
+    const viewWithQueries = createViewWithQueries();
     const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
 
     expect(getByText('Query#1')).not.toBeNull();
-    expect(getByText('Query#2')).not.toBeNull();
+    expect(getByText('My awesome Query tab')).not.toBeNull();
+    expect(getByText('Query#3')).not.toBeNull();
   });
 
-  it('redirects to tv mode page when "Save" is clicked', () => {
-    const { getByText } = render(<BigDisplayModeConfiguration view={view} open />);
-    const saveButton = getByText('Save');
-    expect(saveButton).not.toBeNull();
-    history.push = jest.fn();
-    Routes.pluginRoute = jest.fn(() => viewId => `/dashboards/tv/${viewId}`);
+  // $FlowFixMe: Force subclassing of element;
+  const castElement = <C>(e: HTMLElement): C => e;
 
-    fireEvent.click(saveButton);
+  it('disables cycle tabs if only single tab is present', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} open />);
 
-    expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-    expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=10');
+    const cycleTabs = castElement<HTMLInputElement>(getByLabelText('Cycle Tabs?'));
+
+    expect(cycleTabs.checked).toEqual(false);
+  });
+
+  it('enables cycle tabs if multiple tabs are present', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={createViewWithQueries()} open />);
+
+    const cycleTabs = castElement<HTMLInputElement>(getByLabelText('Cycle Tabs?'));
+
+    expect(cycleTabs.checked).toEqual(true);
+  });
+
+  describe('redirects to tv mode page', () => {
+    beforeEach(() => {
+      history.push = jest.fn();
+      Routes.pluginRoute = jest.fn(() => viewId => `/dashboards/tv/${viewId}`);
+    });
+
+    it('when "Save" is clicked', () => {
+      const { getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+      const saveButton = getByText('Save');
+      expect(saveButton).not.toBeNull();
+
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=10');
+    });
+
+    it('including changed refresh interval', () => {
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+
+      const refreshInterval = getByLabelText('Refresh Interval');
+
+      fireEvent.change(refreshInterval, { target: { value: 42 } });
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=42');
+    });
+
+    it('including cycle tabs setting', () => {
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+
+      const cycleTabs = getByLabelText('Cycle Tabs?');
+
+      fireEvent.click(cycleTabs);
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=&refresh=10');
+    });
+
+    it('including tab cycle interval setting', () => {
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+
+      const cycleTabs = getByLabelText('Cycle Tabs?');
+      fireEvent.click(cycleTabs);
+
+      const cycleInterval = getByLabelText('Tab cycle interval');
+      fireEvent.change(cycleInterval, { target: { value: 4242 } });
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=4242&tabs=&refresh=10');
+    });
+
+    it('including selected tabs', () => {
+      const viewWithQueries = createViewWithQueries();
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+
+      const query1 = getByLabelText('Query#1');
+      fireEvent.click(query1);
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=1%2C2&refresh=10');
+    });
+
+    it('includes tabs and cycle interval if cycle tabs is checked', () => {
+      const viewWithQueries = createViewWithQueries();
+      const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=true&interval=30&tabs=0%2C1%2C2&refresh=10');
+    });
+
+    it('does not include tabs and cycle interval if cycle tabs is unchecked', () => {
+      const viewWithQueries = createViewWithQueries();
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+
+      const cycleTabs = getByLabelText('Cycle Tabs?');
+      fireEvent.click(cycleTabs);
+
+      const saveButton = getByText('Save');
+      fireEvent.click(saveButton);
+
+      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?cycle=false&refresh=10');
+    });
+
+    it('disables tabs and cycle interval if cycle tabs is unchecked', () => {
+      const viewWithQueries = createViewWithQueries();
+      const { getByLabelText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+
+      const cycleTabs = getByLabelText('Cycle Tabs?');
+      fireEvent.click(cycleTabs);
+
+      expect(castElement<HTMLInputElement>(cycleTabs).checked).toEqual(false);
+
+      const cycleInterval = getByLabelText('Tab cycle interval');
+      expect(cycleInterval).toBeDisabled();
+
+      const query1 = getByLabelText('Query#1');
+      expect(query1).toBeDisabled();
+    });
   });
 });
