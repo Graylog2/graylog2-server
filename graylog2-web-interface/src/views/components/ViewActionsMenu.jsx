@@ -46,7 +46,7 @@ const ViewActionsMenu = ({ view, metadata, onSaveView, onSaveAsView, currentUser
     </React.Fragment>
   );
   return (
-    <span>
+    <React.Fragment>
       <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
         <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
         <MenuItem onSelect={() => onSaveView(view)}
@@ -75,7 +75,7 @@ const ViewActionsMenu = ({ view, metadata, onSaveView, onSaveAsView, currentUser
                            show={editViewOpen}
                            onClose={() => setEditViewOpen(false)} />
       {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
-    </span>
+    </React.Fragment>
   );
 };
 
