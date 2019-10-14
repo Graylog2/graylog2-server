@@ -65,8 +65,8 @@ const _emptyDashboardInfo = () => {
         <Jumbotron style={{ marginBottom: 0 }}>
           <h2>This dashboard has no widgets yet</h2>
           <p>
-            You can create a new widget by selecting a wdget type in the left sidebar section &quot;Create&quot;.<br />
-            Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" /> to learn more about the widget creation.
+            You can create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.<br />
+            Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
           </p>
         </Jumbotron>
       </Col>
