@@ -1,15 +1,33 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
+import URI from 'urijs';
+import history from 'util/History';
+
 import { Button, Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem, Modal } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
+import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
+import type { BigDisplayModeQuery } from 'views/pages/ShowDashboardInBigDisplayMode';
 
-const ConfigurationModal = ({ onSave, onCancel, view }: { view: View }) => {
+type Configuration = {
+  refreshInterval: number,
+  cycleTabs: boolean,
+  queryTabs: Array<number>,
+  queryCycleInterval: number,
+};
+
+type ConfigurationModalProps = {
+  onSave: (Configuration) => void,
+  onCancel: () => void,
+  view: View,
+};
+
+const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps) => {
   const availableTabs = view.search.queries.keySeq().map((q, idx) => [idx, view.state.getIn([q.id]).titles.getIn(['tab', 'title'], `Query#${idx}`)]).toJS();
 
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [cycleTabs, setCycleTabs] = useState(true);
-  const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx, _]) => idx));
+  const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx]) => idx));
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
   const addQueryTab = useCallback(idx => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
   const removeQueryTab = useCallback(idx => setQueryTabs(queryTabs.filter(tab => tab !== idx)), [queryTabs, setQueryTabs]);
@@ -78,11 +96,24 @@ const ConfigurationModal = ({ onSave, onCancel, view }: { view: View }) => {
   );
 };
 
-const BigDisplayMode = ({ view }) => {
+const redirectToBigDisplayMode = (view: View, config: BigDisplayModeQuery): void => history.push(
+  new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
+    .search(config)
+    .toString(),
+);
+
+const createQueryFromConfiguration = (config: Configuration): BigDisplayModeQuery => ({
+  cycle: config.cycleTabs,
+  interval: config.queryCycleInterval,
+  tabs: config.queryTabs,
+  refresh: config.refreshInterval,
+});
+
+const BigDisplayModeConfiguration = ({ view }: { view: View }) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const onCancel = useCallback(() => setShowConfigurationModal(false), [setShowConfigurationModal]);
 
-  const onSave = (v) => { console.log(v); onCancel(); };
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config));
 
   return (
     <React.Fragment>
@@ -92,6 +123,4 @@ const BigDisplayMode = ({ view }) => {
   );
 };
 
-BigDisplayMode.propTypes = {};
-
-export default BigDisplayMode;
+export default BigDisplayModeConfiguration;
