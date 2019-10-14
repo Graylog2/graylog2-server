@@ -43,9 +43,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -70,9 +68,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -98,9 +94,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -124,9 +118,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
