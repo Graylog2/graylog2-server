@@ -29,8 +29,9 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
     queryTitle(view, query),
   ]).toJS();
 
+  const multipleTabs = view.search.queries.size > 1;
   const [refreshInterval, setRefreshInterval] = useState(10);
-  const [cycleTabs, setCycleTabs] = useState(true);
+  const [cycleTabs, setCycleTabs] = useState(multipleTabs);
   const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx]) => idx));
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
   const addQueryTab = useCallback(idx => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
