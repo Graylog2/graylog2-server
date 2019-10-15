@@ -61,7 +61,6 @@ module.exports = {
     },
   ],
   usageMode: 'expand',
-  defaultExample: false,
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
   webpackConfig: {
