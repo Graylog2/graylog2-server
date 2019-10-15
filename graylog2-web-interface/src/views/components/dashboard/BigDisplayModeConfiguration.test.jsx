@@ -70,14 +70,14 @@ describe('BigDisplayModeConfiguration', () => {
   });
 
   it('shows open modal per default if `open` prop is `true`', () => {
-    const { getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+    const { getByText } = render(<BigDisplayModeConfiguration view={view} show />);
 
     expect(getByText('Configuring Full Screen')).not.toBeNull();
   });
 
   it('shows all query titles in modal', () => {
     const viewWithQueries = createViewWithQueries();
-    const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+    const { getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
     expect(getByText('Query#1')).not.toBeNull();
     expect(getByText('My awesome Query tab')).not.toBeNull();
@@ -91,7 +91,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('when "Save" is clicked', () => {
-      const { getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+      const { getByText } = render(<BigDisplayModeConfiguration view={view} show />);
       const saveButton = getByText('Save');
       expect(saveButton).not.toBeNull();
 
@@ -102,7 +102,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('including changed refresh interval', () => {
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} show />);
 
       const refreshInterval = getByLabelText('Refresh Interval');
 
@@ -116,7 +116,7 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('including tab cycle interval setting', () => {
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} open />);
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={view} show />);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
       fireEvent.change(cycleInterval, { target: { value: 4242 } });
@@ -130,7 +130,7 @@ describe('BigDisplayModeConfiguration', () => {
 
     it('including selected tabs', () => {
       const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} open />);
+      const { getByLabelText, getByText } = render(<BigDisplayModeConfiguration view={viewWithQueries} show />);
 
       const query1 = getByLabelText('Query#1');
       fireEvent.click(query1);

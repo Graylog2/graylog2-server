@@ -104,11 +104,11 @@ const createQueryFromConfiguration = ({ queryCycleInterval, queryTabs, refreshIn
 type Props = {
   disabled?: boolean,
   view: View,
-  open?: boolean
+  show?: boolean
 };
 
-const BigDisplayModeConfiguration = ({ disabled, view, open }: Props) => {
-  const [showConfigurationModal, setShowConfigurationModal] = useState(open);
+const BigDisplayModeConfiguration = ({ disabled, view, show }: Props) => {
+  const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const onCancel = useCallback(() => setShowConfigurationModal(false), [setShowConfigurationModal]);
 
   const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config));
@@ -125,7 +125,7 @@ const BigDisplayModeConfiguration = ({ disabled, view, open }: Props) => {
 
 BigDisplayModeConfiguration.defaultProps = {
   disabled: false,
-  open: false,
+  show: false,
 };
 
 export default BigDisplayModeConfiguration;
