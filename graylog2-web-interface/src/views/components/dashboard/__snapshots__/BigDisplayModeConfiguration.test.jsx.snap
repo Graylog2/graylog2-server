@@ -19,23 +19,3 @@ exports[`BigDisplayModeConfiguration generates markup that matches snapshot 1`] 
   </li>
 </div>
 `;
-
-exports[`BigDisplayModeConfiguration should do something 1`] = `
-<div>
-  <li
-    class=""
-    role="presentation"
-  >
-    <a
-      href="#"
-      role="menuitem"
-      tabindex="-1"
-    >
-      <i
-        class="fa fa-desktop"
-      />
-       Full Screen
-    </a>
-  </li>
-</div>
-`;
