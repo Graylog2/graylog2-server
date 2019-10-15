@@ -8,6 +8,8 @@ import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
 import { widgetDefinition } from 'views/logic/Widgets';
 import DocumentationLink from 'components/support/DocumentationLink';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
+import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
@@ -62,7 +64,14 @@ const EmptyDashboardInfo = () => (
   <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
     <Col md={12}>
       <Jumbotron style={{ marginBottom: 0 }}>
-        <h2>This dashboard has no widgets yet</h2>
+        <h2>
+          <IfDashboard>
+            This dashboard has no widgets yet
+          </IfDashboard>
+          <IfSearch>
+            There are no widgets defined to visualize the search result
+          </IfSearch>
+        </h2>
         <p>
           You can create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.<br />
           Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
