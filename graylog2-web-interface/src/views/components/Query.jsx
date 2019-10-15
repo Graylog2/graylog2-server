@@ -58,25 +58,24 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
   );
 };
 
-const _emptyDashboardInfo = () => {
-  return (
-    <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
-      <Col md={12}>
-        <Jumbotron style={{ marginBottom: 0 }}>
-          <h2>This dashboard has no widgets yet</h2>
-          <p>
-            You can create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.<br />
-            Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
-          </p>
-        </Jumbotron>
-      </Col>
-    </Row>
-  );
-};
+const EmptyDashboardInfo = () => (
+  <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+    <Col md={12}>
+      <Jumbotron style={{ marginBottom: 0 }}>
+        <h2>This dashboard has no widgets yet</h2>
+        <p>
+          You can create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.<br />
+          Have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
+        </p>
+      </Jumbotron>
+    </Col>
+  </Row>
+);
+
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (!widgets || widgets.size === 0) {
-    return _emptyDashboardInfo();
+    return <EmptyDashboardInfo />;
   }
 
   if (results) {
