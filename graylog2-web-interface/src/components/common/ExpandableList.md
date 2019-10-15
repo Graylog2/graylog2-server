@@ -1,5 +1,5 @@
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 import { ExpandableListItem } from 'components/common';
 
 const ExpandableListExample = createReactClass({
