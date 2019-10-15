@@ -68,7 +68,7 @@
 
 .search-grid {
     z-index: 1;
-    padding-left: 15px;
+    padding: 15px;
     grid-area: search;
     grid-column-start: 2;
     grid-column-end: 4;
