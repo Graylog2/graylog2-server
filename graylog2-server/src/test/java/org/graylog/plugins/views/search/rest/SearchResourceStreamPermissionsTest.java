@@ -23,6 +23,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.authorization.SearchAuthorizer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -96,7 +97,7 @@ public class SearchResourceStreamPermissionsTest {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, StreamService streamService) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, Collections.emptyMap());
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, new SearchAuthorizer(Collections.emptyMap()));
             this.subject = subject;
         }
 
@@ -235,7 +236,6 @@ public class SearchResourceStreamPermissionsTest {
 
     @Test
     public void referencingNonpermittedStreamsFailsForSyncSearch() {
-        final String searchId = "searchId";
         when(search.queries()).thenReturn(ImmutableSet.of(query));
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "disallowedstream"));
 
