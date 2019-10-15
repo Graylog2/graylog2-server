@@ -76,9 +76,6 @@ describe('BigDisplayModeConfiguration', () => {
     expect(getByText('Query#3')).not.toBeNull();
   });
 
-  // $FlowFixMe: Force subclassing of element;
-  const castElement = <C>(e: HTMLElement): C => e;
-
   describe('redirects to tv mode page', () => {
     beforeEach(() => {
       history.push = jest.fn();
