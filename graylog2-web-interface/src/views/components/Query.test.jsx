@@ -1,12 +1,15 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import View from 'views/logic/views/View';
 import Query from './Query';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetGrid from './WidgetGrid';
+
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));
@@ -127,23 +130,47 @@ describe('Query', () => {
     expect(widgetGrid).toHaveProp('widgets', { widget1, widget2 });
   });
 
-  it('renders widget creation explanation, if no widget is defined', () => {
+  it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', () => {
     const results = {
       errors: [],
       searchTypes: {},
     };
-    const wrapper = shallow((
-      <Query results={results}
-             widgetMapping={widgetMapping}
-             widgets={Immutable.Map()}
-             onToggleMessages={() => {}}
-             queryId="someQueryId"
-             showMessages
-             allFields={Immutable.List()}
-             fields={Immutable.List()} />
+    const wrapper = mount((
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <Query results={results}
+               widgetMapping={widgetMapping}
+               widgets={Immutable.Map()}
+               onToggleMessages={() => {}}
+               queryId="someQueryId"
+               showMessages
+               allFields={Immutable.List()}
+               fields={Immutable.List()} />
+      </ViewTypeContext.Provider>
     ));
 
     expect(wrapper.contains('This dashboard has no widgets yet')).toEqual(true);
+  });
+
+
+  it('renders search widget creation explanation on the search page, if no widget is defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = mount((
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <Query results={results}
+               widgetMapping={widgetMapping}
+               widgets={Immutable.Map()}
+               onToggleMessages={() => {}}
+               queryId="someQueryId"
+               showMessages
+               allFields={Immutable.List()}
+               fields={Immutable.List()} />
+      </ViewTypeContext.Provider>
+    ));
+
+    expect(wrapper.contains('There are no widgets defined to visualize the search result')).toEqual(true);
   });
 
   it('renders no widget creation explanation, if there are some widgets defined', () => {
@@ -162,6 +189,6 @@ describe('Query', () => {
              fields={Immutable.List()} />
     ));
 
-    expect(wrapper.contains('This dashboard has no widgets yet')).toEqual(false);
+    expect(wrapper.contains('You can create a new widget by selecting a widget type')).toEqual(false);
   });
 });
