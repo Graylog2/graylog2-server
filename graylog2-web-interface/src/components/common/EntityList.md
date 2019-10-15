@@ -12,6 +12,7 @@ const Button = require('components/graylog').Button;
 const Col = require('components/graylog').Col;
 const DropdownButton = require('components/graylog').DropdownButton;
 const MenuItem = require('components/graylog').MenuItem;
+import { EntityListItem } from 'components/common';
 
 const entities = [
   {

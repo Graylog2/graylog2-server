@@ -36,6 +36,7 @@ const SimpleSelect = createReactClass({
 Multi select input:
 ```js
 const createReactClass = require('create-react-class');
+import { MultiSelect } from 'components/common';
 
 const SimpleSelect = createReactClass({
   getInitialState() {
