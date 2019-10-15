@@ -33,6 +33,7 @@ const ViewTransformer = (searchView: View): View => {
   });
 
   return searchView.toBuilder()
+    .toNewView()
     .type(View.Type.Dashboard)
     .state(newViewStateMap)
     .build();

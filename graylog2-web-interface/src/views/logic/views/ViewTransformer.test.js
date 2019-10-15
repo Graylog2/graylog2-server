@@ -27,6 +27,18 @@ describe('ViewTransformer', () => {
       expect(dashboardView.type).toBe(View.Type.Dashboard);
     });
 
+    it('should change the type', () => {
+      const searchView = View.builder()
+        .id('dead-beef')
+        .title('Breq')
+        .type(View.Type.Search)
+        .build();
+
+      const dashboardView = viewTransformer(searchView);
+      expect(dashboardView.id).toBeUndefined();
+      expect(dashboardView.title).toBeUndefined();
+    });
+
     it('should add the timerange to the widget', () => {
       const query = Query.builder()
         .id('query-id')

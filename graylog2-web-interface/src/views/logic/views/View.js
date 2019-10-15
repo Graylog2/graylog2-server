@@ -206,6 +206,10 @@ class Builder {
     return new Builder(this.value.set('id', value));
   }
 
+  toNewView(): Builder {
+    return new Builder(this.value.set('id', undefined).set('title', undefined));
+  }
+
   type(value: ViewType): Builder {
     return new Builder(this.value.set('type', value));
   }
