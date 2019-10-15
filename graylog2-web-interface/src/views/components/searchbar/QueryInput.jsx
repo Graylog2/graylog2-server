@@ -18,6 +18,7 @@ const _placeholderNode = (placeholder) => {
 };
 
 type Props = {
+  disabled: boolean,
   value: string,
   completers: Array<Completer>,
   // eslint-disable-next-line no-undef
@@ -35,6 +36,7 @@ type State = {
 
 class QueryInput extends Component<Props, State> {
   static defaultProps = {
+    disabled: false,
     onBlur: () => {},
     completerClass: SearchBarAutoCompletions,
     value: '',
@@ -159,8 +161,11 @@ class QueryInput extends Component<Props, State> {
   };
 
   _onFocus = () => {
-    this.isFocussed = true;
-    this._removePlaceholderOnFocus();
+    const { disabled } = this.props;
+    if (!disabled) {
+      this.isFocussed = true;
+      this._removePlaceholderOnFocus();
+    }
   };
 
   _onExecute = (editor: Editor) => {
@@ -181,12 +186,13 @@ class QueryInput extends Component<Props, State> {
   }
 
   render() {
-    const { onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;
+    const { disabled, onBlur, onChange, onExecute, placeholder, value: propsValue, ...rest } = this.props;
     const { value } = this.state;
     return (
-      <div className="query" style={{ display: 'flex' }}>
+      <div className="query" style={{ display: 'flex' }} data-testid="query-input">
         <AceEditor mode="lucene"
                    ref={editor => editor && this._bindEditor(editor)}
+                   readOnly={disabled}
                    theme="ace-queryinput"
                    onBlur={this._onBlur}
                    onChange={this._onChange}
@@ -219,6 +225,7 @@ class QueryInput extends Component<Props, State> {
 QueryInput.propTypes = {
   completers: PropTypes.array.isRequired,
   completerClass: PropTypes.any,
+  disabled: PropTypes.bool,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
   onExecute: PropTypes.func.isRequired,

@@ -14,6 +14,7 @@ export type GlobalOverrideActionsType = RefluxActions<{
   rangeType: (string) => Promise<?GlobalOverride>,
   rangeParams: (string, string | number) => Promise<?GlobalOverride>,
   query: (string) => Promise<?GlobalOverride>,
+  reset: () => Promise<?GlobalOverride>,
 }>;
 
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
@@ -22,6 +23,7 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
     rangeType: { asyncResult: true },
     rangeParams: { asyncResult: true },
     query: { asyncResult: true },
+    reset: { asyncResult: true },
   }),
 );
 
@@ -46,9 +48,7 @@ export const GlobalOverrideStore = singletonStore(
       if (newType === 'disabled') {
         const { timerange, ...rest } = this.globalOverride || {};
         const newGlobalOverride: ?GlobalOverride = isEmpty(rest) ? undefined : { ...rest };
-        const promise = newGlobalOverride !== this.globalOverride
-          ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
-          : Promise.resolve(this.globalOverride);
+        const promise = this._propagateNewGlobalOverride(newGlobalOverride);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
       }
@@ -79,9 +79,7 @@ export const GlobalOverrideStore = singletonStore(
             break;
         }
         const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
-        const promise = newGlobalOverride !== this.globalOverride
-          ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
-          : Promise.resolve(this.globalOverride);
+        const promise = this._propagateNewGlobalOverride(newGlobalOverride);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
       }
@@ -95,10 +93,13 @@ export const GlobalOverrideStore = singletonStore(
         // $FlowFixMe: Flow is unable to validate that timerange is complete
         : { [key]: value };
       const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
-      const promise = newGlobalOverride !== this.globalOverride
-        ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
-        : Promise.resolve(this.globalOverride);
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.rangeParams.promise(promise);
+      return promise;
+    },
+    reset() {
+      const promise = this._propagateNewGlobalOverride(undefined);
+      GlobalOverrideActions.reset.promise(promise);
       return promise;
     },
     query(newQueryString: string) {
@@ -107,11 +108,14 @@ export const GlobalOverrideStore = singletonStore(
         query_string: newQueryString,
       };
       const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, query: newQuery } : { query: newQuery };
-      const promise = newGlobalOverride !== this.globalOverride
-        ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
-        : Promise.resolve(this.globalOverride);
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.query.promise(promise);
       return promise;
+    },
+    _propagateNewGlobalOverride(newGlobalOverride: ?GlobalOverride) {
+      return newGlobalOverride !== this.globalOverride
+        ? SearchExecutionStateActions.globalOverride(newGlobalOverride).then(() => newGlobalOverride)
+        : Promise.resolve(this.globalOverride);
     },
   }),
 );
