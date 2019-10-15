@@ -102,11 +102,12 @@ const createQueryFromConfiguration = ({ queryCycleInterval, queryTabs, refreshIn
 });
 
 type Props = {
+  disabled?: boolean,
   view: View,
   open?: boolean
 };
 
-const BigDisplayModeConfiguration = ({ view, open }: Props) => {
+const BigDisplayModeConfiguration = ({ disabled, view, open }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(open);
   const onCancel = useCallback(() => setShowConfigurationModal(false), [setShowConfigurationModal]);
 
@@ -115,12 +116,15 @@ const BigDisplayModeConfiguration = ({ view, open }: Props) => {
   return (
     <React.Fragment>
       {showConfigurationModal && <ConfigurationModal view={view} onCancel={onCancel} onSave={onSave} />}
-      <MenuItem onSelect={() => setShowConfigurationModal(true)}><i className="fa fa-desktop" /> Full Screen</MenuItem>
+      <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)}>
+        <i className="fa fa-desktop" /> Full Screen
+      </MenuItem>
     </React.Fragment>
   );
 };
 
 BigDisplayModeConfiguration.defaultProps = {
+  disabled: false,
   open: false,
 };
 

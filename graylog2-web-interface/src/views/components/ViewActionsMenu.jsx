@@ -60,7 +60,7 @@ const ViewActionsMenu = ({ view, metadata, onSaveView, onSaveAsView, currentUser
 
         <IfDashboard>
           <MenuItem divider />
-          <BigDisplayModeConfiguration view={view} />
+          <BigDisplayModeConfiguration view={view} disabled={isNewView} />
         </IfDashboard>
       </DropdownButton>
       <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />

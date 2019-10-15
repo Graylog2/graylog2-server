@@ -53,6 +53,14 @@ describe('BigDisplayModeConfiguration', () => {
     expect(container).toMatchSnapshot();
   });
 
+  it('disables menu item if `disabled` prop is `true`', () => {
+    const { getByText, queryByText } = render(<BigDisplayModeConfiguration view={view} disabled />);
+    const menuItem = getByText('Full Screen');
+    fireEvent.click(menuItem);
+
+    expect(queryByText('Configuring Full Screen')).toBeNull();
+  });
+
   it('opens modal when menu item is clicked', async () => {
     const { getByText } = render(<BigDisplayModeConfiguration view={view} />);
     const menuItem = getByText('Full Screen');
