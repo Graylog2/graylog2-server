@@ -1495,7 +1495,7 @@
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-13.1.0.tgz#c563aa192f39350a1d18da36c5a8da382bbd8228"
   integrity sha512-gCubfBUZ6KxzoibJ+SCUc/57Ms1jz5NjHe4+dI2krNmU5zCPAphyLJYyTOg06ueIyfj+SaCUqmzun7ImlxDcKg==
 
-"@types/yargs@^12.0.2", "@types/yargs@^12.0.9":
+"@types/yargs@^12.0.9":
   version "12.0.12"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.12.tgz#45dd1d0638e8c8f153e87d296907659296873916"
   integrity sha512-SOhuU4wNBxhhTHxYaiG5NY4HBhDIDnJF60GU+2LqHAdKKer86//e4yg69aENCtQ04n0ovz+tq2YPME5t5yp4pw==
@@ -2523,6 +2523,11 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
+batch-processor@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/batch-processor/-/batch-processor-1.0.0.tgz#75c95c32b748e0850d10c2b168f6bdbe9891ace8"
+  integrity sha1-dclcMrdI4IUNEMKxaPa9vpiRrOg=
+
 batch@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/batch/-/batch-0.6.1.tgz#dc34314f4e679318093fc760272525f94bf25c16"
@@ -3300,9 +3305,9 @@ chownr@^1.1.1:
   integrity sha512-GkfeAQh+QNy3wquu9oIZr6SS5x7wGdSgNQvD10X3r+AZr1Oys22HW8kAmDMvNg2+Dm0TeGaEuO8gFwdBXxwO8A==
 
 chroma-js@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.0.3.tgz#2521d4f80c4e786e00064c4a62824e38ff6557c4"
-  integrity sha512-2kTvZZOFSV1O81/rm99t9vmkh9jQxsHqsRRoZevDVz/VCC3yKMyPuMK8M5yHG+UMg2tV6cRoqtZtgcD92udcBw==
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/chroma-js/-/chroma-js-2.0.6.tgz#2d4b761be09bf142b541f0011f64f213ecf6c8b6"
+  integrity sha512-IiiClbBRkRwuXNl6impq5ssEhUGpmWvc5zzImZbDUWLWcFbj6ZbtsdZEx6sIXMKes7azgYaUpnmsY1T8BL6PqQ==
 
 chrome-trace-event@^1.0.2:
   version "1.0.2"
@@ -4959,6 +4964,13 @@ electron-to-chromium@^1.3.137:
   version "1.3.146"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.146.tgz#d7010f417f87c2068fbb6700ae57767e2393eba7"
   integrity sha512-BrUq08sx7eR4PCwLbjFxXmjcbDro6DSoc1pN8VCxq76U+o9JQzJlWH/NVtcpAqcktwpE5CVvMyqHqTQfCETNoQ==
+
+element-resize-detector@^1.1.15:
+  version "1.1.15"
+  resolved "https://registry.yarnpkg.com/element-resize-detector/-/element-resize-detector-1.1.15.tgz#48eba1a2eaa26969a4c998d972171128c971d8d2"
+  integrity sha512-16/5avDegXlUxytGgaumhjyQoM6hpp5j3+L79sYq5hlXfTNRy5WMMuTVWkZU3egp/CokCmTmvf18P3KeB57Iog==
+  dependencies:
+    batch-processor "^1.0.0"
 
 element-size@^1.1.1:
   version "1.1.1"
@@ -7179,7 +7191,7 @@ gray-matter@^3.0.8:
   dependencies:
     "@babel/preset-env" "7.4.5"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v4/npm-graylog-web-plugin-3.2.0-SNAPSHOT-63c3dd9e-855a-4647-829b-dca01ab3bfe6-1570700089703/node_modules/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
@@ -12188,7 +12200,7 @@ pretty-error@^2.0.2:
     renderkid "^2.0.1"
     utila "~0.4"
 
-pretty-format@^24.3.0:
+pretty-format@^24.3.0, pretty-format@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-24.9.0.tgz#12fac31b37019a4eea3c11aa9a959eb7628aa7c9"
   integrity sha512-00ZMZUiHaJrNfk33guavqgvfJS30sLYf0f8+Srklv0AMPodGGHcoHgksZ3OThYnIvOd+8yMCn0YiEOogjlgsnA==
@@ -12204,16 +12216,6 @@ pretty-format@^24.8.0:
   integrity sha512-P952T7dkrDEplsR+TuY7q3VXDae5Sr7zmQb12JU/NDQa/3CH7/QW0yvqLcGN6jL+zQFKaoJcPc+yJxMTGmosqw==
   dependencies:
     "@jest/types" "^24.8.0"
-    ansi-regex "^4.0.0"
-    ansi-styles "^3.2.0"
-    react-is "^16.8.4"
-
-pretty-format@^24.9.0:
-  version "24.9.0"
-  resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-24.9.0.tgz#12fac31b37019a4eea3c11aa9a959eb7628aa7c9"
-  integrity sha512-00ZMZUiHaJrNfk33guavqgvfJS30sLYf0f8+Srklv0AMPodGGHcoHgksZ3OThYnIvOd+8yMCn0YiEOogjlgsnA==
-  dependencies:
-    "@jest/types" "^24.9.0"
     ansi-regex "^4.0.0"
     ansi-styles "^3.2.0"
     react-is "^16.8.4"
@@ -12903,6 +12905,16 @@ react-select@2.4.3:
     raf "^3.4.0"
     react-input-autosize "^2.2.1"
     react-transition-group "^2.2.1"
+
+react-sizeme@^2.6.7:
+  version "2.6.7"
+  resolved "https://registry.yarnpkg.com/react-sizeme/-/react-sizeme-2.6.7.tgz#231339ce8821ac2c26424c791e0027f89dae3e90"
+  integrity sha512-xCjPoBP5jmeW58TxIkcviMZqabZis7tTvDFWf0/Wa5XCgVWQTIe74NQBes2N1Kmp64GRLkpm60BaP0kk+v8aCQ==
+  dependencies:
+    element-resize-detector "^1.1.15"
+    invariant "^2.2.4"
+    shallowequal "^1.1.0"
+    throttle-debounce "^2.1.0"
 
 react-sortable-hoc@^1.7.1:
   version "1.9.1"
@@ -15255,6 +15267,11 @@ throat@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/throat/-/throat-4.1.0.tgz#89037cbc92c56ab18926e6ba4cbb200e15672a6a"
   integrity sha1-iQN8vJLFarGJJua6TLsgDhVnKmo=
+
+throttle-debounce@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-2.1.0.tgz#257e648f0a56bd9e54fe0f132c4ab8611df4e1d5"
+  integrity sha512-AOvyNahXQuU7NN+VVvOOX+uW6FPaWdAOdRP5HfwYxAfCzXTFKRMoIMk+n+po318+ktcChx+F1Dd91G3YHeMKyg==
 
 throttleit@^1.0.0:
   version "1.0.0"

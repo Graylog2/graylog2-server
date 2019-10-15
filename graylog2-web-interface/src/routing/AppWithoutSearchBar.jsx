@@ -1,26 +1,24 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'components/graylog';
+import PropTypes from 'prop-types';
+import { Col, Row } from 'components/graylog';
+import Footer from 'components/layout/Footer';
 
-class AppWithoutSearchBar extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
+const AppWithoutSearchBar = (props) => {
+  const { children } = props;
+  return (
+    <div className="container-fluid">
+      <Row id="main-row">
+        <Col md={12} id="main-content">
+          {children}
+        </Col>
+      </Row>
+      <Footer />
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div className="container-fluid">
-        <Row id="main-row">
-          <Col md={12} id="main-content">
-            {this.props.children}
-          </Col>
-        </Row>
-      </div>
-    );
-  }
-}
+AppWithoutSearchBar.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default AppWithoutSearchBar;

@@ -2,16 +2,13 @@
 import * as React from 'react';
 
 import Spinner from 'components/common/Spinner';
-import { FieldList } from 'views/components/sidebar';
 import Query from 'views/components/Query';
-import SideBar from 'views/components/sidebar/SideBar';
 
 import connect from 'stores/connect';
 
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import { SearchStore } from 'views/stores/SearchStore';
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
 import { WidgetStore } from 'views/stores/WidgetStore';
 import LoadingIndicator from 'components/common/LoadingIndicator';
@@ -26,8 +23,6 @@ const SearchLoadingIndicator = connect(
   { searchLoadingState: SearchLoadingStateStore },
 );
 
-const ConnectedFieldList = connect(FieldList, { selectedFields: SelectedFieldsStore });
-const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore });
 const QueryWithWidgets = connect(Query, { widgets: WidgetStore });
 
 type Props = {
@@ -59,12 +54,7 @@ const SearchResult = React.memo(({ fieldTypes, queryId, searches, viewState }: P
                       queryId={queryId}
                       results={currentResults}
                       positions={positions}
-                      widgetMapping={widgetMapping}>
-      <ConnectedSideBar queryId={queryId} results={currentResults}>
-        <ConnectedFieldList allFields={fieldTypes.all}
-                            fields={queryFields} />
-      </ConnectedSideBar>
-    </QueryWithWidgets>
+                      widgetMapping={widgetMapping} />
   ) : <Spinner />;
 
   return (

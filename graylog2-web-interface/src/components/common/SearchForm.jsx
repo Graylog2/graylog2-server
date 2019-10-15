@@ -3,7 +3,7 @@ import React from 'react';
 import Promise from 'bluebird';
 
 import { Button } from 'components/graylog';
-import { Spinner } from 'components/common';
+import Spinner from 'components/common/Spinner';
 
 import style from './SearchForm.css';
 

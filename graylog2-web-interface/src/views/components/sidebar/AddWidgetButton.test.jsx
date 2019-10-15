@@ -7,11 +7,10 @@ import AddWidgetButton from './AddWidgetButton';
 const mockAggregateActionHandler = jest.fn();
 const mockAddMessageCountActionHandler = jest.fn();
 const mockAddMessageTableActionHandler = jest.fn();
-class MockCreateParameterDialog extends React.Component {
-  render() {
-    return <span>42</span>;
-  }
-}
+
+const MockCreateParameterDialog = () => {
+  return <span>42</span>;
+};
 
 const bindings = {
   creators: [
@@ -53,51 +52,54 @@ describe('AddWidgetButton', () => {
   afterEach(() => {
     PluginStore.unregister(plugin);
   });
-  it('renders a dropdown', () => {
-    const wrapper = mount(<AddWidgetButton />);
 
-    const dropdownButton = wrapper.find('DropdownButton').at(0);
-    expect(dropdownButton).toHaveLength(1);
-    expect(dropdownButton.find('MenuItem')).toHaveLength(5);
+  const onClick = jest.fn();
+
+  it('renders a dropdown', () => {
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
+
+    const buttonGroup = wrapper.find('ButtonGroup').at(0);
+    expect(buttonGroup).toHaveLength(1);
+    expect(buttonGroup.find('button')).toHaveLength(4);
   });
   it('contains menu items for all widget types', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const dropdownButton = wrapper.find('DropdownButton');
+    const dropdownButton = wrapper.find('ButtonGroup');
     ['Custom Aggregation', 'Message Count', 'Message Table', 'Parameter']
-      .forEach(title => expect(dropdownButton.find(`a[children="${title}"]`)).toExist());
+      .forEach(title => expect(dropdownButton.find(`button[children="${title}"]`)).toExist());
   });
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addAggregation = wrapper.find('a[children="Custom Aggregation"]');
+    const addAggregation = wrapper.find('button[children="Custom Aggregation"]');
     expect(addAggregation).toExist(0);
     addAggregation.simulate('click');
 
     expect(mockAggregateActionHandler).toHaveBeenCalled();
   });
   it('clicking on option to add message count calls AddMessageCountActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addMessageCount = wrapper.find('a[children="Message Count"]');
+    const addMessageCount = wrapper.find('button[children="Message Count"]');
     expect(addMessageCount).toExist(0);
     addMessageCount.simulate('click');
 
     expect(mockAddMessageCountActionHandler).toHaveBeenCalled();
   });
   it('clicking on option to add message table calls AddMessageTableActionHandler', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addMessageTable = wrapper.find('a[children="Message Table"]');
+    const addMessageTable = wrapper.find('button[children="Message Table"]');
     expect(addMessageTable).toExist(0);
     addMessageTable.simulate('click');
 
     expect(mockAddMessageTableActionHandler).toHaveBeenCalled();
   });
   it('clicking on option to add a parameter renders MockCreateParameterDialog', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addMessageTable = wrapper.find('a[children="Parameter"]');
+    const addMessageTable = wrapper.find('button[children="Parameter"]');
     expect(addMessageTable).toExist(0);
     addMessageTable.simulate('click');
 
@@ -106,9 +108,9 @@ describe('AddWidgetButton', () => {
     expect(wrapper.find('MockCreateParameterDialog')).toExist();
   });
   it('calling onClose from creator component removes it', () => {
-    const wrapper = mount(<AddWidgetButton />);
+    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addMessageTable = wrapper.find('a[children="Parameter"]');
+    const addMessageTable = wrapper.find('button[children="Parameter"]');
     expect(addMessageTable).toExist(0);
     addMessageTable.simulate('click');
 
