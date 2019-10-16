@@ -1,6 +1,6 @@
 Regular `ReactGridContainer`:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const ReactGridContainerExample = createReactClass({
   getInitialState() {
@@ -56,8 +56,8 @@ const ReactGridContainerExample = createReactClass({
 
 Lock or block resizing in `ReactGridContainer`:
 ```js
-const createReactClass = require('create-react-class');
-const { Button, ButtonToolbar } = require('components/graylog');
+import createReactClass from 'create-react-class';
+import { Button, ButtonToolbar } from 'components/graylog';
 
 const ReactGridContainerExampleLocked = createReactClass({
   getInitialState() {

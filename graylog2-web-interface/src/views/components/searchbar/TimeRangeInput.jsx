@@ -5,14 +5,14 @@ import RelativeTimeRangeSelector from 'views/components/searchbar/RelativeTimeRa
 import AbsoluteTimeRangeSelector from 'views/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'views/components/searchbar/KeywordTimeRangeSelector';
 
-export default function TimeRangeInput({ rangeType, rangeParams, config, onChange }) {
+export default function TimeRangeInput({ disabled, rangeType, rangeParams, config, onChange }) {
   switch (rangeType) {
     case 'relative':
-      return <RelativeTimeRangeSelector value={rangeParams} config={config} onChange={onChange} />;
+      return <RelativeTimeRangeSelector disabled={disabled} value={rangeParams} config={config} onChange={onChange} />;
     case 'absolute':
-      return <AbsoluteTimeRangeSelector value={rangeParams} onChange={onChange} />;
+      return <AbsoluteTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} />;
     case 'keyword':
-      return <KeywordTimeRangeSelector value={rangeParams} onChange={onChange} />;
+      return <KeywordTimeRangeSelector disabled={disabled} value={rangeParams} onChange={onChange} />;
     default:
       throw new Error(`Unsupported range type ${rangeType}`);
   }
@@ -22,7 +22,12 @@ TimeRangeInput.propTypes = {
   config: PropTypes.shape({
     relative_timerange_options: PropTypes.objectOf(PropTypes.string).isRequired,
   }).isRequired,
+  disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   rangeParams: PropTypes.object.isRequired,
   rangeType: PropTypes.string.isRequired,
+};
+
+TimeRangeInput.defaultProps = {
+  disabled: false,
 };

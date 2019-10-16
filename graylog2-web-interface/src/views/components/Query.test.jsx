@@ -1,12 +1,15 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
+import View from 'views/logic/views/View';
 import Query from './Query';
 import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetGrid from './WidgetGrid';
+
 
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));
@@ -43,9 +46,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -70,9 +71,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -98,9 +97,7 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
@@ -124,14 +121,74 @@ describe('Query', () => {
              queryId="someQueryId"
              showMessages
              allFields={Immutable.List()}
-             fields={Immutable.List()}>
-        Sidebar Content
-      </Query>
+             fields={Immutable.List()} />
     ));
     const widgetGrid = wrapper.find(WidgetGrid);
     expect(widgetGrid).toHaveLength(1);
     expect(widgetGrid).toHaveProp('errors', { widget1: [error1], widget2: [error2] });
     expect(widgetGrid).toHaveProp('data', { widget1: [], widget2: [] });
     expect(widgetGrid).toHaveProp('widgets', { widget1, widget2 });
+  });
+
+  it('renders dashboard widget creation explanation on the dashboard page, if no widget is defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = mount((
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <Query results={results}
+               widgetMapping={widgetMapping}
+               widgets={Immutable.Map()}
+               onToggleMessages={() => {}}
+               queryId="someQueryId"
+               showMessages
+               allFields={Immutable.List()}
+               fields={Immutable.List()} />
+      </ViewTypeContext.Provider>
+    ));
+    expect(wrapper.html()).toContain('<h2>This dashboard has no widgets yet</h2>');
+    expect(wrapper.html()).toContain('4. <b>Share</b> the dashboard with your colleagues.');
+  });
+
+
+  it('renders search widget creation explanation on the search page, if no widget is defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = mount((
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <Query results={results}
+               widgetMapping={widgetMapping}
+               widgets={Immutable.Map()}
+               onToggleMessages={() => {}}
+               queryId="someQueryId"
+               showMessages
+               allFields={Immutable.List()}
+               fields={Immutable.List()} />
+      </ViewTypeContext.Provider>
+    ));
+    expect(wrapper.html()).toContain('<h2>There are no widgets defined to visualize the search result</h2>');
+    expect(wrapper.html()).not.toContain('4. <b>Share</b> the dashboard with your colleagues.');
+  });
+
+  it('renders no widget creation explanation, if there are some widgets defined', () => {
+    const results = {
+      errors: [],
+      searchTypes: {},
+    };
+    const wrapper = shallow((
+      <Query results={results}
+             widgetMapping={widgetMapping}
+             widgets={widgets}
+             onToggleMessages={() => {}}
+             queryId="someQueryId"
+             showMessages
+             allFields={Immutable.List()}
+             fields={Immutable.List()} />
+    ));
+
+    expect(wrapper.contains('You can create a new widget by selecting a widget type')).toEqual(false);
   });
 });

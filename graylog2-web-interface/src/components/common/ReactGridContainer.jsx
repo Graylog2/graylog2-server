@@ -215,6 +215,7 @@ class ReactGridContainer extends React.Component {
                                breakpoints={BREAKPOINTS}
                                cols={columns}
                                rowHeight={rowHeight}
+                               containerPadding={[0, 0]}
                                margin={[10, 10]}
                                measureBeforeMount={measureBeforeMount}
         // Do not allow dragging from elements inside a `.actions` css class. This is

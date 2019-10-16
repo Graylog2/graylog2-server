@@ -6,7 +6,8 @@ import lodash from 'lodash';
 import { Col, Row } from 'components/graylog';
 
 import { Input } from 'components/bootstrap';
-import { ControlledTableList, TypeAheadDataFilter } from 'components/common';
+import ControlledTableList from 'components/common/ControlledTableList';
+import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
 import style from './TableList.css';
 

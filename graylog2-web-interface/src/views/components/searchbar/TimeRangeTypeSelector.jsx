@@ -3,10 +3,11 @@ import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
 
 import PropTypes from 'views/components/CustomPropTypes';
 
-export default function TimeRangeTypeSelector({ onSelect, value }) {
+export default function TimeRangeTypeSelector({ disabled, onSelect, value }) {
   return (
     <ButtonToolbar className="extended-search-timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
+                      disabled={disabled}
                       title={<i className="fa fa-clock-o" />}
                       onSelect={onSelect}
                       id="dropdown-timerange-selector">
@@ -28,6 +29,11 @@ export default function TimeRangeTypeSelector({ onSelect, value }) {
 }
 
 TimeRangeTypeSelector.propTypes = {
+  disabled: PropTypes.bool,
   onSelect: PropTypes.func.isRequired,
   value: PropTypes.TimeRangeType.isRequired,
+};
+
+TimeRangeTypeSelector.defaultProps = {
+  disabled: false,
 };

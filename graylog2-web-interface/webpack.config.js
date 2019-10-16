@@ -57,7 +57,12 @@ const webpackConfig = {
       {
         test: /bootstrap\.less$/,
         use: [
-          'style-loader',
+          {
+            loader: 'style-loader',
+            options: {
+              insertAt: 'top',
+            },
+          },
           'css-loader',
           {
             loader: 'less-loader',
