@@ -72,7 +72,7 @@ class NumberVisualization extends React.Component<Props, State> {
 
     const newFontsize = Math.floor(fontSize * multiplier);
 
-    if (fontSize !== newFontsize) {
+    if (fontSize !== newFontsize && Number.isFinite(newFontsize)) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ fontSize: newFontsize });
     }
