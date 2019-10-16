@@ -3,7 +3,7 @@ import theme from 'styled-theming';
 
 import { useTheme } from 'theme/GraylogThemeContext';
 
-const buttonStyles = ({ active, specific = true }) => {
+const buttonStyles = ({ active }) => {
   const { colors, utility } = useTheme();
 
   const cssBuilder = (color) => {
@@ -14,15 +14,13 @@ const buttonStyles = ({ active, specific = true }) => {
     const darken125 = utility.darken(color, 1.25);
 
     return css`
-      ${specific && '&& {'}
-        background-color: ${active ? darken100 : color};
-        border-color: ${active ? darken125 : darken025};
+      background-color: ${active ? darken100 : color};
+      border-color: ${active ? darken125 : darken025};
 
-        :hover {
-          background-color: ${active ? darken075 : darken050};
-          border-color: ${active ? darken100 : darken075};
-        }
-      ${specific && '}'}
+      :hover {
+        background-color: ${active ? darken075 : darken050};
+        border-color: ${active ? darken100 : darken075};
+      }
     `;
   };
 
