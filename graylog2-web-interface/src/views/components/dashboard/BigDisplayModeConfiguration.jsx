@@ -95,11 +95,19 @@ const redirectToBigDisplayMode = (view: View, config: UntypedBigDisplayModeQuery
     .toString(),
 );
 
-const createQueryFromConfiguration = ({ queryCycleInterval, queryTabs, refreshInterval }: Configuration): UntypedBigDisplayModeQuery => ({
-  interval: Number(queryCycleInterval).toString(),
-  tabs: queryTabs !== undefined ? queryTabs.join(',') : undefined,
-  refresh: Number(refreshInterval).toString(),
-});
+const createQueryFromConfiguration = (
+  { queryCycleInterval, queryTabs, refreshInterval }: Configuration,
+  view: View,
+): UntypedBigDisplayModeQuery => {
+  const basicConfiguration = {
+    interval: Number(queryCycleInterval).toString(),
+    refresh: Number(refreshInterval).toString(),
+  };
+  const allQueryIndices = view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
+  return !queryTabs || allQueryIndices.join(',') === queryTabs.join(',')
+    ? basicConfiguration
+    : { ...basicConfiguration, tabs: queryTabs.join(',') };
+};
 
 type Props = {
   disabled?: boolean,
@@ -111,7 +119,7 @@ const BigDisplayModeConfiguration = ({ disabled, view, show }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(show);
   const onCancel = useCallback(() => setShowConfigurationModal(false), [setShowConfigurationModal]);
 
-  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config));
+  const onSave = (config: Configuration) => redirectToBigDisplayMode(view, createQueryFromConfiguration(config, view));
 
   return (
     <React.Fragment>
