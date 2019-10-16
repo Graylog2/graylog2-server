@@ -147,8 +147,8 @@ describe('Query', () => {
                fields={Immutable.List()} />
       </ViewTypeContext.Provider>
     ));
-
-    expect(wrapper.contains('This dashboard has no widgets yet')).toEqual(true);
+    expect(wrapper.html()).toContain('<h2>This dashboard has no widgets yet</h2>');
+    expect(wrapper.html()).toContain('4. <b>Share</b> the dashboard with your colleagues.');
   });
 
 
@@ -169,8 +169,8 @@ describe('Query', () => {
                fields={Immutable.List()} />
       </ViewTypeContext.Provider>
     ));
-
-    expect(wrapper.contains('There are no widgets defined to visualize the search result')).toEqual(true);
+    expect(wrapper.html()).toContain('<h2>There are no widgets defined to visualize the search result</h2>');
+    expect(wrapper.html()).not.toContain('4. <b>Share</b> the dashboard with your colleagues.');
   });
 
   it('renders no widget creation explanation, if there are some widgets defined', () => {

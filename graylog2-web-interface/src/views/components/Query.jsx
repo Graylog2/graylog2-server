@@ -83,7 +83,9 @@ const EmptyDashboardInfo = () => (
           <li><p>1. Start with a <b>question</b> you want to answer. Define the problem you want to solve.</p></li>
           <li><p>2. <b>Limit</b> the data to only the data points you want to see.</p></li>
           <li><p>3. <b>Visualize</b> the data. Does it answer your question?</p></li>
-          <li><p>4. <b>Share</b> the view with your colleagues. Prepare it for <b>reuse</b> by using parameters (contained in <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">Graylog Enterprise</a>).</p></li>
+          <IfDashboard>
+            <li><p>4. <b>Share</b> the dashboard with your colleagues. Prepare it for <b>reuse</b> by using parameters (contained in <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">Graylog Enterprise</a>).</p></li>
+          </IfDashboard>
         </ul>
         <p>
           You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />, to learn more about the widget creation.
