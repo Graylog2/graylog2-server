@@ -206,24 +206,26 @@ class Widget extends React.Component<Props, State> {
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
           <span>
             <InteractiveContext.Consumer>
-              {interactive => (<WidgetHeader title={title}
-                                             hideDragHandle={!interactive}
-                                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                                             editing={editing}>
-                <IfInteractive>
-                  <WidgetHorizontalStretch widgetId={widget.id}
-                                           widgetType={widget.type}
-                                           onStretch={onPositionsChange}
-                                           position={position} />
-                  {' '}
-                  <WidgetActionDropdown>
-                    <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                    <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                    <MenuItem divider />
-                    <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                  </WidgetActionDropdown>
-                </IfInteractive>
-              </WidgetHeader>)}
+              {interactive => (
+                <WidgetHeader title={title}
+                              hideDragHandle={!interactive}
+                              onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                              editing={editing}>
+                  <IfInteractive>
+                    <WidgetHorizontalStretch widgetId={widget.id}
+                                             widgetType={widget.type}
+                                             onStretch={onPositionsChange}
+                                             position={position} />
+                    {' '}
+                    <WidgetActionDropdown>
+                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <MenuItem divider />
+                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                    </WidgetActionDropdown>
+                  </IfInteractive>
+                </WidgetHeader>
+              )}
             </InteractiveContext.Consumer>
             {visualization}
           </span>

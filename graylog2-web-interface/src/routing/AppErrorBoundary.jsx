@@ -34,10 +34,11 @@ class AppErrorBoundary extends React.Component {
 
   render() {
     const { error, info } = this.state;
+    const { children } = this.props;
     if (error) {
       return <ErrorPage error={error} info={info} />;
     }
-    return this.props.children;
+    return children;
   }
 }
 

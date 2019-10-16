@@ -1,8 +1,6 @@
 // @flow strict
-
 import View from '../views/View';
 import ViewState from '../views/ViewState';
-import Query from './Query';
 import type { QueryId } from './Query';
 
 const queryTitle = (view: View, queryId: QueryId): string => view.search.queries.keySeq()

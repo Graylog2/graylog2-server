@@ -101,7 +101,7 @@ const AppRouter = () => {
              component={pluginRoute.component} />
     );
   });
-  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map((pluginRoute) => (
+  const pluginRoutesWithParent = pluginRoutes.filter(route => route.parentComponent).map(pluginRoute => (
     <Route key={`${pluginRoute.path}-${pluginRoute.component.displayName}`}
            component={pluginRoute.parentComponent}>
       <Route path={URLUtils.appPrefixed(pluginRoute.path)}
@@ -188,18 +188,23 @@ const AppRouter = () => {
 
               <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} component={LUTCachesPage} />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE} component={LUTCachesPage} action="create" />
-              <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')} component={LUTCachesPage}
+              <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')}
+                     component={LUTCachesPage}
                      action="show" />
-              <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')} component={LUTCachesPage}
+              <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName')}
+                     component={LUTCachesPage}
                      action="edit" />
 
               <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW} component={LUTDataAdaptersPage} />
-              <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE} component={LUTDataAdaptersPage}
+              <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}
+                     component={LUTDataAdaptersPage}
                      action="create" />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')}
-                     component={LUTDataAdaptersPage} action="show" />
+                     component={LUTDataAdaptersPage}
+                     action="show" />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')}
-                     component={LUTDataAdaptersPage} action="edit" />
+                     component={LUTDataAdaptersPage}
+                     action="edit" />
 
               <Route path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
               <Route path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />

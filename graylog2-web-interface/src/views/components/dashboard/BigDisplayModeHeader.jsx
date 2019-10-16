@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import connect from 'stores/connect';
 
 import Spinner from 'components/common/Spinner';
@@ -26,6 +27,12 @@ const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
       <h2>{currentQueryTitle}</h2>
     </React.Fragment>
   );
+};
+
+BigDisplayModeHeader.propTypes = {
+  view: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default connect(BigDisplayModeHeader, { view: ViewStore });
