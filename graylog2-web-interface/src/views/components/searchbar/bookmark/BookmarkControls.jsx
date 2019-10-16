@@ -3,9 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 
-import withPluginEntities from 'views/logic/withPluginEntities';
 import { newDashboardsPath } from 'views/Constants';
-import viewTransformer from 'views/logic/views/ViewTransformer';
 import { Button, ButtonGroup } from 'components/graylog';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -14,7 +12,6 @@ import View from 'views/logic/views/View';
 import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import type { ViewHook } from 'views/logic/hooks/ViewHook';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
@@ -22,8 +19,6 @@ import styles from './BookmarkControls.css';
 
 type Props = {
   viewStoreState: ViewStoreState,
-  executingViewHooks: Array<ViewHook>,
-  loadingViewHooks: Array<ViewHook>,
 };
 
 type State = {
@@ -35,13 +30,6 @@ type State = {
 class BookmarkControls extends React.Component<Props, State> {
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
-    executingViewHooks: PropTypes.array,
-    loadingViewHooks: PropTypes.array,
-  };
-
-  static defaultProps = {
-    executingViewHooks: [],
-    loadingViewHooks: [],
   };
 
   static contextType = ViewLoaderContext;
@@ -216,10 +204,4 @@ class BookmarkControls extends React.Component<Props, State> {
   }
 }
 
-const ConnectedBookmarkControls = connect(BookmarkControls, { viewStoreState: ViewStore });
-
-const mapping = {
-  loadingViewHooks: 'views.hooks.loadingView',
-  executingViewHooks: 'views.hooks.executingView',
-};
-export default withPluginEntities(ConnectedBookmarkControls, mapping);
+export default connect(BookmarkControls, { viewStoreState: ViewStore });
