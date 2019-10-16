@@ -1,6 +1,6 @@
 Light-themed editor:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const MarkdownSourceEditor = createReactClass({
   getInitialState() {
@@ -38,7 +38,7 @@ const MarkdownSourceEditor = createReactClass({
 
 Read-only dark-themed editor:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const TextSourceEditor = createReactClass({
   getInitialState() {
@@ -77,7 +77,7 @@ const TextSourceEditor = createReactClass({
 
 Non-resizable editor without toolbar and with custom height and width:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const JsonSourceEditor = createReactClass({
   getInitialState() {

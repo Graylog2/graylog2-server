@@ -59,7 +59,7 @@ import FieldNameCompletion from 'views/components/searchbar/completions/FieldNam
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import {
-  dashboardsPath,
+  dashboardsPath, dashboardsTvPath,
   extendedSearchPath,
   newDashboardsPath,
   showDashboardsPath,
@@ -68,6 +68,7 @@ import {
 } from 'views/Constants';
 import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from 'views/pages/StreamSearchPage';
+import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 
@@ -87,6 +88,7 @@ const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
 const searchRoutes = enableNewSearch
   ? [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
+    { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage },

@@ -22,13 +22,14 @@ const DebugOverlay = createReactClass({
   },
 
   render() {
-    const modalBody = this.props.show && (
+    const { show, onClose } = this.props;
+    const modalBody = show && (
       <textarea disabled
-                style={{ height: '600', width: '100%' }}
+                style={{ height: '80vh', width: '100%' }}
                 value={JSON.stringify(this.props, null, 2)} />
     );
     return (
-      <Modal onHide={this.props.onClose} show={this.props.show}>
+      <Modal onHide={onClose} show={show}>
         <Modal.Body>
           {modalBody}
         </Modal.Body>
