@@ -5,11 +5,12 @@ import ErrorPage from '../pages/ErrorPage';
 
 class AppErrorBoundary extends React.Component {
   static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]).isRequired,
+    children: PropTypes.node,
     router: PropTypes.object.isRequired,
+  };
+
+  static defaultProps = {
+    children: null,
   };
 
   constructor(props) {
