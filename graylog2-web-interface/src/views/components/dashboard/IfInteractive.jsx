@@ -1,10 +1,14 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
+import InteractiveContext from '../contexts/InteractiveContext';
 
-const IfInteractive = () => {
+type Props = {
+  children: React.Node,
 };
-
-IfInteractive.propTypes = {};
+const IfInteractive = ({ children }: Props) => (
+  <InteractiveContext.Consumer>
+    {interactive => (interactive ? children : null)}
+  </InteractiveContext.Consumer>
+);
 
 export default IfInteractive;
