@@ -11,7 +11,7 @@ type Router = {
 
 export default (view: View, router: Router) => {
   return ViewManagementActions.create(view)
-    .then(() => ViewActions.load(view))
+    .then(v => ViewActions.load(v))
     .then(state => router.push(Routes.VIEWS.VIEWID(state.view.id)))
     .then(() => UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!'))
     .catch(error => UserNotification.error(`Saving view failed: ${error}`, 'Error!'));

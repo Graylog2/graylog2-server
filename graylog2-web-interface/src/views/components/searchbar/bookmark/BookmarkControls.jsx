@@ -105,9 +105,9 @@ class BookmarkControls extends React.Component<Props, State> {
       .build();
 
     ViewManagementActions.create(newView)
-      .then(() => {
+      .then((createdView) => {
         const loaderFunc = this.context;
-        loaderFunc(newView.id);
+        loaderFunc(createdView.id);
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
