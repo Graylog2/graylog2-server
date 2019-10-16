@@ -32,7 +32,6 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,14 +41,18 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,6 +77,9 @@ public class SearchResourceTest {
     private StreamService streamService;
 
     @Mock
+    private SearchAuthorizer authorizer;
+
+    @Mock
     private Search search;
 
     @Mock
@@ -88,7 +94,7 @@ public class SearchResourceTest {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, StreamService streamService) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, mock(SearchAuthorizer.class));
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, authorizer);
             this.subject = subject;
         }
 
@@ -102,8 +108,6 @@ public class SearchResourceTest {
         protected User getCurrentUser() {
             return currentUser;
         }
-
-
     }
 
     @Before
@@ -136,7 +140,7 @@ public class SearchResourceTest {
 
         final Search returnedSearch = this.searchResource.getSearch(searchId);
 
-        assertThat(returnedSearch).isNotNull();
+        assertThat(returnedSearch).isEqualTo(search);
     }
 
     @Test
@@ -144,48 +148,33 @@ public class SearchResourceTest {
         final String searchId = "deadbeef";
         when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.empty());
 
-        try {
-            this.searchResource.getSearch(searchId);
+        final Throwable throwable = catchThrowable(() ->
+                this.searchResource.getSearch(searchId));
 
-            Assert.fail();
-        } catch (javax.ws.rs.NotFoundException nfe) {
-            assertThat(nfe).isNotNull();
-            assertThat(nfe).hasMessage("No such search deadbeef");
-        }
+        assertThat(throwable)
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("No such search deadbeef");
     }
 
     @Test
     public void executeQueryAddsCurrentUserAsOwner() {
-        final String username = "basti";
-        final String searchId = "deadbeef";
-        final String streamId = "streamId";
-        final Query query = mock(Query.class);
-        final ImmutableSet<Query> queries = ImmutableSet.of(query);
-        final SearchJob searchJob = mock(SearchJob.class);
+        mockCurrentUserName("basti");
 
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
-        when(search.queries()).thenReturn(queries);
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(currentUser.getName()).thenReturn(username);
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":streamId")).thenReturn(true);
-        when(searchJobService.create(any(), any())).thenReturn(searchJob);
-        when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        final String searchId = mockValidSearch();
 
         this.searchResource.executeQuery(searchId, Collections.emptyMap());
 
         final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
         verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
 
-        assertThat(usernameCaptor.getValue()).isEqualTo(username);
+        assertThat(usernameCaptor.getValue()).isEqualTo("basti");
     }
 
     @Test
     public void executeSyncJobAddsCurrentUserAsOwner() {
-        final String username = "basti";
-        final SearchJob searchJob = mock(SearchJob.class);
+        mockCurrentUserName("peterchen");
 
-        when(currentUser.getName()).thenReturn(username);
+        final SearchJob searchJob = mock(SearchJob.class);
         when(searchJobService.create(any(), any())).thenReturn(searchJob);
         when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
@@ -196,33 +185,68 @@ public class SearchResourceTest {
         final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
         verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
 
-        assertThat(usernameCaptor.getValue()).isEqualTo(username);
+        assertThat(usernameCaptor.getValue()).isEqualTo("peterchen");
     }
 
     @Test
     public void executeQueryAppliesExecutionState() {
-        final String username = "basti";
-        final String searchId = "deadbeef";
-        final String streamId = "streamId";
-        final Query query = mock(Query.class);
-        final ImmutableSet<Query> queries = ImmutableSet.of(query);
-        final SearchJob searchJob = mock(SearchJob.class);
+        final String searchId = mockValidSearch();
         final Map<String, Object> executionState = ImmutableMap.of("foo", 42);
-
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
-        when(search.queries()).thenReturn(queries);
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(currentUser.getName()).thenReturn(username);
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":streamId")).thenReturn(true);
-        when(searchJobService.create(any(), any())).thenReturn(searchJob);
-        when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         this.searchResource.executeQuery(searchId, executionState);
 
+        //noinspection unchecked
         final ArgumentCaptor<Map<String, Object>> executionStateCaptor = ArgumentCaptor.forClass(Map.class);
         verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
 
         assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
+    }
+
+    @Test
+    public void authorizationFailureInAsyncExecutionLeadsTo403() {
+        doThrow(new ForbiddenException()).when(authorizer).authorize(any(), any());
+
+        final String searchId = mockValidSearch();
+
+        final Throwable throwable = catchThrowable(() ->
+                this.searchResource.executeQuery(searchId, null));
+
+        assertThat(throwable).isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    public void authorizationFailureInSynchronousExecutionLeadsTo403() {
+        doThrow(new ForbiddenException()).when(authorizer).authorize(any(), any());
+
+        mockValidSearch();
+
+        final Throwable throwable = catchThrowable(() ->
+                this.searchResource.executeSyncJob(search, 10000));
+
+        assertThat(throwable).isInstanceOf(ForbiddenException.class);
+    }
+
+    private void mockCurrentUserName(String name) {
+        when(currentUser.getName()).thenReturn(name);
+    }
+
+    private String mockValidSearch() {
+        final String searchId = "deadbeef";
+        final String streamId = "streamId";
+
+        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":" + streamId)).thenReturn(true);
+
+        final Query query = mock(Query.class);
+        when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
+        when(search.queries()).thenReturn(ImmutableSet.of(query));
+
+        when(search.applyExecutionState(any(), any())).thenReturn(search);
+        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
+
+        when(searchJobService.create(any(), any())).thenReturn(mock(SearchJob.class));
+
+        when(queryEngine.execute(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        return searchId;
     }
 }
