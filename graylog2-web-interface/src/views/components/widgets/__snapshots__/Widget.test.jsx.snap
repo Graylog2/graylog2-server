@@ -21,6 +21,7 @@ exports[`<Widget /> should render with empty props 1`] = `
     <span>
       <widget-header
         editing={false}
+        hideDragHandle={false}
         onRename={[Function]}
         title="Widget Title"
       >
