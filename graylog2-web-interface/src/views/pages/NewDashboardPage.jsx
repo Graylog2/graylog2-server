@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Spinner from 'components/common/Spinner';
 
+import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import { processHooks } from 'views/logic/views/ViewLoader';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
@@ -17,13 +18,16 @@ type Props = {
       view?: View,
     },
   };
+  loadingViewHooks: Array<ViewHook>,
+  executingViewHooks: Array<ViewHook>,
 };
 const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHooks }: Props) => {
   const [loaded, setLoaded] = useState(false);
   const [hookComponent, setHookComponent] = useState(undefined);
 
   useEffect(() => {
-    const { view: searchView } = location.state;
+    const { state = {} } = location;
+    const { view: searchView } = state;
     if (searchView) {
       const query = location;
       const dashboardView = viewTransformer(searchView);
@@ -44,7 +48,6 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   }, []);
 
   if (hookComponent) {
-    const HookComponent = hookComponent;
     return (<>{hookComponent}</>);
   }
 
