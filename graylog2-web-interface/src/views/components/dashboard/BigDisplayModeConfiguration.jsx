@@ -8,7 +8,12 @@ import Input from 'components/bootstrap/Input';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
-import type { UntypedBigDisplayModeQuery } from 'views/pages/ShowDashboardInBigDisplayMode';
+
+export type UntypedBigDisplayModeQuery = {|
+  tabs?: string,
+  interval?: string,
+  refresh?: string,
+|};
 
 type Configuration = {
   refreshInterval: number,

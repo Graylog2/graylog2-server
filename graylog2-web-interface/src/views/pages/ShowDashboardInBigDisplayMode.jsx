@@ -13,19 +13,13 @@ import CycleQueryTab from 'views/components/dashboard/bigdisplay/CycleQueryTab';
 import type { QueryId } from 'views/logic/queries/Query';
 import View from 'views/logic/views/View';
 import { RefreshActions } from 'views/stores/RefreshStore';
-// eslint-disable-next-line import/no-cycle
+import type { UntypedBigDisplayModeQuery } from 'views/components/dashboard/BigDisplayModeConfiguration';
 import ShowViewPage from './ShowViewPage';
 
 type BigDisplayModeQuery = {|
   tabs: ?Array<number>,
   interval: number,
   refresh: number,
-|};
-
-export type UntypedBigDisplayModeQuery = {|
-  tabs?: string,
-  interval?: string,
-  refresh?: string,
 |};
 
 type Props = {
