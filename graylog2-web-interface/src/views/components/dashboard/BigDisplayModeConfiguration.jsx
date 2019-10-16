@@ -25,7 +25,7 @@ type ConfigurationModalProps = {
 const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps) => {
   const availableTabs = view.search.queries.keySeq().map((query, idx) => [
     idx,
-    queryTitle(view, query),
+    queryTitle(view, query.id),
   ]).toJS();
 
   const [refreshInterval, setRefreshInterval] = useState(10);
