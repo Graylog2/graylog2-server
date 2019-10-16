@@ -11,14 +11,10 @@ const ViewTransformer = (searchView: View): View => {
     const { timerange, query, filter = List.of() } = searchView.search.queries.find(q => q.id === queryId);
 
     const widgets: List<Widget> = viewState.widgets.map((widget: Widget) => {
-      const streams = filter
-        .filter(value => List.isList(value))
-        .map(filterList => filterList
-          .filter(value => Map.isMap(value) && value.get('type') === 'stream')
-          .map(value => value.get('id'))
-          .toList())
+      const streams = filter.get('filters', List.of())
+        .filter(value => Map.isMap(value) && value.get('type') === 'stream')
+        .map(value => value.get('id'))
         .toList()
-        .flatten(true)
         .toArray();
 
       return widget.toBuilder()
@@ -33,7 +29,7 @@ const ViewTransformer = (searchView: View): View => {
   });
 
   return searchView.toBuilder()
-    .toNewView()
+    .newId()
     .type(View.Type.Dashboard)
     .state(newViewStateMap)
     .build();

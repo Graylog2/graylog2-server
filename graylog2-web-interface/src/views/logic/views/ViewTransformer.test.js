@@ -35,8 +35,8 @@ describe('ViewTransformer', () => {
         .build();
 
       const dashboardView = viewTransformer(searchView);
-      expect(dashboardView.id).toBeUndefined();
-      expect(dashboardView.title).toBeUndefined();
+      expect(dashboardView.id).not.toStrictEqual(searchView.id);
+      expect(dashboardView.isNew).toBe(true);
     });
 
     it('should add the timerange to the widget', () => {
@@ -123,7 +123,11 @@ describe('ViewTransformer', () => {
         .search(searchFixture)
         .build();
       const dashboardView = viewTransformer(searchView);
-      expect(dashboardView).toMatchSnapshot();
+      expect(dashboardView).toMatchSnapshot({
+        _value: {
+          id: expect.any(String),
+        },
+      });
     });
   });
 });

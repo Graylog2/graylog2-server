@@ -24,7 +24,7 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
-const _isNewView = (view): boolean => !view.title;
+const _isNewView = (view): boolean => view.isNew;
 
 const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
 
