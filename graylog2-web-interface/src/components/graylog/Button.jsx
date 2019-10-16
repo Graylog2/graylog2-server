@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback } from 'react';
-import { Button as BootstrapButton } from 'react-bootstrap';
 import styled from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
+import { Button as BootstrapButton } from 'react-bootstrap';
 
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
