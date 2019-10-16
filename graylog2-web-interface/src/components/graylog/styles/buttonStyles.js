@@ -10,7 +10,6 @@ const buttonStyles = ({ colors, active, utility }) => {
     const darken125 = utility.darken(color, 1.25);
 
     return css`
-    && {
       background-color: ${active ? darken100 : color};
       border-color: ${active ? darken125 : darken025};
 
@@ -18,7 +17,7 @@ const buttonStyles = ({ colors, active, utility }) => {
         background-color: ${active ? darken075 : darken050};
         border-color: ${active ? darken100 : darken075};
       }
-    }`;
+    `;
   };
 
   return theme.variants('mode', 'bsStyle', {
