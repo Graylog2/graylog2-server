@@ -95,7 +95,7 @@ const EmptyDashboardInfo = () => (
 
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
-  if (!widgets || widgets.size === 0) {
+  if (!widgets || widgets.isEmpty()) {
     return <EmptyDashboardInfo />;
   }
 
