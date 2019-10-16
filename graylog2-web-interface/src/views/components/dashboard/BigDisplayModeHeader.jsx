@@ -1,0 +1,31 @@
+// @flow strict
+import * as React from 'react';
+import connect from 'stores/connect';
+
+import Spinner from 'components/common/Spinner';
+import { ViewStore } from 'views/stores/ViewStore';
+import queryTitle from 'views/logic/queries/QueryTitle';
+import type { QueryId } from 'views/logic/queries/Query';
+import View from 'views/logic/views/View';
+
+type Props = {
+  view: {
+    activeQuery: ?QueryId,
+    view: ?View,
+  }
+};
+
+const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
+  if (!view || !activeQuery) {
+    return <Spinner />;
+  }
+  const currentQueryTitle = queryTitle(view, activeQuery);
+  return (
+    <React.Fragment>
+      <h1>{view.title}</h1>
+      <h2>{currentQueryTitle}</h2>
+    </React.Fragment>
+  );
+};
+
+export default connect(BigDisplayModeHeader, { view: ViewStore });
