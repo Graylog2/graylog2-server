@@ -37,6 +37,7 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import IfInteractive from '../components/dashboard/IfInteractive';
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
   props => Object.assign(
@@ -115,24 +116,30 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
 
   return (
     <CurrentViewTypeProvider>
-      <IfDashboard>
-        <WindowLeaveMessage route={route} />
-      </IfDashboard>
+      <IfInteractive>
+        <IfDashboard>
+          <WindowLeaveMessage route={route} />
+        </IfDashboard>
+      </IfInteractive>
       <div id="main-row" className="grid-container">
-        <ConnectedSideBar>
-          <ConnectedFieldList />
-        </ConnectedSideBar>
+        <IfInteractive>
+          <ConnectedSideBar>
+            <ConnectedFieldList />
+          </ConnectedSideBar>
+        </IfInteractive>
         <div className="search-grid">
-          <HeaderElements />
-          <IfDashboard>
-            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-            <QueryBar />
-          </IfDashboard>
-          <IfSearch>
-            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-          </IfSearch>
+          <IfInteractive>
+            <HeaderElements />
+            <IfDashboard>
+              <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+              <QueryBar />
+            </IfDashboard>
+            <IfSearch>
+              <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+            </IfSearch>
 
-          <QueryBarElements />
+            <QueryBarElements />
+          </IfInteractive>
 
           <ViewAdditionalContextProvider>
             <SearchResult />
