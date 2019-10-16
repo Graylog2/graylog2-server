@@ -19,8 +19,19 @@ const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).to
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {
     it('should change the type', () => {
+      const query = Query.builder()
+        .id('query-id')
+        .timerange({ type: 'relative', range: 365 })
+        .build();
+
+      const search = Search.builder()
+        .id('search-id')
+        .queries([query])
+        .build();
+
       const searchView = View.builder()
         .type(View.Type.Search)
+        .search(search)
         .build();
 
       const dashboardView = viewTransformer(searchView);
@@ -28,9 +39,20 @@ describe('ViewTransformer', () => {
     });
 
     it('should change the type', () => {
+      const query = Query.builder()
+        .id('query-id')
+        .timerange({ type: 'relative', range: 365 })
+        .build();
+
+      const search = Search.builder()
+        .id('search-id')
+        .queries([query])
+        .build();
+
       const searchView = View.builder()
         .id('dead-beef')
         .title('Breq')
+        .search(search)
         .type(View.Type.Search)
         .build();
 
@@ -115,8 +137,8 @@ describe('ViewTransformer', () => {
     });
   });
 
-  describe('transform with the whole view', () => {
-    it('should transform a view from fixutre', () => {
+  describe('transform with all attributes', () => {
+    it('should transform a view with search from a json fixture', () => {
       const viewFixture = View.fromJSON(readFixture('./ViewTransformer.view.fixture.json'));
       const searchFixture = Search.fromJSON(readFixture('./ViewTransformer.search.fixture.json'));
       const searchView = viewFixture.toBuilder()

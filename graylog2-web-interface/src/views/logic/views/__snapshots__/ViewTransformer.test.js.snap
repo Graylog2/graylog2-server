@@ -1,5 +1,194 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ViewTransformer transform with all attributes should transform a view with search from a json fixture 1`] = `
+Object {
+  "_value": Object {
+    "createdAt": "2019-10-14T07:58:06.562Z",
+    "description": "",
+    "id": Any<String>,
+    "isNew": true,
+    "owner": "admin",
+    "properties": Immutable.List [],
+    "requires": undefined,
+    "search": Object {
+      "id": "5da42aa9c6eb193adff63b1b",
+      "parameters": Array [],
+      "queries": Array [
+        Object {
+          "filter": Immutable.Map {
+            "type": "or",
+            "filters": Immutable.List [
+              Immutable.Map {
+                "type": "stream",
+                "filters": null,
+                "id": "5cdab2293d27467fbe9e8a72",
+                "title": null,
+              },
+            ],
+          },
+          "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
+          "query": Object {
+            "query_string": "author: \\"Bernd Ahlers\\"",
+            "type": "elasticsearch",
+          },
+          "search_types": Array [
+            Object {
+              "filter": null,
+              "id": "77ce265c-83bf-4ae3-bd05-d882570ac014",
+              "limit": 150,
+              "offset": 0,
+              "query": null,
+              "streams": Array [],
+              "timerange": null,
+              "type": "messages",
+            },
+            Object {
+              "column_groups": Array [],
+              "filter": null,
+              "id": "d8691141-660e-442c-b77a-609e6649def0",
+              "query": null,
+              "rollup": true,
+              "row_groups": Array [
+                Object {
+                  "field": "timestamp",
+                  "interval": Object {
+                    "scaling": 1,
+                    "type": "auto",
+                  },
+                  "type": "time",
+                },
+              ],
+              "series": Array [
+                Object {
+                  "field": null,
+                  "id": "count()",
+                  "type": "count",
+                },
+              ],
+              "sort": Array [],
+              "streams": Array [],
+              "timerange": null,
+              "type": "pivot",
+            },
+          ],
+          "timerange": Object {
+            "range": 2592000,
+            "type": "relative",
+          },
+        },
+      ],
+    },
+    "state": Immutable.Map {
+      "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e": Object {
+        "formatting": Object {
+          "highlighting": Array [],
+        },
+        "positions": Object {
+          "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": Object {
+            "col": 1,
+            "height": 2,
+            "row": 1,
+            "width": "Infinity",
+          },
+          "8209351b-407a-455b-9942-cefea43b76ae": Object {
+            "col": 1,
+            "height": 6,
+            "row": 3,
+            "width": "Infinity",
+          },
+        },
+        "selected_fields": null,
+        "titles": Immutable.Map {
+          "widget": Immutable.Map {
+            "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": "Message Count",
+            "8209351b-407a-455b-9942-cefea43b76ae": "All Messages",
+          },
+        },
+        "widget_mapping": Immutable.Map {
+          "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": Immutable.List [
+            "d8691141-660e-442c-b77a-609e6649def0",
+          ],
+          "8209351b-407a-455b-9942-cefea43b76ae": Immutable.List [
+            "77ce265c-83bf-4ae3-bd05-d882570ac014",
+          ],
+        },
+        "widgets": Immutable.List [
+          Object {
+            "config": Object {
+              "fields": Array [
+                "timestamp",
+                "source",
+              ],
+              "show_message_row": true,
+            },
+            "filter": undefined,
+            "id": "8209351b-407a-455b-9942-cefea43b76ae",
+            "query": Object {
+              "query_string": "author: \\"Bernd Ahlers\\"",
+              "type": "elasticsearch",
+            },
+            "streams": Array [
+              "5cdab2293d27467fbe9e8a72",
+            ],
+            "timerange": Object {
+              "range": 2592000,
+              "type": "relative",
+            },
+            "type": "messages",
+          },
+          Object {
+            "config": Object {
+              "column_pivots": Array [],
+              "rollup": true,
+              "row_pivots": Array [
+                Object {
+                  "config": Object {
+                    "interval": Object {
+                      "scaling": null,
+                      "type": "auto",
+                    },
+                  },
+                  "field": "timestamp",
+                  "type": "time",
+                },
+              ],
+              "series": Array [
+                Object {
+                  "config": Object {
+                    "name": null,
+                  },
+                  "function": "count()",
+                },
+              ],
+              "sort": Array [],
+              "visualization": "bar",
+              "visualization_config": null,
+            },
+            "filter": undefined,
+            "id": "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a",
+            "query": Object {
+              "query_string": "author: \\"Bernd Ahlers\\"",
+              "type": "elasticsearch",
+            },
+            "streams": Array [
+              "5cdab2293d27467fbe9e8a72",
+            ],
+            "timerange": Object {
+              "range": 2592000,
+              "type": "relative",
+            },
+            "type": "aggregation",
+          },
+        ],
+      },
+    },
+    "summary": "",
+    "title": "transform",
+    "type": "DASHBOARD",
+  },
+}
+`;
+
 exports[`ViewTransformer transform with the whole view should transform a view from fixutre 1`] = `
 Object {
   "_value": Object {

@@ -33,9 +33,9 @@ describe('BookmarkControls', () => {
     });
 
     it('should loadView after create', (done) => {
-      ViewManagementActions.create = mockAction(jest.fn(() => Promise.resolve()));
-      const onLoadView = jest.fn(() => {
-        return Promise.resolve();
+      ViewManagementActions.create = mockAction(jest.fn((view) => Promise.resolve(view)));
+      const onLoadView = jest.fn((view) => {
+        return new Promise(() => view);
       });
       const viewStoreState = {
         activeQuery: '',
