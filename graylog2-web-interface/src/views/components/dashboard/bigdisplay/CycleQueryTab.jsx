@@ -8,7 +8,7 @@ type Props = {
   interval: number,
   view: ?View,
   activeQuery: ?QueryId,
-  tabs: ?Array<number>,
+  tabs?: ?Array<number>,
 };
 
 const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
@@ -22,15 +22,15 @@ const CycleQueryTab = ({ interval, view, activeQuery, tabs }: Props) => {
       const currentTabIndex = queryTabs.indexOf(currentQueryIndex);
       const nextQueryIndex = queryTabs[(currentTabIndex + 1) % queryTabs.length];
       const nextQueryId = view.search.queries.toIndexedSeq().get(nextQueryIndex).id;
-      ViewActions.selectQuery(nextQueryId);
+      if (nextQueryId !== activeQuery) {
+        ViewActions.selectQuery(nextQueryId);
+      }
     }, interval * 1000);
 
     return () => clearInterval(cycleInterval);
-  }, [interval, view, activeQuery]);
+  }, [interval, view, activeQuery, tabs]);
 
   return null;
 };
-
-CycleQueryTab.propTypes = {};
 
 export default CycleQueryTab;
