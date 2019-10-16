@@ -10,7 +10,7 @@ const SplitButton = forwardRef(({ active, bsStyle, ...props }, ref) => {
     ${buttonStyles({ active })};
 
     ~ .btn.dropdown-toggle {
-      ${buttonStyles({ active, specific: false })};
+      ${buttonStyles({ active })};
     }
   `, [active]);
 
