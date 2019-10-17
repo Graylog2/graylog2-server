@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import connect from 'stores/connect';
 
 import Spinner from 'components/common/Spinner';
@@ -16,16 +17,20 @@ type Props = {
   }
 };
 
+const PositioningWrapper = styled.div`
+  padding-left: 20px;
+`;
+
 const BigDisplayModeHeader = ({ view: { activeQuery, view } = {} }: Props) => {
   if (!view || !activeQuery) {
     return <Spinner />;
   }
   const currentQueryTitle = queryTitle(view, activeQuery);
   return (
-    <React.Fragment>
+    <PositioningWrapper>
       <h1>{view.title}</h1>
       <h2>{currentQueryTitle}</h2>
-    </React.Fragment>
+    </PositioningWrapper>
   );
 };
 
