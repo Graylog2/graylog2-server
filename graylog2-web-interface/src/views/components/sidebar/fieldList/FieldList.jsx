@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import Filter from './Filter';
 import FieldListProvider from './FieldListContext';
@@ -11,7 +12,7 @@ const FieldList = ({ fields, allFields, viewMetadata }) => {
     <FieldListProvider>
       <Filter />
 
-      <div>
+      <FieldsToggle>
         List fields of{' '}
         <FieldsByLink mode="current"
                       text="current streams"
@@ -24,14 +25,16 @@ const FieldList = ({ fields, allFields, viewMetadata }) => {
         <FieldsByLink mode="allreserved"
                       text="all including reserved"
                       title="This shows all fields, including reserved (gl2_*) fields." />
-      </div>
-
-      <hr />
+      </FieldsToggle>
 
       <FieldListWrap fields={fields} allFields={allFields} viewMetadata={viewMetadata} />
     </FieldListProvider>
   );
 };
+
+const FieldsToggle = styled.div`
+  margin: 12px 0;
+`;
 
 FieldList.propTypes = {
   allFields: PropTypes.object.isRequired,

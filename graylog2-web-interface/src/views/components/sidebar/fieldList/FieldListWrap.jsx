@@ -7,7 +7,6 @@ import Field from 'views/components/Field';
 
 import { useFieldList } from './FieldListContext';
 import FieldTypeIcon from './FieldTypeIcon';
-import styles from './FieldList.css';
 
 const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
@@ -44,15 +43,15 @@ const FieldListWrap = ({ fields, allFields, viewMetadata }) => {
   }
 
   return (
-    <div>
-      <StyledWrap>
+    <Wrap>
+      <List>
         {fieldList.map(({ name, type }) => {
           const disabled = !fields.find(f => f.name === name);
 
           return (
-            <li className={styles.fieldListItem}>
+            <Item>
               <FieldTypeIcon type={type} />
-              {' '}
+
               <Field queryId={selectedQuery}
                      viewId={selectedView}
                      disabled={disabled}
@@ -61,22 +60,28 @@ const FieldListWrap = ({ fields, allFields, viewMetadata }) => {
                      interactive>
                 {name}
               </Field>
-            </li>
+            </Item>
           );
         })}
-      </StyledWrap>
-    </div>
+      </List>
+    </Wrap>
   );
 };
 
-const StyledWrap = styled.ul`
+const Wrap = styled.div`
+  overflow: auto;
+`;
+
+const List = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+`;
 
-  > li {
-    padding: 3px 0;
-  }
+const Item = styled.li`
+  font-size: 12px;
+  padding: 3px 0;
+  display: table-row;
 `;
 
 FieldListWrap.propTypes = {

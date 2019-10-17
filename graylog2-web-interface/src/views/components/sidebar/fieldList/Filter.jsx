@@ -1,17 +1,17 @@
 import React, { useRef } from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 
 import { useFieldList } from './FieldListContext';
-import styles from './FieldList.css';
 
 const Filter = () => {
   const filterFieldInputRef = useRef();
   const { filter, setFilter, resetFilter } = useFieldList();
 
   return (
-    <form className={`form-inline ${styles.filterContainer}`} onSubmit={e => e.preventDefault()}>
-      <div className={`form-group has-feedback ${styles.filterInputContainer}`}>
+    <Form className="form-inline" onSubmit={e => e.preventDefault()}>
+      <FilterContainer className="form-group has-feedback">
         <input id="common-search-form-query-input"
                className="query form-control"
                ref={filterFieldInputRef}
@@ -21,14 +21,27 @@ const Filter = () => {
                type="text"
                autoComplete="off"
                spellCheck="false" />
-      </div>
+      </FilterContainer>
       <div className="form-group">
         <Button type="reset" className="reset-button" onClick={resetFilter}>
           Reset
         </Button>
       </div>
-    </form>
+    </Form>
   );
 };
+
+const Form = styled.form`
+  display: flex;
+`;
+
+const FilterContainer = styled.div`
+  flex-grow: 1;
+  margin-right: 5px;
+
+  > input {
+    width: 100%;
+  }
+`;
 
 export default Filter;
