@@ -14,7 +14,7 @@ import ExtendedSearchPage from './ExtendedSearchPage';
 type Props = {
   route: {},
   location: {
-    state: {
+    state?: {
       view?: View,
     },
   };
