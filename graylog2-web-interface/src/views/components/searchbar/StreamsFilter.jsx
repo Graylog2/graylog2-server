@@ -5,9 +5,10 @@ import Select from 'components/common/Select';
 
 const StreamsFilter = ({ disabled, value, streams, onChange }) => {
   const selectedStreams = value.join(',');
+  const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
   return (
-    <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter">
-      <Select placeholder="Select streams the search should include. Searches in all streams if empty."
+    <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter" title={placeholder}>
+      <Select placeholder={placeholder}
               disabled={disabled}
               displayKey="key"
               inputId="streams-filter"
