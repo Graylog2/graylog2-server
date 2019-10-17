@@ -13,7 +13,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
-import styles from './BookmarkControls.css';
 
 type Props = {
   viewStoreState: ViewStoreState,
@@ -164,7 +163,7 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     return (
-      <div className={`${styles.position} pull-right`}>
+      <div className="pull-right">
         <ButtonGroup>
           <React.Fragment>
             <Button disabled={disableReset} title="Empty search" onClick={() => ViewActions.create(View.Type.Search)}>
