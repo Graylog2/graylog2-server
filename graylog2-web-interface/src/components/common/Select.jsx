@@ -102,7 +102,7 @@ const placeholder = base => ({
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden',
-  width: '100%',
+  maxWidth: '100%',
   paddingRight: '20px',
 });
 
