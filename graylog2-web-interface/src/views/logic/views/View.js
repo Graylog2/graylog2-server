@@ -29,7 +29,6 @@ type InternalState = {
   createdAt: Date,
   owner: string,
   requires: Requirements,
-  isNew: boolean,
 };
 
 export type WidgetMapping = Immutable.Map<string, string>;
@@ -65,8 +64,7 @@ export default class View {
     state: ViewStateMap,
     createdAt: Date,
     owner: string,
-    requires: Requirements,
-    isNew: boolean = false) {
+    requires: Requirements) {
     this._value = {
       id,
       type,
@@ -79,7 +77,6 @@ export default class View {
       createdAt,
       owner,
       requires,
-      isNew,
     };
   }
 
@@ -136,13 +133,9 @@ export default class View {
     return this._value.requires;
   }
 
-  get isNew(): boolean {
-    return this._value.isNew;
-  }
-
   // eslint-disable-next-line no-use-before-define
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, isNew } = this._value;
+    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type } = this._value;
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map({
       id,
@@ -156,7 +149,6 @@ export default class View {
       owner,
       requires,
       type,
-      isNew,
     }));
   }
 
@@ -193,7 +185,6 @@ export default class View {
       .createdAt(created_at)
       .owner(owner)
       .requires(requires)
-      .isNew(id === undefined)
       .build();
   }
 
@@ -224,7 +215,7 @@ class Builder {
   }
 
   newId(): Builder {
-    return this.id(ObjectID().toString()).isNew();
+    return this.id(ObjectID().toString());
   }
 
   title(value: string): Builder {
@@ -263,12 +254,8 @@ class Builder {
     return new Builder(this.value.set('requires', value));
   }
 
-  isNew(value: boolean = true): Builder {
-    return new Builder(this.value.set('isNew', value));
-  }
-
   build(): View {
-    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, isNew } = this.value.toObject();
-    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, isNew);
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires } = this.value.toObject();
+    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires);
   }
 }

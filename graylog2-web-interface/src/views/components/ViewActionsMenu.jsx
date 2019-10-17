@@ -24,20 +24,17 @@ import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
-const _isNewView = (view): boolean => view.isNew;
-
 const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
 
 const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
 
-const ViewActionsMenu = ({ view, metadata, onSaveView, onSaveAsView, currentUser }) => {
+const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, currentUser }) => {
   const [shareViewOpen, setShareViewOpen] = useState(false);
   const [debugOpen, setDebugOpen] = useState(false);
   const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
   const [editViewOpen, setEditViewOpen] = useState(false);
 
   const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
-  const isNewView = _isNewView(view);
   const allowedToEdit = _isAllowedToEdit(view, currentUser);
   const debugOverlay = AppConfig.gl2DevMode() && (
     <React.Fragment>
@@ -91,10 +88,11 @@ ViewActionsMenu.propTypes = {
     undeclared: ImmutablePropTypes.Set,
   }).isRequired,
   view: PropTypes.instanceOf(View).isRequired,
+  isNewView: PropTypes.bool.isRequired,
 };
 
 export default connect(
   ViewActionsMenu,
   { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore },
-  ({ view: { view }, currentUser: { currentUser }, ...rest }) => ({ currentUser, view, ...rest }),
+  ({ view: { view, isNew }, currentUser: { currentUser }, ...rest }) => ({ currentUser, view, isNewView: isNew, ...rest }),
 );

@@ -58,7 +58,6 @@ describe('ViewTransformer', () => {
 
       const dashboardView = viewTransformer(searchView);
       expect(dashboardView.id).not.toStrictEqual(searchView.id);
-      expect(dashboardView.isNew).toBe(true);
     });
 
     it('should add the timerange to the widget', () => {
