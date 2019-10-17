@@ -35,7 +35,6 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,9 +80,6 @@ public class SearchResourceStreamPermissionsTest {
 
     @Mock
     private StreamService streamService;
-
-    @Mock
-    private Search search;
 
     @Mock
     private Subject subject;
@@ -214,69 +210,5 @@ public class SearchResourceStreamPermissionsTest {
 
             throw e;
         }
-    }
-
-    @Test
-    public void referencingNonpermittedStreamsFails() {
-        final String searchId = "searchId";
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
-        when(search.queries()).thenReturn(ImmutableSet.of(query));
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "disallowedstream"));
-
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream1")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream2")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":disallowedstream")).thenReturn(false);
-
-        thrown.expect(ForbiddenException.class);
-        thrown.expectMessage(Matchers.describedAs("Disallowed stream id must not leak.",
-                Matchers.not(Matchers.containsString("disallowedstream"))));
-
-        searchResource.executeQuery(searchId, Collections.emptyMap());
-    }
-
-    @Test
-    public void referencingNonpermittedStreamsFailsForSyncSearch() {
-        when(search.queries()).thenReturn(ImmutableSet.of(query));
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "disallowedstream"));
-
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream1")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream2")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":disallowedstream")).thenReturn(false);
-
-        thrown.expect(ForbiddenException.class);
-        thrown.expectMessage(Matchers.describedAs("Disallowed stream id must not leak.",
-                Matchers.not(Matchers.containsString("disallowedstream"))));
-
-        searchResource.executeSyncJob(search, 60000);
-    }
-
-    @Test
-    public void referencingPermittedStreamsSucceeds() {
-        final String searchId = "searchId";
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
-        when(search.queries()).thenReturn(ImmutableSet.of(query));
-        when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(query.usedStreamIds()).thenReturn(ImmutableSet.of("allowedstream1", "allowedstream2", "allowedstream3"));
-
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream1")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream2")).thenReturn(true);
-        when(subject.isPermitted(RestPermissions.STREAMS_READ + ":allowedstream3")).thenReturn(true);
-
-        final SearchJob searchJob = mock(SearchJob.class);
-        when(searchJobService.create(eq(search), any(String.class))).thenReturn(searchJob);
-        when(queryEngine.execute(searchJob)).thenReturn(searchJob);
-        when(searchJob.getId()).thenReturn("searchJobId");
-
-        final Response response = searchResource.executeQuery(searchId, Collections.emptyMap());
-
-        assertThat(response.getStatusInfo().getFamily()).isEqualTo(Response.Status.Family.SUCCESSFUL);
-
-        final ArgumentCaptor<String> permissionCaptor = ArgumentCaptor.forClass(String.class);
-        verify(subject, times(3)).isPermitted(permissionCaptor.capture());
-        assertThat(permissionCaptor.getAllValues()).containsExactlyInAnyOrder(
-                RestPermissions.STREAMS_READ + ":allowedstream1",
-                RestPermissions.STREAMS_READ + ":allowedstream2",
-                RestPermissions.STREAMS_READ + ":allowedstream3"
-        );
     }
 }

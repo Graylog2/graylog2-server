@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -48,16 +46,25 @@ public class SearchAuthorizer {
     public void authorize(Search search, Predicate<String> hasReadPermissionForStream) {
         checkStreamPermissions(search, hasReadPermissionForStream);
 
-        final Map<String, PluginMetadataSummary> missingRequirements = missingRequirementsForEach(search);
-        if (!missingRequirements.isEmpty()) {
-            throw new MissingCapabilitiesException(missingRequirements);
-        }
+        checkMissingRequirements(search);
     }
 
     private void checkStreamPermissions(Search search, Predicate<String> hasReadPermissionForStream) {
-        final Optional<Set<String>> usedStreamIds = search.queries().stream().map(Query::usedStreamIds).reduce(Sets::union);
+        final Set<String> usedStreamIds = usedStreamIdsFrom(search);
 
-        checkUserIsPermittedToSeeStreams(usedStreamIds.orElse(Collections.emptySet()), hasReadPermissionForStream);
+        checkUserIsPermittedToSeeStreams(usedStreamIds, hasReadPermissionForStream);
+    }
+
+    private Set<String> usedStreamIdsFrom(Search search) {
+        final Set<String> usedStreamIds = search.queries().stream()
+                .map(Query::usedStreamIds)
+                .reduce(Sets::union)
+                .orElseThrow(() -> new RuntimeException("Failed to get used stream IDs from query"));
+
+        if (usedStreamIds.isEmpty())
+            throw new IllegalArgumentException("Can't authorize a search with no streams");
+
+        return usedStreamIds;
     }
 
     private void checkUserIsPermittedToSeeStreams(Set<String> streamIds, Predicate<String> hasReadPermissionForStream) {
@@ -74,8 +81,16 @@ public class SearchAuthorizer {
         throw new ForbiddenException("The search is referencing at least one stream you are not permitted to see.");
     }
 
+    private void checkMissingRequirements(Search search) {
+        final Map<String, PluginMetadataSummary> missingRequirements = missingRequirementsForEach(search);
+        if (!missingRequirements.isEmpty()) {
+            throw new MissingCapabilitiesException(missingRequirements);
+        }
+    }
+
     private Map<String, PluginMetadataSummary> missingRequirementsForEach(Search search) {
         return search.requires().entrySet().stream()
-                .filter(entry -> !this.providedCapabilities.containsKey(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(entry -> !this.providedCapabilities.containsKey(entry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
