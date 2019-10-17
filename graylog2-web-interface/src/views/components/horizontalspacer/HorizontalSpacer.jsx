@@ -13,7 +13,7 @@ type Props = {
   /** Needed height in px */
   height: number,
   /** Allow custom classNames */
-  className: string,
+  className?: string,
 };
 
 const Spacer = styled.div`

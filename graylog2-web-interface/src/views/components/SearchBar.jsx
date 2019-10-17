@@ -82,7 +82,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                   </Col>
 
                   <Col mdHidden lgHidden>
-                    <HorizontalSpacer className="mdHidden" />
+                    <HorizontalSpacer />
                   </Col>
 
                   <Col md={5} xs={8}>

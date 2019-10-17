@@ -81,7 +81,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
             </Row>
             <Row className="no-bm">
               <Col>
-                <HorizontalSpacer className="mdHidden" />
+                <HorizontalSpacer />
               </Col>
             </Row>
             <Row className="no-bm">
