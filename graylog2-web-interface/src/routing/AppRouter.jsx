@@ -119,7 +119,7 @@ const AppRouter = () => {
 
   return (
     <Router history={history}>
-      <Route path={Routes.STARTPAGE} component={AppErrorBoundary}>
+      <Route component={AppErrorBoundary}>
         {pluginRoutesWithNullParent}
         <Route path={Routes.STARTPAGE} component={App}>
           <Route component={AppWithGlobalNotifications}>
