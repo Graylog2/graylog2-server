@@ -25,7 +25,7 @@ jest.mock('injection/CombinedProvider', () => {
 });
 
 // To prevent exceptions from getting swallwoed
-jest.mock('./AppErrorBoundary',() => mockComponent('AppErrorBoundary'));
+jest.mock('./AppErrorBoundary', () => mockComponent('AppErrorBoundary'));
 
 jest.mock('components/search/SearchBar', () => mockComponent('SearchBar'));
 
