@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +28,6 @@ import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
@@ -40,9 +38,6 @@ import org.graylog.plugins.views.search.authorization.SearchAuthorizer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.filter.AndFilter;
-import org.graylog.plugins.views.search.filter.OrFilter;
-import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -105,7 +100,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
-                          StreamService streamService, SearchAuthorizer authorizer) {
+                          StreamService streamService,
+                          SearchAuthorizer authorizer) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
@@ -126,7 +122,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final String username = username();
         final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
         final Optional<Search> previous = searchDbService.get(search.id());
         if (!isAdmin && !previous.map(existingSearch -> isOwnerOfSearch(existingSearch, username)).orElse(true)) {
@@ -159,63 +155,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
         }
     }
 
-    private Search addUsersStreamsToQueriesWithoutStreams(Search search) {
-        final Set<Query> queriesWithoutStreams = search.queries().stream()
-                .filter(query -> query.usedStreamIds().isEmpty()).collect(toSet());
-
-        if (queriesWithoutStreams.isEmpty())
-            return search;
-
-        final Set<Query> queriesWithAllAllowedStreams = queriesWithoutStreams.stream()
-                .map(this::addAllAllowedStreamsForUser)
-                .collect(toSet());
-
-        final Set<Query> queriesWithSpecifiedStreams = Sets.difference(search.queries(), queriesWithoutStreams);
-
-        final ImmutableSet<Query> newQueries = Sets.union(queriesWithSpecifiedStreams, queriesWithAllAllowedStreams).immutableCopy();
-
-        return search.toBuilder().queries(newQueries).build();
-    }
-
-    private Query addAllAllowedStreamsForUser(Query q) {
-        final Filter newFilter = addAllAllowedStreamsForUser(q.filter());
-        return q.toBuilder().filter(newFilter).build();
-    }
-
-    private Filter addAllAllowedStreamsForUser(Filter filter) {
-        final Filter orFilter = filteringForStreamIds(allAllowedStreamsForUser());
-        if (filter == null) {
-            return orFilter;
-        }
-        return AndFilter.and(orFilter, filter);
-    }
-
-    private Set<String> allAllowedStreamsForUser() {
-        final Set<String> result = streamService.loadAll().stream()
-                .map(org.graylog2.plugin.streams.Stream::getId)
-                // Unless explicitly queried, exclude event indices by default
-                // Having the event indices in every search, makes sorting almost impossible
-                // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
-                // TODO: this filter can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
-                .filter(id -> !DEFAULT_EVENT_STREAM_IDS.contains(id))
-                .filter(id -> isPermitted(RestPermissions.STREAMS_READ, id))
-                .collect(toSet());
-
-        if (result.isEmpty())
-            throw new ForbiddenException("There are no streams you are permitted to use.");
-
-        return result;
-    }
-
-    private Filter filteringForStreamIds(Set<String> streamIds) {
-        final Set<Filter> streamFilters = streamIds.stream()
-                .map(StreamFilter::ofId)
-                .collect(toSet());
-        return OrFilter.builder()
-                .filters(streamFilters)
-                .build();
-    }
-
     @POST
     @ApiOperation(value = "Execute the referenced search query asynchronously",
             notes = "Starts a new search, irrespective whether or not another is already running")
@@ -225,21 +164,23 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam Map<String, Object> executionState) {
         Search search = getSearch(id);
 
-        search = addUsersStreamsToQueriesWithoutStreams(search);
+        search = search.addStreamsToQueriesWithoutStreams(this::allAllowedStreamsForUser);
 
         authorize(search);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
-
-        final SearchJob searchJob = searchJobService.create(search, username);
+        final SearchJob searchJob = searchJobService.create(search, username());
 
         final SearchJob runningSearchJob = queryEngine.execute(searchJob);
 
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
+    }
+
+    private String username() {
+        return getCurrentUser() != null ? getCurrentUser().getName() : null;
     }
 
     private void authorize(Search search) {
@@ -253,9 +194,9 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeSyncJob(@ApiParam Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
+        final String username = username();
 
-        search = addUsersStreamsToQueriesWithoutStreams(search);
+        search = search.addStreamsToQueriesWithoutStreams(this::allAllowedStreamsForUser);
 
         authorize(search);
 
@@ -282,8 +223,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     public SearchJob jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId) {
-        final String username = getCurrentUser() != null ? getCurrentUser().getName() : null;
-        final SearchJob searchJob = searchJobService.load(jobId, username).orElseThrow(NotFoundException::new);
+        final SearchJob searchJob = searchJobService.load(jobId, username()).orElseThrow(NotFoundException::new);
         try {
             // force a "conditional join", to catch fast responses without having to poll
             //noinspection UnstableApiUsage
@@ -311,5 +251,22 @@ public class SearchResource extends RestResource implements PluginRestResource {
         }
         final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
         return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
+    }
+
+    private ImmutableSet<String> allAllowedStreamsForUser() {
+        final Set<String> result = streamService.loadAll().stream()
+                .map(org.graylog2.plugin.streams.Stream::getId)
+                // Unless explicitly queried, exclude event indices by defaulth
+                // Having the event indices in every search, makes sorting almost impossible
+                // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
+                // TODO: this filter can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
+                .filter(id -> !DEFAULT_EVENT_STREAM_IDS.contains(id))
+                .filter(id -> isPermitted(RestPermissions.STREAMS_READ, id))
+                .collect(toSet());
+
+        if (result.isEmpty())
+            throw new ForbiddenException("There are no streams you are permitted to use.");
+
+        return ImmutableSet.copyOf(result);
     }
 }
