@@ -6,6 +6,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import CustomPropTypes from './CustomPropTypes';
 import FieldActions from './actions/FieldActions';
+import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {|
   children?: React.Node,
@@ -17,14 +18,20 @@ type Props = {|
 |}
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
-  <FieldActions element={children || name}
-                disabled={disabled}
-                menuContainer={menuContainer}
-                name={name}
-                type={type}
-                queryId={queryId}>
-    {name} = {type.type}
-  </FieldActions>
+  <InteractiveContext.Consumer>
+    {interactive => (interactive
+      ? (
+        <FieldActions element={children || name}
+                      disabled={!interactive || disabled}
+                      menuContainer={menuContainer}
+                      name={name}
+                      type={type}
+                      queryId={queryId}>
+          {name} = {type.type}
+        </FieldActions>
+      )
+      : <span>{name}</span>)}
+  </InteractiveContext.Consumer>
 );
 
 Field.propTypes = {
