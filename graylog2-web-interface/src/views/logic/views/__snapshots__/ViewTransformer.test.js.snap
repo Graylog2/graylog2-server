@@ -6,7 +6,6 @@ Object {
     "createdAt": "2019-10-14T07:58:06.562Z",
     "description": "",
     "id": Any<String>,
-    "isNew": true,
     "owner": "admin",
     "properties": Immutable.List [],
     "requires": undefined,
