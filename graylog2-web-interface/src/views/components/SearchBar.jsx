@@ -72,7 +72,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
               <form method="GET" onSubmit={submitForm}>
 
                 <Row className="no-bm extended-search-query-metadata">
-                  <Col md={3}>
+                  <Col md={4}>
                     <TimeRangeTypeSelector onSelect={newRangeType => QueriesActions.rangeType(id, newRangeType).then(performSearch)}
                                            value={rangeType} />
                     <TimeRangeInput onChange={(key, value) => QueriesActions.rangeParams(id, key, value).then(performSearch)}
@@ -85,7 +85,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                     <HorizontalSpacer className="mdHidden" />
                   </Col>
 
-                  <Col md={6} xs={8}>
+                  <Col md={5} xs={8}>
                     <StreamsFilter value={streams}
                                    streams={availableStreams}
                                    onChange={value => QueryFiltersActions.streams(id, value)} />

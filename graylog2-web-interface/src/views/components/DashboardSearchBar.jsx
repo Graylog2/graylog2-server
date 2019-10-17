@@ -57,7 +57,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
         <Col md={12}>
           <form method="GET" onSubmit={submitForm}>
             <Row className="no-bm">
-              <Col md={9} xs={7}>
+              <Col lg={8} md={7} xs={6}>
                 <div className="pull-right search-help">
                   <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                      title="Search query syntax documentation"
@@ -70,7 +70,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
                             onChange={value => GlobalOverrideActions.query(value).then(performSearch).then(() => value)}
                             onExecute={performSearch} />
               </Col>
-              <Col md={3} xs={5}>
+              <Col lg={4} md={5} xs={6}>
                 <TimeRangeOverrideTypeSelector onSelect={newRangeType => GlobalOverrideActions.rangeType(newRangeType).then(performSearch)}
                                                value={rangeType} />
                 <TimeRangeOverrideInput onChange={(key, value) => GlobalOverrideActions.rangeParams(key, value).then(performSearch)}
