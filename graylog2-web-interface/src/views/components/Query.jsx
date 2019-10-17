@@ -13,6 +13,7 @@ import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
+import InteractiveContext from './contexts/InteractiveContext';
 
 const MAXIMUM_GRID_SIZE = 12;
 
@@ -49,14 +50,18 @@ const _renderWidgetGrid = (widgetDefs, widgetMapping, results, positions, queryI
     }
   });
   return (
-    <WidgetGrid allFields={allFields}
-                data={data}
-                errors={errors}
-                fields={fields}
-                locked={false}
-                onPositionsChange={p => _onPositionsChange(p)}
-                positions={positions}
-                widgets={widgets} />
+    <InteractiveContext.Consumer>
+      {interactive => (
+        <WidgetGrid allFields={allFields}
+                    data={data}
+                    errors={errors}
+                    fields={fields}
+                    locked={!interactive}
+                    onPositionsChange={p => _onPositionsChange(p)}
+                    positions={positions}
+                    widgets={widgets} />
+      )}
+    </InteractiveContext.Consumer>
   );
 };
 

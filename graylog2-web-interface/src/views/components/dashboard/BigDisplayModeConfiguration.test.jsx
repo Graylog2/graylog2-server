@@ -98,7 +98,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
     it('including changed refresh interval', () => {
@@ -112,7 +112,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=&refresh=42');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
     it('including tab cycle interval setting', () => {
@@ -125,7 +125,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&tabs=&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
 
     it('including selected tabs', () => {
@@ -139,7 +139,7 @@ describe('BigDisplayModeConfiguration', () => {
       fireEvent.click(saveButton);
 
       expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
-      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&tabs=1%2C2&refresh=10');
+      expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
     });
   });
 });
