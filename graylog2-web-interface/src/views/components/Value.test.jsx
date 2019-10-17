@@ -121,7 +121,7 @@ describe('Value', () => {
   });
 
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => props => (
+    const component = interactive => props => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
