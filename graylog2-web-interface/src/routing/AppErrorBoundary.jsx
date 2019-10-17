@@ -5,11 +5,12 @@ import ErrorPage from '../pages/ErrorPage';
 
 class AppErrorBoundary extends React.Component {
   static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]).isRequired,
+    children: PropTypes.node,
     router: PropTypes.object.isRequired,
+  };
+
+  static defaultProps = {
+    children: null,
   };
 
   constructor(props) {
@@ -33,10 +34,11 @@ class AppErrorBoundary extends React.Component {
 
   render() {
     const { error, info } = this.state;
+    const { children } = this.props;
     if (error) {
       return <ErrorPage error={error} info={info} />;
     }
-    return this.props.children;
+    return children;
   }
 }
 

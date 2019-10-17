@@ -6,6 +6,7 @@ import type { ValueRenderer, ValueRendererProps } from 'views/components/message
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
+import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {|
   children?: React.Node,
@@ -24,9 +25,15 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
-    <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
-      {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
-    </ValueActions>
+    <InteractiveContext.Consumer>
+      {interactive => (interactive
+        ? (
+          <ValueActions element={children || element} field={field} queryId={queryId} type={type} value={value}>
+            {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
+          </ValueActions>
+        )
+        : <span><TypeSpecificValue field={field} value={value} type={type} truncate /></span>)}
+    </InteractiveContext.Consumer>
   );
 };
 

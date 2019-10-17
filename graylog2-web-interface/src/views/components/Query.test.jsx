@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -10,10 +10,10 @@ import AggregationWidget from '../logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetGrid from './WidgetGrid';
 
-
 jest.mock('components/common', () => ({ Spinner: mockComponent('Spinner') }));
 jest.mock('views/logic/Widgets', () => ({ widgetDefinition: () => ({}) }));
 jest.mock('views/components/widgets/Widget', () => mockComponent('Widget'));
+jest.mock('views/components/WidgetGrid', () => mockComponent('WidgetGrid'));
 
 const widgetMapping = Immutable.Map([
   ['widget1', ['searchType1']],
@@ -38,7 +38,7 @@ describe('Query', () => {
         searchType2: { bar: 42 },
       },
     };
-    const wrapper = shallow((
+    const wrapper = mount((
       <Query results={results}
              widgetMapping={widgetMapping}
              widgets={widgets}
@@ -63,7 +63,7 @@ describe('Query', () => {
         searchType2: { bar: 42 },
       },
     };
-    const wrapper = shallow((
+    const wrapper = mount((
       <Query results={results}
              widgetMapping={widgetMapping}
              widgets={widgets}
@@ -89,7 +89,7 @@ describe('Query', () => {
         searchType1: { foo: 17 },
       },
     };
-    const wrapper = shallow((
+    const wrapper = mount((
       <Query results={results}
              widgetMapping={widgetMapping}
              widgets={widgets}
@@ -113,7 +113,7 @@ describe('Query', () => {
       errors: [error1, error2],
       searchTypes: {},
     };
-    const wrapper = shallow((
+    const wrapper = mount((
       <Query results={results}
              widgetMapping={widgetMapping}
              widgets={widgets}
@@ -178,7 +178,7 @@ describe('Query', () => {
       errors: [],
       searchTypes: {},
     };
-    const wrapper = shallow((
+    const wrapper = mount((
       <Query results={results}
              widgetMapping={widgetMapping}
              widgets={widgets}
