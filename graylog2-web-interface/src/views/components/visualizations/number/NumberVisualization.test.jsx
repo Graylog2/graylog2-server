@@ -56,8 +56,8 @@ describe('NumberVisualization', () => {
 
     wrapper.instance().getContainer = jest
       .fn()
-      .mockImplementationOnce(() => ({ childNodes: [{ offsetHeight: 90, offsetWidth: 90 }] }))
-      .mockImplementationOnce(() => ({ childNodes: [{ offsetHeight: 100, offsetWidth: 100 }] }));
+      .mockImplementationOnce(() => ({ children: [{ offsetHeight: 90, offsetWidth: 90 }] }))
+      .mockImplementationOnce(() => ({ children: [{ offsetHeight: 100, offsetWidth: 100 }] }));
 
     wrapper.setProps({ height: 125, width: 125 });
 
