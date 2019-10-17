@@ -1,5 +1,6 @@
 // @flow strict
 import * as React from 'react';
+import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -16,7 +17,7 @@ type Props = {
   className?: string,
 };
 
-const Spacer = styled.div`
+const Spacer: ComponentType<Props> = styled.div`
   width: 100%;
   height: ${props => props.height}px;
 `;
