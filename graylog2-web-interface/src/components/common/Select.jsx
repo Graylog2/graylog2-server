@@ -99,6 +99,11 @@ const placeholder = base => ({
   fontSize: '14px',
   fontWeight: 400,
   color: '#999',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  width: '100%',
+  paddingRight: '20px',
 });
 
 const controlFocus = props => (base, { isFocused }) => {
