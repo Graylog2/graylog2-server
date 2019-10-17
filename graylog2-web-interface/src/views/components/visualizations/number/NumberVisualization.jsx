@@ -51,16 +51,14 @@ class NumberVisualization extends React.Component<Props, State> {
 
     const { fontSize } = this.state;
     const { width, height } = this.props;
-    const { childNodes } = container;
+    const { children } = container;
 
-    if (childNodes.length <= 0) {
+    if (children.length <= 0) {
       return;
     }
 
-    const content = childNodes[0];
-    // $FlowFixMe offsetWidth is part of Node!
+    const content = children[0];
     const contentWidth = content.offsetWidth;
-    // $FlowFixMe offsetHeight is part of Node!
     const contentHeight = content.offsetHeight;
 
     const widthMultiplier = (width * 0.8) / contentWidth;
