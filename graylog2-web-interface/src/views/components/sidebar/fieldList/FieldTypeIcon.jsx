@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import styles from './FieldTypeIcon.css';
-import FieldType from '../../logic/fieldtypes/FieldType';
+import FieldType from 'views/logic/fieldtypes/FieldType';
 
 const iconClass = (type) => {
   switch (type) {
@@ -23,8 +23,14 @@ const iconClass = (type) => {
       return 'question-circle';
   }
 };
+
+const StyledIcon = styled.i`
+  opacity: 0.7;
+  margin-right: 9px;
+`;
+
 const FieldTypeIcon = ({ type }) => {
-  return <i className={`fa fa-${iconClass(type.type)} ${styles.fieldTypeIcon}`} />;
+  return <StyledIcon className={`fa fa-fw fa-${iconClass(type.type)}`} />;
 };
 
 FieldTypeIcon.propTypes = {

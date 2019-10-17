@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FixedSizeList as List } from 'react-window';
+import styled from 'styled-components';
 
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import Field from 'views/components/Field';
 
 import { useFieldList } from './FieldListContext';
+import FieldTypeIcon from './FieldTypeIcon';
 import styles from './FieldList.css';
-
-import FieldTypeIcon from '../FieldTypeIcon';
 
 const isReservedField = fieldName => MessageFieldsFilter.FILTERED_FIELDS.includes(fieldName);
 
@@ -44,45 +43,41 @@ const FieldListWrap = ({ fields, allFields, viewMetadata }) => {
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
   }
 
-  const FieldListRow = ({ fieldList, fields, selectedQuery, selectedView }) => ({ index, style }) => {
-    return (
-      <FieldItem fieldType={fieldList.get(index)}
-                 selectedQuery={selectedQuery}
-                 selectedView={selectedView}
-                 fields={fields}
-                 style={style} />
-    );
-  };
-
-  const FieldItem = ({ fields, fieldType: { name, type }, selectedQuery, selectedView, style }) => {
-    const disabled = !fields.find(f => f.name === name);
-
-    return (
-      <li key={`field-${name}`} className={styles.fieldListItem} style={style}>
-        <FieldTypeIcon type={type} />
-        {' '}
-        <Field queryId={selectedQuery}
-               viewId={selectedView}
-               disabled={disabled}
-               name={name}
-               type={type}
-               interactive>
-          {name}
-        </Field>
-      </li>
-    );
-  };
-
   return (
     <div>
-      <List height={50}
-            itemCount={fieldList.size}
-            itemSize={17}>
-        {FieldListRow({ fieldList, fields, selectedQuery, selectedView })}
-      </List>
+      <StyledWrap>
+        {fieldList.map(({ name, type }) => {
+          const disabled = !fields.find(f => f.name === name);
+
+          return (
+            <li className={styles.fieldListItem}>
+              <FieldTypeIcon type={type} />
+              {' '}
+              <Field queryId={selectedQuery}
+                     viewId={selectedView}
+                     disabled={disabled}
+                     name={name}
+                     type={type}
+                     interactive>
+                {name}
+              </Field>
+            </li>
+          );
+        })}
+      </StyledWrap>
     </div>
   );
 };
+
+const StyledWrap = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    padding: 3px 0;
+  }
+`;
 
 FieldListWrap.propTypes = {
   fields: PropTypes.object.isRequired,
