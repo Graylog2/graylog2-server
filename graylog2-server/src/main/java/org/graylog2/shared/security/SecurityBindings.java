@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package org.graylog2.shared.security;
 
+import com.google.inject.Scopes;
 import org.graylog2.plugin.PluginModule;
 
 public class SecurityBindings extends PluginModule {
     @Override
     protected void configure() {
         bind(Permissions.class).asEagerSingleton();
+        bind(SessionCreator.class).in(Scopes.SINGLETON);
 
         addPermissions(RestPermissions.class);
     }
