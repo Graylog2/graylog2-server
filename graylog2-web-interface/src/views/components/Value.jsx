@@ -32,7 +32,7 @@ const Value = ({ children, field, value, queryId, render = defaultRenderer, type
             {field} = <TypeSpecificValue field={field} value={value} type={type} truncate />
           </ValueActions>
         )
-        : <span>{value}</span>)}
+        : <TypeSpecificValue field={field} value={value} type={type} truncate />)}
     </InteractiveContext.Consumer>
   );
 };
