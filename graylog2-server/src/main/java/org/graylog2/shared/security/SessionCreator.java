@@ -22,21 +22,16 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.concurrent.TimeUnit;
 
 public class SessionCreator {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionCreator.class);
-
     private final UserService userService;
 
     @Inject
@@ -55,7 +50,6 @@ public class SessionCreator {
      * @param authToken Authentication token to log the user in.
      * @return A session for the authenticated user.
      * @throws AuthenticationException if authenticating the user fails
-     * @throws UnknownSessionException if a session id was given but is unknown
      */
     public Session create(@Nullable String currentSessionId, String host, AuthenticationToken authToken) {
 
@@ -65,28 +59,23 @@ public class SessionCreator {
         ThreadContext.bind(subject);
         final Session session = subject.getSession();
 
-        try {
-            subject.login(authToken);
+        subject.login(authToken);
 
-            String username = (String) subject.getPrincipal();
-            final User user = userService.load(username);
+        String username = (String) subject.getPrincipal();
+        final User user = userService.load(username);
 
-            if (user != null) {
-                long timeoutInMillis = user.getSessionTimeoutMs();
-                session.setTimeout(timeoutInMillis);
-            } else {
-                // set a sane default. really we should be able to load the user from above.
-                session.setTimeout(TimeUnit.HOURS.toMillis(8));
-            }
-            session.touch();
-
-            // save subject in session, otherwise we can't get the username back in subsequent requests.
-            ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
-
-            return session;
-        } catch (UnknownSessionException e) {
-            subject.logout();
-            throw (e);
+        if (user != null) {
+            long timeoutInMillis = user.getSessionTimeoutMs();
+            session.setTimeout(timeoutInMillis);
+        } else {
+            // set a sane default. really we should be able to load the user from above.
+            session.setTimeout(TimeUnit.HOURS.toMillis(8));
         }
+        session.touch();
+
+        // save subject in session, otherwise we can't get the username back in subsequent requests.
+        ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
+
+        return session;
     }
 }

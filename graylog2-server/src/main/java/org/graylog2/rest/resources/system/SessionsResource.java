@@ -27,7 +27,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditActor;
@@ -39,8 +38,8 @@ import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
-import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
@@ -131,7 +130,7 @@ public class SessionsResource extends RestResource {
             auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
             return SessionResponse.create(new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate(),
                     session.getId().toString());
-        } catch (AuthenticationException | UnknownSessionException e) {
+        } catch (AuthenticationException e) {
             LOG.info("Invalid username or password for user \"{}\"", username);
             final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "remote_address", host
