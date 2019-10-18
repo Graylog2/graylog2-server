@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { forwardRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Alert as BootstrapAlert } from 'react-bootstrap';
@@ -6,7 +6,7 @@ import { Alert as BootstrapAlert } from 'react-bootstrap';
 import { useTheme } from 'theme/GraylogThemeContext';
 import bsStyleVariant from './variants/bsStyle';
 
-const Alert = ({ bsStyle, ...props }) => {
+const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
   const alertStyles = () => {
     const { utility } = useTheme();
 
@@ -30,9 +30,9 @@ const Alert = ({ bsStyle, ...props }) => {
   `, [bsStyle]);
 
   return (
-    <StyledAlert bsStyle={bsStyle} {...props} />
+    <StyledAlert bsStyle={bsStyle} ref={ref} {...props} />
   );
-};
+});
 
 Alert.propTypes = {
   bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),

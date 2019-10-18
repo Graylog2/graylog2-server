@@ -189,14 +189,7 @@ class Events extends React.Component {
                            totalItems={totalEvents}
                            onChange={onPageChange}>
               {eventList.length === 0 ? (
-                <>
-                  <Alert bsStyle="danger">No {entity} found for the current search criteria.</Alert>
-                  <Alert bsStyle="default">No {entity} found for the current search criteria.</Alert>
-                  <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
-                  <Alert bsStyle="primary">No {entity} found for the current search criteria.</Alert>
-                  <Alert bsStyle="success">No {entity} found for the current search criteria.</Alert>
-                  <Alert bsStyle="warning">No {entity} found for the current search criteria.</Alert>
-                </>
+                <Alert bsStyle="info">No {entity} found for the current search criteria.</Alert>
               ) : (
                 <Table id="events-table" className={styles.eventsTable}>
                   <thead>
