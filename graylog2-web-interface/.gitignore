@@ -12,6 +12,8 @@ manifests/*-manifest.json
 plugin
 cache
 
+test/bin
+
 # Webpack Stats & Analysis Files
 webpack/stats-*
 webpack/analysis-*
