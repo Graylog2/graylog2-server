@@ -31,7 +31,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class SearchResourceTest {
     private SearchJobService searchJobService;
 
     @Mock
-    private StreamService streamService;
+    private PermittedStreamsLoader streamLoader;
 
     @Mock
     private SearchAuthorizer authorizer;
@@ -90,8 +89,8 @@ public class SearchResourceTest {
     class SearchTestResource extends SearchResource {
         private final Subject subject;
 
-        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, StreamService streamService) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamService, authorizer);
+        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreamsLoader streamLoader) {
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, authorizer);
             this.subject = subject;
         }
 
@@ -111,7 +110,7 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), streamService);
+        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), streamLoader);
 
         when(currentUser.getName()).thenReturn("admin");
     }
@@ -132,7 +131,6 @@ public class SearchResourceTest {
     @Test
     public void getSearchAllowsAccessToSearchReturnedByService() {
         final Search search = mockValidSearch();
-        when(searchDbService.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
 
         final Search returnedSearch = this.searchResource.getSearch(search.id());
 
@@ -210,7 +208,27 @@ public class SearchResourceTest {
         final Search search = mockValidSearch();
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 10000));
+                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
+    }
+
+    @Test
+    public void failureToAddDefaultStreamsInAsyncSearchLeadsTo403() {
+        final Search search = mockValidSearch();
+
+        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null));
+    }
+
+    @Test
+    public void failureToAddDefaultStreamsInSynchronousSearchLeadsTo403() {
+        final Search search = mockValidSearch();
+
+        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
     }
 
     private void mockCurrentUserName(String name) {
@@ -232,7 +250,7 @@ public class SearchResourceTest {
         when(search.queries()).thenReturn(ImmutableSet.of(query));
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.of(search));
+        when(searchDbService.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));

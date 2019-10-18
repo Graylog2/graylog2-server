@@ -43,7 +43,6 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -75,8 +73,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static java.util.stream.Collectors.toSet;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 @Api(value = "Enterprise/Search")
 @Path("/views/search")
@@ -92,7 +88,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchDbService searchDbService;
     private final SearchJobService searchJobService;
     private final ObjectMapper objectMapper;
-    private final StreamService streamService;
+    private final PermittedStreamsLoader streamLoader;
     private final SearchAuthorizer authorizer;
 
     @Inject
@@ -100,13 +96,13 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
-                          StreamService streamService,
+                          PermittedStreamsLoader streamLoader,
                           SearchAuthorizer authorizer) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
-        this.streamService = streamService;
+        this.streamLoader = streamLoader;
         this.authorizer = authorizer;
     }
 
@@ -137,6 +133,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return Response.created(URI.create(Objects.requireNonNull(saved.id()))).entity(saved).build();
     }
 
+    private String username() {
+        return getCurrentUser() != null ? getCurrentUser().getName() : null;
+    }
+
     @GET
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
@@ -164,7 +164,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam Map<String, Object> executionState) {
         Search search = getSearch(id);
 
-        search = search.addStreamsToQueriesWithoutStreams(this::allAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
         authorize(search);
 
@@ -179,8 +179,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 .build();
     }
 
-    private String username() {
-        return getCurrentUser() != null ? getCurrentUser().getName() : null;
+    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
+        return streamLoader.loadAllPermittedStreams(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
     private void authorize(Search search) {
@@ -196,7 +196,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
         final String username = username();
 
-        search = search.addStreamsToQueriesWithoutStreams(this::allAllowedStreamsForUser);
+        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
         authorize(search);
 
@@ -253,20 +253,5 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
 
-    private ImmutableSet<String> allAllowedStreamsForUser() {
-        final Set<String> result = streamService.loadAll().stream()
-                .map(org.graylog2.plugin.streams.Stream::getId)
-                // Unless explicitly queried, exclude event indices by defaulth
-                // Having the event indices in every search, makes sorting almost impossible
-                // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
-                // TODO: this filter can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
-                .filter(id -> !DEFAULT_EVENT_STREAM_IDS.contains(id))
-                .filter(id -> isPermitted(RestPermissions.STREAMS_READ, id))
-                .collect(toSet());
 
-        if (result.isEmpty())
-            throw new ForbiddenException("There are no streams you are permitted to use.");
-
-        return ImmutableSet.copyOf(result);
-    }
 }
