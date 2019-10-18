@@ -1,0 +1,68 @@
+{
+  "id": "5da42aa9c6eb193adff63b1b",
+  "queries": [
+    {
+      "id": "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": "author: \"Bernd Ahlers\""
+      },
+      "timerange": {
+        "type": "relative",
+        "range": 2592000
+      },
+      "filter": {
+        "type": "or",
+        "filters": [
+          {
+            "type": "stream",
+            "filters": null,
+            "id": "5cdab2293d27467fbe9e8a72",
+            "title": null
+          }
+        ]
+      },
+      "search_types": [
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "77ce265c-83bf-4ae3-bd05-d882570ac014",
+          "limit": 150,
+          "offset": 0,
+          "type": "messages",
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "d8691141-660e-442c-b77a-609e6649def0",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "field": "timestamp",
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}

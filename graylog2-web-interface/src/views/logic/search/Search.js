@@ -78,6 +78,12 @@ export default class Search {
     const queries = value.queries.map(q => Query.fromJSON(q));
     return new Search(id, queries, parameters.map(p => Parameter.fromJSON(p)));
   }
+
+  // eslint-disable-next-line no-use-before-define
+  static builder(): Builder {
+    // eslint-disable-next-line no-use-before-define
+    return new Builder();
+  }
 }
 
 class Builder {

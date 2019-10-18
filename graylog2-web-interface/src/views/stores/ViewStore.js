@@ -22,6 +22,7 @@ export type ViewStoreState = {
   activeQuery: QueryId,
   view: View,
   dirty: boolean,
+  isNew: boolean,
 };
 
 type ViewActionsType = RefluxActions<{
@@ -49,6 +50,7 @@ export const ViewActions: ViewActionsType = singletonActions(
     state: { asyncResult: true },
     summary: { asyncResult: true },
     title: { asyncResult: true },
+    setNew: { asyncResult: true },
   }),
 );
 
@@ -66,11 +68,16 @@ export const ViewStore: ViewStoreType = singletonStore(
     view: undefined,
     activeQuery: undefined,
     dirty: false,
+    isNew: false,
 
     init() {
       QueriesActions.create.listen(this.createQuery);
       ViewManagementActions.update.completed.listen(() => {
         this.dirty = false;
+        this._trigger();
+      });
+      ViewManagementActions.create.completed.listen(() => {
+        this.isNew = false;
         this._trigger();
       });
     },
@@ -88,6 +95,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = ViewActions.search(view.search)
         .then(() => {
           this.dirty = false;
+          this.isNew = true;
         })
         .then(() => this._trigger());
 
@@ -181,6 +189,10 @@ export const ViewStore: ViewStoreType = singletonStore(
       this.view = this.view.toBuilder().title(newTitle).build();
       this._trigger();
     },
+    setNew() {
+      this.isNew = true;
+      this._trigger();
+    },
     _updateSearch(view: View): [View, boolean] {
       if (!view.search) {
         return [view, false];
@@ -213,6 +225,7 @@ export const ViewStore: ViewStoreType = singletonStore(
         activeQuery: this.activeQuery,
         view: this.view,
         dirty: this.dirty,
+        isNew: this.isNew,
       };
     },
     _trigger() {
