@@ -47,13 +47,15 @@ public class SessionCreator {
     /**
      * Attempts to log the user in with the given authentication token and returns a new or renewed session upon
      * success.
+     * <p>
+     * Side effect: the user will be registered with the current security context.
      *
      * @param currentSessionId A session id, if one exists currently.
      * @param host Host the request to create a session originates from.
-     * @param authToken Authentication token to log the user in with.
-     * @return A session if the user was authenticated, null if authentication succeeded but
+     * @param authToken Authentication token to log the user in.
+     * @return A session for the authenticated user.
      * @throws AuthenticationException if authenticating the user fails
-     * @throws UnknownSessionException if a session id was given but it is unknown
+     * @throws UnknownSessionException if a session id was given but is unknown
      */
     public Session create(@Nullable String currentSessionId, String host, AuthenticationToken authToken) {
 
