@@ -45,12 +45,7 @@ type Props = {
   refreshConfig: RefreshConfig,
 };
 
-type State = {
-  /* eslint-disable-next-line no-undef */
-  intervalId: ?IntervalID,
-};
-
-class RefreshControls extends React.Component<Props, State> {
+class RefreshControls extends React.Component<Props> {
   static propTypes = {
     refreshConfig: PropTypes.object.isRequired,
   };
@@ -65,20 +60,13 @@ class RefreshControls extends React.Component<Props, State> {
     ['5 Minutes', 300000],
   ];
 
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      intervalId: undefined,
-    };
-  }
-
   componentWillUnmount(): void {
     RefreshActions.disable();
   }
 
   _toggleEnable = (): void => {
-    if (this.props.refreshConfig.enabled) {
+    const { refreshConfig } = this.props;
+    if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
       RefreshActions.enable();
