@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
 import Filter from './Filter';
 import FieldListProvider from './FieldListContext';
-import FieldsByLink from './FieldsByLink';
+import FieldsToggle from './FieldsToggle';
 import FieldListWrap from './FieldListWrap';
 
 const FieldList = ({ fields, allFields, viewMetadata }) => {
@@ -12,32 +11,12 @@ const FieldList = ({ fields, allFields, viewMetadata }) => {
     <FieldListProvider>
       <Filter />
 
-      <FieldsToggle>
-        List fields of{' '}
-        <FieldsByLink mode="current"
-                      text="current streams"
-                      key="current-fields"
-                      title="This shows fields which are (prospectively) included in the streams you have selected." />,{' '}
-
-        <FieldsByLink mode="all"
-                      text="all"
-                      key="all-fields"
-                      title="This shows all fields, but no reserved (gl2_*) fields." /> or{' '}
-
-        <FieldsByLink mode="allreserved"
-                      text="all including reserved"
-                      key="allreserved-fields"
-                      title="This shows all fields, including reserved (gl2_*) fields." />
-      </FieldsToggle>
+      <FieldsToggle />
 
       <FieldListWrap fields={fields} allFields={allFields} viewMetadata={viewMetadata} />
     </FieldListProvider>
   );
 };
-
-const FieldsToggle = styled.div`
-  margin: 12px 0;
-`;
 
 FieldList.propTypes = {
   allFields: PropTypes.object.isRequired,

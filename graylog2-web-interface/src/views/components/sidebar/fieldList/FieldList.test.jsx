@@ -5,6 +5,7 @@ import { List } from 'immutable';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldList from './FieldList';
+import { useFieldList } from './FieldListContext';
 // import expectExport from 'expect';
 
 // jest.mock('views/stores/ViewMetadataStore', () => ({
