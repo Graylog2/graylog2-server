@@ -4,7 +4,7 @@ import Color from 'color';
 import teinte from './teinte';
 
 function lighten(hex, percentage) {
-  return Color(hex).whiten(percentage).hex();
+  return Color(hex).lighten(percentage).hex();
 }
 
 function darken(hex, percentage) {
@@ -15,4 +15,9 @@ function opposite(hex) {
   return Color(hex).rotate(180).hex();
 }
 
-export { teinte, lighten, darken, opposite };
+function mix(hex, level) {
+  const mixer = level > 0 ? '#000' : '#fff';
+  return Color(hex).mix(Color(mixer), Math.abs(level) / 100).hex();
+}
+
+export { teinte, lighten, darken, opposite, mix };

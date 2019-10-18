@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
 // TODO: make `teinte` a dynamic set of colors
-import { teinte, lighten, darken, opposite } from './index';
+import { teinte, mix, lighten, darken, opposite } from './index';
 
-const defaultValues = { colors: teinte, utility: { lighten, darken, opposite } };
+const defaultValues = { colors: teinte, utility: { mix, lighten, darken, opposite } };
 const ThemeColor = createContext(defaultValues);
 export const useTheme = () => useContext(ThemeColor);
 
