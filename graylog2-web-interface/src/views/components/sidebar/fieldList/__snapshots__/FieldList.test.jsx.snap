@@ -1,0 +1,636 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<FieldList /> should render a FieldList 1`] = `
+<FieldList
+  allFields={
+    Immutable.List [
+      FieldTypeMapping {
+        "value": Object {
+          "name": "date",
+          "type": FieldType {
+            "value": Immutable.Map {
+              "type": "string",
+              "properties": Immutable.Set [
+                Object {
+                  "enumerable": true,
+                },
+              ],
+              "indexNames": Immutable.Set [],
+            },
+          },
+        },
+      },
+      FieldTypeMapping {
+        "value": Object {
+          "name": "http_method",
+          "type": FieldType {
+            "value": Immutable.Map {
+              "type": "string",
+              "properties": Immutable.Set [
+                Object {
+                  "enumerable": true,
+                },
+              ],
+              "indexNames": Immutable.Set [],
+            },
+          },
+        },
+      },
+    ]
+  }
+  fields={
+    Immutable.List [
+      FieldTypeMapping {
+        "value": Object {
+          "name": "http_method",
+          "type": FieldType {
+            "value": Immutable.Map {
+              "type": "string",
+              "properties": Immutable.Set [
+                Object {
+                  "enumerable": true,
+                },
+              ],
+              "indexNames": Immutable.Set [],
+            },
+          },
+        },
+      },
+    ]
+  }
+  viewMetadata={
+    Object {
+      "activeQuery": "34efae1e-e78e-48ab-ab3f-e83c8611a683",
+      "description": "A description",
+      "id": "5b34f4c44880a54df9616380",
+      "summary": "query summary",
+      "title": "Query Title",
+    }
+  }
+>
+  <FieldListProvider>
+    <Filter>
+      <Filter__Form
+        className="form-inline"
+        onSubmit={[Function]}
+      >
+        <StyledComponent
+          className="form-inline"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Filter__Form-yenxu5-0",
+                "isStatic": true,
+                "lastClassName": "hapvIN",
+                "rules": Array [
+                  "display:flex;",
+                ],
+              },
+              "displayName": "Filter__Form",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Filter__Form-yenxu5-0",
+              "target": "form",
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          onSubmit={[Function]}
+        >
+          <form
+            className="form-inline Filter__Form-yenxu5-0 hapvIN"
+            onSubmit={[Function]}
+          >
+            <Filter__FilterContainer
+              className="form-group has-feedback"
+            >
+              <StyledComponent
+                className="form-group has-feedback"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Filter__FilterContainer-yenxu5-1",
+                      "isStatic": true,
+                      "lastClassName": "cWauCd",
+                      "rules": Array [
+                        "flex-grow:1;margin-right:5px;> input{width:100%;}",
+                      ],
+                    },
+                    "displayName": "Filter__FilterContainer",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Filter__FilterContainer-yenxu5-1",
+                    "target": "div",
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+              >
+                <div
+                  className="form-group has-feedback Filter__FilterContainer-yenxu5-1 cWauCd"
+                >
+                  <input
+                    autoComplete="off"
+                    className="query form-control"
+                    id="common-search-form-query-input"
+                    onChange={[Function]}
+                    placeholder="Filter fields"
+                    spellCheck="false"
+                    type="text"
+                    value=""
+                  />
+                </div>
+              </StyledComponent>
+            </Filter__FilterContainer>
+            <div
+              className="form-group"
+            >
+              <ForwardRef
+                active={false}
+                bsStyle="default"
+                className="reset-button"
+                onClick={[Function]}
+                type="reset"
+              >
+                <Button__StyledButton
+                  bsStyle="default"
+                  className="reset-button"
+                  onClick={[Function]}
+                  type="reset"
+                >
+                  <StyledComponent
+                    bsStyle="default"
+                    className="reset-button"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                          "xsmall",
+                        ],
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                          "default",
+                          "primary",
+                          "link",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "Button__StyledButton-c9cbmb-0",
+                          "isStatic": false,
+                          "lastClassName": "kRDLih",
+                          "rules": Array [
+                            [Function],
+                          ],
+                        },
+                        "displayName": "Button__StyledButton",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    onClick={[Function]}
+                    type="reset"
+                  >
+                    <Button
+                      active={false}
+                      block={false}
+                      bsClass="btn"
+                      bsStyle="default"
+                      className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="reset"
+                    >
+                      <button
+                        className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="reset"
+                      >
+                        Reset
+                      </button>
+                    </Button>
+                  </StyledComponent>
+                </Button__StyledButton>
+              </ForwardRef>
+            </div>
+          </form>
+        </StyledComponent>
+      </Filter__Form>
+    </Filter>
+    <FieldList__FieldsToggle>
+      <StyledComponent
+        forwardedComponent={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "attrs": Array [],
+            "componentStyle": ComponentStyle {
+              "componentId": "FieldList__FieldsToggle-sc-11m0ai1-0",
+              "isStatic": true,
+              "lastClassName": "kKZJAb",
+              "rules": Array [
+                "margin:12px 0;",
+              ],
+            },
+            "displayName": "FieldList__FieldsToggle",
+            "foldedComponentIds": Array [],
+            "render": [Function],
+            "styledComponentId": "FieldList__FieldsToggle-sc-11m0ai1-0",
+            "target": "div",
+            "toString": [Function],
+            "warnTooManyClasses": [Function],
+            "withComponent": [Function],
+          }
+        }
+        forwardedRef={null}
+      >
+        <div
+          className="FieldList__FieldsToggle-sc-11m0ai1-0 kKZJAb"
+        >
+          List fields of
+           
+          <FieldsByLink
+            key="current-fields"
+            mode="current"
+            text="current streams"
+            title="This shows fields which are (prospectively) included in the streams you have selected."
+          >
+            <a
+              onClick={[Function]}
+              role="button"
+              style={
+                Object {
+                  "fontWeight": "bold",
+                }
+              }
+              tabIndex={0}
+              title="This shows fields which are (prospectively) included in the streams you have selected."
+            >
+              current streams
+            </a>
+          </FieldsByLink>
+          ,
+           
+          <FieldsByLink
+            key="all-fields"
+            mode="all"
+            text="all"
+            title="This shows all fields, but no reserved (gl2_*) fields."
+          >
+            <a
+              onClick={[Function]}
+              role="button"
+              style={
+                Object {
+                  "fontWeight": "normal",
+                }
+              }
+              tabIndex={0}
+              title="This shows all fields, but no reserved (gl2_*) fields."
+            >
+              all
+            </a>
+          </FieldsByLink>
+           or
+           
+          <FieldsByLink
+            key="allreserved-fields"
+            mode="allreserved"
+            text="all including reserved"
+            title="This shows all fields, including reserved (gl2_*) fields."
+          >
+            <a
+              onClick={[Function]}
+              role="button"
+              style={
+                Object {
+                  "fontWeight": "normal",
+                }
+              }
+              tabIndex={0}
+              title="This shows all fields, including reserved (gl2_*) fields."
+            >
+              all including reserved
+            </a>
+          </FieldsByLink>
+        </div>
+      </StyledComponent>
+    </FieldList__FieldsToggle>
+    <FieldListWrap
+      allFields={
+        Immutable.List [
+          FieldTypeMapping {
+            "value": Object {
+              "name": "date",
+              "type": FieldType {
+                "value": Immutable.Map {
+                  "type": "string",
+                  "properties": Immutable.Set [
+                    Object {
+                      "enumerable": true,
+                    },
+                  ],
+                  "indexNames": Immutable.Set [],
+                },
+              },
+            },
+          },
+          FieldTypeMapping {
+            "value": Object {
+              "name": "http_method",
+              "type": FieldType {
+                "value": Immutable.Map {
+                  "type": "string",
+                  "properties": Immutable.Set [
+                    Object {
+                      "enumerable": true,
+                    },
+                  ],
+                  "indexNames": Immutable.Set [],
+                },
+              },
+            },
+          },
+        ]
+      }
+      fields={
+        Immutable.List [
+          FieldTypeMapping {
+            "value": Object {
+              "name": "http_method",
+              "type": FieldType {
+                "value": Immutable.Map {
+                  "type": "string",
+                  "properties": Immutable.Set [
+                    Object {
+                      "enumerable": true,
+                    },
+                  ],
+                  "indexNames": Immutable.Set [],
+                },
+              },
+            },
+          },
+        ]
+      }
+      viewMetadata={
+        Object {
+          "activeQuery": "34efae1e-e78e-48ab-ab3f-e83c8611a683",
+          "description": "A description",
+          "id": "5b34f4c44880a54df9616380",
+          "summary": "query summary",
+          "title": "Query Title",
+        }
+      }
+    >
+      <FieldListWrap__Wrap>
+        <StyledComponent
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "FieldListWrap__Wrap-sbutk9-0",
+                "isStatic": true,
+                "lastClassName": "csOTaD",
+                "rules": Array [
+                  "overflow:auto;",
+                ],
+              },
+              "displayName": "FieldListWrap__Wrap",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "FieldListWrap__Wrap-sbutk9-0",
+              "target": "div",
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+        >
+          <div
+            className="FieldListWrap__Wrap-sbutk9-0 csOTaD"
+          >
+            <FieldListWrap__List>
+              <StyledComponent
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "FieldListWrap__List-sbutk9-1",
+                      "isStatic": true,
+                      "lastClassName": "etlqDz",
+                      "rules": Array [
+                        "list-style:none;margin:0;padding:0;",
+                      ],
+                    },
+                    "displayName": "FieldListWrap__List",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "FieldListWrap__List-sbutk9-1",
+                    "target": "ul",
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+              >
+                <ul
+                  className="FieldListWrap__List-sbutk9-1 etlqDz"
+                >
+                  <FieldListWrap__Item
+                    key="field-http_method"
+                  >
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "FieldListWrap__Item-sbutk9-2",
+                            "isStatic": true,
+                            "lastClassName": "cQYviB",
+                            "rules": Array [
+                              "font-size:12px;padding:3px 0;display:table-row;",
+                            ],
+                          },
+                          "displayName": "FieldListWrap__Item",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "FieldListWrap__Item-sbutk9-2",
+                          "target": "li",
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
+                        }
+                      }
+                      forwardedRef={null}
+                    >
+                      <li
+                        className="FieldListWrap__Item-sbutk9-2 cQYviB"
+                      >
+                        <FieldTypeIcon
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "string",
+                                "properties": Immutable.Set [
+                                  Object {
+                                    "enumerable": true,
+                                  },
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                        >
+                          <FieldTypeIcon__StyledIcon
+                            className="fa fa-fw fa-font"
+                          >
+                            <StyledComponent
+                              className="fa fa-fw fa-font"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FieldTypeIcon__StyledIcon-sc-2y5vql-0",
+                                    "isStatic": true,
+                                    "lastClassName": "dEEgYY",
+                                    "rules": Array [
+                                      "opacity:0.7;margin-right:9px;",
+                                    ],
+                                  },
+                                  "displayName": "FieldTypeIcon__StyledIcon",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FieldTypeIcon__StyledIcon-sc-2y5vql-0",
+                                  "target": "i",
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <i
+                                className="fa fa-fw fa-font FieldTypeIcon__StyledIcon-sc-2y5vql-0 dEEgYY"
+                              />
+                            </StyledComponent>
+                          </FieldTypeIcon__StyledIcon>
+                        </FieldTypeIcon>
+                        <Field
+                          disabled={false}
+                          interactive={true}
+                          menuContainer={<body />}
+                          name="http_method"
+                          queryId="34efae1e-e78e-48ab-ab3f-e83c8611a683"
+                          type={
+                            FieldType {
+                              "value": Immutable.Map {
+                                "type": "string",
+                                "properties": Immutable.Set [
+                                  Object {
+                                    "enumerable": true,
+                                  },
+                                ],
+                                "indexNames": Immutable.Set [],
+                              },
+                            }
+                          }
+                          viewId="5b34f4c44880a54df9616380"
+                        >
+                          <FieldActions
+                            disabled={false}
+                            element="http_method"
+                            menuContainer={<body />}
+                            name="http_method"
+                            queryId="34efae1e-e78e-48ab-ab3f-e83c8611a683"
+                            type={
+                              FieldType {
+                                "value": Immutable.Map {
+                                  "type": "string",
+                                  "properties": Immutable.Set [
+                                    Object {
+                                      "enumerable": true,
+                                    },
+                                  ],
+                                  "indexNames": Immutable.Set [],
+                                },
+                              }
+                            }
+                          >
+                            <OverlayDropdown
+                              menuContainer={<body />}
+                              onToggle={[Function]}
+                              placement="right"
+                              show={false}
+                              toggle={
+                                <span
+                                  className="field-element  "
+                                >
+                                  http_method
+                                </span>
+                              }
+                            >
+                              <span
+                                className="dropdowntoggle"
+                                onClick={[Function]}
+                                role="presentation"
+                              >
+                                <span
+                                  className="field-element  "
+                                >
+                                  http_method
+                                </span>
+                                <span
+                                  className="caret"
+                                />
+                              </span>
+                              <Overlay
+                                container={<body />}
+                                containerPadding={10}
+                                onHide={[Function]}
+                                placement="right"
+                                rootClose={true}
+                                shouldUpdatePosition={true}
+                                show={false}
+                                target={[Function]}
+                              />
+                            </OverlayDropdown>
+                          </FieldActions>
+                        </Field>
+                      </li>
+                    </StyledComponent>
+                  </FieldListWrap__Item>
+                </ul>
+              </StyledComponent>
+            </FieldListWrap__List>
+          </div>
+        </StyledComponent>
+      </FieldListWrap__Wrap>
+    </FieldListWrap>
+  </FieldListProvider>
+</FieldList>
+`;

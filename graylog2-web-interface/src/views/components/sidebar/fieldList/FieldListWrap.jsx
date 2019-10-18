@@ -49,7 +49,7 @@ const FieldListWrap = ({ fields, allFields, viewMetadata }) => {
           const disabled = !fields.find(f => f.name === name);
 
           return (
-            <Item>
+            <Item key={`field-${name}`}>
               <FieldTypeIcon type={type} />
 
               <Field queryId={selectedQuery}

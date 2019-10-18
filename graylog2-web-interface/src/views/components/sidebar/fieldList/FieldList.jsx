@@ -16,14 +16,17 @@ const FieldList = ({ fields, allFields, viewMetadata }) => {
         List fields of{' '}
         <FieldsByLink mode="current"
                       text="current streams"
+                      key="current-fields"
                       title="This shows fields which are (prospectively) included in the streams you have selected." />,{' '}
 
         <FieldsByLink mode="all"
                       text="all"
+                      key="all-fields"
                       title="This shows all fields, but no reserved (gl2_*) fields." /> or{' '}
 
         <FieldsByLink mode="allreserved"
                       text="all including reserved"
+                      key="allreserved-fields"
                       title="This shows all fields, including reserved (gl2_*) fields." />
       </FieldsToggle>
 
@@ -40,7 +43,7 @@ FieldList.propTypes = {
   allFields: PropTypes.object.isRequired,
   fields: PropTypes.object.isRequired,
   viewMetadata: PropTypes.shape({
-    id: PropTypes.number,
+    id: PropTypes.string,
     activeQuery: PropTypes.string,
   }).isRequired,
 };

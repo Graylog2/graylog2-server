@@ -54,6 +54,7 @@ const StyledNavItem = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 46px;
 `;
 
 NavItem.propTypes = {
