@@ -23,39 +23,24 @@ class QueryTabs extends React.Component {
     children: null,
   }
 
-  state = {
-    showTitleEditModal: false,
-    titleDraft: '',
+  openTitleEditModal = (activeQueryTitle) => {
+    if (this.queryTitleEditModal) {
+      this.queryTitleEditModal.open(activeQueryTitle);
+    }
   }
 
-  _toggleTitleEditModal = (currentTitle) => {
-    const { showTitleEditModal } = this.state;
-    // Toggle edit modal depending on current state
-    // We need to set the selected query title as the draft on open
-    // and reset the draft input on close
-    this.setState({
-      showTitleEditModal: !showTitleEditModal,
-      titleDraft: showTitleEditModal ? '' : currentTitle,
-    });
-  };
-
-  _onTitleDraftSave = () => {
-    const { titleDraft } = this.state;
-    const { onTitleChange, selectedQueryId } = this.props;
-    onTitleChange(selectedQueryId, titleDraft);
-    this._toggleTitleEditModal();
-  };
-
-  // eslint-disable-next-line no-undef
-  _onTitleDraftChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
-    evt.preventDefault();
-    evt.stopPropagation();
-    this.setState({ titleDraft: evt.target.value });
-  };
-
   render() {
-    const { children, onSelect, onRemove, queries, selectedQueryId, titles, onSaveView, onSaveAsView } = this.props;
-    const { showTitleEditModal, titleDraft } = this.state;
+    const {
+      children,
+      onRemove,
+      onSaveAsView,
+      onSaveView,
+      onSelect,
+      onTitleChange,
+      queries,
+      selectedQueryId,
+      titles,
+    } = this.props;
     const queryTitles = titles;
     const queryTabs = queries.map((id, index) => {
       const title = queryTitles.get(id, `Query#${index + 1}`);
@@ -63,8 +48,8 @@ class QueryTabs extends React.Component {
         <QueryTitle active={id === selectedQueryId}
                     id={id}
                     onClose={() => onRemove(id)}
-                    title={title}
-                    toggleEditModal={this._toggleTitleEditModal} />
+                    openEditModal={this.openTitleEditModal}
+                    title={title} />
       );
       return (
         <Tab eventKey={id}
@@ -95,11 +80,7 @@ class QueryTabs extends React.Component {
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-        <QueryTitleEditModal onDraftChange={this._onTitleDraftChange}
-                             onSave={this._onTitleDraftSave}
-                             show={showTitleEditModal}
-                             titleDraft={titleDraft}
-                             toggleModal={this._toggleTitleEditModal} />
+        <QueryTitleEditModal onTitleChange={onTitleChange} ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} selectedQueryId={selectedQueryId} />
       </span>
     );
   }

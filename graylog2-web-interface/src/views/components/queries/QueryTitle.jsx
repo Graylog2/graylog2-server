@@ -13,8 +13,8 @@ type Props = {
   active: boolean,
   id: QueryId,
   onClose: () => void,
+  openEditModal: (string) => void,
   title: string,
-  toggleEditModal: (string) => void
 };
 
 type State = {
@@ -26,7 +26,7 @@ class QueryTitle extends React.Component<Props, State> {
   static propTypes = {
     onClose: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    toggleEditModal: PropTypes.func.isRequired,
+    openEditModal: PropTypes.func.isRequired,
   };
 
   state = {
@@ -51,14 +51,14 @@ class QueryTitle extends React.Component<Props, State> {
 
   render() {
     const { editing, title } = this.state;
-    const { active, id, toggleEditModal } = this.props;
+    const { active, id, openEditModal } = this.props;
     return (
       <span>
         {title}
         {!editing && active && (
           <QueryActionDropdown>
             <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-            <MenuItem onSelect={() => toggleEditModal(title)}>Edit Title</MenuItem>
+            <MenuItem onSelect={() => openEditModal(title)}>Edit Title</MenuItem>
             <MenuItem divider />
             <MenuItem onSelect={this._onClose}>Close</MenuItem>
           </QueryActionDropdown>
