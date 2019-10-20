@@ -44,7 +44,7 @@ const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
   const selectQueryAndExecute = queryId => onSelectQuery(queryId);
   return (
     <QueryTabs queries={queries}
-               selectedQuery={activeQuery}
+               selectedQueryId={activeQuery}
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}
