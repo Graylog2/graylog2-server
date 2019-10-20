@@ -1,16 +1,34 @@
+// @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Modal, Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
 
-class QueryTitleEditModal extends React.Component {
+import type { TitlesMap } from 'views/stores/TitleTypes';
+
+type Props = {
+  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
+  selectedQueryId: string,
+}
+
+type State = {
+  show: boolean,
+  titleDraft: string,
+}
+
+class QueryTitleEditModal extends React.Component<Props, State> {
+  static propTypes = {
+    onTitleChange: PropTypes.func.isRequired,
+    selectedQueryId: PropTypes.number.isRequired,
+  };
+
   state = {
     show: false,
     titleDraft: '',
   };
 
-  open = (activeQueryTitle) => {
+  open = (activeQueryTitle: string) => {
     this.setState({
       show: true,
       titleDraft: activeQueryTitle,
@@ -39,7 +57,7 @@ class QueryTitleEditModal extends React.Component {
   render() {
     const { show, titleDraft } = this.state;
     return (
-      <Modal show={show} bsSize="large" onHide={this.toggleModal}>
+      <Modal show={show} bsSize="large" onHide={this.close}>
         <Modal.Header closeButton>
           <Modal.Title>Edit query title</Modal.Title>
         </Modal.Header>
@@ -56,16 +74,11 @@ class QueryTitleEditModal extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this._onDraftSave} bsStyle="success">Save</Button>
-          <Button onClick={this.toggleModal}>Cancel</Button>
+          <Button onClick={this.close}>Cancel</Button>
         </Modal.Footer>
       </Modal>
     );
   }
 }
-
-QueryTitleEditModal.propTypes = {
-  onTitleChange: PropTypes.func.isRequired,
-  selectedQueryId: PropTypes.number.isRequired,
-};
 
 export default QueryTitleEditModal;

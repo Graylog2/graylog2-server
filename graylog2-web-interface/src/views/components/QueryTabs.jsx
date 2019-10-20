@@ -1,4 +1,6 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
+import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
 import { Tab, Tabs } from 'components/graylog';
@@ -6,7 +8,25 @@ import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
 
-class QueryTabs extends React.Component {
+import { QueryIdsStore } from 'views/stores/QueryIdsStore';
+import Query from 'views/logic/queries/Query';
+import type { TitlesMap } from 'views/stores/TitleTypes';
+import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
+
+type Props = {
+  children: React.Node,
+  onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
+  onSaveAsView: (view: View) => Promise<mixed>,
+  onSaveView: (View) => void,
+  onSelect: (queryId: string) => Promise<Query> | Promise<string>,
+  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
+  queries: Array<QueryIdsStore>,
+  selectedQueryId: string,
+  titles: Immutable.Map<{[queryId: string]: string}>,
+}
+
+class QueryTabs extends React.Component<Props> {
   static propTypes = {
     children: PropTypes.node,
     onRemove: PropTypes.func.isRequired,
@@ -23,7 +43,9 @@ class QueryTabs extends React.Component {
     children: null,
   }
 
-  openTitleEditModal = (activeQueryTitle) => {
+  queryTitleEditModal: ?QueryTitleEditModal
+
+  openTitleEditModal = (activeQueryTitle: string) => {
     if (this.queryTitleEditModal) {
       this.queryTitleEditModal.open(activeQueryTitle);
     }

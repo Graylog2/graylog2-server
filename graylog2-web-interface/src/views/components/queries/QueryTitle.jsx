@@ -6,13 +6,14 @@ import { MenuItem } from 'components/graylog';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import type { QueryId } from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
 type Props = {
   active: boolean,
   id: QueryId,
-  onClose: () => void,
+  onClose: () => Promise<void> | Promise<ViewState>,
   openEditModal: (string) => void,
   title: string,
 };

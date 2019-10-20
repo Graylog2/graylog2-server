@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
