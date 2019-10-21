@@ -3,12 +3,14 @@ import Color from 'color';
 
 import teinte from './teinte';
 
+const percent = value => Math.abs(value / 100);
+
 function lighten(hex, percentage) {
-  return Color(hex).lighten(percentage).hex();
+  return Color(hex).lighten(percent(percentage)).hex();
 }
 
 function darken(hex, percentage) {
-  return Color(hex).blacken(percentage).hex();
+  return Color(hex).blacken(percent(percentage)).hex();
 }
 
 function opposite(hex) {
@@ -16,8 +18,10 @@ function opposite(hex) {
 }
 
 function mix(hex, level) {
-  const mixer = level > 0 ? '#000' : '#fff';
-  return Color(hex).mix(Color(mixer), Math.abs(level) / 100).hex();
+  const mixer = Color(level > 0 ? '#000' : '#fff');
+  const color = Color(hex);
+
+  return color.mix(mixer, percent(level)).hex();
 }
 
 export { teinte, lighten, darken, opposite, mix };

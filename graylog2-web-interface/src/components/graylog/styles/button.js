@@ -7,11 +7,11 @@ const buttonStyles = ({ active }) => {
   const { utility } = useTheme();
 
   const cssBuilder = (color) => {
-    const darken025 = utility.darken(color, 0.25);
-    const darken050 = utility.darken(color, 0.5);
-    const darken075 = utility.darken(color, 0.75);
-    const darken100 = utility.darken(color, 1);
-    const darken125 = utility.darken(color, 1.25);
+    const darken025 = utility.darken(color, 25);
+    const darken050 = utility.darken(color, 50);
+    const darken075 = utility.darken(color, 75);
+    const darken100 = utility.darken(color, 100);
+    const darken125 = utility.darken(color, 125);
 
     return css`
       background-color: ${active ? darken100 : color};

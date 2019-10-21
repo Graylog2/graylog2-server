@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+// eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
 import { useTheme } from 'theme/GraylogThemeContext';
