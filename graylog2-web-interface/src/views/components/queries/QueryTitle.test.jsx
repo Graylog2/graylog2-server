@@ -33,7 +33,14 @@ describe('QueryTitle', () => {
     };
 
     it('triggers duplication of query', () => {
-      const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={() => {}}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
       const duplicate = findAction(wrapper, 'Duplicate');
 
       return duplicate().then(() => {
@@ -41,7 +48,14 @@ describe('QueryTitle', () => {
       });
     });
     it('selects new query after duplicating it', () => {
-      const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={() => {}}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
       const duplicate = findAction(wrapper, 'Duplicate');
 
       return duplicate().then(() => {
@@ -49,32 +63,5 @@ describe('QueryTitle', () => {
         expect(asMock(ViewActions.selectQuery).mock.calls[0][0]).not.toBeNull();
       });
     });
-  });
-  it('double clicking the query title opens input', () => {
-    const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
-    expect(wrapper.find('input[value="Foo"]')).not.toExist();
-    const title = wrapper.find('span[children="Foo"]');
-
-    title.simulate('doubleClick');
-    wrapper.update();
-
-    expect(wrapper.find('input[value="Foo"]')).toExist();
-  });
-  it('double clicking the query title and changing the name triggers change event', () => {
-    const onChange = jest.fn();
-    const wrapper = mount(<QueryTitle active id="deadbeef" onChange={onChange} onClose={() => {}} value="Foo" />);
-    const title = wrapper.find('span[children="Foo"]');
-
-    title.simulate('doubleClick');
-    wrapper.update();
-
-    const input = wrapper.find('input[value="Foo"]');
-
-    input.simulate('change', { target: { value: 'Bar' } });
-
-    const form = wrapper.find('form');
-    form.simulate('submit');
-
-    expect(onChange).toHaveBeenCalledWith('Bar');
   });
 });
