@@ -5,16 +5,8 @@ import teinte from './teinte';
 
 const percent = value => Math.abs(value / 100);
 
-function lighten(hex, percentage) {
-  return Color(hex).lighten(percent(percentage)).hex();
-}
-
 function darken(hex, percentage) {
   return Color(hex).blacken(percent(percentage)).hex();
-}
-
-function opposite(hex) {
-  return Color(hex).rotate(180).hex();
 }
 
 function mix(hex, level) {
@@ -24,4 +16,4 @@ function mix(hex, level) {
   return color.mix(mixer, percent(level)).hex();
 }
 
-export { teinte, lighten, darken, opposite, mix };
+export { teinte, darken, mix };
