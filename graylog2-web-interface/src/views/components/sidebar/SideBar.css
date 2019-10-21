@@ -32,7 +32,13 @@
     box-shadow:
             inset 0px 13px 5px -10px #CCC,
             inset 0px -13px 5px -10px #CCC;
+}
 
+:local(.navItem) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 46px;
 }
 
 :local(.contentOpen) {

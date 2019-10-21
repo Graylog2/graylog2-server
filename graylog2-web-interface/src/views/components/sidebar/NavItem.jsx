@@ -3,7 +3,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 // $FlowFixMe: could not find types
 import { SizeMe } from 'react-sizeme';
-import styled from 'styled-components';
 
 import styles from './SideBar.css';
 import CustomPropTypes from '../CustomPropTypes';
@@ -28,7 +27,7 @@ const NavItem = ({ isOpen, isSelected, isLast, text, children, icon, onClick }: 
     : styles.contentClosed;
 
   return (
-    <StyledNavItem>
+    <div className={styles.navItem}>
       <div role="presentation" onClick={onClick} className={`${styles.sidebarNav} ${selectedColor}`}>
         <div className={styles.sidebarIcon}>{icon}</div>
         {(isOpen && <div className={styles.sidebarNavFont}>{text}</div>)}
@@ -46,16 +45,9 @@ const NavItem = ({ isOpen, isSelected, isLast, text, children, icon, onClick }: 
           );
         }}
       </SizeMe>
-    </StyledNavItem>
+    </div>
   );
 };
-
-const StyledNavItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 46px;
-`;
 
 NavItem.propTypes = {
   isOpen: PropTypes.bool.isRequired,
