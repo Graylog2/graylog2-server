@@ -70,8 +70,8 @@ describe('QueryTitleEditModal', () => {
     // Modal should be visible
     expect(queryByText(modalHeadline)).not.toBeNull();
     // Modal should not be visible after click on cancel
-    const canselButton = getByText('Cancel');
-    fireEvent.click(canselButton);
+    const cancelButton = getByText('Cancel');
+    fireEvent.click(cancelButton);
     await wait(() => {
       expect(queryByText(modalHeadline)).toBeNull();
     });
