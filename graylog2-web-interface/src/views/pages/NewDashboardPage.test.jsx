@@ -26,6 +26,7 @@ describe('NewDashboardPage', () => {
                                             location={{ state: { view } }} />);
     expect(wrapper).toMatchSnapshot();
     expect(ViewActions.load).toHaveBeenCalledTimes(1);
+    /* $FlowFixMe ViewActions.load was overridden to test the call */
     expect(ViewActions.load.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
   });
 });
