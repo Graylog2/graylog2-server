@@ -54,7 +54,7 @@ class QueryTitle extends React.Component<Props, State> {
     const { editing, title } = this.state;
     const { active, id, openEditModal } = this.props;
     return (
-      <span>
+      <span title={title}>
         {title}
         {!editing && active && (
           <QueryActionDropdown>
