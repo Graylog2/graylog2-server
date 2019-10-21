@@ -11,12 +11,9 @@ import type { TitlesMap } from 'views/stores/TitleTypes';
  * Component that allows the user to update a QueryTab title.
  * It takes the active query title as an argument on open and will use it as the draft.
  * The open action is getting called outside by referencing this component.
- * The state of this modal can't be handled inside the QueryTitle, due to the react bootstrap tabs key bindings.
- * E.g. using the arrow keys inside the title input would result in losing the focus.
  */
 
 type Props = {
-  /** Function to update the query tab tite on save */
   onTitleChange: (newTitle: string) => Promise<TitlesMap>,
 }
 
