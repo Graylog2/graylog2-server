@@ -32,6 +32,7 @@ public class IntegrationsAuditEventTypes implements PluginAuditEventTypes {
 
 
     private static final Set<String> EVENT_TYPES = ImmutableSet.<String>builder()
+            .add(KINESIS_INPUT_CREATE)
             .add(KINESIS_SETUP_CREATE_STREAM)
             .add(KINESIS_SETUP_CREATE_POLICY)
             .add(KINESIS_SETUP_CREATE_SUBSCRIPTION)
