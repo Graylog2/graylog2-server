@@ -17,7 +17,7 @@ import ViewState from 'views/logic/views/ViewState';
 type Props = {
   children: React.Node,
   onRemove: (queryId: string) => Promise<void> | Promise<ViewState>,
-  onSaveAsView: (view: View) => Promise<mixed>,
+  onSaveAsView: (view: View) => Promise<View>,
   onSaveView: (View) => void,
   onSelect: (queryId: string) => Promise<Query> | Promise<string>,
   onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
