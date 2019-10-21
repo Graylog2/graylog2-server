@@ -7,6 +7,6 @@ export {
   Alert,
   Button,
   DropdownButton,
-  SplitButton
+  SplitButton,
 };
 export * from './bootstrap-import';
