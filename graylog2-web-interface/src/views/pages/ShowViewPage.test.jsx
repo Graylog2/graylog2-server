@@ -27,6 +27,11 @@ jest.mock('views/stores/ViewManagementStore', () => ({
   },
 }));
 jest.mock('views/logic/views/ViewDeserializer', () => jest.fn(x => Promise.resolve(x)));
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    execute: mockAction(jest.fn()),
+  },
+}))
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateActions: {},
   SearchExecutionStateStore: { listen: jest.fn() },

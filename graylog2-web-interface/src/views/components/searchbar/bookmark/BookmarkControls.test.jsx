@@ -1,20 +1,21 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'enzyme';
+import { browserHistory } from 'react-router';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-import { ViewActions } from 'views/stores/ViewStore';
+import Routes from 'routing/Routes';
 
 import BookmarkControls from './BookmarkControls';
 
 describe('BookmarkControls', () => {
   describe('Button handling', () => {
     it('should clear a view', (done) => {
-      ViewActions.create = mockAction(jest.fn(() => Promise.resolve()));
+      browserHistory.push = jest.fn();
       const viewStoreState = {
         activeQuery: '',
         view: View.builder()
@@ -27,7 +28,7 @@ describe('BookmarkControls', () => {
       const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState} />);
       wrapper.find('button[title="Empty search"]').simulate('click');
       setImmediate(() => {
-        expect(ViewActions.create).toHaveBeenCalledWith(View.Type.Search);
+        expect(browserHistory.push).toHaveBeenCalledWith(Routes.SEARCH);
         done();
       });
     });

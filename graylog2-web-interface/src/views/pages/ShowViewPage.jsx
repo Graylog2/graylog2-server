@@ -6,11 +6,13 @@ import connect from 'stores/connect';
 import Spinner from 'components/common/Spinner';
 
 import View from 'views/logic/views/View';
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type { ViewLoaderFn } from 'views/logic/views/ViewLoader';
 import ViewLoader from 'views/logic/views/ViewLoader';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
@@ -82,6 +84,8 @@ class ShowViewPage extends React.Component<Props, State> {
     ).then((results) => {
       this.setState({ loaded: true });
       return results;
+    }).then(() => {
+      SearchActions.executeWithCurrentState();
     }).catch(e => e);
   };
 
@@ -99,7 +103,9 @@ class ShowViewPage extends React.Component<Props, State> {
     const { route } = this.props;
 
     return (
-      <ExtendedSearchPage route={route} />
+      <ViewLoaderContext.Provider value={this.loadView}>
+        <ExtendedSearchPage route={route} />
+      </ViewLoaderContext.Provider>
     );
   }
 }

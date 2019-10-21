@@ -1,7 +1,9 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
+import Routes from 'routing/Routes';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
@@ -69,11 +71,12 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   onLoad = (selectedBookmark, loadFunc) => {
-    const { toggleModal } = this.props;
     if (!selectedBookmark || !loadFunc) {
       return;
     }
-    loadFunc(selectedBookmark).then(toggleModal);
+    loadFunc(selectedBookmark).then(() => {
+      browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedBookmark));
+    });
   };
 
   onDelete = (selectedBookmark) => {

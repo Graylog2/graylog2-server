@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { browserHistory } from 'react-router';
 
+import Routes from 'routing/Routes';
 import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup } from 'components/graylog';
 import { Icon } from 'components/common';
@@ -109,7 +110,9 @@ class BookmarkControls extends React.Component<Props, State> {
     ViewManagementActions.create(newView)
       .then((createdView) => {
         const loaderFunc = this.context;
-        loaderFunc(createdView.id);
+        loaderFunc(createdView.id).then(() => {
+          browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(createdView.id));
+        });
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
@@ -185,7 +188,11 @@ class BookmarkControls extends React.Component<Props, State> {
                     onClick={this.loadAsDashboard}>
               <Icon name="dashboard" />
             </Button>
-            <Button disabled={disableReset} title="Empty search" onClick={() => ViewActions.create(View.Type.Search)}>
+            <Button disabled={disableReset}
+                    title="Empty search"
+                    onClick={() => {
+                      browserHistory.push(Routes.SEARCH);
+                    }}>
               <Icon name="eraser" />
             </Button>
             <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>

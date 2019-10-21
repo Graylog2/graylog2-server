@@ -13,9 +13,11 @@ export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red']).mode('lch').colors(40);
 
 export const dashboardsPath = '/dashboards';
-export const newDashboardsPath = '/dashboards/new';
-export const dashboardsTvPath = '/dashboards/tv/:viewId';
-export const extendedSearchPath = '/extendedsearch';
 export const viewsPath = '/views';
+export const searchPath = '/search';
+export const newDashboardsPath = `${dashboardsPath}/new`;
+export const dashboardsTvPath = `${dashboardsPath}/tv/:viewId`;
+export const extendedSearchPath = '/extendedsearch';
+export const showSearchPath = `${searchPath}/:viewId`
 export const showViewsPath = `${viewsPath}/:viewId`;
 export const showDashboardsPath = `${dashboardsPath}/:viewId`;
