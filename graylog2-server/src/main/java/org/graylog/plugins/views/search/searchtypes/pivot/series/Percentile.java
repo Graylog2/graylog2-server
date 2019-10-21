@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.TypedBuilder;
 
@@ -44,6 +45,11 @@ public abstract class Percentile implements SeriesSpec {
 
     @JsonProperty
     public abstract Double percentile();
+
+    @Override
+    public String literal() {
+        return type() + "(" + percentile() + "," + field() + ")";
+    }
 
     public static Builder builder() {
         return new AutoValue_Percentile.Builder().type(NAME);
