@@ -88,7 +88,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchDbService searchDbService;
     private final SearchJobService searchJobService;
     private final ObjectMapper objectMapper;
-    private final PermittedStreamsLoader streamLoader;
+    private final PermittedStreams permittedStreams;
     private final SearchAuthorizer authorizer;
 
     @Inject
@@ -96,13 +96,13 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
-                          PermittedStreamsLoader streamLoader,
+                          PermittedStreams permittedStreams,
                           SearchAuthorizer authorizer) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
-        this.streamLoader = streamLoader;
+        this.permittedStreams = permittedStreams;
         this.authorizer = authorizer;
     }
 
@@ -180,7 +180,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return streamLoader.loadAllPermittedStreams(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+        return permittedStreams.load(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
     private void authorize(Search search) {

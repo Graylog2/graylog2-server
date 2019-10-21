@@ -36,23 +36,23 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PermittedStreamsLoaderTest {
+public class PermittedStreamsTest {
 
     private StreamService streamService;
-    private PermittedStreamsLoader sut;
+    private PermittedStreams sut;
 
     @Before
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
         streamService = mock(StreamService.class);
-        sut = new PermittedStreamsLoader(streamService);
+        sut = new PermittedStreams(streamService);
     }
 
     @Test
     public void findsStreams() {
         stubStreams("oans", "zwoa", "gsuffa");
 
-        ImmutableSet<String> result = sut.loadAllPermittedStreams(id -> true);
+        ImmutableSet<String> result = sut.load(id -> true);
 
         assertThat(result).containsExactlyInAnyOrder("oans", "zwoa", "gsuffa");
     }
@@ -61,7 +61,7 @@ public class PermittedStreamsLoaderTest {
     public void filtersOutNonPermittedStreams() {
         stubStreams("oans", "zwoa", "gsuffa");
 
-        ImmutableSet<String> result = sut.loadAllPermittedStreams(id -> id.equals("gsuffa"));
+        ImmutableSet<String> result = sut.load(id -> id.equals("gsuffa"));
 
         assertThat(result).containsExactly("gsuffa");
     }
@@ -71,7 +71,7 @@ public class PermittedStreamsLoaderTest {
         stubStreams("oans", "zwoa", "gsuffa");
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> sut.loadAllPermittedStreams(id -> false));
+                .isThrownBy(() -> sut.load(id -> false));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class PermittedStreamsLoaderTest {
 
         stubStreams(streamIds.toArray(new String[]{}));
 
-        ImmutableSet<String> result = sut.loadAllPermittedStreams(id -> true);
+        ImmutableSet<String> result = sut.load(id -> true);
 
         assertThat(result).containsExactly("i'm ok");
     }

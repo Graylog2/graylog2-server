@@ -73,7 +73,7 @@ public class SearchResourceTest {
     private SearchJobService searchJobService;
 
     @Mock
-    private PermittedStreamsLoader streamLoader;
+    private PermittedStreams permittedStreams;
 
     @Mock
     private SearchAuthorizer authorizer;
@@ -89,7 +89,7 @@ public class SearchResourceTest {
     class SearchTestResource extends SearchResource {
         private final Subject subject;
 
-        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreamsLoader streamLoader) {
+        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
             super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, authorizer);
             this.subject = subject;
         }
@@ -110,7 +110,7 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), streamLoader);
+        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
 
         when(currentUser.getName()).thenReturn("admin");
     }

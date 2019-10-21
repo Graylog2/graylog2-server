@@ -27,15 +27,15 @@ import java.util.function.Predicate;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
-class PermittedStreamsLoader {
+class PermittedStreams {
     private final StreamService streamService;
 
     @Inject
-    PermittedStreamsLoader(StreamService streamService) {
+    PermittedStreams(StreamService streamService) {
         this.streamService = streamService;
     }
 
-    ImmutableSet<String> loadAllPermittedStreams(Predicate<String> isStreamIdPermitted) {
+    ImmutableSet<String> load(Predicate<String> isStreamIdPermitted) {
         final Set<String> result = streamService.loadAll().stream()
                 .map(org.graylog2.plugin.streams.Stream::getId)
                 // Unless explicitly queried, exclude event indices by defaulth
