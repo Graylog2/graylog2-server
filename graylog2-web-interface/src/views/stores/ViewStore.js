@@ -50,7 +50,6 @@ export const ViewActions: ViewActionsType = singletonActions(
     state: { asyncResult: true },
     summary: { asyncResult: true },
     title: { asyncResult: true },
-    setNew: { asyncResult: true },
   }),
 );
 
@@ -77,6 +76,10 @@ export const ViewStore: ViewStoreType = singletonStore(
         this._trigger();
       });
       ViewManagementActions.create.completed.listen(() => {
+        this.isNew = false;
+        this._trigger();
+      });
+      ViewManagementActions.get.completed.listen(() => {
         this.isNew = false;
         this._trigger();
       });
@@ -187,10 +190,6 @@ export const ViewStore: ViewStoreType = singletonStore(
     title(newTitle) {
       this.dirty = true;
       this.view = this.view.toBuilder().title(newTitle).build();
-      this._trigger();
-    },
-    setNew() {
-      this.isNew = true;
       this._trigger();
     },
     _updateSearch(view: View): [View, boolean] {
