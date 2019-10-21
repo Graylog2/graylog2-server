@@ -114,24 +114,22 @@ class SideBar extends React.Component<Props, State> {
     return (
       <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
         {open && <div className={`background ${styles.toggleArea}`} />}
-        <div className={styles.sidebarContainer}>
-          <div className="sidebar">
-            <div className={`${styles.sidebarContent}`}>
-              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
-                <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
-              </span>
-              {
+        <div className={`${styles.sidebarContent}`}>
+          <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
+            <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
+          </span>
+          {
                 resultsEmpty
-                  ? <Spinner />
+                  ? <Spinner text="" />
                   : (
-                    <React.Fragment>
+                    <>
                       <NavItem isSelected={open && selectedKey === 'viewDescription'}
                                text="View Description"
                                icon={<i className="fa fa-info" />}
                                onClick={this.setSelectedKey('viewDescription')}
                                isLast={false}
                                isOpen={open}>
-                        <React.Fragment>
+                        <>
                           <div className={styles.viewMetadata}>
                             <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
                             <small>{viewMetadata.summary || defaultNewViewSummary}</small>
@@ -141,7 +139,7 @@ class SideBar extends React.Component<Props, State> {
                             <SearchResultOverview results={results} />
                           </div>
                           {this.formatViewDescription(viewMetadata)}
-                        </React.Fragment>
+                        </>
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'createWidget'}
                                text="Create"
@@ -155,7 +153,7 @@ class SideBar extends React.Component<Props, State> {
 
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'highlighting'}
-                               text="Formatting & Highlighting"
+                               text="Formatting &amp; Highlighting"
                                icon={<i className="fa fa-paragraph" />}
                                onClick={this.setSelectedKey('highlighting')}
                                isLast={false}
@@ -170,11 +168,9 @@ class SideBar extends React.Component<Props, State> {
                                isOpen={open}>
                         {children}
                       </NavItem>
-                    </React.Fragment>
+                    </>
                   )
               }
-            </div>
-          </div>
         </div>
       </div>
     );
