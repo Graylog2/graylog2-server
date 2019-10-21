@@ -9,13 +9,14 @@ import withPluginEntities from 'views/logic/withPluginEntities';
 import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+import type { ViewJson } from 'views/logic/views/View';
 import ExtendedSearchPage from './ExtendedSearchPage';
 
 type Props = {
   route: {},
   location: {
     state?: {
-      view?: View | {},
+      view?: View | ViewJson,
     },
   };
   loadingViewHooks: Array<ViewHook>,
@@ -28,7 +29,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   useEffect(() => {
     const { state = {} } = location;
     const { view: searchView } = state;
-    if (searchView && searchView.search) {
+    if (searchView && searchView.search && searchView instanceof View) {
       const query = location;
       const dashboardView = viewTransformer(searchView);
       const loadPromise = ViewActions.load(dashboardView).then(() => dashboardView);
