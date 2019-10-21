@@ -29,4 +29,16 @@ describe('NewDashboardPage', () => {
     /* $FlowFixMe ViewActions.load was overridden to test the call */
     expect(ViewActions.load.mock.calls[0][0].type).toStrictEqual(View.Type.Dashboard);
   });
+
+  it('should not render transform search view to dashboard view if view search is in JSON format', () => {
+    const view = View.create().toBuilder().type(View.Type.Search).search(Search.builder().build())
+      .createdAt(new Date('2019-10-16T14:38:44.681Z'))
+      .build()
+      .toJSON();
+    ViewActions.load = mockAction(jest.fn(() => new Promise(() => {})));
+    const wrapper = mount(<NewDashboardPage route={{}}
+                                            location={{ state: { view } }} />);
+    expect(wrapper).toMatchSnapshot();
+    expect(ViewActions.load).toHaveBeenCalledTimes(0);
+  });
 });

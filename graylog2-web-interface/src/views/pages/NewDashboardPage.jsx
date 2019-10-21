@@ -15,7 +15,7 @@ type Props = {
   route: {},
   location: {
     state?: {
-      view?: View,
+      view?: View | {},
     },
   };
   loadingViewHooks: Array<ViewHook>,
@@ -28,7 +28,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   useEffect(() => {
     const { state = {} } = location;
     const { view: searchView } = state;
-    if (searchView) {
+    if (searchView && searchView.search) {
       const query = location;
       const dashboardView = viewTransformer(searchView);
       const loadPromise = ViewActions.load(dashboardView).then(() => dashboardView);
