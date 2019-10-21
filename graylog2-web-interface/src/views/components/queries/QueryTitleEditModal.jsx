@@ -62,6 +62,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
         <Modal.Body>
           <Input autoFocus
                  help="The title of the query tab."
+                 id="title"
                  label="Title"
                  name="title"
                  onChange={this._onDraftChange}
