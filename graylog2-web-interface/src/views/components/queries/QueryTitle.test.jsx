@@ -17,21 +17,22 @@ describe('QueryTitle', () => {
     QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Query.builder().newId().build())));
     ViewActions.selectQuery = mockAction(jest.fn(queryId => Promise.resolve(queryId)));
   });
-  describe('duplicate action', () => {
-    const findAction = (wrapper, name) => {
-      const openMenuTrigger = wrapper.find('i[data-testid="query-action-dropdown"]');
-      openMenuTrigger.simulate('click');
 
-      wrapper.update();
-      const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
-      return () => new Promise((resolve) => {
-        onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
-        setImmediate(() => {
-          resolve();
-        });
+  const findAction = (wrapper, name) => {
+    const openMenuTrigger = wrapper.find('i[data-testid="query-action-dropdown"]');
+    openMenuTrigger.simulate('click');
+
+    wrapper.update();
+    const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
+    return () => new Promise((resolve) => {
+      onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
+      setImmediate(() => {
+        resolve();
       });
-    };
+    });
+  };
 
+  describe('duplicate action', () => {
     it('triggers duplication of query', () => {
       const wrapper = mount(
         <QueryTitle active
@@ -47,6 +48,7 @@ describe('QueryTitle', () => {
         expect(QueriesActions.duplicate).toHaveBeenCalled();
       });
     });
+
     it('selects new query after duplicating it', () => {
       const wrapper = mount(
         <QueryTitle active
@@ -61,6 +63,25 @@ describe('QueryTitle', () => {
       return duplicate().then(() => {
         expect(ViewActions.selectQuery).toHaveBeenCalled();
         expect(asMock(ViewActions.selectQuery).mock.calls[0][0]).not.toBeNull();
+      });
+    });
+  });
+
+  describe('edit title action', () => {
+    it('opens edit modal', () => {
+      const openEditModalFn = jest.fn();
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={openEditModalFn}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
+      const clickOnEditOption = findAction(wrapper, 'Edit Title');
+
+      return clickOnEditOption().then(() => {
+        expect(openEditModalFn).toHaveBeenCalledTimes(1);
       });
     });
   });
