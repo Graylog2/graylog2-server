@@ -20,7 +20,7 @@ type State = {
 class QueryTitleEditModal extends React.Component<Props, State> {
   static propTypes = {
     onTitleChange: PropTypes.func.isRequired,
-    selectedQueryId: PropTypes.number.isRequired,
+    selectedQueryId: PropTypes.string.isRequired,
   };
 
   state = {
@@ -35,7 +35,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     });
   }
 
-  close = () => {
+  _close = () => {
     this.setState({
       show: false,
       titleDraft: '',
@@ -46,7 +46,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     const { titleDraft } = this.state;
     const { onTitleChange, selectedQueryId } = this.props;
     onTitleChange(selectedQueryId, titleDraft);
-    this.close();
+    this._close();
   };
 
   // eslint-disable-next-line no-undef
@@ -57,7 +57,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   render() {
     const { show, titleDraft } = this.state;
     return (
-      <Modal show={show} bsSize="large" onHide={this.close}>
+      <Modal show={show} bsSize="large" onHide={this._close}>
         <Modal.Header closeButton>
           <Modal.Title>Edit query title</Modal.Title>
         </Modal.Header>
@@ -74,7 +74,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this._onDraftSave} bsStyle="success">Save</Button>
-          <Button onClick={this.close}>Cancel</Button>
+          <Button onClick={this._close}>Cancel</Button>
         </Modal.Footer>
       </Modal>
     );
