@@ -19,8 +19,7 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const { queryByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve()}
-                           selectedQueryId="selected-query-id" />,
+                           onTitleChange={() => Promise.resolve()} />,
     );
     // Modal should not be visible initially
     expect(queryByText('Edit query title')).toBeNull();
@@ -33,8 +32,7 @@ describe('QueryTitleEditModal', () => {
     let modalRef;
     const { getByDisplayValue } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={() => Promise.resolve()}
-                           selectedQueryId="selected-query-id" />,
+                           onTitleChange={() => Promise.resolve()} />,
     );
     openModal(modalRef);
     expect(getByDisplayValue('CurrentTitle')).not.toBeNull();
@@ -45,8 +43,7 @@ describe('QueryTitleEditModal', () => {
     const onTitleChangeFn = jest.fn();
     const { getByDisplayValue, getByText } = render(
       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-                           onTitleChange={onTitleChangeFn}
-                           selectedQueryId="selected-query-id" />,
+                           onTitleChange={onTitleChangeFn} />,
     );
     openModal(modalRef);
     const titleInput = getByDisplayValue('CurrentTitle');
@@ -54,7 +51,7 @@ describe('QueryTitleEditModal', () => {
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
     fireEvent.click(saveButton);
     expect(onTitleChangeFn).toHaveBeenCalledTimes(1);
-    expect(onTitleChangeFn).toHaveBeenCalledWith('selected-query-id', 'NewTitle');
+    expect(onTitleChangeFn).toHaveBeenCalledWith('NewTitle');
     // TODO: Fix this test case, right now the modal is still visible
     // // Modal should not be visible anymore
     // expect(queryByText('Edit query title')).toBeNull();
@@ -66,8 +63,7 @@ describe('QueryTitleEditModal', () => {
   //     const onTitleChangeFn = jest.fn();
   //     const { getByText, queryByText } = render(
   //       <QueryTitleEditModal ref={(ref) => { modalRef = ref; }}
-  //                            onTitleChange={onTitleChangeFn}
-  //                            selectedQueryId="selected-query-id" />,
+  //                            onTitleChange={onTitleChangeFn} />,
   //     );
   //     openModal(modalRef);
   //     // Modal should be visible

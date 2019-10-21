@@ -102,7 +102,8 @@ class QueryTabs extends React.Component<Props> {
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-        <QueryTitleEditModal onTitleChange={onTitleChange} ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} selectedQueryId={selectedQueryId} />
+        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
+                             ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} />
       </span>
     );
   }

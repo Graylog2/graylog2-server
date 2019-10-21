@@ -8,8 +8,7 @@ import Input from 'components/bootstrap/Input';
 import type { TitlesMap } from 'views/stores/TitleTypes';
 
 type Props = {
-  onTitleChange: (queryId: string, newTitle: string) => Promise<TitlesMap>,
-  selectedQueryId: string,
+  onTitleChange: (newTitle: string) => Promise<TitlesMap>,
 }
 
 type State = {
@@ -20,7 +19,6 @@ type State = {
 class QueryTitleEditModal extends React.Component<Props, State> {
   static propTypes = {
     onTitleChange: PropTypes.func.isRequired,
-    selectedQueryId: PropTypes.string.isRequired,
   };
 
   state = {
@@ -44,8 +42,8 @@ class QueryTitleEditModal extends React.Component<Props, State> {
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;
-    const { onTitleChange, selectedQueryId } = this.props;
-    onTitleChange(selectedQueryId, titleDraft);
+    const { onTitleChange } = this.props;
+    onTitleChange(titleDraft);
     this._close();
   };
 
@@ -64,7 +62,6 @@ class QueryTitleEditModal extends React.Component<Props, State> {
         <Modal.Body>
           <Input autoFocus
                  help="The title of the query tab."
-                 id="title"
                  label="Title"
                  name="title"
                  onChange={this._onDraftChange}
