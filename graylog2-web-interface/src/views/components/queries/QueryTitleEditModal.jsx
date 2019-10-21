@@ -66,7 +66,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     return (
       <Modal show={show} bsSize="large" onHide={this._close}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit query title</Modal.Title>
+          <Modal.Title>Editing query title</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Input autoFocus

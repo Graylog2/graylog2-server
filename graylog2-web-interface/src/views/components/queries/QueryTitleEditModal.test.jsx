@@ -9,7 +9,7 @@ jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
 
 describe('QueryTitleEditModal', () => {
   afterEach(cleanup);
-  const modalHeadline = 'Edit query title';
+  const modalHeadline = 'Editing query title';
   const openModal = (modalRef, currentTitle = 'CurrentTitle') => {
     if (modalRef) {
       modalRef.open(currentTitle);
