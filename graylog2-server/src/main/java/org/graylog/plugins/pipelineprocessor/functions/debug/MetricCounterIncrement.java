@@ -11,14 +11,14 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import javax.inject.Inject;
 
-public class MetricCounter extends AbstractFunction<Void> {
+public class MetricCounterIncrement extends AbstractFunction<Void> {
 
-    public static final String NAME = "metric_counter";
+    public static final String NAME = "metric_counter_inc";
     private final ParameterDescriptor<String, Counter> nameParam;
     private final ParameterDescriptor<Long, Long> valueParam;
 
     @Inject
-    public MetricCounter(MetricRegistry metricRegistry) {
+    public MetricCounterIncrement(MetricRegistry metricRegistry) {
         nameParam = ParameterDescriptor.string("name", Counter.class)
                 .description("The counter metric name, will always be prefixed with 'org.graylog.rulemetrics.'")
                 .transform(name -> metricRegistry.counter(MetricRegistry.name("org.graylog.rulemetrics", name)))

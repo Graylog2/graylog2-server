@@ -1,7 +1,8 @@
 rule "metric counter"
 when true
 then
-  metric_counter("foo", 41);
-  metric_counter("foo", 2);
-  metric_counter("foo", -1);
+  metric_counter_inc("foo", 41);
+  metric_counter_inc("foo");
+  metric_counter_inc("foo", 1);
+  metric_counter_inc("foo", -1);
 end

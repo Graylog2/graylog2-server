@@ -31,7 +31,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.*;
 import org.graylog.plugins.pipelineprocessor.functions.dates.*;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.*;
-import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounter;
+import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.*;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.*;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
@@ -250,7 +250,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
-        functions.put(MetricCounter.NAME, new MetricCounter(metricRegistry));
+        functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
         functionRegistry = new FunctionRegistry(functions);
     }
 

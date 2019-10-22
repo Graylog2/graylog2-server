@@ -52,7 +52,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
 import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
-import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounter;
+import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
@@ -252,7 +252,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);
-        addMessageProcessorFunction(MetricCounter.NAME, MetricCounter.class);
+        addMessageProcessorFunction(MetricCounterIncrement.NAME, MetricCounterIncrement.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
