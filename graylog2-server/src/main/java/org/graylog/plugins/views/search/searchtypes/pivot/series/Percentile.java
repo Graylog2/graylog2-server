@@ -48,7 +48,7 @@ public abstract class Percentile implements SeriesSpec {
 
     @Override
     public String literal() {
-        return type() + "(" + percentile() + "," + field() + ")";
+        return type() + "(" + field() + "," + percentile() + ")";
     }
 
     public static Builder builder() {
