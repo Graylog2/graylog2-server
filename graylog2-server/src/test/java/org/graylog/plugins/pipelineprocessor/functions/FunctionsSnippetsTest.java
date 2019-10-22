@@ -16,14 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -31,13 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import javax.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -116,6 +101,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
@@ -154,6 +140,22 @@ import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+
+import javax.inject.Provider;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Executors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
 
@@ -230,6 +232,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Split.NAME, new Split());
         functions.put(StartsWith.NAME, new StartsWith());
         functions.put(Replace.NAME, new Replace());
+        functions.put(Length.NAME, new Length());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -527,6 +530,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat((boolean) message.getField("has_xyz")).isFalse();
         assertThat(message.getField("string_literal")).isInstanceOf(String.class);
         assertThat((String) message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
+    }
+
+    @Test
+    public void stringLength() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("chars_utf8")).isEqualTo(5L);
+        assertThat(message.getField("bytes_utf8")).isEqualTo(6L);
+        assertThat(message.getField("chars_ascii")).isEqualTo(5L);
+        assertThat(message.getField("bytes_ascii")).isEqualTo(5L);
     }
 
     @Test
