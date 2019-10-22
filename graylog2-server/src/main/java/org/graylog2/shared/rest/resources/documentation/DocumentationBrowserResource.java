@@ -65,6 +65,7 @@ public class DocumentationBrowserResource extends RestResource {
                 .build();
     }
 
+    // Serve Swagger for a specific node, using HttpPublishUri
     @GET
     @Produces(MediaType.TEXT_HTML)
     @Path("index.html")
@@ -72,7 +73,25 @@ public class DocumentationBrowserResource extends RestResource {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
         final Map<String, Object> model = ImmutableMap.of(
-                "baseUri", RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API).toString());
+                "baseUri", httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API).toString(),
+                "globalModePath", "",
+                "globalUriMarker", "",
+                "showWarning", "");
+        return templateEngine.transform(template, model);
+    }
+
+    // Serve Swagger in cluster global mode, using HttpExternalUri
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/global/index.html")
+    public String allIndex(@Context HttpHeaders httpHeaders) throws IOException {
+        final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
+        final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
+        final Map<String, Object> model = ImmutableMap.of(
+                "baseUri", RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API).toString(),
+                "globalModePath", "global/index.html",
+                "globalUriMarker", "/global",
+                "showWarning", "true");
         return templateEngine.transform(template, model);
     }
 
@@ -84,6 +103,10 @@ public class DocumentationBrowserResource extends RestResource {
             throw new BadRequestException("Not allowed to access parent directory");
         }
 
+        // Remove path globalModePath before we serve swagger resources
+        if (route.startsWith("global/")) {
+            route = route.replace("global/", "");
+        }
         final URL resource = classLoader.getResource("swagger/" + route);
         if (null != resource) {
             try {
