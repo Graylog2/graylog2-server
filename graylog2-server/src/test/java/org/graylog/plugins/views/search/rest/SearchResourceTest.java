@@ -22,8 +22,8 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.authorization.SearchAuthorizer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
@@ -76,7 +76,7 @@ public class SearchResourceTest {
     private PermittedStreams permittedStreams;
 
     @Mock
-    private SearchAuthorizer authorizer;
+    private SearchExecutionGuard executionGuard;
 
     @Mock
     private Subject subject;
@@ -90,7 +90,7 @@ public class SearchResourceTest {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, authorizer);
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard);
             this.subject = subject;
         }
 
@@ -193,7 +193,7 @@ public class SearchResourceTest {
 
     @Test
     public void authorizationFailureInAsyncExecutionLeadsTo403() {
-        doThrow(new ForbiddenException()).when(authorizer).authorize(any(), any());
+        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
 
         final String searchId = mockValidSearch().id();
 
@@ -203,7 +203,7 @@ public class SearchResourceTest {
 
     @Test
     public void authorizationFailureInSynchronousExecutionLeadsTo403() {
-        doThrow(new ForbiddenException()).when(authorizer).authorize(any(), any());
+        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
 
         final Search search = mockValidSearch();
 

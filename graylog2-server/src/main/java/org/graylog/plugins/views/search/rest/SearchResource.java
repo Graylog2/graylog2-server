@@ -32,9 +32,9 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchMetadata;
-import org.graylog.plugins.views.search.authorization.SearchAuthorizer;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
@@ -89,7 +89,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchJobService searchJobService;
     private final ObjectMapper objectMapper;
     private final PermittedStreams permittedStreams;
-    private final SearchAuthorizer authorizer;
+    private final SearchExecutionGuard executionGuard;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
@@ -97,13 +97,13 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
                           PermittedStreams permittedStreams,
-                          SearchAuthorizer authorizer) {
+                          SearchExecutionGuard executionGuard) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
         this.permittedStreams = permittedStreams;
-        this.authorizer = authorizer;
+        this.executionGuard = executionGuard;
     }
 
     @VisibleForTesting
@@ -184,7 +184,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private void authorize(Search search) {
-        this.authorizer.authorize(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+        this.executionGuard.check(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
     @POST

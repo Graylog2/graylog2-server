@@ -1,25 +1,24 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.authorization;
+package org.graylog.plugins.views.search;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.PluginMetaData;
 import org.slf4j.Logger;
@@ -32,18 +31,18 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SearchAuthorizer {
+public class SearchExecutionGuard {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchAuthorizer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchExecutionGuard.class);
 
     private final Map<String, PluginMetaData> providedCapabilities;
 
     @Inject
-    public SearchAuthorizer(Map<String, PluginMetaData> providedCapabilities) {
+    public SearchExecutionGuard(Map<String, PluginMetaData> providedCapabilities) {
         this.providedCapabilities = providedCapabilities;
     }
 
-    public void authorize(Search search, Predicate<String> hasReadPermissionForStream) {
+    public void check(Search search, Predicate<String> hasReadPermissionForStream) {
         checkStreamPermissions(search, hasReadPermissionForStream);
 
         checkMissingRequirements(search);

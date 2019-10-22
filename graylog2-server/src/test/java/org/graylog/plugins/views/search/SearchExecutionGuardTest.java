@@ -1,25 +1,24 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.authorization;
+package org.graylog.plugins.views.search;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
@@ -40,11 +39,11 @@ import java.util.function.Predicate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.graylog.plugins.views.search.authorization.TestData.requirementsMap;
+import static org.graylog.plugins.views.search.TestData.requirementsMap;
 import static org.mockito.Mockito.mock;
 
-public class SearchAuthorizerTest {
-    private SearchAuthorizer sut;
+public class SearchExecutionGuardTest {
+    private SearchExecutionGuard sut;
     private Map<String, PluginMetaData> providedCapabilities;
 
     @Before
@@ -54,7 +53,7 @@ public class SearchAuthorizerTest {
         providedCapabilities = new HashMap<>();
         providedCapabilities.put("my only capability", mock(PluginMetaData.class));
 
-        sut = new SearchAuthorizer(providedCapabilities);
+        sut = new SearchExecutionGuard(providedCapabilities);
     }
 
     @Test
@@ -62,7 +61,7 @@ public class SearchAuthorizerTest {
         final Search search = searchWithStreamIds("ok", "not-ok");
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> sut.authorize(search, id -> id.equals("ok")));
+                .isThrownBy(() -> sut.check(search, id -> id.equals("ok")));
     }
 
     @Test
@@ -77,7 +76,7 @@ public class SearchAuthorizerTest {
         final Search search = searchWithStreamIds();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> sut.authorize(search, id -> true))
+                .isThrownBy(() -> sut.check(search, id -> true))
                 .withMessageContaining("no streams");
     }
 
@@ -86,7 +85,7 @@ public class SearchAuthorizerTest {
         final Search search = searchWithCapabilityRequirements("awesomeness");
 
         assertThatExceptionOfType(MissingCapabilitiesException.class)
-                .isThrownBy(() -> sut.authorize(search, id -> true))
+                .isThrownBy(() -> sut.check(search, id -> true))
                 .satisfies(ex -> assertThat(ex.getMissingRequirements()).containsOnlyKeys("awesomeness"));
     }
 
@@ -99,7 +98,7 @@ public class SearchAuthorizerTest {
     }
 
     private void assertSucceeds(Search search, Predicate<String> isStreamIdPermitted) {
-        assertThatCode(() -> sut.authorize(search, isStreamIdPermitted)).doesNotThrowAnyException();
+        assertThatCode(() -> sut.check(search, isStreamIdPermitted)).doesNotThrowAnyException();
     }
 
     private Search searchWithCapabilityRequirements(String... requirementNames) {
