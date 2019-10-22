@@ -76,10 +76,6 @@ export const ViewStore: ViewStoreType = singletonStore(
         this.dirty = false;
         this._trigger();
       });
-      ViewManagementActions.create.completed.listen(() => {
-        this.isNew = false;
-        this._trigger();
-      });
     },
 
     getInitialState(): ViewStoreState {
@@ -144,6 +140,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const firstQueryId = get(queries.first(), 'id');
       const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
       this.selectQuery(selectedQuery);
+      this.isNew = false;
 
       const promise = Promise.resolve(this._state());
       ViewActions.load.promise(promise);
@@ -187,10 +184,6 @@ export const ViewStore: ViewStoreType = singletonStore(
     title(newTitle) {
       this.dirty = true;
       this.view = this.view.toBuilder().title(newTitle).build();
-      this._trigger();
-    },
-    setNew() {
-      this.isNew = true;
       this._trigger();
     },
     _updateSearch(view: View): [View, boolean] {

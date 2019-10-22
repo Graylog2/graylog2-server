@@ -32,6 +32,8 @@ describe('ViewStore', () => {
   const dummyView = View.builder().search(dummySearch).build();
   it('.load should select first query if activeQuery is not set', () => ViewActions.load(dummyView)
     .then(state => expect(state.activeQuery).toBe('firstQueryId')));
+  it('.load should set isNew to false', () => ViewActions.load(dummyView)
+    .then(state => expect(state.isNew).toBeFalsy()));
   it('.load should select activeQuery if it is set and present in view', () => ViewActions.selectQuery('secondQueryId')
     .then(() => ViewActions.load(dummyView))
     .then(state => expect(state.activeQuery).toBe('secondQueryId')));
@@ -60,6 +62,10 @@ describe('ViewStore', () => {
     it('sets dirty flag to false when creating a view', () => {
       return ViewActions.create(View.Type.Dashboard)
         .then(({ dirty }) => expect(dirty).toBeFalsy());
+    });
+    it('sets isNew flag to true when creating a view', () => {
+      return ViewActions.create(View.Type.Dashboard)
+        .then(({ isNew }) => expect(isNew).toBeTruthy());
     });
   });
 
