@@ -76,6 +76,7 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.graylog2.indexer.cluster.jest.JestUtils.deduplicateErrors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -252,7 +253,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 })
                 .collect(Collectors.toList());
         final MultiSearch.Builder multiSearchBuilder = new MultiSearch.Builder(searches);
-        final MultiSearchResult result = JestUtils.execute(jestClient, multiSearchBuilder.build(), () -> "Unable to perform search query");
+        final MultiSearchResult result = JestUtils.execute(jestClient, multiSearchBuilder.build(), () -> "Unable to perform search query: ");
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -305,10 +306,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .filter(error -> error.startsWith("Expected numeric type on field"))
                     .collect(Collectors.toList());
             if (!nonNumericFieldErrors.isEmpty()) {
-                return Optional.of(new FieldTypeException("Unable to perform search query", nonNumericFieldErrors));
+                return Optional.of(new FieldTypeException("Unable to perform search query: ", deduplicateErrors(nonNumericFieldErrors)));
             }
 
-            return Optional.of(new ElasticsearchException("Unable to perform search query", errors));
+            return Optional.of(new ElasticsearchException("Unable to perform search query: ", deduplicateErrors(errors)));
         }
 
         return Optional.empty();

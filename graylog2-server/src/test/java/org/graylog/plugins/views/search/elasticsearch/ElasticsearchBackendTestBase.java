@@ -40,6 +40,7 @@ import java.util.stream.IntStream;
 
 abstract class ElasticsearchBackendTestBase {
     static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
+    static final ObjectMapper objectMapper = objectMapperProvider.get();
 
     MultiSearchResult resultFor(String result) {
         final ObjectMapper objectMapper = objectMapperProvider.get();
@@ -65,7 +66,6 @@ abstract class ElasticsearchBackendTestBase {
     }
 
     List<String> indicesOf(MultiSearch clientRequest) throws IOException {
-        final ObjectMapper objectMapper = objectMapperProvider.get();
         final String request = clientRequest.getData(objectMapper);
         final String[] lines = request.split("\\r?\\n");
         final int noOfHeaders = lines.length / 2;

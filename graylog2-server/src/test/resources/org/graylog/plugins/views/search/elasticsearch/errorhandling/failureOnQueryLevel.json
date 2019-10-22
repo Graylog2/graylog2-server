@@ -1,0 +1,18 @@
+{
+  "error": {
+    "root_cause": [
+      {
+        "type": "generic",
+        "reason": "Something went wrong"
+      },
+      {
+        "type": "generic",
+        "reason": "Something went wrong"
+      },
+      {
+        "type": "generic",
+        "reason": "Something went wrong"
+      }
+    ]
+  }
+}
