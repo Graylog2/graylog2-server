@@ -1,9 +1,24 @@
 import theme from 'styled-theming';
+import { lighten } from 'polished';
+import { css } from 'styled-components';
 
+import contrastingColor from 'util/contrastingColor';
 import { useTheme } from 'theme/GraylogThemeContext';
 
-const bsStyle = (cssBuilder) => {
+const alertStyles = () => {
   const { colors } = useTheme();
+
+  const cssBuilder = (hex) => {
+    const borderColor = lighten(0.10, hex);
+    const backgroundColor = lighten(0.40, hex);
+    const textColor = contrastingColor(backgroundColor);
+
+    return css`
+      background-color: ${backgroundColor};
+      border-color: ${borderColor};
+      color: ${textColor};
+    `;
+  };
 
   return theme.variants('mode', 'bsStyle', {
     danger: {
@@ -27,4 +42,4 @@ const bsStyle = (cssBuilder) => {
   });
 };
 
-export default bsStyle;
+export default alertStyles;
