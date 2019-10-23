@@ -15,4 +15,7 @@
 
 declare module 'react-router' {
   declare export function withRouter<Props>(component: ComponentType<Props>): ComponentType<$Rest<Props, 'router'>>;
+  declare export class browserHistory {
+    static push: ({pathname: string, state: {}}) => void,
+  }
 }

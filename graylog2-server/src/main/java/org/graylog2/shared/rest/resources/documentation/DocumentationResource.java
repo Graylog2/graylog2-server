@@ -92,13 +92,30 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
+    @ApiOperation(value = "Get API documentation with cluster global URI path")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/global")
+    public Response globalOverview() {
+        return buildSuccessfulCORSResponse(generator.generateOverview());
+    }
+
+    @GET
+    @Timed
     @ApiOperation(value = "Get detailed API documentation of a single resource")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route,
                           @Context HttpHeaders httpHeaders) {
-        final URI baseUri = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
+        // If the documentation was requested from "cluster global mode", use the HttpExternalUri for the baseUri.
+        // Otherwise use the per node HttpPublishUri.
+        URI baseUri;
+        if (route.startsWith("global")) {
+            route = route.replace("global", "");
+            baseUri = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
+        } else {
+            baseUri = httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API);
+        }
         return buildSuccessfulCORSResponse(generator.generateForRoute(route, baseUri.toString()));
     }
 

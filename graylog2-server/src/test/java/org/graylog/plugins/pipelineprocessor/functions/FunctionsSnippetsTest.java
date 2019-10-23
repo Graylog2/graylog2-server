@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -57,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
@@ -163,6 +165,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static final EventBus eventBus = new EventBus();
     private static StreamCacheService streamCacheService;
     private static Stream otherStream;
+    private static MetricRegistry metricRegistry = new MetricRegistry();
 
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
@@ -323,6 +326,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
+        functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -1007,5 +1011,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void metricCounter() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        evaluateRule(rule);
+
+        assertThat(metricRegistry.getCounters().get("org.graylog.rulemetrics.foo").getCount()).isEqualTo(42);
     }
 }
