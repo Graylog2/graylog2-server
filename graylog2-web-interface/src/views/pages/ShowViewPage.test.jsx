@@ -31,7 +31,7 @@ jest.mock('views/stores/SearchStore', () => ({
   SearchActions: {
     execute: mockAction(jest.fn()),
   },
-}))
+}));
 jest.mock('views/stores/SearchExecutionStateStore', () => ({
   SearchExecutionStateActions: {},
   SearchExecutionStateStore: { listen: jest.fn() },

@@ -18,6 +18,6 @@ export const searchPath = '/search';
 export const newDashboardsPath = `${dashboardsPath}/new`;
 export const dashboardsTvPath = `${dashboardsPath}/tv/:viewId`;
 export const extendedSearchPath = '/extendedsearch';
-export const showSearchPath = `${searchPath}/:viewId`
+export const showSearchPath = `${searchPath}/:viewId`;
 export const showViewsPath = `${viewsPath}/:viewId`;
 export const showDashboardsPath = `${dashboardsPath}/:viewId`;
