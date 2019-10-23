@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import connect from 'stores/connect';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button, ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
@@ -11,16 +12,25 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 
-const { RulesActions } = CombinedProvider.get('Rules');
+const { RulesActions, RulesStore } = CombinedProvider.get('Rules');
 
 class RuleList extends React.Component {
   static propTypes = {
     rules: PropTypes.array.isRequired,
+    metricsConfig: PropTypes.object,
+  };
+
+  static defaultProps = {
+    metricsConfig: undefined,
   };
 
   state = {
     openMetricsConfig: false,
   };
+
+  componentDidMount() {
+    RulesActions.loadMetricsConfig();
+  }
 
   _delete = (rule) => {
     return () => {
@@ -75,7 +85,16 @@ class RuleList extends React.Component {
     this.setState({ openMetricsConfig: !openMetricsConfig });
   };
 
+  renderDebugMetricsButton = (metricsConfig) => {
+    if (metricsConfig && metricsConfig.metrics_enabled) {
+      return <Button bsStyle="warning" onClick={this.toggleMetricsConfig}>Debug Metrics: ON</Button>;
+    } else {
+      return <Button onClick={this.toggleMetricsConfig}>Debug Metrics</Button>;
+    }
+  };
+
   render() {
+    const { rules, metricsConfig } = this.props;
     const filterKeys = ['title', 'description'];
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
     const { openMetricsConfig } = this.state;
@@ -87,7 +106,7 @@ class RuleList extends React.Component {
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
                    sortByKey="title"
-                   rows={this.props.rules}
+                   rows={rules}
                    filterBy="Title"
                    dataRowFormatter={this._ruleInfoFormatter}
                    filterLabel="Filter Rules"
@@ -96,12 +115,7 @@ class RuleList extends React.Component {
             <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
               <Button bsStyle="success">Create Rule</Button>
             </LinkContainer>
-            <DropdownButton key="more-rule-actions-button"
-                            title="More actions"
-                            pullRight
-                            id="more-rule-actions-dropdown">
-              <MenuItem onSelect={this.toggleMetricsConfig}>Configure Metrics</MenuItem>
-            </DropdownButton>
+            {this.renderDebugMetricsButton(metricsConfig)}
           </ButtonToolbar>
         </DataTable>
         {openMetricsConfig && <RuleMetricsConfigContainer onClose={this.toggleMetricsConfig} />}
@@ -110,4 +124,6 @@ class RuleList extends React.Component {
   }
 }
 
-export default RuleList;
+export default connect(RuleList, { rules: RulesStore }, ({ rules }) => {
+  return { metricsConfig: rules ? rules.metricsConfig : rules };
+});
