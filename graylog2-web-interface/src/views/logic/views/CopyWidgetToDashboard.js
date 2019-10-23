@@ -20,14 +20,26 @@ const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, Qu
     return undefined;
   }, undefined);
 };
-const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): View => {
+
+const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
+  const dashboardQueryId = dashboard.state.keys().first();
+  const viewState = dashboard.state.get(dashboardQueryId);
+  const newViewState = viewState.builder()
+    .widgets(viewState.widgets().push(widget))
+    .build();
+  return dashboard.toBuilder()
+    .state(dashboard.state.set(dashboardQueryId, newViewState))
+    .build();
+};
+
+const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View): ?View => {
   if (dashboard.type !== View.Type.Dashboard) {
-    throw new Error('Unsupported Operation');
+    return undefined;
   }
 
   const queryMap: Map<QueryId, Query> = Map(search.search.queries.map(q => [q.id, q]));
-
   const match: ?[Widget, QueryId] = _findWidgetAndQueryIdInView(widgetId, search);
+
   if (match) {
     const [widget, queryId] = match;
     const { timerange, query, filter = List.of() } = queryMap.get(queryId);
@@ -44,9 +56,10 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .streams(streams)
       .build();
 
-    const dashboardState = dashboard.state.first();
-
+    return _addWidgetToDashboard(dashboardWidget, dashboard);
   }
+
+  return undefined;
 };
 
 export default CopyWidgetToDashboard;
