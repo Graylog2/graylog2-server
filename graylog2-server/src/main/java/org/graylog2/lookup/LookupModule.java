@@ -21,7 +21,6 @@ import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
 import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
-import org.graylog2.lookup.caches.GuavaLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.plugin.inject.Graylog2Module;
 
@@ -35,11 +34,6 @@ public class LookupModule extends Graylog2Module {
                 NullCache.class,
                 NullCache.Factory.class,
                 NullCache.Config.class);
-
-        installLookupCache(GuavaLookupCache.NAME,
-                GuavaLookupCache.class,
-                GuavaLookupCache.Factory.class,
-                GuavaLookupCache.Config.class);
 
         installLookupCache(CaffeineLookupCache.NAME,
                 CaffeineLookupCache.class,

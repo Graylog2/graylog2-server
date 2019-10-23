@@ -50,7 +50,8 @@ import java.util.stream.Collectors;
 public class CaffeineLookupCache extends LookupCache {
     private static final Logger LOG = LoggerFactory.getLogger(CaffeineLookupCache.class);
 
-    public static final String NAME = "caffeine_cache";
+    // Use the old GuavaLookupCache name, so we don't have to deal with migrations
+    public static final String NAME = "guava_cache";
     private final Cache<LookupCacheKey, LookupResult> cache;
 
     @Inject

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { TimeUnit } from 'components/common';
 
-class GuavaCaffeineCacheSummary extends React.Component {
+class CaffeineCacheSummary extends React.Component {
   static propTypes = {
     cache: PropTypes.object.isRequired,
   };
@@ -22,4 +22,4 @@ class GuavaCaffeineCacheSummary extends React.Component {
   }
 }
 
-export default GuavaCaffeineCacheSummary;
+export default CaffeineCacheSummary;

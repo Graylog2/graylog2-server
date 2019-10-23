@@ -5,7 +5,7 @@ import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
 import { TimeUnitInput } from 'components/common';
 
-class GuavaCaffeineCacheFieldSet extends React.Component {
+class CaffeineCacheFieldSet extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
@@ -68,4 +68,4 @@ class GuavaCaffeineCacheFieldSet extends React.Component {
   }
 }
 
-export default GuavaCaffeineCacheFieldSet;
+export default CaffeineCacheFieldSet;

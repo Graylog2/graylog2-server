@@ -1,18 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Alert } from 'components/graylog';
 
-class GuavaCaffeineCacheDocumentation extends React.Component {
-  static propTypes = {
-    displayName: PropTypes.string.isRequired,
-  };
+class CaffeineCacheDocumentation extends React.Component {
 
   render() {
-    const { displayName } = this.props;
     return (
       <div>
-        <p>The <i>{displayName}</i> maintains recently used values from data adapters.</p>
+        <p>The in-memory cache maintains recently used values from data adapters.</p>
         <p>Please make sure your Graylog servers have enough heap to accomodate the cached entries and monitor the cache efficiency.</p>
 
         <Alert style={{ marginBottom: 10 }} bsStyle="info">
@@ -46,4 +41,4 @@ class GuavaCaffeineCacheDocumentation extends React.Component {
   }
 }
 
-export default GuavaCaffeineCacheDocumentation;
+export default CaffeineCacheDocumentation;
