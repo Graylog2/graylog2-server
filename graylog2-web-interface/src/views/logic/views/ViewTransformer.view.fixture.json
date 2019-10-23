@@ -1,0 +1,97 @@
+{
+  "id": "5da42abdc6eb193adff63b1c",
+  "type": "SEARCH",
+  "title": "transform",
+  "summary": "",
+  "description": "",
+  "search_id": "5da42aa9c6eb193adff63b1b",
+  "properties": [],
+  "state": {
+    "d3cf19bd-f933-4f7b-aa4a-e7cd3fc1c18e": {
+      "selected_fields": null,
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": "Message Count",
+          "8209351b-407a-455b-9942-cefea43b76ae": "All Messages"
+        }
+      },
+      "widgets": [
+        {
+          "id": "8209351b-407a-455b-9942-cefea43b76ae",
+          "type": "messages",
+          "config": {
+            "fields": [
+              "timestamp",
+              "source"
+            ],
+            "show_message_row": true
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "timestamp",
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "auto",
+                    "scaling": null
+                  }
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": [
+          "d8691141-660e-442c-b77a-609e6649def0"
+        ],
+        "8209351b-407a-455b-9942-cefea43b76ae": [
+          "77ce265c-83bf-4ae3-bd05-d882570ac014"
+        ]
+      },
+      "positions": {
+        "527ed7fe-722d-4cf1-bd42-ed2b29a5a59a": {
+          "col": 1,
+          "row": 1,
+          "height": 2,
+          "width": "Infinity"
+        },
+        "8209351b-407a-455b-9942-cefea43b76ae": {
+          "col": 1,
+          "row": 3,
+          "height": 6,
+          "width": "Infinity"
+        }
+      }
+    }
+  },
+  "created_at": "2019-10-14T07:58:06.562Z",
+  "owner": "admin"
+}

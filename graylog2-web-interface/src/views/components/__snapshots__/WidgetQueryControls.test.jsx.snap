@@ -1,0 +1,205 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WidgetQueryControls should do something 1`] = `
+<div>
+  <div
+    class="no-bm extended-search-query-metadata row"
+  >
+    <div
+      class="col-md-4"
+    >
+      <div
+        class="extended-search-timerange-chooser pull-left btn-toolbar"
+        role="toolbar"
+      >
+        <div
+          class="dropdown btn-group btn-group-info"
+        >
+          <button
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-info"
+            id="dropdown-timerange-selector"
+            role="button"
+            type="button"
+          >
+            <i
+              class="fa fa-clock-o"
+            />
+             
+            <span
+              class="caret"
+            />
+          </button>
+          <ul
+            aria-labelledby="dropdown-timerange-selector"
+            class="dropdown-menu"
+            role="menu"
+          >
+            <li
+              class="selected"
+              role="presentation"
+            >
+              <a
+                href="#"
+                role="menuitem"
+                tabindex="-1"
+              >
+                Relative
+              </a>
+            </li>
+            <li
+              class=""
+              role="presentation"
+            >
+              <a
+                href="#"
+                role="menuitem"
+                tabindex="-1"
+              >
+                Absolute
+              </a>
+            </li>
+            <li
+              class=""
+              role="presentation"
+            >
+              <a
+                href="#"
+                role="menuitem"
+                tabindex="-1"
+              >
+                Keyword
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div
+        class="timerange-selector relative"
+        style="margin-left: 50px;"
+      >
+        <div
+          class="form-group"
+        >
+          
+          <span>
+            <select
+              class="relative form-control"
+              id="relative-timerange-selector"
+              label=""
+              name="relative"
+              placeholder=""
+              type="select"
+            >
+              <option
+                value="0"
+              >
+                Search in last day
+              </option>
+              <option
+                value="0"
+              >
+                Search in all messages
+              </option>
+            </select>
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-md-8"
+    >
+      <div
+        data-testid="streams-filter"
+        style="position: relative; z-index: 10;"
+        title="Select streams the search should include. Searches in all streams if empty."
+      >
+        <div
+          class="css-1pcexqc-container"
+        >
+          <div
+            class="css-mxcylq-control"
+          >
+            <div
+              class="css-1hio1c"
+            >
+              <div
+                class="css-22r4e1-placeholder"
+              >
+                Select streams the search should include. Searches in all streams if empty.
+              </div>
+              <div
+                class="css-1g6gooi"
+              >
+                <div
+                  class=""
+                  style="display: inline-block;"
+                >
+                  <input
+                    aria-autocomplete="list"
+                    autocapitalize="none"
+                    autocomplete="off"
+                    autocorrect="off"
+                    id="streams-filter"
+                    spellcheck="false"
+                    style="box-sizing: content-box; width: 2px; border: 0px; font-size: inherit; opacity: 1; outline: 0; padding: 0px;"
+                    tabindex="0"
+                    type="text"
+                    value=""
+                  />
+                  <div
+                    style="position: absolute; top: 0px; left: 0px; visibility: hidden; height: 0px; overflow: scroll; white-space: pre; font-size: inherit; font-family: -webkit-small-control; letter-spacing: normal; text-transform: none;"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="css-1wy0on6"
+            >
+              <div
+                aria-hidden="true"
+                style="display: flex; padding: 0px; box-sizing: border-box; font-size: 150%;"
+              >
+                <i
+                  class="fa fa-caret-down"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="no-bm row"
+  >
+    <div
+      class="col-md-12"
+    >
+      <div
+        class="pull-right search-help"
+      >
+        <a
+          href="http://docs.graylog.org/en/3.2/pages/queries.html"
+          target="_blank"
+          title="Search query syntax documentation"
+        >
+          <i
+            class="fa fa-lightbulb-o"
+          />
+        </a>
+      </div>
+      <button
+        class="pull-left search-button-execute Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
+        type="submit"
+      >
+        <i
+          class="fa fa-search"
+        />
+      </button>
+    </div>
+  </div>
+</div>
+`;

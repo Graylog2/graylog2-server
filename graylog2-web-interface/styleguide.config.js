@@ -60,7 +60,7 @@ module.exports = {
       content: 'docs/util-objects.md',
     },
   ],
-  showUsage: true,
+  usageMode: 'expand',
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
   webpackConfig: {

@@ -5,7 +5,7 @@ Simple example without transforming the given date time:
 
 Relative time:
 ```js
-const moment = require('moment');
+import moment from 'moment';
 const yesterday = moment().subtract(1, 'day');
 <span><Timestamp dateTime={yesterday} /> is <Timestamp dateTime={yesterday} relative />.</span>
 ```
@@ -23,7 +23,7 @@ Showing date/time of Unix Timestamp (in millis):
 
 Time zone conversions:
 ```js
-const moment = require('moment');
+import moment from 'moment';
 const nowUtc = moment.utc();
 <dl>
   <dt>UTC</dt>

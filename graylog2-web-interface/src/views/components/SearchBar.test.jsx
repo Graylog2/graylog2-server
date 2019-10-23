@@ -29,6 +29,11 @@ jest.mock('views/stores/ViewManagementStore', () => ({
         listen: jest.fn(),
       },
     },
+    create: {
+      completed: {
+        listen: jest.fn(),
+      },
+    },
   },
 }));
 jest.mock('views/components/searchbar/QueryInput', () => 'query-input');
