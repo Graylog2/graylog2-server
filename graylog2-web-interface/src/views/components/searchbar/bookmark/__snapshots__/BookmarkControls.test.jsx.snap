@@ -54,7 +54,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
           className="btn-group"
         >
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Export to new dashboard"
@@ -140,7 +139,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
@@ -229,7 +227,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Unsaved changes"
@@ -325,7 +322,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"
@@ -471,7 +467,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
           className="btn-group"
         >
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Export to new dashboard"
@@ -557,7 +552,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
@@ -646,7 +640,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Saved search"
@@ -742,7 +735,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"
@@ -888,7 +880,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
           className="btn-group"
         >
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Export to new dashboard"
@@ -974,7 +965,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             disabled={true}
             onClick={[Function]}
@@ -1063,7 +1053,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Save search"
@@ -1159,7 +1148,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"

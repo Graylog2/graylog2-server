@@ -745,7 +745,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -817,7 +817,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1065,7 +1065,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"

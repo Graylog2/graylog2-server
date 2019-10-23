@@ -99,7 +99,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
@@ -184,7 +183,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
@@ -607,7 +605,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
             className="modal-footer"
           >
             <ForwardRef
-              active={false}
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
@@ -681,7 +678,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
@@ -755,7 +751,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               onClick={[Function]}
             >
@@ -932,7 +927,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
@@ -1017,7 +1011,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
@@ -1385,7 +1378,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
             className="modal-footer"
           >
             <ForwardRef
-              active={false}
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
@@ -1459,7 +1451,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
@@ -1533,7 +1524,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               onClick={[Function]}
             >
@@ -1710,7 +1700,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="submit-button"
                       disabled={false}
@@ -1795,7 +1784,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                     }
                   >
                     <ForwardRef
-                      active={false}
                       bsStyle="default"
                       className="reset-button"
                       onClick={[Function]}
@@ -2218,7 +2206,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
             className="modal-footer"
           >
             <ForwardRef
-              active={false}
               bsStyle="primary"
               disabled={true}
               onClick={[Function]}
@@ -2292,7 +2279,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               disabled={true}
               onClick={[Function]}
@@ -2366,7 +2352,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               </Button__StyledButton>
             </ForwardRef>
             <ForwardRef
-              active={false}
               bsStyle="default"
               onClick={[Function]}
             >

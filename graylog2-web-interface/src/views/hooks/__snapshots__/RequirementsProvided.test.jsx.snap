@@ -105,7 +105,6 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
             >
               <ForwardRef
                 action="push"
-                active={false}
                 bsStyle="success"
                 onClick={[Function]}
                 type="submit"
