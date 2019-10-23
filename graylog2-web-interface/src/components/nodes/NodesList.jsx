@@ -16,7 +16,7 @@ const NodesList = createReactClass({
 
   propTypes: {
     permissions: PropTypes.array.isRequired,
-    nodes: PropTypes.arrayOf(PropTypes.object).isRequired,
+    nodes: PropTypes.object,
   },
 
   mixins: [Reflux.connect(ClusterOverviewStore)],
