@@ -17,32 +17,18 @@ class RuleMetricsConfigContainer extends React.Component {
     onClose: () => {},
   };
 
-  state = {
-    showConfig: false,
-  };
-
   componentDidMount() {
-    RulesActions.loadMetricsConfig().then(this.showConfig).catch(this.showConfig);
+    RulesActions.loadMetricsConfig();
   }
-
-  showConfig = () => {
-    this.setState({ showConfig: true });
-  };
-
-  handleClose = () => {
-    const { onClose } = this.props;
-    this.setState({ showConfig: false }, onClose);
-  };
 
   handleChange = (nextConfig) => {
     return RulesActions.updateMetricsConfig(nextConfig);
   };
 
   render() {
-    const { metricsConfig } = this.props;
-    const { showConfig } = this.state;
+    const { metricsConfig, onClose } = this.props;
 
-    if (!showConfig) {
+    if (!metricsConfig) {
       return null;
     }
 
@@ -50,7 +36,7 @@ class RuleMetricsConfigContainer extends React.Component {
       <RuleMetricsConfig ref={(component) => { this.configComponent = component; }}
                          config={metricsConfig}
                          onChange={this.handleChange}
-                         onClose={this.handleClose} />
+                         onClose={onClose} />
     );
   }
 }
