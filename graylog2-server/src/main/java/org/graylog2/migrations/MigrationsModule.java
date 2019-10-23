@@ -40,6 +40,5 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20190705071400_AddEventIndexSetsMigration.class);
         addMigration(V20190730100900_AddAlertsManagerRole.class);
         addMigration(V20190730000000_CreateDefaultEventsConfiguration.class);
-        addMigration(V20190905114400_RemoveOldProcessingStatusIndex.class);
     }
 }

@@ -8,7 +8,6 @@ import StoreProvider from 'injection/StoreProvider';
 
 import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
-import { Alert } from 'components/graylog';
 import URI from 'urijs';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
