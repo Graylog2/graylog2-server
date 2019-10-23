@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
+import uuid from 'uuid/v4';
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
@@ -23,7 +24,19 @@ const initialFilterConfig = {
 const initialAggregationConfig = {
   group_by: [],
   series: [],
-  conditions: {},
+  conditions: {
+    expression: {
+      expr: undefined,
+      left: {
+        expr: 'number-ref',
+        ref: uuid(),
+      },
+      right: {
+        expr: 'number',
+        value: 0,
+      },
+    },
+  },
 };
 
 class FilterAggregationForm extends React.Component {
