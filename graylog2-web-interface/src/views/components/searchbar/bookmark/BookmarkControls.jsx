@@ -1,7 +1,9 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
+import { newDashboardsPath } from 'views/Constants';
 import { Button, ButtonGroup } from 'components/graylog';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
@@ -124,6 +126,18 @@ class BookmarkControls extends React.Component<Props, State> {
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
+  loadAsDashboard = () => {
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+
+    browserHistory.push({
+      pathname: newDashboardsPath,
+      state: {
+        view: view,
+      },
+    });
+  };
+
   render() {
     const { showForm, showList, newTitle } = this.state;
     const { viewStoreState } = this.props;
@@ -166,6 +180,10 @@ class BookmarkControls extends React.Component<Props, State> {
       <div className="pull-right">
         <ButtonGroup>
           <React.Fragment>
+            <Button title="Export to new dashboard"
+                    onClick={this.loadAsDashboard}>
+              <i className="fa fa-dashboard" />
+            </Button>
             <Button disabled={disableReset} title="Empty search" onClick={() => ViewActions.create(View.Type.Search)}>
               <i className="fa fa-eraser" />
             </Button>

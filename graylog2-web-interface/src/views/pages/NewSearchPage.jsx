@@ -2,12 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import connect from 'stores/connect';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
-import { ViewActions, ViewStore } from 'views/stores/ViewStore';
+import { ViewActions } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
 import ViewLoader from 'views/logic/views/ViewLoader';
@@ -95,9 +93,8 @@ class NewSearchPage extends React.Component<Props, State> {
   }
 }
 
-const NewSearchPageWithStores = connect(NewSearchPage, { executionState: SearchExecutionStateStore, viewStoreState: ViewStore });
 const mapping = {
   loadingViewHooks: 'views.hooks.loadingView',
   executingViewHooks: 'views.hooks.executingView',
 };
-export default withPluginEntities(NewSearchPageWithStores, mapping);
+export default withPluginEntities(NewSearchPage, mapping);
