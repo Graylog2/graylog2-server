@@ -8,7 +8,6 @@
 }
 
 .timerange-selector .relative {
-    font-size: 12px;
     color: #666;
 }
 
@@ -17,7 +16,7 @@
 }
 
 .extended-search-query-metadata {
-    margin-bottom: 7px !important;
+    margin-bottom: 10px !important;
 }
 
 .search-button-execute {

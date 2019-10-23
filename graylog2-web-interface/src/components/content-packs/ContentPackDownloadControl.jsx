@@ -55,7 +55,7 @@ class ContentPackDownloadControl extends React.Component {
     return (
       <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Export search results as CSV</Modal.Title>
+          <Modal.Title>Download Content Pack</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>{infoText}</p>

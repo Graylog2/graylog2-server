@@ -32,7 +32,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import java.net.URISyntaxException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,10 +47,12 @@ import static org.mockito.Mockito.when;
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
+    private static final String GEO_LITE2_ASN_MMDB = "/GeoLite2-ASN.mmdb";
 
     private static final ImmutableMap<DatabaseType, String> DB_PATH = ImmutableMap.of(
             DatabaseType.MAXMIND_CITY, GEO_LITE2_CITY_MMDB,
-            DatabaseType.MAXMIND_COUNTRY, GEO_LITE2_COUNTRY_MMDB
+            DatabaseType.MAXMIND_COUNTRY, GEO_LITE2_COUNTRY_MMDB,
+            DatabaseType.MAXMIND_ASN, GEO_LITE2_ASN_MMDB
     );
 
     abstract static class Base {
@@ -204,6 +205,33 @@ public class MaxmindDataAdapterTest {
             } finally {
                 adapter.setDatabaseReader(oldDatabaseReader);
             }
+        }
+    }
+
+    @RunWith(ConditionalRunner.class)
+    @ResourceExistsCondition(GEO_LITE2_ASN_MMDB)
+    public static class AsnDatabaseTest extends Base {
+        public AsnDatabaseTest() {
+            super(DatabaseType.MAXMIND_ASN);
+        }
+
+        @Test
+        public void doGetSuccessfullyResolvesGooglePublicDNSAddress() {
+            // This test will possibly get flaky when the entry for 8.8.8.8 changes!
+            final LookupResult lookupResult = adapter.doGet("8.8.8.8");
+            assertThat(lookupResult.singleValue()).isEqualTo(15169);
+            assertThat(lookupResult.multiValue())
+                    .extracting("as_number")
+                    .containsExactly(15169);
+            assertThat(lookupResult.multiValue())
+                    .extracting("as_organization")
+                    .containsExactly("Google LLC");
+        }
+
+        @Test
+        public void doGetReturnsEmptyResultOnPrivateIp() {
+            final LookupResult lookupResult = adapter.doGet("192.168.1.1");
+            assertThat(lookupResult).isEqualTo(LookupResult.empty());
         }
     }
 }
