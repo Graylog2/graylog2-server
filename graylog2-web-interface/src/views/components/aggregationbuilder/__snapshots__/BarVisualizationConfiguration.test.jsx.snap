@@ -10,7 +10,7 @@ Array [
     onMouseLeave={[Function]}
   >
     <i
-      className="fa fa-question-circle"
+      className="fa fa-question-circle pull-right"
     />
   </span>,
   <div
@@ -129,7 +129,7 @@ Array [
     onMouseLeave={[Function]}
   >
     <i
-      className="fa fa-question-circle"
+      className="fa fa-question-circle pull-right"
     />
   </span>,
   <div

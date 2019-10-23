@@ -219,7 +219,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                 <td>
                   <span>
                     <i
-                      className="fa fa-archive"
+                      className="fa fa-archive contentPackEntity"
                       title="Content Pack"
                     />
                   </span>

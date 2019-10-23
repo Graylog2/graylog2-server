@@ -447,7 +447,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
         />
         ) or entities from the former content pack revision (
         <i
-          className="fa fa-archive"
+          className="fa fa-archive contentPackEntity"
         />
         ).
       </span>
@@ -563,10 +563,10 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 tabIndex={0}
               >
                 <i
-                  className="fa fa-circle-thin"
+                  className="fa fa-circle-thin fa-stack-1x iconBackground"
                 />
                 <i
-                  className="fa fa-angle-up"
+                  className="fa fa-angle-up fa-stack-1x"
                 />
               </div>
             </div>

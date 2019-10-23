@@ -573,7 +573,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           2018-01-22 16:36:02.189 +01:00
                         </time>
                         <i
-                          className="fa fa-info fa-fw"
+                          className="fa fa-info timezoneInfo fa-fw"
                           onClick={null}
                           onMouseOut={[Function]}
                           onMouseOver={[Function]}

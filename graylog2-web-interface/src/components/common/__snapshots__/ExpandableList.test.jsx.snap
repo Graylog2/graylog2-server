@@ -30,10 +30,10 @@ exports[`<ExpandableList /> should render with a Item 1`] = `
           tabIndex={0}
         >
           <i
-            className="fa fa-circle-thin"
+            className="fa fa-circle-thin fa-stack-1x iconBackground"
           />
           <i
-            className="fa fa-angle-up"
+            className="fa fa-angle-up fa-stack-1x"
           />
         </div>
       </div>
@@ -86,10 +86,10 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
           tabIndex={0}
         >
           <i
-            className="fa fa-circle-thin"
+            className="fa fa-circle-thin fa-stack-1x iconBackground"
           />
           <i
-            className="fa fa-angle-down"
+            className="fa fa-angle-down fa-stack-1x"
           />
         </div>
       </div>
@@ -137,10 +137,10 @@ exports[`<ExpandableList /> should render with a nested ExpandableList 1`] = `
                 tabIndex={0}
               >
                 <i
-                  className="fa fa-circle-thin"
+                  className="fa fa-circle-thin fa-stack-1x iconBackground"
                 />
                 <i
-                  className="fa fa-angle-up"
+                  className="fa fa-angle-up fa-stack-1x"
                 />
               </div>
             </div>
