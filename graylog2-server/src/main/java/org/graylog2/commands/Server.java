@@ -25,8 +25,6 @@ import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.graylog.events.EventsModule;
-import org.graylog.scheduler.JobSchedulerConfiguration;
-import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.plugins.cef.CEFInputModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -35,6 +33,8 @@ import org.graylog.plugins.sidecar.SidecarModule;
 import org.graylog.plugins.views.ESBackendModule;
 import org.graylog.plugins.views.ViewsBindings;
 import org.graylog.plugins.views.ViewsConfig;
+import org.graylog.scheduler.JobSchedulerConfiguration;
+import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -75,6 +75,7 @@ import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.AuthenticationModule;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.ObjectMapperModule;
@@ -160,7 +161,8 @@ public class Server extends ServerBootstrap {
             new ViewsBindings(),
             new ESBackendModule(),
             new JobSchedulerModule(),
-            new EventsModule()
+            new EventsModule(),
+            new AuthenticationModule()
         );
 
         return modules.build();

@@ -17,8 +17,6 @@
 package org.graylog2.shared.security;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.session.Session;
@@ -26,6 +24,8 @@ import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.junit.After;
@@ -35,17 +35,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Date;
+import java.util.Optional;
+
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class SessionCreatorTest {
-    private static final long SESSION_TIMEOUT = 1234L;
-    private final UsernamePasswordToken validToken = new UsernamePasswordToken("username", "password");
-    private final UsernamePasswordToken invalidToken = new UsernamePasswordToken("username", "wrong password");
+    private static final long SESSION_TIMEOUT = Long.MAX_VALUE;
+    private final ActorAwareUsernamePasswordToken validToken = new ActorAwareUsernamePasswordToken("username",
+            "password");
+    private final ActorAwareUsernamePasswordToken invalidToken = new ActorAwareUsernamePasswordToken("username", "wrong password");
+
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private AuditEventSender auditEventSender;
 
     @InjectMocks
     private SessionCreator sessionCreator;
@@ -78,15 +85,17 @@ public class SessionCreatorTest {
         setUpUserMock();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Session session = sessionCreator.create(null, "host", validToken);
-        assertNotNull(session);
-        assertEquals(1234L, session.getTimeout());
+        Optional<Session> session = sessionCreator.create(null, "host", validToken);
+        assertTrue(session.isPresent());
+        assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
         assertTrue(SecurityUtils.getSubject().isAuthenticated());
+        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
     }
 
-    @Test(expected = AuthenticationException.class)
+    @Test
     public void invalidAuthToken() {
         sessionCreator.create(null, "host", invalidToken);
+        verify(auditEventSender).failure(eq(validToken.getActor()), anyString(), anyMap());
     }
 
     @Test
@@ -99,10 +108,31 @@ public class SessionCreatorTest {
         String oldSessionId = oldSession.getId().toString();
 
         assertFalse(SecurityUtils.getSubject().isAuthenticated());
-        Session session = sessionCreator.create(oldSessionId, "host", validToken);
-        assertNotNull(session);
-        assertEquals(SESSION_TIMEOUT, session.getTimeout());
-        assertEquals(oldSessionId, session.getId());
+        Optional<Session> session = sessionCreator.create(oldSessionId, "host", validToken);
+        assertTrue(session.isPresent());
+        assertEquals(SESSION_TIMEOUT, session.get().getTimeout());
+        assertEquals(oldSessionId, session.get().getId());
+        assertTrue(SecurityUtils.getSubject().isAuthenticated());
+        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(), anyMap());
+    }
+
+    @Test
+    public void extendExpiredSession() {
+        setUpUserMock();
+
+        // Create an expired session and store it.
+        SimpleSession oldSession = new SimpleSession();
+        oldSession.setLastAccessTime(new Date(0));
+        ((DefaultSessionManager) securityManager.getSessionManager()).getSessionDAO().create(oldSession);
+        String oldSessionId = oldSession.getId().toString();
+
+        assertFalse(SecurityUtils.getSubject().isAuthenticated());
+        Optional<Session> session = sessionCreator.create(oldSessionId, "host", validToken);
+        assertTrue(session.isPresent());
+
+        // User will get a new session
+        assertNotEquals(oldSessionId, session.get().getId());
+
         assertTrue(SecurityUtils.getSubject().isAuthenticated());
     }
 

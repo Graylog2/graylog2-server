@@ -16,29 +16,26 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.google.common.collect.ImmutableMap;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.glassfish.grizzly.http.server.Request;
-import org.graylog2.audit.AuditActor;
-import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.RestTools;
-import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.ActorAwareAuthenticationToken;
+import org.graylog2.shared.security.ActorAwareAuthenticationTokenFactory;
 import org.graylog2.shared.security.SessionCreator;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
@@ -51,8 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -67,10 +64,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
-import static org.graylog2.audit.AuditEventTypes.SESSION_CREATE;
 
 @Path("/system/sessions")
 @Api(value = "System/Sessions")
@@ -84,7 +79,7 @@ public class SessionsResource extends RestResource {
     private final Set<IpSubnet> trustedSubnets;
     private final Request grizzlyRequest;
     private final SessionCreator sessionCreator;
-    private final AuditEventSender auditEventSender;
+    private final ActorAwareAuthenticationTokenFactory tokenFactory;
 
     @Inject
     public SessionsResource(UserService userService,
@@ -92,22 +87,26 @@ public class SessionsResource extends RestResource {
                             ShiroAuthenticationFilter authenticationFilter,
                             @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
                             @Context Request grizzlyRequest, SessionCreator sessionCreator,
-                            AuditEventSender auditEventSender) {
-        this.auditEventSender = auditEventSender;
+                            ActorAwareAuthenticationTokenFactory tokenFactory) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
         this.trustedSubnets = trustedSubnets;
         this.grizzlyRequest = grizzlyRequest;
         this.sessionCreator = sessionCreator;
+        this.tokenFactory = tokenFactory;
     }
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
     @NoAuditEvent("dispatches audit events in the method body")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
-                                      @ApiParam(name = "Login request", value = "Username and credentials", required = true)
-                                      @Valid @NotNull SessionCreateRequest createRequest) {
+                                      @ApiParam(name = "Login request", value = "Credentials. The default " +
+                                              "implementation requires presence of two properties: 'username' and " +
+                                              "'password'. However a plugin may customize which kind of credentials " +
+                                              "are accepted and therefore expect different properties.",
+                                              required = true)
+                                      @NotNull JsonNode createRequest) {
 
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
@@ -115,28 +114,24 @@ public class SessionsResource extends RestResource {
         }
         final ShiroSecurityContext shiroSecurityContext = (ShiroSecurityContext) securityContext;
 
+        final ActorAwareAuthenticationToken authToken;
+        try {
+            authToken = tokenFactory.forRequestBody(createRequest);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
         // we treat the BASIC auth username as the sessionid
         final String sessionId = shiroSecurityContext.getUsername();
         final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
-        final String username = createRequest.username();
-        final UsernamePasswordToken authToken = new UsernamePasswordToken(username, createRequest.password());
 
-        try {
-            Session session = sessionCreator.create(sessionId, host, authToken);
-            final Map<String, Object> auditEventContext = ImmutableMap.of(
-                    "session_id", session.getId(),
-                    "remote_address", host
-            );
-            auditEventSender.success(AuditActor.user(username), SESSION_CREATE, auditEventContext);
-            return SessionResponse.create(new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate(),
-                    session.getId().toString());
-        } catch (AuthenticationException e) {
-            LOG.info("Invalid username or password for user \"{}\"", username);
-            final Map<String, Object> auditEventContext = ImmutableMap.of(
-                    "remote_address", host
-            );
-            auditEventSender.failure(AuditActor.user(username), SESSION_CREATE, auditEventContext);
-            throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
+        Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
+        if (session.isPresent()) {
+            Session s = session.get();
+            return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
+                    s.getId().toString());
+        } else {
+            throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
         }
     }
 
