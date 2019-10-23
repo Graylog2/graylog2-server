@@ -30,6 +30,7 @@ import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
+import CopyToDashboard from './CopyToDashboardForm';
 
 type Props = {
   id: string,
@@ -49,6 +50,7 @@ type State = {
   configChanged?: boolean,
   editing: boolean,
   oldConfig?: WidgetConfig,
+  showCopyToDashboard: boolean,
 };
 
 class Widget extends React.Component<Props, State> {
@@ -92,7 +94,10 @@ class Widget extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     const { editing } = props;
-    this.state = { editing };
+    this.state = {
+      editing,
+      showCopyToDashboard: false,
+    };
     if (editing) {
       this.state = { ...this.state, oldConfig: props.widget.config };
     }
@@ -111,6 +116,16 @@ class Widget extends React.Component<Props, State> {
     WidgetActions.duplicate(widgetId).then((newWidget) => {
       TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
     });
+  };
+
+  _onToggleCopyToDashboard = () => {
+    const { showCopyToDashboard } = this.state;
+    this.setState({ showCopyToDashboard: !showCopyToDashboard });
+  };
+
+  _onCopyToDashboard = (widgetId, dashboardId) => {
+    console.log(widgetId, dashboardId);
+    this._onToggleCopyToDashboard();
   };
 
   _onToggleEdit = () => {
@@ -175,7 +190,7 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing } = this.state;
+    const { editing, showCopyToDashboard } = this.state;
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
@@ -220,9 +235,14 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
+                    {showCopyToDashboard
+                    && (<CopyToDashboard widgetId={id}
+                                         onSubmit={this._onCopyToDashboard}
+                                         onCancel={this._onToggleCopyToDashboard}/>)}
                   </IfInteractive>
                 </WidgetHeader>
               )}
