@@ -89,6 +89,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
+import org.graylog.plugins.pipelineprocessor.functions.messages.TrafficAccountingSize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -154,6 +155,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(CloneMessage.NAME, CloneMessage.class);
         addMessageProcessorFunction(RemoveFromStream.NAME, RemoveFromStream.class);
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
+        addMessageProcessorFunction(TrafficAccountingSize.NAME, TrafficAccountingSize.class);
         // helper service for route_to_stream
         serviceBinder().addBinding().to(StreamCacheService.class).in(Scopes.SINGLETON);
 

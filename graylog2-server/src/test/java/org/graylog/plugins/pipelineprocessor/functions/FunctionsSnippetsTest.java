@@ -16,14 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -31,13 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import javax.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -108,6 +93,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
+import org.graylog.plugins.pipelineprocessor.functions.messages.TrafficAccountingSize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -155,6 +141,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 
+import javax.inject.Provider;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Executors;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class FunctionsSnippetsTest extends BaseParserTest {
 
     public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
@@ -183,6 +185,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
         functions.put(CloneMessage.NAME, new CloneMessage());
+        functions.put(TrafficAccountingSize.NAME, new TrafficAccountingSize());
 
         // route to stream mocks
         final StreamService streamService = mock(StreamService.class);
@@ -992,5 +995,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void accountingSize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        // this can change if either the test message content changes or traffic accounting calculation is changed!
+        assertThat(message.getField("accounting_size")).isEqualTo(54L);
     }
 }
