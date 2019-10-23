@@ -25,15 +25,18 @@ const Icon = React.forwardRef(({
 }, ref) => {
   const cleanIconName = name.replace(/^fa-/, ''); // remove "fa-" prefix if it exists
 
-  const iconClasses = classnames('fa', `fa-${cleanIconName}`, {
-    [`fa-flip-${flip}`]: !!flip,
-    [`fa-rotate-${rotate}`]: !!rotate,
-    [`fa-${size}`]: !!size,
-    'fa-fw': !!fixedWidth,
-    'fa-inverse': !!inverse,
-    'fa-pulse': !!pulse,
-    'fa-spin': !!spin,
-  });
+  const iconClasses = classnames('fa',
+    `fa-${cleanIconName}`,
+    className,
+    {
+      [`fa-flip-${flip}`]: !!flip,
+      [`fa-rotate-${rotate}`]: !!rotate,
+      [`fa-${size}`]: !!size,
+      'fa-fw': !!fixedWidth,
+      'fa-inverse': !!inverse,
+      'fa-pulse': !!pulse,
+      'fa-spin': !!spin,
+    });
 
   return (
     <i className={iconClasses} {...props} ref={ref} />
