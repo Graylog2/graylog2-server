@@ -42,7 +42,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
@@ -422,7 +422,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
@@ -802,7 +802,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
