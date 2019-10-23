@@ -123,9 +123,17 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -179,7 +187,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -266,7 +273,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -363,7 +369,6 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -535,9 +540,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -591,7 +604,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -678,7 +690,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -775,7 +786,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -947,9 +957,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -1003,7 +1021,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -1090,7 +1107,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }
@@ -1187,7 +1203,6 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
-                    "usesTheme": false,
                     "warnTooManyClasses": [Function],
                     "withComponent": [Function],
                   }

@@ -160,7 +160,6 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                             "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
-                            "usesTheme": false,
                             "warnTooManyClasses": [Function],
                             "withComponent": [Function],
                           }

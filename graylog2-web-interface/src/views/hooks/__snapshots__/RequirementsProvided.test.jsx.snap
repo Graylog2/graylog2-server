@@ -151,7 +151,6 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                         "styledComponentId": "Button__StyledButton-c9cbmb-0",
                         "target": [Function],
                         "toString": [Function],
-                        "usesTheme": false,
                         "warnTooManyClasses": [Function],
                         "withComponent": [Function],
                       }

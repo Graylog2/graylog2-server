@@ -160,7 +160,7 @@ exports[`WidgetQueryControls should do something 1`] = `
             >
               <div
                 aria-hidden="true"
-                style="color: hsl(0, 0%, 80%); display: flex; padding: 0px; transition: color 150ms; box-sizing: border-box; font-size: 150%; margin-right: 1rem;"
+                style="display: flex; padding: 0px; box-sizing: border-box; font-size: 150%;"
               >
                 <i
                   class="fa fa-caret-down"
@@ -192,7 +192,7 @@ exports[`WidgetQueryControls should do something 1`] = `
         </a>
       </div>
       <button
-        class="Button__StyledButton-c9cbmb-0 kRDLih pull-left search-button-execute btn btn-success"
+        class="pull-left search-button-execute Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
         type="submit"
       >
         <i

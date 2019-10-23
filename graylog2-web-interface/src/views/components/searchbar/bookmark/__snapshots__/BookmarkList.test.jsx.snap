@@ -147,7 +147,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -160,12 +159,12 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih submit-button"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -232,7 +231,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -246,13 +244,13 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih reset-button"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -654,7 +652,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -729,7 +726,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -801,7 +797,6 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -985,7 +980,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -998,12 +992,12 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih submit-button"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -1070,7 +1064,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -1084,13 +1077,13 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih reset-button"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -1437,7 +1430,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -1512,7 +1504,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -1584,7 +1575,6 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -1768,7 +1758,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -1781,12 +1770,12 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih submit-button"
+                            className="submit-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             type="submit"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+                              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               type="submit"
                             >
@@ -1853,7 +1842,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                               "styledComponentId": "Button__StyledButton-c9cbmb-0",
                               "target": [Function],
                               "toString": [Function],
-                              "usesTheme": false,
                               "warnTooManyClasses": [Function],
                               "withComponent": [Function],
                             }
@@ -1867,13 +1855,13 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                             block={false}
                             bsClass="btn"
                             bsStyle="default"
-                            className="Button__StyledButton-c9cbmb-0 kRDLih reset-button"
+                            className="reset-button Button__StyledButton-c9cbmb-0 kRDLih"
                             disabled={false}
                             onClick={[Function]}
                             type="reset"
                           >
                             <button
-                              className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+                              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
                               disabled={false}
                               onClick={[Function]}
                               type="reset"
@@ -2275,7 +2263,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -2350,7 +2337,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }
@@ -2422,7 +2408,6 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
-                      "usesTheme": false,
                       "warnTooManyClasses": [Function],
                       "withComponent": [Function],
                     }

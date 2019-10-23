@@ -46,7 +46,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -62,7 +62,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -152,7 +152,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -168,7 +168,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -245,7 +245,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -261,7 +261,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
@@ -406,7 +406,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih submit-button btn btn-default"
+          className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           type="submit"
         >
@@ -422,7 +422,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
         }
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih reset-button btn btn-default"
+          className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
           disabled={false}
           onClick={[Function]}
           type="reset"
