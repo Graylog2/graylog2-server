@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Alert } from 'react-bootstrap';
+import { Alert } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
@@ -68,10 +68,9 @@ export default class RuleMetricsConfig extends React.Component {
                           onModalClose={onClose}
                           show
                           submitButtonText="Save">
-        <Alert bsStyle="info">
-          <h4><i className="fa fa-info-circle" /> Important:</h4>
+        <Alert bsStyle="warning">
           Rule metrics should only be enabled to debug a performance issue because collecting the
-          metrics will slow down message processing.
+          metrics will slow down message processing and increase memory usage.
         </Alert>
         <fieldset>
           <Input type="radio"
