@@ -101,7 +101,7 @@ const buttonStyles = ({ bsStyle }) => {
       teinte: cssBuilder(colors.tertiary.sei),
     },
     link: {
-      teinte: cssBuilder(colors.tertiary.sei),
+      teinte: cssBuilder(colors.tertiary.quattro),
     },
   });
 };

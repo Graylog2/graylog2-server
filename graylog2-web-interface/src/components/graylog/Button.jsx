@@ -6,13 +6,14 @@ import { Button as BootstrapButton } from 'react-bootstrap';
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const Button = forwardRef(({ active, bsStyle, ...props }, ref) => {
+const Button = forwardRef((props, ref) => {
+  const { active, bsStyle, disabled } = props;
   const StyledButton = useCallback(styled(BootstrapButton)`
-    ${buttonStyles({ active })}
-  `, [active]);
+    ${buttonStyles(props)}
+  `, [active, bsStyle, disabled]);
 
   return (
-    <StyledButton bsStyle={bsStyle} ref={ref} {...props} />
+    <StyledButton ref={ref} {...props} />
   );
 });
 
