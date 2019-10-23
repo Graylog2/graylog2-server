@@ -1,7 +1,7 @@
 ```js
-const createReactClass = require('create-react-class');
-const Immutable = require('immutable');
-const { Col, Row } = require('components/graylog');
+import createReactClass from 'create-react-class';
+import Immutable from 'immutable';
+import { Col, Row } from 'components/graylog';
 
 const ControlledTableListExample = createReactClass({
   getInitialState() {

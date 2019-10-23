@@ -26,13 +26,29 @@ const _processViewHooks = (viewHooks: Array<ViewHook>, view: View, query: Query,
   return promise.then(() => view).then(onSuccess).then(() => view);
 };
 
+export const processHooks = (
+  promise: Promise<View>,
+  loadingViewHooks: Array<ViewHook> = [],
+  executingViewHooks: Array<ViewHook> = [],
+  query: Query = {},
+  onSuccess: OnSuccess = () => {},
+) => {
+  return promise
+    .then((view: View) => {
+      return _processViewHooks(loadingViewHooks, view, query, onSuccess);
+    })
+    .then((view: View) => {
+      return _processViewHooks(executingViewHooks, view, query, onSuccess);
+    });
+};
+
 const ViewLoader = (viewId: string,
   loadingViewHooks: Array<ViewHook> = [],
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
   onError: OnError = () => {}) => {
-  return ViewManagementActions.get(viewId)
+  const promise = ViewManagementActions.get(viewId)
     .then(ViewDeserializer, (e) => {
       if (e.status === 404) {
         history.replace(Routes.NOTFOUND);
@@ -40,16 +56,11 @@ const ViewLoader = (viewId: string,
         throw e;
       }
       return View.create();
-    })
-    .then((view) => {
-      return _processViewHooks(loadingViewHooks, view, query, onSuccess);
-    })
-    .then((view) => {
-      return _processViewHooks(executingViewHooks, view, query, onSuccess);
-    })
+    });
+
+  return processHooks(promise, loadingViewHooks, executingViewHooks, query, onSuccess)
     .catch(onError);
 };
 
 export type ViewLoaderFn = typeof ViewLoader;
-
 export default ViewLoader;

@@ -97,6 +97,7 @@ describe('ExtendedSearchPage', () => {
     ViewStore.getInitialState = jest.fn(() => ({
       view: View.create().toBuilder().type(View.Type.Dashboard).build(),
       dirty: false,
+      isNew: true,
       activeQuery: 'foobar',
     }));
     FieldTypesActions.all = mockAction(jest.fn());

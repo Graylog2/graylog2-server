@@ -1,8 +1,10 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { newDashboardsPath } from 'views/Constants';
+import { Button, ButtonGroup } from 'components/graylog';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -13,7 +15,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
-import styles from './BookmarkControls.css';
 
 type Props = {
   viewStoreState: ViewStoreState,
@@ -105,9 +106,9 @@ class BookmarkControls extends React.Component<Props, State> {
       .build();
 
     ViewManagementActions.create(newView)
-      .then(() => {
+      .then((createdView) => {
         const loaderFunc = this.context;
-        loaderFunc(newView.id);
+        loaderFunc(createdView.id);
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
@@ -121,8 +122,20 @@ class BookmarkControls extends React.Component<Props, State> {
   deleteBookmark = (view) => {
     return ViewManagementActions.delete(view)
       .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
-      .then(ViewActions.create)
+      .then(() => ViewActions.create(View.Type.Search))
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+  };
+
+  loadAsDashboard = () => {
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+
+    browserHistory.push({
+      pathname: newDashboardsPath,
+      state: {
+        view: view,
+      },
+    });
   };
 
   render() {
@@ -164,10 +177,14 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     return (
-      <div className={`${styles.position} pull-right`}>
+      <div className="pull-right">
         <ButtonGroup>
           <React.Fragment>
-            <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
+            <Button title="Export to new dashboard"
+                    onClick={this.loadAsDashboard}>
+              <i className="fa fa-dashboard" />
+            </Button>
+            <Button disabled={disableReset} title="Empty search" onClick={() => ViewActions.create(View.Type.Search)}>
               <i className="fa fa-eraser" />
             </Button>
             <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>

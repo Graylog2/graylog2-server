@@ -15,3 +15,8 @@ cache
 # Webpack Stats & Analysis Files
 webpack/stats-*
 webpack/analysis-*
+
+test/bin
+
+# Generated frontend style guide
+docs/styleguide

@@ -1,11 +1,11 @@
 :local(.editWidgetDialog) {
-    height: 80vh !important;
-    width: 80vw !important;
-    margin-top: 20px !important;
+    height: 80vh;
+    width: 80vw;
+    margin-top: 20px;
 }
 
 :local(.editWidgetControls) {
-    width: 80vw !important;
+    width: 80vw;
 }
 
 :local(.editWidgetControlsContent) {

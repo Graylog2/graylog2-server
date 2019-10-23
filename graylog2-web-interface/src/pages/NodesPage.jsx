@@ -1,19 +1,50 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import Routes from 'routing/Routes';
+import URLUtils from 'util/URLUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, ExternalLinkButton, PageHeader, Spinner } from 'components/common';
 import { NodesList } from 'components/nodes';
+import URI from 'urijs';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const NodesStore = StoreProvider.getStore('Nodes');
 
 const NodesPage = createReactClass({
   displayName: 'NodesPage',
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(NodesStore)],
+
+  _isLoading() {
+    const { nodes } = this.state;
+    return !(nodes);
+  },
+
+  _renderGlobalAPIButton() {
+    if (this._isLoading()) {
+      return <Spinner />;
+    }
+    if (this._hasExternalURI()) {
+      return (
+        <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(Routes.GLOBAL_API_BROWSER)}>
+          Cluster Global API browser
+        </ExternalLinkButton>
+      );
+    }
+    return null;
+  },
+
+  _hasExternalURI() {
+    const { nodes } = this.state;
+    const nodeVals = Object.values(nodes);
+    const publishURI = URLUtils.qualifyUrl('/');
+    return (nodeVals.findIndex(node => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
+  },
 
   render() {
+    const { nodes } = this.state;
     return (
       <DocumentTitle title="Nodes">
         <div>
@@ -25,8 +56,11 @@ const NodesPage = createReactClass({
               you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
               will be persisted to disk, even when processing is disabled.
             </span>
+            <span>
+              {this._renderGlobalAPIButton()}
+            </span>
           </PageHeader>
-          <NodesList permissions={this.state.currentUser.permissions} />
+          <NodesList permissions={this.state.currentUser.permissions} nodes={nodes} />
         </div>
       </DocumentTitle>
     );

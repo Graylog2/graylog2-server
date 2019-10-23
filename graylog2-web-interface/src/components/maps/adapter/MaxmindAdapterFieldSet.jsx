@@ -34,6 +34,7 @@ class MaxmindAdapterFieldSet extends React.Component {
   render() {
     const { config } = this.props;
     const databaseTypes = [
+      { label: 'ASN database', value: 'MAXMIND_ASN' },
       { label: 'City database', value: 'MAXMIND_CITY' },
       { label: 'Country database', value: 'MAXMIND_COUNTRY' },
     ];

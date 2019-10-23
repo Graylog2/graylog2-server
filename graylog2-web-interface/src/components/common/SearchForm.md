@@ -1,7 +1,7 @@
 Search form with uncontrolled query string:
 ```js
-const createReactClass = require('create-react-class');
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import { Button } from 'components/graylog';
 
 const SearchFormExample = createReactClass({
   getInitialState() {
@@ -43,8 +43,8 @@ const SearchFormExample = createReactClass({
 Search form with controlled query string and help:
 
 ```js
-const createReactClass = require('create-react-class');
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import { Button } from 'components/graylog';
 
 const SearchFormExample = createReactClass({
   getInitialState() {

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { SavedSearchesStore, SavedSearchesActions } from 'views/stores/SavedSearchesStore';
 import type { SavedSearchesState } from 'views/stores/SavedSearchesStore';
 import connect from 'stores/connect';
-import { Modal, ListGroup, ListGroupItem, Button } from 'react-bootstrap';
+import { Modal, ListGroup, ListGroupItem, Button } from 'components/graylog';
 import { PaginatedList, SearchForm } from 'components/common';
 import View from 'views/logic/views/View';
 

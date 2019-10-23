@@ -45,6 +45,11 @@ public abstract class Percentile implements SeriesSpec {
     @JsonProperty
     public abstract Double percentile();
 
+    @Override
+    public String literal() {
+        return type() + "(" + field() + "," + percentile() + ")";
+    }
+
     public static Builder builder() {
         return new AutoValue_Percentile.Builder().type(NAME);
     }

@@ -37,6 +37,8 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!./ExtendedSearchPage.css';
+import IfInteractive from '../components/dashboard/IfInteractive';
+import InteractiveContext from '../components/contexts/InteractiveContext';
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
   props => Object.assign(
@@ -115,31 +117,41 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
 
   return (
     <CurrentViewTypeProvider>
-      <IfDashboard>
-        <WindowLeaveMessage route={route} />
-      </IfDashboard>
-      <div id="main-row" className="grid-container">
-        <ConnectedSideBar>
-          <ConnectedFieldList />
-        </ConnectedSideBar>
-        <div className="search-grid">
-          <HeaderElements />
-          <IfDashboard>
-            <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-            <QueryBar />
-          </IfDashboard>
-          <IfSearch>
-            <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-          </IfSearch>
+      <IfInteractive>
+        <IfDashboard>
+          <WindowLeaveMessage route={route} />
+        </IfDashboard>
+      </IfInteractive>
+      <InteractiveContext.Consumer>
+        {interactive => (
+          <div id="main-row" className={interactive ? 'grid-container' : null}>
+            <IfInteractive>
+              <ConnectedSideBar>
+                <ConnectedFieldList />
+              </ConnectedSideBar>
+            </IfInteractive>
+            <div className="search-grid">
+              <IfInteractive>
+                <HeaderElements />
+                <IfDashboard>
+                  <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  <QueryBar />
+                </IfDashboard>
+                <IfSearch>
+                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                </IfSearch>
 
-          <QueryBarElements />
+                <QueryBarElements />
+              </IfInteractive>
 
-          <ViewAdditionalContextProvider>
-            <SearchResult />
-          </ViewAdditionalContextProvider>
-          <Footer />
-        </div>
-      </div>
+              <ViewAdditionalContextProvider>
+                <SearchResult />
+              </ViewAdditionalContextProvider>
+              <Footer />
+            </div>
+          </div>
+        )}
+      </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>
   );
 };

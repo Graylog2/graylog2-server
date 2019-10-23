@@ -1,17 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Row, FormControl, FormGroup, InputGroup } from 'components/graylog';
+import { Alert, Col, FormControl, FormGroup, InputGroup, Row } from 'components/graylog';
 import Immutable from 'immutable';
+import styled from 'styled-components';
 
 import DateTime from 'logic/datetimes/DateTime';
 import StoreProvider from 'injection/StoreProvider';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
+const KeywordPreview = styled(Alert)`
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 0 !important;  /* Would be overwritten by graylog.less */
+`;
+
+const TimeRangeInput = styled(FormControl)`
+  min-height: 34px;
+  font-size: 14px;
+`;
+
 export default class KeywordTimeRangeSelector extends React.Component {
   static propTypes = {
+    disabled: PropTypes.bool,
     value: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    disabled: false,
   };
 
   constructor(props) {
@@ -53,7 +73,8 @@ export default class KeywordTimeRangeSelector extends React.Component {
     } else {
       ToolsStore.testNaturalDate(value)
         .then((data) => {
-          this.props.onChange('keyword', value);
+          const { onChange } = this.props;
+          onChange('keyword', value);
           this.setState({ validationState: null }, () => this._onKeywordPreviewLoaded(data));
         })
         .catch(() => this.setState({ validationState: 'error' }, this._resetKeywordPreview));
@@ -62,30 +83,32 @@ export default class KeywordTimeRangeSelector extends React.Component {
 
   render() {
     const { keywordPreview, validationState, value } = this.state;
+    const { disabled } = this.props;
     const { from, to } = keywordPreview.toObject();
     const keywordPreviewElement = keywordPreview.size > 0 && (
-      <Alert bsStyle="info" style={{ height: 30, paddingTop: 5, paddingBottom: 5, marginTop: 0 }}>
+      <KeywordPreview bsStyle="info">
         <strong style={{ marginRight: 8 }}>Preview:</strong>
         {from} to {to}
-      </Alert>
+      </KeywordPreview>
     );
     return (
-      <div className="timerange-selector keyword" style={{ width: 650 }}>
+      <div className="timerange-selector keyword">
         <Row className="no-bm" style={{ marginLeft: 50 }}>
-          <Col md={3} style={{ padding: 0 }}>
-            <FormGroup key={name} controlId={`form-inline-${name}`} style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
+          <Col xs={3} style={{ padding: 0 }}>
+            <FormGroup controlId="form-inline-keyword" style={{ marginRight: 5, width: '100%' }} validationState={validationState}>
               <InputGroup>
-                <FormControl type="text"
-                             className="input-sm"
-                             name="keyword"
-                             placeholder="Last week"
-                             onChange={this._keywordSearchChanged}
-                             required
-                             value={value} />
+                <TimeRangeInput type="text"
+                                className="input-sm"
+                                name="keyword"
+                                disabled={disabled}
+                                placeholder="Last week"
+                                onChange={this._keywordSearchChanged}
+                                required
+                                value={value} />
               </InputGroup>
             </FormGroup>
           </Col>
-          <Col md={8} style={{ paddingRight: 0 }}>
+          <Col xs={8} style={{ paddingRight: 0 }}>
             {keywordPreviewElement}
           </Col>
         </Row>
