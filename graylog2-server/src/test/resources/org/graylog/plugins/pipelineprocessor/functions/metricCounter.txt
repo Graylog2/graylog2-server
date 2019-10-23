@@ -1,0 +1,8 @@
+rule "metric counter"
+when true
+then
+  metric_counter_inc("foo", 41);
+  metric_counter_inc("foo");
+  metric_counter_inc("foo", 1);
+  metric_counter_inc("foo", -1);
+end
