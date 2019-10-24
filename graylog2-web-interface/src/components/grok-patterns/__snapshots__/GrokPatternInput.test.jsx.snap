@@ -11,7 +11,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       className="form-group"
     >
       <label
-        className="control-label"
+        className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
         htmlFor="pattern-input"
       >
         Pattern
@@ -44,7 +44,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       className="filterFormGroup"
     >
       <label
-        className="control-label"
+        className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
         htmlFor="pattern-selector"
       >
         Filter pattern
@@ -180,7 +180,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       className="form-group"
     >
       <label
-        className="control-label"
+        className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
         htmlFor="pattern-input"
       >
         Pattern
@@ -213,7 +213,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       className="filterFormGroup"
     >
       <label
-        className="control-label"
+        className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
         htmlFor="pattern-selector"
       >
         Filter pattern

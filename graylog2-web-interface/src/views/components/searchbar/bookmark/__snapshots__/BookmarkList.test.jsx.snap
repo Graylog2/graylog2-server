@@ -307,17 +307,50 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                       <div
                         className="form-group"
                       >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
+                        <ForwardRef>
+                          <ControlLabel__StyledControlLabel>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                    "isStatic": true,
+                                    "lastClassName": "bluuBD",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                    ],
+                                  },
+                                  "displayName": "ControlLabel__StyledControlLabel",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <ControlLabel
+                                bsClass="control-label"
+                                className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD"
+                                srOnly={false}
+                              >
+                                <label
+                                  className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+                                  htmlFor="page-size"
+                                >
+                                  Show:
+                                </label>
+                              </ControlLabel>
+                            </StyledComponent>
+                          </ControlLabel__StyledControlLabel>
+                        </ForwardRef>
                         <InputWrapper>
                           <span>
                             <FormControl
@@ -1135,17 +1168,50 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                       <div
                         className="form-group"
                       >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
+                        <ForwardRef>
+                          <ControlLabel__StyledControlLabel>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                    "isStatic": true,
+                                    "lastClassName": "bluuBD",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                    ],
+                                  },
+                                  "displayName": "ControlLabel__StyledControlLabel",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <ControlLabel
+                                bsClass="control-label"
+                                className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD"
+                                srOnly={false}
+                              >
+                                <label
+                                  className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+                                  htmlFor="page-size"
+                                >
+                                  Show:
+                                </label>
+                              </ControlLabel>
+                            </StyledComponent>
+                          </ControlLabel__StyledControlLabel>
+                        </ForwardRef>
                         <InputWrapper>
                           <span>
                             <FormControl
@@ -1908,17 +1974,50 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                       <div
                         className="form-group"
                       >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
+                        <ForwardRef>
+                          <ControlLabel__StyledControlLabel>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                    "isStatic": true,
+                                    "lastClassName": "bluuBD",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                    ],
+                                  },
+                                  "displayName": "ControlLabel__StyledControlLabel",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "ControlLabel__StyledControlLabel-sc-1edmum5-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <ControlLabel
+                                bsClass="control-label"
+                                className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD"
+                                srOnly={false}
+                              >
+                                <label
+                                  className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+                                  htmlFor="page-size"
+                                >
+                                  Show:
+                                </label>
+                              </ControlLabel>
+                            </StyledComponent>
+                          </ControlLabel__StyledControlLabel>
+                        </ForwardRef>
                         <InputWrapper>
                           <span>
                             <FormControl

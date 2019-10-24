@@ -118,7 +118,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="name"
                   >
                     Name
@@ -147,7 +147,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="summary"
                   >
                     Summary
@@ -176,7 +176,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="description"
                   >
                     Description
@@ -204,7 +204,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="vendor"
                   >
                     Vendor
@@ -233,7 +233,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="url"
                   >
                     URL
@@ -592,7 +592,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="name"
                   >
                     Name
@@ -621,7 +621,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="summary"
                   >
                     Summary
@@ -650,7 +650,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="description"
                   >
                     Description
@@ -678,7 +678,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="vendor"
                   >
                     Vendor
@@ -707,7 +707,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
                     htmlFor="url"
                   >
                     URL

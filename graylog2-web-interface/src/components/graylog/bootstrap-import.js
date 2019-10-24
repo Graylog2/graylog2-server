@@ -1,23 +1,13 @@
 // eslint-disable-next-line no-restricted-imports
 export {
-  Badge,
-  ButtonGroup, // no theme needed
-  ButtonToolbar, // no theme needed
-  Checkbox,
-  Clearfix,
-  Col,
-  Collapse,
-  ControlLabel,
+  Checkbox, // NOTE: do we want custom or keep OS styles
   Dropdown,
   Form,
   FormControl,
-  FormGroup,
-  Grid,
   HelpBlock,
   InputGroup,
   Jumbotron,
   Label,
-  ListGroup,
   ListGroupItem,
   MenuItem,
   Modal,
@@ -25,18 +15,29 @@ export {
   Navbar,
   NavDropdown,
   NavItem,
-  OverlayTrigger,
   Pager,
   Pagination,
   Panel,
-  PanelGroup,
   Popover,
   ProgressBar,
-  Radio,
+  Radio, // NOTE: do we want custom or keep OS styles
   Row,
   Tab,
   Table,
   Tabs,
   Tooltip,
   Well,
+
+  /* 👇 no custom theme colors needed 👇 */
+  ButtonGroup,
+  ButtonToolbar,
+  Clearfix,
+  Col,
+  Collapse,
+  FormGroup,
+  Grid,
+  ListGroup,
+  OverlayTrigger,
+  PanelGroup,
+  /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';

@@ -16,7 +16,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="title"
         >
           Title
@@ -45,7 +45,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="name"
         >
           Name
@@ -74,7 +74,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="description"
         >
           Description
@@ -103,7 +103,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="type"
         >
           Value Type
@@ -153,7 +153,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="default_value"
         >
           Default value
@@ -198,7 +198,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="title"
         >
           Title
@@ -227,7 +227,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="name"
         >
           Name
@@ -256,7 +256,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="description"
         >
           Description
@@ -285,7 +285,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="type"
         >
           Value Type
@@ -335,7 +335,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="default_value"
         >
           Default value
@@ -380,7 +380,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="title"
         >
           Title
@@ -409,7 +409,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="name"
         >
           Name
@@ -438,7 +438,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="description"
         >
           Description
@@ -467,7 +467,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="type"
         >
           Value Type
@@ -517,7 +517,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         className="form-group"
       >
         <label
-          className="control-label"
+          className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
           htmlFor="default_value"
         >
           Default value
