@@ -95,6 +95,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
+import org.graylog.plugins.pipelineprocessor.functions.messages.TrafficAccountingSize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -188,6 +189,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
         functions.put(CloneMessage.NAME, new CloneMessage());
+        functions.put(TrafficAccountingSize.NAME, new TrafficAccountingSize());
 
         // route to stream mocks
         final StreamService streamService = mock(StreamService.class);
@@ -1010,6 +1012,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void accountingSize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        // this can change if either the test message content changes or traffic accounting calculation is changed!
+        assertThat(message.getField("accounting_size")).isEqualTo(54L);
     }
 
     @Test
