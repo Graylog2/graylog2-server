@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
+import { Button, ButtonToolbar, Col } from 'components/graylog';
+
+import { emptyBooleanExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
+
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
 /* eslint-disable import/no-cycle */
@@ -22,6 +26,12 @@ class AggregationConditionExpression extends React.Component {
       left: PropTypes.object,
       right: PropTypes.object,
     }).isRequired,
+  };
+
+  handleAddExpression = () => {
+    const { expression, onChange } = this.props;
+    const nextExpression = emptyBooleanExpressionConfig({ operator: '&&', expression });
+    onChange('conditions', nextExpression);
   };
 
   handleChildChange = (branch) => {
@@ -56,7 +66,16 @@ class AggregationConditionExpression extends React.Component {
       case '>=':
       case '==':
       default:
-        return <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />;
+        return (
+          <>
+            <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />
+            <Col md={1}>
+              <ButtonToolbar>
+                <Button onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>
+              </ButtonToolbar>
+            </Col>
+          </>
+        );
     }
   }
 }
