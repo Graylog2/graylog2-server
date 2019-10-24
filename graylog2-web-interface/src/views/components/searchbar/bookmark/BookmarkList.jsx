@@ -71,12 +71,14 @@ class BookmarkList extends React.Component<Props, State> {
   };
 
   onLoad = (selectedBookmark, loadFunc) => {
+    const { toggleModal } = this.props;
     if (!selectedBookmark || !loadFunc) {
       return;
     }
     loadFunc(selectedBookmark).then(() => {
       browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(selectedBookmark));
     });
+    toggleModal();
   };
 
   onDelete = (selectedBookmark) => {
