@@ -58,6 +58,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
@@ -103,6 +104,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
@@ -235,6 +237,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Split.NAME, new Split());
         functions.put(StartsWith.NAME, new StartsWith());
         functions.put(Replace.NAME, new Replace());
+        functions.put(Length.NAME, new Length());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -325,6 +328,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(GrokMatch.NAME, new GrokMatch(grokPatternRegistry));
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
+        functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -531,6 +535,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat((boolean) message.getField("has_xyz")).isFalse();
         assertThat(message.getField("string_literal")).isInstanceOf(String.class);
         assertThat((String) message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
+    }
+
+    @Test
+    public void stringLength() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("chars_utf8")).isEqualTo(5L);
+        assertThat(message.getField("bytes_utf8")).isEqualTo(6L);
+        assertThat(message.getField("chars_ascii")).isEqualTo(5L);
+        assertThat(message.getField("bytes_ascii")).isEqualTo(5L);
     }
 
     @Test

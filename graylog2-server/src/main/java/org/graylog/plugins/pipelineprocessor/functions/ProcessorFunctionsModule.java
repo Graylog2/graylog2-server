@@ -52,6 +52,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
 import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
+import org.graylog.plugins.pipelineprocessor.functions.debug.MetricCounterIncrement;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
@@ -98,6 +99,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
@@ -184,6 +186,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Split.NAME, Split.class);
         addMessageProcessorFunction(StartsWith.NAME, StartsWith.class);
         addMessageProcessorFunction(Replace.NAME, Replace.class);
+        addMessageProcessorFunction(Length.NAME, Length.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
@@ -253,6 +256,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);
+        addMessageProcessorFunction(MetricCounterIncrement.NAME, MetricCounterIncrement.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
