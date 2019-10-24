@@ -46,6 +46,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -128,12 +129,12 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchBackendT
                 .readTree(resourceFile("errorhandling/failureOnQueryLevel.json"));
         when(result.getJsonObject()).thenReturn(resultObject);
 
-        try {
-            this.backend.doRun(searchJob, query, queryContext, Collections.emptySet());
-        } catch (ElasticsearchException e) {
-            assertThat(e.getErrorDetails()).hasSize(1);
-            assertThat(e.getErrorDetails()).containsExactly("Something went wrong");
-        }
+        assertThatExceptionOfType(ElasticsearchException.class)
+                .isThrownBy(() -> this.backend.doRun(searchJob, query, queryContext, Collections.emptySet()))
+                .satisfies(ex -> {
+                    assertThat(ex.getErrorDetails()).hasSize(1);
+                    assertThat(ex.getErrorDetails()).containsExactly("Something went wrong");
+                });
     }
 
     @Test
