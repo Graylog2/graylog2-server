@@ -56,6 +56,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 
+import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collections;
 import java.util.Set;
 
@@ -132,6 +133,10 @@ public abstract class PluginModule extends Graylog2Module {
                                        new TypeLiteral<Class<? extends PluginRestResource>>() {})
                         .permitDuplicates();
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).toInstance(restResourceClass);
+    }
+
+    protected void addJerseyExceptionMapper(Class<? extends ExceptionMapper> exceptionMapperClass) {
+        jerseyExceptionMapperBinder().addBinding().toInstance(exceptionMapperClass);
     }
 
     protected void addConfigBeans() {
