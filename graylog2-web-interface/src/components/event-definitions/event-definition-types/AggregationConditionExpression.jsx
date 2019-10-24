@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, Col } from 'components/graylog';
+import { Button, ButtonToolbar, Col, FormGroup } from 'components/graylog';
 
 import { emptyBooleanExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
@@ -13,6 +13,8 @@ import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpr
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
 /* eslint-enable import/no-cycle */
+
+import styles from './AggregationConditionExpression.css';
 
 class AggregationConditionExpression extends React.Component {
   static propTypes = {
@@ -80,11 +82,15 @@ class AggregationConditionExpression extends React.Component {
         return (
           <>
             <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />
-            <Col md={1}>
-              <ButtonToolbar>
-                <Button onClick={this.handleDeleteExpression}><i className="fa fa-minus fa-fw" /></Button>
-                <Button onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>
-              </ButtonToolbar>
+            <Col md={2}>
+              <FormGroup>
+                <div className={styles.formControlNoLabel}>
+                  <ButtonToolbar>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression}><i className="fa fa-minus fa-fw" /></Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>
+                  </ButtonToolbar>
+                </div>
+              </FormGroup>
             </Col>
           </>
         );

@@ -18,7 +18,7 @@ const ComparisonExpression = (props) => {
   };
 
   return (
-    <Col md={10}>
+    <Col md={9}>
       <Row className="row-sm">
         <AggregationConditionExpression {...props}
                                         expression={expression.left}
