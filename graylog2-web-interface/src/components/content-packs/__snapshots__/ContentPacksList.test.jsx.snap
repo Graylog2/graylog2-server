@@ -245,7 +245,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="badge installed"
+                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
                     >
                       installed
                     </span>
@@ -397,7 +397,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="badge installed"
+                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
                     >
                       installed
                     </span>
