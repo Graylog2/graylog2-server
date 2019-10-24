@@ -6,7 +6,6 @@ export {
   FormControl,
   InputGroup,
   Jumbotron,
-  Label,
   ListGroupItem,
   MenuItem,
   Modal,
