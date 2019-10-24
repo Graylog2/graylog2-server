@@ -330,7 +330,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
                 </td>
                 <td>
                   <span
-                    className="failure badge"
+                    className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-default"
                   >
                     <i
                       className="fa fa-times"
@@ -494,7 +494,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                 </td>
                 <td>
                   <span
-                    className="failure badge"
+                    className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-default"
                   >
                     <i
                       className="fa fa-times"
