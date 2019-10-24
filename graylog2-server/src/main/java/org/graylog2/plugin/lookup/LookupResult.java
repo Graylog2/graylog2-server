@@ -53,7 +53,7 @@ public abstract class LookupResult {
             .cacheTTL(NO_TTL)
             .build();
 
-    private static final LookupResult ERROR_LOOKUP_RESULT = builder()
+    private static final LookupResult DEFAULT_ERROR_LOOKUP_RESULT = builder()
             .cacheTTL(ERROR_CACHE_TTL)
             .hasError(true)
             .build();
@@ -94,7 +94,11 @@ public abstract class LookupResult {
     }
 
     public static LookupResult withError() {
-        return ERROR_LOOKUP_RESULT;
+        return DEFAULT_ERROR_LOOKUP_RESULT;
+    }
+
+    public static LookupResult withError(long errorTTL) {
+        return builder().hasError(true).cacheTTL(errorTTL).build();
     }
 
     public static LookupResult single(final CharSequence singleValue) {

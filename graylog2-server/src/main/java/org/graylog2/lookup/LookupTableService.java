@@ -79,6 +79,7 @@ public class LookupTableService extends AbstractIdleService {
 
     private final Map<String, LookupCache.Factory> cacheFactories;
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
+    private final Map<String, LookupDataAdapter.Factory2> adapterFactories2;
     private final ScheduledExecutorService scheduler;
     private final EventBus eventBus;
     private final LookupDataAdapterRefreshService adapterRefreshService;
@@ -97,6 +98,7 @@ public class LookupTableService extends AbstractIdleService {
                               DBLookupTableService dbTables,
                               Map<String, LookupCache.Factory> cacheFactories,
                               Map<String, LookupDataAdapter.Factory> adapterFactories,
+                              Map<String, LookupDataAdapter.Factory2> adapterFactories2,
                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
                               EventBus eventBus) {
         this.dbAdapters = dbAdapters;
@@ -104,6 +106,7 @@ public class LookupTableService extends AbstractIdleService {
         this.dbTables = dbTables;
         this.cacheFactories = cacheFactories;
         this.adapterFactories = adapterFactories;
+        this.adapterFactories2 = adapterFactories2;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
         this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
@@ -283,13 +286,19 @@ public class LookupTableService extends AbstractIdleService {
 
     private LookupDataAdapter createAdapter(DataAdapterDto dto, ImmutableSet.Builder<LookupDataAdapter> existingAdapters) {
         try {
+            final LookupDataAdapter.Factory2 factory2 = adapterFactories2.get(dto.config().type());
             final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
-            if (factory == null) {
+            final LookupDataAdapter adapter;
+
+            if (factory2 != null) {
+                adapter = factory2.create(dto);
+            } else if (factory != null) {
+                adapter = factory.create(dto.id(), dto.name(), dto.config());
+            } else {
                 LOG.warn("Unable to load data adapter {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
                 // TODO system notification
                 return null;
             }
-            final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
             adapter.addListener(new LoggingServiceListener(
                             "Data Adapter",
                             String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),

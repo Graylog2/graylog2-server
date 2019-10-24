@@ -45,12 +45,12 @@ public class LookupModule extends Graylog2Module {
                 CSVFileDataAdapter.Factory.class,
                 CSVFileDataAdapter.Config.class);
 
-        installLookupDataAdapter(DnsLookupDataAdapter.NAME,
+        installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
                                  DnsLookupDataAdapter.class,
                                  DnsLookupDataAdapter.Factory.class,
                                  DnsLookupDataAdapter.Config.class);
 
-        installLookupDataAdapter(HTTPJSONPathDataAdapter.NAME,
+        installLookupDataAdapter2(HTTPJSONPathDataAdapter.NAME,
                 HTTPJSONPathDataAdapter.class,
                 HTTPJSONPathDataAdapter.Factory.class,
                 HTTPJSONPathDataAdapter.Config.class);

@@ -92,7 +92,6 @@ public class HTTPJSONPathDataAdapterTest {
         final JsonPath multiPath = JsonPath.compile("$.list");
         final LookupResult result = HTTPJSONPathDataAdapter.parseBody(singlePath, multiPath, emptyBody);
 
-        assertThat(result.isEmpty()).isTrue();
-        assertThat(result.hasError()).isTrue();
+        assertThat(result).isNull();
     }
 }
