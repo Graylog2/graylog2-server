@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
-import uuid from 'uuid/v4';
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
+import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
+
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
 import AggregationForm from './AggregationForm';
@@ -25,17 +26,7 @@ const initialAggregationConfig = {
   group_by: [],
   series: [],
   conditions: {
-    expression: {
-      expr: undefined,
-      left: {
-        expr: 'number-ref',
-        ref: uuid(),
-      },
-      right: {
-        expr: 'number',
-        value: 0,
-      },
-    },
+    expression: emptyComparisonExpressionConfig(),
   },
 };
 
