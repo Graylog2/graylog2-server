@@ -1,5 +1,5 @@
 import theme from 'styled-theming';
-import { lighten } from 'polished';
+import { darken, lighten } from 'polished';
 import { css } from 'styled-components';
 
 import contrastingColor from 'util/contrastingColor';
@@ -9,8 +9,12 @@ const alertStyles = () => {
   const { colors } = useTheme();
 
   const cssBuilder = (hex) => {
-    const borderColor = lighten(0.10, hex);
-    const backgroundColor = lighten(0.40, hex);
+    const lightenBorder = lighten(0.30, hex);
+    const borderColor = lightenBorder === '#fff' ? darken(0.08, hex) : lightenBorder;
+
+    const lightenBackground = lighten(0.40, hex);
+    const backgroundColor = lightenBackground === '#fff' ? darken(0.05, hex) : lightenBackground;
+
     const textColor = contrastingColor(backgroundColor);
 
     return css`

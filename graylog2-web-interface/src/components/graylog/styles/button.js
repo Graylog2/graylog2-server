@@ -32,8 +32,7 @@ const buttonStyles = ({ bsStyle }) => {
 
     const linkBackground = 'transparent';
     const linkBorder = 'transparent';
-    const buttonLuminance = getLuminance(color);
-    const buttonColorAdjust = buttonLuminance > 0.5 ? darken : lighten;
+    const buttonColorAdjust = getLuminance(color) > 0.5 ? darken : lighten;
 
     const defaultBackground = isLink ? linkBackground : color;
     const defaultBorder = isLink ? linkBorder : buttonColorAdjust(0.05, color);
