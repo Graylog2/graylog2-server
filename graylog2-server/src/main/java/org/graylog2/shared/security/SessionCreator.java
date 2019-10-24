@@ -76,7 +76,7 @@ public class SessionCreator {
 
             subject.login(authToken);
 
-            String username = (String) subject.getPrincipal();
+            String username = subject.getPrincipal().toString();
             final User user = userService.load(username);
 
             if (user != null) {
