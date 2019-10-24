@@ -35,6 +35,7 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesExceptionMapper;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
@@ -249,6 +250,7 @@ public class JerseyService extends AbstractIdleService {
                         AnyExceptionClassMapper.class,
                         WebApplicationExceptionMapper.class,
                         BadRequestExceptionMapper.class,
+                        MissingCapabilitiesExceptionMapper.class,
                         RestAccessLogFilter.class,
                         NodeIdResponseFilter.class,
                         XHRFilter.class,
