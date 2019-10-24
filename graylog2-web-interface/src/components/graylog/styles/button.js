@@ -1,5 +1,5 @@
 import { css } from 'styled-components';
-import { darken, lighten } from 'polished';
+import { darken, lighten, getLuminance } from 'polished';
 
 import theme from 'styled-theming';
 
@@ -32,18 +32,20 @@ const buttonStyles = ({ bsStyle }) => {
 
     const linkBackground = 'transparent';
     const linkBorder = 'transparent';
+    const buttonLuminance = getLuminance(color);
+    const buttonColorAdjust = buttonLuminance > 0.5 ? darken : lighten;
 
     const defaultBackground = isLink ? linkBackground : color;
-    const defaultBorder = isLink ? linkBorder : darken(0.10, color);
+    const defaultBorder = isLink ? linkBorder : buttonColorAdjust(0.05, color);
     const defaultColor = fontContrast(color);
 
-    const activeBackground = isLink ? linkBackground : darken(0.10, color);
-    const activeBorder = isLink ? linkBorder : darken(0.15, color);
-    const activeColor = fontContrast(darken(0.10, color));
+    const activeBackground = isLink ? linkBackground : buttonColorAdjust(0.10, color);
+    const activeBorder = isLink ? linkBorder : buttonColorAdjust(0.15, color);
+    const activeColor = fontContrast(buttonColorAdjust(0.10, color));
 
-    const disabledBackground = isLink ? linkBackground : lighten(0.20, color);
-    const disabledBorder = isLink ? linkBorder : lighten(0.15, color);
-    const disabledColor = fontContrast(lighten(0.20, color));
+    const disabledBackground = isLink ? linkBackground : buttonColorAdjust(0.20, color);
+    const disabledBorder = isLink ? linkBorder : buttonColorAdjust(0.15, color);
+    const disabledColor = fontContrast(buttonColorAdjust(0.20, color));
 
     return css`
       background-color: ${defaultBackground};

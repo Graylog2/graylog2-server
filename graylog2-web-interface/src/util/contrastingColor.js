@@ -1,7 +1,8 @@
 import {
-  lighten,
-  darken,
+  getLuminance,
   meetsContrastGuidelines,
+  shade,
+  tint,
 } from 'polished';
 
 /**
@@ -16,21 +17,15 @@ import {
 
 const contrastingColor = (color, wcagLevel = 'AA') => {
   const mixStep = 0.05;
+  const adjust = getLuminance(color) < 0.5 ? tint : shade;
   let mixture = 0;
-  let outputColor = '#000';
+  let outputColor = adjust(mixture, color);
 
-  while (mixture < 1) {
+  while (mixture <= 1) {
     const percent = mixture.toFixed(2);
-    const darker = darken(percent, color);
-    const lighter = lighten(percent, color);
+    outputColor = adjust(percent, color);
 
-    if (meetsContrastGuidelines(color, darker)[wcagLevel]) {
-      outputColor = darker;
-      break;
-    }
-
-    if (meetsContrastGuidelines(color, lighter)[wcagLevel]) {
-      outputColor = lighter;
+    if (meetsContrastGuidelines(color, outputColor)[wcagLevel]) {
       break;
     }
 
