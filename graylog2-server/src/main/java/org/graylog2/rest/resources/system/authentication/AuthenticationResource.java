@@ -26,6 +26,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.AuthenticationConfig;
+import org.graylog2.security.realm.ActivatedRealmsOnlyMap;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -37,9 +38,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_EDIT;
-import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_READ;
-import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
+import static org.graylog2.shared.security.RestPermissions.*;
 
 @RequiresAuthentication
 @Path("/system/authentication")
@@ -52,7 +51,7 @@ public class AuthenticationResource extends RestResource {
 
     @Inject
     public AuthenticationResource(final ClusterConfigService clusterConfigService,
-                                  final Map<String, AuthenticatingRealm> availableRealms) {
+                                  final ActivatedRealmsOnlyMap availableRealms) {
 
         this.clusterConfigService = clusterConfigService;
         this.availableRealms = availableRealms;

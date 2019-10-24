@@ -23,6 +23,7 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.security.realm.ActivatedRealmsOnlyMap;
 import org.graylog2.utilities.LenientExplicitOrdering;
 
 import javax.annotation.Nonnull;
@@ -49,7 +50,7 @@ public class OrderedAuthenticatingRealms extends AbstractCollection<Realm> {
     private final AtomicReference<List<Realm>> orderedRealms = new AtomicReference<>();
 
     @Inject
-    public OrderedAuthenticatingRealms(Map<String, AuthenticatingRealm> realms,
+    public OrderedAuthenticatingRealms(ActivatedRealmsOnlyMap realms,
                                        ClusterConfigService clusterConfigService,
                                        EventBus eventBus) {
         this.availableRealms = realms;
