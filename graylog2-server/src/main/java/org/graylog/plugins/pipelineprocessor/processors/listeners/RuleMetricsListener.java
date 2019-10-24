@@ -24,10 +24,13 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.metrics.MetricUtils;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -40,30 +43,51 @@ public class RuleMetricsListener implements InterpreterListener {
     }
 
     private final MetricRegistry metricRegistry;
-    private final Map<String, Timer.Context> evaluateTimers = new HashMap<>();
-    private final Map<String, Timer.Context> executeTimers = new HashMap<>();
+    private final Map<TimerMapKey, Timer.Context> evaluateTimers = new HashMap<>();
+    private final Map<TimerMapKey, Timer.Context> executeTimers = new HashMap<>();
 
     public RuleMetricsListener(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
     }
 
-    public static String getMetricName(String ruleId, Type type) {
-        return name(Rule.class, ruleId, "trace", type.toString().toLowerCase(Locale.US), "duration");
+    public static String getMetricName(String name, Type type) {
+        return name(Rule.class, name, "trace", type.toString().toLowerCase(Locale.US), "duration");
     }
 
-    private void startTimer(Rule rule, Type type, Map<String, Timer.Context> timers) {
-        if (rule.id() != null) {
-            final Timer timer = MetricUtils.getOrRegister(metricRegistry, getMetricName(rule.id(), type), new Timer());
-            timers.put(rule.id(), timer.time());
+    private void forEachStage(Rule rule, Pipeline pipeline, Consumer<Stage> consumer) {
+        pipeline.stages().forEach(stage -> {
+            stage.getRules().stream()
+                    .filter(stageRule -> Objects.equals(stageRule.id(), rule.id()))
+                    .forEach(stageRule -> consumer.accept(stage));
+        });
+    }
+
+    private void startTimerForKey(TimerMapKey key, String metricName, Map<TimerMapKey, Timer.Context> timers) {
+        final Timer timer = MetricUtils.getOrRegister(metricRegistry, metricName, new Timer());
+        timers.put(key, timer.time());
+    }
+
+    private void startTimer(Rule rule, Pipeline pipeline, Type type, Map<TimerMapKey, Timer.Context> timers) {
+        if (rule.id() != null && pipeline.id() != null) {
+            forEachStage(rule, pipeline, stage -> {
+                final String name = name(rule.id(), pipeline.id(), String.valueOf(stage.stage()));
+                startTimerForKey(new TimerMapKey(rule, pipeline, stage), getMetricName(name, type), timers);
+            });
+            startTimerForKey(new TimerMapKey(rule), getMetricName(rule.id(), type), timers);
         }
     }
 
-    private void stopTimer(Rule rule, Map<String, Timer.Context> timers) {
-        if (rule.id() != null) {
-            final Timer.Context timer = timers.get(rule.id());
-            if (timer != null) {
-                timer.stop();
-            }
+    private void stopTimerForKey(TimerMapKey key, Map<TimerMapKey, Timer.Context> timers) {
+        final Timer.Context timer = timers.get(key);
+        if (timer != null) {
+            timer.stop();
+        }
+    }
+
+    private void stopTimer(Rule rule, Pipeline pipeline, Map<TimerMapKey, Timer.Context> timers) {
+        if (rule.id() != null && pipeline.id() != null) {
+            forEachStage(rule, pipeline, stage -> stopTimerForKey(new TimerMapKey(rule, pipeline, stage), timers));
+            stopTimerForKey(new TimerMapKey(rule), timers);
         }
     }
 
@@ -89,32 +113,32 @@ public class RuleMetricsListener implements InterpreterListener {
 
     @Override
     public void evaluateRule(Rule rule, Pipeline pipeline) {
-        startTimer(rule, Type.EVALUATE, evaluateTimers);
+        startTimer(rule, pipeline, Type.EVALUATE, evaluateTimers);
     }
 
     @Override
     public void failEvaluateRule(Rule rule, Pipeline pipeline) {
-        stopTimer(rule, evaluateTimers);
+        stopTimer(rule, pipeline, evaluateTimers);
     }
 
     @Override
     public void satisfyRule(Rule rule, Pipeline pipeline) {
-        stopTimer(rule, evaluateTimers);
+        stopTimer(rule, pipeline, evaluateTimers);
     }
 
     @Override
     public void dissatisfyRule(Rule rule, Pipeline pipeline) {
-        stopTimer(rule, evaluateTimers);
+        stopTimer(rule, pipeline, evaluateTimers);
     }
 
     @Override
     public void executeRule(Rule rule, Pipeline pipeline) {
-        startTimer(rule, Type.EXECUTE, executeTimers);
+        startTimer(rule, pipeline, Type.EXECUTE, executeTimers);
     }
 
     @Override
     public void finishExecuteRule(Rule rule, Pipeline pipeline) {
-        stopTimer(rule, executeTimers);
+        stopTimer(rule, pipeline, executeTimers);
     }
 
     @Override
@@ -127,5 +151,39 @@ public class RuleMetricsListener implements InterpreterListener {
 
     @Override
     public void stopPipelineExecution(Pipeline pipeline, Stage stage) {
+    }
+
+    /**
+     * Helper class to simplify timer map key handling.
+     */
+    private static class TimerMapKey {
+        private final String rule;
+        private final String pipeline;
+        private final int stage;
+
+        TimerMapKey(Rule rule) {
+            this(rule, null, null);
+        }
+
+        TimerMapKey(Rule rule, @Nullable Pipeline pipeline, @Nullable Stage stage) {
+            this.rule = rule.id();
+            this.pipeline = pipeline != null ? pipeline.id() : null;
+            this.stage = stage != null ? stage.stage() : 0;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TimerMapKey that = (TimerMapKey) o;
+            return stage == that.stage &&
+                    rule.equals(that.rule) &&
+                    Objects.equals(pipeline, that.pipeline);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(rule, pipeline, stage);
+        }
     }
 }
