@@ -22,10 +22,10 @@ const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, Qu
 };
 
 const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
-  const dashboardQueryId = dashboard.state.keys().first();
-  const viewState = dashboard.state.get(dashboardQueryId);
-  const newViewState = viewState.builder()
-    .widgets(viewState.widgets().push(widget))
+  const dashboardQueryId = dashboard.state.keySeq().first();
+  const viewState: ViewState = dashboard.state.get(dashboardQueryId);
+  const newViewState = viewState.toBuilder()
+    .widgets(viewState.widgets.push(widget))
     .build();
   return dashboard.toBuilder()
     .state(dashboard.state.set(dashboardQueryId, newViewState))
