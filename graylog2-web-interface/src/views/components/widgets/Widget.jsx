@@ -2,14 +2,17 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
+import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -34,6 +37,7 @@ import CopyToDashboard from './CopyToDashboardForm';
 
 type Props = {
   id: string,
+  view: ViewStoreState,
   widget: WidgetModel,
   data?: Array<*>,
   editing?: boolean,
@@ -56,6 +60,7 @@ type State = {
 class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
+    view: PropTypes.object.isRequired,
     widget: PropTypes.shape({
       id: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
@@ -124,7 +129,15 @@ class Widget extends React.Component<Props, State> {
   };
 
   _onCopyToDashboard = (widgetId, dashboardId) => {
-    console.log(widgetId, dashboardId);
+    const { view, widget } = this.props;
+    const { view: activeView } = view;
+    browserHistory.push({
+      pathname: Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId),
+      state: {
+        view: activeView,
+        widgetId: widget.id,
+      },
+    });
     this._onToggleCopyToDashboard();
   };
 
@@ -240,9 +253,11 @@ class Widget extends React.Component<Props, State> {
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
                     {showCopyToDashboard
-                    && (<CopyToDashboard widgetId={id}
-                                         onSubmit={this._onCopyToDashboard}
-                                         onCancel={this._onToggleCopyToDashboard}/>)}
+                    && (
+                      <CopyToDashboard widgetId={id}
+                                       onSubmit={this._onCopyToDashboard}
+                                       onCancel={this._onToggleCopyToDashboard} />
+                    )}
                   </IfInteractive>
                 </WidgetHeader>
               )}
@@ -255,4 +270,4 @@ class Widget extends React.Component<Props, State> {
   }
 }
 
-export default connect(Widget, { view: ViewMetadataStore });
+export default connect(Widget, { view: ViewStore });

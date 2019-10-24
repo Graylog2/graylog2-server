@@ -1,10 +1,13 @@
 // @flow strict
 import { List, Map } from 'immutable';
 
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Query from 'views/logic/queries/Query';
+
 
 type QueryId = string;
 
@@ -23,8 +26,8 @@ const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, Qu
 
 const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
-  const viewState: ViewState = dashboard.state.get(dashboardQueryId);
-  const newViewState = viewState.toBuilder()
+  const viewState = dashboard.state.get(dashboardQueryId);
+  const newViewState = viewState.builder()
     .widgets(viewState.widgets.push(widget))
     .build();
   return dashboard.toBuilder()
