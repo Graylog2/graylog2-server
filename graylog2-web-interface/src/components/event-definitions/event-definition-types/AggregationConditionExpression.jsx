@@ -34,15 +34,26 @@ class AggregationConditionExpression extends React.Component {
     onChange('conditions', nextExpression);
   };
 
+  handleDeleteExpression = () => {
+    const { onChange } = this.props;
+    onChange('conditions', null);
+  };
+
   handleChildChange = (branch) => {
     return (key, update) => {
       const { expression, onChange } = this.props;
 
       let nextUpdate = update;
       if (key === 'conditions') {
-        const nextExpression = lodash.cloneDeep(expression);
-        nextExpression[branch] = update;
-        nextUpdate = nextExpression;
+        if (update === null) {
+          // This happens when one of the branches got removed. Replace the current tree with the still existing branch.
+          nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
+        } else {
+          // Propagate the update in the expression tree.
+          const nextExpression = lodash.cloneDeep(expression);
+          nextExpression[branch] = update;
+          nextUpdate = nextExpression;
+        }
       }
 
       onChange(key, nextUpdate);
@@ -71,6 +82,7 @@ class AggregationConditionExpression extends React.Component {
             <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />
             <Col md={1}>
               <ButtonToolbar>
+                <Button onClick={this.handleDeleteExpression}><i className="fa fa-minus fa-fw" /></Button>
                 <Button onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>
               </ButtonToolbar>
             </Col>

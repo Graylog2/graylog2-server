@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Row } from 'components/graylog';
+import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 
@@ -19,7 +20,9 @@ class AggregationConditionsForm extends React.Component {
   handleChange = (key, update) => {
     const { onChange } = this.props;
     if (key === 'conditions') {
-      onChange(key, { expression: update });
+      // Propagate empty comparison expression, if the last expression was removed
+      const nextUpdate = update || emptyComparisonExpressionConfig();
+      onChange(key, { expression: nextUpdate });
       return;
     }
 
