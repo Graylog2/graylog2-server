@@ -1,5 +1,5 @@
 // @flow strict
-import * as React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { flow, fromPairs, get, zip } from 'lodash';
 
@@ -11,12 +11,14 @@ import type { VisualizationComponent, VisualizationComponentProps } from 'views/
 import MapVisualization from './MapVisualization';
 import { extractSeries } from '../ChartData';
 import transformKeys from '../TransformKeys';
+import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 const arrayToMap = ([name, x, y]) => ({ name, x, y });
 const lastKey = keys => keys[keys.length - 1];
 const mergeObject = (prev, last) => Object.assign({}, prev, last);
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+  const onRenderComplete = useContext(RenderCompletionCallback);
   const { rowPivots } = config;
   const pipeline = flow([
     transformKeys(config.rowPivots, config.columnPivots),
@@ -53,6 +55,7 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
                       id="world-map"
                       viewport={viewport}
                       width={width}
+                      onRenderComplete={onRenderComplete}
                       onChange={_onChange} />
   );
 };

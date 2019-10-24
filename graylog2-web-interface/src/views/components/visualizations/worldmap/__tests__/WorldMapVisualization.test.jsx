@@ -6,6 +6,7 @@ import { mount } from 'enzyme';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import WorldMapVisualization from '../WorldMapVisualization';
 
 jest.mock('../MapVisualization', () => 'map-visualization');
@@ -59,5 +60,26 @@ describe('WorldMapVisualization', () => {
     _onChange(viewport);
 
     expect(onChange).toHaveBeenCalledWith(WorldMapVisualizationConfig.create(viewport));
+  });
+  it('calls render completion callback after first render', () => {
+    const renderCompletionCallback = jest.fn();
+    const wrapper = mount((
+      <RenderCompletionCallback.Provider value={renderCompletionCallback}>
+        <WorldMapVisualization config={config}
+                               data={[]}
+                               editing
+                               effectiveTimerange={effectiveTimerange}
+                               fields={Immutable.List()}
+                               onChange={() => {}}
+                               toggleEdit={() => {}}
+                               height={1024}
+                               width={800} />
+      </RenderCompletionCallback.Provider>
+    ));
+
+    const { onRenderComplete } = wrapper.find('map-visualization').props();
+    onRenderComplete();
+
+    expect(renderCompletionCallback).toHaveBeenCalled();
   });
 });

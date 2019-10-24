@@ -3,7 +3,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type {
+  VisualizationComponent,
+  VisualizationComponentProps,
+} from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';

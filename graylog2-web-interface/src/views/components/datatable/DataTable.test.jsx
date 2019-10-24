@@ -12,6 +12,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable/DataTable';
+import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 
@@ -180,5 +181,29 @@ describe('DataTable', () => {
 
     expectFieldType('Value[field="max(timestamp)"]', FieldTypes.DATE());
     expectFieldType('Field[name="max(timestamp)"]', FieldTypes.DATE());
+  });
+
+  it('calls render completion callback after first render', () => {
+    const config = AggregationWidgetConfig.builder()
+      .rowPivots([])
+      .columnPivots([])
+      .series([])
+      .sort([])
+      .visualization('table')
+      .rollup(true)
+      .build();
+    const Component = () => (
+      <DataTable config={config}
+                 currentView={currentView}
+                 data={[]}
+                 fields={Immutable.List([])} />
+    );
+    const onRenderComplete = jest.fn();
+    mount((
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <Component />
+      </RenderCompletionCallback.Provider>
+    ));
+    expect(onRenderComplete).toHaveBeenCalled();
   });
 });
