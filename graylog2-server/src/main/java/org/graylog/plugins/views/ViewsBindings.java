@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
@@ -147,6 +148,8 @@ public class ViewsBindings extends ViewsModule {
         // trigger capability binder once to set it up
         viewsCapabilityBinder();
         queryMetadataDecoratorBinder();
+
+        addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
     }
 
     private void registerSortConfigSubclasses() {
@@ -179,4 +182,5 @@ public class ViewsBindings extends ViewsModule {
         registerSharingStrategy(AllUsersOfInstance.TYPE, AllUsersOfInstanceStrategy.class);
         registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
         registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
-    }}
+    }
+}
