@@ -4,7 +4,6 @@ import lodash from 'lodash';
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
-import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
@@ -25,9 +24,7 @@ const initialFilterConfig = {
 const initialAggregationConfig = {
   group_by: [],
   series: [],
-  conditions: {
-    expression: emptyComparisonExpressionConfig(),
-  },
+  conditions: {},
 };
 
 class FilterAggregationForm extends React.Component {

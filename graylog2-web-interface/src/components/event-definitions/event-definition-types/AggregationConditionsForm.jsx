@@ -8,6 +8,8 @@ import AggregationConditionExpression from './AggregationConditionExpression';
 
 import commonStyles from '../common/commonStyles.css';
 
+const initialEmptyConditionConfig = emptyComparisonExpressionConfig();
+
 class AggregationConditionsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
@@ -31,7 +33,7 @@ class AggregationConditionsForm extends React.Component {
 
   render() {
     const { eventDefinition } = this.props;
-    const { expression } = eventDefinition.config.conditions;
+    const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
 
     return (
       <React.Fragment>
