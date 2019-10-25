@@ -26,7 +26,6 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.AuthenticationConfig;
-import org.graylog2.security.realm.ActivatedRealmsOnlyMap;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -51,7 +50,7 @@ public class AuthenticationResource extends RestResource {
 
     @Inject
     public AuthenticationResource(final ClusterConfigService clusterConfigService,
-                                  final ActivatedRealmsOnlyMap availableRealms) {
+                                  final Map<String, AuthenticatingRealm> availableRealms) {
 
         this.clusterConfigService = clusterConfigService;
         this.availableRealms = availableRealms;
