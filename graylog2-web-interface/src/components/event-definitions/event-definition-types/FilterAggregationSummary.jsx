@@ -4,11 +4,11 @@ import lodash from 'lodash';
 import { Link } from 'react-router';
 
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
-import AggregationExpressionParser from 'logic/alerts/AggregationExpressionParser';
 import PermissionsMixin from 'util/PermissionsMixin';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import Routes from 'routing/Routes';
 
+import AggregationConditionSummary from './AggregationConditionSummary';
 import withStreams from './withStreams';
 import { TIME_UNITS } from './FilterForm';
 
@@ -71,8 +71,6 @@ class FilterAggregationSummary extends React.Component {
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-    const expressionResults = AggregationExpressionParser.parseExpression(conditions);
-
     const effectiveStreamIds = PermissionsMixin.isPermitted(currentUser.permissions, 'streams:read')
       ? streams : [];
 
@@ -94,8 +92,7 @@ class FilterAggregationSummary extends React.Component {
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
             <dd>
-              {series[0] ? <em>{series[0].function}({series[0].field})</em> : <span>No series selected</span>}
-              {' '}{expressionResults.operator} {expressionResults.value}
+              <AggregationConditionSummary series={series} conditions={conditions} />
             </dd>
           </React.Fragment>
         )}
