@@ -89,10 +89,9 @@ const CenteredBox = styled.div`
   margin: 0 auto;
 `;
 
-// TODO: Remove `!important`, find other way to overcome specificity issue
 const ResetFilterButton = styled(Button)`
   margin-left: 5px;
-  vertical-align: initial !important;
+  vertical-align: initial;
 `;
 
 const ResetOverrideHint = () => (

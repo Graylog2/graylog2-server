@@ -1,7 +1,6 @@
 // @flow strict
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
@@ -16,125 +15,84 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import * as Permissions from 'views/Permissions';
+import View from 'views/logic/views/View';
 import ViewPropertiesModal from './views/ViewPropertiesModal';
 import ShareViewModal from './views/ShareViewModal';
+import IfDashboard from './dashboard/IfDashboard';
+import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
 
-const ViewActionsMenu = createReactClass({
-  propTypes: {
+const _isAllowedToEdit = (view: View, currentUser) => isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
+
+const _hasUndeclaredParameters = (searchMetadata: SearchMetadata) => searchMetadata.undeclared.size > 0;
+
+const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, currentUser }) => {
+  const [shareViewOpen, setShareViewOpen] = useState(false);
+  const [debugOpen, setDebugOpen] = useState(false);
+  const [saveAsViewOpen, setSaveAsViewOpen] = useState(false);
+  const [editViewOpen, setEditViewOpen] = useState(false);
+
+  const hasUndeclaredParameters = _hasUndeclaredParameters(metadata);
+  const allowedToEdit = _isAllowedToEdit(view, currentUser);
+  const debugOverlay = AppConfig.gl2DevMode() && (
+    <React.Fragment>
+      <MenuItem divider />
+      <MenuItem onSelect={() => setDebugOpen(true)}>Debug</MenuItem>
+    </React.Fragment>
+  );
+  return (
+    <React.Fragment>
+      <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
+        <MenuItem onSelect={() => setEditViewOpen(true)} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
+        <MenuItem onSelect={() => onSaveView(view)}
+                  disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>
+          Save
+        </MenuItem>
+        <MenuItem onSelect={() => setSaveAsViewOpen(true)} disabled={hasUndeclaredParameters}>Save as</MenuItem>
+        <MenuItem onSelect={() => setShareViewOpen(true)} disabled={isNewView || !allowedToEdit}>Share</MenuItem>
+
+        {debugOverlay}
+
+        <IfDashboard>
+          <MenuItem divider />
+          <BigDisplayModeConfiguration view={view} disabled={isNewView} />
+        </IfDashboard>
+      </DropdownButton>
+      <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
+      <ViewPropertiesModal view={view.toBuilder().newId().build()}
+                           title="Save new view"
+                           onSave={onSaveAsView}
+                           show={saveAsViewOpen}
+                           onClose={() => setSaveAsViewOpen(false)} />
+      <ViewPropertiesModal view={view}
+                           title="Editing view"
+                           onSave={onSaveView}
+                           show={editViewOpen}
+                           onClose={() => setEditViewOpen(false)} />
+      {shareViewOpen && <ShareViewModal view={view} show onClose={() => setShareViewOpen(false)} />}
+    </React.Fragment>
+  );
+};
+
+ViewActionsMenu.propTypes = {
+  currentUser: PropTypes.shape({
     currentUser: PropTypes.shape({
-      currentUser: PropTypes.shape({
-        permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-      }).isRequired,
+      permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
     }).isRequired,
-    onSaveView: PropTypes.func.isRequired,
-    onSaveAsView: PropTypes.func.isRequired,
-    metadata: PropTypes.shape({
-      undeclared: ImmutablePropTypes.Set,
-    }).isRequired,
-    view: PropTypes.shape({
-      view: PropTypes.object.isRequired,
-    }).isRequired,
-  },
+  }).isRequired,
+  onSaveView: PropTypes.func.isRequired,
+  onSaveAsView: PropTypes.func.isRequired,
+  metadata: PropTypes.shape({
+    undeclared: ImmutablePropTypes.Set,
+  }).isRequired,
+  view: PropTypes.instanceOf(View).isRequired,
+  isNewView: PropTypes.bool.isRequired,
+};
 
-  getInitialState() {
-    return {
-      debugOpen: false,
-      editViewOpen: false,
-      shareViewOpen: false,
-    };
-  },
-
-  handleDebugOpen() {
-    this.setState({ debugOpen: true });
-  },
-
-  handleDebugClose() {
-    this.setState({ debugOpen: false });
-  },
-
-  handleEdit() {
-    this.setState({ editViewOpen: true });
-  },
-
-  handleEditClose() {
-    this.setState({ editViewOpen: false });
-  },
-
-  handleSaveAs() {
-    this.setState({ saveAsViewOpen: true });
-  },
-
-  handleSaveAsViewClose() {
-    this.setState({ saveAsViewOpen: false });
-  },
-
-  handleShareView() {
-    this.setState({ shareViewOpen: true });
-  },
-
-  handleShareViewClose() {
-    this.setState({ shareViewOpen: false });
-  },
-
-  handleSaveView(view) {
-    // eslint-disable-next-line react/destructuring-assignment
-    this.props.onSaveView(view);
-  },
-
-  handleSaveAsView(view) {
-    // eslint-disable-next-line react/destructuring-assignment
-    this.props.onSaveAsView(view);
-  },
-
-  _isNewView(view) {
-    return !view.title;
-  },
-
-  _isAllowedToEdit(view) {
-    // eslint-disable-next-line react/destructuring-assignment
-    const { currentUser } = this.props.currentUser;
-    return isPermitted(currentUser.permissions, [Permissions.View.Edit(view.id)]);
-  },
-
-  _hasUndeclaredParameters(searchMetadata: SearchMetadata) {
-    return searchMetadata.undeclared.size > 0;
-  },
-
-  render() {
-    // eslint-disable-next-line react/destructuring-assignment
-    const { view } = this.props.view;
-    const onSave = () => this.handleSaveView(view);
-    const { metadata } = this.props;
-    const hasUndeclaredParameters = this._hasUndeclaredParameters(metadata);
-    const isNewView = this._isNewView(view);
-    const allowedToEdit = this._isAllowedToEdit(view);
-    const debugOverlay = AppConfig.gl2DevMode() && (
-      <React.Fragment>
-        <MenuItem divider />
-        <MenuItem onSelect={this.handleDebugOpen}>Debug</MenuItem>
-      </React.Fragment>
-    );
-    const { saveAsViewOpen, editViewOpen, shareViewOpen, debugOpen } = this.state;
-    return (
-      <span>
-        <DropdownButton title="Actions" id="query-tab-actions-dropdown" bsStyle="info" pullRight>
-          <MenuItem onSelect={this.handleEdit} disabled={isNewView || !allowedToEdit}>Edit</MenuItem>
-          <MenuItem onSelect={onSave} disabled={isNewView || hasUndeclaredParameters || !allowedToEdit}>Save</MenuItem>
-          <MenuItem onSelect={this.handleSaveAs} disabled={hasUndeclaredParameters}>Save as</MenuItem>
-          <MenuItem onSelect={this.handleShareView} disabled={isNewView || !allowedToEdit}>Share</MenuItem>
-
-          {debugOverlay}
-        </DropdownButton>
-        <DebugOverlay show={debugOpen} onClose={this.handleDebugClose} />
-        <ViewPropertiesModal view={view.toBuilder().newId().build()} title="Save new view" onSave={this.handleSaveAsView} show={saveAsViewOpen} onClose={this.handleSaveAsViewClose} />
-        <ViewPropertiesModal view={view} title="Editing view" onSave={this.handleSaveView} show={editViewOpen} onClose={this.handleEditClose} />
-        {shareViewOpen && <ShareViewModal view={view} show onClose={this.handleShareViewClose} />}
-      </span>
-    );
-  },
-});
-
-export default connect(ViewActionsMenu, { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore });
+export default connect(
+  ViewActionsMenu,
+  { metadata: SearchMetadataStore, view: ViewStore, currentUser: CurrentUserStore },
+  ({ view: { view, isNew }, currentUser: { currentUser }, ...rest }) => ({ currentUser, view, isNewView: isNew, ...rest }),
+);

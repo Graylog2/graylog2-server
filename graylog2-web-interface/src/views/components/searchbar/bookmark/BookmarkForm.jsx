@@ -1,9 +1,9 @@
 // @flow strict
 import React from 'react';
-import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
 
+import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/graylog';
 import styles from './BookmarkForm.css';
 
 type Props = {
@@ -31,6 +31,7 @@ const BookmarkForm = (props: Props) => {
   } = props;
   const disableSaveAs = !value || value === '' || disableCreateNew;
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+
   return (
     <Portal>
       <Position container={document.body}

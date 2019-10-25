@@ -14,13 +14,15 @@ import ViewState from 'views/logic/views/ViewState';
 import Query from 'views/logic/queries/Query';
 import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
+import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
 import type { RefluxActions } from './StoreTypes';
 
 export type ViewStoreState = {
-  activeQuery: string,
+  activeQuery: QueryId,
   view: View,
   dirty: boolean,
+  isNew: boolean,
 };
 
 type ViewActionsType = RefluxActions<{
@@ -48,6 +50,7 @@ export const ViewActions: ViewActionsType = singletonActions(
     state: { asyncResult: true },
     summary: { asyncResult: true },
     title: { asyncResult: true },
+    setNew: { asyncResult: true },
   }),
 );
 
@@ -65,6 +68,7 @@ export const ViewStore: ViewStoreType = singletonStore(
     view: undefined,
     activeQuery: undefined,
     dirty: false,
+    isNew: false,
 
     init() {
       QueriesActions.create.listen(this.createQuery);
@@ -87,6 +91,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const promise = ViewActions.search(view.search)
         .then(() => {
           this.dirty = false;
+          this.isNew = true;
         })
         .then(() => this._trigger());
 
@@ -135,6 +140,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const firstQueryId = get(queries.first(), 'id');
       const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
       this.selectQuery(selectedQuery);
+      this.isNew = false;
 
       const promise = Promise.resolve(this._state());
       ViewActions.load.promise(promise);
@@ -212,6 +218,7 @@ export const ViewStore: ViewStoreType = singletonStore(
         activeQuery: this.activeQuery,
         view: this.view,
         dirty: this.dirty,
+        isNew: this.isNew,
       };
     },
     _trigger() {

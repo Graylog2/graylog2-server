@@ -1,5 +1,5 @@
+// eslint-disable-next-line no-restricted-imports
 export {
-  Alert,
   Badge,
   ButtonGroup, // no theme needed
   ButtonToolbar, // no theme needed

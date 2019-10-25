@@ -1,7 +1,7 @@
 ```js
-const createReactClass = require('create-react-class');
-const Immutable = require('immutable');
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import Immutable from 'immutable';
+import { Button } from 'components/graylog';
 
 const TableListExample = createReactClass({
   getInitialState() {
@@ -58,9 +58,9 @@ const TableListExample = createReactClass({
 ```
 
 ```js
-const createReactClass = require('create-react-class');
-const Immutable = require('immutable');
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import Immutable from 'immutable';
+import { Button } from 'components/graylog';
 
 const TableListExampleNoBulkActions = createReactClass({
   getInitialState() {

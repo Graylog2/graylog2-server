@@ -8,10 +8,8 @@
 
 `EntityList` with two elements:
 ```js
-const Button = require('components/graylog').Button;
-const Col = require('components/graylog').Col;
-const DropdownButton = require('components/graylog').DropdownButton;
-const MenuItem = require('components/graylog').MenuItem;
+import { Button, Col, DropdownButton, MenuItem } from 'components/graylog';
+import { EntityListItem } from 'components/common';
 
 const entities = [
   {

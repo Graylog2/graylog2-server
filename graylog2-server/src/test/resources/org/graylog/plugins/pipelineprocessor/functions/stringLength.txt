@@ -1,0 +1,8 @@
+rule "stringLength"
+when true
+then
+    set_field("chars_utf8", length("hällo"));
+    set_field("bytes_utf8", length("hällo", true));
+    set_field("chars_ascii", length("hallo"));
+    set_field("bytes_ascii", length("hallo", true));
+end

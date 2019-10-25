@@ -1,6 +1,6 @@
 Using `Wizard` as uncontrolled component:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const Component1 = createReactClass({
 
@@ -51,7 +51,7 @@ const WizardExample = createReactClass({
 
 Using `Wizard` as controlled component with no previous/next buttons and no preview:
 ```js
-const createReactClass = require('create-react-class');
+import createReactClass from 'create-react-class';
 
 const Component1 = createReactClass({
 
