@@ -64,6 +64,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -128,8 +129,10 @@ public class SessionsResource extends RestResource {
         Optional<Session> session = sessionCreator.create(sessionId, host, authToken);
         if (session.isPresent()) {
             Session s = session.get();
-            return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
-                    s.getId().toString());
+            Date validUntil = new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate();
+            String newSessionId = s.getId().toString();
+            String username = getUsernameFromSession(s);
+            return SessionResponse.create(validUntil, newSessionId, username);
         } else {
             throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
         }
@@ -173,5 +176,12 @@ public class SessionsResource extends RestResource {
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
+    }
+
+    private String getUsernameFromSession(Session s) {
+        return new Subject.Builder().sessionId(s.getId())
+                                    .buildSubject()
+                                    .getPrincipal()
+                                    .toString();
     }
 }
