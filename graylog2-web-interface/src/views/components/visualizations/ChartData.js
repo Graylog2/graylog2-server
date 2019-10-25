@@ -1,5 +1,5 @@
 // @flow strict
-import { flatten, flow, isEqual, set } from 'lodash';
+import { flatten, flow, isEqual, set, includes } from 'lodash';
 
 import type { Key, Leaf, Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -12,50 +12,85 @@ export type ChartDefinition = {
   y?: Array<any>,
 };
 
-export type ChartData = [any, Array<Key>, Array<any>]
+export type ChartData = [any, Array<Key>, Array<any>, Array<any>]
 export type ExtractedSeries = Array<ChartData>;
 
 export type KeyJoiner = (Array<any>) => string;
 
-export type Generator = (string, string, Array<string>, Array<any>, number, number) => ChartDefinition;
+export type Generator = (string, string, Array<string>, Array<any>, Array<any>, number, number) => ChartDefinition;
+
+
+const XYZ_CHARTS = ['heatmap'];
 
 const _defaultKeyJoiner = keys => keys.join('-');
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner) => {
-  return (results: Rows): ExtractedSeries => {
+const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
+
+const _flattenLeafs = (leafs: Array<Leaf>, extractRowLeafs: boolean = false) => {
+  const filterCondition = (value) => {
+    if (!value.source.endsWith('leaf')) {
+      return false;
+    }
+    if (extractRowLeafs) {
+      return value.source !== 'row-leaf';
+    }
+    return true;
+  };
+  return flatten(leafs.map(l => l.values.filter(v => filterCondition(v)).map(v => [l.key, v])));
+};
+
+const _extractSeriesXY = (valuesBySeries, xLabels): ExtractedSeries => {
+  return Object.keys(valuesBySeries).map(value => [
+    value,
+    xLabels,
+    valuesBySeries[value],
+    [],
+  ]);
+};
+
+const _extractSeriesXYZ = (valuesBySeries, xLabels): ExtractedSeries => {
+  const y = Object.keys(valuesBySeries);
+  const z = Object.values(valuesBySeries);
+  return [[
+    'Hidden label',
+    xLabels,
+    y,
+    z,
+  ]];
+};
+
+export const extractSeries = (chartType: string, keyJoiner: KeyJoiner = _defaultKeyJoiner) => {
+  return (results: Rows) => {
+    const isXYZChart = includes(XYZ_CHARTS, chartType);
     // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
     const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
-
-    const x = leafs.map(({ key }) => key);
-
-    const y = flatten(leafs.map(l => l.values.filter(v => v.source.endsWith('leaf')).map(v => [l.key, v])));
-
+    const xLabels = leafs.map(({ key }) => key);
+    const flatLeafs = _flattenLeafs(leafs, isXYZChart);
     const valuesBySeries = {};
-    y.forEach(([key, value]) => {
+
+    flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
-      const targetIdx = x.findIndex(l => isEqual(l, key));
+      const targetIdx = xLabels.findIndex(l => isEqual(l, key));
       if (value.value) {
-        set(valuesBySeries, [joinedKey, targetIdx], value.value);
+        set(valuesBySeries, [joinedKey, targetIdx], value.value || 0);
       }
     });
 
-    return Object.keys(valuesBySeries).map(value => [
-      value,
-      x,
-      valuesBySeries[value],
-    ]);
+    if (isXYZChart) {
+      return _extractSeriesXYZ(valuesBySeries, xLabels);
+    }
+    return _extractSeriesXY(valuesBySeries, xLabels);
   };
 };
 
-const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
-
 export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator): ((ExtractedSeries) => Array<ChartDefinition>) => {
   return (results: ExtractedSeries) => {
-    const allCharts: Array<[string, string, Array<string>, Array<any>]> = results.map(([value, x, values]) => [
+    const allCharts: Array<[string, string, Array<string>, Array<any>, Array<any>]> = results.map(([value, x, values, z]) => [
       chartType,
       value,
       x.map(key => key.join('-')),
       values,
+      z,
     ]);
 
     return allCharts.map((args, idx) => generator(...args, idx, allCharts.length));
@@ -63,11 +98,11 @@ export const generateChart = (chartType: string, generator: Generator = _default
 };
 
 export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
-  return (results: ExtractedSeries) => results.map(([name, keys, values]) => {
+  return (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
     const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
     const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
     const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
-    return [name, newKeys, newValues];
+    return [name, newKeys, newValues, z];
   });
 };
 
@@ -80,7 +115,7 @@ export const chartData = (
   generator: Generator = _defaultChartGenerator,
 ): Array<ChartDefinition> => flow([
   transformKeys(rowPivots, columnPivots),
-  extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined),
+  extractSeries(chartType, series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined),
   removeNulls(),
   generateChart(chartType, generator),
 ])(data);
