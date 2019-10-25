@@ -134,7 +134,7 @@ public abstract class IndexSetUpdateRequest {
                 .creationDate(oldConfig.creationDate())
                 .indexAnalyzer(oldConfig.indexAnalyzer())
                 .indexTemplateName(oldConfig.indexTemplateName())
-                .indexTemplateType(oldConfig.indexTemplateType().get())
+                .indexTemplateType(oldConfig.indexTemplateType().orElse(null))
                 .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
