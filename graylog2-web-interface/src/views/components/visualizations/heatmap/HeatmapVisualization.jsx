@@ -5,17 +5,15 @@ import PropTypes from 'prop-types';
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition } from '../ChartData';
+import GenericPlot from '../GenericPlot';
 
 import { chartData } from '../ChartData';
-import XYPlot from '../XYPlot';
 
-const chartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
+const _seriesGenerator = (type, name, labels, values, z): ChartDefinition => ({ type, name, x: labels, y: values, z, connectgaps: true });
 
-const HeatmapVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => {
+const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   return (
-    <XYPlot config={config}
-            effectiveTimerange={effectiveTimerange}
-            chartData={chartData(config, data, 'heatmap', chartGenerator)} />
+    <GenericPlot chartData={chartData(config, data, 'heatmap', _seriesGenerator)} />
   );
 };
 
