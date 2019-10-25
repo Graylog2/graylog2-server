@@ -5,7 +5,8 @@ import moment from 'moment';
 import styled from 'styled-components';
 
 import connect from 'stores/connect';
-import { Col, Row } from 'components/graylog/index';
+import { Col, Row } from 'components/graylog';
+import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import Button from 'components/graylog/Button';
@@ -140,7 +141,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
             <div className="pull-right search-help">
               <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                  title="Search query syntax documentation"
-                                 text={<i className="fa fa-lightbulb-o" />} />
+                                 text={<Icon name="lightbulb-o" />} />
             </div>
             <SearchButton disabled={disableSearch || isGloballyOverridden} />
 

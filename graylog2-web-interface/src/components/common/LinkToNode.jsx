@@ -7,7 +7,8 @@ import { Link } from 'react-router';
 import StoreProvider from 'injection/StoreProvider';
 
 import Routes from 'routing/Routes';
-import Spinner from 'components/common/Spinner';
+import Icon from './Icon';
+import Spinner from './Spinner';
 
 const NodesStore = StoreProvider.getStore('Nodes');
 
@@ -36,11 +37,12 @@ const LinkToNode = createReactClass({
     const node = this.state.nodes[this.props.nodeId];
 
     if (node) {
-      const iconClass = node.is_master ? 'fa fa-star master-node' : 'fa fa-code-fork';
+      const iconName = node.is_master ? 'star' : 'code-fork';
+      const iconClass = node.is_master ? 'master-node' : '';
       const iconTitle = node.is_master ? 'This is the master node in the cluster' : '';
       return (
         <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>
-          <i className={iconClass} title={iconTitle} />
+          <Icon name={iconName} className={iconClass} title={iconTitle} />
           {' '}
           {node.short_node_id} / {node.hostname}
         </Link>

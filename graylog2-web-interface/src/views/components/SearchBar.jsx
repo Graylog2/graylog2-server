@@ -1,13 +1,13 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
 
 import connect from 'stores/connect';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
-import { Spinner } from 'components/common';
+import { Spinner, Icon } from 'components/common';
+import { Col, Row } from 'components/graylog';
 
 import SearchButton from 'views/components/searchbar/SearchButton';
 import BookmarkControls from 'views/components/searchbar/bookmark/BookmarkControls';
@@ -101,7 +101,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
                     <div className="pull-right search-help">
                       <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                          title="Search query syntax documentation"
-                                         text={<i className="fa fa-lightbulb-o" />} />
+                                         text={<Icon name="lightbulb-o" />} />
                     </div>
                     <SearchButton disabled={disableSearch} />
 

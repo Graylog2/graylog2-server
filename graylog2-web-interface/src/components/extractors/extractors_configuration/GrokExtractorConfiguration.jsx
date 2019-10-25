@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Row, Col, ControlLabel, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import { Input } from 'components/bootstrap';
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
 import UserNotification from 'util/UserNotification';
@@ -133,7 +134,7 @@ class GrokExtractorConfiguration extends React.Component {
         <Row>
           <Col mdOffset={2} md={1}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {trying ? <i className="fa fa-spin fa-spinner" /> : 'Try against example'}
+              {trying ? <Icon name="spinner" spin /> : 'Try against example'}
             </Button>
           </Col>
         </Row>

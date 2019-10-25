@@ -3,7 +3,7 @@
 exports[`<Spinner /> should render with a different text string 1`] = `
 <span>
   <i
-    className="fa fa-spin fa-spinner"
+    className="fa fa-spinner fa-spin"
   />
    
   Hello world!
@@ -13,7 +13,7 @@ exports[`<Spinner /> should render with a different text string 1`] = `
 exports[`<Spinner /> should render without props 1`] = `
 <span>
   <i
-    className="fa fa-spin fa-spinner"
+    className="fa fa-spinner fa-spin"
   />
    
   Loading...

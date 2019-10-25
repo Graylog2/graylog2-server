@@ -4,6 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import lodash from 'lodash';
 
 import { Col, Row, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import PermissionsMixin from 'util/PermissionsMixin';
 
@@ -79,7 +80,7 @@ class NotificationsForm extends React.Component {
         <Col md={6} lg={5}>
           <span className={styles.manageNotifications}>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
-              <Button bsStyle="link" bsSize="small">Manage Notifications <i className="fa fa-external-link" /></Button>
+              <Button bsStyle="link" bsSize="small">Manage Notifications <Icon name="external-link" /></Button>
             </LinkContainer>
           </span>
           <h2 className={commonStyles.title}>Notifications <small>(optional)</small></h2>

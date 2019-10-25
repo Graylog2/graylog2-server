@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Table } from 'components/graylog';
 
+import { Alert, Table } from 'components/graylog';
+import { Icon } from 'components/common';
 import { IndexerFailure } from 'components/indexers';
 
 class IndexerFailuresList extends React.Component {
@@ -12,7 +13,7 @@ class IndexerFailuresList extends React.Component {
   render() {
     if (this.props.failures.length === 0) {
       return (
-        <Alert bsStyle="success"><i className="fa fa-check-circle" /> Hurray! There are not any indexer failures.</Alert>
+        <Alert bsStyle="success"><Icon name="check-circle" /> Hurray! There are not any indexer failures.</Alert>
       );
     }
 

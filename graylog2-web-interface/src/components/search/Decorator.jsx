@@ -102,7 +102,7 @@ const Decorator = createReactClass({
 
     const decoratorActionsMenu = this._formatActionsMenu();
     return (
-      <span className={DecoratorStyles.fullWidth}>
+      <span className={DecoratorStyles.fixedWidth}>
         <div className={DecoratorStyles.decoratorBox}>
           <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
           {decoratorActionsMenu}

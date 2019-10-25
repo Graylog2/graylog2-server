@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import ImmutablePropTypes from 'react-immutable-proptypes';
-import { Popover, OverlayTrigger } from 'components/graylog';
 
-import { Timestamp } from 'components/common';
+import { Popover, OverlayTrigger } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import DateTime from 'logic/datetimes/DateTime';
 import DecorationStats from 'logic/message/DecorationStats';
@@ -116,7 +116,7 @@ class MessageTableEntry extends React.Component {
       <span>
         <Timestamp dateTime={value} format={DateTime.Formats.TIMESTAMP_TZ} />
         <OverlayTrigger trigger={['hover']} overlay={popoverHoverFocus}>
-          <i className={`fa fa-fw fa-info ${style.timezoneInfo}`} />
+          <Icon name="info" className={style.timezoneInfo} fixedWidth />
         </OverlayTrigger>
       </span>
     );

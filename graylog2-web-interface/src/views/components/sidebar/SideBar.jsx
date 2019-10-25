@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
-import { Spinner } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import styles from './SideBar.css';
@@ -109,8 +109,8 @@ class SideBar extends React.Component<Props, State> {
       ? styles.iconRight
       : styles.iconLeft;
     const icon = open
-      ? 'fa-times'
-      : 'fa-chevron-right';
+      ? 'times'
+      : 'chevron-right';
     return (
       <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
         {open && <div className={`background ${styles.toggleArea}`} />}
@@ -118,7 +118,7 @@ class SideBar extends React.Component<Props, State> {
           <div className="sidebar">
             <div className={`${styles.sidebarContent}`}>
               <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
-                <span data-testid="toggle-button"><i className={`fa ${icon} ${styles.sidebarIcon}`} /></span>
+                <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
               </span>
               {
                 resultsEmpty
@@ -127,7 +127,7 @@ class SideBar extends React.Component<Props, State> {
                     <React.Fragment>
                       <NavItem isSelected={open && selectedKey === 'viewDescription'}
                                text="View Description"
-                               icon={<i className="fa fa-info" />}
+                               icon={<Icon name="info" />}
                                onClick={this.setSelectedKey('viewDescription')}
                                isLast={false}
                                isOpen={open}>
@@ -145,7 +145,7 @@ class SideBar extends React.Component<Props, State> {
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'createWidget'}
                                text="Create"
-                               icon={<i className="fa fa-plus" />}
+                               icon={<Icon name="plus" />}
                                onClick={this.setSelectedKey('createWidget')}
                                isLast={false}
                                isOpen={open}>
@@ -156,7 +156,7 @@ class SideBar extends React.Component<Props, State> {
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'highlighting'}
                                text="Formatting & Highlighting"
-                               icon={<i className="fa fa-paragraph" />}
+                               icon={<Icon name="paragraph" />}
                                onClick={this.setSelectedKey('highlighting')}
                                isLast={false}
                                isOpen={open}>
@@ -164,7 +164,7 @@ class SideBar extends React.Component<Props, State> {
                       </NavItem>
                       <NavItem isSelected={open && selectedKey === 'fields'}
                                text="Fields"
-                               icon={<i className="fa fa-subscript" />}
+                               icon={<Icon name="subscript" />}
                                onClick={this.setSelectedKey('fields')}
                                isLast
                                isOpen={open}>

@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Alert } from 'components/graylog';
+import Icon from './Icon';
 
 /**
  * Component used to represent list of entities in Graylog, where each entity will have a title, description,
@@ -29,7 +31,7 @@ class EntityList extends React.Component {
     if (this.props.items.length === 0) {
       return (
         <Alert bsStyle={this.props.bsNoItemsStyle}>
-          <i className="fa fa-info-circle" />&nbsp;
+          <Icon name="info-circle" />&nbsp;
           {this.props.noItemsText}
         </Alert>
       );

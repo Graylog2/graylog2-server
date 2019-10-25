@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { widgetDefinition } from 'views/logic/Widgets';
+import { Icon } from 'components/common';
 import style from './WidgetHorizontalStretch.css';
 
 class WidgetHorizontalStretch extends React.Component {
@@ -27,8 +28,7 @@ class WidgetHorizontalStretch extends React.Component {
     const icon = width === Infinity ? 'compress' : 'arrows-h';
     return (
       <span>
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-        <i role="link" tabIndex={0} onClick={this._onClick} className={`fa fa-${icon} ${style.button}`} />
+        <Icon role="link" tabIndex={0} onClick={this._onClick} name={icon} className={style.button} />
       </span>
     );
   }

@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { Button, Tooltip } from 'components/graylog';
-import { OverlayElement, Pluralize } from 'components/common';
+import { OverlayElement, Pluralize, Icon } from 'components/common';
 import CollapsibleStreamRuleList from 'components/streamrules/CollapsibleStreamRuleList';
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
 
@@ -175,7 +175,7 @@ const Stream = createReactClass({
     }
 
     const createdFromContentPack = (stream.content_pack
-      ? <i className="fa fa-cube" title="Created from content pack" /> : null);
+      ? <Icon name="cube" title="Created from content pack" /> : null);
 
     const streamRuleList = isDefaultStream ? null
       : (

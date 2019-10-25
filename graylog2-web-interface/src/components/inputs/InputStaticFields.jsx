@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
@@ -22,7 +23,7 @@ class InputStaticFields extends React.Component {
   _deleteButton = (fieldName) => {
     return (
       <Button bsStyle="link" bsSize="xsmall" style={{ verticalAlign: 'baseline' }} onClick={this._deleteStaticField(fieldName)}>
-        <i className="fa fa-remove" />
+        <Icon name="remove" />
       </Button>
     );
   };

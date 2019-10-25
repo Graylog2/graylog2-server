@@ -1,11 +1,13 @@
 import React from 'react';
+
+import { Icon } from 'components/common';
 import { WidgetErrorsList } from './WidgetPropTypes';
 
 import styles from './MessageWidgets.css';
 
 const ErrorWidget = ({ errors }) => (
   <div className={styles.spinnerContainer}>
-    <i className={`fa fa-exclamation-triangle fa-3x ${styles.iconMargin}`} />
+    <Icon name="exclamation-triangle" size="3x" className={styles.iconMargin} />
     <span>
       <strong>While retrieving data for this widget, the following error(s) occurred:</strong>
 
