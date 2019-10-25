@@ -117,7 +117,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('Alert')).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
+      expect(wrapper.find('Alert').at(0)).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
       done();
     });
   });
@@ -147,7 +147,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('Alert')).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
+      expect(wrapper.find('Alert').at(0)).toIncludeText('Preview:2018-11-14 13:52:38 to 2018-11-14 13:57:38');
       done();
     });
   });
