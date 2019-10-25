@@ -125,6 +125,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }
 
+        guard(search);
+
         final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
