@@ -31,7 +31,7 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation }) => 
 NumberExpression.propTypes = {
   expression: PropTypes.shape({
     expr: PropTypes.string,
-    value: PropTypes.number,
+    value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // Accept string to allow clearing field
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
