@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.plugin.PluginMetaData;
@@ -43,27 +42,9 @@ public class SearchExecutionGuard {
     }
 
     public void check(Search search, Predicate<String> hasReadPermissionForStream) {
-        checkStreamPermissions(search, hasReadPermissionForStream);
+        checkUserIsPermittedToSeeStreams(search.usedStreamIds(), hasReadPermissionForStream);
 
         checkMissingRequirements(search);
-    }
-
-    private void checkStreamPermissions(Search search, Predicate<String> hasReadPermissionForStream) {
-        final Set<String> usedStreamIds = usedStreamIdsFrom(search);
-
-        checkUserIsPermittedToSeeStreams(usedStreamIds, hasReadPermissionForStream);
-    }
-
-    private Set<String> usedStreamIdsFrom(Search search) {
-        final Set<String> usedStreamIds = search.queries().stream()
-                .map(Query::usedStreamIds)
-                .reduce(Sets::union)
-                .orElseThrow(() -> new RuntimeException("Failed to get used stream IDs from query"));
-
-        if (usedStreamIds.isEmpty())
-            throw new IllegalArgumentException("Can't authorize a search with no streams");
-
-        return usedStreamIds;
     }
 
     private void checkUserIsPermittedToSeeStreams(Set<String> streamIds, Predicate<String> hasReadPermissionForStream) {
