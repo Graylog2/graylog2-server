@@ -8,8 +8,6 @@ import { Clearfix, Col, FormGroup } from 'components/graylog';
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
-import styles from '../AggregationConditionExpression.css';
-
 const BooleanExpression = (props) => {
   const { expression, level, onChildChange, onChange } = props;
 
@@ -30,22 +28,21 @@ const BooleanExpression = (props) => {
       <Clearfix />
       <Col md={1}>
         <FormGroup controlId="boolean-operator">
-          <div className={styles.formControlNoLabel}>
-            <Select id="boolean-operator"
-                    matchProp="label"
-                    onChange={handleOperatorChange}
-                    options={[
-                      { label: 'AND', value: '&&' },
-                      { label: 'OR', value: '||' },
-                    ]}
-                    value={expression.expr} />
-          </div>
+          <Select id="boolean-operator"
+                  matchProp="label"
+                  onChange={handleOperatorChange}
+                  options={[
+                    { label: 'AND', value: '&&' },
+                    { label: 'OR', value: '||' },
+                  ]}
+                  value={expression.expr} />
         </FormGroup>
       </Col>
       <AggregationConditionExpression {...props}
                                       expression={expression.right}
                                       onChange={onChildChange('right')}
-                                      level={level + 1} />
+                                      level={level + 1}
+                                      renderLabel={false} />
     </>
   );
 };

@@ -29,10 +29,12 @@ class AggregationConditionExpression extends React.Component {
       right: PropTypes.object,
     }).isRequired,
     level: PropTypes.number, // Internal use only
+    renderLabel: PropTypes.bool,
   };
 
   static defaultProps = {
     level: 0,
+    renderLabel: true,
   };
 
   handleAddExpression = () => {
@@ -68,7 +70,7 @@ class AggregationConditionExpression extends React.Component {
   };
 
   render() {
-    const { expression } = this.props;
+    const { expression, renderLabel } = this.props;
     switch (expression.expr) {
       case 'number-ref':
         return <NumberRefExpression {...this.props} />;
@@ -88,7 +90,7 @@ class AggregationConditionExpression extends React.Component {
             <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />
             <Col md={2}>
               <FormGroup>
-                <div className={styles.formControlNoLabel}>
+                <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
                     <Button bsSize="sm" onClick={this.handleDeleteExpression}><i className="fa fa-minus fa-fw" /></Button>
                     <Button bsSize="sm" onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>

@@ -9,7 +9,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const ComparisonExpression = (props) => {
-  const { expression, level, onChildChange, onChange, validation } = props;
+  const { expression, level, onChildChange, onChange, renderLabel, validation } = props;
 
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
@@ -27,7 +27,7 @@ const ComparisonExpression = (props) => {
 
         <Col md={3}>
           <FormGroup controlId="aggregation-condition" validationState={validation.errors.conditions ? 'error' : null}>
-            <ControlLabel>Is</ControlLabel>
+            {renderLabel && <ControlLabel>Is</ControlLabel>}
             <Select id="aggregation-condition"
                     matchProp="label"
                     placeholder="Select Condition"

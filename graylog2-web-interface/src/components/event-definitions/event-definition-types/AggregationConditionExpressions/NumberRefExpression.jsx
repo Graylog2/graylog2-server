@@ -18,6 +18,7 @@ const NumberRefExpression = ({
   eventDefinition,
   expression,
   onChange,
+  renderLabel,
   validation,
 }) => {
   const getSeries = (seriesId) => {
@@ -63,7 +64,7 @@ const NumberRefExpression = ({
   return (
     <Col md={6}>
       <FormGroup controlId="aggregation-function" validationState={validation.errors.series ? 'error' : null}>
-        <ControlLabel>If</ControlLabel>
+        {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
           <Col md={6}>
             <Select id="aggregation-function"
@@ -100,6 +101,7 @@ NumberRefExpression.propTypes = {
   }).isRequired,
   formattedFields: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
+  renderLabel: PropTypes.bool.isRequired,
   validation: PropTypes.object.isRequired,
 };
 
