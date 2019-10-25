@@ -28,6 +28,11 @@ class AggregationConditionExpression extends React.Component {
       left: PropTypes.object,
       right: PropTypes.object,
     }).isRequired,
+    level: PropTypes.number, // Internal use only
+  };
+
+  static defaultProps = {
+    level: 0,
   };
 
   handleAddExpression = () => {
@@ -63,13 +68,12 @@ class AggregationConditionExpression extends React.Component {
   };
 
   render() {
-    const { expression, onChange, validation } = this.props;
-
+    const { expression } = this.props;
     switch (expression.expr) {
       case 'number-ref':
         return <NumberRefExpression {...this.props} />;
       case 'number':
-        return <NumberExpression expression={expression} onChange={onChange} validation={validation} />;
+        return <NumberExpression {...this.props} />;
       case '&&':
       case '||':
         return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} />;

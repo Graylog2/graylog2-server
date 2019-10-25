@@ -11,7 +11,7 @@ import AggregationConditionExpression from '../AggregationConditionExpression';
 import styles from '../AggregationConditionExpression.css';
 
 const BooleanExpression = (props) => {
-  const { expression, onChildChange, onChange } = props;
+  const { expression, level, onChildChange, onChange } = props;
 
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
@@ -21,9 +21,12 @@ const BooleanExpression = (props) => {
 
   return (
     <>
+      {/* Render an empty column in the first condition, to align it with others. */}
+      {level === 0 && <Col md={1} />}
       <AggregationConditionExpression {...props}
                                       expression={expression.left}
-                                      onChange={onChildChange('left')} />
+                                      onChange={onChildChange('left')}
+                                      level={level + 1} />
       <Clearfix />
       <Col md={1}>
         <FormGroup controlId="boolean-operator">
@@ -41,7 +44,8 @@ const BooleanExpression = (props) => {
       </Col>
       <AggregationConditionExpression {...props}
                                       expression={expression.right}
-                                      onChange={onChildChange('right')} />
+                                      onChange={onChildChange('right')}
+                                      level={level + 1} />
     </>
   );
 };
@@ -52,6 +56,7 @@ BooleanExpression.propTypes = {
     left: PropTypes.object,
     right: PropTypes.object,
   }).isRequired,
+  level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
 };

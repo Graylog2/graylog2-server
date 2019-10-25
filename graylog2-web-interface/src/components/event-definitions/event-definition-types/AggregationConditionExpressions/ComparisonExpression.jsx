@@ -9,7 +9,7 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const ComparisonExpression = (props) => {
-  const { expression, onChildChange, onChange, validation } = props;
+  const { expression, level, onChildChange, onChange, validation } = props;
 
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
@@ -22,7 +22,9 @@ const ComparisonExpression = (props) => {
       <Row className="row-sm">
         <AggregationConditionExpression {...props}
                                         expression={expression.left}
-                                        onChange={onChildChange('left')} />
+                                        onChange={onChildChange('left')}
+                                        level={level + 1} />
+
         <Col md={3}>
           <FormGroup controlId="aggregation-condition" validationState={validation.errors.conditions ? 'error' : null}>
             <ControlLabel>Is</ControlLabel>
@@ -45,7 +47,8 @@ const ComparisonExpression = (props) => {
         </Col>
         <AggregationConditionExpression {...props}
                                         expression={expression.right}
-                                        onChange={onChildChange('right')} />
+                                        onChange={onChildChange('right')}
+                                        level={level + 1} />
       </Row>
     </Col>
   );
@@ -57,6 +60,7 @@ ComparisonExpression.propTypes = {
     left: PropTypes.object,
     right: PropTypes.object,
   }).isRequired,
+  level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
   validation: PropTypes.object.isRequired,
