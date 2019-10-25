@@ -166,7 +166,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
@@ -183,7 +183,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return permittedStreams.load(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
-    private void authorize(Search search) {
+    private void guard(Search search) {
         this.executionGuard.check(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
@@ -198,7 +198,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
 
