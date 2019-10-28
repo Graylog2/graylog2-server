@@ -186,6 +186,8 @@ public class MongoDbGrokPatternService implements GrokPatternService {
             patternNames.add(savedGrokPattern.name());
         }
 
+        clusterBus.post(GrokPatternsUpdatedEvent.create(patternNames.build()));
+
         return savedPatterns.build();
     }
 
