@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
 import { Button, ButtonToolbar, Col, FormGroup } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import { emptyBooleanExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
@@ -92,8 +93,8 @@ class AggregationConditionExpression extends React.Component {
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression}><i className="fa fa-minus fa-fw" /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression}><i className="fa fa-plus fa-fw" /></Button>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression}><Icon name="minus" fixedWidth /></Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression}><Icon name="plus" fixedWidth /></Button>
                   </ButtonToolbar>
                 </div>
               </FormGroup>
