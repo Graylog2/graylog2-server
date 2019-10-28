@@ -35,15 +35,14 @@ class AggregationForm extends React.Component {
     fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
   );
 
-  propagateConfigChange = (key, value) => {
+  propagateConfigChange = (update) => {
     const { eventDefinition, onChange } = this.props;
-    const nextConfig = lodash.cloneDeep(eventDefinition.config);
-    nextConfig[key] = value;
+    const nextConfig = Object.assign({}, eventDefinition.config, update);
     onChange('config', nextConfig);
   };
 
   handleGroupByChange = (nextValue) => {
-    this.propagateConfigChange('group_by', nextValue);
+    this.propagateConfigChange({ group_by: nextValue });
   };
 
   render() {
