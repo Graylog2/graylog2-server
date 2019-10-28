@@ -6,18 +6,18 @@ export default class Direction {
 
   static Descending = new Direction('Descending');
 
-  direction: DirectionJson;
+  _direction: DirectionJson;
 
   constructor(direction: DirectionJson) {
-    this.direction = direction;
+    this._direction = direction;
   }
 
   toJSON(): DirectionJson {
-    return this.direction;
+    return this._direction;
   }
 
   get direction() {
-    return this.direction;
+    return this._direction;
   }
 
   static fromJSON(value: DirectionJson): Direction {
