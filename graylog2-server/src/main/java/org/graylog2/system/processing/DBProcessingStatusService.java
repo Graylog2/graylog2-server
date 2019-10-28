@@ -84,7 +84,9 @@ public class DBProcessingStatusService {
         // TODO remove this in a future release (maybe at 3.5)
         final String OLD_INDEX_NAME = "updated_at_1_input_journal.uncommitted_entries_1_input_journal.written_messages_1m_rate_1";
         try {
-            db.dropIndex(OLD_INDEX_NAME);
+            if (db.getIndexInfo().stream().anyMatch(dbo -> dbo.get("name").equals(OLD_INDEX_NAME))) {
+                db.dropIndex(OLD_INDEX_NAME);
+            }
         } catch (MongoException ignored) {
             // index was either never created or already deleted
         }
