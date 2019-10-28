@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
@@ -137,15 +136,8 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
 
     private Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Set<String> streamIds) {
         return mergeCompoundFieldTypes(
-                streamIds
+                streamService.loadByIds(streamIds)
                         .stream()
-                        .map(streamId -> {
-                            try {
-                                return streamService.load(streamId);
-                            } catch (NotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
                         .filter(Objects::nonNull)
                         .map(indexSet -> indexSet.getIndexSet().getConfig().id())
                         .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
