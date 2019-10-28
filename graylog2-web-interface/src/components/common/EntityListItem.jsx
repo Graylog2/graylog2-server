@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'components/graylog';
+import Icon from './Icon';
 
 /**
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
@@ -53,7 +54,7 @@ class EntityListItem extends React.Component {
               && (
               <div className="item-description">
                 {this.props.createdFromContentPack
-                && <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
+                && <span><Icon name="cube" title="Created from content pack" />&nbsp;</span>
               }
                 <span>{this.props.description}</span>
               </div>

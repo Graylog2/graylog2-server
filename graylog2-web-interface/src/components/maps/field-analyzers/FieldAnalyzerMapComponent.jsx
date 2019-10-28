@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import { Spinner } from 'components/common';
+import { Spinner, Icon } from 'components/common';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import { Button } from 'components/graylog';
 
@@ -142,7 +142,7 @@ const FieldAnalyzerMapComponent = createReactClass({
                                 pullRight
                                 permissions={permissions}>
 
-              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><Icon name="close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Map for field: {field}</h1>

@@ -20,6 +20,7 @@ import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 
 import styles from './MessageList.css';
+import RenderCompletionCallback from './RenderCompletionCallback';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
@@ -64,13 +65,16 @@ class MessageList extends React.Component<Props, State> {
     config: undefined,
   };
 
+  static contextType = RenderCompletionCallback;
+
   state = {
     currentPage: 1,
     expandedMessages: Immutable.Set(),
   };
 
   componentDidMount() {
-    InputsActions.list();
+    const onRenderComplete = this.context;
+    InputsActions.list().then(() => (onRenderComplete && onRenderComplete()));
   }
 
   _getSelectedFields = () => {

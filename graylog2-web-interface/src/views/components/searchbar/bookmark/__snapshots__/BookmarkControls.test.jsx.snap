@@ -123,9 +123,17 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -204,9 +212,17 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -282,14 +298,27 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Unsaved changes"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "#ffc107",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark"
+                        style={
+                          Object {
+                            "color": "#ffc107",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -365,9 +394,17 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -503,9 +540,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -584,9 +629,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -662,14 +715,27 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Saved search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "#007bff",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark"
+                        style={
+                          Object {
+                            "color": "#007bff",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -745,9 +811,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -883,9 +957,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Export to new dashboard"
                     type="button"
                   >
-                    <i
-                      className="fa fa-dashboard"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -964,9 +1046,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -1042,14 +1132,27 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Save search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark-o"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark-o"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark-o"
+                        style={
+                          Object {
+                            "color": "",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -1125,9 +1228,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>

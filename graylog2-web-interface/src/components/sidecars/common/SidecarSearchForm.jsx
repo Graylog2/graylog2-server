@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { OverlayTrigger, Popover, Table, Button } from 'components/graylog';
-import { SearchForm } from 'components/common';
+import { SearchForm, Icon } from 'components/common';
 
 import style from './SidecarSearchForm.css';
 
@@ -72,7 +72,7 @@ class SidecarSearchForm extends React.Component {
 
     const queryHelp = (
       <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover}>
-        <Button bsStyle="link"><i className="fa fa-question-circle" /></Button>
+        <Button bsStyle="link"><Icon name="question-circle" /></Button>
       </OverlayTrigger>
     );
 

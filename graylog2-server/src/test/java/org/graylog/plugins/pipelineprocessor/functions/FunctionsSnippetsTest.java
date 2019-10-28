@@ -95,6 +95,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
+import org.graylog.plugins.pipelineprocessor.functions.messages.TrafficAccountingSize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -103,6 +104,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Join;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Length;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexReplace;
@@ -187,6 +189,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
         functions.put(CloneMessage.NAME, new CloneMessage());
+        functions.put(TrafficAccountingSize.NAME, new TrafficAccountingSize());
 
         // route to stream mocks
         final StreamService streamService = mock(StreamService.class);
@@ -234,6 +237,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Split.NAME, new Split());
         functions.put(StartsWith.NAME, new StartsWith());
         functions.put(Replace.NAME, new Replace());
+        functions.put(Length.NAME, new Length());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -532,6 +536,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat((boolean) message.getField("has_xyz")).isFalse();
         assertThat(message.getField("string_literal")).isInstanceOf(String.class);
         assertThat((String) message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
+    }
+
+    @Test
+    public void stringLength() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("chars_utf8")).isEqualTo(5L);
+        assertThat(message.getField("bytes_utf8")).isEqualTo(6L);
+        assertThat(message.getField("chars_ascii")).isEqualTo(5L);
+        assertThat(message.getField("bytes_ascii")).isEqualTo(5L);
     }
 
     @Test
@@ -999,6 +1015,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(actionsTriggered.get()).isTrue();
     }
 
+    @Test
+    public void accountingSize() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        // this can change if either the test message content changes or traffic accounting calculation is changed!
+        assertThat(message.getField("accounting_size")).isEqualTo(54L);
+    }
+  
     @Test
     public void metricCounter() {
         final Rule rule = parser.parseRule(ruleForTest(), true);

@@ -46,12 +46,21 @@ exports[`NewDashboardPage should not render transform search view to dashboard v
     route={Object {}}
   >
     <Spinner
+      name="spinner"
       text="Loading..."
     >
       <span>
-        <i
-          className="fa fa-spin fa-spinner"
-        />
+        <ForwardRef
+          fixedWidth={false}
+          inverse={false}
+          name="spinner"
+          pulse={false}
+          spin={true}
+        >
+          <i
+            className="fa fa-spinner fa-spin"
+          />
+        </ForwardRef>
          
         Loading...
       </span>
@@ -72,12 +81,21 @@ exports[`NewDashboardPage should render minimal 1`] = `
     route={Object {}}
   >
     <Spinner
+      name="spinner"
       text="Loading..."
     >
       <span>
-        <i
-          className="fa fa-spin fa-spinner"
-        />
+        <ForwardRef
+          fixedWidth={false}
+          inverse={false}
+          name="spinner"
+          pulse={false}
+          spin={true}
+        >
+          <i
+            className="fa fa-spinner fa-spin"
+          />
+        </ForwardRef>
          
         Loading...
       </span>
@@ -132,12 +150,21 @@ exports[`NewDashboardPage should render transform search view to dashboard view 
     route={Object {}}
   >
     <Spinner
+      name="spinner"
       text="Loading..."
     >
       <span>
-        <i
-          className="fa fa-spin fa-spinner"
-        />
+        <ForwardRef
+          fixedWidth={false}
+          inverse={false}
+          name="spinner"
+          pulse={false}
+          spin={true}
+        >
+          <i
+            className="fa fa-spinner fa-spin"
+          />
+        </ForwardRef>
          
         Loading...
       </span>

@@ -1,5 +1,5 @@
 // @flow strict
-import * as React from 'react';
+import React, { useContext, useEffect } from 'react';
 import * as Immutable from 'immutable';
 import { flatten, isEqual, uniqWith } from 'lodash';
 
@@ -16,6 +16,7 @@ import DataTableEntry from './DataTableEntry';
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
+import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 type Props = {
   config: AggregationWidgetConfig,
@@ -63,6 +64,9 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 };
 
 const DataTable = ({ config, currentView, data, fields }: Props) => {
+  const onRenderComplete = useContext(RenderCompletionCallback);
+  useEffect(onRenderComplete, [onRenderComplete]);
+
   const { columnPivots, rowPivots, series, rollup } = config;
   const rows = data || [];
 

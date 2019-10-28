@@ -4,6 +4,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { Panel } from 'components/graylog';
+import { Icon } from 'components/common';
 import naturalSort from 'javascript-natural-sort';
 import { Input } from 'components/bootstrap';
 
@@ -79,8 +80,7 @@ const SidebarMessageField = createReactClass({
   },
 
   render() {
-    let toggleClassName = 'fa fa-fw open-analyze-field ';
-    toggleClassName += this.state.showActions ? 'open-analyze-field-active fa-caret-down' : 'fa-caret-right';
+    const { showActions } = this.state;
 
     let fieldAnalyzers;
     if (this.state.showActions) {
@@ -90,7 +90,11 @@ const SidebarMessageField = createReactClass({
     return (
       <li>
         <div className="pull-left">
-          <a href="#" onClick={this._toggleFieldAnalyzers}><i className={toggleClassName} /></a>
+          <a href="#" onClick={this._toggleFieldAnalyzers}>
+            <Icon name={showActions ? 'caret-down' : 'caret-right'}
+                  className={`open-analyze-field ${showActions && 'open-analyze-field-active'}`}
+                  fixedWidth />
+          </a>
         </div>
         <div className="field-selector">
           <Input id="field-selector-checkbox"

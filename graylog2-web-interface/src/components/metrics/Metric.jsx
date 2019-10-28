@@ -4,13 +4,14 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 
 import { MetricDetails } from 'components/metrics';
+import { Icon } from 'components/common';
 
 const Metric = createReactClass({
   displayName: 'Metric',
 
   propTypes: {
     metric: PropTypes.object.isRequired,
-    namespace: PropTypes.string,
+    namespace: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
   },
 
@@ -61,7 +62,7 @@ const Metric = createReactClass({
     return (
       <span>
         <div className="name">
-          <i className={`fa fa-${this._formatIcon(metric.type)}`} />{' '}
+          <Icon name={this._formatIcon(metric.type)} />{' '}
           <a className="open" href="#" onClick={this._showDetails}>{this._formatName(metric.full_name)}</a>
         </div>
         {details}

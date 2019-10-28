@@ -180,8 +180,12 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <i
-                              className="fa fa-search-plus"
+                            <ForwardRef
+                              fixedWidth={false}
+                              inverse={false}
+                              name="search-plus"
+                              pulse={false}
+                              spin={false}
                             />
                           }
                           className="dropdown-toggle btn btn-xs btn-default"
@@ -384,8 +388,12 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           aria-expanded={false}
                           aria-haspopup={true}
                           aria-label={
-                            <i
-                              className="fa fa-search-plus"
+                            <ForwardRef
+                              fixedWidth={false}
+                              inverse={false}
+                              name="search-plus"
+                              pulse={false}
+                              spin={false}
                             />
                           }
                           className="dropdown-toggle btn btn-xs btn-default"
@@ -565,7 +573,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                           2018-01-22 16:36:02.189 +01:00
                         </time>
                         <i
-                          className="fa fa-fw fa-info timezoneInfo"
+                          className="fa fa-info timezoneInfo fa-fw"
                           onClick={null}
                           onMouseOut={[Function]}
                           onMouseOver={[Function]}

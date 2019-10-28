@@ -10,7 +10,8 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
-import Pluralize from 'components/common/Pluralize';
+import { Icon, Pluralize } from 'components/common';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
 const ControlsContainer = styled.div`
@@ -99,7 +100,7 @@ class RefreshControls extends React.Component<Props> {
       <ControlsContainer className="pull-right">
         <FlexibleButtonGroup>
           <Button onClick={this._toggleEnable}>
-            {refreshConfig.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
+            {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
           </Button>
 
           <DropdownButton title={buttonLabel} id="refresh-options-dropdown">

@@ -4,6 +4,7 @@ import { mount } from 'enzyme';
 
 import ChartColorContext from '../ChartColorContext';
 import GenericPlot from '../GenericPlot';
+import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 jest.mock('components/common/ColorPicker', () => 'color-picker');
 // eslint-disable-next-line global-require
@@ -170,5 +171,16 @@ describe('GenericPlot', () => {
 
       expect(lens.setColor).toHaveBeenCalledWith('x', '#141414');
     });
+  });
+  it('calls render completion callback after plotting', () => {
+    const onRenderComplete = jest.fn();
+    const wrapper = mount((
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <GenericPlot chartData={[{ x: 23, name: 'count()' }, { x: 42, name: 'sum(bytes)' }]} />
+      </RenderCompletionCallback.Provider>
+    ));
+    const { onAfterPlot } = wrapper.find('PlotlyComponent').props();
+    onAfterPlot();
+    expect(onRenderComplete).toHaveBeenCalled();
   });
 });

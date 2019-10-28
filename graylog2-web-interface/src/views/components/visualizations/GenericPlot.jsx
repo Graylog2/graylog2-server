@@ -11,6 +11,7 @@ import ChartColorContext from './ChartColorContext';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style/useable!css!./GenericPlot.css';
 import InteractiveContext from '../contexts/InteractiveContext';
+import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 type LegendConfig = {
   name: string,
@@ -23,18 +24,18 @@ type ChartMarker = {
   color?: string,
 };
 
-type ChartConfig = {
+export type ChartConfig = {
   name: string,
   labels: Array<string>,
   line?: ChartMarker,
   marker?: ChartMarker,
 };
 
-type ColorMap = {
+export type ColorMap = {
   [string]: string,
 };
 
-type ChartColor = {
+export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
 };
@@ -163,31 +164,36 @@ class GenericPlot extends React.Component<Props, State> {
           return (
             <InteractiveContext.Consumer>
               {interactive => (
-                <React.Fragment>
-                  <Plot data={newChartData}
-                        useResizeHandler
-                        layout={interactive ? plotLayout : merge(nonInteractiveLayout, plotLayout)}
-                        style={style}
-                        onClick={interactive ? null : () => false}
-                        onLegendClick={interactive ? this._onLegendClick : () => false}
-                        onRelayout={interactive ? this._onRelayout : () => false}
-                        config={config} />
-                  {legendConfig && (
-                    <RootCloseWrapper event="mousedown"
-                                      onRootClose={this._onCloseColorPopup}>
-                      <Overlay show
-                               placement="top"
-                               target={legendConfig.target}>
-                        <Popover id="legend-config"
-                                 title={`Configuration for ${legendConfig.name}`}
-                                 className={styles.locals.customPopover}>
-                          <ColorPicker color={legendConfig.color}
-                                       onChange={newColor => this._onColorSelect(setColor, legendConfig.name, newColor)} />
-                        </Popover>
-                      </Overlay>
-                    </RootCloseWrapper>
+                <RenderCompletionCallback.Consumer>
+                  {onRenderComplete => (
+                    <>
+                      <Plot data={newChartData}
+                            useResizeHandler
+                            layout={interactive ? plotLayout : merge(nonInteractiveLayout, plotLayout)}
+                            style={style}
+                            onAfterPlot={onRenderComplete}
+                            onClick={interactive ? null : () => false}
+                            onLegendClick={interactive ? this._onLegendClick : () => false}
+                            onRelayout={interactive ? this._onRelayout : () => false}
+                            config={config} />
+                      {legendConfig && (
+                        <RootCloseWrapper event="mousedown"
+                                          onRootClose={this._onCloseColorPopup}>
+                          <Overlay show
+                                   placement="top"
+                                   target={legendConfig.target}>
+                            <Popover id="legend-config"
+                                     title={`Configuration for ${legendConfig.name}`}
+                                     className={styles.locals.customPopover}>
+                              <ColorPicker color={legendConfig.color}
+                                           onChange={newColor => this._onColorSelect(setColor, legendConfig.name, newColor)} />
+                            </Popover>
+                          </Overlay>
+                        </RootCloseWrapper>
+                      )}
+                    </>
                   )}
-                </React.Fragment>
+                </RenderCompletionCallback.Consumer>
               )}
             </InteractiveContext.Consumer>
           );

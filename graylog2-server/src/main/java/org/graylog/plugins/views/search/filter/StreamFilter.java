@@ -24,7 +24,10 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 @AutoValue
 @JsonTypeName(StreamFilter.NAME)
@@ -55,6 +58,15 @@ public abstract class StreamFilter implements Filter {
 
     public static StreamFilter ofId(String id) {
         return builder().streamId(id).build();
+    }
+
+    public static Filter anyIdOf(String... ids) {
+        final Set<Filter> streamFilters = Arrays.stream(ids)
+                .map(StreamFilter::ofId)
+                .collect(toSet());
+        return OrFilter.builder()
+                .filters(streamFilters)
+                .build();
     }
 
     @AutoValue.Builder

@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { Alert, Col, Label, OverlayTrigger, Row, Table, Tooltip, Button } from 'components/graylog';
-import { EmptyEntity, IfPermitted, PaginatedList, Timestamp } from 'components/common';
+import { EmptyEntity, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -56,15 +56,15 @@ class Events extends React.Component {
     let style;
     switch (priority) {
       case EventDefinitionPriorityEnum.LOW:
-        icon = 'fa-thermometer-empty';
+        icon = 'thermometer-empty';
         style = 'text-muted';
         break;
       case EventDefinitionPriorityEnum.HIGH:
-        icon = 'fa-thermometer-full';
+        icon = 'thermometer-full';
         style = 'text-danger';
         break;
       default:
-        icon = 'fa-thermometer-half';
+        icon = 'thermometer-half';
         style = 'text-info';
     }
 
@@ -73,7 +73,7 @@ class Events extends React.Component {
     return (
       <React.Fragment>
         <OverlayTrigger placement="top" overlay={tooltip}>
-          <i className={`fa fa-fw ${icon} ${style} ${styles.priority}`} />
+          <Icon name={icon} fixedWidth className={`${style} ${styles.priority}`} />
         </OverlayTrigger>
       </React.Fragment>
     );

@@ -4,7 +4,7 @@ import Immutable from 'immutable';
 
 import { Button } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
-import { DatePicker } from 'components/common';
+import { DatePicker, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import styles from './AbsoluteTimeRangeSelector.css';
@@ -89,7 +89,8 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onChange={event => this.onChange('from', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button disabled={disabled} onClick={() => _setDateTimeToNow('from', onChange)}><i className="fa fa-magic" />
+                     <Button disabled={disabled} onClick={() => _setDateTimeToNow('from', onChange)}>
+                       <Icon name="magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(from) ? null : 'error'}
@@ -98,7 +99,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
         </div>
 
         <p className={`text-center ${styles.separator}`}>
-          <i className="fa fa-long-arrow-right" />
+          <Icon name="long-arrow-right" />
         </p>
         <input type="hidden" name="to" />
         <div className={styles.inputWidth}>
@@ -116,7 +117,8 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                    onChange={event => this.onChange('to', event.target.value)}
                    placeholder={DateTime.Formats.DATETIME}
                    buttonAfter={(
-                     <Button disabled={disabled} onClick={() => _setDateTimeToNow('to', onChange)}><i className="fa fa-magic" />
+                     <Button disabled={disabled} onClick={() => _setDateTimeToNow('to', onChange)}>
+                       <Icon name="magic" />
                      </Button>
 )}
                    bsStyle={_isValidDateString(to) ? null : 'error'}

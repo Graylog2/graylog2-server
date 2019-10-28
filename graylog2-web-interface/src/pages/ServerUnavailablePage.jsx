@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Modal, Well } from 'components/graylog';
+import { Icon } from 'components/common';
 import DocumentTitle from 'components/common/DocumentTitle';
 
 import URLUtils from 'util/URLUtils';
@@ -97,7 +98,7 @@ class ServerUnavailablePage extends React.Component {
       <DocumentTitle title="Server unavailable">
         <Modal show>
           <Modal.Header>
-            <Modal.Title><i className="fa fa-exclamation-triangle" /> Server currently unavailable</Modal.Title>
+            <Modal.Title><Icon name="exclamation-triangle" /> Server currently unavailable</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>

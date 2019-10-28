@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { Row, Col, Table, Popover, OverlayTrigger, Button } from 'components/graylog';
-import { PaginatedList, SearchForm, Spinner } from 'components/common';
+import { PaginatedList, SearchForm, Spinner, Icon } from 'components/common';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 
 import Styles from './Overview.css';
@@ -112,7 +112,7 @@ class CachesOverview extends React.Component {
                   <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
                 </LinkContainer>
                 <OverlayTrigger trigger="click" rootClose placement="right" overlay={this._helpPopover()}>
-                  <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
+                  <Button bsStyle="link" className={Styles.searchHelpButton}><Icon name="question-circle" fixedWidth /></Button>
                 </OverlayTrigger>
               </SearchForm>
               <Table condensed hover className={Styles.overviewTable}>

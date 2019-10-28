@@ -4,6 +4,7 @@ import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
+import { Icon } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 
@@ -101,7 +102,7 @@ const LegacyHistogram = createReactClass({
 
     const resolutionSelector = (
       <ul className="graph-resolution-selector list-inline">
-        <li><i className="fa fa-clock-o" /></li>
+        <li><Icon name="clock-o" /></li>
         {resolutionLinks}
       </ul>
     );

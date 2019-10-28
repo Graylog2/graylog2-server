@@ -1,7 +1,7 @@
 import React from 'react';
-import { ProgressBar } from 'components/graylog';
 
-import { LinkToNode, Timestamp } from 'components/common';
+import { ProgressBar } from 'components/graylog';
+import { LinkToNode, Timestamp, Icon } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
@@ -27,7 +27,7 @@ class SystemJob extends React.Component {
     return (
       <div>
         <div style={{ lineHeight: 1.5, marginBottom: 5 }}>
-          <i className="fa fa-cog" />{' '}
+          <Icon name="cog" />{' '}
           <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
           - Started on <LinkToNode nodeId={job.node_id} />{' '}
           <Timestamp dateTime={job.started_at} relative />{' '}
