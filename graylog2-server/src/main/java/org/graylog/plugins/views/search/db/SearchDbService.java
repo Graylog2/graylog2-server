@@ -24,11 +24,6 @@ import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
 import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
@@ -47,14 +42,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * This class is a helper to implement a basic Mongojack-based database service that allows CRUD operations on a single DTO type.
- *
- * <p>
- * Subclasses can add more sophisticated search methods by access the protected "db" property.<br/>
- * Indices can be added in the constructor.
- * </p>
- */
 public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
     private final ViewService viewService;
