@@ -73,6 +73,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
                  name="title"
                  onChange={this._onDraftChange}
                  required
+                 maxLength={40}
                  type="text"
                  value={titleDraft} />
         </Modal.Body>
