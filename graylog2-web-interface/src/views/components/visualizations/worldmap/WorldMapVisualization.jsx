@@ -9,7 +9,7 @@ import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import MapVisualization from './MapVisualization';
-import { extractSeries } from '../ChartData';
+import { defaultSeriesExtraction } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
 const arrayToMap = ([name, x, y]) => ({ name, x, y });
@@ -20,7 +20,7 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
   const { rowPivots } = config;
   const pipeline = flow([
     transformKeys(config.rowPivots, config.columnPivots),
-    extractSeries(),
+    defaultSeriesExtraction(),
     results => results.map(arrayToMap),
   ]);
   const series = pipeline(data)
