@@ -49,8 +49,10 @@ class QueryTitleEditModal extends React.Component<Props, State> {
   _onDraftSave = () => {
     const { titleDraft } = this.state;
     const { onTitleChange } = this.props;
-    onTitleChange(titleDraft);
-    this._close();
+    if (titleDraft !== '') {
+      onTitleChange(titleDraft);
+      this._close();
+    }
   };
 
   // eslint-disable-next-line no-undef
@@ -72,7 +74,6 @@ class QueryTitleEditModal extends React.Component<Props, State> {
                  label="Title"
                  name="title"
                  onChange={this._onDraftChange}
-                 required
                  maxLength={40}
                  type="text"
                  value={titleDraft} />
