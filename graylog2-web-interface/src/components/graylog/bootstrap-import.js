@@ -15,7 +15,6 @@ export {
   Grid,
   HelpBlock,
   InputGroup,
-  Jumbotron,
   Label,
   ListGroup,
   ListGroupItem,
