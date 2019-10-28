@@ -92,9 +92,6 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new SearchDbService(
                         mongoRule.getMongoConnection(),
                         mapperProvider,
-                        viewService,
-                        viewSharingService,
-                        isViewSharedForUser,
                         dto -> new SearchRequirements(Collections.emptySet(), dto)
                 )
         );
