@@ -42,7 +42,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
@@ -54,7 +54,91 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
           className="btn-group"
         >
           <ForwardRef
-            active={false}
+            bsStyle="default"
+            onClick={[Function]}
+            title="Export to new dashboard"
+          >
+            <Button__StyledButton
+              bsStyle="default"
+              onClick={[Function]}
+              title="Export to new dashboard"
+            >
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "kRDLih",
+                      "rules": Array [
+                        [Function],
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Export to new dashboard"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Export to new dashboard"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Export to new dashboard"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
+          </ForwardRef>
+          <ForwardRef
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
@@ -126,16 +210,23 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Unsaved changes"
@@ -204,21 +295,33 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="Unsaved changes"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "#ffc107",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark"
+                        style={
+                          Object {
+                            "color": "#ffc107",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"
@@ -287,9 +390,17 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -344,7 +455,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
@@ -356,7 +467,91 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
           className="btn-group"
         >
           <ForwardRef
-            active={false}
+            bsStyle="default"
+            onClick={[Function]}
+            title="Export to new dashboard"
+          >
+            <Button__StyledButton
+              bsStyle="default"
+              onClick={[Function]}
+              title="Export to new dashboard"
+            >
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "kRDLih",
+                      "rules": Array [
+                        [Function],
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Export to new dashboard"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Export to new dashboard"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Export to new dashboard"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
+          </ForwardRef>
+          <ForwardRef
             bsStyle="default"
             disabled={false}
             onClick={[Function]}
@@ -428,16 +623,23 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Saved search"
@@ -506,21 +708,33 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="Saved search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "#007bff",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark"
+                        style={
+                          Object {
+                            "color": "#007bff",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"
@@ -589,9 +803,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
@@ -646,7 +868,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
     }
   >
     <div
-      className="position pull-right"
+      className="pull-right"
     >
       <ButtonGroup
         block={false}
@@ -658,7 +880,91 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
           className="btn-group"
         >
           <ForwardRef
-            active={false}
+            bsStyle="default"
+            onClick={[Function]}
+            title="Export to new dashboard"
+          >
+            <Button__StyledButton
+              bsStyle="default"
+              onClick={[Function]}
+              title="Export to new dashboard"
+            >
+              <StyledComponent
+                bsStyle="default"
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "SIZES": Array [
+                      "large",
+                      "small",
+                      "xsmall",
+                    ],
+                    "STYLES": Array [
+                      "success",
+                      "warning",
+                      "danger",
+                      "info",
+                      "default",
+                      "primary",
+                      "link",
+                    ],
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "Button__StyledButton-c9cbmb-0",
+                      "isStatic": false,
+                      "lastClassName": "kRDLih",
+                      "rules": Array [
+                        [Function],
+                      ],
+                    },
+                    "displayName": "Button__StyledButton",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+                onClick={[Function]}
+                title="Export to new dashboard"
+              >
+                <Button
+                  active={false}
+                  block={false}
+                  bsClass="btn"
+                  bsStyle="default"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih"
+                  disabled={false}
+                  onClick={[Function]}
+                  title="Export to new dashboard"
+                >
+                  <button
+                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    disabled={false}
+                    onClick={[Function]}
+                    title="Export to new dashboard"
+                    type="button"
+                  >
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="dashboard"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-dashboard"
+                      />
+                    </ForwardRef>
+                  </button>
+                </Button>
+              </StyledComponent>
+            </Button__StyledButton>
+          </ForwardRef>
+          <ForwardRef
             bsStyle="default"
             disabled={true}
             onClick={[Function]}
@@ -730,16 +1036,23 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Empty search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-eraser"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="eraser"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-eraser"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="Save search"
@@ -808,21 +1121,33 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="Save search"
                     type="button"
                   >
-                    <i
-                      className="fa fa-bookmark-o"
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="bookmark-o"
+                      pulse={false}
+                      spin={false}
                       style={
                         Object {
                           "color": "",
                         }
                       }
-                    />
+                    >
+                      <i
+                        className="fa fa-bookmark-o"
+                        style={
+                          Object {
+                            "color": "",
+                          }
+                        }
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>
             </Button__StyledButton>
           </ForwardRef>
           <ForwardRef
-            active={false}
             bsStyle="default"
             onClick={[Function]}
             title="List of saved searches"
@@ -891,9 +1216,17 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     title="List of saved searches"
                     type="button"
                   >
-                    <i
-                      className="fa fa-folder-o"
-                    />
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="folder-o"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-folder-o"
+                      />
+                    </ForwardRef>
                   </button>
                 </Button>
               </StyledComponent>

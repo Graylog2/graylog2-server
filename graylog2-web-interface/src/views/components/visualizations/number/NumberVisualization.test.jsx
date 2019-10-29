@@ -5,6 +5,7 @@ import { List } from 'immutable';
 import renderer from 'react-test-renderer';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualization from './NumberVisualization';
 
 jest.mock('stores/connect', () => x => x);
@@ -45,6 +46,23 @@ describe('NumberVisualization', () => {
                                                          fields={fields}
                                                          currentView={currentView} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('calls render completion callback after first render', () => {
+    const Component = () => (
+      <NumberVisualization data={data}
+                           width={200}
+                           height={200}
+                           fields={fields}
+                           currentView={currentView} />
+    );
+    const onRenderComplete = jest.fn();
+    renderer.create((
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <Component />
+      </RenderCompletionCallback.Provider>
+    ));
+    expect(onRenderComplete).toHaveBeenCalled();
   });
 
   it('changes font size upon resize', () => {

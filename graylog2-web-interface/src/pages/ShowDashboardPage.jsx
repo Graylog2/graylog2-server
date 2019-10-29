@@ -14,7 +14,7 @@ import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import { Row, Col, Alert, Button } from 'components/graylog';
-import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
+import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted, Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
@@ -275,7 +275,7 @@ const ShowDashboardPage = createReactClass({
                                    description={dashboard.description}
                                    onSaved={this._handleDashboardUpdate}
                                    buttonClass="btn-info btn-xs">
-          <i className="fa fa-pencil" />
+          <Icon name="pencil" />
         </EditDashboardModalTrigger>
       ) : null;
     const dashboardTitle = (

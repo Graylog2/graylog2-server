@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { SplitButton, MenuItem } from 'components/graylog';
+
 import ExtractorUtils from 'util/ExtractorUtils';
+import { SplitButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 
 class MessageFieldSearchActions extends React.Component {
   static propTypes = {
@@ -46,7 +48,7 @@ class MessageFieldSearchActions extends React.Component {
       <div className="message-field-actions pull-right">
         <SplitButton pullRight
                      bsSize="xsmall"
-                     title={<i className="fa fa-search-plus" />}
+                     title={<Icon name="search-plus" />}
                      key={1}
                      onClick={this.props.onAddFieldToSearchBar}
                      id={`more-actions-dropdown-field-${this.props.fieldName}`}>

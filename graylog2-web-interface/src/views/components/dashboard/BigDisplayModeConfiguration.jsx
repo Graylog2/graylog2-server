@@ -5,6 +5,7 @@ import history from 'util/History';
 
 import { Button, Checkbox, ControlLabel, FormGroup, HelpBlock, MenuItem, Modal } from 'components/graylog';
 import Input from 'components/bootstrap/Input';
+import { Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import View from 'views/logic/views/View';
 import queryTitle from 'views/logic/queries/QueryTitle';
@@ -130,7 +131,7 @@ const BigDisplayModeConfiguration = ({ disabled, view, show }: Props) => {
     <React.Fragment>
       {showConfigurationModal && <ConfigurationModal view={view} onCancel={onCancel} onSave={onSave} />}
       <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)}>
-        <i className="fa fa-desktop" /> Full Screen
+        <Icon name="desktop" /> Full Screen
       </MenuItem>
     </React.Fragment>
   );

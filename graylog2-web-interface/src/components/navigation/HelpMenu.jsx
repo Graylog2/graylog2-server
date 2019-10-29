@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { MenuItem, NavDropdown } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
-import { ExternalLink } from 'components/common';
+
+import { MenuItem, NavDropdown } from 'components/graylog';
+import { ExternalLink, Icon } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
@@ -10,7 +11,7 @@ import Routes from 'routing/Routes';
 const HelpMenu = ({ active }) => (
   <NavDropdown active={active}
                id="help-menu-dropdown"
-               title={<i className="fa fa-question-circle" aria-label="Help" />}
+               title={<Icon name="question-circle" aria-label="Help" />}
                noCaret>
 
     <LinkContainer to={Routes.getting_started(true)}>

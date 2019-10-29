@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash';
 
 import { Row, Col, Panel, HelpBlock } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { ExpandableList, ExpandableListItem, SearchForm } from 'components/common';
+import { ExpandableList, ExpandableListItem, SearchForm, Icon } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import Entity from 'logic/content-packs/Entity';
 
@@ -164,9 +164,9 @@ class ContentPackSelection extends React.Component {
 
   _entityItemHeader = (entity) => {
     if (entity instanceof Entity) {
-      return <span><i className={`fa fa-archive ${style.contentPackEntity}`} />{' '}<span>{entity.title}</span></span>;
+      return <span><Icon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></span>;
     }
-    return <span><i className="fa fa-server" />{' '}<span>{entity.title}</span></span>;
+    return <span><Icon name="server" />{' '}<span>{entity.title}</span></span>;
   };
 
   render() {
@@ -269,8 +269,8 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
             {this.props.edit && (
-            <HelpBlock>You can select between installed entities from the server (<i className="fa fa-server" />) or
-              entities from the former content pack revision (<i className={`fa fa-archive ${style.contentPackEntity}`} />).
+            <HelpBlock>You can select between installed entities from the server (<Icon name="server" />) or
+              entities from the former content pack revision (<Icon name="archive" className={style.contentPackEntity} />).
             </HelpBlock>
             )}
           </Col>

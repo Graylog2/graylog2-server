@@ -42,10 +42,10 @@ public class ElasticsearchClientConfiguration {
     Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
-    int elasticsearchMaxTotalConnections = 20;
+    int elasticsearchMaxTotalConnections = 200;
 
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = {PositiveIntegerValidator.class})
-    int elasticsearchMaxTotalConnectionsPerRoute = 2;
+    int elasticsearchMaxTotalConnectionsPerRoute = 20;
 
     @Parameter(value = "elasticsearch_max_retries", validators = {PositiveIntegerValidator.class})
     int elasticsearchMaxRetries = 2;

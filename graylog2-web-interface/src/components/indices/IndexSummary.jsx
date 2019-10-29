@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Label } from 'components/graylog';
 
-import { Timestamp } from 'components/common';
+import { Label } from 'components/graylog';
+import { Timestamp, Icon } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import { IndexSizeSummary } from 'components/indices';
@@ -67,9 +67,9 @@ class IndexSummary extends React.Component {
 
   _formatShowDetailsLink = () => {
     if (this.state.showDetails) {
-      return <span className="index-more-actions"><i className="fa fa-caret-down" /> Hide Details / Actions</span>;
+      return <span className="index-more-actions"><Icon name="caret-down" /> Hide Details / Actions</span>;
     }
-    return <span className="index-more-actions"><i className="fa fa-caret-right" /> Show Details / Actions</span>;
+    return <span className="index-more-actions"><Icon name="caret-right" /> Show Details / Actions</span>;
   };
 
   _toggleShowDetails = (event) => {

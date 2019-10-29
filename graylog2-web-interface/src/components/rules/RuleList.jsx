@@ -1,21 +1,36 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import connect from 'stores/connect';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link } from 'react-router';
 
-import { Button } from 'components/graylog';
+import { Button, ButtonToolbar } from 'components/graylog';
 import { DataTable, Timestamp } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import RuleMetricsConfigContainer from './RuleMetricsConfigContainer';
 
-const { RulesActions } = CombinedProvider.get('Rules');
+const { RulesActions, RulesStore } = CombinedProvider.get('Rules');
 
 class RuleList extends React.Component {
   static propTypes = {
     rules: PropTypes.array.isRequired,
+    metricsConfig: PropTypes.object,
   };
+
+  static defaultProps = {
+    metricsConfig: undefined,
+  };
+
+  state = {
+    openMetricsConfig: false,
+  };
+
+  componentDidMount() {
+    RulesActions.loadMetricsConfig();
+  }
 
   _delete = (rule) => {
     return () => {
@@ -65,9 +80,24 @@ class RuleList extends React.Component {
     );
   };
 
+  toggleMetricsConfig = () => {
+    const { openMetricsConfig } = this.state;
+    this.setState({ openMetricsConfig: !openMetricsConfig });
+  };
+
+  renderDebugMetricsButton = (metricsConfig) => {
+    if (metricsConfig && metricsConfig.metrics_enabled) {
+      return <Button bsStyle="warning" onClick={this.toggleMetricsConfig}>Debug Metrics: ON</Button>;
+    } else {
+      return <Button onClick={this.toggleMetricsConfig}>Debug Metrics</Button>;
+    }
+  };
+
   render() {
+    const { rules, metricsConfig } = this.props;
     const filterKeys = ['title', 'description'];
     const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Actions'];
+    const { openMetricsConfig } = this.state;
 
     return (
       <div>
@@ -76,20 +106,24 @@ class RuleList extends React.Component {
                    headers={headers}
                    headerCellFormatter={this._headerCellFormatter}
                    sortByKey="title"
-                   rows={this.props.rules}
+                   rows={rules}
                    filterBy="Title"
                    dataRowFormatter={this._ruleInfoFormatter}
                    filterLabel="Filter Rules"
                    filterKeys={filterKeys}>
-          <div className="pull-right">
+          <ButtonToolbar className="pull-right">
             <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
               <Button bsStyle="success">Create Rule</Button>
             </LinkContainer>
-          </div>
+            {this.renderDebugMetricsButton(metricsConfig)}
+          </ButtonToolbar>
         </DataTable>
+        {openMetricsConfig && <RuleMetricsConfigContainer onClose={this.toggleMetricsConfig} />}
       </div>
     );
   }
 }
 
-export default RuleList;
+export default connect(RuleList, { rules: RulesStore }, ({ rules }) => {
+  return { metricsConfig: rules ? rules.metricsConfig : rules };
+});

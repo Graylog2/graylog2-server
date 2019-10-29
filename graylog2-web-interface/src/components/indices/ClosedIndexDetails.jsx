@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'components/graylog';
 
 import ActionsProvider from 'injection/ActionsProvider';
 
+import { Alert, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import { IndexRangeSummary } from 'components/indices';
 
 const IndicesActions = ActionsProvider.getActions('Indices');
@@ -29,7 +30,7 @@ class ClosedIndexDetails extends React.Component {
     return (
       <div className="index-info">
         <IndexRangeSummary indexRange={indexRange} />
-        <Alert bsStyle="info"><i className="fa fa-info-circle" /> This index is closed. Index information is not available{' '}
+        <Alert bsStyle="info"><Icon name="info-circle" /> This index is closed. Index information is not available{' '}
           at the moment, please reopen the index and try again.
         </Alert>
 

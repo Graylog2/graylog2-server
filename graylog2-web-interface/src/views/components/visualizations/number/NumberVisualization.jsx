@@ -12,6 +12,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
 import style from './NumberVisualization.css';
+import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 type Props = {
   data: Rows,
@@ -34,6 +35,8 @@ class NumberVisualization extends React.Component<Props, State> {
     fields: PropTypes.object.isRequired,
   };
 
+  static contextType = RenderCompletionCallback;
+
   container: HTMLElement | null;
 
   constructor(props) {
@@ -41,6 +44,13 @@ class NumberVisualization extends React.Component<Props, State> {
     this.state = {
       fontSize: 20,
     };
+  }
+
+  componentDidMount() {
+    const onRenderComplete = this.context;
+    if (onRenderComplete) {
+      onRenderComplete();
+    }
   }
 
   componentDidUpdate() {

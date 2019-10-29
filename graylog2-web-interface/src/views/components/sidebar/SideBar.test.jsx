@@ -81,7 +81,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('i.sidebarIcon').simulate('click');
+    wrapper.find('[data-testid="toggle-button"]').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
 
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
@@ -104,7 +104,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('i.sidebarIcon').simulate('click');
+    wrapper.find('[data-testid="toggle-button"]').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
     expect(wrapper.find('h3').text()).toBe('New View');
     expect(wrapper.find('small').text()).toBe('No summary.');
@@ -125,7 +125,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('i.sidebarIcon').simulate('click');
+    wrapper.find('[data-testid="toggle-button"]').simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });

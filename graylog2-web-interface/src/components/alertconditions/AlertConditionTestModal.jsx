@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { BootstrapModalWrapper } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Spinner, Icon } from 'components/common';
 import { Alert, Modal, Button } from 'components/graylog';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -76,7 +76,7 @@ class AlertConditionTestModal extends React.Component {
   renderSatisfiedCondition = (testResults) => {
     return (
       <span>
-        <i className={`fa fa-bell ${style.testResultIcon}`} />
+        <Icon name="bell" className={style.testResultIcon} />
         <p className={style.testResultText}>Condition was satisfied and an Alert would be triggered.<br />
           <b>Details</b>: {testResults.description}
         </p>
@@ -87,7 +87,7 @@ class AlertConditionTestModal extends React.Component {
   renderUnsatisfiedCondition = () => {
     return (
       <div>
-        <i className={`fa fa-bell-slash ${style.testResultIcon}`} />
+        <Icon name="bell-slash" className={style.testResultIcon} />
         <p className={style.testResultText}>
           Condition was <b>not</b> satisfied and an Alert would <b>not</b> be triggered.
         </p>

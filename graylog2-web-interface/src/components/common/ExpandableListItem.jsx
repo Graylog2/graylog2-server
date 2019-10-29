@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Checkbox } from 'components/graylog';
+import Icon from './Icon';
 
 import style from './ExpandableListItem.css';
 
@@ -109,8 +110,8 @@ class ExpandableListItem extends React.Component {
           && (
           <div className={style.expandBoxContainer}>
             <div className={`fa-stack ${style.expandBox}`} role="button" tabIndex={0} onClick={this._toggleExpand}>
-              <i className={`fa fa-circle-thin fa-stack-1x ${style.iconBackground}`} />
-              <i className={`fa fa-stack-1x fa-angle-${expanded ? 'down' : 'up'}`} />
+              <Icon name="circle-thin" className={`fa-stack-1x ${style.iconBackground}`} />
+              <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
             </div>
           </div>
           )

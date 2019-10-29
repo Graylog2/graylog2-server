@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ListGroupItem } from 'components/graylog';
 import { DragSource, DropTarget } from 'react-dnd';
 
+import { ListGroupItem } from 'components/graylog';
+import Icon from './Icon';
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';
 
 const ItemTypes = {
@@ -112,7 +115,7 @@ class SortableListItem extends React.Component {
       classes.push('over');
     }
 
-    const handle = <span className={SortableListItemStyle.itemHandle}><i className="fa fa-sort" /></span>;
+    const handle = <span className={SortableListItemStyle.itemHandle}><Icon name="sort" /></span>;
 
     const component = (
       <div className="sortable-list-item">

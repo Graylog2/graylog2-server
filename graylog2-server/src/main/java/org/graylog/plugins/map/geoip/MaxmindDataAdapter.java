@@ -24,11 +24,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
+import com.maxmind.geoip2.model.AsnResponse;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import com.maxmind.geoip2.record.Country;
@@ -222,6 +224,25 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                     return LookupResult.empty();
                 } catch (Exception e) {
                     LOG.warn("Unable to look up country data for IP address {}, returning empty result.", addr, e);
+                    return LookupResult.empty();
+                }
+            case MAXMIND_ASN:
+                try {
+                    final AsnResponse asn = reader.asn(addr);
+                    if (asn == null) {
+                        LOG.debug("No ASN data for IP address {}, returning empty result.", addr);
+                        return LookupResult.empty();
+                    }
+                    final ImmutableMap<Object, Object> map = ImmutableMap.of(
+                            "as_number", asn.getAutonomousSystemNumber(),
+                            "as_organization", asn.getAutonomousSystemOrganization()
+                    );
+                    return LookupResult.multi(asn.getAutonomousSystemNumber(), map);
+                } catch (AddressNotFoundException nfe) {
+                    LOG.debug("Unable to look up ASN data for IP address {}, returning empty result.", addr, nfe);
+                    return LookupResult.empty();
+                } catch (Exception e) {
+                    LOG.warn("Unable to look up ASN data for IP address {}, returning empty result.", addr, e);
                     return LookupResult.empty();
                 }
         }

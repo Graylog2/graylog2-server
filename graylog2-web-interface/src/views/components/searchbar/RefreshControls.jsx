@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import styled from 'styled-components';
 
 // $FlowFixMe: imports from core need to be fixed in flow
 import connect from 'stores/connect';
@@ -9,10 +10,32 @@ import connect from 'stores/connect';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { MenuItem, ButtonGroup, DropdownButton, Button } from 'components/graylog';
 // $FlowFixMe: imports from core need to be fixed in flow
-import Pluralize from 'components/common/Pluralize';
+import { Icon, Pluralize } from 'components/common';
+// $FlowFixMe: imports from core need to be fixed in flow
 import { RefreshActions, RefreshStore } from 'views/stores/RefreshStore';
 
-import styles from './RefreshControls.css';
+const ControlsContainer = styled.div`
+  max-width: 100%;
+`;
+
+const FlexibleButtonGroup = styled(ButtonGroup)`
+  display: flex;
+  > .btn-group {
+    max-width: calc(100% - 34px);
+    .btn:first-child {
+      max-width: 100%;
+    }
+  }
+`;
+
+const ButtonLabel = styled.div`
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: calc(100% - 9px);
+  vertical-align: inherit;
+`;
+
 
 type RefreshConfig = {
   interval: number,
@@ -23,12 +46,7 @@ type Props = {
   refreshConfig: RefreshConfig,
 };
 
-type State = {
-  /* eslint-disable-next-line no-undef */
-  intervalId: ?IntervalID,
-};
-
-class RefreshControls extends React.Component<Props, State> {
+class RefreshControls extends React.Component<Props> {
   static propTypes = {
     refreshConfig: PropTypes.object.isRequired,
   };
@@ -43,20 +61,13 @@ class RefreshControls extends React.Component<Props, State> {
     ['5 Minutes', 300000],
   ];
 
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      intervalId: undefined,
-    };
-  }
-
   componentWillUnmount(): void {
     RefreshActions.disable();
   }
 
   _toggleEnable = (): void => {
-    if (this.props.refreshConfig.enabled) {
+    const { refreshConfig } = this.props;
+    if (refreshConfig.enabled) {
       RefreshActions.disable();
     } else {
       RefreshActions.enable();
@@ -67,27 +78,36 @@ class RefreshControls extends React.Component<Props, State> {
     RefreshActions.setInterval(interval);
   };
 
+  _buttonLabel = (refreshConfigEnabled, naturalInterval) => {
+    let buttonText = 'Not updating';
+    if (refreshConfigEnabled) {
+      buttonText = <React.Fragment>Update every {naturalInterval}</React.Fragment>;
+    }
+    return <ButtonLabel>{buttonText}</ButtonLabel>;
+  }
+
   render() {
+    const { refreshConfig } = this.props;
     const intervalOptions = RefreshControls.INTERVAL_OPTIONS.map(([label, interval]: [string, number]) => {
       return <MenuItem key={`RefreshControls-${label}`} onClick={() => this._onChange(interval)}>{label}</MenuItem>;
     });
-    const intervalDuration = moment.duration(this.props.refreshConfig.interval);
+    const intervalDuration = moment.duration(refreshConfig.interval);
     const naturalInterval = intervalDuration.asSeconds() < 60
       ? <span>{intervalDuration.asSeconds()} <Pluralize singular="second" plural="seconds" value={intervalDuration.asSeconds()} /></span>
       : <span>{intervalDuration.asMinutes()} <Pluralize singular="minute" plural="minutes" value={intervalDuration.asMinutes()} /></span>;
-    const buttonLabel = <span>Update every {naturalInterval}</span>;
+    const buttonLabel = this._buttonLabel(refreshConfig.enabled, naturalInterval);
     return (
-      <div className={`${styles.position} pull-right`}>
-        <ButtonGroup>
+      <ControlsContainer className="pull-right">
+        <FlexibleButtonGroup>
           <Button onClick={this._toggleEnable}>
-            {this.props.refreshConfig.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
+            {refreshConfig.enabled ? <Icon name="pause" /> : <Icon name="play" />}
           </Button>
 
-          <DropdownButton title={this.props.refreshConfig.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">
+          <DropdownButton title={buttonLabel} id="refresh-options-dropdown">
             {intervalOptions}
           </DropdownButton>
-        </ButtonGroup>
-      </div>
+        </FlexibleButtonGroup>
+      </ControlsContainer>
     );
   }
 }

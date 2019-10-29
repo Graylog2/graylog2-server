@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Alert } from 'components/graylog';
 
-import { IfPermitted, TypeAheadDataFilter } from 'components/common';
+import { Row, Col, Alert } from 'components/graylog';
+import { IfPermitted, TypeAheadDataFilter, Icon } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 
@@ -89,7 +89,7 @@ class StreamComponent extends React.Component {
 
       return (
         <Alert bsStyle="warning">
-          <i className="fa fa-info-circle" />&nbsp;No streams configured. {createStreamButton}
+          <Icon name="info-circle" />&nbsp;No streams configured. {createStreamButton}
         </Alert>
       );
     }

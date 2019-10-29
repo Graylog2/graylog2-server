@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { withRouter } from 'react-router';
 
 import connect from 'stores/connect';
@@ -44,7 +43,7 @@ const QueryBar = ({ children, queries, queryTitles, router, viewMetadata }) => {
   const selectQueryAndExecute = queryId => onSelectQuery(queryId);
   return (
     <QueryTabs queries={queries}
-               selectedQuery={activeQuery}
+               selectedQueryId={activeQuery}
                titles={queryTitles}
                onSelect={selectQueryAndExecute}
                onTitleChange={onTitleChange}

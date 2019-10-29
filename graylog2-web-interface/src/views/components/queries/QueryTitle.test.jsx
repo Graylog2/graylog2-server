@@ -17,31 +17,47 @@ describe('QueryTitle', () => {
     QueriesActions.duplicate = mockAction(jest.fn(() => Promise.resolve(Query.builder().newId().build())));
     ViewActions.selectQuery = mockAction(jest.fn(queryId => Promise.resolve(queryId)));
   });
-  describe('duplicate action', () => {
-    const findAction = (wrapper, name) => {
-      const openMenuTrigger = wrapper.find('i[className="fa fa-chevron-down"]');
-      openMenuTrigger.simulate('click');
 
-      wrapper.update();
-      const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
-      return () => new Promise((resolve) => {
-        onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
-        setImmediate(() => {
-          resolve();
-        });
+  const findAction = (wrapper, name) => {
+    const openMenuTrigger = wrapper.find('i[data-testid="query-action-dropdown"]');
+    openMenuTrigger.simulate('click');
+
+    wrapper.update();
+    const { onSelect } = wrapper.find(`MenuItem[children="${name}"]`).props();
+    return () => new Promise((resolve) => {
+      onSelect(undefined, { preventDefault: jest.fn(), stopPropagation: jest.fn() });
+      setImmediate(() => {
+        resolve();
       });
-    };
+    });
+  };
 
+  describe('duplicate action', () => {
     it('triggers duplication of query', () => {
-      const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={() => {}}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
       const duplicate = findAction(wrapper, 'Duplicate');
 
       return duplicate().then(() => {
         expect(QueriesActions.duplicate).toHaveBeenCalled();
       });
     });
+
     it('selects new query after duplicating it', () => {
-      const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={() => {}}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
       const duplicate = findAction(wrapper, 'Duplicate');
 
       return duplicate().then(() => {
@@ -50,31 +66,23 @@ describe('QueryTitle', () => {
       });
     });
   });
-  it('double clicking the query title opens input', () => {
-    const wrapper = mount(<QueryTitle active id="deadbeef" onChange={() => {}} onClose={() => {}} value="Foo" />);
-    expect(wrapper.find('input[value="Foo"]')).not.toExist();
-    const title = wrapper.find('span[children="Foo"]');
 
-    title.simulate('doubleClick');
-    wrapper.update();
+  describe('edit title action', () => {
+    it('opens edit modal', () => {
+      const openEditModalFn = jest.fn();
+      const wrapper = mount(
+        <QueryTitle active
+                    id="deadbeef"
+                    openEditModal={openEditModalFn}
+                    onChange={() => {}}
+                    onClose={() => Promise.resolve()}
+                    title="Foo" />,
+      );
+      const clickOnEditOption = findAction(wrapper, 'Edit Title');
 
-    expect(wrapper.find('input[value="Foo"]')).toExist();
-  });
-  it('double clicking the query title and changing the name triggers change event', () => {
-    const onChange = jest.fn();
-    const wrapper = mount(<QueryTitle active id="deadbeef" onChange={onChange} onClose={() => {}} value="Foo" />);
-    const title = wrapper.find('span[children="Foo"]');
-
-    title.simulate('doubleClick');
-    wrapper.update();
-
-    const input = wrapper.find('input[value="Foo"]');
-
-    input.simulate('change', { target: { value: 'Bar' } });
-
-    const form = wrapper.find('form');
-    form.simulate('submit');
-
-    expect(onChange).toHaveBeenCalledWith('Bar');
+      return clickOnEditOption().then(() => {
+        expect(openEditModalFn).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 });

@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { DropdownButton, MenuItem } from 'components/graylog';
 import { Link } from 'react-router';
 
+import { DropdownButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -14,7 +15,7 @@ import Routes from 'routing/Routes';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const { DashboardsActions } = CombinedProvider.get('Dashboards');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 const Dashboard = createReactClass({
@@ -74,7 +75,7 @@ const Dashboard = createReactClass({
 
   render() {
     const createdFromContentPack = (this.props.dashboard.content_pack
-      ? <i className="fa fa-cube" title="Created from content pack" /> : null);
+      ? <Icon name="cube" title="Created from content pack" /> : null);
 
     return (
       <li className="stream">

@@ -1,9 +1,18 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'components/graylog';
 import lodash from 'lodash';
 import IsolatedScroll from 'react-isolated-scroll';
+
+import {
+  FormControl,
+  FormGroup,
+  Icon,
+  ListGroup,
+  ListGroupItem,
+  OverlayTrigger,
+  Popover,
+} from 'components/graylog';
 
 import style from './SelectPopover.css';
 
@@ -138,7 +147,7 @@ const SelectPopover = createReactClass({
   renderClearSelectionItem() {
     return (
       <ListGroupItem onClick={this.clearItemSelection}>
-        <i className="fa fa-fw fa-times text-danger" /> {this.props.clearSelectionText}
+        <Icon name="times" fixedWidth className="text-danger" /> {this.props.clearSelectionText}
       </ListGroupItem>
     );
   },

@@ -2,17 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Select from 'components/common/Select';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 const StreamsFilter = ({ disabled, value, streams, onChange }) => {
   const selectedStreams = value.join(',');
+  const placeholder = 'Select streams the search should include. Searches in all streams if empty.';
+  const options = streams.sort(({ key: key1 }, { key: key2 }) => defaultCompare(key1, key2));
   return (
-    <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter">
-      <Select placeholder="Select streams the search should include. Searches in all streams if empty."
+    <div style={{ position: 'relative', zIndex: 10 }} data-testid="streams-filter" title={placeholder}>
+      <Select placeholder={placeholder}
               disabled={disabled}
               displayKey="key"
               inputId="streams-filter"
               onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
-              options={streams}
+              options={options}
               multi
               style={{ width: '100%' }}
               value={selectedStreams} />

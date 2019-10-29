@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
+import { Icon } from 'components/common';
 import ActionDropdown from 'views/components/common/ActionDropdown';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 };
 
 const QueryActionDropdown = ({ children }: Props) => (
-  <ActionDropdown element={<i className="fa fa-chevron-down" />}>
+  <ActionDropdown element={<Icon name="chevron-down" data-testid="query-action-dropdown" />}>
     {children}
   </ActionDropdown>
 );

@@ -114,6 +114,7 @@ exports[`WidgetQueryControls should do something 1`] = `
       <div
         data-testid="streams-filter"
         style="position: relative; z-index: 10;"
+        title="Select streams the search should include. Searches in all streams if empty."
       >
         <div
           class="css-1pcexqc-container"
@@ -125,7 +126,7 @@ exports[`WidgetQueryControls should do something 1`] = `
               class="css-1hio1c"
             >
               <div
-                class="css-15vyb8i-placeholder"
+                class="css-22r4e1-placeholder"
               >
                 Select streams the search should include. Searches in all streams if empty.
               </div>

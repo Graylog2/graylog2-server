@@ -82,6 +82,11 @@ class SimulatorInterpreterListener implements InterpreterListener {
     }
 
     @Override
+    public void finishExecuteRule(Rule rule, Pipeline pipeline) {
+        executionTrace.addTrace("Finished execution " + rule + " in " + pipeline);
+    }
+
+    @Override
     public void failExecuteRule(Rule rule, Pipeline pipeline) {
         executionTrace.addTrace("Failed execution " + rule + " in " + pipeline);
     }

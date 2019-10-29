@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Row, Col, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 import ObjectUtils from 'util/ObjectUtils';
@@ -96,7 +98,7 @@ class TimeRangeOptionsForm extends React.Component {
                        value={description}
                        onChange={this._onChange(idx, 'description')} />
                 <span className="input-group-addon">
-                  <i className="fa fa-trash" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
+                  <Icon name="fa-trash" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
                 </span>
               </div>
             </Col>

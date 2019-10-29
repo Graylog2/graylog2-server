@@ -1,7 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col } from 'components/graylog';
 
+import { Row, Col } from 'components/graylog';
+import { Icon } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import style from './PluginList.css';
 
@@ -16,7 +17,7 @@ const PluginList = createReactClass({
     const plugin = PluginStore.get().filter(p => p.metadata.name === pluginName)[0];
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <i className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`} />&nbsp;
+        <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );

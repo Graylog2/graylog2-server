@@ -2,10 +2,10 @@
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 1000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -31,7 +31,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         role="button"
         type="button"
       >
-        Not updating
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
+          Not updating
+        </div>
          
         <span
           className="caret"
@@ -148,10 +152,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: false and interval: 300000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -177,7 +181,11 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
         role="button"
         type="button"
       >
-        Not updating
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
+          Not updating
+        </div>
          
         <span
           className="caret"
@@ -294,10 +302,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 1000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -323,7 +331,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             1
@@ -332,7 +342,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               second
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -449,10 +459,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 2000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -478,7 +488,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             2
@@ -487,7 +499,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               seconds
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -604,10 +616,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 5000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -633,7 +645,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             5
@@ -642,7 +656,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               seconds
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -759,10 +773,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 10000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -788,7 +802,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             10
@@ -797,7 +813,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               seconds
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -914,10 +930,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 30000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -943,7 +959,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             30
@@ -952,7 +970,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               seconds
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -1069,10 +1087,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 60000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -1098,7 +1116,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             1
@@ -1107,7 +1127,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               minute
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"
@@ -1224,10 +1244,10 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
 
 exports[`RefreshControls rendering it renders refresh controlls with enabled: true and interval: 300000 1`] = `
 <div
-  className="position pull-right"
+  className="pull-right RefreshControls__ControlsContainer-sc-1pygk8n-0 kShVuS"
 >
   <div
-    className="btn-group"
+    className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
       className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
@@ -1253,7 +1273,9 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
         role="button"
         type="button"
       >
-        <span>
+        <div
+          className="RefreshControls__ButtonLabel-sc-1pygk8n-2 jztvlP"
+        >
           Update every 
           <span>
             5
@@ -1262,7 +1284,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
               minutes
             </span>
           </span>
-        </span>
+        </div>
          
         <span
           className="caret"

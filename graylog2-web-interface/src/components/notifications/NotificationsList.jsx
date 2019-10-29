@@ -1,11 +1,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import { Alert, Row, Col } from 'components/graylog';
 
 import StoreProvider from 'injection/StoreProvider';
 
-import { Spinner } from 'components/common';
+import { Alert, Row, Col } from 'components/graylog';
+import { Icon, Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 
 const NotificationsStore = StoreProvider.getStore('Notifications');
@@ -39,7 +39,7 @@ const NotificationsList = createReactClass({
       title = 'No notifications';
       content = (
         <Alert bsStyle="success" className="notifications-none">
-          <i className="fa fa-check-circle" />{' '}
+          <Icon name="check-circle" />{' '}
           &nbsp;No notifications
         </Alert>
       );

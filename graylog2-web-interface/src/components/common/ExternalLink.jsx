@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import Icon from './Icon';
+
 /**
  * Component that renders a link to an external resource.
  */
@@ -22,7 +24,7 @@ class ExternalLink extends React.Component {
   static defaultProps = {
     href: '',
     target: '_blank',
-    iconClass: 'fa-external-link',
+    iconClass: 'external-link',
     className: '',
   };
 
@@ -31,7 +33,7 @@ class ExternalLink extends React.Component {
       <span>
         {this.props.children}
         &nbsp;
-        <i className={`fa ${this.props.iconClass}`} />
+        <Icon name={this.props.iconClass} />
       </span>
     );
 

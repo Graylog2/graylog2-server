@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -76,6 +77,20 @@ public class DBProcessingStatusService {
                 mapper.get());
 
         db.createIndex(new BasicDBObject(ProcessingStatusDto.FIELD_NODE_ID, 1), new BasicDBObject("unique", true));
+
+        // Remove the old (3.1.0) index before creating the new one. This is needed, because mongodb >= 4.2 won't allow
+        // the creation of identical indices with a different name. We don't use a migration,
+        // because it can race with the code below that creates the same index with a shorter name.
+        // TODO remove this in a future release (maybe at 3.5)
+        final String OLD_INDEX_NAME = "updated_at_1_input_journal.uncommitted_entries_1_input_journal.written_messages_1m_rate_1";
+        try {
+            if (db.getIndexInfo().stream().anyMatch(dbo -> dbo.get("name").equals(OLD_INDEX_NAME))) {
+                db.dropIndex(OLD_INDEX_NAME);
+            }
+        } catch (MongoException ignored) {
+            // index was either never created or already deleted
+        }
+
         // Use a custom index name to avoid the automatically generated index name which will be pretty long and
         // might cause errors due to the 127 character index name limit. (e.g. when using a long database name)
         // See: https://github.com/Graylog2/graylog2-server/issues/6322

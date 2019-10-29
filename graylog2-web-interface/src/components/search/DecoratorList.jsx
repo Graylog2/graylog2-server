@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 
-import { SortableList } from 'components/common';
+import { Alert } from 'components/graylog';
+import { SortableList, Icon } from 'components/common';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
@@ -23,7 +23,7 @@ class DecoratorList extends React.Component {
     if (!this.props.decorators || this.props.decorators.length === 0) {
       return (
         <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-          <i className="fa fa-info-circle" />&nbsp;No decorators configured.
+          <Icon name="info-circle" />&nbsp;No decorators configured.
         </Alert>
       );
     }

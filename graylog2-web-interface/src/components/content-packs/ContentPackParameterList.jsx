@@ -3,7 +3,7 @@ import React from 'react';
 import { findIndex } from 'lodash';
 
 import { Button, Modal, ButtonToolbar, Badge } from 'components/graylog';
-import { DataTable, SearchForm } from 'components/common';
+import { DataTable, SearchForm, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackEditParameter from 'components/content-packs/ContentPackEditParameter';
 
@@ -61,7 +61,7 @@ class ContentPackParameterList extends React.Component {
     const { onDeleteParameter, readOnly } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
     const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
-    const icon = parameterApplied ? 'fa fa-check' : 'fa fa-times';
+    const icon = parameterApplied ? 'check' : 'times';
     const bsStyle = parameterApplied ? 'success' : 'failure';
 
     return (
@@ -71,7 +71,7 @@ class ContentPackParameterList extends React.Component {
         <td className={ContentPackParameterListStyle.bigColumns}>{parameter.description}</td>
         <td>{parameter.type}</td>
         <td>{ContentPackUtils.convertToString(parameter)}</td>
-        <td><Badge className={bsStyle}><i className={icon} /></Badge></td>
+        <td><Badge className={bsStyle}><Icon name={icon} /></Badge></td>
         {!readOnly
         && (
         <td>
