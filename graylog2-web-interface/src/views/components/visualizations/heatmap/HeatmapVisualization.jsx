@@ -27,7 +27,14 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
 const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   const showSummaryCol = false;
   const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, showSummaryCol);
-  const layout = { yaxis: { type: 'category' }, xaxis: { type: 'category' } };
+  const axisConfig = {
+    type: 'category',
+    fixedrange: true,
+  };
+  const layout = {
+    yaxis: axisConfig,
+    xaxis: axisConfig,
+  };
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
   );
