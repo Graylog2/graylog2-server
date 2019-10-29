@@ -5,7 +5,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { rgba } from 'polished';
 
 import { useTheme } from 'theme/GraylogThemeContext';
-import NotFoundBackgroundImage from '../../public/images/not-found-bg.jpg';
+import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
 
 const GlobalStyle = createGlobalStyle`
   body {

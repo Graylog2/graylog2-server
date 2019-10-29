@@ -9,7 +9,7 @@ const Jumbotron = forwardRef((props, ref) => {
   const { colors } = useTheme();
   const StyledJumbotron = useCallback(styled(BootstrapJumbotron)`
     color: ${colors.primary.tre};
-    background-color: ${colors.secondary.tre};
+    background-color: ${colors.primary.due};
   `, []);
 
   return (
