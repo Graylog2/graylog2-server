@@ -10,15 +10,15 @@ export type ChartDefinition = {
   name: string,
   x?: Array<string>,
   y?: Array<any>,
-  z?: Array<any>,
+  z?: Array<Array<any>>,
 };
 
-export type ChartData = [any, Array<Key>, Array<any>, Array<any>]
+export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>]
 export type ExtractedSeries = Array<ChartData>;
 
 export type KeyJoiner = (Array<any>) => string;
 
-export type Generator = (string, string, Array<string>, Array<any>, Array<any>, number, number) => ChartDefinition;
+export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number) => ChartDefinition;
 
 const _defaultKeyJoiner = keys => keys.join('-');
 
