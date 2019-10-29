@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.errors;
+package org.graylog.plugins.views.search.rest.exceptionmappers;
 
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Test;

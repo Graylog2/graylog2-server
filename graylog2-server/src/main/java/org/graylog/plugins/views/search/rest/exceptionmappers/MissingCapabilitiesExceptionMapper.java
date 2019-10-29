@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.errors;
+package org.graylog.plugins.views.search.rest.exceptionmappers;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-
 import java.util.Map;
 
 public class MissingCapabilitiesExceptionMapper implements ExceptionMapper<MissingCapabilitiesException> {
