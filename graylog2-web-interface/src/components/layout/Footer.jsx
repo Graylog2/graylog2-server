@@ -10,9 +10,19 @@ const SystemStore = StoreProvider.getStore('System');
 const Footer = createReactClass({
   displayName: 'Footer',
   mixins: [Reflux.connect(SystemStore)],
+  mounted: false,
 
   componentDidMount() {
-    SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
+    this.mounted = true;
+    SystemStore.jvm().then((jvmInfo) => {
+      if (this.mounted) {
+        this.setState({ jvm: jvmInfo });
+      }
+    });
+  },
+
+  componentWillUnmount() {
+    this.mounted = false;
   },
 
   _isLoading() {
