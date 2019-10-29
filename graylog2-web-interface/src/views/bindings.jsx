@@ -19,7 +19,7 @@ import NumberVisualization from 'views/components/visualizations/number/NumberVi
 import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
-import HeatMapVisualization from 'views/components/visualizations/heatmap/HeatMapVisualization';
+import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -277,9 +277,9 @@ export default {
       component: ScatterVisualization,
     },
     {
-      type: HeatMapVisualization.type,
+      type: HeatmapVisualization.type,
       displayName: 'Heatmap',
-      component: HeatMapVisualization,
+      component: HeatmapVisualization,
     },
   ],
   creators: [
