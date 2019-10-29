@@ -60,6 +60,7 @@ const validData = [
       { key: ['count()'], value: 100000, rollup: true, source: 'row-inner' },
     ],
     source: 'non-leaf',
-  }];
+  },
+];
 // eslint-disable-next-line import/prefer-default-export
 export { validData };

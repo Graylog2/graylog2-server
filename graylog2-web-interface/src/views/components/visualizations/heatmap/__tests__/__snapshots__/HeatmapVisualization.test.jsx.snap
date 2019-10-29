@@ -311,6 +311,18 @@ exports[`HeatmapVisualization renders correctly 1`] = `
       },
     ]
   }
+  effectiveTimerange={
+    Object {
+      "from": "2019-10-22T11:54:35.850Z",
+      "to": "2019-10-29T11:53:50.000Z",
+      "type": "absolute",
+    }
+  }
+  fields={Immutable.List []}
+  height={1024}
+  onChange={[Function]}
+  toggleEdit={[Function]}
+  width={800}
 >
   <GenericPlot
     chartData={
