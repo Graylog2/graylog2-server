@@ -143,6 +143,13 @@ public abstract class Search {
         return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
     }
 
+    Set<String> usedStreamIds() {
+        return queries().stream()
+                .map(Query::usedStreamIds)
+                .reduce(Sets::union)
+                .orElseThrow(() -> new RuntimeException("Failed to get used stream IDs from query"));
+    }
+
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {

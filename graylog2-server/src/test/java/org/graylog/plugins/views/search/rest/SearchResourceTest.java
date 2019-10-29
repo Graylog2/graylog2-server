@@ -130,7 +130,7 @@ public class SearchResourceTest {
 
     @Test
     public void getSearchAllowsAccessToSearchReturnedByService() {
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
 
         final Search returnedSearch = this.searchResource.getSearch(search.id());
 
@@ -151,7 +151,7 @@ public class SearchResourceTest {
     public void executeQueryAddsCurrentUserAsOwner() {
         mockCurrentUserName("basti");
 
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
 
         this.searchResource.executeQuery(search.id(), Collections.emptyMap());
 
@@ -165,7 +165,7 @@ public class SearchResourceTest {
     public void executeSyncJobAddsCurrentUserAsOwner() {
         mockCurrentUserName("peterchen");
 
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
 
         this.searchResource.executeSyncJob(search, 100);
 
@@ -177,7 +177,7 @@ public class SearchResourceTest {
 
     @Test
     public void executeQueryAppliesExecutionState() {
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
         final Map<String, Object> executionState = ImmutableMap.of("foo", 42);
 
         when(searchDbService.get(search.id())).thenReturn(Optional.of(search));
@@ -192,20 +192,20 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void authorizationFailureInAsyncExecutionLeadsTo403() {
-        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
+    public void guardExceptionInAsyncExecutionLeadsTo403() {
+        final Search search = mockExistingSearch();
 
-        final String searchId = mockValidSearch().id();
+        throwGuardExceptionFor(search);
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeQuery(searchId, null));
+                .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null));
     }
 
     @Test
-    public void authorizationFailureInSynchronousExecutionLeadsTo403() {
-        doThrow(new ForbiddenException()).when(executionGuard).check(any(), any());
+    public void guardExceptionInSynchronousExecutionLeadsTo403() {
+        final Search search = mockExistingSearch();
 
-        final Search search = mockValidSearch();
+        throwGuardExceptionFor(search);
 
         assertThatExceptionOfType(ForbiddenException.class)
                 .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
@@ -213,7 +213,7 @@ public class SearchResourceTest {
 
     @Test
     public void failureToAddDefaultStreamsInAsyncSearchLeadsTo403() {
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
 
         doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
 
@@ -223,7 +223,7 @@ public class SearchResourceTest {
 
     @Test
     public void failureToAddDefaultStreamsInSynchronousSearchLeadsTo403() {
-        final Search search = mockValidSearch();
+        final Search search = mockExistingSearch();
 
         doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
 
@@ -231,23 +231,45 @@ public class SearchResourceTest {
                 .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
     }
 
+    @Test
+    public void guardExceptionOnPostLeadsTo403() {
+        final Search search = mockNewSearch();
+
+        throwGuardExceptionFor(search);
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> searchResource.createSearch(search));
+    }
+
     private void mockCurrentUserName(String name) {
         when(currentUser.getName()).thenReturn(name);
     }
 
-    private Search mockValidSearch() {
-        final String searchId = "deadbeef";
-        final String streamId = "streamId";
+    private void throwGuardExceptionFor(Search search) {
+        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
+    }
 
+    private Search mockNewSearch() {
         final Search search = mock(Search.class);
-        when(search.id()).thenReturn(searchId);
+
         when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
 
+        final String streamId = "streamId";
         when(subject.isPermitted(RestPermissions.STREAMS_READ + ":" + streamId)).thenReturn(true);
 
         final Query query = mock(Query.class);
         when(query.usedStreamIds()).thenReturn(ImmutableSet.of(streamId));
         when(search.queries()).thenReturn(ImmutableSet.of(query));
+
+        return search;
+    }
+
+    private Search mockExistingSearch() {
+
+        final Search search = mockNewSearch();
+
+        final String searchId = "deadbeef";
+        when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
         when(searchDbService.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
