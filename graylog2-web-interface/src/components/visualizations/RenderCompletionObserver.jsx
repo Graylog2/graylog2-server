@@ -18,7 +18,8 @@ class RenderCompletionObserver extends React.Component {
       return;
     }
     this._renderComplete = true;
-    this.props.onRenderComplete();
+    const { onRenderComplete } = this.props;
+    onRenderComplete();
   };
 
   render() {
