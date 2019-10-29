@@ -69,7 +69,7 @@ class QueryTitleEditModal extends React.Component<Props, State> {
         </Modal.Header>
         <Modal.Body>
           <Input autoFocus
-                 help="The title of the query tab."
+                 help="The title of the query tab. It has a maximum length of 40 characters."
                  id="title"
                  label="Title"
                  name="title"
