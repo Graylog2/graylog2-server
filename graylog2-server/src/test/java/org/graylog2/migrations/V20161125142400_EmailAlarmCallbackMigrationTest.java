@@ -78,7 +78,7 @@ public class V20161125142400_EmailAlarmCallbackMigrationTest {
     public void setUp() throws Exception {
         final User localAdmin = mock(User.class);
         when(localAdmin.getId()).thenReturn(localAdminId);
-        when(userService.getAdminUser()).thenReturn(localAdmin);
+        when(userService.getRootUser()).thenReturn(Optional.of(localAdmin));
 
         this.emailAlarmCallbackMigrationPeriodical = new V20161125142400_EmailAlarmCallbackMigration(clusterConfigService,
             streamService,

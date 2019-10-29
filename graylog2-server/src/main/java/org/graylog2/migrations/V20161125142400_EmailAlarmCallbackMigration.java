@@ -63,7 +63,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
         this.streamService = streamService;
         this.alarmCallbackService = alarmCallbackService;
         this.emailAlarmCallback = emailAlarmCallback;
-        this.localAdminUser = userService.getAdminUser();
+        this.localAdminUser = userService.getRootUser().orElse(null);
     }
 
     @Override
@@ -117,6 +117,11 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
     }
 
     private Optional<String> migrateStream(Stream stream) {
+        if (localAdminUser == null) {
+            throw new IllegalStateException("The root user is disabled. This migration will run only with the root " +
+                                                    "user enabled");
+        }
+
         final Map<String, Object> defaultConfig = this.getDefaultEmailAlarmCallbackConfig();
         LOG.debug("Creating email alarm callback for stream <" + stream.getId() + ">");
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackService.create(stream.getId(),
