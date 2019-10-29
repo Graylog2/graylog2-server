@@ -1,0 +1,379 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UpdateSearchForWidgets should generate a new search for the view 1`] = `
+Object {
+  "created_at": "2019-07-05T07:35:42.335Z",
+  "description": "",
+  "id": "5d6d03909889ecf444527f98",
+  "owner": "admin",
+  "properties": Immutable.List [],
+  "search_id": "5d6ce7bd5d1eb45af534399e",
+  "state": Immutable.Map {
+    "f678e6c5-43b1-4200-b5c3-d33eae164dea": Object {
+      "formatting": Object {
+        "highlighting": Array [],
+      },
+      "positions": Object {
+        "3d568826-fe3d-413a-99a6-09e51d82c851": Object {
+          "col": 9,
+          "height": 2,
+          "row": 1,
+          "width": 4,
+        },
+        "897a0961-a548-4651-9ca6-f3d6f21b8379": Object {
+          "col": 1,
+          "height": 4,
+          "row": 3,
+          "width": 4,
+        },
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": Object {
+          "col": 1,
+          "height": 2,
+          "row": 7,
+          "width": "Infinity",
+        },
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": Object {
+          "col": 1,
+          "height": 2,
+          "row": 1,
+          "width": 4,
+        },
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": Object {
+          "col": 9,
+          "height": 4,
+          "row": 3,
+          "width": 4,
+        },
+        "ec997825-6065-4fb7-ba86-427e74109ee4": Object {
+          "col": 5,
+          "height": 4,
+          "row": 3,
+          "width": 4,
+        },
+        "ef9e676a-2d08-4433-b082-2617878a6e59": Object {
+          "col": 1,
+          "height": 6,
+          "row": 9,
+          "width": "Infinity",
+        },
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": Object {
+          "col": 5,
+          "height": 2,
+          "row": 1,
+          "width": 4,
+        },
+      },
+      "selected_fields": Array [
+        "source",
+        "message",
+      ],
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {
+          "98ccf13e-6dec-4362-bcf3-a4776f457061": "Message Count",
+          "ef9e676a-2d08-4433-b082-2617878a6e59": "All Messages",
+          "c78e9a51-2e36-4ec4-86de-9df4d29f0863": "First Commit",
+          "3d568826-fe3d-413a-99a6-09e51d82c851": "Last Commit",
+          "fb496a41-4358-4bc8-b19f-244c71fe9143": "Commit Count",
+          "897a0961-a548-4651-9ca6-f3d6f21b8379": "Commit per Weekday",
+          "ec997825-6065-4fb7-ba86-427e74109ee4": "Work Time",
+          "dc4a61b2-26e6-468e-bac2-f7702846ca92": "Project Distribution",
+        },
+        "tab": Immutable.Map {
+          "title": "AuthorOverview",
+        },
+      },
+      "widget_mapping": Immutable.Map {
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": Immutable.Set [
+          "dead-beef",
+        ],
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": Immutable.Set [
+          "dead-beef",
+        ],
+        "ec997825-6065-4fb7-ba86-427e74109ee4": Immutable.Set [
+          "dead-beef",
+        ],
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": Immutable.Set [
+          "dead-beef",
+        ],
+        "897a0961-a548-4651-9ca6-f3d6f21b8379": Immutable.Set [
+          "dead-beef",
+        ],
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": Immutable.Set [
+          "dead-beef",
+        ],
+        "3d568826-fe3d-413a-99a6-09e51d82c851": Immutable.Set [
+          "dead-beef",
+        ],
+        "ef9e676a-2d08-4433-b082-2617878a6e59": Immutable.Set [
+          "dead-beef",
+        ],
+      },
+      "widgets": Immutable.List [
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "formatting_settings": Object {
+              "chart_colors": Object {
+                "count()": "#455a64",
+              },
+            },
+            "rollup": true,
+            "row_pivots": Array [
+              Object {
+                "config": Object {
+                  "limit": 15,
+                },
+                "field": "project",
+                "type": "values",
+              },
+            ],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [
+              Object {
+                "direction": "Descending",
+                "field": "count()",
+                "type": "series",
+              },
+            ],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "dc4a61b2-26e6-468e-bac2-f7702846ca92",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "rollup": true,
+            "row_pivots": Array [],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": "Message Count",
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "numeric",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "fb496a41-4358-4bc8-b19f-244c71fe9143",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "formatting_settings": Object {
+              "chart_colors": Object {
+                "count()": "#fbc02d",
+              },
+            },
+            "rollup": true,
+            "row_pivots": Array [
+              Object {
+                "config": Object {
+                  "limit": 24,
+                },
+                "field": "hour",
+                "type": "values",
+              },
+            ],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [
+              Object {
+                "direction": "Ascending",
+                "field": "hour",
+                "type": "pivot",
+              },
+            ],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "ec997825-6065-4fb7-ba86-427e74109ee4",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "rollup": true,
+            "row_pivots": Array [],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "min(timestamp)",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "numeric",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "c78e9a51-2e36-4ec4-86de-9df4d29f0863",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "formatting_settings": Object {
+              "chart_colors": Object {
+                "count()": "#689f38",
+              },
+            },
+            "rollup": true,
+            "row_pivots": Array [
+              Object {
+                "config": Object {
+                  "limit": 15,
+                },
+                "field": "dayOfTheWeek",
+                "type": "values",
+              },
+              Object {
+                "config": Object {
+                  "limit": 15,
+                },
+                "field": "weekday",
+                "type": "values",
+              },
+            ],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [
+              Object {
+                "direction": "Ascending",
+                "field": "dayOfTheWeek",
+                "type": "pivot",
+              },
+            ],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "897a0961-a548-4651-9ca6-f3d6f21b8379",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "rollup": true,
+            "row_pivots": Array [
+              Object {
+                "config": Object {
+                  "interval": Object {
+                    "scaling": null,
+                    "type": "auto",
+                  },
+                },
+                "field": "timestamp",
+                "type": "time",
+              },
+            ],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "98ccf13e-6dec-4362-bcf3-a4776f457061",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "rollup": true,
+            "row_pivots": Array [],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "max(timestamp)",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "numeric",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "3d568826-fe3d-413a-99a6-09e51d82c851",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "fields": Array [
+              "timestamp",
+              "source",
+              "lines_add",
+              "lines_removed",
+            ],
+            "show_message_row": true,
+          },
+          "filter": undefined,
+          "id": "ef9e676a-2d08-4433-b082-2617878a6e59",
+          "query": null,
+          "streams": Array [],
+          "timerange": null,
+          "type": "messages",
+        },
+      ],
+    },
+  },
+  "summary": "",
+  "title": "Author Commit History",
+  "type": "SEARCH",
+}
+`;

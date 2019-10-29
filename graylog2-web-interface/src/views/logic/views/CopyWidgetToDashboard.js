@@ -8,6 +8,7 @@ import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import Query from 'views/logic/queries/Query';
 
+import UpdateSearchForWidgets from './UpdateSearchForWidgets';
 
 type QueryId = string;
 
@@ -27,7 +28,7 @@ const _findWidgetAndQueryIdInView = (widgetId: string, view: View): ?[Widget, Qu
 const _addWidgetToDashboard = (widget: Widget, dashboard: View): View => {
   const dashboardQueryId = dashboard.state.keySeq().first();
   const viewState = dashboard.state.get(dashboardQueryId);
-  const newViewState = viewState.builder()
+  const newViewState = viewState.toBuilder()
     .widgets(viewState.widgets.push(widget))
     .build();
   return dashboard.toBuilder()
@@ -59,7 +60,7 @@ const CopyWidgetToDashboard = (widgetId: string, search: View, dashboard: View):
       .streams(streams)
       .build();
 
-    return _addWidgetToDashboard(dashboardWidget, dashboard);
+    return UpdateSearchForWidgets(_addWidgetToDashboard(dashboardWidget, dashboard));
   }
 
   return undefined;

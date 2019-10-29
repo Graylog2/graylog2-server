@@ -200,10 +200,6 @@ export const ViewStore: ViewStoreType = singletonStore(
       return [view, false];
     },
     _state(): ViewStoreState {
-      if (this.view) {
-        console.log(JSON.stringify(this.view, null, 2));
-        console.log(JSON.stringify(this.view.search, null, 2));
-      }
       return {
         activeQuery: this.activeQuery,
         view: this.view,

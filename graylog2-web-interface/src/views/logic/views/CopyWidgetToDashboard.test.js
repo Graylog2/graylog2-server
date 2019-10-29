@@ -5,6 +5,12 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import copyWidgetToDashboard from './CopyWidgetToDashboard';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
+jest.mock('../Widgets', () => ({
+  widgetDefinition: () => ({ searchTypes: () => [{}] }),
+}));
+
 const cwd = dirname(__filename);
 const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
