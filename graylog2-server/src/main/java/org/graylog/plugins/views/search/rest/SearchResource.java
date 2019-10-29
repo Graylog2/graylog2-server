@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchMetadata;
@@ -90,6 +91,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final ObjectMapper objectMapper;
     private final PermittedStreams permittedStreams;
     private final SearchExecutionGuard executionGuard;
+    private final SearchDomain searchDomain;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
@@ -97,13 +99,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
                           PermittedStreams permittedStreams,
-                          SearchExecutionGuard executionGuard) {
+                          SearchExecutionGuard executionGuard,
+                          SearchDomain searchDomain) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
         this.permittedStreams = permittedStreams;
         this.executionGuard = executionGuard;
+        this.searchDomain = searchDomain;
     }
 
     @VisibleForTesting
@@ -143,8 +147,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDbService.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(ViewsRestPermissions.VIEW_READ, viewId))
-                .orElseThrow(() -> new NotFoundException("No such search " + searchId));
+        return searchDomain.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(ViewsRestPermissions.VIEW_READ));
     }
 
     @GET
