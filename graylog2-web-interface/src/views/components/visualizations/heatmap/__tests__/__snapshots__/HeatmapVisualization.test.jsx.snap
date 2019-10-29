@@ -436,9 +436,11 @@ exports[`HeatmapVisualization renders correctly 1`] = `
     layout={
       Object {
         "xaxis": Object {
+          "fixedrange": true,
           "type": "category",
         },
         "yaxis": Object {
+          "fixedrange": true,
           "type": "category",
         },
       }
@@ -581,9 +583,11 @@ exports[`HeatmapVisualization renders correctly 1`] = `
           },
           "showlegend": true,
           "xaxis": Object {
+            "fixedrange": true,
             "type": "category",
           },
           "yaxis": Object {
+            "fixedrange": true,
             "type": "category",
           },
         }
@@ -734,9 +738,11 @@ exports[`HeatmapVisualization renders correctly 1`] = `
             },
             "showlegend": true,
             "xaxis": Object {
+              "fixedrange": true,
               "type": "category",
             },
             "yaxis": Object {
+              "fixedrange": true,
               "type": "category",
             },
           }
