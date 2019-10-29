@@ -435,6 +435,10 @@ exports[`HeatmapVisualization renders correctly 1`] = `
     }
     layout={
       Object {
+        "margin": Object {
+          "b": 80,
+          "l": 80,
+        },
         "xaxis": Object {
           "fixedrange": true,
           "type": "category",
@@ -575,8 +579,8 @@ exports[`HeatmapVisualization renders correctly 1`] = `
           },
           "margin": Object {
             "autoexpand": true,
-            "b": 40,
-            "l": 40,
+            "b": 80,
+            "l": 80,
             "pad": 0,
             "r": 10,
             "t": 10,
@@ -730,8 +734,8 @@ exports[`HeatmapVisualization renders correctly 1`] = `
             },
             "margin": Object {
               "autoexpand": true,
-              "b": 40,
-              "l": 40,
+              "b": 80,
+              "l": 80,
               "pad": 0,
               "r": 10,
               "t": 10,

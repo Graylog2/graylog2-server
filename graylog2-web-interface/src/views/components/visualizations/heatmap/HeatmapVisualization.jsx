@@ -33,6 +33,10 @@ const HeatmapVisualization: VisualizationComponent = ({ config, data }: Visualiz
   const layout = {
     yaxis: axisConfig,
     xaxis: axisConfig,
+    margin: {
+      b: 80,
+      l: 80,
+    },
   };
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
