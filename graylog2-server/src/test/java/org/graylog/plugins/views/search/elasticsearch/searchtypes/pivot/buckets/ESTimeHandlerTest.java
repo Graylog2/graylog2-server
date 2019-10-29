@@ -73,6 +73,7 @@ public class ESTimeHandlerTest {
         when(time.field()).thenReturn("foobar");
         final ESPivot.AggTypes aggTypes = mock(ESPivot.AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }
 
     @Test

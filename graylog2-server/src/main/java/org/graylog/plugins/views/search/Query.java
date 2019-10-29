@@ -14,6 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * This file is part of Graylog.
+ * <p>
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog.plugins.views.search;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -78,6 +94,15 @@ public abstract class Query {
     @JsonProperty
     public abstract BackendQuery query();
 
+    @JsonIgnore
+    public abstract Optional<GlobalOverride> globalOverride();
+
+    public TimeRange effectiveTimeRange(SearchType searchType) {
+        return this.globalOverride().flatMap(GlobalOverride::timerange)
+                .orElse(searchType.timerange()
+                        .orElse(this.timerange()));
+    }
+
     @Nonnull
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
@@ -102,6 +127,12 @@ public abstract class Query {
                 try {
                     final Object rawTimerange = state.path("timerange");
                     final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
+                    builder.globalOverride(
+                            globalOverride().map(GlobalOverride::toBuilder)
+                                    .orElseGet(GlobalOverride::builder)
+                                    .timerange(newTimeRange)
+                                    .build()
+                    );
                     builder.timerange(newTimeRange);
                 } catch (Exception e) {
                     LOG.error("Unable to deserialize execution state for time range", e);
@@ -110,6 +141,12 @@ public abstract class Query {
             if (hasQuery) {
                 final Object rawQuery = state.path("query");
                 final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
+                builder.globalOverride(
+                        globalOverride().map(GlobalOverride::toBuilder)
+                                .orElseGet(GlobalOverride::builder)
+                                .query(newQuery)
+                                .build()
+                );
                 builder.query(newQuery);
             }
             if (hasSearchTypes) {
@@ -182,6 +219,8 @@ public abstract class Query {
 
         @JsonProperty
         public abstract Builder query(BackendQuery query);
+
+        public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
 
         @JsonProperty("search_types")
         public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);
