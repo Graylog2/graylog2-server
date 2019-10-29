@@ -596,6 +596,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
           },
         }
       }
+      onAfterPlot={[Function]}
       onClick={null}
       onLegendClick={[Function]}
       onRelayout={[Function]}
@@ -751,6 +752,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
             },
           }
         }
+        onAfterPlot={[Function]}
         onClick={null}
         onLegendClick={[Function]}
         onRelayout={[Function]}
