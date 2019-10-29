@@ -36,8 +36,10 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
+import org.graylog.plugins.pipelineprocessor.processors.listeners.RuleMetricsListener;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -72,6 +74,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final Journal journal;
     private final Meter filteredOutMessages;
     private final Timer executionTime;
+    private final MetricRegistry metricRegistry;
     private final ConfigurationStateUpdater stateUpdater;
 
     @Inject
@@ -82,6 +85,7 @@ public class PipelineInterpreter implements MessageProcessor {
         this.journal = journal;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
+        this.metricRegistry = metricRegistry;
         this.stateUpdater = stateUpdater;
     }
 
@@ -93,6 +97,9 @@ public class PipelineInterpreter implements MessageProcessor {
     public Messages process(Messages messages) {
         try (Timer.Context ignored = executionTime.time()) {
             final State latestState = stateUpdater.getLatestState();
+            if (latestState.enableRuleMetrics()) {
+                return process(messages, new RuleMetricsListener(metricRegistry), latestState);
+            }
             return process(messages, new NoopInterpreterListener(), latestState);
         }
     }
@@ -340,31 +347,35 @@ public class PipelineInterpreter implements MessageProcessor {
                                        InterpreterListener interpreterListener) {
         rule.markExecution();
         interpreterListener.executeRule(rule, pipeline);
-        log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
-        final GeneratedRule generatedRule = rule.generatedRule();
-        if (generatedRule != null) {
-            try {
-                generatedRule.then(context);
-                return true;
-            } catch (Exception ignored) {
-                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                appendProcessingError(rule, message, lastError.toString());
-                log.debug("Encountered evaluation error, skipping rest of the rule: {}", lastError);
-                rule.markFailure();
-                return false;
-            }
-        } else {
-            if (ConfigurationStateUpdater.isAllowCodeGeneration()) {
-                throw new IllegalStateException("Should have generated code and not interpreted the tree");
-            }
-            for (Statement statement : rule.then()) {
-                if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
-                    // statement raised an error, skip the rest of the rule
+        try {
+            log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
+            final GeneratedRule generatedRule = rule.generatedRule();
+            if (generatedRule != null) {
+                try {
+                    generatedRule.then(context);
+                    return true;
+                } catch (Exception ignored) {
+                    final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                    appendProcessingError(rule, message, lastError.toString());
+                    log.debug("Encountered evaluation error, skipping rest of the rule: {}", lastError);
+                    rule.markFailure();
                     return false;
                 }
+            } else {
+                if (ConfigurationStateUpdater.isAllowCodeGeneration()) {
+                    throw new IllegalStateException("Should have generated code and not interpreted the tree");
+                }
+                for (Statement statement : rule.then()) {
+                    if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
+                        // statement raised an error, skip the rest of the rule
+                        return false;
+                    }
+                }
             }
+            return true;
+        } finally {
+            interpreterListener.finishExecuteRule(rule, pipeline);
         }
-        return true;
     }
 
     private boolean evaluateStatement(Message message,
@@ -445,16 +456,19 @@ public class PipelineInterpreter implements MessageProcessor {
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
         private final LoadingCache<Set<Pipeline>, StageIterator.Configuration> cache;
         private final boolean cachedIterators;
+        private final RuleMetricsConfigDto ruleMetricsConfig;
 
         @AssistedInject
         public State(@Assisted ImmutableMap<String, Pipeline> currentPipelines,
                      @Assisted ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
+                     @Assisted RuleMetricsConfigDto ruleMetricsConfig,
                      MetricRegistry metricRegistry,
                      @Named("processbuffer_processors") int processorCount,
                      @Named("cached_stageiterators") boolean cachedIterators) {
             this.currentPipelines = currentPipelines;
             this.streamPipelineConnections = streamPipelineConnections;
             this.cachedIterators = cachedIterators;
+            this.ruleMetricsConfig = ruleMetricsConfig;
 
             cache = CacheBuilder.newBuilder()
                     .concurrencyLevel(processorCount)
@@ -479,6 +493,10 @@ public class PipelineInterpreter implements MessageProcessor {
             return streamPipelineConnections;
         }
 
+        public boolean enableRuleMetrics() {
+            return ruleMetricsConfig.metricsEnabled();
+        }
+
         public StageIterator getStageIterator(Set<Pipeline> pipelines) {
             try {
                 if (cachedIterators) {
@@ -495,7 +513,8 @@ public class PipelineInterpreter implements MessageProcessor {
 
         public interface Factory {
             State newState(ImmutableMap<String, Pipeline> currentPipelines,
-                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections);
+                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
+                           RuleMetricsConfigDto ruleMetricsConfig);
         }
     }
 }

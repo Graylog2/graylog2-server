@@ -34,6 +34,7 @@ public interface InterpreterListener {
     void satisfyRule(Rule rule, Pipeline pipeline);
     void dissatisfyRule(Rule rule, Pipeline pipeline);
     void executeRule(Rule rule, Pipeline pipeline);
+    void finishExecuteRule(Rule rule, Pipeline pipeline);
     void failExecuteRule(Rule rule, Pipeline pipeline);
     void continuePipelineExecution(Pipeline pipeline, Stage stage);
     void stopPipelineExecution(Pipeline pipeline, Stage stage);

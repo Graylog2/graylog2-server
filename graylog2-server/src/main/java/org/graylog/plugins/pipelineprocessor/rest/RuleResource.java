@@ -25,6 +25,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -65,14 +67,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private static final Logger log = LoggerFactory.getLogger(RuleResource.class);
 
     private final RuleService ruleService;
+    private final RuleMetricsConfigService ruleMetricsConfigService;
     private final PipelineRuleParser pipelineRuleParser;
     private final FunctionRegistry functionRegistry;
 
     @Inject
     public RuleResource(RuleService ruleService,
+                        RuleMetricsConfigService ruleMetricsConfigService,
                         PipelineRuleParser pipelineRuleParser,
                         FunctionRegistry functionRegistry) {
         this.ruleService = ruleService;
+        this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.functionRegistry = functionRegistry;
     }
@@ -202,4 +207,18 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .collect(Collectors.toList());
     }
 
+    @ApiOperation("Get rule metrics configuration")
+    @Path("/config/metrics")
+    @GET
+    public RuleMetricsConfigDto metricsConfig() {
+        return ruleMetricsConfigService.get();
+    }
+
+    @ApiOperation("Update rule metrics configuration")
+    @Path("/config/metrics")
+    @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_METRICS_UPDATE)
+    public RuleMetricsConfigDto updateMetricsConfig(RuleMetricsConfigDto config) {
+        return ruleMetricsConfigService.save(config);
+    }
 }
