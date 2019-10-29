@@ -27,7 +27,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -45,11 +48,15 @@ public class SearchDomainTest {
     @Mock
     private SearchDbService dbService;
 
+    private List<Search> allSearchesInDb = new ArrayList<>();
+
     @Mock
     private ViewPermissions viewPermissions;
 
     @Before
     public void setUp() throws Exception {
+        allSearchesInDb.clear();
+        when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());
         sut = new SearchDomain(dbService, viewPermissions);
     }
 
@@ -65,7 +72,7 @@ public class SearchDomainTest {
     public void loadsSearchIfUserIsOwner() {
         final User user = user("boeser-willi");
 
-        final Search search = withOwner(user.getName());
+        final Search search = mockSearchWithOwner(user.getName());
 
         final Search result = sut.getForUser(search.id(), user, id -> true);
 
@@ -75,7 +82,7 @@ public class SearchDomainTest {
     @Test
     public void loadsSearchIfSearchIsPermittedViaViews() {
         final User user = user("someone");
-        final Search search = withOwner("someone else");
+        final Search search = mockSearchWithOwner("someone else");
 
         when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
 
@@ -87,12 +94,50 @@ public class SearchDomainTest {
     @Test
     public void throwsPermissionExceptionIfNeitherOwnedNorPermittedFromViews() {
         final User user = user("someone");
-        final Search search = withOwner("someone else");
+        final Search search = mockSearchWithOwner("someone else");
 
         when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(false);
 
         assertThatExceptionOfType(PermissionException.class)
                 .isThrownBy(() -> sut.getForUser(search.id(), user, id -> true));
+    }
+
+    @Test
+    public void includesOwnedSearchesInList() {
+        final User user = user("boeser-willi");
+
+        final Search ownedSearch = mockSearchWithOwner(user.getName());
+        mockSearchWithOwner("someone else");
+
+        List<Search> result = sut.getAllForUser(user, id -> true);
+
+        assertThat(result).containsExactly(ownedSearch);
+    }
+
+    @Test
+    public void includesSearchesPermittedViaViewsInList() {
+        final User user = user("someone");
+
+        final Search permittedSearch = mockSearchWithOwner("someone else");
+        mockSearchWithOwner("someone else");
+
+        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user), any())).thenReturn(true);
+
+        List<Search> result = sut.getAllForUser(user, id -> true);
+
+        assertThat(result).containsExactly(permittedSearch);
+    }
+
+    @Test
+    public void listIsEmptyIfNoSearchesPermitted() {
+        final User user = user("someone");
+
+        mockSearchWithOwner("someone else");
+        mockSearchWithOwner("someone else");
+
+        List<Search> result = sut.getAllForUser(user, id -> true);
+
+        assertThat(result).isEmpty();
     }
 
     private User user(String name) {
@@ -101,8 +146,9 @@ public class SearchDomainTest {
         return user;
     }
 
-    private Search withOwner(String owner) {
-        Search search = Search.builder().id("some-id").owner(owner).build();
+    private Search mockSearchWithOwner(String owner) {
+        Search search = Search.builder().id(UUID.randomUUID().toString()).owner(owner).build();
+        allSearchesInDb.add(search);
         when(dbService.get(search.id())).thenReturn(Optional.of(search));
         return search;
     }

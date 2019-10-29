@@ -70,8 +70,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -147,17 +145,18 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDomain.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(ViewsRestPermissions.VIEW_READ));
+        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission);
+    }
+
+    private boolean hasViewReadPermission(String viewId) {
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
     }
 
     @GET
-    @ApiOperation(value = "Get all current search queries in the system")
+    @ApiOperation(value = "Get all searches which the user may see")
     public List<Search> getAllSearches() {
-        // TODO should be paginated and limited to own (or visible queries)
-        // make sure we close the iterator properly
-        try (Stream<Search> searchStream = searchDbService.streamAll()) {
-            return searchStream.collect(Collectors.toList());
-        }
+        // TODO should be paginated
+        return searchDomain.getAllForUser(getCurrentUser(), this::hasViewReadPermission);
     }
 
     @POST
@@ -185,11 +184,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+        return permittedStreams.load(this::hasStreamReadPermission);
+    }
+
+    private boolean hasStreamReadPermission(String streamId) {
+        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     private void guard(Search search) {
-        this.executionGuard.check(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+        this.executionGuard.check(search, this::hasStreamReadPermission);
     }
 
     @POST

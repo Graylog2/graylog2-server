@@ -22,7 +22,9 @@ import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class SearchDomain {
     private final SearchDbService dbService;
@@ -42,6 +44,12 @@ public class SearchDomain {
             return search;
 
         throw new PermissionException("User " + user + " does not have permission to load search " + search.id());
+    }
+
+    public List<Search> getAllForUser(User user, Predicate<String> viewReadPermission) {
+        return dbService.streamAll()
+                .filter(s -> hasReadPermissionFor(user, viewReadPermission, s))
+                .collect(Collectors.toList());
     }
 
     private boolean hasReadPermissionFor(User user, Predicate<String> viewReadPermission, Search search) {
