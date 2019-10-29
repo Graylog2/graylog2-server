@@ -24,7 +24,7 @@ const _defaultKeyJoiner = keys => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
-const _flattenLeafs = (leafs: Array<Leaf>, showSummarySeries: boolean = false) => {
+const _flattenLeafs = (leafs: Array<Leaf>, showSummarySeries: boolean = true) => {
   const filterCondition = (value) => {
     if (!value.source.endsWith('leaf')) {
       return false;
