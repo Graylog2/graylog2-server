@@ -24,7 +24,7 @@ const _defaultKeyJoiner = keys => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
-export const flattenLeafs = (leafs: Array<Leaf>, showSummary: boolean = false): Array<any> => {
+const _flattenLeafs = (leafs: Array<Leaf>, showSummary: boolean = false) => {
   const filterCondition = (value) => {
     if (!value.source.endsWith('leaf')) {
       return false;
@@ -37,13 +37,23 @@ export const flattenLeafs = (leafs: Array<Leaf>, showSummary: boolean = false): 
   return flatten(leafs.map(l => l.values.filter(v => filterCondition(v)).map(v => [l.key, v])));
 };
 
-export const defaultSeriesExtraction = (keyJoiner: KeyJoiner = _defaultKeyJoiner) => {
-  return (results: Rows): ExtractedSeries => {
+export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+  return Object.keys(valuesBySeries).map(value => [
+    value,
+    xLabels,
+    valuesBySeries[value],
+    [],
+  ]);
+};
+
+export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, showSummaryCol: boolean = true) => {
+  return (results: Rows) => {
     // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
     const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
-    const xLabels = leafs.map(({ key }) => key);
-    const flatLeafs = flattenLeafs(leafs, true);
+    const xLabels: Array<any> = leafs.map(({ key }) => key);
+    const flatLeafs = _flattenLeafs(leafs, showSummaryCol);
     const valuesBySeries = {};
+
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
       const targetIdx = xLabels.findIndex(l => isEqual(l, key));
@@ -51,13 +61,7 @@ export const defaultSeriesExtraction = (keyJoiner: KeyJoiner = _defaultKeyJoiner
         set(valuesBySeries, [joinedKey, targetIdx], value.value);
       }
     });
-
-    return Object.keys(valuesBySeries).map(value => [
-      value,
-      xLabels,
-      valuesBySeries[value],
-      [],
-    ]);
+    return { valuesBySeries, xLabels };
   };
 };
 
@@ -91,12 +95,14 @@ export const chartData = (
   data: Rows,
   chartType: string,
   generator: Generator = _defaultChartGenerator,
-  customSeriesExtraction?: (keyJoiner: KeyJoiner) => (results: Rows) => ExtractedSeries,
+  formatSeriesCustom?: ({valuesBySeries: Object, xLabels: Array<any>}) => ExtractedSeries,
+  showSummaryCol?: boolean,
 ): Array<ChartDefinition> => {
-  const extractSeries = customSeriesExtraction || defaultSeriesExtraction;
+  const seriesFormatter = formatSeriesCustom || formatSeries;
   return flow([
     transformKeys(rowPivots, columnPivots),
-    extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : _defaultKeyJoiner),
+    extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, showSummaryCol),
+    seriesFormatter,
     removeNulls(),
     generateChart(chartType, generator),
   ])(data);

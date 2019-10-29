@@ -5,7 +5,7 @@ import md5 from 'md5';
 import { flow } from 'lodash';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { chartData, defaultSeriesExtraction, generateChart } from '../ChartData';
+import { chartData, extractSeries, formatSeries, generateChart } from '../ChartData';
 import transformKeys from '../TransformKeys';
 
 const cwd = dirname(__filename);
@@ -93,7 +93,8 @@ describe('Chart helper functions', () => {
       const generatorFunction = (type, name, labels, values) => md5(JSON.stringify({ type, name, labels, values }));
       const pipeline = flow([
         transformKeys(config.rowPivots, config.columnPivots),
-        defaultSeriesExtraction(),
+        extractSeries(),
+        formatSeries,
         // $FlowFixMe: Returning different result type on purpose
         generateChart('scatter', generatorFunction),
       ]);
