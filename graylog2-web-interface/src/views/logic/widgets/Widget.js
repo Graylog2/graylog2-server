@@ -3,6 +3,7 @@ import { Map } from 'immutable';
 import uuid from 'uuid/v4';
 
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
+import { singleton } from '../singleton';
 
 type State = {
   id: string,
@@ -150,4 +151,4 @@ class Builder {
 
 Widget.Builder = Builder;
 
-export default Widget;
+export default singleton('views.logic.widgets.Widget', () => Widget);
