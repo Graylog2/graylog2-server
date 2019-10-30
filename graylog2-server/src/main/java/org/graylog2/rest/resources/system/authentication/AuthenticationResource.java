@@ -37,7 +37,9 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.security.RestPermissions.*;
+import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_EDIT;
+import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_READ;
+import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
 
 @RequiresAuthentication
 @Path("/system/authentication")
