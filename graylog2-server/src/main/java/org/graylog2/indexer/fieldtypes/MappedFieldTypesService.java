@@ -59,12 +59,12 @@ public class MappedFieldTypesService {
         );
     }
 
-    public MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
+    private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
         final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType.physicalType()).orElse(UNKNOWN_TYPE);
         return MappedFieldTypeDTO.create(fieldType.fieldName(), mappedFieldType);
     }
 
-    public Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(java.util.stream.Stream<MappedFieldTypeDTO> stream) {
+    private Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(java.util.stream.Stream<MappedFieldTypeDTO> stream) {
         return stream.collect(Collectors.groupingBy(MappedFieldTypeDTO::name, Collectors.toSet()))
                 .entrySet()
                 .stream()
