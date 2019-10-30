@@ -1,39 +1,59 @@
-import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
-import Version from 'util/Version';
+// @flow strict
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
+import Version from 'util/Version';
+import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
 const SystemStore = StoreProvider.getStore('System');
 
-const Footer = createReactClass({
-  displayName: 'Footer',
-  mixins: [Reflux.connect(SystemStore)],
-
-  componentDidMount() {
-    SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
+type Props = {
+  system?: {
+    version: string,
+    hostname: string
   },
+};
 
-  _isLoading() {
-    return !(this.state.system && this.state.jvm);
-  },
+const Footer = ({ system }: Props) => {
+  const [jvm, setJvm] = useState();
+  useEffect(() => {
+    let mounted = true;
+    SystemStore.jvm().then((jvmInfo) => {
+      if (mounted) {
+        setJvm(jvmInfo);
+      }
+    });
 
-  render() {
-    if (this._isLoading()) {
-      return (
-        <div id="footer">
-          Graylog {Version.getFullVersion()}
-        </div>
-      );
-    }
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
+  if (!(system && jvm)) {
     return (
       <div id="footer">
-        Graylog {this.state.system.version} on {this.state.system.hostname} ({this.state.jvm.info})
+        Graylog {Version.getFullVersion()}
       </div>
     );
-  },
-});
+  }
 
-export default Footer;
+  return (
+    <div id="footer">
+      Graylog {system.version} on {system.hostname} ({jvm.info})
+    </div>
+  );
+};
+
+Footer.propTypes = {
+  system: PropTypes.shape({
+    version: PropTypes.string,
+    hostname: PropTypes.string,
+  }),
+};
+
+Footer.defaultProps = {
+  system: undefined,
+};
+
+export default connect(Footer, { system: SystemStore });
