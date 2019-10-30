@@ -51,7 +51,7 @@ public class MappedFieldTypesService {
                 streamService.loadByIds(streamIds)
                         .stream()
                         .filter(Objects::nonNull)
-                        .map(indexSet -> indexSet.getIndexSet().getConfig().id())
+                        .map(stream -> stream.getIndexSet().getConfig().id())
                         .flatMap(indexSetId -> this.indexFieldTypesService.findForIndexSet(indexSetId).stream())
                         .map(IndexFieldTypesDTO::fields)
                         .flatMap(Collection::stream)
