@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.errors.EntityNotFoundException;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog2.plugin.database.users.User;
 import org.junit.Before;
@@ -61,11 +60,12 @@ public class SearchDomainTest {
     }
 
     @Test
-    public void throwsNotFoundWhenIdDoesntExist() {
+    public void returnsEmptyOptionalWhenIdDoesntExist() {
         when(dbService.get("some-id")).thenReturn(Optional.empty());
 
-        assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> sut.getForUser("some-id", mock(User.class), id -> true));
+        final Optional<Search> result = sut.getForUser("some-id", mock(User.class), id -> true);
+
+        assertThat(result).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -74,9 +74,9 @@ public class SearchDomainTest {
 
         final Search search = mockSearchWithOwner(user.getName());
 
-        final Search result = sut.getForUser(search.id(), user, id -> true);
+        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
 
-        assertThat(result).isEqualTo(search);
+        assertThat(result).isEqualTo(Optional.of(search));
     }
 
     @Test
@@ -86,9 +86,9 @@ public class SearchDomainTest {
 
         when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
 
-        final Search result = sut.getForUser(search.id(), user, id -> true);
+        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
 
-        assertThat(result).isEqualTo(search);
+        assertThat(result).isEqualTo(Optional.of(search));
     }
 
     @Test

@@ -17,12 +17,12 @@
 package org.graylog.plugins.views.search;
 
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.errors.EntityNotFoundException;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog2.plugin.database.users.User;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -36,14 +36,17 @@ public class SearchDomain {
         this.viewPermissions = viewPermissions;
     }
 
-    public Search getForUser(String id, User user, Predicate<String> viewReadPermission) {
-        final Search search = dbService.get(id)
-                .orElseThrow(() -> EntityNotFoundException.forClassWithId(Search.class, id));
+    public Optional<Search> getForUser(String id, User user, Predicate<String> viewReadPermission) {
+        final Optional<Search> search = dbService.get(id);
 
-        if (hasReadPermissionFor(user, viewReadPermission, search))
-            return search;
+        search.ifPresent(s -> checkPermission(user, viewReadPermission, s));
 
-        throw new PermissionException("User " + user + " does not have permission to load search " + search.id());
+        return search;
+    }
+
+    private void checkPermission(User user, Predicate<String> viewReadPermission, Search s) {
+        if (!hasReadPermissionFor(user, viewReadPermission, s))
+            throw new PermissionException("User " + user + " does not have permission to load search " + s.id());
     }
 
     public List<Search> getAllForUser(User user, Predicate<String> viewReadPermission) {

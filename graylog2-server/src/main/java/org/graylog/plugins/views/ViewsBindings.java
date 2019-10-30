@@ -35,7 +35,6 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
-import org.graylog.plugins.views.search.rest.exceptionmappers.EntityNotFoundExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -189,6 +188,5 @@ public class ViewsBindings extends ViewsModule {
     private void registerExceptionMappers() {
         addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
-        addJerseyExceptionMapper(EntityNotFoundExceptionMapper.class);
     }
 }

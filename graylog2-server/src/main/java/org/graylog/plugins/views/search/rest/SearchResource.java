@@ -145,7 +145,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission);
+        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
     }
 
     private boolean hasViewReadPermission(String viewId) {

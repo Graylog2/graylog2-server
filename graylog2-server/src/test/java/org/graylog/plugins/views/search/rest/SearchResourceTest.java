@@ -42,6 +42,7 @@ import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotFoundException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -132,12 +133,21 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void getSearchAllowsAccessToSearchReturnedByService() {
+    public void getSearchLoadsSearch() {
         final Search search = mockExistingSearch();
 
         final Search returnedSearch = this.searchResource.getSearch(search.id());
 
         assertThat(returnedSearch).isEqualTo(search);
+    }
+
+    @Test
+    public void getSearchThrowsNotFoundIfSearchDoesntExist() {
+        when(searchDomain.getForUser(any(), any(), any())).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> this.searchResource.getSearch("god"))
+                .withMessageContaining("god");
     }
 
     @Test
@@ -265,7 +275,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDomain.getForUser(eq(search.id()), any(), any())).thenReturn(search);
+        when(searchDomain.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));
