@@ -31,11 +31,13 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class MappedFieldTypesServiceTest {
@@ -48,11 +50,13 @@ public class MappedFieldTypesServiceTest {
     @Mock
     private IndexFieldTypesService indexFieldTypesService;
 
+    private FieldTypeMapper fieldTypeMapper;
     private MappedFieldTypesService mappedFieldTypesService;
 
     @Before
     public void setUp() throws Exception {
-        this.mappedFieldTypesService = new MappedFieldTypesService(streamService, indexFieldTypesService, new FieldTypeMapper());
+        this.fieldTypeMapper = spy(new FieldTypeMapper());
+        this.mappedFieldTypesService = new MappedFieldTypesService(streamService, indexFieldTypesService, fieldTypeMapper);
         final Stream stream = mock(Stream.class, Answers.RETURNS_DEEP_STUBS);
         when(stream.getIndexSet().getConfig().id()).thenReturn("indexSetId");
         final Set<Stream> streams = Collections.singleton(stream);
@@ -106,6 +110,33 @@ public class MappedFieldTypesServiceTest {
         assertThat(result).containsExactlyInAnyOrder(
                 MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
                 MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("compound(long,string)", ImmutableSet.of("compound")))
+        );
+    }
+
+    @Test
+    public void fieldsOfSameTypesWithDifferentPropertiesDoReturnMergedType() {
+        final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
+                createIndexTypes(
+                        "deadbeef",
+                        "testIndex",
+                        FieldTypeDTO.create("field1", "keyword"),
+                        FieldTypeDTO.create("field2", "foo")
+                ),
+                createIndexTypes(
+                        "affeaffe",
+                        "testIndex2",
+                        FieldTypeDTO.create("field1", "text"),
+                        FieldTypeDTO.create("field2", "bar")
+                )
+        );
+        when(indexFieldTypesService.findForIndexSet("indexSetId")).thenReturn(fieldTypes);
+        when(fieldTypeMapper.mapType("foo")).thenReturn(Optional.of(FieldTypes.Type.createType("foobar", ImmutableSet.of("foo", "baz"))));
+        when(fieldTypeMapper.mapType("bar")).thenReturn(Optional.of(FieldTypes.Type.createType("foobar", ImmutableSet.of("bar", "baz"))));
+
+        final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"));
+        assertThat(result).containsExactlyInAnyOrder(
+                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("compound"))),
+                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("foobar", ImmutableSet.of("compound", "baz")))
         );
     }
 
