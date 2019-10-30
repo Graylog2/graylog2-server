@@ -111,7 +111,7 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
-        install(new AuthenticatingRealmModule());
+        install(new AuthenticatingRealmModule(configuration));
         bindSearchResponseDecorators();
         install(new GrokModule());
         install(new LookupModule());

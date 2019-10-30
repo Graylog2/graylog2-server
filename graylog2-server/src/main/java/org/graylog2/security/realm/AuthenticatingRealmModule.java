@@ -19,18 +19,34 @@ package org.graylog2.security.realm;
 import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.inject.Graylog2Module;
 
+import java.util.Set;
+
 public class AuthenticatingRealmModule extends Graylog2Module {
+
+    private final Set<String> deactivatedRealms;
+
+    public AuthenticatingRealmModule(Configuration configuration) {
+        this.deactivatedRealms = configuration.getDeactivatedBuiltinAuthenticationProviders();
+    }
 
     @Override
     protected void configure() {
         final MapBinder<String, AuthenticatingRealm> auth = authenticationRealmBinder();
 
-        auth.addBinding(AccessTokenAuthenticator.NAME).to(AccessTokenAuthenticator.class).in(Scopes.SINGLETON);
-        auth.addBinding(RootAccountRealm.NAME).to(RootAccountRealm.class).in(Scopes.SINGLETON);
-        auth.addBinding(LdapUserAuthenticator.NAME).to(LdapUserAuthenticator.class).in(Scopes.SINGLETON);
-        auth.addBinding(PasswordAuthenticator.NAME).to(PasswordAuthenticator.class).in(Scopes.SINGLETON);
-        auth.addBinding(SessionAuthenticator.NAME).to(SessionAuthenticator.class).in(Scopes.SINGLETON);
+        add(auth, AccessTokenAuthenticator.NAME, AccessTokenAuthenticator.class);
+        add(auth, RootAccountRealm.NAME, RootAccountRealm.class);
+        add(auth, LdapUserAuthenticator.NAME, LdapUserAuthenticator.class);
+        add(auth, PasswordAuthenticator.NAME, PasswordAuthenticator.class);
+        add(auth, SessionAuthenticator.NAME, SessionAuthenticator.class);
+    }
+
+    private void add(MapBinder<String, AuthenticatingRealm> auth, String name,
+                     Class<? extends AuthenticatingRealm> realm) {
+        if (!deactivatedRealms.contains(name)) {
+            auth.addBinding(name).to(realm).in(Scopes.SINGLETON);
+        }
     }
 }

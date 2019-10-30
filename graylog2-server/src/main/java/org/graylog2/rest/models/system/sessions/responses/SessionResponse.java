@@ -34,9 +34,13 @@ public abstract class SessionResponse {
     @JsonProperty("session_id")
     public abstract String sessionId();
 
+    @JsonProperty("username")
+    public abstract String username();
+
     @JsonCreator
     public static SessionResponse create(@JsonProperty("valid_until") Date validUntil,
-                                         @JsonProperty("session_id") String sessionId) {
-        return new AutoValue_SessionResponse(validUntil, sessionId);
+                                         @JsonProperty("session_id") String sessionId,
+                                         @JsonProperty("username") String username) {
+        return new AutoValue_SessionResponse(validUntil, sessionId, username);
     }
 }
