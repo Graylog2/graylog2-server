@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { values } from 'lodash';
+import { values, find, isEmpty } from 'lodash';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -23,14 +23,16 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
   ]];
 };
 
-const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
-  const showSummaryCol = false;
-  const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, showSummaryCol);
+const _chartLayout = (heatmapData) => {
   const axisConfig = {
-    type: 'category',
+    type: undefined,
     fixedrange: true,
   };
-  const layout = {
+  // Adding the axis type, without provided z data, would hide the empty grid.
+  if (find(heatmapData, series => !isEmpty(series.z))) {
+    axisConfig.type = 'category';
+  }
+  return {
     yaxis: axisConfig,
     xaxis: axisConfig,
     margin: {
@@ -38,6 +40,12 @@ const HeatmapVisualization: VisualizationComponent = ({ config, data }: Visualiz
       l: 80,
     },
   };
+};
+
+const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
+  const showSummaryCol = false;
+  const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, showSummaryCol);
+  const layout = _chartLayout(heatmapData);
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
   );
