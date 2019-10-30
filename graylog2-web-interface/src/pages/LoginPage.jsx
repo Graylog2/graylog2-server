@@ -3,12 +3,10 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { DocumentTitle, Icon } from 'components/common';
-import { Row, FormGroup, Alert, Button } from 'components/graylog';
-import { Input } from 'components/bootstrap';
+import { Alert, Col, Row } from 'components/graylog';
+import LoginForm from 'components/login/LoginForm';
 
-import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import LoadingPage from './LoadingPage';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -16,18 +14,11 @@ import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
-const SessionStore = StoreProvider.getStore('Session');
-const SessionActions = ActionsProvider.getActions('Session');
+const { SessionStore, SessionActions } = CombinedProvider.get('Session');
 
 const LoginPage = createReactClass({
   displayName: 'LoginPage',
   mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
-
-  getInitialState() {
-    return {
-      loading: false,
-    };
-  },
 
   componentDidMount() {
     disconnectedStyle.use();
@@ -38,31 +29,14 @@ const LoginPage = createReactClass({
   componentWillUnmount() {
     disconnectedStyle.unuse();
     authStyle.unuse();
-    if (this.promise) {
-      this.promise.cancel();
-    }
   },
 
-  onSignInClicked(event) {
-    event.preventDefault();
-    this.resetLastError();
-    this.setState({ loading: true });
-    const username = this.username.getValue();
-    const password = this.password.getValue();
-    const location = document.location.host;
-    this.promise = SessionActions.login.triggerPromise(username, password, location);
-    this.promise.catch((error) => {
-      if (error.additional.status === 401) {
-        this.setState({ lastError: 'Invalid credentials, please verify them and retry.' });
-      } else {
-        this.setState({ lastError: `Error - the server returned: ${error.additional.status} - ${error.message}` });
-      }
-    });
-    this.promise.finally(() => {
-      if (!this.promise.isCancelled()) {
-        this.setState({ loading: false });
-      }
-    });
+  handleErrorChange(nextError) {
+    this.setState({ lastError: nextError });
+  },
+
+  resetLastError() {
+    this.handleErrorChange(undefined);
   },
 
   formatLastError(error) {
@@ -78,12 +52,9 @@ const LoginPage = createReactClass({
     return null;
   },
 
-  resetLastError() {
-    this.setState({ lastError: undefined });
-  },
 
   render() {
-    const { lastError, loading, validatingSession } = this.state;
+    const { lastError, validatingSession } = this.state;
 
     if (validatingSession) {
       return (
@@ -97,22 +68,12 @@ const LoginPage = createReactClass({
         <div>
           <div className="container" id="login-box">
             <Row>
-              <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
+              <Col md={4} mdOffset={4} id="login-box-content" className="well">
                 <legend><Icon name="group" /> Welcome to Graylog</legend>
-
                 {alert}
 
-                <Input ref={(username) => { this.username = username; }} id="username" type="text" placeholder="Username" autoFocus />
-
-                <Input ref={(password) => { this.password = password; }} id="password" type="password" placeholder="Password" />
-
-                <FormGroup>
-                  <Button type="submit" bsStyle="info" disabled={loading}>
-                    {loading ? 'Signing in...' : 'Sign in'}
-                  </Button>
-                </FormGroup>
-
-              </form>
+                <LoginForm onErrorChange={this.handleErrorChange} />
+              </Col>
             </Row>
           </div>
         </div>
