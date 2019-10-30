@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 export {
   Checkbox, // NOTE: do we want custom or keep OS styles
+  ControlLabel,
   Dropdown,
   Form,
   FormControl,
