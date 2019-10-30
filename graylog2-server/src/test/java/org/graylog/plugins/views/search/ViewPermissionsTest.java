@@ -31,10 +31,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.plugins.views.search.views.ViewDTO.idsFrom;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,8 +82,9 @@ public class ViewPermissionsTest {
         ViewDTO sharedView = someView();
         User user = mock(User.class);
 
-        mockSomeViewsIncluding(sharedView);
-        when(viewSharingService.forView(sharedView.id())).thenReturn(Optional.empty());
+        ImmutableSet<ViewDTO> viewDTOS = mockSomeViewsIncluding(sharedView);
+
+        when(viewSharingService.forViews(idsFrom(viewDTOS))).thenReturn(ImmutableSet.of());
 
         boolean result = sut.isSearchPermitted("some-id", user, id -> false);
 
@@ -113,14 +115,17 @@ public class ViewPermissionsTest {
 
     private void mockViewWithSharingStatusForUser(User user, boolean isSharedWithUser) {
         ViewDTO sharedView = someView();
-        mockSomeViewsIncluding(sharedView);
+        Set<ViewDTO> views = mockSomeViewsIncluding(sharedView);
+        Set<String> viewIds = idsFrom(views);
         ViewSharing viewSharing = mock(ViewSharing.class);
-        when(viewSharingService.forView(sharedView.id())).thenReturn(Optional.of(viewSharing));
+        when(viewSharingService.forViews(viewIds)).thenReturn(ImmutableSet.of(viewSharing));
         when(isViewSharedForUser.isAllowedToSee(user, viewSharing)).thenReturn(isSharedWithUser);
     }
 
-    private void mockSomeViewsIncluding(ViewDTO sharedView) {
-        when(viewService.forSearch("some-id")).thenReturn(ImmutableSet.of(sharedView, someView(), someView()));
+    private ImmutableSet<ViewDTO> mockSomeViewsIncluding(ViewDTO sharedView) {
+        ImmutableSet<ViewDTO> views = ImmutableSet.of(sharedView, someView(), someView());
+        when(viewService.forSearch("some-id")).thenReturn(views);
+        return views;
     }
 
     private ViewDTO someView() {
