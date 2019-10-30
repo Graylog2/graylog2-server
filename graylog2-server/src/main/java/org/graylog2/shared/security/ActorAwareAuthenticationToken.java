@@ -16,18 +16,9 @@
  */
 package org.graylog2.shared.security;
 
-import com.google.inject.Scopes;
-import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.plugin.PluginModule;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.graylog2.audit.AuditActor;
 
-public class SecurityBindings extends PluginModule {
-    @Override
-    protected void configure() {
-        bind(Permissions.class).asEagerSingleton();
-        bind(SessionCreator.class).in(Scopes.SINGLETON);
-        addPermissions(RestPermissions.class);
-
-        OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
-                      .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
-    }
+public interface ActorAwareAuthenticationToken extends AuthenticationToken {
+    AuditActor getActor();
 }

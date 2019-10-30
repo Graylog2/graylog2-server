@@ -20,7 +20,6 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
-import badgeStyles from 'components/bootstrap/Badge.css';
 
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
@@ -78,7 +77,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         {
         AppConfig.gl2DevMode()
-          && <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+          && <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
         }
       </Navbar.Header>
       <Navbar.Collapse>
@@ -124,7 +123,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           AppConfig.gl2DevMode()
             && (
               <InactiveNavItem className={styles['dev-badge-wrap']}>
-                <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+                <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
               </InactiveNavItem>
             )
           }

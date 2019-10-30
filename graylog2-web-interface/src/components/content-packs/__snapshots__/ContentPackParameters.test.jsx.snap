@@ -154,7 +154,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       </td>
                       <td>
                         <span
-                          className="failure badge"
+                          className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-default"
                         >
                           <i
                             className="fa fa-times"

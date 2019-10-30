@@ -14,35 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.sessions.requests;
+package org.graylog.plugins.pipelineprocessor.events;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
-import javax.validation.constraints.NotEmpty;
 
 @AutoValue
-@WithBeanGetter
-@JsonAutoDetect
-public abstract class SessionCreateRequest {
-    @JsonProperty
-    @NotEmpty
-    public abstract String username();
-
-    @JsonProperty
-    @NotEmpty
-    public abstract String password();
-
-    @JsonProperty
-    public abstract String host();
+public abstract class RuleMetricsConfigChangedEvent {
+    @JsonProperty("enabled")
+    public abstract boolean enabled();
 
     @JsonCreator
-    public static SessionCreateRequest create(@JsonProperty("username") @NotEmpty String username,
-                                              @JsonProperty("password") @NotEmpty String password,
-                                              @JsonProperty("host") String host) {
-        return new AutoValue_SessionCreateRequest(username, password, host);
+    public static RuleMetricsConfigChangedEvent create(@JsonProperty("enabled") boolean enabled) {
+        return new AutoValue_RuleMetricsConfigChangedEvent(enabled);
     }
 }

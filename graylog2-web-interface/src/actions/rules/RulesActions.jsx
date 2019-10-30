@@ -9,6 +9,8 @@ const RulesActions = Reflux.createActions({
   parse: { asyncResult: true },
   multiple: { asyncResult: true },
   loadFunctions: { asyncResult: true },
+  loadMetricsConfig: { asyncResult: true },
+  updateMetricsConfig: { asyncResult: true },
 });
 
 export default RulesActions;

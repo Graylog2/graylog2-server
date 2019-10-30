@@ -12,9 +12,10 @@ const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
   rules: undefined,
   functionDescriptors: undefined,
+  metricsConfig: undefined,
 
   getInitialState() {
-    return { rules: this.rules, functionDescriptors: this.functionDescriptors };
+    return { rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig };
   },
 
   _updateRulesState(rule) {
@@ -154,6 +155,39 @@ const RulesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
     return fetch('GET', url)
       .then(this._updateFunctionDescriptors);
+  },
+  loadMetricsConfig() {
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
+    const promise = fetch('GET', url);
+
+    promise.then(
+      (response) => {
+        this.metricsConfig = response;
+        this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
+      },
+      (error) => {
+        UserNotification.error(`Couldn't load rule metrics config: ${error.message}`, "Couldn't load rule metrics config");
+      },
+    );
+
+    RulesActions.loadMetricsConfig.promise(promise);
+  },
+  updateMetricsConfig(nextConfig) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
+    const promise = fetch('PUT', url, nextConfig);
+
+    promise.then(
+      (response) => {
+        this.metricsConfig = response;
+        this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
+        UserNotification.success('Successfully updated rule metrics config');
+      },
+      (error) => {
+        UserNotification.error(`Couldn't update rule metrics config: ${error.message}`, "Couldn't update rule metrics config");
+      },
+    );
+
+    RulesActions.updateMetricsConfig.promise(promise);
   },
 });
 

@@ -33,6 +33,16 @@
     color: #333;
 }
 
+#QueryTabs .nav-tabs li.active a .fa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
 #QueryTabs .nav-tabs li a:hover {
     border: 1px solid transparent;
     color: #000;

@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -140,6 +141,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
     private Set<IpSubnet> trustedProxies = Collections.emptySet();
+
+    @Parameter(value = "deactivated_builtin_authentication_providers", converter = StringSetConverter.class)
+    private Set<String> deactivatedBuiltinAuthenticationProviders = Collections.emptySet();
 
     public boolean isMaster() {
         return isMaster;
@@ -278,6 +282,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getLoadBalancerRequestThrottleJournalUsage() {
         return loadBalancerThrottleThresholdPercentage;
+    }
+
+    public Set<String> getDeactivatedBuiltinAuthenticationProviders() {
+        return deactivatedBuiltinAuthenticationProviders;
     }
 
     @ValidatorMethod

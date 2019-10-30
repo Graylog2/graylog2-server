@@ -125,6 +125,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }
 
+        guard(search);
+
         final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
@@ -166,7 +168,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
@@ -183,7 +185,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
         return permittedStreams.load(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
-    private void authorize(Search search) {
+    private void guard(Search search) {
         this.executionGuard.check(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
     }
 
@@ -198,7 +200,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
 
