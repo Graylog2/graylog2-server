@@ -70,22 +70,19 @@ public class MappedFieldTypesService {
                 .stream()
                 .map(entry -> {
                     final Set<MappedFieldTypeDTO> fieldTypes = entry.getValue();
-                    final String fieldName = entry.getKey();
                     if (fieldTypes.size() == 1) {
                         return fieldTypes.iterator().next();
                     }
 
-                    final Set<String> distinctTypes = fieldTypes.stream()
-                            .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().type())
-                            .sorted()
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
+                    final String fieldName = entry.getKey();
+
+                    final Set<String> distinctTypes = distinctSortedTypeNames(fieldTypes);
+
                     final String compoundFieldType = distinctTypes.size() > 1
                             ? distinctTypes.stream().collect(Collectors.joining(",", "compound(", ")"))
                             : distinctTypes.stream().findFirst().orElse("unknown");
-                    final ImmutableSet<String> commonProperties = fieldTypes.stream()
-                            .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().properties())
-                            .reduce((s1, s2) -> Sets.intersection(s1, s2).immutableCopy())
-                            .orElse(ImmutableSet.of());
+
+                    final ImmutableSet<String> commonProperties = commonPropertiesOfTypes(fieldTypes);
 
                     final ImmutableSet<String> properties = ImmutableSet.<String>builder().addAll(commonProperties).add(PROP_COMPOUND_TYPE).build();
                     return MappedFieldTypeDTO.create(fieldName, createType(compoundFieldType, properties));
@@ -93,5 +90,19 @@ public class MappedFieldTypesService {
                 })
                 .collect(Collectors.toSet());
 
+    }
+
+    private LinkedHashSet<String> distinctSortedTypeNames(Set<MappedFieldTypeDTO> fieldTypes) {
+        return fieldTypes.stream()
+                .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().type())
+                .sorted()
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private ImmutableSet<String> commonPropertiesOfTypes(Set<MappedFieldTypeDTO> fieldTypes) {
+        return fieldTypes.stream()
+                .map(mappedFieldTypeDTO -> mappedFieldTypeDTO.type().properties())
+                .reduce((s1, s2) -> Sets.intersection(s1, s2).immutableCopy())
+                .orElse(ImmutableSet.of());
     }
 }
