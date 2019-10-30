@@ -55,7 +55,7 @@ const _visualizationForType = (type: string): VisualizationComponent => {
 };
 
 const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: Props) => {
-  if (config.isEmpty) {
+  if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
   }
 

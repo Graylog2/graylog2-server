@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 class RenderCompletionObserver extends React.Component {
   static propTypes = {
@@ -17,16 +18,16 @@ class RenderCompletionObserver extends React.Component {
       return;
     }
     this._renderComplete = true;
-    this.props.onRenderComplete();
+    const { onRenderComplete } = this.props;
+    onRenderComplete();
   };
 
   render() {
+    const { children } = this.props;
     return (
-      <div>
-        {React.Children.map(this.props.children, (child) => {
-          return React.cloneElement(child, { onRenderComplete: this._handleRenderComplete });
-        })}
-      </div>
+      <RenderCompletionCallback.Provider value={this._handleRenderComplete}>
+        {children}
+      </RenderCompletionCallback.Provider>
     );
   }
 }
