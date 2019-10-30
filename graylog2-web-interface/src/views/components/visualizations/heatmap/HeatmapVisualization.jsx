@@ -42,9 +42,10 @@ const _chartLayout = (heatmapData) => {
   };
 };
 
+const _leafSourceMatcher = (source: string) => source.endsWith('leaf') && source !== 'row-leaf';
+
 const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
-  const showSummaryCol = false;
-  const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, showSummaryCol);
+  const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
   const layout = _chartLayout(heatmapData);
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />

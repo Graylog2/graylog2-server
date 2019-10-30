@@ -24,17 +24,8 @@ const _defaultKeyJoiner = keys => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
-const _flattenLeafs = (leafs: Array<Leaf>, showSummarySeries: boolean = true) => {
-  const filterCondition = (value) => {
-    if (!value.source.endsWith('leaf')) {
-      return false;
-    }
-    if (!showSummarySeries) {
-      return value.source !== 'row-leaf';
-    }
-    return true;
-  };
-  return flatten(leafs.map(l => l.values.filter(v => filterCondition(v)).map(v => [l.key, v])));
+const _flattenLeafs = (leafs: Array<Leaf>, matcher: string => boolean = source => source.endsWith('leaf')) => {
+  return flatten(leafs.map(l => l.values.filter(value => matcher(value.source)).map(v => [l.key, v])));
 };
 
 export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
@@ -46,12 +37,12 @@ export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Objec
   ]);
 };
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, showSummarySeries: boolean = true) => {
+export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafSourceMatcher?: string => boolean) => {
   return (results: Rows) => {
     // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
     const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
     const xLabels: Array<any> = leafs.map(({ key }) => key);
-    const flatLeafs = _flattenLeafs(leafs, showSummarySeries);
+    const flatLeafs = _flattenLeafs(leafs, leafSourceMatcher);
     const valuesBySeries = {};
 
     flatLeafs.forEach(([key, value]) => {
@@ -96,12 +87,12 @@ export const chartData = (
   chartType: string,
   generator: Generator = _defaultChartGenerator,
   formatSeriesCustom?: ({valuesBySeries: Object, xLabels: Array<any>}) => ExtractedSeries,
-  showSummarySeries?: boolean,
+  leafSourceMatcher?: string => boolean,
 ): Array<ChartDefinition> => {
   const seriesFormatter = formatSeriesCustom || formatSeries;
   return flow([
     transformKeys(rowPivots, columnPivots),
-    extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, showSummarySeries),
+    extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafSourceMatcher),
     seriesFormatter,
     removeNulls(),
     generateChart(chartType, generator),
