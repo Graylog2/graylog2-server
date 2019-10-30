@@ -16,18 +16,12 @@
  */
 package org.graylog2.shared.security;
 
-import com.google.inject.Scopes;
-import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.plugin.PluginModule;
+import com.fasterxml.jackson.databind.JsonNode;
 
-public class SecurityBindings extends PluginModule {
-    @Override
-    protected void configure() {
-        bind(Permissions.class).asEagerSingleton();
-        bind(SessionCreator.class).in(Scopes.SINGLETON);
-        addPermissions(RestPermissions.class);
-
-        OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
-                      .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);
-    }
+public interface ActorAwareAuthenticationTokenFactory {
+    /**
+     * Create an authentication token for the given JsonNode
+     * @throws IllegalArgumentException if the required properties are missing in the input (or otherwise not valid)
+     */
+    ActorAwareAuthenticationToken forRequestBody(JsonNode jsonNode);
 }

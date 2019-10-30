@@ -22,7 +22,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="name"
             >
               Name
@@ -51,7 +51,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="summary"
             >
               Summary
@@ -80,7 +80,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="description"
             >
               Description
@@ -108,7 +108,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="vendor"
             >
               Vendor
@@ -137,7 +137,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="url"
             >
               URL
@@ -286,7 +286,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="name"
             >
               Name
@@ -315,7 +315,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="summary"
             >
               Summary
@@ -344,7 +344,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="description"
             >
               Description
@@ -372,7 +372,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="vendor"
             >
               Vendor
@@ -401,7 +401,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="url"
             >
               URL

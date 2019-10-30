@@ -74,7 +74,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'] },
+      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
     });
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
@@ -104,7 +104,7 @@ describe('XYPlot', () => {
     const genericPlot = wrapper.find('GenericPlot');
     expect(genericPlot).toHaveProp('layout', {
       yaxis: { fixedrange: true, rangemode: 'tozero' },
-      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'] },
+      xaxis: { range: ['2018-10-12T02:04:21Z', '2018-10-12T10:04:21Z'], type: 'date' },
     });
   });
 });

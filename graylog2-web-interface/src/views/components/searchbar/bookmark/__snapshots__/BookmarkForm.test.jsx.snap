@@ -41,7 +41,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
             >
               Title
             </label>
@@ -117,7 +117,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
             >
               Title
             </label>
@@ -201,7 +201,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
             className="form-group"
           >
             <label
-              className="ControlLabel__StyledControlLabel-sc-1edmum5-0 bluuBD control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
             >
               Title
             </label>
