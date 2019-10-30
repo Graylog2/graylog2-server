@@ -84,7 +84,7 @@ class ShowViewPage extends React.Component<Props, State> {
     ).then((results) => {
       this.setState({ loaded: true });
       return results;
-    }).then(() => {
+    }).then(() => SearchActions.executeWithCurrentState())
       SearchActions.executeWithCurrentState();
     }).catch(e => e);
   };
