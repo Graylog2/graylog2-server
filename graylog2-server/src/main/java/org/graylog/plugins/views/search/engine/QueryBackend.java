@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
@@ -56,7 +57,9 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     }
 
     default AbsoluteRange effectiveTimeRangeForResult(Query query, QueryResult queryResult) {
-        if (isAllMessages(query.timerange())) {
+        final TimeRange effectiveTimeRange = query.globalOverride().flatMap(GlobalOverride::timerange).orElse(query.timerange());
+
+        if (isAllMessages(effectiveTimeRange)) {
             final Optional<AbsoluteRange> effectiveRange = queryResult.searchTypes().values().stream()
                     .filter(result -> result instanceof PivotResult)
                     .map(result -> ((PivotResult) result).effectiveTimerange())
