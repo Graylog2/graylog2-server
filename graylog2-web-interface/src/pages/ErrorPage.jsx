@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { DocumentTitle, Icon } from 'components/common';
+import { Button } from 'components/graylog';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import errorPageStyles from './ErrorPage.css';
@@ -15,6 +16,7 @@ class ErrorPage extends React.Component {
   static propTypes = {
     error: PropTypes.shape({
       message: PropTypes.string.isRequired,
+      stack: PropTypes.string,
     }).isRequired,
     info: PropTypes.shape({
       componentStack: PropTypes.string.isRequired,
@@ -55,7 +57,9 @@ class ErrorPage extends React.Component {
                 <dt>
                       Error:
                   <div className={`pull-right ${errorPageStyles.toggleDetails}`}>
-                    <a href="#" tabIndex={0} onClick={this._toggleDetails}>{showDetails ? 'Show less' : 'Show more'}</a>
+                    <Button bsStyle="link" tabIndex={0} onClick={this._toggleDetails}>
+                      {showDetails ? 'Show less' : 'Show more'}
+                    </Button>
                   </div>
                 </dt>
                 <dd className={errorPageStyles.greyBackground}>
