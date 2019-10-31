@@ -4,6 +4,7 @@ import styled from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Badge as BootstrapBadge } from 'react-bootstrap';
 
+import { bsStyles } from './variants/bsStyle';
 import badgeStyles from './styles/badge';
 
 const Badge = forwardRef((props, ref) => {
@@ -18,7 +19,7 @@ const Badge = forwardRef((props, ref) => {
 });
 
 Badge.propTypes = {
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary']),
+  bsStyle: PropTypes.oneOf(bsStyles),
 };
 
 Badge.defaultProps = {
