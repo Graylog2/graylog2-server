@@ -131,7 +131,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
         assertThat(queryResult.errors()).hasSize(1);
         final SearchTypeError searchTypeError = (SearchTypeError) new ArrayList<>(queryResult.errors()).get(0);
         assertThat(searchTypeError.description()).isEqualTo(
-                "Unable to perform search query\n" +
+                "Unable to perform search query: \n" +
                         "\n" +
                         "Expected numeric type on field [field1], but got [keyword]."
         );

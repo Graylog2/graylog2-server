@@ -24,7 +24,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="form-group"
           >
             <label
-              className="control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="content-packs-filter"
             >
               Filter
@@ -1820,7 +1820,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="form-group"
           >
             <label
-              className="control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="content-packs-filter"
             >
               Filter

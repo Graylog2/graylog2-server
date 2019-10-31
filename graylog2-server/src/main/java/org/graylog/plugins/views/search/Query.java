@@ -78,6 +78,15 @@ public abstract class Query {
     @JsonProperty
     public abstract BackendQuery query();
 
+    @JsonIgnore
+    public abstract Optional<GlobalOverride> globalOverride();
+
+    public TimeRange effectiveTimeRange(SearchType searchType) {
+        return this.globalOverride().flatMap(GlobalOverride::timerange)
+                .orElse(searchType.timerange()
+                        .orElse(this.timerange()));
+    }
+
     @Nonnull
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
@@ -102,6 +111,12 @@ public abstract class Query {
                 try {
                     final Object rawTimerange = state.path("timerange");
                     final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
+                    builder.globalOverride(
+                            globalOverride().map(GlobalOverride::toBuilder)
+                                    .orElseGet(GlobalOverride::builder)
+                                    .timerange(newTimeRange)
+                                    .build()
+                    );
                     builder.timerange(newTimeRange);
                 } catch (Exception e) {
                     LOG.error("Unable to deserialize execution state for time range", e);
@@ -110,6 +125,12 @@ public abstract class Query {
             if (hasQuery) {
                 final Object rawQuery = state.path("query");
                 final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
+                builder.globalOverride(
+                        globalOverride().map(GlobalOverride::toBuilder)
+                                .orElseGet(GlobalOverride::builder)
+                                .query(newQuery)
+                                .build()
+                );
                 builder.query(newQuery);
             }
             if (hasSearchTypes) {
@@ -182,6 +203,8 @@ public abstract class Query {
 
         @JsonProperty
         public abstract Builder query(BackendQuery query);
+
+        public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
 
         @JsonProperty("search_types")
         public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);
