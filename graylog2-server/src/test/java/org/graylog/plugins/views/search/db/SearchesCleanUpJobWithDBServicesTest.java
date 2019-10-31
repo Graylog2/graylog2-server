@@ -24,8 +24,6 @@ import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
@@ -86,15 +84,10 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 mapperProvider,
                 clusterConfigService
         );
-        final ViewSharingService viewSharingService = mock(ViewSharingService.class);
-        final IsViewSharedForUser isViewSharedForUser = mock(IsViewSharedForUser.class);
         this.searchDbService = spy(
                 new SearchDbService(
                         mongoRule.getMongoConnection(),
                         mapperProvider,
-                        viewService,
-                        viewSharingService,
-                        isViewSharedForUser,
                         dto -> new SearchRequirements(Collections.emptySet(), dto)
                 )
         );

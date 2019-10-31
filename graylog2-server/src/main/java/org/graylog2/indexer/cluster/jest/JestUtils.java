@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 
 public class JestUtils {
@@ -95,7 +96,11 @@ public class JestUtils {
             return new ElasticsearchException(errorMessage.get(), Collections.singletonList(errorNode.toString()));
         }
 
-        return new ElasticsearchException(errorMessage.get(), reasons);
+        return new ElasticsearchException(errorMessage.get(), deduplicateErrors(reasons));
+    }
+
+    public static List<String> deduplicateErrors(List<String> errors) {
+        return errors.stream().distinct().collect(Collectors.toList());
     }
 
     private static FieldTypeException buildFieldTypeException(Supplier<String> errorMessage, String reason) {
