@@ -18,4 +18,10 @@ describe('contrastingColor', () => {
 
     expect(color1).toBe('#999');
   });
+
+  it('should accept transparent color strings', () => {
+    const color1 = contrastingColor('rgba(0, 0, 0, 0.5)');
+
+    expect(color1).toBe('rgba(157,157,157,0.825)');
+  });
 });
