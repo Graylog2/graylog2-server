@@ -18,6 +18,10 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import SearchActions from 'views/actions/SearchActions';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
+import View from 'views/logic/views/View';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -34,6 +38,7 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
+import Search from "../../logic/search/Search";
 
 type Props = {
   id: string,
@@ -129,14 +134,17 @@ class Widget extends React.Component<Props, State> {
   };
 
   _onCopyToDashboard = (widgetId, dashboardId) => {
-    const { view, widget } = this.props;
+    const { view } = this.props;
     const { view: activeView } = view;
-    browserHistory.push({
-      pathname: Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId),
-      state: {
-        view: activeView,
-        widgetId: widget.id,
-      },
+    ViewManagementActions.get(dashboardId).then((dashboardJson) => {
+      const dashboard = View.fromJSON(dashboardJson);
+      SearchActions.get(dashboardJson.search_id).then((searchJson) => {
+        const search = Search.fromJSON(searchJson);
+        const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
+        ViewManagementActions.update(newDashboard).then(() => {
+          browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
+        });
+      });
     });
     this._onToggleCopyToDashboard();
   };
