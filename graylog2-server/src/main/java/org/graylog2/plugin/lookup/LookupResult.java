@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
-import org.graylog2.lookup.caches.CaffeineLookupCache;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
@@ -74,7 +73,7 @@ public abstract class LookupResult {
 
     /**
      * The time to live (in milliseconds) for a LookupResult instance. Prevents repeated lookups for the same key
-     * during the time to live period. The TTL is only only considered by the {@link CaffeineLookupCache} implementation.
+     * during the time to live period. Depending on the LookupCache implementation this might be ignored.
      */
     @JsonProperty("ttl")
     public abstract long cacheTTL();
@@ -121,6 +120,10 @@ public abstract class LookupResult {
 
     public static LookupResult multi(final Boolean singleValue, final Map<Object, Object> multiValue) {
         return withoutTTL().single(singleValue).multiValue(multiValue).build();
+    }
+
+    public static LookupResult withDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {
+        return addDefaults(singleValue, multiValue).build();
     }
 
     public static LookupResult.Builder addDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {

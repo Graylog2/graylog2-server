@@ -69,6 +69,7 @@ public abstract class LookupCache extends AbstractIdleService {
         MetricUtils.safelyRegister(metricRegistry, MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), entriesGauge);
     }
 
+    @Deprecated
     public void incrTotalCount() {
         totalCount.mark();
     }
@@ -76,12 +77,14 @@ public abstract class LookupCache extends AbstractIdleService {
         totalCount.mark(n);
     }
 
+    @Deprecated
     public void incrHitCount() {
         hitCount.mark();
     }
     public void incrHitCount(long n) {
         hitCount.mark(n);
     }
+    @Deprecated
     public void incrMissCount() {
         missCount.mark();
     }

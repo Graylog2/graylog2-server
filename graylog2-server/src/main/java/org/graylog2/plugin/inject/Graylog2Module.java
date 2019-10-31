@@ -442,7 +442,7 @@ public abstract class Graylog2Module extends AbstractModule {
                                             Class<? extends LookupDataAdapterConfiguration> configClass) {
         install(new FactoryModuleBuilder().implement(LookupDataAdapter.class, adapterClass).build(factoryClass));
         lookupDataAdapterBinder2().addBinding(name).to(factoryClass);
-        registerJacksonSubtype(configClass, name); // TODO twice?
+        registerJacksonSubtype(configClass, name);
     }
 
     /**
