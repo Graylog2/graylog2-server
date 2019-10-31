@@ -12,6 +12,7 @@ import Input from 'components/bootstrap/Input';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 
 const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
+const DEFAULT_CATCH_UP_WINDOW = 3600000;
 
 const EventsConfig = createReactClass({
   displayName: 'EventsConfig',
@@ -21,6 +22,7 @@ const EventsConfig = createReactClass({
       events_search_timeout: PropTypes.number,
       events_notification_retry_period: PropTypes.number,
       events_notification_default_backlog: PropTypes.number,
+      events_catchup_window: PropTypes.number,
     }),
     updateConfig: PropTypes.func.isRequired,
   },
@@ -31,6 +33,7 @@ const EventsConfig = createReactClass({
         events_search_timeout: 60000,
         events_notification_retry_period: 300000,
         events_notification_default_backlog: 50,
+        events_catchup_window: DEFAULT_CATCH_UP_WINDOW,
       },
     };
   },
@@ -101,6 +104,16 @@ const EventsConfig = createReactClass({
     this._propagateChanges('events_notification_default_backlog', value);
   },
 
+  _onCatchUpWindowUpdate(nextValue, nextUnit, nextEnabled) {
+    const { config } = this.state;
+    if (config.events_catchup_window === 0 && nextEnabled) {
+      this._propagateChanges('events_catchup_window', DEFAULT_CATCH_UP_WINDOW);
+      return;
+    }
+    const catchupWindowinMs = nextEnabled ? moment.duration(nextValue, nextUnit).asMilliseconds() : 0;
+    this._propagateChanges('events_catchup_window', catchupWindowinMs);
+  },
+
   _titleCase(str) {
     return lodash.capitalize(str);
   },
@@ -109,6 +122,7 @@ const EventsConfig = createReactClass({
     const { config } = this.state;
     const eventsSearchTimeout = extractDurationAndUnit(config.events_search_timeout, TIME_UNITS);
     const eventsNotificationRetryPeriod = extractDurationAndUnit(config.events_notification_retry_period, TIME_UNITS);
+    const eventsCatchupWindow = extractDurationAndUnit(config.events_catchup_window, TIME_UNITS);
     const eventsNotificationDefaultBacklog = config.events_notification_default_backlog;
     return (
       <div>
@@ -121,6 +135,8 @@ const EventsConfig = createReactClass({
           <dd>{eventsNotificationRetryPeriod.duration} {this._titleCase(eventsNotificationRetryPeriod.unit)}</dd>
           <dt>Notification Backlog:</dt>
           <dd>{eventsNotificationDefaultBacklog}</dd>
+          <dt>Catch Up Window:</dt>
+          <dd>{eventsCatchupWindow.duration > 0 ? eventsCatchupWindow.duration : 'disabled'} {eventsCatchupWindow.duration > 0 ? this._titleCase(eventsCatchupWindow.unit) : ''}</dd>
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
@@ -163,6 +179,17 @@ const EventsConfig = createReactClass({
                    value={eventsNotificationDefaultBacklog}
                    min="0"
                    required />
+            <FormGroup controlId="catch-up-window">
+              <TimeUnitInput label="Catch up window size"
+                             update={this._onCatchUpWindowUpdate}
+                             value={eventsCatchupWindow.duration}
+                             unit={eventsCatchupWindow.unit}
+                             enabled={eventsCatchupWindow.duration > 0}
+                             units={TIME_UNITS} />
+              <HelpBlock>If Event processor execution is behind schedule, queries on older data will be run with this window size to speed up processing.
+                (If the &quot;search within the last&quot; setting of an event definiton is greater, this setting will be ignored)
+              </HelpBlock>
+            </FormGroup>
           </fieldset>
         </BootstrapModalForm>
       </div>

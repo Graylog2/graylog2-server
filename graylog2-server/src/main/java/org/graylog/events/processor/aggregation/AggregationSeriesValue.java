@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = AggregationSeriesValue.Builder.class)
@@ -37,6 +38,10 @@ public abstract class AggregationSeriesValue {
     }
 
     public abstract Builder toBuilder();
+
+    public AggregationSeriesValue withoutFirstBucket() {
+        return toBuilder().key(key().stream().skip(1).collect(Collectors.toList())).build();
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {

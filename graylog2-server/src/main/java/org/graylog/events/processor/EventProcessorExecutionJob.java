@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -59,15 +60,18 @@ public class EventProcessorExecutionJob implements Job {
     private final JobSchedulerClock clock;
     private final EventProcessorEngine eventProcessorEngine;
     private final Config config;
+    private final EventsConfigurationProvider configurationProvider;
 
     @Inject
     public EventProcessorExecutionJob(JobScheduleStrategies scheduleStrategies,
                                       JobSchedulerClock clock,
                                       EventProcessorEngine eventProcessorEngine,
+                                      EventsConfigurationProvider configurationProvider,
                                       @Assisted JobDefinitionDto jobDefinition) {
         this.scheduleStrategies = scheduleStrategies;
         this.clock = clock;
         this.eventProcessorEngine = eventProcessorEngine;
+        this.configurationProvider = configurationProvider;
         this.config = (Config) jobDefinition.config();
     }
 
@@ -122,8 +126,22 @@ public class EventProcessorExecutionJob implements Job {
             // we are using in Elasticsearch is only using millisecond precision. ("date") Once we switch to a
             // different date type with nanosecond precision (e.g. "date_nanos"), this workaround will break and we
             // will miss messages.
-            final DateTime nextTo = to.plus(config.processingHopSize());
-            final DateTime nextFrom = nextTo.minus(config.processingWindowSize()).plusMillis(1);
+            DateTime nextTo = to.plus(config.processingHopSize());
+            DateTime nextFrom = nextTo.minus(config.processingWindowSize()).plusMillis(1);
+
+            // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
+            // we can switch to a bigger scheduling window: `processingCatchUpWindowSize`.
+            // If enabled, it will ignore the processingHopSize and will schedule a tumbling window timerange of `processingCatchUpWindowSize` chunks.
+            final long catchUpSize = configurationProvider.get().eventCatchupWindow();
+            if (catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now)) {
+                final long chunkCount = catchUpSize / config.processingWindowSize();
+
+                // Align to multiples of the processingWindowSize
+                nextTo = to.plus(config.processingWindowSize() * chunkCount);
+                nextFrom = to.plusMillis(1);
+                LOG.debug("eventproc <{}> is catching up on old data. Combining {} search windows with catchUpWindowSize={}ms: from={} to={}",
+                        config.eventDefinitionId(), chunkCount, catchUpSize, nextFrom, nextTo);
+            }
 
             LOG.trace("Set new timerange of eventproc <{}> in job trigger data: from={} to={} (hopSize={}ms windowSize={}ms)",
                     config.eventDefinitionId(), nextFrom, nextTo, config.processingHopSize(), config.processingWindowSize());

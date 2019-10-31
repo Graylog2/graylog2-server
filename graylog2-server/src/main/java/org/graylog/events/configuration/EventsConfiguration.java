@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.joda.time.Duration;
 
 @JsonAutoDetect
 @JsonDeserialize(builder = AutoValue_EventsConfiguration.Builder.class)
@@ -28,10 +29,12 @@ public abstract class EventsConfiguration {
     private static final String FIELD_SEARCH_TIMEOUT = "events_search_timeout";
     private static final String FIELD_NOTIFICATIONS_RETRY_PERIOD = "events_notification_retry_period";
     private static final String FIELD_NOTIFICATIONS_DEFAULT_BACKLOG = "events_notification_default_backlog";
+    private static final String FIELD_CATCHUP_WINDOW = "events_catchup_window";
 
     private static final long DEFAULT_SEARCH_TIMEOUT_MS = 60000;
     private static final long DEFAULT_NOTIFICATIONS_RETRY_MS = 300000;
     private static final long DEFAULT_NOTIFICATIONS_BACKLOG = 50;
+    public static final long DEFAULT_CATCH_UP_WINDOW_MS = Duration.standardHours(1).getMillis();
 
     @JsonProperty(FIELD_SEARCH_TIMEOUT)
     public abstract long eventsSearchTimeout();
@@ -42,11 +45,15 @@ public abstract class EventsConfiguration {
     @JsonProperty(FIELD_NOTIFICATIONS_DEFAULT_BACKLOG)
     public abstract long eventNotificationsBacklog();
 
+    @JsonProperty(FIELD_CATCHUP_WINDOW)
+    public abstract long eventCatchupWindow();
+
     public static Builder builder() {
         return new AutoValue_EventsConfiguration.Builder()
                 .eventsSearchTimeout(DEFAULT_SEARCH_TIMEOUT_MS)
                 .eventNotificationsRetry(DEFAULT_NOTIFICATIONS_RETRY_MS)
-                .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG);
+                .eventNotificationsBacklog(DEFAULT_NOTIFICATIONS_BACKLOG)
+                .eventCatchupWindow(DEFAULT_CATCH_UP_WINDOW_MS);
     }
 
     public abstract Builder toBuilder();
@@ -61,6 +68,9 @@ public abstract class EventsConfiguration {
 
         @JsonProperty(FIELD_NOTIFICATIONS_DEFAULT_BACKLOG)
         public abstract Builder eventNotificationsBacklog(long defaultBacklog);
+
+        @JsonProperty(FIELD_CATCHUP_WINDOW)
+        public abstract Builder eventCatchupWindow(long catchupWindow);
 
         public abstract EventsConfiguration build();
     }

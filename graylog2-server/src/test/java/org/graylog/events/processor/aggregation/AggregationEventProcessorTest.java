@@ -84,7 +84,7 @@ public class AggregationEventProcessorTest {
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(timerange.to()), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -118,7 +118,7 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -187,7 +187,7 @@ public class AggregationEventProcessorTest {
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(timerange.to()), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -230,7 +230,7 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of("stream-1", "stream-2", "stream-3"))
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -253,10 +253,10 @@ public class AggregationEventProcessorTest {
                                 ))
                                 .build(),
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
-                                                .key(ImmutableList.of("a"))
+                                                .key(ImmutableList.of("a")) // TODO shouldn't this always be the same key as the AggregationKeyResult.key()?
                                                 .value(23.0d) // Doesn't match condition
                                                 .series(AggregationSeries.builder()
                                                         .id("abc123")
@@ -423,7 +423,7 @@ public class AggregationEventProcessorTest {
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(timerange.to()), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -457,7 +457,7 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of()) // No streams in result
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
@@ -505,7 +505,7 @@ public class AggregationEventProcessorTest {
         // We expect to get the end of the aggregation timerange as event time
         final TestEvent event1 = new TestEvent(timerange.to());
         final TestEvent event2 = new TestEvent(timerange.to());
-        when(eventFactory.createEvent(any(EventDefinition.class), eq(timerange.to()), anyString()))
+        when(eventFactory.createEvent(any(EventDefinition.class), eq(now), anyString()))
                 .thenReturn(event1)  // first invocation return value
                 .thenReturn(event2); // second invocation return value
 
@@ -548,7 +548,7 @@ public class AggregationEventProcessorTest {
                 .sourceStreams(ImmutableSet.of()) // No streams in result
                 .keyResults(ImmutableList.of(
                         AggregationKeyResult.builder()
-                                .key(ImmutableList.of("one", "two"))
+                                .key(ImmutableList.of(now.toString(), "one", "two"))
                                 .seriesValues(ImmutableList.of(
                                         AggregationSeriesValue.builder()
                                                 .key(ImmutableList.of("a"))
