@@ -31,8 +31,6 @@ const SystemJobsComponent = createReactClass({
     if (!this.state.jobs) {
       return <Spinner />;
     }
-
-    throw new Error('foo');
     const jobs = Object.keys(this.state.jobs)
       .map(nodeId => (this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : []))
       .reduce((a, b) => a.concat(b));
