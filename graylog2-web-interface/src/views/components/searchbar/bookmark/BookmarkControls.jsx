@@ -123,10 +123,17 @@ class BookmarkControls extends React.Component<Props, State> {
     this.toggleListModal();
   };
 
-  deleteBookmark = (view) => {
-    return ViewManagementActions.delete(view)
-      .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
+  deleteBookmark = (deletedView) => {
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+    return ViewManagementActions.delete(deletedView)
+      .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
       .then(() => ViewActions.create(View.Type.Search))
+      .then(() => {
+        if (deletedView.id === view.id) {
+          browserHistory.push(Routes.SEARCH);
+        }
+      })
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
   };
 
