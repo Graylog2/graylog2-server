@@ -3,6 +3,7 @@ import Badge from './Badge';
 import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
+import HelpBlock from './HelpBlock';
 import SplitButton from './SplitButton';
 
 export {
@@ -11,6 +12,7 @@ export {
   Button,
   ControlLabel,
   DropdownButton,
+  HelpBlock,
   SplitButton,
 };
 export * from './bootstrap-import';

@@ -4,7 +4,6 @@ export {
   Dropdown,
   Form,
   FormControl,
-  HelpBlock,
   InputGroup,
   Jumbotron,
   Label,
