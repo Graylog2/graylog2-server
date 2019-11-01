@@ -13,18 +13,8 @@ const StyledControlLabel = color => useCallback(styled(BootstrapControlLabel)`
   display: inline-block;
 `, [color]);
 
-const ControlLabel = forwardRef(({ children, ...props }, ref) => {
-  const { colors } = useTheme();
-  const Label = StyledControlLabel(colors.primary.tre);
-
-  return (
-    <Label ref={ref} {...props}>{children}</Label>
-  );
-});
-
 const ControlLabelRaw = ({ children, ...props }) => {
-  // NOTE: This non-forwarded component is needed for tests in
-  // `graylog-plugin-enterprise/enterprise/src/web/enterprise/parameters/components/ParameterInputForm.jsx`
+  // NOTE: This non-forwarded component is needed for tests in `Enterprise Plugin`
   const { colors } = useTheme();
   const Label = StyledControlLabel(colors.primary.tre);
 
@@ -33,6 +23,8 @@ const ControlLabelRaw = ({ children, ...props }) => {
   );
 };
 
+const ControlLabel = forwardRef((props, ref) => <ControlLabelRaw ref={ref} {...props} />);
+
 const propTypes = {
   children: PropTypes.any.isRequired,
 };
@@ -40,5 +32,5 @@ const propTypes = {
 ControlLabel.propTypes = propTypes;
 ControlLabelRaw.propTypes = propTypes;
 
-export { ControlLabelRaw };
 export default ControlLabel;
+export { ControlLabelRaw };
