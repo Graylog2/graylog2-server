@@ -76,23 +76,25 @@ const FieldStatistics = createReactClass({
     if (this.isMounted) {
       this.setState({ statsLoadPending: this.state.statsLoadPending.set(field, true) });
       const promise = FieldStatisticsStore.getFieldStatistics(field);
-      promise.then((statistics) => {
-        this.setState({
-          fieldStatistics: this.state.fieldStatistics.set(field, statistics),
-          statsLoadPending: this.state.statsLoadPending.set(field, false),
-        });
-      }).catch((error) => {
-        // if the field has no statistics to display, remove it from the set of fields (which will cause the component to not render)
-        if (error.additional && error.additional.status === 400) {
+      promise.then(
+        (statistics) => {
           this.setState({
-            fieldStatistics: this.state.fieldStatistics.delete(field),
+            fieldStatistics: this.state.fieldStatistics.set(field, statistics),
             statsLoadPending: this.state.statsLoadPending.delete(field),
           });
-        } else {
-          UserNotification.error(`Loading field statistics failed with status: ${error}`,
-            'Could not load field statistics');
-        }
-      });
+        },
+        (error) => {
+          // If the field has no statistics to display, remove it from the set of fields
+          if (error.additional && error.additional.status === 400) {
+            this.setState({ fieldStatistics: this.state.fieldStatistics.delete(field) });
+          } else {
+            UserNotification.error(`Loading field statistics failed with status: ${error}`,
+              'Could not load field statistics');
+          }
+          // Reset loading state for the field after failure
+          this.setState({ statsLoadPending: this.state.statsLoadPending.delete(field) });
+        },
+      );
     }
   },
 
@@ -180,7 +182,10 @@ const FieldStatistics = createReactClass({
               <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Field Statistics</h1>
+          <h1>
+            Field Statistics{' '}
+            {!this.state.statsLoadPending.isEmpty() && <i className="fa fa-spin fa-spinner" />}
+          </h1>
 
           <div className="table-responsive">
             <table className="table table-striped table-bordered table-hover table-condensed">
