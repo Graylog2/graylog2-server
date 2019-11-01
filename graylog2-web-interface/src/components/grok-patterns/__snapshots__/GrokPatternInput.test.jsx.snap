@@ -65,11 +65,11 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         
       </span>
     </div>
-    <ul
+    <div
       className="resultList"
     >
-      <li
-        className="list-group-item"
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
         id="list-item-0"
         onKeyDown={[Function]}
       >
@@ -99,9 +99,9 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-      <li
-        className="list-group-item"
+      </span>
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
         id="list-item-1"
         onKeyDown={[Function]}
       >
@@ -131,9 +131,9 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-      <li
-        className="list-group-item"
+      </span>
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
         id="list-item-2"
         onKeyDown={[Function]}
       >
@@ -163,8 +163,8 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-    </ul>
+      </span>
+    </div>
   </div>
 </div>
 `;

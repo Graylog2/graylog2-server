@@ -212,7 +212,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="list-group"
     >
       <span
-        className="listGroupHeader list-group-item"
+        className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="headerWrapper"
@@ -221,7 +221,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -373,7 +373,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -525,7 +525,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -666,7 +666,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -807,7 +807,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -948,7 +948,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -1089,7 +1089,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -1230,7 +1230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -1371,7 +1371,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"
@@ -1512,7 +1512,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
       >
         <div
           className="row-sm row"

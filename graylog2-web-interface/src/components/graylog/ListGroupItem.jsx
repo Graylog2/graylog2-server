@@ -7,7 +7,7 @@ import { darken } from 'polished';
 
 import { colorLevel, useTheme } from 'theme/GraylogThemeContext';
 import contrastingColor from 'util/contrastingColor';
-import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
+import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex) => {
   const backgroundColor = colorLevel(hex, -9);
@@ -82,11 +82,11 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
 
 ListGroupItem.propTypes = {
   /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(bsStyles),
+  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
 };
 
 ListGroupItem.defaultProps = {
-  bsStyle: 'default',
+  bsStyle: undefined,
 };
 
 export default ListGroupItem;

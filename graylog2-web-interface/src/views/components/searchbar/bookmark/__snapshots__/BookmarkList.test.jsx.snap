@@ -407,29 +407,96 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                   <div
                     className="list-group"
                   >
-                    <ListGroupItem
+                    <ForwardRef
                       active={false}
-                      bsClass="list-group-item"
                       header="test-0"
                       key="foo-bar-0"
-                      listItem={false}
                       onClick={[Function]}
                     >
-                      <button
-                        className="list-group-item"
+                      <ListGroupItem__StyledListGroupItem
+                        active={false}
+                        header="test-0"
                         onClick={[Function]}
-                        type="button"
                       >
-                        <h4
-                          className="list-group-item-heading"
+                        <StyledComponent
+                          active={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                "isStatic": false,
+                                "lastClassName": "cngeNa",
+                                "rules": Array [
+                                  "&.list-group-item-action{color:",
+                                  "#1F1F1F",
+                                  ";&:hover,&:focus{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#F1F2F2",
+                                  ";}&:active{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#DCE1E5",
+                                  ";}}&.list-group-item{background-color:",
+                                  "#FFF",
+                                  ";border-color:",
+                                  "#DCE1E5",
+                                  ";&.disabled,&:disabled{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#FFF",
+                                  ";}}",
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "ListGroupItem__StyledListGroupItem",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          header="test-0"
+                          onClick={[Function]}
                         >
-                          test-0
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        />
-                      </button>
-                    </ListGroupItem>
+                          <ListGroupItem
+                            active={false}
+                            bsClass="list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa"
+                            header="test-0"
+                            listItem={false}
+                            onClick={[Function]}
+                          >
+                            <button
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+                              onClick={[Function]}
+                              type="button"
+                            >
+                              <h4
+                                className="list-group-item-heading"
+                              >
+                                test-0
+                              </h4>
+                              <p
+                                className="list-group-item-text"
+                              />
+                            </button>
+                          </ListGroupItem>
+                        </StyledComponent>
+                      </ListGroupItem__StyledListGroupItem>
+                    </ForwardRef>
                   </div>
                 </ListGroup>
                 <div
@@ -2074,29 +2141,96 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   <div
                     className="list-group"
                   >
-                    <ListGroupItem
+                    <ForwardRef
                       active={false}
-                      bsClass="list-group-item"
                       header="test-0"
                       key="foo-bar-0"
-                      listItem={false}
                       onClick={[Function]}
                     >
-                      <button
-                        className="list-group-item"
+                      <ListGroupItem__StyledListGroupItem
+                        active={false}
+                        header="test-0"
                         onClick={[Function]}
-                        type="button"
                       >
-                        <h4
-                          className="list-group-item-heading"
+                        <StyledComponent
+                          active={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                                "isStatic": false,
+                                "lastClassName": "cngeNa",
+                                "rules": Array [
+                                  "&.list-group-item-action{color:",
+                                  "#1F1F1F",
+                                  ";&:hover,&:focus{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#F1F2F2",
+                                  ";}&:active{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#DCE1E5",
+                                  ";}}&.list-group-item{background-color:",
+                                  "#FFF",
+                                  ";border-color:",
+                                  "#DCE1E5",
+                                  ";&.disabled,&:disabled{color:",
+                                  "#1F1F1F",
+                                  ";background-color:",
+                                  "#FFF",
+                                  ";}}",
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "ListGroupItem__StyledListGroupItem",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          header="test-0"
+                          onClick={[Function]}
                         >
-                          test-0
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        />
-                      </button>
-                    </ListGroupItem>
+                          <ListGroupItem
+                            active={false}
+                            bsClass="list-group-item"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa"
+                            header="test-0"
+                            listItem={false}
+                            onClick={[Function]}
+                          >
+                            <button
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+                              onClick={[Function]}
+                              type="button"
+                            >
+                              <h4
+                                className="list-group-item-heading"
+                              >
+                                test-0
+                              </h4>
+                              <p
+                                className="list-group-item-text"
+                              />
+                            </button>
+                          </ListGroupItem>
+                        </StyledComponent>
+                      </ListGroupItem__StyledListGroupItem>
+                    </ForwardRef>
                   </div>
                 </ListGroup>
                 <div
