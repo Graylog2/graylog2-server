@@ -20,10 +20,19 @@ const LoginPage = createReactClass({
   displayName: 'LoginPage',
   mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
 
+  getInitialState() {
+    return {
+      didValidateSession: false,
+    };
+  },
+
   componentDidMount() {
     disconnectedStyle.use();
     authStyle.use();
-    SessionActions.validate();
+    SessionActions.validate().then((response) => {
+      this.setState({ didValidateSession: true });
+      return response;
+    });
   },
 
   componentWillUnmount() {
@@ -54,9 +63,9 @@ const LoginPage = createReactClass({
 
 
   render() {
-    const { lastError, validatingSession } = this.state;
+    const { lastError, didValidateSession } = this.state;
 
-    if (validatingSession) {
+    if (!didValidateSession) {
       return (
         <LoadingPage />
       );
