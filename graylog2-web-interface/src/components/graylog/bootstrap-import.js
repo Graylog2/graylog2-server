@@ -7,7 +7,6 @@ export {
   InputGroup,
   Jumbotron,
   Label,
-  ListGroupItem,
   MenuItem,
   Modal,
   Nav,

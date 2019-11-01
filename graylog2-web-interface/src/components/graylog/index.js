@@ -4,6 +4,7 @@ import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
 import HelpBlock from './HelpBlock';
+import ListGroupItem from './ListGroupItem';
 import SplitButton from './SplitButton';
 
 export {
@@ -13,6 +14,7 @@ export {
   ControlLabel,
   DropdownButton,
   HelpBlock,
+  ListGroupItem,
   SplitButton,
 };
 export * from './bootstrap-import';
