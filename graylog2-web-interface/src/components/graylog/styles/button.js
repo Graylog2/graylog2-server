@@ -1,10 +1,9 @@
 import { css } from 'styled-components';
 import { darken, lighten, getLuminance } from 'polished';
 
-import theme from 'styled-theming';
-
 import { useTheme } from 'theme/GraylogThemeContext';
 import contrastingColor from 'util/contrastingColor';
+import bsStyleThemeVariant from '../variants/bsStyle';
 
 const buttonStyles = ({ bsStyle }) => {
   const { colors } = useTheme();
@@ -82,25 +81,7 @@ const buttonStyles = ({ bsStyle }) => {
     `;
   };
 
-  return theme.variants('mode', 'bsStyle', {
-    danger: {
-      teinte: cssBuilder(colors.secondary.uno),
-    },
-    default: {
-      teinte: cssBuilder(colors.secondary.due),
-    },
-    info: {
-      teinte: cssBuilder(colors.tertiary.uno),
-    },
-    primary: {
-      teinte: cssBuilder(colors.tertiary.quattro),
-    },
-    success: {
-      teinte: cssBuilder(colors.tertiary.tre),
-    },
-    warning: {
-      teinte: cssBuilder(colors.tertiary.sei),
-    },
+  return bsStyleThemeVariant(cssBuilder, {
     link: {
       teinte: cssBuilder(colors.tertiary.quattro),
     },
