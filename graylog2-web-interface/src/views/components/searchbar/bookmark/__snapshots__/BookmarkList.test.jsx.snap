@@ -308,48 +308,50 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                         className="form-group"
                       >
                         <ForwardRef>
-                          <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
-                                    "lastClassName": "iZJNbd",
-                                    "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                          <ControlLabelRaw>
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": true,
+                                      "lastClassName": "iZJNbd",
+                                      "rules": Array [
+                                        "color:",
+                                        "#1F1F1F",
+                                        ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                            >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                                srOnly={false}
+                                forwardedRef={null}
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                                  htmlFor="page-size"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
-                          </ControlLabel>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                          </ControlLabelRaw>
                         </ForwardRef>
                         <InputWrapper>
                           <span>
@@ -1169,48 +1171,50 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                         className="form-group"
                       >
                         <ForwardRef>
-                          <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
-                                    "lastClassName": "iZJNbd",
-                                    "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                          <ControlLabelRaw>
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": true,
+                                      "lastClassName": "iZJNbd",
+                                      "rules": Array [
+                                        "color:",
+                                        "#1F1F1F",
+                                        ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                            >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                                srOnly={false}
+                                forwardedRef={null}
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                                  htmlFor="page-size"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
-                          </ControlLabel>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                          </ControlLabelRaw>
                         </ForwardRef>
                         <InputWrapper>
                           <span>
@@ -1975,48 +1979,50 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                         className="form-group"
                       >
                         <ForwardRef>
-                          <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
-                                    "lastClassName": "iZJNbd",
-                                    "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                          <ControlLabelRaw>
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": true,
+                                      "lastClassName": "iZJNbd",
+                                      "rules": Array [
+                                        "color:",
+                                        "#1F1F1F",
+                                        ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                            >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                                srOnly={false}
+                                forwardedRef={null}
                               >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                                  htmlFor="page-size"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                  srOnly={false}
                                 >
-                                  Show:
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
-                          </ControlLabel>
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                    htmlFor="page-size"
+                                  >
+                                    Show:
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                          </ControlLabelRaw>
                         </ForwardRef>
                         <InputWrapper>
                           <span>
