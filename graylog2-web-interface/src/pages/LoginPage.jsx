@@ -1,6 +1,7 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { DocumentTitle, Icon } from 'components/common';
 import { Alert, Col, Row } from 'components/graylog';
@@ -61,6 +62,17 @@ const LoginPage = createReactClass({
     return null;
   },
 
+  renderLoginForm() {
+    const loginComponent = PluginStore.exports('loginProviderType');
+
+    if (loginComponent.length === 1) {
+      return React.createElement(loginComponent[0].formComponent, {
+        onErrorChange: this.handleErrorChange,
+      });
+    }
+
+    return <LoginForm onErrorChange={this.handleErrorChange} />;
+  },
 
   render() {
     const { lastError, didValidateSession } = this.state;
@@ -81,7 +93,7 @@ const LoginPage = createReactClass({
                 <legend><Icon name="group" /> Welcome to Graylog</legend>
                 {alert}
 
-                <LoginForm onErrorChange={this.handleErrorChange} />
+                {this.renderLoginForm()}
               </Col>
             </Row>
           </div>
