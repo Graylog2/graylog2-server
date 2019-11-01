@@ -7,12 +7,12 @@ import IsolatedScroll from 'react-isolated-scroll';
 import {
   FormControl,
   FormGroup,
-  Icon,
   ListGroup,
   ListGroupItem,
   OverlayTrigger,
   Popover,
 } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import style from './SelectPopover.css';
 
@@ -71,7 +71,6 @@ const SelectPopover = createReactClass({
       itemFormatter: item => item,
       multiple: false,
       selectedItems: [],
-      onItemSelect: () => {},
       displayDataFilter: true,
       filterPlaceholder: 'Type to filter',
       clearSelectionText: 'Clear selection',
@@ -80,25 +79,31 @@ const SelectPopover = createReactClass({
   },
 
   getInitialState() {
+    const { items, selectedItems } = this.props;
+
     return {
       filterText: '',
-      filteredItems: this.props.items,
-      selectedItems: this.props.selectedItems,
+      filteredItems: items,
+      selectedItems: selectedItems,
     };
   },
 
   componentWillReceiveProps(nextProps) {
-    if (!lodash.isEqual(this.props.selectedItems, nextProps.selectedItems)) {
+    const { items, selectedItems } = this.props;
+    const { filterText } = this.state;
+
+    if (!lodash.isEqual(selectedItems, nextProps.selectedItems)) {
       this.setState({ selectedItems: nextProps.selectedItems });
     }
-    if (this.props.items !== nextProps.items) {
-      this.filterData(this.state.filterText, nextProps.items);
+    if (items !== nextProps.items) {
+      this.filterData(filterText, nextProps.items);
     }
   },
 
   handleSelectionChange(nextSelection) {
+    const { onItemSelect } = this.props;
     this.setState({ selectedItems: nextSelection });
-    this.props.onItemSelect(nextSelection, () => this.overlay.hide());
+    onItemSelect(nextSelection, () => this.overlay.hide());
   },
 
   clearItemSelection() {
@@ -107,14 +112,17 @@ const SelectPopover = createReactClass({
 
   handleItemSelection(item) {
     return () => {
+      const { multiple } = this.props;
       const { selectedItems } = this.state;
       let nextSelectedItems;
-      if (this.props.multiple) {
+
+      if (multiple) {
         // Clicking on a selected value on a multiselect input will toggle the item's select status
         nextSelectedItems = selectedItems.includes(item) ? lodash.without(selectedItems, item) : lodash.concat(selectedItems, item);
       } else {
         nextSelectedItems = [item];
       }
+
       this.handleSelectionChange(nextSelectedItems);
     };
   },
@@ -137,17 +145,25 @@ const SelectPopover = createReactClass({
   },
 
   renderDataFilter(items) {
+    const { filterPlaceholder } = this.props;
+    const { filterText } = this.state;
+
     return (
       <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
-        <FormControl type="text" placeholder={this.props.filterPlaceholder} value={this.state.filterText} onChange={this.handleFilterChange(items)} />
+        <FormControl type="text"
+                     placeholder={filterPlaceholder}
+                     value={filterText}
+                     onChange={this.handleFilterChange(items)} />
       </FormGroup>
     );
   },
 
   renderClearSelectionItem() {
+    const { clearSelectionText } = this.props;
+
     return (
       <ListGroupItem onClick={this.clearItemSelection}>
-        <Icon name="times" fixedWidth className="text-danger" /> {this.props.clearSelectionText}
+        <Icon name="times" fixedWidth className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
   },
@@ -167,7 +183,7 @@ const SelectPopover = createReactClass({
               return (
                 <ListGroupItem key={item}
                                onClick={disabled ? () => {} : this.handleItemSelection(item)}
-                               active={this.state.selectedItems.includes(item)}
+                               active={selectedItems.includes(item)}
                                disabled={disabled}>
                   {itemFormatter(item)}
                 </ListGroupItem>
