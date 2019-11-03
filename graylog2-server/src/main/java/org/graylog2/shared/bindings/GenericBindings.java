@@ -41,6 +41,7 @@ import org.graylog2.shared.bindings.providers.SystemOkHttpClientProvider;
 import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
+import org.graylog2.shared.buffers.processors.MessageULIDGenerator;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -60,6 +61,8 @@ public class GenericBindings extends AbstractModule {
         bind(ProcessBuffer.class).asEagerSingleton();
         bind(InputBuffer.class).to(InputBufferImpl.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
+
+        bind(MessageULIDGenerator.class).asEagerSingleton();
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
