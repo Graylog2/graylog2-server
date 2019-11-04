@@ -18,12 +18,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -168,12 +168,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -318,12 +318,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -475,12 +475,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -632,12 +632,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -789,12 +789,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -946,12 +946,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -1103,12 +1103,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -1260,12 +1260,12 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       />
     </button>
     <div
-      className="dropdown btn-group btn-group-default"
+      className="dropdown btn-group"
     >
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
