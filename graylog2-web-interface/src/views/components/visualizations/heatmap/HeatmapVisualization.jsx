@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { values, find, isEmpty } from 'lodash';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 
@@ -43,7 +42,7 @@ const _chartLayout = (heatmapData) => {
   };
 };
 
-const _leafSourceMatcher = (value: Value) => value.source.endsWith('leaf') && value.source !== 'row-leaf';
+const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
