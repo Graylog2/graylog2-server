@@ -328,7 +328,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
     chartData={
       Array [
         Object {
-          "hovertemplate": "%{xaxis.title.text}: %{x}<br>%{yaxis.title.text}: %{y}<br>value: %{z}<extra></extra>",
+          "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{z}<extra></extra>",
           "name": "Heatmap Chart",
           "test": "wtwe",
           "transpose": true,
@@ -465,18 +465,13 @@ exports[`HeatmapVisualization renders correctly 1`] = `
           "b": 80,
           "l": 80,
         },
+        "plot_bgcolor": "rgb(8, 17, 164)",
         "xaxis": Object {
           "fixedrange": true,
-          "title": Object {
-            "text": "http_status",
-          },
           "type": "category",
         },
         "yaxis": Object {
           "fixedrange": true,
-          "title": Object {
-            "text": "hour",
-          },
           "type": "category",
         },
       }
@@ -494,7 +489,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
       data={
         Array [
           Object {
-            "hovertemplate": "%{xaxis.title.text}: %{x}<br>%{yaxis.title.text}: %{y}<br>value: %{z}<extra></extra>",
+            "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{z}<extra></extra>",
             "name": "Heatmap Chart",
             "test": "wtwe",
             "transpose": true,
@@ -643,19 +638,14 @@ exports[`HeatmapVisualization renders correctly 1`] = `
             "r": 10,
             "t": 10,
           },
+          "plot_bgcolor": "rgb(8, 17, 164)",
           "showlegend": true,
           "xaxis": Object {
             "fixedrange": true,
-            "title": Object {
-              "text": "http_status",
-            },
             "type": "category",
           },
           "yaxis": Object {
             "fixedrange": true,
-            "title": Object {
-              "text": "hour",
-            },
             "type": "category",
           },
         }
@@ -682,7 +672,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
         data={
           Array [
             Object {
-              "hovertemplate": "%{xaxis.title.text}: %{x}<br>%{yaxis.title.text}: %{y}<br>value: %{z}<extra></extra>",
+              "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{z}<extra></extra>",
               "name": "Heatmap Chart",
               "test": "wtwe",
               "transpose": true,
@@ -831,19 +821,14 @@ exports[`HeatmapVisualization renders correctly 1`] = `
               "r": 10,
               "t": 10,
             },
+            "plot_bgcolor": "rgb(8, 17, 164)",
             "showlegend": true,
             "xaxis": Object {
               "fixedrange": true,
-              "title": Object {
-                "text": "http_status",
-              },
               "type": "category",
             },
             "yaxis": Object {
               "fixedrange": true,
-              "title": Object {
-                "text": "hour",
-              },
               "type": "category",
             },
           }

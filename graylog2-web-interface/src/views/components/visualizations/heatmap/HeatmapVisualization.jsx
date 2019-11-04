@@ -10,16 +10,21 @@ import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
 
-const _generateSeries = (type, name, x, y, z): ChartDefinition => ({
-  type,
-  name,
-  test: 'wtwe',
-  x: y,
-  y: x,
-  z,
-  transpose: true,
-  hovertemplate: '%{xaxis.title.text}: %{x}<br>%{yaxis.title.text}: %{y}<br>value: %{z}<extra></extra>',
-});
+const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivots, series): ChartDefinition => {
+  const xAxisTitle = get(rowPivots, '[0].field');
+  const yAxisTitle = get(columnPivots, '[0].field');
+  const seriesTitle = get(series, '[0]._value.function');
+  return {
+    type,
+    name,
+    test: 'wtwe',
+    x: y,
+    y: x,
+    z,
+    transpose: true,
+    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{z}<extra></extra>`,
+  };
+};
 
 const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
   // When using the hovertemplate, the value z can't be undefined. Plotly would throw errors when hovering over a field.
@@ -37,8 +42,8 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
 };
 
 const _chartLayout = (heatmapData, config) => {
-  const xAxisTitle = get(config, '_value.columnPivots[0].field');
-  const yAxisTitle = get(config, '_value.rowPivots[0].field');
+  const seriesTitle = get(config, '_value.series[0]._value.function') || '';
+  const isCount = seriesTitle.startsWith('count') || seriesTitle.startsWith('sum');
   const axisConfig = {
     type: undefined,
     fixedrange: true,
@@ -48,22 +53,13 @@ const _chartLayout = (heatmapData, config) => {
     axisConfig.type = 'category';
   }
   return {
-    yaxis: {
-      ...axisConfig,
-      title: {
-        text: yAxisTitle,
-      },
-    },
-    xaxis: {
-      ...axisConfig,
-      title: {
-        text: xAxisTitle,
-      },
-    },
+    yaxis: axisConfig,
+    xaxis: axisConfig,
     margin: {
       b: 80,
       l: 80,
     },
+    plot_bgcolor: isCount ? 'rgb(8, 17, 164)' : 'transparent',
   };
 };
 

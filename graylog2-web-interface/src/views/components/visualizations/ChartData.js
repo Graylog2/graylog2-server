@@ -3,7 +3,10 @@ import { flatten, flow, isEqual, set } from 'lodash';
 
 import type { Key, Leaf, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
 import transformKeys from './TransformKeys';
+
 
 export type ChartDefinition = {
   type: string,
@@ -18,7 +21,7 @@ export type ExtractedSeries = Array<ChartData>;
 
 export type KeyJoiner = (Array<any>) => string;
 
-export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number) => ChartDefinition;
+export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number, Array<Pivot>, Array<Pivot>, Array<Series>) => ChartDefinition;
 
 const _defaultKeyJoiner = keys => keys.join('-');
 
@@ -56,7 +59,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator): ((ExtractedSeries) => Array<ChartDefinition>) => {
+export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, rowPivots: Array<Pivot>, columnPivots: Array<Pivot>, series: Array<Series>): ((ExtractedSeries) => Array<ChartDefinition>) => {
   return (results: ExtractedSeries) => {
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
@@ -66,7 +69,7 @@ export const generateChart = (chartType: string, generator: Generator = _default
       z,
     ]);
 
-    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length));
+    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, rowPivots, columnPivots, series));
   };
 };
 
@@ -94,6 +97,6 @@ export const chartData = (
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
-    generateChart(chartType, generator),
+    generateChart(chartType, generator, rowPivots, columnPivots, series),
   ])(data);
 };
