@@ -2463,9 +2463,9 @@ babel-plugin-add-module-exports@^1.0.2:
     chokidar "^2.0.4"
 
 babel-plugin-dynamic-import-node@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-2.2.0.tgz#c0adfb07d95f4a4495e9aaac6ec386c4d7c2524e"
-  integrity sha512-fP899ELUnTaBcIzmrW7nniyqqdYWrWuJUyPWHxFa/c7r7hS6KC8FscNfLlBNIoPSc55kYMGEEKjPjJGCLbE1qA==
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-2.3.0.tgz#f00f507bdaa3c3e3ff6e7e5e98d90a7acab96f7f"
+  integrity sha512-o6qFkpeQEBxcqt0XYlWzAVxNCSCZdUgcR8IRlhD/8DylxjjO4foPcvTW0GGKa/cVt3rvxZ7o5ippJ+/0nvLhlQ==
   dependencies:
     object.assign "^4.1.0"
 
@@ -7252,7 +7252,7 @@ gray-matter@^3.0.8:
   dependencies:
     "@babel/preset-env" "7.4.5"
     babel-eslint "9.0.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v5/npm-graylog-web-plugin-3.2.0-SNAPSHOT-f302ded2-563d-4073-8ffb-33a683dae663-1571854834997/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     html-webpack-plugin "3.2.0"
     javascript-natural-sort "0.7.1"
     jquery "3.4.1"
@@ -12693,10 +12693,10 @@ react-router@3.2.1:
     prop-types "^15.5.6"
     warning "^3.0.0"
 
-react-select-event@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-2.1.1.tgz#982c840e5b3aed5632a380ef4203b8f11051273d"
-  integrity sha512-zBDn/rQ2yugcQih2ujaokys5qkYxabpKCM43i+Ew1e4joZiCyplpzHWjz+qETV6H5KJG/gmVvE7Z0QRtHIQpkg==
+react-select-event@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-select-event/-/react-select-event-3.0.0.tgz#ff2f3a92c7931fad39d7a954b0875bc77c66aab5"
+  integrity sha512-0CnqCCF8nS4WAIbmWchuN8NvYfRTU+JMPY+EyzLWpBw2MgRa8XRt88Ve6JCK2PZtCRIJQyqh+9pRBy/c//Bu1w==
   dependencies:
     "@testing-library/dom" ">=5"
 

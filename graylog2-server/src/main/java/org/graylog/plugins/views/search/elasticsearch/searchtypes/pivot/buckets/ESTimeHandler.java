@@ -33,7 +33,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.plugins.views.search.Query;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -44,7 +43,7 @@ public class ESTimeHandler extends ESPivotBucketSpecHandler<Time, DateHistogramA
     @Nonnull
     @Override
     public Optional<AggregationBuilder> doCreateAggregation(String name, Pivot pivot, Time timeSpec, ESPivot searchTypeHandler, ESGeneratedQueryContext esGeneratedQueryContext, Query query) {
-        final DateHistogramInterval dateHistogramInterval = timeSpec.interval().toDateHistogramInterval(query.timerange());
+        final DateHistogramInterval dateHistogramInterval = timeSpec.interval().toDateHistogramInterval(query.effectiveTimeRange(pivot));
         final Optional<Histogram.Order> ordering = orderForPivot(pivot, timeSpec, esGeneratedQueryContext);
         final DateHistogramAggregationBuilder builder = AggregationBuilders.dateHistogram(name)
                 .dateHistogramInterval(dateHistogramInterval)

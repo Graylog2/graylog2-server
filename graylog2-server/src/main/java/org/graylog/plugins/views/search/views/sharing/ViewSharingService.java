@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.views.sharing;
 
+import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -24,6 +25,7 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.Optional;
+import java.util.Set;
 
 public class ViewSharingService {
     protected final JacksonDBCollection<ViewSharing, ObjectId> db;
@@ -35,6 +37,10 @@ public class ViewSharingService {
                 ViewSharing.class,
                 org.bson.types.ObjectId.class,
                 mapper.get());
+    }
+
+    public Set<ViewSharing> forViews(Set<String> viewIds) {
+        return ImmutableSet.copyOf(this.db.find(DBQuery.in(ViewSharing.FIELD_VIEW_ID, viewIds)).iterator());
     }
 
     public Optional<ViewSharing> forView(String viewId) {

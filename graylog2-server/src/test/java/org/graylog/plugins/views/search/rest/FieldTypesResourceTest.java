@@ -16,30 +16,29 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
-import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
-import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class FieldTypesResourceTest {
@@ -47,17 +46,23 @@ public class FieldTypesResourceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private IndexFieldTypesService indexFieldTypesService;
+    private MappedFieldTypesService mappedFieldTypesService;
 
     @Mock
-    private StreamService streamService;
+    private PermittedStreams permittedStreams;
 
     @Mock
     private Subject currentSubject;
 
+    @Captor
+    private ArgumentCaptor<Predicate<String>> isPermittedCaptor;
+
+    @Captor
+    private ArgumentCaptor<Set<String>> streamIdCaptor;
+
     class FieldTypesTestResource extends FieldTypesResource {
-        FieldTypesTestResource(IndexFieldTypesService indexFieldTypesService, StreamService streamService, FieldTypeMapper fieldTypeMapper) {
-            super(indexFieldTypesService, streamService, fieldTypeMapper);
+        FieldTypesTestResource(MappedFieldTypesService mappedFieldTypesService, PermittedStreams permittedStreams) {
+            super(mappedFieldTypesService, permittedStreams);
         }
 
         @Override
@@ -70,61 +75,67 @@ public class FieldTypesResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":*"))).thenReturn(true);
-        this.fieldTypesResource = new FieldTypesTestResource(indexFieldTypesService, streamService, new FieldTypeMapper());
-    }
-
-    private IndexFieldTypesDTO createIndexTypes(String indexId, String indexName, FieldTypeDTO... fieldTypes) {
-        return IndexFieldTypesDTO.create(indexId, indexName, Stream.of(fieldTypes).collect(Collectors.toSet()));
+        this.fieldTypesResource = new FieldTypesTestResource(mappedFieldTypesService, permittedStreams);
     }
 
     @Test
-    public void fieldsOfSameTypeDoNotReturnCompoundTypeIfPropertiesAreDifferent() {
-        final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
-                createIndexTypes(
-                        "deadbeef",
-                        "testIndex",
-                        FieldTypeDTO.create("field1", "keyword"),
-                        FieldTypeDTO.create("field2", "long")
-                ),
-                createIndexTypes(
-                        "affeaffe",
-                        "testIndex2",
-                        FieldTypeDTO.create("field1", "text"),
-                        FieldTypeDTO.create("field2", "long")
-                )
-        );
-        when(indexFieldTypesService.findAll()).thenReturn(fieldTypes);
+    public void allFieldTypesChecksPermissionsForStream() {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(false);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
 
-        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes();
-        assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("compound")))
-        );
+        when(permittedStreams.load(isPermittedCaptor.capture())).thenReturn(ImmutableSet.of());
+
+        this.fieldTypesResource.allFieldTypes();
+
+        final Predicate<String> isPermitted = isPermittedCaptor.getValue();
+
+        assertThat(isPermitted.test("2323")).isFalse();
+        assertThat(isPermitted.test("4242")).isTrue();
     }
 
     @Test
-    public void fieldsOfDifferentTypesDoReturnCompoundType() {
-        final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
-                createIndexTypes(
-                        "deadbeef",
-                        "testIndex",
-                        FieldTypeDTO.create("field1", "long"),
-                        FieldTypeDTO.create("field2", "long")
-                ),
-                createIndexTypes(
-                        "affeaffe",
-                        "testIndex2",
-                        FieldTypeDTO.create("field1", "text"),
-                        FieldTypeDTO.create("field2", "long")
-                )
-        );
-        when(indexFieldTypesService.findAll()).thenReturn(fieldTypes);
+    public void allFieldTypesReturnsResultFromMappedFieldTypesService() {
+        when(permittedStreams.load(any())).thenReturn(ImmutableSet.of("2323", "4242"));
+        final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")))).thenReturn(fieldTypes);
 
         final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.allFieldTypes();
-        assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("compound(long,string)", ImmutableSet.of("compound")))
-        );
+
+        assertThat(result).isEqualTo(fieldTypes);
+    }
+
+    @Test
+    public void byStreamChecksPermissionsForStream() {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+
+        this.fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .build());
+
+        final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(currentSubject, times(2)).isPermitted(streamIdCaptor.capture());
+
+        assertThat(streamIdCaptor.getAllValues()).containsExactlyInAnyOrder("streams:read:2323", "streams:read:4242");
+    }
+
+    @Test
+    public void byStreamReturnsTypesFromMappedFieldTypesService() {
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":2323"))).thenReturn(true);
+        when(currentSubject.isPermitted(eq(RestPermissions.STREAMS_READ + ":4242"))).thenReturn(true);
+        final Set<MappedFieldTypeDTO> fieldTypes = Collections.singleton(MappedFieldTypeDTO.create("foobar",
+                FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
+        when(mappedFieldTypesService.fieldTypesByStreamIds(eq(ImmutableSet.of("2323", "4242")))).thenReturn(fieldTypes);
+
+        final Set<MappedFieldTypeDTO> result = this.fieldTypesResource.byStreams(FieldTypesForStreamsRequest.Builder.builder()
+                .streams(ImmutableSet.of("2323", "4242"))
+                .build());
+
+        verify(mappedFieldTypesService, times(1)).fieldTypesByStreamIds(streamIdCaptor.capture());
+
+        assertThat(streamIdCaptor.getValue()).containsExactlyInAnyOrder("2323", "4242");
+        assertThat(result).isEqualTo(fieldTypes);
     }
 }

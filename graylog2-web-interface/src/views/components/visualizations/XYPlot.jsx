@@ -46,7 +46,7 @@ const XYPlot = ({
 }: Props) => {
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
 
-  const layout = merge({ yaxis }, plotLayout);
+  const layout = merge({}, { yaxis }, plotLayout);
 
   const _onZoom = config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true;
   if (config.isTimeline) {
@@ -54,6 +54,7 @@ const XYPlot = ({
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
     layout.xaxis = {
       range: [normalizedFrom, normalizedTo],
+      type: 'date',
     };
   } else {
     layout.xaxis = {

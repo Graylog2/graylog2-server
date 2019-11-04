@@ -139,7 +139,7 @@ class GenericPlot extends React.Component<Props, State> {
         namelength: -1,
       },
     };
-    const plotLayout = merge(defaultLayout, layout);
+    const plotLayout = merge({}, defaultLayout, layout);
 
     const style = { height: 'calc(100% - 10px)', width: '100%' };
 
@@ -169,7 +169,7 @@ class GenericPlot extends React.Component<Props, State> {
                     <>
                       <Plot data={newChartData}
                             useResizeHandler
-                            layout={interactive ? plotLayout : merge(nonInteractiveLayout, plotLayout)}
+                            layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
                             style={style}
                             onAfterPlot={onRenderComplete}
                             onClick={interactive ? null : () => false}

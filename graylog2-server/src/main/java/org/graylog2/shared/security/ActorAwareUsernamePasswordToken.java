@@ -14,22 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.errors;
+package org.graylog2.shared.security;
 
-import com.google.common.collect.ImmutableMap;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.graylog2.audit.AuditActor;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+import javax.annotation.Nonnull;
+import java.util.Objects;
 
-import java.util.Map;
+/**
+ * Audit actor is always the username.
+ */
+public class ActorAwareUsernamePasswordToken extends UsernamePasswordToken implements ActorAwareAuthenticationToken {
 
-public class MissingCapabilitiesExceptionMapper implements ExceptionMapper<MissingCapabilitiesException> {
+    public ActorAwareUsernamePasswordToken(@Nonnull String username, @Nonnull String password) {
+        super(username, password);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(password);
+    }
+
     @Override
-    public Response toResponse(MissingCapabilitiesException exception) {
-        final Map<String, Object> error = ImmutableMap.of(
-                "error", "Unable to execute this search, the following capabilities are missing:",
-                "missing", exception.getMissingRequirements()
-        );
-        return Response.status(Response.Status.CONFLICT).entity(error).build();
+    public AuditActor getActor() {
+         return AuditActor.user(getUsername());
     }
 }

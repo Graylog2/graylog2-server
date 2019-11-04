@@ -20,7 +20,6 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
-import badgeStyles from 'components/bootstrap/Badge.css';
 
 import NavigationBrand from './NavigationBrand';
 import NotificationBadge from './NotificationBadge';
@@ -61,6 +60,8 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
   return formatSinglePluginRoute(pluginRoute);
 };
 
+const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginNavigations = PluginStore.exports('navigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
@@ -78,7 +79,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
 
         {
         AppConfig.gl2DevMode()
-          && <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+          && <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
         }
       </Navbar.Header>
       <Navbar.Collapse>
@@ -89,10 +90,12 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             </LinkContainer>
           </IfPermitted>
 
+          {!enableNewSearch && (
           <NavDropdown title="Views" id="views-dropdown">
             <NavigationLink path={Routes.EXTENDEDSEARCH} description="Create new" />
             <NavigationLink path={Routes.VIEWS.LIST} description="Load existing" />
           </NavDropdown>
+          )}
 
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
@@ -124,7 +127,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           AppConfig.gl2DevMode()
             && (
               <InactiveNavItem className={styles['dev-badge-wrap']}>
-                <Badge className={`dev-badge ${badgeStyles.badgeDanger}`}>DEV</Badge>
+                <Badge bsStyle="danger" className="dev-badge">DEV</Badge>
               </InactiveNavItem>
             )
           }
