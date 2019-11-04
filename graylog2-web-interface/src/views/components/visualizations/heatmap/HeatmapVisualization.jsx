@@ -17,19 +17,40 @@ const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivot
   return {
     type,
     name,
-    test: 'wtwe',
     x: y,
     y: x,
     z,
     transpose: true,
-    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{z}<extra></extra>`,
+    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{y}<extra></extra>`,
+    colorscale: [
+      [0.00, '#440154'],
+      [0.05, '#481567'],
+      [0.10, '#483677'],
+      [0.15, '#453781'],
+      [0.20, '#404788'],
+      [0.30, '#39568c'],
+      [0.35, '#33638d'],
+      [0.40, '#2d708e'],
+      [0.45, '#287d8e'],
+      [0.50, '#238a8d'],
+      [0.55, '#1f968b'],
+      [0.60, '#20a387'],
+      [0.65, '#29af7f'],
+      [0.70, '#3cbb75'],
+      [0.75, '#55c667'],
+      [0.80, '#73d055'],
+      [0.85, '#95d840'],
+      [0.90, '#b8de29'],
+      [0.95, '#dce319'],
+      [1.00, '#fde725'],
+    ],
   };
 };
 
 const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
   // When using the hovertemplate, the value z can't be undefined. Plotly would throw errors when hovering over a field.
   const z = values(valuesBySeries).map((series) => {
-    const newSeries = fill(Array(xLabels.length), null);
+    const newSeries = fill(Array(xLabels.length), 'None');
     return merge(newSeries, series);
   });
   const yLabels = Object.keys(valuesBySeries);
@@ -41,9 +62,7 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
   ]];
 };
 
-const _chartLayout = (heatmapData, config) => {
-  const seriesTitle = get(config, '_value.series[0]._value.function') || '';
-  const isCount = seriesTitle.startsWith('count') || seriesTitle.startsWith('sum');
+const _chartLayout = (heatmapData) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
@@ -59,7 +78,7 @@ const _chartLayout = (heatmapData, config) => {
       b: 80,
       l: 80,
     },
-    plot_bgcolor: isCount ? 'rgb(8, 17, 164)' : 'transparent',
+    plot_bgcolor: '#440154',
   };
 };
 
@@ -67,7 +86,7 @@ const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !==
 
 const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
-  const layout = _chartLayout(heatmapData, config);
+  const layout = _chartLayout(heatmapData);
   return (
     <GenericPlot chartData={heatmapData} layout={layout} />
   );
