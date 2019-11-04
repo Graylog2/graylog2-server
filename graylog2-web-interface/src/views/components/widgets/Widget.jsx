@@ -136,15 +136,25 @@ class Widget extends React.Component<Props, State> {
   _onCopyToDashboard = (widgetId, dashboardId) => {
     const { view } = this.props;
     const { view: activeView } = view;
+
+    const updateDashboardWithNewSearch = (dashboard: View) => ({ search: newSearch }) => {
+      const newDashboard = dashboard.toBuilder().search(newSearch).build();
+      ViewManagementActions.update(newDashboard).then(() => {
+        browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
+      });
+    };
+
+    const addWidgetToDashboard = (dashboard: View) => (searchJson) => {
+      const search = Search.fromJSON(searchJson);
+      const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
+      if (newDashboard && newDashboard.search) {
+        SearchActions.create(newDashboard.search).then(updateDashboardWithNewSearch(newDashboard));
+      }
+    };
+
     ViewManagementActions.get(dashboardId).then((dashboardJson) => {
       const dashboard = View.fromJSON(dashboardJson);
-      SearchActions.get(dashboardJson.search_id).then((searchJson) => {
-        const search = Search.fromJSON(searchJson);
-        const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
-        ViewManagementActions.update(newDashboard).then(() => {
-          browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
-        });
-      });
+      SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
     });
     this._onToggleCopyToDashboard();
   };

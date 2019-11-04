@@ -40,7 +40,7 @@ type ViewManagementActionsType = RefluxActions<{
   create: (View) => Promise<View>,
   delete: (View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
-  get: (string) => Promise<ViewJson>,
+  get: (string) => Promise<View>,
   search: (string, number, number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
   update: (View) => Promise<View>,
 }>;
@@ -81,7 +81,7 @@ const ViewManagementStore = singletonStore(
       };
     },
 
-    get(viewId: string): Promise<View> {
+    get(viewId: string): Promise<ViewJson> {
       const promise = fetch('GET', `${viewsUrl}/${viewId}`);
       ViewManagementActions.get.promise(promise);
       return promise;
