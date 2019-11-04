@@ -7,7 +7,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import InactiveNavItem from './InactiveNavItem';
-import badgeStyles from '../bootstrap/Badge.css';
 
 const { NotificationsActions, NotificationsStore } = CombinedProvider.get('Notifications');
 
@@ -20,6 +19,8 @@ class NotificationBadge extends React.PureComponent {
     total: undefined,
   };
 
+  POLL_INTERVAL = 3000;
+
   componentDidMount() {
     NotificationsActions.list();
     this.interval = setInterval(NotificationsActions.list, this.POLL_INTERVAL);
@@ -28,8 +29,6 @@ class NotificationBadge extends React.PureComponent {
   componentWillUnmount() {
     clearInterval(this.interval);
   }
-
-  POLL_INTERVAL = 3000;
 
   render() {
     const { total } = this.props;
@@ -40,7 +39,7 @@ class NotificationBadge extends React.PureComponent {
       <Nav navbar>
         <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
           <InactiveNavItem className="notification-badge-link">
-            <Badge className={badgeStyles.badgeDanger} id="notification-badge">{total}</Badge>
+            <Badge bsStyle="danger" id="notification-badge">{total}</Badge>
           </InactiveNavItem>
         </LinkContainer>
       </Nav>

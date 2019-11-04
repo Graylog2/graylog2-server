@@ -21,18 +21,9 @@ import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchRequirements;
-import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
-import org.graylog.plugins.views.search.views.sharing.ViewSharingService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.database.users.User;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -43,7 +34,6 @@ import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -57,21 +47,12 @@ import java.util.stream.Stream;
  */
 public class SearchDbService {
     protected final JacksonDBCollection<Search, ObjectId> db;
-    private final ViewService viewService;
-    private final ViewSharingService viewSharingService;
-    private final IsViewSharedForUser isViewSharedForUser;
     private final SearchRequirements.Factory searchRequirementsFactory;
 
     @Inject
     protected SearchDbService(MongoConnection mongoConnection,
                               MongoJackObjectMapperProvider mapper,
-                              ViewService viewService,
-                              ViewSharingService viewSharingService,
-                              IsViewSharedForUser isViewSharedForUser,
                               SearchRequirements.Factory searchRequirementsFactory) {
-        this.viewService = viewService;
-        this.viewSharingService = viewSharingService;
-        this.isViewSharedForUser = isViewSharedForUser;
         this.searchRequirementsFactory = searchRequirementsFactory;
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("searches"),
                 Search.class,
@@ -83,31 +64,6 @@ public class SearchDbService {
     public Optional<Search> get(String id) {
         return Optional.ofNullable(db.findOneById(new ObjectId(id)))
                 .map(this::requirementsForSearch);
-    }
-
-    public Optional<Search> getForUser(String id, User user, Predicate<String> permissionChecker) {
-        final Optional<Search> search = get(id).map(this::requirementsForSearch);
-
-        if (!search.isPresent()) {
-            return Optional.empty();
-        }
-
-        if (search.map(s -> s.owner().map(owner -> owner.equals(user.getName())).orElse(false)).orElse(false)) {
-            return search;
-        }
-
-        if (viewService.forSearch(id).stream()
-                .map(view -> viewSharingService.forView(view.id()))
-                .anyMatch(viewSharing -> viewSharing.map(sharing -> isViewSharedForUser.isAllowedToSee(user, sharing)).orElse(false))) {
-            return search;
-        }
-
-        if (viewService.forSearch(id).stream()
-                .anyMatch(view -> permissionChecker.test(view.id()))) {
-            return search;
-        }
-
-        return Optional.empty();
     }
 
     public Search save(Search search) {

@@ -173,8 +173,8 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         final Double from = queryResult.getAggregations().getMinAggregation("timestamp-min").getMin();
         final Double to = queryResult.getAggregations().getMaxAggregation("timestamp-max").getMax();
         final AbsoluteRange effectiveTimerange = AbsoluteRange.create(
-                from == null ? query.timerange().getFrom() : new DateTime(from.longValue(), DateTimeZone.UTC),
-                to == null ? query.timerange().getTo() : new DateTime(to.longValue(), DateTimeZone.UTC)
+                from == null ? query.effectiveTimeRange(pivot).getFrom() : new DateTime(from.longValue(), DateTimeZone.UTC),
+                to == null ? query.effectiveTimeRange(pivot).getTo() : new DateTime(to.longValue(), DateTimeZone.UTC)
         );
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()

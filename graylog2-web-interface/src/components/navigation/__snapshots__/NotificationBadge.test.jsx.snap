@@ -54,19 +54,58 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                   onKeyDown={[Function]}
                   role="button"
                 >
-                  <Badge
-                    bsClass="badge"
-                    className="badgeDanger"
+                  <ForwardRef
+                    bsStyle="danger"
                     id="notification-badge"
-                    pullRight={false}
                   >
-                    <span
-                      className="badgeDanger badge"
+                    <Badge__StyledBadge
+                      bsStyle="danger"
                       id="notification-badge"
                     >
-                      42
-                    </span>
-                  </Badge>
+                      <StyledComponent
+                        bsStyle="danger"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                              "isStatic": false,
+                              "lastClassName": "gDhrrS",
+                              "rules": Array [
+                                [Function],
+                              ],
+                            },
+                            "displayName": "Badge__StyledBadge",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        id="notification-badge"
+                      >
+                        <Badge
+                          bsClass="badge"
+                          bsStyle="danger"
+                          className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                          id="notification-badge"
+                          pullRight={false}
+                        >
+                          <span
+                            className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-danger"
+                            id="notification-badge"
+                          >
+                            42
+                          </span>
+                        </Badge>
+                      </StyledComponent>
+                    </Badge__StyledBadge>
+                  </ForwardRef>
                 </a>
               </SafeAnchor>
             </li>

@@ -79,9 +79,9 @@ const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, 
 ViewActionsMenu.propTypes = {
   currentUser: PropTypes.shape({
     currentUser: PropTypes.shape({
-      permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-    }).isRequired,
-  }).isRequired,
+      permissions: PropTypes.arrayOf(PropTypes.string),
+    }),
+  }),
   onSaveView: PropTypes.func.isRequired,
   onSaveAsView: PropTypes.func.isRequired,
   metadata: PropTypes.shape({
@@ -89,6 +89,14 @@ ViewActionsMenu.propTypes = {
   }).isRequired,
   view: PropTypes.instanceOf(View).isRequired,
   isNewView: PropTypes.bool.isRequired,
+};
+
+ViewActionsMenu.defaultProps = {
+  currentUser: {
+    currentUser: {
+      permissions: [],
+    },
+  },
 };
 
 export default connect(
