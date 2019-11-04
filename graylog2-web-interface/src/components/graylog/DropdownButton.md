@@ -9,6 +9,7 @@ styles.map((style, i) => {
       <DropdownButton title={style}
                       bsStyle={style.toLowerCase()}
                       key={`split-button-${i}`}>
+        <MenuItem header>Header</MenuItem>
         <MenuItem eventKey="1">Default</MenuItem>
         <MenuItem eventKey="2" active>Active</MenuItem>
         <MenuItem eventKey="4" disabled>Disabled</MenuItem>
