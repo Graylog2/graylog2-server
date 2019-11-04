@@ -110,7 +110,7 @@ describe('Chart helper functions', () => {
     });
     it('should allow passing a leaf source matcher function to modify the resulting series', () => {
       const input = readFixture('ChartData.test.simple.json');
-      const leafSourceMatcher = (source: string) => source.endsWith('leaf') && source !== 'row-leaf';
+      const leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
       const result = chartData(config, input, 'scatter', undefined, undefined, leafSourceMatcher);
       const expectedResult = readFixture('ChartData.test.simple.sourceMatcher.result.json');
       expect(result).toHaveLength(4);

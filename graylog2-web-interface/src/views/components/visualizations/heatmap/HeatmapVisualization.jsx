@@ -67,7 +67,7 @@ const _chartLayout = (heatmapData, config) => {
   };
 };
 
-const _leafSourceMatcher = (source: string) => source.endsWith('leaf') && source !== 'row-leaf';
+const _leafSourceMatcher = ({ source }) => source.endsWith('leaf') && source !== 'row-leaf';
 
 const HeatmapVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => {
   const heatmapData = chartData(config, data, 'heatmap', _generateSeries, _formatSeries, _leafSourceMatcher);
