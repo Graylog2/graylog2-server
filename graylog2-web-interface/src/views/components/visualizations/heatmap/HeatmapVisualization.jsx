@@ -33,10 +33,11 @@ const COLORSCALE = [
   [1.00, '#fde725'],
 ];
 
-const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivots, series): ChartDefinition => {
-  const xAxisTitle = get(columnPivots, '[0].field');
-  const yAxisTitle = get(rowPivots, '[0].field');
-  const seriesTitle = get(series, '[0]._value.function');
+const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefinition => {
+  console.log(config);
+  const xAxisTitle = get(config, '_value.rowPivots[0].field');
+  const yAxisTitle = get(config, '_value.columnPivots[0].field');
+  const seriesTitle = get(config, '_value.series[0]._value.function');
   return {
     type,
     name,
