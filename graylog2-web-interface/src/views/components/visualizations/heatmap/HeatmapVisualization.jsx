@@ -34,7 +34,6 @@ const COLORSCALE = [
 ];
 
 const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefinition => {
-  console.log(config);
   const xAxisTitle = get(config, '_value.rowPivots[0].field');
   const yAxisTitle = get(config, '_value.columnPivots[0].field');
   const seriesTitle = get(config, '_value.series[0]._value.function');
