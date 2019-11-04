@@ -5,7 +5,6 @@ export {
   Form,
   FormControl,
   InputGroup,
-  Label,
   ListGroupItem,
   MenuItem,
   Modal,
