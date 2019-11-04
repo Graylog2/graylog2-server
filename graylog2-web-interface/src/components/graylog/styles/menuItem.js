@@ -3,7 +3,7 @@ import { css } from 'styled-components';
 import teinte from 'theme/teinte';
 import contrastingColor from 'util/contrastingColor';
 
-const menuItemStyles = () => css`
+const menuItemStyles = css`
   & ~ .dropdown-menu > li > a {
     color: ${teinte.primary.tre};
 

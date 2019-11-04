@@ -9,7 +9,7 @@ import buttonStyles from './styles/button';
 const DropdownButton = React.memo(styled(BootstrapDropdownButton)`
   ${props => buttonStyles(props)};
 
-  ${menuItemStyles()};
+  ${menuItemStyles};
 `);
 
 export default DropdownButton;
