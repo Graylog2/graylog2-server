@@ -5,6 +5,7 @@ import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
 import Jumbotron from './Jumbotron';
 import HelpBlock from './HelpBlock';
+import MenuItem from './MenuItem';
 import SplitButton from './SplitButton';
 
 export {
@@ -15,6 +16,7 @@ export {
   DropdownButton,
   Jumbotron,
   HelpBlock,
+  MenuItem,
   SplitButton,
 };
 export * from './bootstrap-import';

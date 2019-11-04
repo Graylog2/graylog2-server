@@ -6,9 +6,11 @@ import styled from 'styled-components';
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
+let StyledDropdownButton;
+
 const DropdownButton = forwardRef((props, ref) => {
   const { bsStyle, active, disabled } = props;
-  const StyledDropdownButton = useCallback(styled(BootstrapDropdownButton)`
+  StyledDropdownButton = useCallback(styled(BootstrapDropdownButton)`
     ${buttonStyles(props)};
   `, [bsStyle, active, disabled]);
 
@@ -22,3 +24,4 @@ DropdownButton.propTypes = propTypes;
 DropdownButton.defaultProps = defaultProps;
 
 export default DropdownButton;
+export { StyledDropdownButton };
