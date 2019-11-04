@@ -11,8 +11,8 @@ import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
 
 const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivots, series): ChartDefinition => {
-  const xAxisTitle = get(rowPivots, '[0].field');
-  const yAxisTitle = get(columnPivots, '[0].field');
+  const xAxisTitle = get(columnPivots, '[0].field');
+  const yAxisTitle = get(rowPivots, '[0].field');
   const seriesTitle = get(series, '[0]._value.function');
   return {
     type,
