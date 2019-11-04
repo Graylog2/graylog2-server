@@ -84,7 +84,8 @@ const _chartLayout = (heatmapData) => {
     fixedrange: true,
   };
   // Adding the axis type, without provided z data, would hide the empty grid.
-  if (find(heatmapData, series => !isEmpty(series.z))) {
+  const hasContent = find(heatmapData, series => !isEmpty(series.z));
+  if (hasContent) {
     axisConfig.type = 'category';
   }
   return {
@@ -94,7 +95,7 @@ const _chartLayout = (heatmapData) => {
       b: 80,
       l: 80,
     },
-    plot_bgcolor: '#440154',
+    plot_bgcolor: hasContent ? '#440154' : 'transparent',
   };
 };
 
