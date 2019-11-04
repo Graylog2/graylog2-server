@@ -492,7 +492,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
               227,
             ],
           ],
-          "hovertemplate": "http_status: %{x}<br>hour: %{y}<br>count(): %{customdata}<extra></extra>",
+          "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{customdata}<extra></extra>",
           "name": "Heatmap Chart",
           "type": "heatmap",
           "x": Array [
@@ -797,7 +797,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
                 227,
               ],
             ],
-            "hovertemplate": "http_status: %{x}<br>hour: %{y}<br>count(): %{customdata}<extra></extra>",
+            "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{customdata}<extra></extra>",
             "name": "Heatmap Chart",
             "type": "heatmap",
             "x": Array [
@@ -1124,7 +1124,7 @@ exports[`HeatmapVisualization renders correctly 1`] = `
                   227,
                 ],
               ],
-              "hovertemplate": "http_status: %{x}<br>hour: %{y}<br>count(): %{customdata}<extra></extra>",
+              "hovertemplate": "hour: %{x}<br>http_status: %{y}<br>count(): %{customdata}<extra></extra>",
               "name": "Heatmap Chart",
               "type": "heatmap",
               "x": Array [
