@@ -10,6 +10,29 @@ import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
 
+const COLORSCALE = [
+  [0.00, '#440154'],
+  [0.05, '#481567'],
+  [0.10, '#483677'],
+  [0.15, '#453781'],
+  [0.20, '#404788'],
+  [0.30, '#39568c'],
+  [0.35, '#33638d'],
+  [0.40, '#2d708e'],
+  [0.45, '#287d8e'],
+  [0.50, '#238a8d'],
+  [0.55, '#1f968b'],
+  [0.60, '#20a387'],
+  [0.65, '#29af7f'],
+  [0.70, '#3cbb75'],
+  [0.75, '#55c667'],
+  [0.80, '#73d055'],
+  [0.85, '#95d840'],
+  [0.90, '#b8de29'],
+  [0.95, '#dce319'],
+  [1.00, '#fde725'],
+];
+
 const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivots, series): ChartDefinition => {
   const xAxisTitle = get(columnPivots, '[0].field');
   const yAxisTitle = get(rowPivots, '[0].field');
@@ -20,39 +43,32 @@ const _generateSeries = (type, name, x, y, z, idx, total, rowPivots, columnPivot
     x: y,
     y: x,
     z,
-    transpose: true,
-    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{y}<extra></extra>`,
-    colorscale: [
-      [0.00, '#440154'],
-      [0.05, '#481567'],
-      [0.10, '#483677'],
-      [0.15, '#453781'],
-      [0.20, '#404788'],
-      [0.30, '#39568c'],
-      [0.35, '#33638d'],
-      [0.40, '#2d708e'],
-      [0.45, '#287d8e'],
-      [0.50, '#238a8d'],
-      [0.55, '#1f968b'],
-      [0.60, '#20a387'],
-      [0.65, '#29af7f'],
-      [0.70, '#3cbb75'],
-      [0.75, '#55c667'],
-      [0.80, '#73d055'],
-      [0.85, '#95d840'],
-      [0.90, '#b8de29'],
-      [0.95, '#dce319'],
-      [1.00, '#fde725'],
-    ],
+    customdata: z,
+    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{customdata}<extra></extra>`,
+    colorscale: COLORSCALE,
   };
 };
 
-const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
-  // When using the hovertemplate, the value z can't be undefined. Plotly would throw errors when hovering over a field.
-  const z = values(valuesBySeries).map((series) => {
-    const newSeries = fill(Array(xLabels.length), 'None');
+const _fillEmptyFields = (z: Array<Array<any>>, xLabels: Array<any>) => {
+  const defaultValue = 'None';
+  return z.map((series) => {
+    const newSeries = fill(Array(xLabels.length), defaultValue);
     return merge(newSeries, series);
   });
+};
+
+const _transposeMatrix = (z: Array<Array<any>>) => {
+  if (isEmpty(z)) {
+    return z;
+  }
+  return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
+};
+
+const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+  // When using the hovertemplate, we need to provie a value for empty z values.
+  // Otherwise plotly would throw errors when hovering over a field.
+  // We need to transpose the z matrix, because we are changing the x and y label in the generator function
+  const z = _transposeMatrix(_fillEmptyFields(values(valuesBySeries), xLabels));
   const yLabels = Object.keys(valuesBySeries);
   return [[
     'Heatmap Chart',
