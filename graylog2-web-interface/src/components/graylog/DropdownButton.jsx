@@ -1,27 +1,15 @@
-import React, { forwardRef, useCallback } from 'react';
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { DropdownButton as BootstrapDropdownButton } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import menuItemStyles from './styles/menuItem';
 import buttonStyles from './styles/button';
-import { propTypes, defaultProps } from './props/button';
 
-let StyledDropdownButton;
+const DropdownButton = React.memo(styled(BootstrapDropdownButton)`
+  ${props => buttonStyles(props)};
 
-const DropdownButton = forwardRef((props, ref) => {
-  const { bsStyle, active, disabled } = props;
-  StyledDropdownButton = useCallback(styled(BootstrapDropdownButton)`
-    ${buttonStyles(props)};
-  `, [bsStyle, active, disabled]);
-
-  return (
-    <StyledDropdownButton ref={ref} {...props} />
-  );
-});
-
-DropdownButton.propTypes = propTypes;
-
-DropdownButton.defaultProps = defaultProps;
+  ${menuItemStyles()};
+`);
 
 export default DropdownButton;
-export { StyledDropdownButton };

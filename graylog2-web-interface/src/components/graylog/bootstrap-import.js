@@ -5,7 +5,6 @@ export {
   Form,
   FormControl,
   InputGroup,
-  Label,
   ListGroupItem,
   Modal,
   Nav,
@@ -34,6 +33,7 @@ export {
   FormGroup,
   Grid,
   ListGroup,
+  MenuItem,
   OverlayTrigger,
   PanelGroup,
   /* 👆 no custom theme colors needed 👆 */
