@@ -15,6 +15,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),
   gl2DevMode: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => false),
 }));
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);

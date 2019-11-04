@@ -4,7 +4,6 @@ import { mount } from 'enzyme';
 import AppErrorBoundary from './AppErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: x => x }));
-jest.mock('!style/useable!css!./NotFoundPage.css', () => ({ use: jest.fn(), unuse: jest.fn() }));
 
 const suppressConsole = (fn) => {
   /* eslint-disable no-console */
