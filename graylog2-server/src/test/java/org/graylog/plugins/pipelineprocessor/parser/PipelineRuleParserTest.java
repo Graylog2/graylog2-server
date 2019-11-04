@@ -56,6 +56,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMus
 import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
+import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
@@ -95,6 +96,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
         functions.put("concat", new ConcatFunction());
         functions.put("trigger_test", new TriggerTestFunction());
         functions.put("optional", new OptionalFunction());
+        functions.put("required", new RequiredFunction());
         functions.put("customObject", new CustomObjectFunction());
         functions.put("beanObject", new BeanObjectFunction());
         functions.put("keys", new KeysFunction());
@@ -247,6 +249,17 @@ public class PipelineRuleParserTest extends BaseParserTest {
             assertTrue(e.getErrors().stream().allMatch(error -> error instanceof OptionalParametersMustBeNamed));
         }
 
+    }
+
+    @Test
+    public void requiredParameter() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertTrue(e.getErrors().stream().allMatch(error -> error instanceof WrongNumberOfArgs));
+        }
     }
 
     @Test
@@ -562,6 +575,25 @@ public class PipelineRuleParserTest extends BaseParserTest {
                             ParameterDescriptor.string("b").build(),
                             ParameterDescriptor.floating("c").optional().build(),
                             ParameterDescriptor.integer("d").build()
+                    ))
+                    .build();
+        }
+    }
+
+    public static class RequiredFunction extends AbstractFunction<Boolean> {
+        @Override
+        public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+            return true;
+        }
+
+        @Override
+        public FunctionDescriptor<Boolean> descriptor() {
+            return FunctionDescriptor.<Boolean>builder()
+                    .name("required")
+                    .returnType(Boolean.class)
+                    .params(of(
+                            ParameterDescriptor.integer("a").build(),
+                            ParameterDescriptor.string("b").build()
                     ))
                     .build();
         }
