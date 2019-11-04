@@ -9,7 +9,6 @@ export {
   Modal,
   Nav,
   Navbar,
-  NavDropdown,
   NavItem,
   Pager,
   Pagination,

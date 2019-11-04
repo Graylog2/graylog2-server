@@ -1,0 +1,12 @@
+import React from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { NavDropdown as BootstrapNavDropdown } from 'react-bootstrap';
+import styled from 'styled-components';
+
+import menuItemStyles from './styles/menuItem';
+
+const NavDropdown = React.memo(styled(BootstrapNavDropdown)`
+  ${menuItemStyles()};
+`);
+
+export default NavDropdown;
