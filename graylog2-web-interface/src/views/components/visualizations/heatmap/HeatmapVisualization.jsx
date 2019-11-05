@@ -84,6 +84,7 @@ const _axisConfg = (chartHasContent) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
+    automargin: true,
   };
   // Adding the axis type, without provided z data, would hide the empty grid
   if (chartHasContent) {
@@ -98,10 +99,6 @@ const _chartLayout = (heatmapData) => {
   return {
     yaxis: axisConfig,
     xaxis: axisConfig,
-    margin: {
-      b: 80,
-      l: 80,
-    },
     plot_bgcolor: hasContent ? BG_COLOR : 'transparent',
   };
 };
