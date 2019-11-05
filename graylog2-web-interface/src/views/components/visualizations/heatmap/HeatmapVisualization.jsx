@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { values, merge, fill, find, isEmpty, get } from 'lodash';
 
+
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { ChartDefinition, ExtractedSeries } from '../ChartData';
@@ -84,7 +85,7 @@ const _axisConfg = (chartHasContent) => {
     type: undefined,
     fixedrange: true,
   };
-  // Adding the axis type, without provided z data, would hide the empty grid.
+  // Adding the axis type, without provided z data, would hide the empty grid
   if (chartHasContent) {
     axisConfig.type = 'category';
   }
