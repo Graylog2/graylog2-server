@@ -5,7 +5,6 @@ import type { Key, Leaf, Rows, Value } from 'views/logic/searchtypes/pivot/Pivot
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import transformKeys from './TransformKeys';
 
-
 export type ChartDefinition = {
   type: string,
   name: string,

@@ -37,9 +37,9 @@ const COLORSCALE = [
 ];
 
 const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefinition => {
-  const xAxisTitle = get(config, '_value.rowPivots[0].field');
-  const yAxisTitle = get(config, '_value.columnPivots[0].field');
-  const seriesTitle = get(config, '_value.series[0]._value.function');
+  const xAxisTitle = get(config, ['_value', 'rowPivots', idx, 'field']);
+  const yAxisTitle = get(config, ['_value', 'columnPivots', idx, 'field']);
+  const seriesTitle = get(config, ['_value', 'series', idx, '_value', 'function']);
   const hovertemplate = `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{customdata}<extra></extra>`;
   return {
     type,
