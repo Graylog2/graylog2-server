@@ -7,6 +7,7 @@ import Jumbotron from './Jumbotron';
 import HelpBlock from './HelpBlock';
 import Label from './Label';
 import SplitButton from './SplitButton';
+import Table from './Table';
 
 export {
   Alert,
@@ -18,5 +19,6 @@ export {
   HelpBlock,
   Label,
   SplitButton,
+  Table,
 };
 export * from './bootstrap-import';

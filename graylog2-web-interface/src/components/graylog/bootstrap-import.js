@@ -20,7 +20,6 @@ export {
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
   Tab,
-  Table,
   Tabs,
   Tooltip,
   Well,
