@@ -22,6 +22,7 @@ import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -38,7 +39,6 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
-import Search from "../../logic/search/Search";
 
 type Props = {
   id: string,

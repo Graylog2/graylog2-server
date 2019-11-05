@@ -1,8 +1,6 @@
 // @flow strict
 import { List, Map } from 'immutable';
 
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
-
 import Widget from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';

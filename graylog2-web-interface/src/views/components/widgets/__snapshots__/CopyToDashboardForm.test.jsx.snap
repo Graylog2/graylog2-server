@@ -84,7 +84,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   class="form-group"
                 >
                   <label
-                    class="control-label"
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     for="page-size"
                   >
                     Show:
@@ -303,7 +303,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   class="form-group"
                 >
                   <label
-                    class="control-label"
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     for="page-size"
                   >
                     Show:

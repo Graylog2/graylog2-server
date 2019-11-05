@@ -13,7 +13,8 @@ type Props = {
   dashboards: DashboardsStoreState,
 };
 
-const CopyToDashboard = ({ widgetId, onCancel, dashboards: { list, pagination }, onSubmit }: Props) => {
+const CopyToDashboardForm = (props: Props) => {
+  const { widgetId, onCancel, dashboards: { list, pagination }, onSubmit } = props;
   const [selectedDashboard, setSelectedDashbaord] = useState('');
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
@@ -86,4 +87,4 @@ const CopyToDashboard = ({ widgetId, onCancel, dashboards: { list, pagination },
   );
 };
 
-export default connect(CopyToDashboard, { dashboards: DashboardsStore });
+export default connect(CopyToDashboardForm, { dashboards: DashboardsStore });

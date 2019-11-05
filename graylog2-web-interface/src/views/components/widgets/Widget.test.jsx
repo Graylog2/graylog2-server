@@ -2,6 +2,10 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
+import { render, wait, fireEvent, cleanup } from '@testing-library/react';
+import { browserHistory } from 'react-router';
+import { Map } from 'immutable';
+import Routes from 'routing/Routes';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
@@ -9,10 +13,35 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
+import View from 'views/logic/views/View';
+import { DashboardsStore } from 'views/stores/DashboardsStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import SearchActions from 'views/actions/SearchActions';
+import Search from 'views/logic/search/Search';
+import Query from 'views/logic/queries/Query';
+import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
+import asMock from 'helpers/mocking/AsMock';
+import ViewState from 'views/logic/views/ViewState';
 
 import Widget from './Widget';
 import LoadingWidget from './LoadingWidget';
 import ErrorWidget from './ErrorWidget';
+
+jest.mock('views/actions/SearchActions', () => ({
+  create: mockAction(jest.fn()),
+  get: mockAction(jest.fn()),
+}));
+
+jest.mock('views/stores/ViewManagementStore', () => ({
+  ViewManagementActions: {
+    update: mockAction(jest.fn()),
+    get: mockAction(jest.fn()),
+  },
+}));
+
+jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 
 jest.mock('../searchbar/QueryInput', () => mockComponent('QueryInput'));
 jest.mock('./WidgetHeader', () => 'widget-header');
@@ -48,6 +77,42 @@ const createNodeMock = (element) => {
 
 describe('<Widget />', () => {
   const widget = { config: {}, id: 'widgetId', type: 'dummy' };
+
+  const viewState = ViewState.builder().build();
+  const query = Query.builder().id('query-id').build();
+  const searchSearch = Search.builder().queries([query]).id('search-1').build();
+  const search = View.builder()
+    .search(searchSearch)
+    .type(View.Type.Dashboard)
+    .state(Map.of('query-id', viewState))
+    .id('search-1')
+    .title('search 1')
+    .build();
+  const viewStoreState: ViewStoreState = {
+    activeQuery: 'query-id',
+    view: search,
+    isNew: false,
+    dirty: false,
+  };
+
+  const searchDB1 = Search.builder().id('search-1').build();
+  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
+    .search(searchDB1)
+    .build();
+  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
+    .build();
+  const dashboardList = [dashboard1, dashboard2];
+  const dashboardState = {
+    list: dashboardList,
+    pagination: {
+      total: 2,
+      page: 1,
+      per_page: 10,
+      count: 2,
+    },
+  };
+
+
   const DummyWidget = props => (
     <Widget widget={widget}
             id="widgetId"
@@ -109,6 +174,58 @@ describe('<Widget />', () => {
     duplicate.simulate('click');
 
     expect(WidgetActions.duplicate).toHaveBeenCalled();
+  });
+
+  describe('copy widget to dashboard', () => {
+    beforeEach(() => {
+      DashboardsStore.getInitialState = jest.fn(() => dashboardState);
+      ViewStore.getInitialState = jest.fn(() => viewStoreState);
+      ViewManagementActions.get = mockAction(jest.fn((() => Promise.resolve(dashboard1.toJSON()))));
+      SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
+      ViewManagementActions.update = mockAction(jest.fn(() => Promise.resolve()));
+      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1.toJSON() })));
+      Routes.pluginRoute = jest.fn(route => id => `${route}-${id}`);
+      browserHistory.push = jest.fn();
+      asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
+        .search(Search.builder().id('search-id').build())
+        .id('new-id').type(View.Type.Dashboard)
+        .build());
+    });
+    afterEach(() => {
+      cleanup();
+    });
+    const renderAndClick = () => {
+      const { getByText, getByTestId } = render(<DummyWidget />);
+      const actionToggle = getByTestId('widgetActionDropDown');
+      fireEvent.click(actionToggle);
+      const copyToDashboard = getByText('Copy to Dashboard');
+      fireEvent.click(copyToDashboard);
+      const view1ListItem = getByText('view 1');
+      fireEvent.click(view1ListItem);
+      const selectBtn = getByText('Select');
+      fireEvent.click(selectBtn);
+    };
+
+    it('should get dashboard from backend', async () => {
+      renderAndClick();
+      await wait(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+    });
+    it('should get corresponding search to dashboard', async () => {
+      renderAndClick();
+      await wait(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
+    });
+    it('should create new search for dashboard', async () => {
+      renderAndClick();
+      await wait(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
+    });
+    it('should update dashboard with new search and widget', async () => {
+      renderAndClick();
+      await wait(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
+    });
+    it('should redirect to updated dashboard', async () => {
+      renderAndClick();
+      await wait(() => expect(browserHistory.push).toHaveBeenCalledTimes(1));
+    });
   });
   it('adds cancel action to widget in edit mode', () => {
     const wrapper = mount(<DummyWidget editing />);
