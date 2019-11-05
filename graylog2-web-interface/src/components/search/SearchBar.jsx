@@ -1,3 +1,4 @@
+/* eslint-disable */
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
