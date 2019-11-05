@@ -1,27 +1,17 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
 
-import { useTheme } from 'theme/GraylogThemeContext';
+import teinte from 'theme/teinte';
 
-const StyledControlLabel = color => useCallback(styled(BootstrapControlLabel)`
-  color: ${color};
+const ControlLabelRaw = styled(BootstrapControlLabel)`
+  color: ${teinte.primary.tre};
   font-weight: bold;
   margin-bottom: 5px;
   display: inline-block;
-`, [color]);
-
-const ControlLabelRaw = ({ children, ...props }) => {
-  // NOTE: This non-forwarded component is needed for tests in `Enterprise Plugin`
-  const { colors } = useTheme();
-  const Label = StyledControlLabel(colors.primary.tre);
-
-  return (
-    <Label {...props}>{children}</Label>
-  );
-};
+`;
 
 const ControlLabel = forwardRef((props, ref) => <ControlLabelRaw ref={ref} {...props} />);
 

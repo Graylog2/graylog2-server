@@ -17,7 +17,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
         className="form-group"
       >
         <label
-          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+          className="col-sm-3 ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
           htmlFor="comment"
         >
           Comment
@@ -56,7 +56,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
         className="form-group"
       >
         <label
-          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+          className="col-sm-3 ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
           htmlFor="PARAM"
         >
           A parameter

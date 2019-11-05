@@ -83,7 +83,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
                         htmlFor="filter-streams-data-filter"
                       >
                         Filter Streams
@@ -339,7 +339,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
                         htmlFor="filter-dashboards-data-filter"
                       >
                         Filter Dashboards
@@ -646,7 +646,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
                         htmlFor="filter-streams-data-filter"
                       >
                         Filter Streams
@@ -902,7 +902,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
                         htmlFor="filter-dashboards-data-filter"
                       >
                         Filter Dashboards
