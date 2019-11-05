@@ -10,6 +10,8 @@ import type { ChartDefinition, ExtractedSeries } from '../ChartData';
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
 
+const BG_COLOR = '#440154';
+
 const COLORSCALE = [
   [0.00, '#440154'],
   [0.05, '#481567'],
@@ -37,6 +39,7 @@ const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefiniti
   const xAxisTitle = get(config, '_value.rowPivots[0].field');
   const yAxisTitle = get(config, '_value.columnPivots[0].field');
   const seriesTitle = get(config, '_value.series[0]._value.function');
+  const hovertemplate = `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{customdata}<extra></extra>`;
   return {
     type,
     name,
@@ -44,12 +47,12 @@ const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefiniti
     y: x,
     z,
     customdata: z,
-    hovertemplate: `${xAxisTitle}: %{x}<br>${yAxisTitle}: %{y}<br>${seriesTitle}: %{customdata}<extra></extra>`,
+    hovertemplate,
     colorscale: COLORSCALE,
   };
 };
 
-const _fillEmptyFields = (z: Array<Array<any>>, xLabels: Array<any>) => {
+const _fillUpMatrix = (z: Array<Array<any>>, xLabels: Array<any>) => {
   const defaultValue = 'None';
   return z.map((series) => {
     const newSeries = fill(Array(xLabels.length), defaultValue);
@@ -57,10 +60,8 @@ const _fillEmptyFields = (z: Array<Array<any>>, xLabels: Array<any>) => {
   });
 };
 
-const _transposeMatrix = (z: Array<Array<any>>) => {
-  if (isEmpty(z)) {
-    return z;
-  }
+const _transposeMatrix = (z: Array<Array<any>> = []) => {
+  if (!z[0]) { return z; }
   return z[0].map((_, c) => { return z.map((r) => { return r[c]; }); });
 };
 
@@ -68,7 +69,7 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
   // When using the hovertemplate, we need to provie a value for empty z values.
   // Otherwise plotly would throw errors when hovering over a field.
   // We need to transpose the z matrix, because we are changing the x and y label in the generator function
-  const z = _transposeMatrix(_fillEmptyFields(values(valuesBySeries), xLabels));
+  const z = _transposeMatrix(_fillUpMatrix(values(valuesBySeries), xLabels));
   const yLabels = Object.keys(valuesBySeries);
   return [[
     'Heatmap Chart',
@@ -78,16 +79,21 @@ const _formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLa
   ]];
 };
 
-const _chartLayout = (heatmapData) => {
+const _axisConfg = (chartHasContent) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
   };
   // Adding the axis type, without provided z data, would hide the empty grid.
-  const hasContent = find(heatmapData, series => !isEmpty(series.z));
-  if (hasContent) {
+  if (chartHasContent) {
     axisConfig.type = 'category';
   }
+  return axisConfig;
+};
+
+const _chartLayout = (heatmapData) => {
+  const hasContent = find(heatmapData, series => !isEmpty(series.z));
+  const axisConfig = _axisConfg(hasContent);
   return {
     yaxis: axisConfig,
     xaxis: axisConfig,
@@ -95,7 +101,7 @@ const _chartLayout = (heatmapData) => {
       b: 80,
       l: 80,
     },
-    plot_bgcolor: hasContent ? '#440154' : 'transparent',
+    plot_bgcolor: hasContent ? BG_COLOR : 'transparent',
   };
 };
 
