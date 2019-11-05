@@ -6,7 +6,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
     className="form-group"
   >
     <label
-      className="ControlLabel__ControlLabelRaw-sc-1edmum5-0 hfJIQy control-label"
+      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
     >
       Name
     </label>
