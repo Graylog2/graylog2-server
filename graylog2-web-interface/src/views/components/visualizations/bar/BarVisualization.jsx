@@ -13,6 +13,7 @@ type ChartDefinition = {
   name: string,
   x?: Array<string>,
   y?: Array<any>,
+  z?: Array<Array<any>>,
   opacity: number,
 };
 

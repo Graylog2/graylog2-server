@@ -6,6 +6,7 @@
 
 :local(.errorMessage dt) {
     font-size: 1.2em;
+    overflow: auto;
 }
 
 :local(.greyBackground) {
