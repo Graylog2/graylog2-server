@@ -26,7 +26,7 @@ const listGroupItemStyles = (hex) => {
         }
 
         &.active {
-          color: ${contrastingColor(backgroundColor)};
+          color: ${contrastingColor(textColor)};
           background-color: ${textColor};
           border-color: ${textColor};
         }
@@ -34,7 +34,7 @@ const listGroupItemStyles = (hex) => {
 
       &.list-group-item {
         &.active {
-          color: ${contrastingColor(backgroundColor)};
+          color: ${contrastingColor(hex)};
           background-color: ${hex};
           border-color: ${hex};
         }
@@ -56,7 +56,7 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
       }
 
       &:active {
-        color: ${colors.primary.tre};
+        color: ${contrastingColor(colors.secondary.tre, 'AA')};
         background-color: ${colors.secondary.tre};
       }
     }

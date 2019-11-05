@@ -127,7 +127,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
         className="list-group"
       >
         <span
-          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
         >
           <div
             className="headerWrapper"
@@ -136,7 +136,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
         >
           No items to display
         </span>
@@ -289,7 +289,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
         className="list-group"
       >
         <span
-          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
         >
           <div
             className="headerWrapper"
@@ -298,7 +298,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
         >
           <div
             className="itemWrapper itemWrapperStatic"
@@ -333,7 +333,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 cngeNa list-group-item"
+          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
         >
           <div
             className="itemWrapper itemWrapperStatic"
