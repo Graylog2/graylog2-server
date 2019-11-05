@@ -433,7 +433,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "ilWjBR",
+                                "lastClassName": "THrbj",
                                 "rules": Array [
                                   "&.list-group-item-action{color:",
                                   "#1F1F1F",
@@ -442,7 +442,7 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                                   ";background-color:",
                                   "#F1F2F2",
                                   ";}&:active{color:",
-                                  "#585a5b",
+                                  "#424344",
                                   ";background-color:",
                                   "#DCE1E5",
                                   ";}}&.list-group-item{background-color:",
@@ -474,13 +474,13 @@ exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
                           <ListGroupItem
                             active={false}
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj"
                             header="test-0"
                             listItem={false}
                             onClick={[Function]}
                           >
                             <button
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                               onClick={[Function]}
                               type="button"
                             >
@@ -2167,7 +2167,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ListGroupItem__StyledListGroupItem-sc-1ky0joo-0",
                                 "isStatic": false,
-                                "lastClassName": "ilWjBR",
+                                "lastClassName": "THrbj",
                                 "rules": Array [
                                   "&.list-group-item-action{color:",
                                   "#1F1F1F",
@@ -2176,7 +2176,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                                   ";background-color:",
                                   "#F1F2F2",
                                   ";}&:active{color:",
-                                  "#585a5b",
+                                  "#424344",
                                   ";background-color:",
                                   "#DCE1E5",
                                   ";}}&.list-group-item{background-color:",
@@ -2208,13 +2208,13 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                           <ListGroupItem
                             active={false}
                             bsClass="list-group-item"
-                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR"
+                            className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj"
                             header="test-0"
                             listItem={false}
                             onClick={[Function]}
                           >
                             <button
-                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                              className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                               onClick={[Function]}
                               type="button"
                             >

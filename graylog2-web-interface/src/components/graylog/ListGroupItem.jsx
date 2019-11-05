@@ -56,7 +56,7 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
       }
 
       &:active {
-        color: ${contrastingColor(colors.secondary.tre, 'AA')};
+        color: ${contrastingColor(colors.secondary.tre)};
         background-color: ${colors.secondary.tre};
       }
     }

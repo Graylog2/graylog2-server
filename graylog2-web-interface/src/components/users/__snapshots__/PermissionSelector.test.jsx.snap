@@ -139,7 +139,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="form-group"
@@ -170,7 +170,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -234,7 +234,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -395,7 +395,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="form-group"
@@ -426,7 +426,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -490,7 +490,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -702,7 +702,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="form-group"
@@ -733,7 +733,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -797,7 +797,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -958,7 +958,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="form-group"
@@ -989,7 +989,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -1053,7 +1053,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 ilWjBR list-group-item"
+                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                 >
                   <div
                     className="itemWrapper "
