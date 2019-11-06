@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.db.SearchDbService;
@@ -79,6 +80,9 @@ public class SearchResourceTest {
     private SearchExecutionGuard executionGuard;
 
     @Mock
+    private SearchDomain searchDomain;
+
+    @Mock
     private Subject subject;
 
     @Mock
@@ -90,7 +94,7 @@ public class SearchResourceTest {
         private final Subject subject;
 
         SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard);
+            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain);
             this.subject = subject;
         }
 
@@ -129,7 +133,7 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void getSearchAllowsAccessToSearchReturnedByService() {
+    public void getSearchLoadsSearch() {
         final Search search = mockExistingSearch();
 
         final Search returnedSearch = this.searchResource.getSearch(search.id());
@@ -138,13 +142,12 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void getSearchThrowsNotFoundExceptionIfNoSearchReturnedByService() {
-        final String searchId = "deadbeef";
-        when(searchDbService.getForUser(eq(searchId), any(), any())).thenReturn(Optional.empty());
+    public void getSearchThrowsNotFoundIfSearchDoesntExist() {
+        when(searchDomain.getForUser(any(), any(), any())).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> this.searchResource.getSearch(searchId))
-                .withMessage("No such search deadbeef");
+                .isThrownBy(() -> this.searchResource.getSearch("god"))
+                .withMessageContaining("god");
     }
 
     @Test
@@ -272,7 +275,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDbService.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
+        when(searchDomain.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));

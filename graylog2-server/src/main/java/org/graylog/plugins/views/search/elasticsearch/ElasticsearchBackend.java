@@ -31,6 +31,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
@@ -76,6 +77,7 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.graylog2.indexer.cluster.jest.JestUtils.deduplicateErrors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -143,7 +145,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .must(
                             Objects.requireNonNull(
                                     IndexHelper.getTimestampRangeFilter(
-                                            searchType.timerange().orElse(query.timerange())
+                                            query.effectiveTimeRange(searchType)
                                     ),
                                     "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                             )
@@ -228,7 +230,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
-                                if (searchType.streams().isEmpty() && !searchType.timerange().isPresent()) {
+                                if (searchType.streams().isEmpty()
+                                        && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
+                                        && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
                                 final Set<String> usedStreamIds = searchType.streams().isEmpty()
@@ -236,7 +240,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                                         : searchType.streams();
                                 final Set<Stream> usedStreamsOfSearchType = loadStreams(usedStreamIds);
 
-                                return Optional.of(indicesByTimeRange(searchType.timerange().orElse(query.timerange())).stream()
+                                return Optional.of(indicesByTimeRange(query.effectiveTimeRange(searchType)).stream()
                                         .filter(new IndexRangeContainsOneOfStreams(usedStreamsOfSearchType))
                                         .map(IndexRange::indexName)
                                         .collect(Collectors.toSet()));
@@ -252,7 +256,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 })
                 .collect(Collectors.toList());
         final MultiSearch.Builder multiSearchBuilder = new MultiSearch.Builder(searches);
-        final MultiSearchResult result = JestUtils.execute(jestClient, multiSearchBuilder.build(), () -> "Unable to perform search query");
+        final MultiSearchResult result = JestUtils.execute(jestClient, multiSearchBuilder.build(), () -> "Unable to perform search query: ");
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -305,10 +309,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .filter(error -> error.startsWith("Expected numeric type on field"))
                     .collect(Collectors.toList());
             if (!nonNumericFieldErrors.isEmpty()) {
-                return Optional.of(new FieldTypeException("Unable to perform search query", nonNumericFieldErrors));
+                return Optional.of(new FieldTypeException("Unable to perform search query: ", deduplicateErrors(nonNumericFieldErrors)));
             }
 
-            return Optional.of(new ElasticsearchException("Unable to perform search query", errors));
+            return Optional.of(new ElasticsearchException("Unable to perform search query: ", deduplicateErrors(errors)));
         }
 
         return Optional.empty();

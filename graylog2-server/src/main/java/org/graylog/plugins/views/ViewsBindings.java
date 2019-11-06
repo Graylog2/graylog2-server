@@ -30,12 +30,13 @@ import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.errors.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
+import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
+import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
@@ -149,7 +150,7 @@ public class ViewsBindings extends ViewsModule {
         viewsCapabilityBinder();
         queryMetadataDecoratorBinder();
 
-        addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
+        registerExceptionMappers();
     }
 
     private void registerSortConfigSubclasses() {
@@ -182,5 +183,10 @@ public class ViewsBindings extends ViewsModule {
         registerSharingStrategy(AllUsersOfInstance.TYPE, AllUsersOfInstanceStrategy.class);
         registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
         registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
+    }
+
+    private void registerExceptionMappers() {
+        addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
+        addJerseyExceptionMapper(PermissionExceptionMapper.class);
     }
 }

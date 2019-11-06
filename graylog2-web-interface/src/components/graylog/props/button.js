@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 
+import { bsStyles } from '../variants/bsStyle';
+
 const propTypes = {
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
+  bsStyle: PropTypes.oneOf([...bsStyles, 'link']),
 };
 
 const defaultProps = {
