@@ -125,10 +125,10 @@ describe('<Widget />', () => {
 
   );
   it('should render with empty props', () => {
-    const options = { createNodeMock };
-    const wrapper = renderer.create(<DummyWidget />, options);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const { baseElement } = render(<DummyWidget />);
+    expect(baseElement).toMatchSnapshot();
   });
+
   it('should render loading widget for widget without data', () => {
     const wrapper = mount(<DummyWidget />);
     expect(wrapper.find(LoadingWidget)).toHaveLength(1);
