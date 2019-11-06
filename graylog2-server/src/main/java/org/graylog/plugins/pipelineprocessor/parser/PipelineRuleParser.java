@@ -387,6 +387,7 @@ public class PipelineRuleParser {
                                     .count();
                             if (numberRequiredParams > positionalArgs.size()) {
                                 parseContext.addError(new WrongNumberOfArgs(ctx, function, positionalArgs.size()));
+                                hasError = true;
                             }
                         }
                     }
