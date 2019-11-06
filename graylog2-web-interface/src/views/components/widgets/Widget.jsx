@@ -64,6 +64,14 @@ type State = {
 };
 
 class Widget extends React.Component<Props, State> {
+  static _visualizationForType(type) {
+    return widgetDefinition(type).visualizationComponent;
+  }
+
+  static _editComponentForType(type) {
+    return widgetDefinition(type).editComponent;
+  }
+
   static propTypes = {
     id: PropTypes.string.isRequired,
     view: PropTypes.object.isRequired,
@@ -93,14 +101,6 @@ class Widget extends React.Component<Props, State> {
     errors: undefined,
     editing: false,
   };
-
-  static _visualizationForType(type) {
-    return widgetDefinition(type).visualizationComponent;
-  }
-
-  static _editComponentForType(type) {
-    return widgetDefinition(type).editComponent;
-  }
 
   constructor(props) {
     super(props);

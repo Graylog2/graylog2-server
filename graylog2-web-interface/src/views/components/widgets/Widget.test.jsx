@@ -1,6 +1,5 @@
 // @flow strict
 import React from 'react';
-import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 import { render, wait, fireEvent, cleanup } from '@testing-library/react';
 import { browserHistory } from 'react-router';
@@ -64,16 +63,6 @@ jest.mock('views/stores/ChartColorRulesStore', () => ({
 jest.mock('views/stores/WidgetStore');
 jest.mock('views/stores/TitlesStore');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
-
-const createNodeMock = (element) => {
-  if (element.type === 'div') {
-    return {
-      clientHeight: 420,
-      clientWidth: 420,
-    };
-  }
-  return null;
-};
 
 describe('<Widget />', () => {
   const widget = { config: {}, id: 'widgetId', type: 'dummy' };
