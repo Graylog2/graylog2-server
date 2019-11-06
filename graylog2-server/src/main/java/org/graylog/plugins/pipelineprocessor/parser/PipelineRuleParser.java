@@ -381,6 +381,14 @@ public class PipelineRuleParser {
                         if (requiredAfterOptional) {
                             parseContext.addError(new OptionalParametersMustBeNamed(ctx, function));
                             hasError = true;
+                        } else {
+                            final long numberRequiredParams = params.stream()
+                                    .filter(p -> !p.optional())
+                                    .count();
+                            if (numberRequiredParams > positionalArgs.size()) {
+                                parseContext.addError(new WrongNumberOfArgs(ctx, function, positionalArgs.size()));
+                                hasError = true;
+                            }
                         }
                     }
 
