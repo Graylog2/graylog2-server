@@ -1,6 +1,9 @@
 // @flow strict
 import React from 'react';
+import { render, fireEvent, wait } from '@testing-library/react';
 import { mount } from 'enzyme';
+import { browserHistory } from 'react-router';
+import Routes from 'routing/Routes';
 
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -103,6 +106,30 @@ describe('BookmarkList', () => {
       wrapper.find('button.list-group-item').simulate('click');
       wrapper.find('button[children="Load"]').simulate('click');
       expect(onLoad).toBeCalledTimes(1);
+    });
+
+    it('should change url after load', async () => {
+      const onLoad = jest.fn(() => Promise.resolve());
+      Routes.pluginRoute = jest.fn(route => id => `${route}:${id}`);
+      browserHistory.push = jest.fn();
+      const views = createViewsResponse(1);
+
+      const { getByText } = render(
+        <ViewLoaderContext.Provider value={onLoad}>
+          <BookmarkList toggleModal={() => {}}
+                        showModal
+                        deleteBookmark={() => {}}
+                        views={views} />
+        </ViewLoaderContext.Provider>,
+      );
+      const listItem = getByText('test-0');
+      fireEvent.click(listItem);
+      const loadButton = getByText('Load');
+      fireEvent.click(loadButton);
+      await wait(() => {
+        expect(browserHistory.push).toBeCalledTimes(1);
+        expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');
+      });
     });
   });
 });
