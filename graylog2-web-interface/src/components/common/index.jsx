@@ -32,6 +32,7 @@ export { default as PageHeader } from './PageHeader';
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pluralize } from './Pluralize';
 export { default as ReactGridContainer } from './ReactGridContainer';
+export { default as Scratchpad } from './Scratchpad';
 export { default as ScrollButton } from './ScrollButton';
 export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
