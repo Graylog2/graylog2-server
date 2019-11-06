@@ -7,45 +7,49 @@ import { AggregationType } from 'views/components/aggregationbuilder/Aggregation
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { Leaf } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 import MapVisualization from './MapVisualization';
-import { extractSeries, formatSeries, flattenLeafs } from '../ChartData';
+import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
 import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
-const arrayToMap = ([name, x, y]) => ({ name, x, y });
-const lastKey = keys => keys[keys.length - 1];
-const mergeObject = (prev, last) => Object.assign({}, prev, last);
+const _arrayToMap = ([name, x, y]) => ({ name, x, y });
+const _lastKey = keys => keys[keys.length - 1];
+const _mergeObject = (prev, last) => Object.assign({}, prev, last);
+const _generateSeriesWithoutMetric = (rows: Rows) => {
+  const leafs = getLeafsFromRows(rows);
+  const xLabels = getXLabelsFromLeafs(leafs);
+  return { valuesBySeries: { 'No metric defined': xLabels.map(() => 0) }, xLabels };
+};
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  let pipeline;
   const { rowPivots } = config;
-  let resultsWithoutMetric;
-  const generateResultWithoutMetric = (results) => {
-    const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
-    const xLabels: Array<any> = leafs.map(({ key }) => key);
-    const flatLeafs = flattenLeafs(leafs);
-    if (!isEmpty(xLabels) && isEmpty(flatLeafs)) {
-      // return results;
-      resultsWithoutMetric = [{ name: 'No metric defined', x: xLabels, y: xLabels.map(() => '> 1') }];
-    }
-    return results;
-  };
-  const pipeline = flow([
-    transformKeys(config.rowPivots, config.columnPivots),
-    generateResultWithoutMetric,
-    extractSeries(),
-    formatSeries,
-    results => results.map(arrayToMap),
-  ]);
-  const pipelineData = pipeline(data);
-  const result = resultsWithoutMetric || pipelineData;
-  const series = result.map(({ name, x, y }) => {
-    const newX = x.map(lastKey);
+  const onRenderComplete = useContext(RenderCompletionCallback);
+  const hasMetric = !isEmpty(config._value.series);
+  const markerRadiusSize = !hasMetric ? 1 : undefined;
+
+  if (hasMetric) {
+    pipeline = flow([
+      transformKeys(config.rowPivots, config.columnPivots),
+      extractSeries(),
+      formatSeries,
+      results => results.map(_arrayToMap),
+    ]);
+  } else {
+    pipeline = flow([
+      transformKeys(config.rowPivots, config.columnPivots),
+      _generateSeriesWithoutMetric,
+      formatSeries,
+      results => results.map(_arrayToMap),
+    ]);
+  }
+  const series = pipeline(data).map(({ name, x, y }) => {
+    const newX = x.map(_lastKey);
     const keys = x.map(k => k.slice(0, -1)
       .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-      .reduce(mergeObject, {}));
+      .reduce(_mergeObject, {}));
     return { name, y, x: newX, keys };
   })
     .map(({ keys, name, x, y }) => {
@@ -71,6 +75,7 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
                       viewport={viewport}
                       width={width}
                       onRenderComplete={onRenderComplete}
+                      markerRadiusSize={markerRadiusSize}
                       onChange={_onChange} />
   );
 };

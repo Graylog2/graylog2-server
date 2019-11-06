@@ -28,21 +28,26 @@ export const flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ 
   return flatten(leafs.map(l => l.values.filter(value => matcher(value)).map(v => [l.key, v])));
 };
 
-export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
-  const result = Object.keys(valuesBySeries).map(value => [
+export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+  return Object.keys(valuesBySeries).map(value => [
     value,
     xLabels,
     valuesBySeries[value],
     [],
   ]);
-  return result;
 };
+
+export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
+  // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
+  return rows.filter(row => (row.source === 'leaf'));
+};
+
+export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<any> => leafs.map(({ key }) => key);
 
 export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: Value => boolean) => {
   return (results: Rows) => {
-    // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
-    const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
-    const xLabels: Array<any> = leafs.map(({ key }) => key);
+    const leafs = getLeafsFromRows(results);
+    const xLabels = getXLabelsFromLeafs(leafs);
     const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
     const valuesBySeries = {};
     flatLeafs.forEach(([key, value]) => {

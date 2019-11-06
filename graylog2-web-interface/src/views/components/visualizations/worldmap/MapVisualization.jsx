@@ -26,6 +26,8 @@ const MapVisualization = createReactClass({
     onRenderComplete: PropTypes.func,
     onChange: PropTypes.func.isRequired,
     locked: PropTypes.bool, // Disables zoom and dragging
+    markerRadiusSize: PropTypes.number,
+    markerRadiusIncrementSize: PropTypes.number,
     viewport: PropTypes.shape({
       center: PropTypes.arrayOf(PropTypes.number),
       zoom: PropTypes.number,
@@ -41,6 +43,8 @@ const MapVisualization = createReactClass({
       onRenderComplete: () => {},
       locked: false,
       viewport: DEFAULT_VIEWPORT,
+      markerRadiusSize: 10,
+      markerRadiusIncrementSize: 10,
     };
   },
 
@@ -58,8 +62,6 @@ const MapVisualization = createReactClass({
   _map: undefined,
   _isMapReady: false,
   _areTilesReady: false,
-  MARKER_RADIUS_SIZES: 10,
-  MARKER_RADIUS_INCREMENT_SIZES: 10,
 
   // Workaround to avoid wrong placed markers or empty tiles if the map container size changed.
   _forceMapUpdate() {
@@ -71,13 +73,13 @@ const MapVisualization = createReactClass({
   },
 
   // Coordinates are given as "lat,long"
-  _formatMarker(coordinates, value, min, max, increment, color, name, keys) {
+  _formatMarker(coordinates, value, min, max, radiusSize, increment, color, name, keys) {
     // eslint-disable-next-line no-restricted-globals
     const formattedCoordinates = coordinates.split(',').map(component => Number(component)).filter(n => !isNaN(n));
     if (formattedCoordinates.length !== 2) {
       return null;
     }
-    const radius = this._getBucket(value, this.MARKER_RADIUS_SIZES, min, max, increment);
+    const radius = this._getBucket(value, radiusSize, min, max, increment);
     const markerKeys = flatten(Object.entries(keys).map(([k, v]) => [<dt key={`dt-${k}-${v}`}>{k}</dt>, <dd key={`dd-${k}-${v}`}>{v}</dd>]));
     return (
       <CircleMarker key={`${name}-${coordinates}`}
@@ -94,8 +96,14 @@ const MapVisualization = createReactClass({
             {markerKeys}
             <dt>Coordinates:</dt>
             <dd>{coordinates}</dd>
-            <dt>Value:</dt>
-            <dd>{value}</dd>
+            {value
+              && (
+              <React.Fragment>
+                <dt>Value:</dt>
+                <dd>{value}</dd>
+              </React.Fragment>
+              )
+            }
           </dl>
         </Popup>
       </CircleMarker>
@@ -129,7 +137,7 @@ const MapVisualization = createReactClass({
   },
 
   render() {
-    const { data, id, height, width, url, attribution, interactive, locked, viewport, onChange } = this.props;
+    const { data, id, height, width, url, attribution, interactive, locked, viewport, onChange, markerRadiusSize, markerRadiusIncrementSize } = this.props;
 
     const noOfKeys = data.length;
     const chromaScale = chroma.scale('Spectral');
@@ -141,7 +149,7 @@ const MapVisualization = createReactClass({
       const color = chromaScale(idx * (1 / noOfKeys));
       Object.entries(values)
         .forEach(([coord, value], valueIdx) => markers
-          .push(this._formatMarker(coord, value, min, max, this.MARKER_RADIUS_INCREMENT_SIZES, color, name, keys[valueIdx])));
+          .push(this._formatMarker(coord, value, min, max, markerRadiusSize, markerRadiusIncrementSize, color, name, keys[valueIdx])));
     });
 
     return (
