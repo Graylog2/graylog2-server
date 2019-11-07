@@ -7,7 +7,6 @@ export {
   InputGroup,
   ListGroupItem,
   MenuItem,
-  Modal,
   Nav,
   Navbar,
   NavDropdown,
