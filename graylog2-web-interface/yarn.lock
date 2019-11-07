@@ -1629,7 +1629,7 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
   integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
 
-"@types/react@^16.9.4":
+"@types/react@^16.9.9":
   version "16.9.11"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.11.tgz#70e0b7ad79058a7842f25ccf2999807076ada120"
   integrity sha512-UBT4GZ3PokTXSWmdgC/GeCGEJXE5ofWyibCcecRLUVN2ZBpXQGVgQGtG2foS7CrTKFKlQVVswLvf7Js6XA/CVQ==
@@ -12653,13 +12653,13 @@ react-lifecycles-compat@^3.0.2, react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-mops@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-mops/-/react-mops-1.0.0.tgz#73fccabb8c4872ff9cd5a698f8b61fe46a9673e5"
-  integrity sha512-fr9V90OYsBuubYM0kphowKh2DGbYzojXG6R+uM6V2D+cS5WT/aBpLUMXoDHD9ynza7+fg7UAwh1SVv2hAINANA==
+react-mops@v2.0.0-beta.0:
+  version "2.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/react-mops/-/react-mops-2.0.0-beta.0.tgz#d860624b0a980d588d5fe8d4c0a53720caf48e74"
+  integrity sha512-jYHOEsAq7JpqEbwh221MS6oVk0Z/9l+zzB/GZCRThhYzFkgfqFqViihKX+mhU5DaJurG7qFpmqnDIDa7Mcy9lg==
   dependencies:
     "@types/classnames" "^2.2.9"
-    "@types/react" "^16.9.4"
+    "@types/react" "^16.9.9"
     "@types/uuid" "^3.4.5"
     classnames "2.2.6"
     immutability-helper "^3.0.1"
