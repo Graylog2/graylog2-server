@@ -40,7 +40,7 @@ type ViewManagementActionsType = RefluxActions<{
   create: (View) => Promise<View>,
   delete: (View) => Promise<View>,
   forValue: () => Promise<ViewSummaries>,
-  get: (string) => Promise<View>,
+  get: (string) => Promise<ViewJson>,
   search: (string, number, number, ?SortField, ?SortOrder) => Promise<PaginatedViews>,
   update: (View) => Promise<View>,
 }>;
