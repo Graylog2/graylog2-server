@@ -81,9 +81,17 @@ const StageForm = createReactClass({
   },
 
   _getFormattedOptions(rules) {
-    return rules ? rules.map((rule) => {
-      return { value: rule.title, label: rule.title };
-    }) : [];
+    const { stage } = this.state;
+    const choosedRules = stage.rules;
+    return rules ? rules.filter(rule => this._filterChoosedRules(rule, choosedRules)).map(this._formatRuleOption) : [];
+  },
+
+  _formatRuleOption(rule) {
+    return { value: rule.title, label: rule.title };
+  },
+
+  _filterChoosedRules(rule, choosedRules) {
+    return !choosedRules.includes(rule.title);
   },
 
   render() {
