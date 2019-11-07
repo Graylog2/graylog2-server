@@ -257,44 +257,10 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
-                    "isStatic": true,
-                    "lastClassName": "zLQl",
+                    "isStatic": false,
+                    "lastClassName": "dfydXw",
                     "rules": Array [
-                      "&.nav{> li{> a{&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";}}&.disabled > a{color:",
-                      "#DCE1E5",
-                      ";&:hover,&:focus{color:",
-                      "#DCE1E5",
-                      ";}}}.open > a{&,&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";}}}&.nav-tabs{border-bottom-color:",
-                      "#9E1F63",
-                      ";> li{> a{&:hover{border-color:",
-                      "#F1F2F2",
-                      " ",
-                      "#F1F2F2",
-                      " ",
-                      "#9E1F63",
-                      ";}}&.active > a{&,&:hover,&:focus{color:",
-                      "#1F1F1F",
-                      ";background-color:",
-                      "#FFF",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";border-bottom-color:transparent;}}}}&.nav-pills{> li{&.active > a{&,&:hover,&:focus{color:",
-                      "#FFF",
-                      ";background-color:",
-                      "#9E1F63",
-                      ";}}}}&.nav-tabs.nav-justified{> .active > a,> .active > a:hover,> .active > a:focus{border-color:",
-                      "#9E1F63",
-                      ";}@media (min-width:768px){> li > a{border-bottom-color:",
-                      "#9E1F63",
-                      ";}> .active > a,> .active > a:hover,> .active > a:focus{border-bottom-color:",
-                      "#FFF",
-                      ";}}}",
+                      [Function],
                     ],
                   },
                   "displayName": "Nav",
@@ -315,7 +281,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 zLQl"
+                className="Nav-dzawzr-0 dfydXw"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -323,7 +289,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                 stacked={false}
               >
                 <ul
-                  className="Nav-dzawzr-0 zLQl nav nav-pills"
+                  className="Nav-dzawzr-0 dfydXw nav nav-pills"
                   role={null}
                 >
                   <NavItem
@@ -691,44 +657,10 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
-                    "isStatic": true,
-                    "lastClassName": "zLQl",
+                    "isStatic": false,
+                    "lastClassName": "dfydXw",
                     "rules": Array [
-                      "&.nav{> li{> a{&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";}}&.disabled > a{color:",
-                      "#DCE1E5",
-                      ";&:hover,&:focus{color:",
-                      "#DCE1E5",
-                      ";}}}.open > a{&,&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";}}}&.nav-tabs{border-bottom-color:",
-                      "#9E1F63",
-                      ";> li{> a{&:hover{border-color:",
-                      "#F1F2F2",
-                      " ",
-                      "#F1F2F2",
-                      " ",
-                      "#9E1F63",
-                      ";}}&.active > a{&,&:hover,&:focus{color:",
-                      "#1F1F1F",
-                      ";background-color:",
-                      "#FFF",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";border-bottom-color:transparent;}}}}&.nav-pills{> li{&.active > a{&,&:hover,&:focus{color:",
-                      "#FFF",
-                      ";background-color:",
-                      "#9E1F63",
-                      ";}}}}&.nav-tabs.nav-justified{> .active > a,> .active > a:hover,> .active > a:focus{border-color:",
-                      "#9E1F63",
-                      ";}@media (min-width:768px){> li > a{border-bottom-color:",
-                      "#9E1F63",
-                      ";}> .active > a,> .active > a:hover,> .active > a:focus{border-bottom-color:",
-                      "#FFF",
-                      ";}}}",
+                      [Function],
                     ],
                   },
                   "displayName": "Nav",
@@ -749,7 +681,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 zLQl"
+                className="Nav-dzawzr-0 dfydXw"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -757,7 +689,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                 stacked={false}
               >
                 <ul
-                  className="Nav-dzawzr-0 zLQl nav nav-pills"
+                  className="Nav-dzawzr-0 dfydXw nav nav-pills"
                   role={null}
                 >
                   <NavItem
@@ -954,44 +886,10 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
-                    "isStatic": true,
-                    "lastClassName": "zLQl",
+                    "isStatic": false,
+                    "lastClassName": "dfydXw",
                     "rules": Array [
-                      "&.nav{> li{> a{&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";}}&.disabled > a{color:",
-                      "#DCE1E5",
-                      ";&:hover,&:focus{color:",
-                      "#DCE1E5",
-                      ";}}}.open > a{&,&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";}}}&.nav-tabs{border-bottom-color:",
-                      "#9E1F63",
-                      ";> li{> a{&:hover{border-color:",
-                      "#F1F2F2",
-                      " ",
-                      "#F1F2F2",
-                      " ",
-                      "#9E1F63",
-                      ";}}&.active > a{&,&:hover,&:focus{color:",
-                      "#1F1F1F",
-                      ";background-color:",
-                      "#FFF",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";border-bottom-color:transparent;}}}}&.nav-pills{> li{&.active > a{&,&:hover,&:focus{color:",
-                      "#FFF",
-                      ";background-color:",
-                      "#9E1F63",
-                      ";}}}}&.nav-tabs.nav-justified{> .active > a,> .active > a:hover,> .active > a:focus{border-color:",
-                      "#9E1F63",
-                      ";}@media (min-width:768px){> li > a{border-bottom-color:",
-                      "#9E1F63",
-                      ";}> .active > a,> .active > a:hover,> .active > a:focus{border-bottom-color:",
-                      "#FFF",
-                      ";}}}",
+                      [Function],
                     ],
                   },
                   "displayName": "Nav",
@@ -1013,7 +911,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 zLQl"
+                className="Nav-dzawzr-0 dfydXw"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -1021,7 +919,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 stacked={true}
               >
                 <ul
-                  className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+                  className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
                   role={null}
                 >
                   <NavItem
@@ -1387,44 +1285,10 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                   "attrs": Array [],
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
-                    "isStatic": true,
-                    "lastClassName": "zLQl",
+                    "isStatic": false,
+                    "lastClassName": "dfydXw",
                     "rules": Array [
-                      "&.nav{> li{> a{&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";}}&.disabled > a{color:",
-                      "#DCE1E5",
-                      ";&:hover,&:focus{color:",
-                      "#DCE1E5",
-                      ";}}}.open > a{&,&:hover,&:focus{background-color:",
-                      "#F1F2F2",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";}}}&.nav-tabs{border-bottom-color:",
-                      "#9E1F63",
-                      ";> li{> a{&:hover{border-color:",
-                      "#F1F2F2",
-                      " ",
-                      "#F1F2F2",
-                      " ",
-                      "#9E1F63",
-                      ";}}&.active > a{&,&:hover,&:focus{color:",
-                      "#1F1F1F",
-                      ";background-color:",
-                      "#FFF",
-                      ";border-color:",
-                      "#9E1F63",
-                      ";border-bottom-color:transparent;}}}}&.nav-pills{> li{&.active > a{&,&:hover,&:focus{color:",
-                      "#FFF",
-                      ";background-color:",
-                      "#9E1F63",
-                      ";}}}}&.nav-tabs.nav-justified{> .active > a,> .active > a:hover,> .active > a:focus{border-color:",
-                      "#9E1F63",
-                      ";}@media (min-width:768px){> li > a{border-bottom-color:",
-                      "#9E1F63",
-                      ";}> .active > a,> .active > a:hover,> .active > a:focus{border-bottom-color:",
-                      "#FFF",
-                      ";}}}",
+                      [Function],
                     ],
                   },
                   "displayName": "Nav",
@@ -1446,7 +1310,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 zLQl"
+                className="Nav-dzawzr-0 dfydXw"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -1454,7 +1318,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 stacked={true}
               >
                 <ul
-                  className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+                  className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
                   role={null}
                 >
                   <NavItem

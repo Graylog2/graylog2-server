@@ -1,93 +1,59 @@
 // eslint-disable-next-line no-restricted-imports
 import { Nav as BootstrapNav } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import teinte from 'theme/teinte';
+import { colorLevel } from 'theme/util';
+import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)`
-  &.nav {
-    > li {
-      > a {
-        &:hover,
-        &:focus {
-          background-color: ${teinte.secondary.due};
+const Nav = styled(BootstrapNav)(() => {
+  const borderColor = colorLevel(teinte.tertiary.due, -3);
+
+  return css`
+    &.nav {
+      > li {
+        > a {
+          &:hover,
+          &:focus {
+            background-color: ${colorLevel(teinte.secondary.due, -3)};
+          }
         }
-      }
 
-      &.disabled > a {
-        color: ${teinte.secondary.tre};
-
-        &:hover,
-        &:focus {
+        &.disabled > a {
           color: ${teinte.secondary.tre};
-        }
-      }
-    }
 
-    .open > a {
-      &,
-      &:hover,
-      &:focus {
-        background-color: ${teinte.secondary.due};
-        border-color: ${teinte.tertiary.quattro};
-      }
-    }
-  }
-
-  &.nav-tabs {
-    border-bottom-color: ${teinte.tertiary.quattro};
-
-    > li {
-      > a {
-        &:hover {
-          border-color: ${teinte.secondary.due} ${teinte.secondary.due} ${teinte.tertiary.quattro};
+          &:hover,
+          &:focus {
+            color: ${teinte.secondary.tre};
+          }
         }
       }
 
-      &.active > a {
+      .open > a {
         &,
         &:hover,
         &:focus {
-          color: ${teinte.primary.tre};
-          background-color: ${teinte.primary.due};
-          border-color: ${teinte.tertiary.quattro};
-          border-bottom-color: transparent;
+          background-color: ${colorLevel(teinte.secondary.due, -3)};
+          border-color: ${borderColor};
         }
       }
     }
-  }
 
-  &.nav-pills {
-    > li {
-      &.active > a {
-        &,
-        &:hover,
-        &:focus {
-          color: ${teinte.primary.due};
-          background-color: ${teinte.tertiary.quattro};
+    &.nav-pills {
+      > li {
+        &.active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: ${teinte.primary.due};
+            background-color: ${borderColor};
+          }
         }
       }
     }
-  }
 
-  &.nav-tabs.nav-justified {
-    > .active > a,
-    > .active > a:hover,
-    > .active > a:focus {
-      border-color: ${teinte.tertiary.quattro};
-    }
-
-    @media (min-width: 768px) {
-      > li > a {
-        border-bottom-color: ${teinte.tertiary.quattro};
-      }
-      > .active > a,
-      > .active > a:hover,
-      > .active > a:focus {
-        border-bottom-color: ${teinte.primary.due};
-      }
-    }
-  }
-`;
+    &${navTabsStyles()}
+  `;
+});
 
 export default Nav;
