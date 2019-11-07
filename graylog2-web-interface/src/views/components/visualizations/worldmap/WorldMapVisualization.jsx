@@ -44,8 +44,9 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
         .map((key, idx) => ({ [rowPivots[idx].field]: key }))
         .reduce(_mergeObject, {}));
       return { name, y, x: newX, keys };
-    }).map(({ keys, name, x, y }) => {
-    // eslint-disable-next-line no-unused-vars
+    })
+    .map(({ keys, name, x, y }) => {
+      // eslint-disable-next-line no-unused-vars
       const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
       return { keys, name, values };
     });
