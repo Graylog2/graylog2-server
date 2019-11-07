@@ -150,7 +150,7 @@ describe('<Widget />', () => {
     expect(errorWidgets2).toHaveLength(1);
   });
   it('should render correct widget visualization for widget with data', () => {
-    const { queryAllByTestId, queryAllByTitle, debug } = render(<DummyWidget data={[]} />);
+    const { queryAllByTestId, queryAllByTitle } = render(<DummyWidget data={[]} />);
     expect(queryAllByTestId('loading-widget')).toHaveLength(0);
     expect(queryAllByTitle('Widget Title')).toHaveLength(2);
   });
