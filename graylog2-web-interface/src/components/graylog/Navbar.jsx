@@ -147,11 +147,11 @@ const Navbar = styled(BootstrapNavbar)`
 
     .navbar-nav {
       > li > a {
-        color: ${lighten(0.15, teinte.tertiary.uno)};
+        color: ${teinte.secondary.due};
 
         &:hover,
         &:focus {
-          color: ${teinte.primary.due};
+          color: ${teinte.tertiary.due};
           background-color: transparent;
         }
       }
@@ -181,7 +181,7 @@ const Navbar = styled(BootstrapNavbar)`
         }
       }
 
-      @media (max-width: @grid-float-breakpoint-max) {
+      @media (max-width: 767px) {
         .open .dropdown-menu {
           > .dropdown-header {
             border-color: ${darken(0.10, teinte.primary.tre)};
@@ -190,10 +190,10 @@ const Navbar = styled(BootstrapNavbar)`
             background-color: ${lighten(0.20, teinte.primary.tre)};
           }
           > li > a {
-            color: ${lighten(0.15, teinte.tertiary.uno)};
+            color: ${teinte.secondary.due};
             &:hover,
             &:focus {
-              color: ${teinte.primary.due};
+              color: ${teinte.tertiary.due};
               background-color: transparent;
             }
           }
