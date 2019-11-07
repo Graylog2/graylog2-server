@@ -17,46 +17,37 @@ import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 const _arrayToMap = ([name, x, y]) => ({ name, x, y });
 const _lastKey = keys => keys[keys.length - 1];
 const _mergeObject = (prev, last) => Object.assign({}, prev, last);
-const _generateSeriesWithoutMetric = (rows: Rows) => {
+const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
   const xLabels = getXLabelsFromLeafs(leafs);
-  return { valuesBySeries: { 'No metric defined': xLabels.map(() => 0) }, xLabels };
+  return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
 };
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
-  let pipeline;
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
   const hasMetric = !isEmpty(config._value.series);
   const markerRadiusSize = !hasMetric ? 1 : undefined;
+  const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
 
-  if (hasMetric) {
-    pipeline = flow([
-      transformKeys(config.rowPivots, config.columnPivots),
-      extractSeries(),
-      formatSeries,
-      results => results.map(_arrayToMap),
-    ]);
-  } else {
-    pipeline = flow([
-      transformKeys(config.rowPivots, config.columnPivots),
-      _generateSeriesWithoutMetric,
-      formatSeries,
-      results => results.map(_arrayToMap),
-    ]);
-  }
+  const pipeline = flow([
+    transformKeys(config.rowPivots, config.columnPivots),
+    seriesExtractor,
+    formatSeries,
+    results => results.map(_arrayToMap),
+  ]);
+
   const series = pipeline(data).map(({ name, x, y }) => {
     const newX = x.map(_lastKey);
     const keys = x.map(k => k.slice(0, -1)
       .map((key, idx) => ({ [rowPivots[idx].field]: key }))
       .reduce(_mergeObject, {}));
     return { name, y, x: newX, keys };
-  })
-    .map(({ keys, name, x, y }) => {
-      // eslint-disable-next-line no-unused-vars
-      const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
-      return { keys, name, values };
-    });
+  }).map(({ keys, name, x, y }) => {
+    // eslint-disable-next-line no-unused-vars
+    const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
+    return { keys, name, values };
+  });
 
   const viewport = get(config, 'visualizationConfig.viewport');
   const _onChange = (newViewport) => {
