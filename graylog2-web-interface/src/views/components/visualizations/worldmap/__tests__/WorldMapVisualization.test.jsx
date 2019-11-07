@@ -87,6 +87,7 @@ describe('WorldMapVisualization', () => {
 
   it('renders Map component with correct data, when a metric is defined', () => {
     const series = new Series('count()');
+    // $FlowFixMe: type is always defined
     const configWithMetric = AggregationWidgetConfig.builder().series([series]).visualization(WorldMapVisualization.type).build();
     const data = [
       { key: ['37.751,-97.822'], values: [{ key: ['count()'], value: 25, rollup: true, source: 'row-leaf' }], source: 'leaf' },
