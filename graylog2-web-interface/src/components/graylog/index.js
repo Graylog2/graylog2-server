@@ -8,6 +8,7 @@ import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
+import Nav from './Nav';
 import NavDropdown from './NavDropdown';
 import Pagination from './Pagination';
 import Panel from './Panel';
@@ -27,6 +28,7 @@ export {
   Label,
   ListGroupItem,
   Modal,
+  Nav,
   NavDropdown,
   Pagination,
   Panel,
