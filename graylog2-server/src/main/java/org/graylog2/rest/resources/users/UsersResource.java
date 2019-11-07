@@ -89,8 +89,8 @@ import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
-import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 
 @RequiresAuthentication
 @Path("/users")
@@ -158,8 +158,11 @@ public class UsersResource extends RestResource {
                                     maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
-        final User adminUser = userService.getAdminUser();
-        resultUsers.add(toUserResponse(adminUser, lastSessionForUser.getOrDefault(adminUser.getName(), Optional.empty())));
+        userService.getRootUser().ifPresent(adminUser ->
+            resultUsers.add(
+                    toUserResponse(adminUser, lastSessionForUser.getOrDefault(adminUser.getName(), Optional.empty()))
+            )
+        );
 
         for (User user : users) {
             resultUsers.add(toUserResponse(user, lastSessionForUser.getOrDefault(user.getName(), Optional.empty())));
