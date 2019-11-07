@@ -9,6 +9,7 @@ import Label from './Label';
 import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
 import Nav from './Nav';
+import Navbar from './Navbar';
 import NavDropdown from './NavDropdown';
 import Panel from './Panel';
 import SplitButton from './SplitButton';
@@ -27,6 +28,7 @@ export {
   ListGroupItem,
   Modal,
   Nav,
+  Navbar,
   NavDropdown,
   Panel,
   SplitButton,

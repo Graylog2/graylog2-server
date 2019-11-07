@@ -2,7 +2,7 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import teinte from 'theme/teinte';
+import { breakpoint, teinte } from 'theme';
 
 const Nav = styled(BootstrapNav)`
   &.nav {
@@ -77,7 +77,7 @@ const Nav = styled(BootstrapNav)`
       border-color: ${teinte.tertiary.quattro};
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: ${breakpoint.min.sm}) {
       > li > a {
         border-bottom-color: ${teinte.tertiary.quattro};
       }

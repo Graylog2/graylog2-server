@@ -5,7 +5,6 @@ export {
   Form,
   FormControl,
   InputGroup,
-  Navbar,
   NavItem,
   Pager,
   Pagination,
