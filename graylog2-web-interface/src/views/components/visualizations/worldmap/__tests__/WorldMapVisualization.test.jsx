@@ -114,6 +114,7 @@ describe('WorldMapVisualization', () => {
   });
 
   it('renders Map component with correct data, when no metric is defined', () => {
+    // $FlowFixMe: type is always defined
     const configWithoutMetric = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
     const data = [
       { key: ['37.751,-97.822'], values: [], source: 'leaf' },
