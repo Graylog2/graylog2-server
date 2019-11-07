@@ -45,6 +45,7 @@ exports[`<Widget /> should render with empty props 1`] = `
           >
             <i
               class="fa fa-refresh spinner fa-3x"
+              data-testid="loading-widget"
             />
           </div>
         </span>
