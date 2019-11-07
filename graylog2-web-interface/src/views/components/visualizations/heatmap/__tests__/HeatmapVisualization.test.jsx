@@ -16,8 +16,7 @@ describe('HeatmapVisualization', () => {
     const series = new Series('count()');
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
-      .columnPivots([columnPivot])
-      .series([series])
+      .columnPivots([columnPivot]).series([series])
       .visualization('heatmap')
       .build();
     const effectiveTimerange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
