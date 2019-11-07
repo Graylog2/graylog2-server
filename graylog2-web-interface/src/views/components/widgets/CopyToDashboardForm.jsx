@@ -13,14 +13,13 @@ type Props = {
   dashboards: DashboardsStoreState,
 };
 
-const CopyToDashboardForm = (props: Props) => {
-  const { widgetId, onCancel, dashboards: { list, pagination }, onSubmit } = props;
+const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list, pagination }, onSubmit }: Props) => {
   const [selectedDashboard, setSelectedDashbaord] = useState('');
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
   const execSearch = useCallback((query, page, perPage) => {
     DashboardsActions.search(query, page, perPage);
-  });
+  }, []);
 
   const handleSearch = useCallback((query) => {
     setPaginationState({
