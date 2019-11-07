@@ -133,7 +133,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         final String trimmedKey = StringUtils.trimToNull(key.toString());
         if (trimmedKey == null) {
             LOG.debug("A blank key was supplied");
-            return LookupResult.empty();
+            return getEmptyResult();
         }
 
         LOG.debug("Beginning [{}] DNS resolution for key [{}]", config.lookupType(), trimmedKey);
@@ -193,7 +193,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getEmptyResult();
         }
 
         if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
@@ -201,7 +201,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not resolve [{}] records for hostname [{}].", A_RECORD_LABEL, key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     /**
@@ -215,11 +215,11 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
-            return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
+            return getEmptyResult(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return this.resultWithError;
+            return getErrorResult();
         }
 
         if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
@@ -227,7 +227,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not resolve [{}] records for hostname [{}].", AAAA_RECORD_LABEL, key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
@@ -276,7 +276,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                 singleValue = ip6Answers.get(0).ipAddress();
             } else {
                 LOG.debug("Could not resolve [A/AAAA] records hostname [{}].", key);
-                return LookupResult.empty();
+                return getEmptyResult();
             }
 
             final LookupResult.Builder builder = LookupResult.builder();
@@ -298,7 +298,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return this.resultWithError;
+            return getErrorResult();
         }
     }
 
@@ -310,7 +310,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return this.resultWithError;
+            return getErrorResult();
         }
 
         if (dnsResponse != null) {
@@ -337,7 +337,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not perform reverse lookup on IP address [{}]. No PTR record was found.", key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     private LookupResult performTextLookup(Object key) {
@@ -350,7 +350,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return this.resultWithError;
+            return getErrorResult();
         }
 
         if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
@@ -362,7 +362,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not perform Text lookup on IP address [{}]. No TXT records were found.", key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     /**

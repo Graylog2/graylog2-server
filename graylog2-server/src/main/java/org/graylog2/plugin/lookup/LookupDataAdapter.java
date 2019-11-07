@@ -41,7 +41,7 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     private final LookupDataAdapterConfiguration config;
     private final Timer requestTimer;
     private final Timer refreshTimer;
-    protected LookupResult resultWithError;
+    private LookupResult resultWithError;
 
     private AtomicReference<Throwable> dataSourceError = new AtomicReference<>();
 
@@ -62,6 +62,14 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         this.refreshTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.adapters", id, "refresh"));
         this.resultWithError = LookupResult.withError();
     }
+
+    public LookupResult getErrorResult() {
+        return resultWithError;
+    }
+    public LookupResult getEmptyResult() {
+        return LookupResult.empty();
+    }
+
 
     @Override
     protected void startUp() throws Exception {
@@ -127,7 +135,7 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
     public LookupResult get(Object key) {
         if (state() == State.FAILED) {
-            return resultWithError;
+            return getErrorResult();
         }
         checkState(isRunning(), "Data adapter needs to be started before it can be used");
         try (final Timer.Context ignored = requestTimer.time()) {

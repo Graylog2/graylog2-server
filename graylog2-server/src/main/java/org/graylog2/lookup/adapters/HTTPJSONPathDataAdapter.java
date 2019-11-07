@@ -156,7 +156,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         if (url == null) {
             LOG.error("Couldn't parse URL <%s> - returning empty result", urlString);
             httpURLErrors.mark();
-            return this.resultWithError;
+            return getErrorResult();
         }
 
         final Request request = new Request.Builder()
@@ -170,18 +170,18 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             if (!response.isSuccessful()) {
                 LOG.warn("HTTP request for key <{}> failed: {}", key, response);
                 httpRequestErrors.mark();
-                return this.resultWithError;
+                return getErrorResult();
             }
 
             final LookupResult result = parseBody(singleJsonPath, multiJsonPath, response.body().byteStream());
             if (result == null) {
-                return this.resultWithError;
+                return getErrorResult();
             }
             return result;
         } catch (IOException e) {
             LOG.error("HTTP request error for key <{}>", key, e);
             httpRequestErrors.mark();
-            return this.resultWithError;
+            return getErrorResult();
         } finally {
             time.stop();
         }
