@@ -11,6 +11,11 @@ const MultiValueRemove = (props) => {
   );
 };
 
+const valueContainer = base => ({
+  ...base,
+  minWidth: '8vw',
+});
+
 const multiValue = base => ({
   ...base,
   backgroundColor: '#ebf5ff',
@@ -49,6 +54,7 @@ const Select = ({ components, styles, ...rest }: Props) => {
     multiValue,
     multiValueLabel,
     multiValueRemove,
+    valueContainer,
     ...styles,
   };
   return <ReactSelect {...rest} components={_components} styles={_styles} />;
