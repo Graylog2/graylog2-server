@@ -3,12 +3,11 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
-
+import { cloneDeep } from 'lodash';
 import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import FormsUtils from 'util/FormsUtils';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -37,7 +36,8 @@ const StageForm = createReactClass({
   },
 
   getInitialState() {
-    const { stage } = this.props;
+    let { stage } = this.props;
+    stage = cloneDeep(stage);
     return {
       // when editing, take the stage that's been passed in
       stage: {
@@ -53,13 +53,15 @@ const StageForm = createReactClass({
   },
 
   _onChange(event) {
-    const { stage } = this.state;
+    let { stage } = this.state;
+    stage = cloneDeep(stage);
     stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState({ stage });
   },
 
   _onRulesChange(newRules) {
-    const { stage } = this.state;
+    let { stage } = this.state;
+    stage = cloneDeep(stage);
     stage.rules = newRules;
     this.setState({ stage });
   },
