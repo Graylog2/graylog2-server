@@ -6,7 +6,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
     className="form-group"
   >
     <label
-      className="control-label"
+      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
     >
       Name
     </label>
@@ -17,7 +17,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
       value="count()"
     />
     <span
-      className="help-block"
+      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
     >
       The name of the series as it appears in the chart.
     </span>

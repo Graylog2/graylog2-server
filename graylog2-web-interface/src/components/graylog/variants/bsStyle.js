@@ -1,30 +1,32 @@
 import theme from 'styled-theming';
+import teinte from 'theme/teinte';
 
-import { useTheme } from 'theme/GraylogThemeContext';
+const bsStyles = ['success', 'warning', 'danger', 'info', 'default', 'primary'];
 
-const bsStyle = (cssBuilder) => {
-  const { colors } = useTheme();
-
+const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}) => {
   return theme.variants('mode', 'bsStyle', {
     danger: {
-      teinte: cssBuilder(colors.secondary.uno),
+      teinte: cssBuilder(teinte.secondary.uno),
     },
     default: {
-      teinte: cssBuilder(colors.secondary.due),
+      teinte: cssBuilder(teinte.secondary.due),
     },
     info: {
-      teinte: cssBuilder(colors.tertiary.uno),
+      teinte: cssBuilder(teinte.tertiary.uno),
     },
     primary: {
-      teinte: cssBuilder(colors.tertiary.quattro),
+      teinte: cssBuilder(teinte.tertiary.quattro),
     },
     success: {
-      teinte: cssBuilder(colors.tertiary.tre),
+      teinte: cssBuilder(teinte.tertiary.tre),
     },
     warning: {
-      teinte: cssBuilder(colors.tertiary.sei),
+      teinte: cssBuilder(teinte.tertiary.sei),
     },
+    ...additionalVariants,
   });
 };
 
-export default bsStyle;
+
+export default bsStyleThemeVariant;
+export { bsStyles };

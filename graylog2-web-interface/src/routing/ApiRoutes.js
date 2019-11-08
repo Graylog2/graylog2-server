@@ -371,6 +371,7 @@ const ApiRoutes = {
     multiple: () => { return { url: '/system/pipelines/rule/multiple' }; },
     functions: () => { return { url: '/system/pipelines/rule/functions' }; },
     parse: () => { return { url: '/system/pipelines/rule/parse' }; },
+    metricsConfig: () => { return { url: '/system/pipelines/rule/config/metrics' }; },
   },
   ConnectionsController: {
     list: () => { return { url: '/system/pipelines/connections' }; },

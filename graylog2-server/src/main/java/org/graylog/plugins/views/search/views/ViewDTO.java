@@ -29,10 +29,12 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
@@ -101,6 +103,10 @@ public abstract class ViewDTO {
     }
 
     public abstract Builder toBuilder();
+
+    public static Set<String> idsFrom(Collection<ViewDTO> views) {
+        return views.stream().map(ViewDTO::id).collect(Collectors.toSet());
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {

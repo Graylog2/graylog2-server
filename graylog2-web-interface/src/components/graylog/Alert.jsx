@@ -1,33 +1,32 @@
 import React, { forwardRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import { darken, lighten } from 'polished';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import { useTheme } from 'theme/GraylogThemeContext';
-import bsStyleVariant from './variants/bsStyle';
+import contrastingColor from 'util/contrastingColor';
+import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
+
+const alertStyles = (hex) => {
+  const lightenBorder = lighten(0.30, hex);
+  const borderColor = lightenBorder === '#fff' ? darken(0.08, hex) : lightenBorder;
+
+  const lightenBackground = lighten(0.40, hex);
+  const backgroundColor = lightenBackground === '#fff' ? darken(0.05, hex) : lightenBackground;
+
+  const textColor = contrastingColor(backgroundColor);
+
+  return css`
+    background-color: ${backgroundColor};
+    border-color: ${borderColor};
+    color: ${textColor};
+  `;
+};
 
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
-  const alertStyles = () => {
-    const { utility } = useTheme();
-
-    const cssBuilder = (hex) => {
-      const borderColor = utility.mix(hex, -10);
-      const backgroundColor = utility.mix(hex, -75);
-      const textColor = utility.mix(hex, 60);
-
-      return css`
-        background-color: ${backgroundColor};
-        border-color: ${borderColor};
-        color: ${textColor};
-      `;
-    };
-
-    return bsStyleVariant(cssBuilder);
-  };
-
   const StyledAlert = useCallback(styled(BootstrapAlert)`
-    ${alertStyles()}
+    ${bsStyleThemeVariant(alertStyles)}
   `, [bsStyle]);
 
   return (
@@ -36,7 +35,7 @@ const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
 });
 
 Alert.propTypes = {
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
+  bsStyle: PropTypes.oneOf(bsStyles),
 };
 
 Alert.defaultProps = {

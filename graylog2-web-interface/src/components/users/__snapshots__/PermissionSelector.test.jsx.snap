@@ -83,7 +83,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="control-label"
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                         htmlFor="filter-streams-data-filter"
                       >
                         Filter Streams
@@ -339,7 +339,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="control-label"
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                         htmlFor="filter-dashboards-data-filter"
                       >
                         Filter Dashboards
@@ -646,7 +646,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="control-label"
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                         htmlFor="filter-streams-data-filter"
                       >
                         Filter Streams
@@ -745,7 +745,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -817,7 +817,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -902,7 +902,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       className="form-group"
                     >
                       <label
-                        className="control-label"
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                         htmlFor="filter-dashboards-data-filter"
                       >
                         Filter Dashboards
@@ -1065,7 +1065,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"

@@ -51,7 +51,7 @@ const SessionStore = Reflux.createStore({
     const username = Store.get('username');
     this.validatingSession = true;
     this._propagateState();
-    this._validateSession(sessionId)
+    const promise = this._validateSession(sessionId)
       .then((response) => {
         if (response.is_valid) {
           return SessionActions.login.completed({
@@ -69,6 +69,8 @@ const SessionStore = Reflux.createStore({
         this.validatingSession = false;
         this._propagateState();
       });
+
+    SessionActions.validate.promise(promise);
   },
   _validateSession(sessionId) {
     return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))

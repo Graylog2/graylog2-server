@@ -24,7 +24,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             className="form-group"
           >
             <label
-              className="control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="content-packs-filter"
             >
               Filter
@@ -245,7 +245,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="badge installed"
+                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
                     >
                       installed
                     </span>
@@ -397,7 +397,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="badge installed"
+                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
                     >
                       installed
                     </span>
@@ -1820,7 +1820,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             className="form-group"
           >
             <label
-              className="control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
               htmlFor="content-packs-filter"
             >
               Filter

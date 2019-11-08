@@ -118,7 +118,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="name"
                   >
                     Name
@@ -137,7 +137,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Give a descriptive name for this content pack.
                     </span>
@@ -147,7 +147,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="summary"
                   >
                     Summary
@@ -166,7 +166,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Give a short summary of the content pack.
                     </span>
@@ -176,7 +176,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="description"
                   >
                     Description
@@ -194,7 +194,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Give a long description of the content pack in markdown.
                     </span>
@@ -204,7 +204,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="vendor"
                   >
                     Vendor
@@ -223,7 +223,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
@@ -233,7 +233,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="url"
                   >
                     URL
@@ -251,7 +251,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Where can I find the content pack. e.g. github url
                     </span>
@@ -592,7 +592,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="name"
                   >
                     Name
@@ -611,7 +611,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="Content Pack the movie"
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Give a descriptive name for this content pack.
                     </span>
@@ -621,7 +621,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="summary"
                   >
                     Summary
@@ -640,7 +640,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="A old content pack"
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Give a short summary of the content pack.
                     </span>
@@ -650,7 +650,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="description"
                   >
                     Description
@@ -668,7 +668,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="## No one dares"
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Give a long description of the content pack in markdown.
                     </span>
@@ -678,7 +678,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="vendor"
                   >
                     Vendor
@@ -697,7 +697,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="Beinstein"
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
@@ -707,7 +707,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   className="form-group"
                 >
                   <label
-                    className="control-label"
+                    className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                     htmlFor="url"
                   >
                     URL
@@ -725,7 +725,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="http://beinstein.com"
                     />
                     <span
-                      className="help-block"
+                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
                     >
                       Where can I find the content pack. e.g. github url
                     </span>

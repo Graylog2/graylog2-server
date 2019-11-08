@@ -32,6 +32,7 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchMetadata;
@@ -69,8 +70,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -90,6 +89,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final ObjectMapper objectMapper;
     private final PermittedStreams permittedStreams;
     private final SearchExecutionGuard executionGuard;
+    private final SearchDomain searchDomain;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
@@ -97,13 +97,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
                           SearchJobService searchJobService,
                           ObjectMapper objectMapper,
                           PermittedStreams permittedStreams,
-                          SearchExecutionGuard executionGuard) {
+                          SearchExecutionGuard executionGuard,
+                          SearchDomain searchDomain) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
         this.objectMapper = objectMapper;
         this.permittedStreams = permittedStreams;
         this.executionGuard = executionGuard;
+        this.searchDomain = searchDomain;
     }
 
     @VisibleForTesting
@@ -125,6 +127,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
             throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
         }
 
+        guard(search);
+
         final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
         if (saved == null || saved.id() == null) {
             return Response.serverError().build();
@@ -141,18 +145,19 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDbService.getForUser(searchId, getCurrentUser(), viewId -> isPermitted(ViewsRestPermissions.VIEW_READ, viewId))
-                .orElseThrow(() -> new NotFoundException("No such search " + searchId));
+        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
+                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+    }
+
+    private boolean hasViewReadPermission(String viewId) {
+        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
     }
 
     @GET
-    @ApiOperation(value = "Get all current search queries in the system")
+    @ApiOperation(value = "Get all searches which the user may see")
     public List<Search> getAllSearches() {
-        // TODO should be paginated and limited to own (or visible queries)
-        // make sure we close the iterator properly
-        try (Stream<Search> searchStream = searchDbService.streamAll()) {
-            return searchStream.collect(Collectors.toList());
-        }
+        // TODO should be paginated
+        return searchDomain.getAllForUser(getCurrentUser(), this::hasViewReadPermission);
     }
 
     @POST
@@ -166,7 +171,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
@@ -180,11 +185,15 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+        return permittedStreams.load(this::hasStreamReadPermission);
     }
 
-    private void authorize(Search search) {
-        this.executionGuard.check(search, streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId));
+    private boolean hasStreamReadPermission(String streamId) {
+        return isPermitted(RestPermissions.STREAMS_READ, streamId);
+    }
+
+    private void guard(Search search) {
+        this.executionGuard.check(search, this::hasStreamReadPermission);
     }
 
     @POST
@@ -198,7 +207,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
 
-        authorize(search);
+        guard(search);
 
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
 

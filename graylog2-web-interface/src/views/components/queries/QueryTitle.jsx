@@ -6,65 +6,43 @@ import { MenuItem } from 'components/graylog';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import type { QueryId } from 'views/logic/queries/Query';
+import ViewState from 'views/logic/views/ViewState';
 
 import QueryActionDropdown from './QueryActionDropdown';
 
 type Props = {
   active: boolean,
   id: QueryId,
-  onChange: (string) => void,
-  onClose: () => void,
-  value: string,
+  onClose: () => Promise<void> | Promise<ViewState>,
+  openEditModal: (string) => void,
+  title: string,
 };
 
 type State = {
   editing: boolean,
-  value: string,
+  title: string,
 };
 
 class QueryTitle extends React.Component<Props, State> {
   static propTypes = {
-    onChange: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    value: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    openEditModal: PropTypes.func.isRequired,
   };
 
   state = {
     editing: false,
     // eslint-disable-next-line react/destructuring-assignment
-    value: this.props.value,
+    title: this.props.title,
   };
 
   componentWillReceiveProps(nextProps: Props) {
-    this.setState({ value: nextProps.value });
+    this.setState({ title: nextProps.title });
   }
-
-  _toggleEditing = () => {
-    this.setState(state => ({ editing: !state.editing }));
-  };
-
-  // eslint-disable-next-line no-undef
-  _onChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
-    evt.preventDefault();
-    evt.stopPropagation();
-    this.setState({ value: evt.target.value });
-  };
 
   _onClose = () => {
     const { onClose } = this.props;
     onClose();
-  };
-
-  _onSubmit = () => {
-    const { value } = this.state;
-    if (value !== '') {
-      const { onChange } = this.props;
-      onChange(value);
-    } else {
-      // eslint-disable-next-line react/destructuring-assignment
-      this.setState({ value: this.props.value });
-    }
-    this.setState({ editing: false });
   };
 
   _onDuplicate = (id: QueryId) => {
@@ -73,27 +51,15 @@ class QueryTitle extends React.Component<Props, State> {
   };
 
   render() {
-    const { editing, value } = this.state;
-    const { active, id } = this.props;
-    const valueField = editing ? (
-      <form onSubmit={this._onSubmit}>
-        <input type="text"
-               value={value}
-               onFocus={e => e.target.select()}
-               onBlur={this._toggleEditing}
-               onChange={this._onChange} />
-      </form>
-    ) : (
-      <span onDoubleClick={this._toggleEditing}>
-        {value}
-      </span>
-    );
+    const { editing, title } = this.state;
+    const { active, id, openEditModal } = this.props;
     return (
-      <span>
-        {valueField}{' '}
+      <span title={title}>
+        {title}
         {!editing && active && (
           <QueryActionDropdown>
             <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+            <MenuItem onSelect={() => openEditModal(title)}>Edit Title</MenuItem>
             <MenuItem divider />
             <MenuItem onSelect={this._onClose}>Close</MenuItem>
           </QueryActionDropdown>

@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 
+import { bsStyles } from '../variants/bsStyle';
+
 const propTypes = {
-  /* NOTE: need props so we can set default styles */
-  active: PropTypes.bool,
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info', 'default', 'primary', 'link']),
+  bsStyle: PropTypes.oneOf([...bsStyles, 'link']),
 };
 
 const defaultProps = {
-  active: false,
   bsStyle: 'default',
 };
 

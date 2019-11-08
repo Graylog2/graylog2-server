@@ -75,6 +75,11 @@ public class NoopInterpreterListener implements InterpreterListener {
     }
 
     @Override
+    public void finishExecuteRule(Rule rule, Pipeline pipeline) {
+
+    }
+
+    @Override
     public void failExecuteRule(Rule rule, Pipeline pipeline) {
 
     }

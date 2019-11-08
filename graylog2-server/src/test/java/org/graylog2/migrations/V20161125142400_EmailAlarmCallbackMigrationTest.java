@@ -25,7 +25,6 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.shared.users.UserService;
@@ -72,19 +71,14 @@ public class V20161125142400_EmailAlarmCallbackMigrationTest {
     @Mock
     private UserService userService;
 
-    private final static String localAdminId = "local:adminMock";
+    private final static String localAdminId = "local:admin";
 
     @Before
     public void setUp() throws Exception {
-        final User localAdmin = mock(User.class);
-        when(localAdmin.getId()).thenReturn(localAdminId);
-        when(userService.getAdminUser()).thenReturn(localAdmin);
-
         this.emailAlarmCallbackMigrationPeriodical = new V20161125142400_EmailAlarmCallbackMigration(clusterConfigService,
             streamService,
             alarmCallbackConfigurationService,
-            emailAlarmCallback,
-            userService);
+            emailAlarmCallback);
     }
 
     @Test
