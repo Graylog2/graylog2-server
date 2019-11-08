@@ -47,7 +47,6 @@ const StartPage = createReactClass({
 
   _redirectToStartpage() {
     const { currentUser, currentUser: { startpage }, gettingStarted } = this.state;
-    
     // Show getting started page if user is an admin and getting started wasn't dismissed
     if (PermissionsMixin.isPermitted(currentUser.permissions, ['inputs:create'])) {
       if (gettingStarted.show) {
