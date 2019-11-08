@@ -6,6 +6,7 @@ import DropdownButton from './DropdownButton';
 import Jumbotron from './Jumbotron';
 import HelpBlock from './HelpBlock';
 import Label from './Label';
+import Pagination from './Pagination';
 import SplitButton from './SplitButton';
 
 export {
@@ -17,6 +18,7 @@ export {
   Jumbotron,
   HelpBlock,
   Label,
+  Pagination,
   SplitButton,
 };
 export * from './bootstrap-import';

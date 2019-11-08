@@ -13,7 +13,6 @@ export {
   NavDropdown,
   NavItem,
   Pager,
-  Pagination,
   Panel,
   Popover,
   ProgressBar,
