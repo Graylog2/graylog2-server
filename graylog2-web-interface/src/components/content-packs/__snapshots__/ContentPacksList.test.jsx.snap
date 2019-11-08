@@ -78,7 +78,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -1664,7 +1664,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -1874,7 +1874,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -2004,7 +2004,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
