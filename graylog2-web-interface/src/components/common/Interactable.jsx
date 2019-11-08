@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled from 'styled-components';
 import { lighten } from 'polished';
 
 import { Button } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 import teinte from 'theme/teinte';
 
 import 'react-mops/dist/esm/index.css';
@@ -72,12 +72,12 @@ const Interactable = ({
   size,
   title,
 }) => {
-  const dragHandleRef = React.useRef(null);
-  const [dragHandleClassName, setDragHandleClassName] = React.useState(null);
-  const [dragPosition, setDragPosition] = React.useState(position);
-  const [resizeSize, setResizeSize] = React.useState(size);
+  const dragHandleRef = useRef(null);
+  const [dragHandleClassName, setDragHandleClassName] = useState(null);
+  const [dragPosition, setDragPosition] = useState(position);
+  const [resizeSize, setResizeSize] = useState(size);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setDragHandleClassName(dragHandleRef.current.classList[0]);
   }, []);
 

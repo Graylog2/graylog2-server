@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import teinte from 'theme/teinte';
 import { Alert } from 'components/graylog';
-import { Interactable } from 'components/common';
+import Interactable from 'components/common/Interactable';
 import isLocalStorageReady from 'util/isLocalStorageReady';
 import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
