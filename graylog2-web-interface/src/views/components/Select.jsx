@@ -45,9 +45,16 @@ type Props = {
   styles: { [string]: any }
 };
 
+
+const ValueWithTitle = (props: {data: { label: string }}) => {
+  const { data: { label } } = props;
+  return <Components.MultiValue {...props} innerProps={{ title: label }} />;
+};
+
 const Select = ({ components, styles, ...rest }: Props) => {
   const _components = {
     MultiValueRemove,
+    MultiValue: components.MultiValue || ValueWithTitle,
     ...components,
   };
   const _styles = {
