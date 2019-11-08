@@ -42,7 +42,8 @@ const Scratchpad = () => {
 
   const writeData = (newData) => {
     if (localStorageReady) {
-      localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...storage, ...newData }));
+      const currentStorage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
+      localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...currentStorage, ...newData }));
     }
   };
 
