@@ -13,7 +13,7 @@ const MultiValueRemove = (props) => {
 
 const valueContainer = base => ({
   ...base,
-  minWidth: '8vw',
+  minWidth: '6.5vw',
 });
 
 const multiValue = base => ({
