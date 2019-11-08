@@ -7,7 +7,6 @@ import { Link } from 'react-router';
 import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 
 import Routes from 'routing/Routes';
