@@ -42,7 +42,7 @@ const StartPage = createReactClass({
   },
 
   _redirect(page) {
-    history.push(page);
+    history.replace(page);
   },
 
   _redirectToStartpage() {
