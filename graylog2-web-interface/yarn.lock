@@ -6059,6 +6059,11 @@ fast-levenshtein@~2.0.4:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
+fast-memoize@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/fast-memoize/-/fast-memoize-2.5.1.tgz#c3519241e80552ce395e1a32dcdde8d1fd680f5d"
+  integrity sha512-xdmw296PCL01tMOXx9mdJSmWY29jQgxyuZdq0rEHMu+Tpe1eOEtCycoG6chzlcrWsNgpZP7oL8RiQr7+G6Bl6g==
+
 fastparse@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/fastparse/-/fastparse-1.1.1.tgz#d1e2643b38a94d7583b479060e6c4affc94071f8"
@@ -12437,6 +12442,13 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+re-resizable@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/re-resizable/-/re-resizable-6.1.0.tgz#ba4ece505b48f05691446d57837151349d7575e8"
+  integrity sha512-Jj9zdYW6SnUto8pmH4b/3Kms/PKPv9CuWE70W1IuUIR1HlrEibgsqhbUe8BYDRBTuagH1gav09806k7TieUeSA==
+  dependencies:
+    fast-memoize "^2.5.1"
+
 react-ace-builds@^7.2.4:
   version "7.2.4"
   resolved "https://registry.yarnpkg.com/react-ace-builds/-/react-ace-builds-7.2.4.tgz#15224253608b94394e1ce63665bc02842d773c64"
@@ -12583,6 +12595,14 @@ react-draggable@3.x, react-draggable@^3.0.3:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
+react-draggable@4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-4.0.3.tgz#6b9f76f66431c47b9070e9b805bbc520df8ca481"
+  integrity sha512-4vD6zms+9QGeZ2RQXzlUBw8PBYUXy+dzYX5r22idjp9YwQKIIvD/EojL0rbjS1GK4C3P0rAJnmKa8gDQYWUDyA==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
 react-error-overlay@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.3.tgz#c378c4b0a21e88b2e159a3e62b2f531fd63bf60d"
@@ -12698,6 +12718,15 @@ react-resizable@1.x, react-resizable@^1.8.0:
   dependencies:
     prop-types "15.x"
     react-draggable "^3.0.3"
+
+react-rnd@^10.1.1:
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/react-rnd/-/react-rnd-10.1.1.tgz#4f4d9d28c46a6060acb64600df7a88490862a324"
+  integrity sha512-KwNUbNd4Kg2DTLdw/Eb8dSC3T5nMRQIRfyyVjdoLT85hKXpeCkMRb2zo4BHCzkgdgCbFGgYLDmj1qRH5DUkTGA==
+  dependencies:
+    re-resizable "6.1.0"
+    react-draggable "4.0.3"
+    tslib "1.10.0"
 
 react-router-bootstrap@0.23.2:
   version "0.23.2"
@@ -15252,6 +15281,11 @@ ts-loader@^5.3.3:
     loader-utils "^1.0.2"
     micromatch "^3.1.4"
     semver "^5.0.1"
+
+tslib@1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
+  integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
 
 tslib@^1.9.0:
   version "1.9.3"
