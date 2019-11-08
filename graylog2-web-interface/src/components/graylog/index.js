@@ -11,6 +11,7 @@ import Modal from './Modal';
 import Nav from './Nav';
 import Navbar from './Navbar';
 import NavDropdown from './NavDropdown';
+import Pagination from './Pagination';
 import Panel from './Panel';
 import SplitButton from './SplitButton';
 import Table from './Table';
@@ -30,6 +31,7 @@ export {
   Nav,
   Navbar,
   NavDropdown,
+  Pagination,
   Panel,
   SplitButton,
   Table,

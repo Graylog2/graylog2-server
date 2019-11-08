@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
-import { Page } from 'components/common';
+
+import { Pager } from 'components/graylog';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
@@ -32,6 +33,8 @@ const MessageTablePaginator = createReactClass({
   getDefaultProps() {
     return {
       pageSize: UniversalSearchStore.DEFAULT_LIMIT,
+      children: undefined,
+      position: '',
     };
   },
 
@@ -54,7 +57,10 @@ const MessageTablePaginator = createReactClass({
   eventsThrottler: new EventHandlersThrottler(),
 
   _initializeAffix() {
-    if (this.props.position === 'bottom') {
+    const { position } = this.props;
+
+    if (position === 'bottom') {
+      // eslint-disable-next-line react/no-find-dom-node
       $(ReactDOM.findDOMNode(this.paginatorAffix)).affix({
         offset: {
           top: 500,
@@ -65,78 +71,100 @@ const MessageTablePaginator = createReactClass({
   },
 
   _setPaginationWidth() {
-    if (this.props.position === 'bottom') {
+    const { position } = this.props;
+
+    if (position === 'bottom') {
       this.eventsThrottler.throttle(() => {
+        // eslint-disable-next-line react/no-find-dom-node
         this.setState({ paginationWidth: ReactDOM.findDOMNode(this.paginatorContainer).clientWidth });
       });
     }
   },
 
   _numberOfPages() {
-    return Math.ceil(this.props.resultCount / this.props.pageSize);
+    const { resultCount, pageSize } = this.props;
+
+    return Math.ceil(resultCount / pageSize);
   },
 
   _minPage() {
-    const currentTenMin = Math.floor(this.props.currentPage / 10) * 10;
+    const { currentPage } = this.props;
+
+    const currentTenMin = Math.floor(currentPage / 10) * 10;
     return Math.max(1, currentTenMin);
   },
 
   _maxPage() {
-    if (this.props.currentPage > this._numberOfPages()) {
-      return this.props.currentPage;
+    const { currentPage } = this.props;
+
+    if (currentPage > this._numberOfPages()) {
+      return currentPage;
     }
-    const currentTenMax = Math.ceil((this.props.currentPage + 1) / 10) * 10;
+
+    const currentTenMax = Math.ceil((currentPage + 1) / 10) * 10;
     return Math.min(this._numberOfPages(), currentTenMax);
   },
 
   _onPageChanged(page) {
+    const { currentPage, onPageChange } = this.props;
     let newPage;
 
     if (page === 'Previous') {
-      newPage = this.props.currentPage - 1;
+      newPage = currentPage - 1;
     } else if (page === 'Next') {
-      newPage = this.props.currentPage + 1;
+      newPage = currentPage + 1;
     } else {
       newPage = Number(page);
     }
 
-    this.props.onPageChange(newPage);
+    onPageChange(newPage);
   },
 
   render() {
+    const { children, currentPage, position } = this.props;
+    const { paginationWidth } = this.state;
     const pages = [];
 
-    pages.push(<Page key="previous"
-                     href="#"
-                     page="Previous"
-                     isDisabled={this.props.currentPage === 1}
-                     onPageChanged={this._onPageChanged} />);
-    for (let i = this._minPage(); i <= this._maxPage(); i++) {
-      pages.push(<Page key={`page${i}`}
-                       href="#"
-                       page={i}
-                       isActive={i === this.props.currentPage}
-                       onPageChanged={this._onPageChanged} />);
+    let nav;
+
+    pages.push(
+      <Pager.Item href="#"
+                  disabled={currentPage === 1}
+                  onSelect={() => this._onPageChanged('Previous')}
+                  key="previous">
+        Previous
+      </Pager.Item>,
+    );
+    for (let i = this._minPage(); i <= this._maxPage(); i += 1) {
+      pages.push(
+        <Pager.Item href="#"
+                    className={i === currentPage && 'active'}
+                    onSelect={() => this._onPageChanged(i)}
+                    key={`page${i}`}>
+          {i}
+        </Pager.Item>,
+      );
     }
-    pages.push(<Page key="next"
-                     href="#"
-                     page="Next"
-                     isDisabled={this.props.currentPage >= this._maxPage()}
-                     onPageChanged={this._onPageChanged} />);
+    pages.push(
+      <Pager.Item href="#"
+                  onSelect={() => this._onPageChanged('Next')}
+                  disabled={currentPage >= this._maxPage()}
+                  key="next">
+        Next
+      </Pager.Item>,
+    );
 
     const pagination = (
       <ul className="pagination">
         {pages}
       </ul>
     );
-
-    let nav;
-    if (this.props.position === 'bottom') {
+    if (position === 'bottom') {
       nav = (
         <div ref={(paginatorAffix) => { this.paginatorAffix = paginatorAffix; }}>
-          {this.props.children}
+          {children}
           <nav className="text-center"
-               style={{ width: this.state.paginationWidth + 20 }}>
+               style={{ width: paginationWidth + 20 }}>
             {pagination}
           </nav>
         </div>
@@ -146,7 +174,7 @@ const MessageTablePaginator = createReactClass({
     }
 
     return (
-      <div ref={(paginatorContainer) => { this.paginatorContainer = paginatorContainer; }} id={`message-table-paginator-${this.props.position}`}>
+      <div ref={(paginatorContainer) => { this.paginatorContainer = paginatorContainer; }} id={`message-table-paginator-${position}`}>
         {nav}
       </div>
     );
