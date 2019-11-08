@@ -11,7 +11,6 @@ export {
   Form,
   FormGroup,
   Grid,
-  InputGroup,
   ListGroup,
   MenuItem,
   NavItem,
