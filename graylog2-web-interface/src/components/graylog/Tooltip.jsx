@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled from 'styled-components';
-import { darken } from 'polished';
 
 import teinte from 'theme/teinte';
 
@@ -31,7 +30,6 @@ const Tooltip = styled(BootstrapTooltip)`
   &.bottom-right .tooltip-arrow {
     border-bottom-color: ${teinte.primary.tre};
   }
-
 
   .tooltip-inner {
     color: ${teinte.primary.due};

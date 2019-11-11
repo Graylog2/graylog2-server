@@ -1,20 +1,22 @@
 ### Basic
 
 ```js
+const styles = { position: 'relative', display: 'inline-block' };
+
 <div>
-  <Tooltip placement="right" className="in" id="tooltip-right" style={{ position: 'relative', display: 'inline-block' }}>
+  <Tooltip placement="right" className="in" id="tooltip-right" style={styles}>
     Tooltip right
   </Tooltip>
 
-  <Tooltip placement="top" className="in" id="tooltip-top" style={{ position: 'relative', display: 'inline-block' }}>
+  <Tooltip placement="top" className="in" id="tooltip-top" style={styles}>
     Tooltip top
   </Tooltip>
 
-  <Tooltip placement="left" className="in" id="tooltip-left" style={{ position: 'relative', display: 'inline-block' }}>
+  <Tooltip placement="left" className="in" id="tooltip-left" style={styles}>
     Tooltip left
   </Tooltip>
 
-  <Tooltip placement="bottom" className="in" id="tooltip-bottom" style={{ position: 'relative', display: 'inline-block' }}>
+  <Tooltip placement="bottom" className="in" id="tooltip-bottom" style={styles}>
     Tooltip bottom
   </Tooltip>
 </div>
@@ -23,14 +25,14 @@
 ### Hover
 
 ```js
-import { ButtonToolbar, Button, OverlayTrigger } from './index'
+import { ButtonToolbar, Button, OverlayTrigger } from './index';
+
 const TooltipExample = () => {
   const tooltip = (
     <Tooltip id="tooltip">
       <strong>Yo!</strong> Check this info.
     </Tooltip>
   );
-
 
   return (
     <ButtonToolbar>
