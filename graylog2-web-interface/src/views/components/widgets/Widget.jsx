@@ -130,8 +130,7 @@ class Widget extends React.Component<Props, State> {
   };
 
   _onToggleCopyToDashboard = () => {
-    const { showCopyToDashboard } = this.state;
-    this.setState({ showCopyToDashboard: !showCopyToDashboard });
+    this.setState(({ showCopyToDashboard }) => ({ showCopyToDashboard: !showCopyToDashboard }));
   };
 
   _onCopyToDashboard = (widgetId, dashboardId) => {

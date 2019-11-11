@@ -15,7 +15,7 @@ type DashboardsActionsType = RefluxActions<{
 }>;
 
 export type DashboardsStoreState = {
-  list: ?Array<View>,
+  list?: Array<View>,
   pagination: {
     total: number,
     page: number,

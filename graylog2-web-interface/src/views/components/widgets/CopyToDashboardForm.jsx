@@ -13,22 +13,18 @@ type Props = {
   dashboards: DashboardsStoreState,
 };
 
-const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list, pagination }, onSubmit }: Props) => {
-  const [selectedDashboard, setSelectedDashbaord] = useState('');
+const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
+  const [selectedDashboard, setSelectedDashboard] = useState('');
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
-
-  const execSearch = useCallback((query, page, perPage) => {
-    DashboardsActions.search(query, page, perPage);
-  }, []);
 
   const handleSearch = useCallback((query) => {
     setPaginationState({
       query,
       ...paginationState,
     });
-    setSelectedDashbaord('');
-    execSearch(query, paginationState.page, paginationState.perPage);
-  }, []);
+    setSelectedDashboard('');
+    DashboardsActions.search(query, paginationState.page, paginationState.perPage);
+  }, [paginationState]);
 
   const handleSearchReset = useCallback(() => handleSearch(''), []);
 
@@ -38,18 +34,18 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list, paginatio
       perPage,
       ...paginationState,
     });
-    setSelectedDashbaord('');
-    execSearch(paginationState.query, page, perPage);
-  }, []);
+    setSelectedDashboard('');
+    DashboardsActions.search(paginationState.query, page, perPage);
+  }, [paginationState, setSelectedDashboard, setPaginationState]);
 
   useEffect(() => {
-    execSearch(paginationState.query, paginationState.page, paginationState.perPage);
+    DashboardsActions.search(paginationState.query, paginationState.page, paginationState.perPage);
   }, []);
 
-  const dashboardList = (list || []).map((dashboard) => {
+  const dashboardList = list.map((dashboard) => {
     return (
       <ListGroupItem active={selectedDashboard === dashboard.id}
-                     onClick={() => setSelectedDashbaord(dashboard.id)}
+                     onClick={() => setSelectedDashboard(dashboard.id)}
                      header={dashboard.title}
                      key={dashboard.id}>
         {dashboard.summary}
