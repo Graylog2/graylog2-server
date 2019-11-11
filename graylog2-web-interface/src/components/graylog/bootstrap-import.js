@@ -14,7 +14,6 @@ export {
   NavItem,
   Pager,
   Pagination,
-  Panel,
   Popover,
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
