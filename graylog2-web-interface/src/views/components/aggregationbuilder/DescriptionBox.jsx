@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Popover } from 'components/graylog';
 import { Portal } from 'react-portal';
 import { Position } from 'react-overlays';
+
+import { Popover } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import styles from './DescriptionBox.css';
 import HoverForHelp from './HoverForHelp';
@@ -55,11 +57,11 @@ export default class DescriptionBox extends React.Component {
   configCaret = () => {
     if (this.props.configurableOptions) {
       return (
-        <i ref={(node) => { this.target = node; }}
-           role="button"
-           tabIndex={0}
-           onClick={this.onToggleConfig}
-           className="fa fa-wrench" />
+        <Icon ref={(node) => { this.target = node; }}
+              role="button"
+              tabIndex={0}
+              onClick={this.onToggleConfig}
+              name="wrench" />
       );
     }
     return null;

@@ -4,6 +4,7 @@ import URI from 'urijs';
 
 import ApiRoutes from 'routing/ApiRoutes';
 import { Modal, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
@@ -54,13 +55,13 @@ class ContentPackDownloadControl extends React.Component {
     return (
       <BootstrapModalWrapper ref={(node) => { this.downloadModal = node; }} bsSize="large">
         <Modal.Header closeButton>
-          <Modal.Title>Export search results as CSV</Modal.Title>
+          <Modal.Title>Download Content Pack</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <p>{infoText}</p>
           <p>
             <a href={this._getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-              <i className="fa fa-cloud-download" />{' '}Download
+              <Icon name="cloud-download" />{' '}Download
             </a>
           </p>
         </Modal.Body>

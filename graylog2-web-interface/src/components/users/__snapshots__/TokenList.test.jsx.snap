@@ -15,7 +15,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           className="col-sm-2"
         >
           <label
-            className="tokenNewNameLabel control-label"
+            className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd control-label"
           >
             Token Name
           </label>
@@ -36,7 +36,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           className="col-sm-2"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-primary"
+            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
             disabled={true}
             id="create-token"
             type="submit"
@@ -71,7 +71,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               className="form-group"
             >
               <label
-                className="control-label"
+                className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                 htmlFor="filter-data-filter"
               >
                 Filter
@@ -91,7 +91,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               </div>
             </div>
             <button
-              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
               disabled={false}
               style={
                 Object {
@@ -103,7 +103,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               Filter
             </button>
             <button
-              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
               disabled={true}
               onClick={[Function]}
               style={
@@ -177,7 +177,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           className="col-sm-2"
         >
           <label
-            className="tokenNewNameLabel control-label"
+            className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd control-label"
           >
             Token Name
           </label>
@@ -198,7 +198,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           className="col-sm-2"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-primary"
+            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
             disabled={true}
             id="create-token"
             type="submit"
@@ -233,7 +233,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               className="form-group"
             >
               <label
-                className="control-label"
+                className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
                 htmlFor="filter-data-filter"
               >
                 Filter
@@ -253,7 +253,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               </div>
             </div>
             <button
-              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
               disabled={false}
               style={
                 Object {
@@ -265,7 +265,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               Filter
             </button>
             <button
-              className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
+              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
               disabled={true}
               onClick={[Function]}
               style={
@@ -315,7 +315,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   title="Copy to clipboard"
                 />
                 <button
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
                   disabled={false}
                   onClick={[Function]}
                   type="button"
@@ -350,7 +350,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   title="Copy to clipboard"
                 />
                 <button
-                  className="Button__StyledButton-c9cbmb-0 cBCVOY btn btn-xs btn-primary"
+                  className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
                   disabled={false}
                   onClick={[Function]}
                   type="button"

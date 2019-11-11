@@ -1,4 +1,5 @@
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
+const path = require('path');
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = {
@@ -42,6 +43,10 @@ module.exports = {
           components: 'src/components/common/[A-Z]*.jsx',
         },
         {
+          name: 'Themeable',
+          components: 'src/components/graylog/[A-Z]*.jsx',
+        },
+        {
           name: 'Configuration Forms',
           components: 'src/components/configurationforms/[A-Z]*.jsx',
         },
@@ -60,7 +65,10 @@ module.exports = {
       content: 'docs/util-objects.md',
     },
   ],
-  showUsage: true,
+  usageMode: 'expand',
+  styleguideComponents: {
+    Wrapper: path.join(__dirname, 'src/theme/GraylogThemeContext'),
+  },
   styleguideDir: 'docs/styleguide',
   title: 'Graylog UI documentation',
   webpackConfig: {

@@ -29,9 +29,12 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
+import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -63,6 +66,7 @@ public class ConfigurationStateUpdater {
     private final PipelineService pipelineService;
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineRuleParser pipelineRuleParser;
+    private final RuleMetricsConfigService ruleMetricsConfigService;
     private final MetricRegistry metricRegistry;
     private final FunctionRegistry functionRegistry;
     private final ScheduledExecutorService scheduler;
@@ -79,6 +83,7 @@ public class ConfigurationStateUpdater {
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                      PipelineRuleParser pipelineRuleParser,
+                                     RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
                                      FunctionRegistry functionRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
@@ -89,6 +94,7 @@ public class ConfigurationStateUpdater {
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineRuleParser = pipelineRuleParser;
+        this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.metricRegistry = metricRegistry;
         this.functionRegistry = functionRegistry;
         this.scheduler = scheduler;
@@ -160,7 +166,8 @@ public class ConfigurationStateUpdater {
         }
         ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
 
-        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections);
+        final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
+        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
         latestState.set(newState);
         return newState;
     }
@@ -234,6 +241,12 @@ public class ConfigurationStateUpdater {
     @Subscribe
     public void handlePipelineStateChange(PipelineInterpreter.State event) {
         log.debug("Pipeline interpreter state got updated");
+    }
+
+    @Subscribe
+    public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
+        log.debug("Rule metrics config changed: {}", event);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
     }
 
     @VisibleForTesting

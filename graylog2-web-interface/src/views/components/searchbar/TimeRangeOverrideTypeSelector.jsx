@@ -1,12 +1,13 @@
 import React from 'react';
-import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import { ButtonToolbar, DropdownButton, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
 import PropTypes from 'views/components/CustomPropTypes';
 
 const TimeRangeOverrideTypeSelector = ({ onSelect, value }) => (
   <ButtonToolbar className="extended-search-timerange-chooser pull-left">
     <DropdownButton bsStyle="info"
-                    title={<i className="fa fa-clock-o" />}
+                    title={<Icon name="clock-o" />}
                     onSelect={onSelect}
                     id="dropdown-timerange-selector">
       <MenuItem eventKey="disabled"

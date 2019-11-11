@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert, Button } from 'components/graylog';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 
+import { Alert, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MatchingTypeSwitcher from 'components/streams/MatchingTypeSwitcher';
 import StreamRuleList from 'components/streamrules/StreamRuleList';
@@ -82,13 +83,13 @@ class StreamRulesEditor extends React.Component {
       if (this.state.matchData.matches) {
         return (
           <span>
-            <i className="fa fa-check" style={{ color: 'green' }} /> This message would be routed to this stream.
+            <Icon name="check" style={{ color: 'green' }} /> This message would be routed to this stream.
           </span>
         );
       }
       return (
         <span>
-          <i className="fa fa-remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
+          <Icon name="remove" style={{ color: 'red' }} /> This message would not be routed to this stream.
         </span>
       );
     }
@@ -109,7 +110,7 @@ class StreamRulesEditor extends React.Component {
               <LoaderTabs messageId={this.props.messageId} index={this.props.index} onMessageLoaded={this.onMessageLoaded} />
             </div>
 
-            <div className="spinner" style={{ display: 'none' }}><h2><i className="fa fa-spinner fa-spin" /> &nbsp;Loading message
+            <div className="spinner" style={{ display: 'none' }}><h2><Icon name="spinner" spin /> &nbsp;Loading message
             </h2>
             </div>
 

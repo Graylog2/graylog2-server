@@ -3,13 +3,11 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
-
+import { cloneDeep } from 'lodash';
 import { Button, FormGroup, ControlLabel } from 'components/graylog';
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -38,7 +36,8 @@ const StageForm = createReactClass({
   },
 
   getInitialState() {
-    const stage = ObjectUtils.clone(this.props.stage);
+    let { stage } = this.props;
+    stage = cloneDeep(stage);
     return {
       // when editing, take the stage that's been passed in
       stage: {
@@ -54,13 +53,15 @@ const StageForm = createReactClass({
   },
 
   _onChange(event) {
-    const stage = ObjectUtils.clone(this.state.stage);
+    let { stage } = this.state;
+    stage = cloneDeep(stage);
     stage[event.target.name] = FormsUtils.getValueFromInput(event.target);
     this.setState({ stage });
   },
 
   _onRulesChange(newRules) {
-    const stage = ObjectUtils.clone(this.state.stage);
+    let { stage } = this.state;
+    stage = cloneDeep(stage);
     stage.rules = newRules;
     this.setState({ stage });
   },
@@ -71,24 +72,37 @@ const StageForm = createReactClass({
 
   _saved() {
     this._closeModal();
-    if (this.props.create) {
+    const { create } = this.props;
+    if (create) {
       this.setState(this.getInitialState());
     }
   },
 
   _save() {
-    this.props.save(this.state.stage, this._saved);
+    const { stage } = this.state;
+    const { save } = this.props;
+    save(stage, this._saved);
   },
 
   _getFormattedOptions(rules) {
-    return rules ? rules.map((rule) => {
-      return { value: rule.title, label: rule.title };
-    }) : [];
+    const { stage } = this.state;
+    const chosenRules = stage.rules;
+    return rules ? rules.filter(rule => this._filterChosenRules(rule, chosenRules)).map(this._formatRuleOption) : [];
+  },
+
+  _formatRuleOption(rule) {
+    return { value: rule.title, label: rule.title };
+  },
+
+  _filterChosenRules(rule, chosenRules) {
+    return !chosenRules.includes(rule.title);
   },
 
   render() {
     let triggerButtonContent;
-    if (this.props.create) {
+    const { create } = this.props;
+    const { stage, rules } = this.state;
+    if (create) {
       triggerButtonContent = 'Add new stage';
     } else {
       triggerButtonContent = <span>Edit</span>;
@@ -104,11 +118,11 @@ const StageForm = createReactClass({
     return (
       <span>
         <Button onClick={this.openModal}
-                bsStyle={this.props.create ? 'success' : 'info'}>
+                bsStyle={create ? 'success' : 'info'}>
           {triggerButtonContent}
         </Button>
         <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                            title={`${this.props.create ? 'Add new' : 'Edit'} stage ${this.state.stage.stage}`}
+                            title={`${create ? 'Add new' : 'Edit'} stage ${stage.stage}`}
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <fieldset>
@@ -119,7 +133,7 @@ const StageForm = createReactClass({
                    autoFocus
                    onChange={this._onChange}
                    help="Stage priority. The lower the number, the earlier it will execute."
-                   value={this.state.stage.stage} />
+                   value={stage.stage} />
 
             <FormGroup>
               <ControlLabel>Continue processing on next stage when</ControlLabel>
@@ -131,7 +145,7 @@ const StageForm = createReactClass({
                    value="true"
                    label="All rules on this stage match the message"
                    onChange={this._onChange}
-                   checked={this.state.stage.match_all} />
+                   checked={stage.match_all} />
 
             <Input type="radio"
                    id="match_any"
@@ -139,15 +153,15 @@ const StageForm = createReactClass({
                    value="false"
                    label="At least one of the rules on this stage matches the message"
                    onChange={this._onChange}
-                   checked={!this.state.stage.match_all} />
+                   checked={!stage.match_all} />
 
             <Input id="stage-rules-select"
                    label="Stage rules"
                    help={rulesHelp}>
-              <SelectableList options={this._getFormattedOptions(this.state.rules)}
-                              isLoading={!this.state.rules}
+              <SelectableList options={this._getFormattedOptions(rules)}
+                              isLoading={!rules}
                               onChange={this._onRulesChange}
-                              selectedOptions={this.state.stage.rules} />
+                              selectedOptions={stage.rules} />
             </Input>
           </fieldset>
         </BootstrapModalForm>

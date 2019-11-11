@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Alert } from 'components/graylog';
 
+import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 import { SystemJob } from 'components/systemjobs';
 
 class SystemJobsList extends React.Component {
@@ -22,7 +23,7 @@ class SystemJobsList extends React.Component {
     if (jobs.length === 0) {
       return (
         <Alert bsStyle="info" className="systemjobs-none">
-          <i className="fa fa-info-circle" />{' '}
+          <Icon name="info-circle" />{' '}
           &nbsp;No active system jobs.
         </Alert>
       );

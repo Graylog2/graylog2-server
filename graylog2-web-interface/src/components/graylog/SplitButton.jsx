@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { forwardRef, useCallback } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
 import styled from 'styled-components';
 
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const SplitButton = ({ active, bsStyle, ...props }) => {
-  const StyledSplitButton = styled(BootstrapSplitButton)`
-    ${buttonStyles({ active })};
+const SplitButton = forwardRef((props, ref) => {
+  const { active, bsStyle, disabled } = props;
+  const StyledSplitButton = useCallback(styled(BootstrapSplitButton)`
+    ${buttonStyles(props)};
 
     ~ .btn.dropdown-toggle {
-      ${buttonStyles({ active, specific: false })};
+      ${buttonStyles(props)};
     }
-  `;
+  `, [active, bsStyle, disabled]);
 
   return (
-    <StyledSplitButton bsStyle={bsStyle} {...props} />
+    <StyledSplitButton ref={ref} {...props} />
   );
-};
+});
 
 SplitButton.propTypes = propTypes;
 

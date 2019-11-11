@@ -32,6 +32,7 @@ import com.google.common.collect.Maps;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
+import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
@@ -77,6 +78,15 @@ public abstract class Query {
     @JsonProperty
     public abstract BackendQuery query();
 
+    @JsonIgnore
+    public abstract Optional<GlobalOverride> globalOverride();
+
+    public TimeRange effectiveTimeRange(SearchType searchType) {
+        return this.globalOverride().flatMap(GlobalOverride::timerange)
+                .orElse(searchType.timerange()
+                        .orElse(this.timerange()));
+    }
+
     @Nonnull
     @JsonProperty("search_types")
     public abstract ImmutableSet<SearchType> searchTypes();
@@ -88,7 +98,7 @@ public abstract class Query {
                 .searchTypes(of());
     }
 
-    public Query applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
+    Query applyExecutionState(ObjectMapper objectMapper, JsonNode state) {
         if (state.isMissingNode()) {
             return this;
         }
@@ -101,6 +111,12 @@ public abstract class Query {
                 try {
                     final Object rawTimerange = state.path("timerange");
                     final TimeRange newTimeRange = objectMapper.convertValue(rawTimerange, TimeRange.class);
+                    builder.globalOverride(
+                            globalOverride().map(GlobalOverride::toBuilder)
+                                    .orElseGet(GlobalOverride::builder)
+                                    .timerange(newTimeRange)
+                                    .build()
+                    );
                     builder.timerange(newTimeRange);
                 } catch (Exception e) {
                     LOG.error("Unable to deserialize execution state for time range", e);
@@ -109,6 +125,12 @@ public abstract class Query {
             if (hasQuery) {
                 final Object rawQuery = state.path("query");
                 final BackendQuery newQuery = objectMapper.convertValue(rawQuery, BackendQuery.class);
+                builder.globalOverride(
+                        globalOverride().map(GlobalOverride::toBuilder)
+                                .orElseGet(GlobalOverride::builder)
+                                .query(newQuery)
+                                .build()
+                );
                 builder.query(newQuery);
             }
             if (hasSearchTypes) {
@@ -150,6 +172,23 @@ public abstract class Query {
                 .orElse(Collections.emptySet());
     }
 
+    public boolean hasStreams() {
+        return !usedStreamIds().isEmpty();
+    }
+
+    Query addStreamsToFilter(ImmutableSet<String> streamIds) {
+        final Filter newFilter = addStreamsTo(filter(), streamIds);
+        return toBuilder().filter(newFilter).build();
+    }
+
+    private Filter addStreamsTo(Filter filter, Set<String> streamIds) {
+        final Filter streamIdFilter = StreamFilter.anyIdOf(streamIds.toArray(new String[]{}));
+        if (filter == null) {
+            return streamIdFilter;
+        }
+        return AndFilter.and(streamIdFilter, filter);
+    }
+
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
@@ -164,6 +203,8 @@ public abstract class Query {
 
         @JsonProperty
         public abstract Builder query(BackendQuery query);
+
+        public abstract Builder globalOverride(@Nullable GlobalOverride globalOverride);
 
         @JsonProperty("search_types")
         public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);

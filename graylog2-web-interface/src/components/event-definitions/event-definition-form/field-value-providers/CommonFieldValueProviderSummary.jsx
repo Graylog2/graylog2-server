@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Table, Button } from 'components/graylog';
+import { Icon } from 'components/common';
 import styles from './CommonFieldValueProviderSummary.css';
 
 class CommonFieldValueProviderSummary extends React.Component {
@@ -30,7 +31,7 @@ class CommonFieldValueProviderSummary extends React.Component {
         <dt>{fieldName}</dt>
         <dd>
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-            <i className={`fa fa-caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
+            <Icon name={`caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
             {displayDetails ? 'Less details' : 'More details'}
           </Button>
           {displayDetails && (

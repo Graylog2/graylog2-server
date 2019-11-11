@@ -1,11 +1,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
-import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
-
 import Reflux from 'reflux';
 
 import ObjectUtils from 'util/ObjectUtils';
 
+import { Row, Col, Panel, Table, Tabs, Tab } from 'components/graylog';
+import { Icon } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
 
@@ -70,7 +70,7 @@ end`,
         <tr key={p.name}>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
           <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
-          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <i className="fa fa-check" />}</td>
+          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
           <td>{p.description}</td>
         </tr>
       );

@@ -19,6 +19,7 @@ import NumberVisualization from 'views/components/visualizations/number/NumberVi
 import PieVisualization from 'views/components/visualizations/pie/PieVisualization';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
+import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -59,15 +60,17 @@ import FieldNameCompletion from 'views/components/searchbar/completions/FieldNam
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
 import {
-  dashboardsPath,
+  dashboardsPath, dashboardsTvPath,
   extendedSearchPath,
   newDashboardsPath,
   showDashboardsPath,
   showViewsPath,
+  showSearchPath,
   viewsPath,
 } from 'views/Constants';
 import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from 'views/pages/StreamSearchPage';
+import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 
@@ -87,6 +90,8 @@ const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
 const searchRoutes = enableNewSearch
   ? [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
+    { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
+    { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage },
@@ -272,6 +277,11 @@ export default {
       type: ScatterVisualization.type,
       displayName: 'Scatter Plot',
       component: ScatterVisualization,
+    },
+    {
+      type: HeatmapVisualization.type,
+      displayName: 'Heatmap',
+      component: HeatmapVisualization,
     },
   ],
   creators: [

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Set } from 'immutable';
 
-import { DataTable } from 'components/common';
+import { DataTable, Icon } from 'components/common';
 import { Badge } from 'components/graylog';
 import './ContentPackConstraints.css';
 
@@ -22,7 +22,9 @@ class ContentPackConstraints extends React.Component {
 
   _rowFormatter = (item) => {
     const constraint = item.constraint || item;
-    const fulfilledIcon = item.fulfilled || this.props.isFulfilled ? <i className="fa fa-check" /> : <i className="fa fa-times" />;
+    const fulfilledIcon = (item.fulfilled || this.props.isFulfilled)
+      ? <Icon name="check" />
+      : <Icon name="times" />;
     const fulfilledBg = item.fulfilled || this.props.isFulfilled ? 'success' : 'failure';
     const name = constraint.type === 'server-version' ? 'Graylog' : constraint.plugin;
     return (

@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Label } from 'components/graylog';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 
+import { Row, Col, Label } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
-import { Spinner, Timestamp } from 'components/common';
+import { Spinner, Timestamp, Icon } from 'components/common';
 
 import Routes from 'routing/Routes';
 import MessageActions from './MessageActions';
@@ -61,10 +61,9 @@ class MessageDetail extends React.Component {
       const nodeURL = Routes.node(nodeId);
       nodeInformation = (
         <a href={nodeURL}>
-          <i className="fa fa-code-fork" />
+          <Icon name="code-fork" />
           &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}
-          </span>
+          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
         </a>
       );
     } else {
@@ -156,7 +155,7 @@ class MessageDetail extends React.Component {
                             searchConfig={this.props.searchConfig}
                             streams={allStreams} />
             <h3 className="message-details-title">
-              <i className="fa fa-envelope" />
+              <Icon name="envelope" />
               &nbsp;
               {messageTitle}
             </h3>

@@ -3,7 +3,10 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
-import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type {
+  VisualizationComponent,
+  VisualizationComponentProps,
+} from 'views/components/aggregationbuilder/AggregationBuilder';
 
 import GenericPlot from '../GenericPlot';
 import { chartData } from '../ChartData';
@@ -27,7 +30,7 @@ const _horizontalDimensions = (idx, total) => {
   return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
 };
 
-const _generateSeries = (type, name, x, y, idx, total) => ({
+const _generateSeries = (type, name, x, y, z, idx, total) => ({
   type,
   name,
   hole: 0.4,

@@ -1,8 +1,12 @@
 // @flow strict
 import React from 'react';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
-import { Button, ButtonGroup } from 'react-bootstrap';
+import Routes from 'routing/Routes';
+import { newDashboardsPath } from 'views/Constants';
+import { Button, ButtonGroup } from 'components/graylog';
+import { Icon } from 'components/common';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { ViewStore, ViewActions } from 'views/stores/ViewStore';
@@ -13,7 +17,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
-import styles from './BookmarkControls.css';
 
 type Props = {
   viewStoreState: ViewStoreState,
@@ -105,9 +108,11 @@ class BookmarkControls extends React.Component<Props, State> {
       .build();
 
     ViewManagementActions.create(newView)
-      .then(() => {
+      .then((createdView) => {
         const loaderFunc = this.context;
-        loaderFunc(newView.id);
+        loaderFunc(createdView.id).then(() => {
+          browserHistory.push(Routes.pluginRoute('SEARCH_VIEWID')(createdView.id));
+        });
       })
       .then(this.toggleFormModal)
       .then(() => UserNotification.success(`Saving view "${newView.title}" was successful!`, 'Success!'))
@@ -118,11 +123,30 @@ class BookmarkControls extends React.Component<Props, State> {
     this.toggleListModal();
   };
 
-  deleteBookmark = (view) => {
-    return ViewManagementActions.delete(view)
-      .then(() => UserNotification.success(`Deleting view "${view.title}" was successful!`, 'Success!'))
-      .then(ViewActions.create)
+  deleteBookmark = (deletedView) => {
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+    return ViewManagementActions.delete(deletedView)
+      .then(() => UserNotification.success(`Deleting view "${deletedView.title}" was successful!`, 'Success!'))
+      .then(() => ViewActions.create(View.Type.Search))
+      .then(() => {
+        if (deletedView.id === view.id) {
+          browserHistory.push(Routes.SEARCH);
+        }
+      })
       .catch(error => UserNotification.error(`Deleting view failed: ${this._extractErrorMessage(error)}`, 'Error!'));
+  };
+
+  loadAsDashboard = () => {
+    const { viewStoreState } = this.props;
+    const { view } = viewStoreState;
+
+    browserHistory.push({
+      pathname: newDashboardsPath,
+      state: {
+        view: view,
+      },
+    });
   };
 
   render() {
@@ -138,7 +162,7 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     const loaded = (view && view.id);
-    const bookmarkStyle = loaded ? 'fa-bookmark' : 'fa-bookmark-o';
+    const bookmarkStyle = loaded ? 'bookmark' : 'bookmark-o';
     let bookmarkColor: string = '';
     if (loaded) {
       bookmarkColor = dirty ? '#ffc107' : '#007bff';
@@ -164,20 +188,28 @@ class BookmarkControls extends React.Component<Props, State> {
     );
 
     return (
-      <div className={`${styles.position} pull-right`}>
+      <div className="pull-right">
         <ButtonGroup>
           <React.Fragment>
-            <Button disabled={disableReset} title="Empty search" onClick={ViewActions.create}>
-              <i className="fa fa-eraser" />
+            <Button title="Export to new dashboard"
+                    onClick={this.loadAsDashboard}>
+              <Icon name="dashboard" />
+            </Button>
+            <Button disabled={disableReset}
+                    title="Empty search"
+                    onClick={() => {
+                      browserHistory.push(Routes.SEARCH);
+                    }}>
+              <Icon name="eraser" />
             </Button>
             <Button title={title} ref={(elem) => { this.formTarget = elem; }} onClick={this.toggleFormModal}>
-              <i style={{ color: bookmarkColor }} className={`fa ${bookmarkStyle}`} />
+              <Icon style={{ color: bookmarkColor }} name={bookmarkStyle} />
             </Button>
             {bookmarkForm}
           </React.Fragment>
           <Button title="List of saved searches"
                   onClick={this.toggleListModal}>
-            <i className="fa fa-folder-o" />
+            <Icon name="folder-o" />
           </Button>
           {bookmarkList}
         </ButtonGroup>

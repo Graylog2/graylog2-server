@@ -8,7 +8,6 @@
 }
 
 .timerange-selector .relative {
-    font-size: 12px;
     color: #666;
 }
 
@@ -17,7 +16,7 @@
 }
 
 .extended-search-query-metadata {
-    margin-bottom: 7px !important;
+    margin-bottom: 10px !important;
 }
 
 .search-button-execute {
@@ -32,6 +31,16 @@
 #QueryTabs .nav-tabs li.active a {
     background-color: #fff;
     color: #333;
+}
+
+#QueryTabs .nav-tabs li.active a .fa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+    cursor: pointer;
 }
 
 #QueryTabs .nav-tabs li a:hover {
@@ -68,7 +77,7 @@
 
 .search-grid {
     z-index: 1;
-    padding-left: 15px;
+    padding: 15px;
     grid-area: search;
     grid-column-start: 2;
     grid-column-end: 4;

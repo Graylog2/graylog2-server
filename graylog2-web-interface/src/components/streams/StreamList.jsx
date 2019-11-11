@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import { Alert } from 'components/graylog';
+import { Icon } from 'components/common';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Stream from './Stream';
@@ -50,7 +51,7 @@ const StreamList = createReactClass({
     }
     return (
       <Alert bsStyle="info">
-        <i className="fa fa-info-circle" />&nbsp;No streams match your search filter.
+        <Icon name="info-circle" />&nbsp;No streams match your search filter.
       </Alert>
     );
   },

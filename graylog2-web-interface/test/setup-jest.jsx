@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import jQuery from 'jquery';
 import { configure } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
@@ -11,7 +12,14 @@ registerBuiltinStores();
 
 configure({ adapter: new Adapter() });
 
-// eslint-disable-next-line no-console
+const consoleWarn = console.warn;
+
+console.warn = jest.fn((...args) => {
+  if (!args[0] || !args[0].includes('react-async-component-lifecycle-hooks')) {
+    consoleWarn(format(...args));
+  }
+});
+
 console.error = jest.fn((...args) => {
   throw new Error(format(...args));
 });

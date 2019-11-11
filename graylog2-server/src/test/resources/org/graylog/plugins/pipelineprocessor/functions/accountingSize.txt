@@ -1,0 +1,6 @@
+rule "accounting size"
+when true
+then
+    let size = traffic_accounting_size();
+    set_field("accounting_size", size);
+end

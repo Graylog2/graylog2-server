@@ -155,7 +155,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
 exports[`<ContentPackInstallEntityList /> should render without entities 1`] = `
 <span>
   <i
-    className="fa fa-spin fa-spinner"
+    className="fa fa-spinner fa-spin"
   />
    
   Loading...

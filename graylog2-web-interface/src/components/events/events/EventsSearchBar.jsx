@@ -4,7 +4,7 @@ import moment from 'moment';
 import lodash from 'lodash';
 
 import { ButtonGroup, ControlLabel, FormControl, FormGroup, Button } from 'components/graylog';
-import { SearchForm, TimeUnitInput } from 'components/common';
+import { SearchForm, TimeUnitInput, Icon } from 'components/common';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import FormsUtils from 'util/FormsUtils';
 
@@ -70,14 +70,14 @@ class EventsSearchBar extends React.Component {
           <div className={styles.searchForm}>
             <SearchForm query={parameters.query}
                         onSearch={onQueryChange}
-                        searchButtonLabel={<i className="fa fa-search" />}
+                        searchButtonLabel={<Icon name="search" />}
                         loadingLabel=""
                         placeholder="Find Events"
                         queryWidth="100%"
                         topMargin={0}
                         useLoadingState>
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>
-                <i className={`fa fa-refresh ${isReloadingResults ? 'fa-spin' : ''}`} />
+                <Icon name="refresh" spin={isReloadingResults} />
               </Button>
             </SearchForm>
           </div>

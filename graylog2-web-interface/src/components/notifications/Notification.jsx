@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+
 import { Alert, Button } from 'components/graylog';
-import { Timestamp } from 'components/common';
+import { Timestamp, Icon } from 'components/common';
 
 import NotificationsFactory from 'logic/notifications/NotificationsFactory';
 
@@ -28,7 +29,7 @@ class Notification extends React.Component {
         <Button className="close delete-notification" onClick={this._onClose}>&times;</Button>
 
         <h3 className="notification-head">
-          <i className="fa fa-bolt" />{' '}
+          <Icon name="bolt" />{' '}
           {notificationView.title}{' '}
 
           <span className="notification-timestamp">

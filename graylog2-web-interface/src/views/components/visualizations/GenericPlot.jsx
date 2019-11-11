@@ -10,6 +10,8 @@ import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import ChartColorContext from './ChartColorContext';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import styles from '!style/useable!css!./GenericPlot.css';
+import InteractiveContext from '../contexts/InteractiveContext';
+import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
 type LegendConfig = {
   name: string,
@@ -22,18 +24,18 @@ type ChartMarker = {
   color?: string,
 };
 
-type ChartConfig = {
+export type ChartConfig = {
   name: string,
   labels: Array<string>,
   line?: ChartMarker,
   marker?: ChartMarker,
 };
 
-type ColorMap = {
+export type ColorMap = {
   [string]: string,
 };
 
-type ChartColor = {
+export type ChartColor = {
   line?: ChartMarker,
   marker?: ChartMarker,
 };
@@ -53,6 +55,12 @@ type State = {
 type Axis = {
   autosize: boolean,
   [string]: string,
+};
+
+const nonInteractiveLayout = {
+  yaxis: { fixedrange: true },
+  xaxis: { fixedrange: true },
+  hovermode: false,
 };
 
 class GenericPlot extends React.Component<Props, State> {
@@ -112,7 +120,7 @@ class GenericPlot extends React.Component<Props, State> {
 
   render() {
     const { chartData, layout, setChartColor } = this.props;
-    const plotLayout = merge({
+    const defaultLayout = {
       autosize: true,
       showlegend: true,
       margin: {
@@ -130,7 +138,8 @@ class GenericPlot extends React.Component<Props, State> {
       hoverlabel: {
         namelength: -1,
       },
-    }, layout);
+    };
+    const plotLayout = merge({}, defaultLayout, layout);
 
     const style = { height: 'calc(100% - 10px)', width: '100%' };
 
@@ -153,30 +162,40 @@ class GenericPlot extends React.Component<Props, State> {
             return chart;
           });
           return (
-            <React.Fragment>
-              <Plot data={newChartData}
-                    useResizeHandler
-                    layout={plotLayout}
-                    style={style}
-                    onLegendClick={this._onLegendClick}
-                    onRelayout={this._onRelayout}
-                    config={config} />
-              {legendConfig && (
-                <RootCloseWrapper event="mousedown"
-                                  onRootClose={this._onCloseColorPopup}>
-                  <Overlay show
-                           placement="top"
-                           target={legendConfig.target}>
-                    <Popover id="legend-config"
-                             title={`Configuration for ${legendConfig.name}`}
-                             className={styles.locals.customPopover}>
-                      <ColorPicker color={legendConfig.color}
-                                   onChange={newColor => this._onColorSelect(setColor, legendConfig.name, newColor)} />
-                    </Popover>
-                  </Overlay>
-                </RootCloseWrapper>
+            <InteractiveContext.Consumer>
+              {interactive => (
+                <RenderCompletionCallback.Consumer>
+                  {onRenderComplete => (
+                    <>
+                      <Plot data={newChartData}
+                            useResizeHandler
+                            layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                            style={style}
+                            onAfterPlot={onRenderComplete}
+                            onClick={interactive ? null : () => false}
+                            onLegendClick={interactive ? this._onLegendClick : () => false}
+                            onRelayout={interactive ? this._onRelayout : () => false}
+                            config={config} />
+                      {legendConfig && (
+                        <RootCloseWrapper event="mousedown"
+                                          onRootClose={this._onCloseColorPopup}>
+                          <Overlay show
+                                   placement="top"
+                                   target={legendConfig.target}>
+                            <Popover id="legend-config"
+                                     title={`Configuration for ${legendConfig.name}`}
+                                     className={styles.locals.customPopover}>
+                              <ColorPicker color={legendConfig.color}
+                                           onChange={newColor => this._onColorSelect(setColor, legendConfig.name, newColor)} />
+                            </Popover>
+                          </Overlay>
+                        </RootCloseWrapper>
+                      )}
+                    </>
+                  )}
+                </RenderCompletionCallback.Consumer>
               )}
-            </React.Fragment>
+            </InteractiveContext.Consumer>
           );
         }}
       </ChartColorContext.Consumer>

@@ -244,7 +244,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>${nodejs.version}</nodeVersion>
-                                    <yarn.version>${yarn.version}</yarn.version>
+                                    <yarnVersion>${yarn.version}</yarnVersion>
                                 </configuration>
                             </execution>
 

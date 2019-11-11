@@ -14,13 +14,39 @@ import Query from 'views/logic/queries/Query';
 import GenericPlot from './GenericPlot';
 import OnZoom from './OnZoom';
 import CustomPropTypes from '../CustomPropTypes';
+import type { ChartColor, ChartConfig, ColorMap } from './GenericPlot';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-const XYPlot = ({ config, chartData, currentQuery, timezone, effectiveTimerange, getChartColor, setChartColor, plotLayout = {}, onZoom = OnZoom }) => {
+type Props = {
+  config: AggregationWidgetConfig,
+  chartData: any,
+  currentQuery: Query,
+  timezone: string,
+  effectiveTimerange: {
+    from: string,
+    to: string,
+  },
+  getChartColor?: (Array<ChartConfig>, string) => ?string,
+  setChartColor?: (ChartConfig, ColorMap) => ChartColor,
+  plotLayout?: any,
+  onZoom: (Query, string, string) => boolean,
+};
+
+const XYPlot = ({
+  config,
+  chartData,
+  currentQuery,
+  timezone,
+  effectiveTimerange,
+  getChartColor,
+  setChartColor,
+  plotLayout = {},
+  onZoom = OnZoom,
+}: Props) => {
   const yaxis = { fixedrange: true, rangemode: 'tozero' };
 
-  const layout = merge({ yaxis }, plotLayout);
+  const layout = merge({}, { yaxis }, plotLayout);
 
   const _onZoom = config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true;
   if (config.isTimeline) {
@@ -28,6 +54,7 @@ const XYPlot = ({ config, chartData, currentQuery, timezone, effectiveTimerange,
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
     layout.xaxis = {
       range: [normalizedFrom, normalizedTo],
+      type: 'date',
     };
   } else {
     layout.xaxis = {

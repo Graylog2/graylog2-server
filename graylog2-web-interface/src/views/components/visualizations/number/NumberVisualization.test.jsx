@@ -1,9 +1,11 @@
-import React from 'react';
+// @flow strict
+import * as React from 'react';
 import { mount } from 'enzyme';
 import { List } from 'immutable';
 import renderer from 'react-test-renderer';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import NumberVisualization from './NumberVisualization';
 
 jest.mock('stores/connect', () => x => x);
@@ -35,7 +37,7 @@ describe('NumberVisualization', () => {
     ],
   }];
   const currentView = { activeQuery: 'dead-beef' };
-  const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT)]);
+  const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   it('should render a number visualization', () => {
     const wrapper = renderer.create(<NumberVisualization data={data}
@@ -44,6 +46,23 @@ describe('NumberVisualization', () => {
                                                          fields={fields}
                                                          currentView={currentView} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
+  });
+
+  it('calls render completion callback after first render', () => {
+    const Component = () => (
+      <NumberVisualization data={data}
+                           width={200}
+                           height={200}
+                           fields={fields}
+                           currentView={currentView} />
+    );
+    const onRenderComplete = jest.fn();
+    renderer.create((
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <Component />
+      </RenderCompletionCallback.Provider>
+    ));
+    expect(onRenderComplete).toHaveBeenCalled();
   });
 
   it('changes font size upon resize', () => {
@@ -56,8 +75,8 @@ describe('NumberVisualization', () => {
 
     wrapper.instance().getContainer = jest
       .fn()
-      .mockImplementationOnce(() => ({ childNodes: [{ offsetHeight: 90, offsetWidth: 90 }] }))
-      .mockImplementationOnce(() => ({ childNodes: [{ offsetHeight: 100, offsetWidth: 100 }] }));
+      .mockImplementationOnce(() => ({ children: [{ offsetHeight: 90, offsetWidth: 90 }] }))
+      .mockImplementationOnce(() => ({ children: [{ offsetHeight: 100, offsetWidth: 100 }] }));
 
     wrapper.setProps({ height: 125, width: 125 });
 

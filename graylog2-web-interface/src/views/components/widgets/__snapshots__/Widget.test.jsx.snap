@@ -21,6 +21,7 @@ exports[`<Widget /> should render with empty props 1`] = `
     <span>
       <widget-header
         editing={false}
+        hideDragHandle={false}
         onRename={[Function]}
         title="Widget Title"
       >
@@ -55,7 +56,7 @@ exports[`<Widget /> should render with empty props 1`] = `
         className="spinnerContainer"
       >
         <i
-          className="fa fa-spin fa-3x fa-refresh spinner"
+          className="fa fa-refresh spinner fa-3x"
         />
       </div>
     </span>

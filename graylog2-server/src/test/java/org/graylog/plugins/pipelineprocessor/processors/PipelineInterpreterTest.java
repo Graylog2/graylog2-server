@@ -31,6 +31,8 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto;
+import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryPipelineStreamConnectionsService;
@@ -248,6 +250,8 @@ public class PipelineInterpreterTest {
 
     @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
+        final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
+        when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(MongoDbPipelineStreamConnectionsService.class);
         final PipelineConnections pipelineConnections = PipelineConnections.create("p1", DEFAULT_STREAM_ID, Collections.singleton("p1"));
         when(pipelineStreamConnectionsService.loadAll()).thenReturn(Collections.singleton(pipelineConnections));
@@ -259,11 +263,12 @@ public class PipelineInterpreterTest {
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
+                ruleMetricsConfigService,
                 new MetricRegistry(),
                 functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true),
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
                 false);
         return new PipelineInterpreter(
                 mock(Journal.class),
@@ -275,6 +280,8 @@ public class PipelineInterpreterTest {
     @Test
     @SuppressForbidden("Allow using default thread factory")
     public void testMetrics() {
+        final RuleMetricsConfigService ruleMetricsConfigService = mock(RuleMetricsConfigService.class);
+        when(ruleMetricsConfigService.get()).thenReturn(RuleMetricsConfigDto.createDefault());
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final RuleService ruleService = new InMemoryRuleService(clusterEventBus);
         ruleService.save(RuleDao.create("abc",
@@ -313,11 +320,12 @@ public class PipelineInterpreterTest {
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
+                ruleMetricsConfigService,
                 metricRegistry,
                 functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true),
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true),
                 false);
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),

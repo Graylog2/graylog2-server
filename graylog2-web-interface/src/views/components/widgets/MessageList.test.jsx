@@ -13,6 +13,8 @@ import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
 import InputsStore from 'stores/inputs/InputsStore';
 import * as messageList from 'views/components/messagelist';
 import MessageList from './MessageList';
+import RenderCompletionCallback from './RenderCompletionCallback';
+import InputsActions from '../../../actions/inputs/InputsActions';
 
 const MessageTableEntry = () => (
   <AdditionalContext.Consumer>
@@ -32,10 +34,8 @@ jest.mock('views/stores/ViewStore', () => ({
     ['getInitialState', () => ({ activeQuery: 'somequery', view: { id: 'someview' } })],
   ),
 }));
-jest.mock('stores/inputs/InputsStore', () => ({
-  InputsStore: MockStore('listen', 'getInitialState'),
-  InputsActions: { list: jest.fn() },
-}));
+jest.mock('stores/inputs/InputsStore', () => MockStore('listen', 'getInitialState'));
+jest.mock('actions/inputs/InputsActions', () => ({ list: jest.fn(() => Promise.resolve()) }));
 jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 jest.mock('views/stores/SelectedFieldsStore', () => ({
   SelectedFieldsStore: MockStore('listen', 'selectedFields'),
@@ -100,5 +100,35 @@ describe('MessageList', () => {
                        data={data}
                        fields={Immutable.List([])}
                        config={config} />);
+  });
+
+  it('refreshs Inputs list upon mount', () => {
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const Component = () => (
+      <MessageList editing
+                   data={data}
+                   fields={Immutable.List([])}
+                   config={config} />
+    );
+    mount(<Component />);
+    expect(InputsActions.list).toHaveBeenCalled();
+  });
+
+  it('calls render completion callback after first render', () => {
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const Component = () => (
+      <MessageList editing
+                   data={data}
+                   fields={Immutable.List([])}
+                   config={config} />
+    );
+    return new Promise((resolve) => {
+      const onRenderComplete = jest.fn(resolve);
+      mount((
+        <RenderCompletionCallback.Provider value={onRenderComplete}>
+          <Component />
+        </RenderCompletionCallback.Provider>
+      ));
+    });
   });
 });

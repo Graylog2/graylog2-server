@@ -269,7 +269,7 @@ public class V20180212165000_AddDefaultCollectors extends Migration {
                         "tags:\n" +
                         " - windows\n" +
                         "filebeat.inputs:\n" +
-                        "  type: log\n" +
+                        "- type: log\n" +
                         "  enabled: true\n" +
                         "  paths:\n" +
                         "    - C:\\logs\\log.log\n"

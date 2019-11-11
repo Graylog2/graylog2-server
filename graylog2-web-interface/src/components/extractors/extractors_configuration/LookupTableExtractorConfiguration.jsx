@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col, Button } from 'components/graylog';
 import { Link } from 'react-router';
 
+import { Row, Col, Button } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { Select, Spinner, Icon } from 'components/common';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';
@@ -110,7 +110,7 @@ class LookupTableExtractorConfiguration extends React.Component {
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
+                {this.state.trying ? <Icon name="spinner" spin /> : 'Try'}
               </Button>
             </Col>
           </Row>

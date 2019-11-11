@@ -1,1947 +1,477 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BookmarkList render the BookmarkList should handle toggleModal 1`] = `
-<ModalDialog
-  bsClass="modal"
-  className="fade in"
-  onClick={[Function]}
-  role="document"
-  style={
-    Object {
-      "paddingLeft": undefined,
-      "paddingRight": 0,
-    }
-  }
-  tabIndex="-1"
->
-  <div
-    className="fade in modal"
-    onClick={[Function]}
-    role="dialog"
-    style={
-      Object {
-        "display": "block",
-        "paddingLeft": undefined,
-        "paddingRight": 0,
-      }
-    }
-    tabIndex="-1"
-  >
-    <div
-      className="modal-dialog"
-    >
-      <div
-        className="modal-content"
-        role="document"
-      >
-        <ModalBody
-          bsClass="modal-body"
-          componentClass="div"
-        >
-          <div
-            className="modal-body"
-          >
-            <SearchForm
-              buttonLeftMargin={5}
-              label={null}
-              loadingLabel="Loading..."
-              onQueryChange={[Function]}
-              onReset={[Function]}
-              onSearch={[Function]}
-              placeholder="Enter search query..."
-              query=""
-              queryHelpComponent={null}
-              queryWidth="auto"
-              resetButtonLabel="Reset"
-              searchBsStyle="default"
-              searchButtonLabel="Search"
-              topMargin={15}
-              useLoadingState={false}
-              wrapperClass="search"
-            >
-              <div
-                className="search"
-                style={
-                  Object {
-                    "marginTop": 15,
-                  }
-                }
-              >
-                <form
-                  className="form-inline"
-                  onSubmit={[Function]}
-                >
-                  <div
-                    className="form-group has-feedback"
-                  >
-                    <input
-                      autoComplete="off"
-                      className="query form-control"
-                      id="common-search-form-query-input"
-                      onChange={[Function]}
-                      placeholder="Enter search query..."
-                      spellCheck="false"
-                      style={
-                        Object {
-                          "width": "auto",
-                        }
-                      }
-                      type="text"
-                      value=""
-                    />
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="submit-button"
-                      disabled={false}
-                      type="submit"
-                    >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="submit-button"
-                        disabled={false}
-                        type="submit"
-                      >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="submit-button"
-                          disabled={false}
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          type="submit"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            type="submit"
-                          >
-                            <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Search
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="reset-button"
-                      onClick={[Function]}
-                      type="reset"
-                    >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="reset-button"
-                        onClick={[Function]}
-                        type="reset"
-                      >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="reset-button"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          onClick={[Function]}
-                          type="reset"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="reset"
-                          >
-                            <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                </form>
-              </div>
-            </SearchForm>
-            <PaginatedList
-              activePage={1}
-              onChange={[Function]}
-              pageSize={5}
-              pageSizes={
-                Array [
-                  5,
-                  10,
-                  15,
-                ]
-              }
-              showPageSizeSelect={true}
-              totalItems={1}
-            >
-              <span>
-                <div
-                  className="form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
-                >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={5}
-                  >
-                    <FormGroup
-                      bsClass="form-group"
-                      controlId="page-size"
-                      validationState={null}
-                    >
-                      <div
-                        className="form-group"
-                      >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
-                        <InputWrapper>
-                          <span>
-                            <FormControl
-                              bsClass="form-control"
-                              bsSize="small"
-                              componentClass="select"
-                              inputRef={[Function]}
-                              label="Show:"
-                              name="page-size"
-                              onChange={[Function]}
-                              placeholder=""
-                              type="select"
-                              value={5}
-                            >
-                              <select
-                                className="form-control input-sm"
-                                id="page-size"
-                                label="Show:"
-                                name="page-size"
-                                onChange={[Function]}
-                                placeholder=""
-                                type="select"
-                                value={5}
-                              >
-                                <option
-                                  key="option-5"
-                                  value={5}
-                                >
-                                  5
-                                </option>
-                                <option
-                                  key="option-10"
-                                  value={10}
-                                >
-                                  10
-                                </option>
-                                <option
-                                  key="option-15"
-                                  value={15}
-                                >
-                                  15
-                                </option>
-                              </select>
-                            </FormControl>
-                          </span>
-                        </InputWrapper>
-                      </div>
-                    </FormGroup>
-                  </Input>
-                </div>
-                <ListGroup
-                  bsClass="list-group"
-                >
-                  <div
-                    className="list-group"
-                  >
-                    <ListGroupItem
-                      active={false}
-                      bsClass="list-group-item"
-                      header="test-0"
-                      key="foo-bar-0"
-                      listItem={false}
-                      onClick={[Function]}
-                    >
-                      <button
-                        className="list-group-item"
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        <h4
-                          className="list-group-item-heading"
-                        >
-                          test-0
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        />
-                      </button>
-                    </ListGroupItem>
-                  </div>
-                </ListGroup>
-                <div
-                  className="text-center"
-                >
-                  <Pagination
-                    activePage={1}
-                    boundaryLinks={false}
-                    bsClass="pagination"
-                    bsSize="small"
-                    ellipsis={true}
-                    first={true}
-                    items={1}
-                    last={true}
-                    maxButtons={10}
-                    next={true}
-                    onSelect={[Function]}
-                    prev={true}
-                  >
-                    <ul
-                      className="pagination pagination-sm"
-                    >
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={1}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="First"
-                              >
-                                «
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={0}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Previous"
-                              >
-                                ‹
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={true}
-                        componentClass={[Function]}
-                        disabled={false}
-                        eventKey={1}
-                        key="1"
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="active"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={false}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                            >
-                              1
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={2}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Next"
-                              >
-                                ›
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={1}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Last"
-                              >
-                                »
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                    </ul>
-                  </Pagination>
-                </div>
-              </span>
-            </PaginatedList>
-          </div>
-        </ModalBody>
-        <ModalFooter
-          bsClass="modal-footer"
-          componentClass="div"
-        >
-          <div
-            className="modal-footer"
-          >
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="primary"
-              disabled={true}
-              onClick={[Function]}
-            >
-              <button
-                className="btn btn-primary"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Load
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={true}
-              onClick={[Function]}
-            >
-              <button
-                className="btn btn-default"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={false}
-              onClick={[Function]}
-            >
-              <button
-                className="btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Cancel
-              </button>
-            </Button>
-          </div>
-        </ModalFooter>
-      </div>
-    </div>
-  </div>
-</ModalDialog>
-`;
-
 exports[`BookmarkList render the BookmarkList should render empty 1`] = `
-<ModalDialog
-  bsClass="modal"
-  className="fade in"
-  onClick={[Function]}
-  role="document"
-  style={
-    Object {
-      "paddingLeft": undefined,
-      "paddingRight": 0,
-    }
-  }
-  tabIndex="-1"
+<body
+  class="modal-open"
+  style="padding-right: 0px;"
 >
   <div
-    className="fade in modal"
-    onClick={[Function]}
+    aria-hidden="true"
+  />
+  <div
     role="dialog"
-    style={
-      Object {
-        "display": "block",
-        "paddingLeft": undefined,
-        "paddingRight": 0,
-      }
-    }
-    tabIndex="-1"
   >
     <div
-      className="modal-dialog"
+      class="modal-backdrop fade in"
+    />
+    <div
+      class="fade in modal"
+      role="dialog"
+      style="display: block; padding-right: 0px;"
+      tabindex="-1"
     >
       <div
-        className="modal-content"
-        role="document"
+        class="modal-dialog"
       >
-        <ModalBody
-          bsClass="modal-body"
-          componentClass="div"
+        <div
+          class="modal-content"
+          role="document"
         >
           <div
-            className="modal-body"
+            class="modal-body"
           >
-            <SearchForm
-              buttonLeftMargin={5}
-              label={null}
-              loadingLabel="Loading..."
-              onQueryChange={[Function]}
-              onReset={[Function]}
-              onSearch={[Function]}
-              placeholder="Enter search query..."
-              query=""
-              queryHelpComponent={null}
-              queryWidth="auto"
-              resetButtonLabel="Reset"
-              searchBsStyle="default"
-              searchButtonLabel="Search"
-              topMargin={15}
-              useLoadingState={false}
-              wrapperClass="search"
+            <div
+              class="search"
+              style="margin-top: 15px;"
             >
+              <form
+                class="form-inline"
+              >
+                <div
+                  class="form-group has-feedback"
+                >
+                  <input
+                    autocomplete="off"
+                    class="query form-control"
+                    id="common-search-form-query-input"
+                    placeholder="Enter search query..."
+                    spellcheck="false"
+                    style="width: auto;"
+                    type="text"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    type="submit"
+                  >
+                    Search
+                  </button>
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    type="reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+            <span>
               <div
-                className="search"
-                style={
-                  Object {
-                    "marginTop": 15,
-                  }
-                }
+                class="form-inline page-size"
+                style="float: right;"
               >
-                <form
-                  className="form-inline"
-                  onSubmit={[Function]}
+                <div
+                  class="form-group"
                 >
-                  <div
-                    className="form-group has-feedback"
+                  <label
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                    for="page-size"
                   >
-                    <input
-                      autoComplete="off"
-                      className="query form-control"
-                      id="common-search-form-query-input"
-                      onChange={[Function]}
-                      placeholder="Enter search query..."
-                      spellCheck="false"
-                      style={
-                        Object {
-                          "width": "auto",
-                        }
-                      }
-                      type="text"
-                      value=""
-                    />
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="submit-button"
-                      disabled={false}
-                      type="submit"
+                    Show:
+                  </label>
+                  <span>
+                    <select
+                      class="form-control input-sm"
+                      id="page-size"
+                      label="Show:"
+                      name="page-size"
+                      placeholder=""
+                      type="select"
                     >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="submit-button"
-                        disabled={false}
-                        type="submit"
+                      <option
+                        value="5"
                       >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="submit-button"
-                          disabled={false}
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          type="submit"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            type="submit"
-                          >
-                            <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Search
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="reset-button"
-                      onClick={[Function]}
-                      type="reset"
-                    >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="reset-button"
-                        onClick={[Function]}
-                        type="reset"
+                        5
+                      </option>
+                      <option
+                        value="10"
                       >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="reset-button"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          onClick={[Function]}
-                          type="reset"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="reset"
-                          >
-                            <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                </form>
+                        10
+                      </option>
+                      <option
+                        value="15"
+                      >
+                        15
+                      </option>
+                    </select>
+                    
+                  </span>
+                </div>
               </div>
-            </SearchForm>
-            <PaginatedList
-              activePage={0}
-              onChange={[Function]}
-              pageSize={5}
-              pageSizes={
-                Array [
-                  5,
-                  10,
-                  15,
-                ]
-              }
-              showPageSizeSelect={true}
-              totalItems={0}
-            >
               <span>
-                <div
-                  className="form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
-                >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={5}
-                  >
-                    <FormGroup
-                      bsClass="form-group"
-                      controlId="page-size"
-                      validationState={null}
-                    >
-                      <div
-                        className="form-group"
-                      >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
-                        <InputWrapper>
-                          <span>
-                            <FormControl
-                              bsClass="form-control"
-                              bsSize="small"
-                              componentClass="select"
-                              inputRef={[Function]}
-                              label="Show:"
-                              name="page-size"
-                              onChange={[Function]}
-                              placeholder=""
-                              type="select"
-                              value={5}
-                            >
-                              <select
-                                className="form-control input-sm"
-                                id="page-size"
-                                label="Show:"
-                                name="page-size"
-                                onChange={[Function]}
-                                placeholder=""
-                                type="select"
-                                value={5}
-                              >
-                                <option
-                                  key="option-5"
-                                  value={5}
-                                >
-                                  5
-                                </option>
-                                <option
-                                  key="option-10"
-                                  value={10}
-                                >
-                                  10
-                                </option>
-                                <option
-                                  key="option-15"
-                                  value={15}
-                                >
-                                  15
-                                </option>
-                              </select>
-                            </FormControl>
-                          </span>
-                        </InputWrapper>
-                      </div>
-                    </FormGroup>
-                  </Input>
-                </div>
-                <span>
-                  No bookmarks found
-                </span>
-                <div
-                  className="text-center"
-                >
-                  <Pagination
-                    activePage={1}
-                    boundaryLinks={false}
-                    bsClass="pagination"
-                    bsSize="small"
-                    ellipsis={true}
-                    first={true}
-                    items={0}
-                    last={true}
-                    maxButtons={10}
-                    next={true}
-                    onSelect={[Function]}
-                    prev={true}
-                  >
-                    <ul
-                      className="pagination pagination-sm"
-                    >
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={1}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="First"
-                              >
-                                «
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={0}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Previous"
-                              >
-                                ‹
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={2}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Next"
-                              >
-                                ›
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={0}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Last"
-                              >
-                                »
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                    </ul>
-                  </Pagination>
-                </div>
+                No bookmarks found
               </span>
-            </PaginatedList>
+              <div
+                class="text-center"
+              >
+                <ul
+                  class="pagination pagination-sm"
+                >
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="First"
+                      >
+                        «
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Previous"
+                      >
+                        ‹
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Next"
+                      >
+                        ›
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Last"
+                      >
+                        »
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </span>
           </div>
-        </ModalBody>
-        <ModalFooter
-          bsClass="modal-footer"
-          componentClass="div"
-        >
           <div
-            className="modal-footer"
+            class="modal-footer"
           >
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="primary"
-              disabled={true}
-              onClick={[Function]}
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+              disabled=""
+              type="button"
             >
-              <button
-                className="btn btn-primary"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Load
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={true}
-              onClick={[Function]}
+              Load
+            </button>
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              disabled=""
+              type="button"
             >
-              <button
-                className="btn btn-default"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={false}
-              onClick={[Function]}
+              Delete
+            </button>
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              type="button"
             >
-              <button
-                className="btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Cancel
-              </button>
-            </Button>
+              Cancel
+            </button>
           </div>
-        </ModalFooter>
+        </div>
       </div>
     </div>
   </div>
-</ModalDialog>
+</body>
 `;
 
 exports[`BookmarkList render the BookmarkList should render with views 1`] = `
-<ModalDialog
-  bsClass="modal"
-  className="fade in"
-  onClick={[Function]}
-  role="document"
-  style={
-    Object {
-      "paddingLeft": undefined,
-      "paddingRight": 0,
-    }
-  }
-  tabIndex="-1"
+<body
+  class="modal-open"
+  style="padding-right: 0px;"
 >
   <div
-    className="fade in modal"
-    onClick={[Function]}
+    aria-hidden="true"
+  />
+  <div
     role="dialog"
-    style={
-      Object {
-        "display": "block",
-        "paddingLeft": undefined,
-        "paddingRight": 0,
-      }
-    }
-    tabIndex="-1"
   >
     <div
-      className="modal-dialog"
+      class="modal-backdrop fade in"
+    />
+    <div
+      class="fade in modal"
+      role="dialog"
+      style="display: block; padding-right: 0px;"
+      tabindex="-1"
     >
       <div
-        className="modal-content"
-        role="document"
+        class="modal-dialog"
       >
-        <ModalBody
-          bsClass="modal-body"
-          componentClass="div"
+        <div
+          class="modal-content"
+          role="document"
         >
           <div
-            className="modal-body"
+            class="modal-body"
           >
-            <SearchForm
-              buttonLeftMargin={5}
-              label={null}
-              loadingLabel="Loading..."
-              onQueryChange={[Function]}
-              onReset={[Function]}
-              onSearch={[Function]}
-              placeholder="Enter search query..."
-              query=""
-              queryHelpComponent={null}
-              queryWidth="auto"
-              resetButtonLabel="Reset"
-              searchBsStyle="default"
-              searchButtonLabel="Search"
-              topMargin={15}
-              useLoadingState={false}
-              wrapperClass="search"
+            <div
+              class="search"
+              style="margin-top: 15px;"
             >
+              <form
+                class="form-inline"
+              >
+                <div
+                  class="form-group has-feedback"
+                >
+                  <input
+                    autocomplete="off"
+                    class="query form-control"
+                    id="common-search-form-query-input"
+                    placeholder="Enter search query..."
+                    spellcheck="false"
+                    style="width: auto;"
+                    type="text"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    type="submit"
+                  >
+                    Search
+                  </button>
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    type="reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+            <span>
               <div
-                className="search"
-                style={
-                  Object {
-                    "marginTop": 15,
-                  }
-                }
+                class="form-inline page-size"
+                style="float: right;"
               >
-                <form
-                  className="form-inline"
-                  onSubmit={[Function]}
+                <div
+                  class="form-group"
                 >
-                  <div
-                    className="form-group has-feedback"
+                  <label
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                    for="page-size"
                   >
-                    <input
-                      autoComplete="off"
-                      className="query form-control"
-                      id="common-search-form-query-input"
-                      onChange={[Function]}
-                      placeholder="Enter search query..."
-                      spellCheck="false"
-                      style={
-                        Object {
-                          "width": "auto",
-                        }
-                      }
-                      type="text"
-                      value=""
-                    />
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="submit-button"
-                      disabled={false}
-                      type="submit"
+                    Show:
+                  </label>
+                  <span>
+                    <select
+                      class="form-control input-sm"
+                      id="page-size"
+                      label="Show:"
+                      name="page-size"
+                      placeholder=""
+                      type="select"
                     >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="submit-button"
-                        disabled={false}
-                        type="submit"
+                      <option
+                        value="5"
                       >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="submit-button"
-                          disabled={false}
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          type="submit"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            type="submit"
-                          >
-                            <button
-                              className="submit-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              type="submit"
-                            >
-                              Search
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                  <div
-                    className="form-group"
-                    style={
-                      Object {
-                        "marginLeft": 5,
-                      }
-                    }
-                  >
-                    <Button
-                      active={false}
-                      bsStyle="default"
-                      className="reset-button"
-                      onClick={[Function]}
-                      type="reset"
-                    >
-                      <Button__StyledButton
-                        bsStyle="default"
-                        className="reset-button"
-                        onClick={[Function]}
-                        type="reset"
+                        5
+                      </option>
+                      <option
+                        value="10"
                       >
-                        <StyledComponent
-                          bsStyle="default"
-                          className="reset-button"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "SIZES": Array [
-                                "large",
-                                "small",
-                                "xsmall",
-                              ],
-                              "STYLES": Array [
-                                "success",
-                                "warning",
-                                "danger",
-                                "info",
-                                "default",
-                                "primary",
-                                "link",
-                              ],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "Button__StyledButton-c9cbmb-0",
-                                "isStatic": false,
-                                "lastClassName": "cBCVOY",
-                                "rules": Array [
-                                  [Function],
-                                  ";",
-                                ],
-                              },
-                              "displayName": "Button__StyledButton",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          onClick={[Function]}
-                          type="reset"
-                        >
-                          <Button
-                            active={false}
-                            block={false}
-                            bsClass="btn"
-                            bsStyle="default"
-                            className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="reset"
-                          >
-                            <button
-                              className="reset-button Button__StyledButton-c9cbmb-0 cBCVOY btn btn-default"
-                              disabled={false}
-                              onClick={[Function]}
-                              type="reset"
-                            >
-                              Reset
-                            </button>
-                          </Button>
-                        </StyledComponent>
-                      </Button__StyledButton>
-                    </Button>
-                  </div>
-                </form>
+                        10
+                      </option>
+                      <option
+                        value="15"
+                      >
+                        15
+                      </option>
+                    </select>
+                    
+                  </span>
+                </div>
               </div>
-            </SearchForm>
-            <PaginatedList
-              activePage={1}
-              onChange={[Function]}
-              pageSize={5}
-              pageSizes={
-                Array [
-                  5,
-                  10,
-                  15,
-                ]
-              }
-              showPageSizeSelect={true}
-              totalItems={1}
-            >
-              <span>
-                <div
-                  className="form-inline page-size"
-                  style={
-                    Object {
-                      "float": "right",
-                    }
-                  }
+              <div
+                class="list-group"
+              >
+                <button
+                  class="list-group-item"
+                  type="button"
                 >
-                  <Input
-                    addonAfter={null}
-                    bsSize="small"
-                    bsStyle={null}
-                    buttonAfter={null}
-                    help=""
-                    id="page-size"
-                    label="Show:"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="select"
-                    value={5}
+                  <h4
+                    class="list-group-item-heading"
                   >
-                    <FormGroup
-                      bsClass="form-group"
-                      controlId="page-size"
-                      validationState={null}
-                    >
-                      <div
-                        className="form-group"
-                      >
-                        <ControlLabel
-                          bsClass="control-label"
-                          srOnly={false}
-                        >
-                          <label
-                            className="control-label"
-                            htmlFor="page-size"
-                          >
-                            Show:
-                          </label>
-                        </ControlLabel>
-                        <InputWrapper>
-                          <span>
-                            <FormControl
-                              bsClass="form-control"
-                              bsSize="small"
-                              componentClass="select"
-                              inputRef={[Function]}
-                              label="Show:"
-                              name="page-size"
-                              onChange={[Function]}
-                              placeholder=""
-                              type="select"
-                              value={5}
-                            >
-                              <select
-                                className="form-control input-sm"
-                                id="page-size"
-                                label="Show:"
-                                name="page-size"
-                                onChange={[Function]}
-                                placeholder=""
-                                type="select"
-                                value={5}
-                              >
-                                <option
-                                  key="option-5"
-                                  value={5}
-                                >
-                                  5
-                                </option>
-                                <option
-                                  key="option-10"
-                                  value={10}
-                                >
-                                  10
-                                </option>
-                                <option
-                                  key="option-15"
-                                  value={15}
-                                >
-                                  15
-                                </option>
-                              </select>
-                            </FormControl>
-                          </span>
-                        </InputWrapper>
-                      </div>
-                    </FormGroup>
-                  </Input>
-                </div>
-                <ListGroup
-                  bsClass="list-group"
+                    test-0
+                  </h4>
+                  <p
+                    class="list-group-item-text"
+                  />
+                </button>
+              </div>
+              <div
+                class="text-center"
+              >
+                <ul
+                  class="pagination pagination-sm"
                 >
-                  <div
-                    className="list-group"
+                  <li
+                    class="disabled"
                   >
-                    <ListGroupItem
-                      active={false}
-                      bsClass="list-group-item"
-                      header="test-0"
-                      key="foo-bar-0"
-                      listItem={false}
-                      onClick={[Function]}
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
                     >
-                      <button
-                        className="list-group-item"
-                        onClick={[Function]}
-                        type="button"
+                      <span
+                        aria-label="First"
                       >
-                        <h4
-                          className="list-group-item-heading"
-                        >
-                          test-0
-                        </h4>
-                        <p
-                          className="list-group-item-text"
-                        />
-                      </button>
-                    </ListGroupItem>
-                  </div>
-                </ListGroup>
-                <div
-                  className="text-center"
-                >
-                  <Pagination
-                    activePage={1}
-                    boundaryLinks={false}
-                    bsClass="pagination"
-                    bsSize="small"
-                    ellipsis={true}
-                    first={true}
-                    items={1}
-                    last={true}
-                    maxButtons={10}
-                    next={true}
-                    onSelect={[Function]}
-                    prev={true}
+                        «
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
                   >
-                    <ul
-                      className="pagination pagination-sm"
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
                     >
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={1}
-                        onSelect={[Function]}
+                      <span
+                        aria-label="Previous"
                       >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="First"
-                              >
-                                «
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={0}
-                        onSelect={[Function]}
+                        ‹
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="active"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                    >
+                      1
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Next"
                       >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Previous"
-                              >
-                                ‹
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={true}
-                        componentClass={[Function]}
-                        disabled={false}
-                        eventKey={1}
-                        key="1"
-                        onSelect={[Function]}
+                        ›
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Last"
                       >
-                        <li
-                          className="active"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={false}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                            >
-                              1
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={2}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Next"
-                              >
-                                ›
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                      <PaginationButton
-                        active={false}
-                        componentClass={[Function]}
-                        disabled={true}
-                        eventKey={1}
-                        onSelect={[Function]}
-                      >
-                        <li
-                          className="disabled"
-                        >
-                          <SafeAnchor
-                            componentClass="a"
-                            disabled={true}
-                            onClick={[Function]}
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="button"
-                              style={
-                                Object {
-                                  "pointerEvents": "none",
-                                }
-                              }
-                              tabIndex={-1}
-                            >
-                              <span
-                                aria-label="Last"
-                              >
-                                »
-                              </span>
-                            </a>
-                          </SafeAnchor>
-                        </li>
-                      </PaginationButton>
-                    </ul>
-                  </Pagination>
-                </div>
-              </span>
-            </PaginatedList>
+                        »
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </span>
           </div>
-        </ModalBody>
-        <ModalFooter
-          bsClass="modal-footer"
-          componentClass="div"
-        >
           <div
-            className="modal-footer"
+            class="modal-footer"
           >
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="primary"
-              disabled={true}
-              onClick={[Function]}
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+              disabled=""
+              type="button"
             >
-              <button
-                className="btn btn-primary"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Load
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={true}
-              onClick={[Function]}
+              Load
+            </button>
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              disabled=""
+              type="button"
             >
-              <button
-                className="btn btn-default"
-                disabled={true}
-                onClick={[Function]}
-                type="button"
-              >
-                Delete
-              </button>
-            </Button>
-            <Button
-              active={false}
-              block={false}
-              bsClass="btn"
-              bsStyle="default"
-              disabled={false}
-              onClick={[Function]}
+              Delete
+            </button>
+            <button
+              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              type="button"
             >
-              <button
-                className="btn btn-default"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Cancel
-              </button>
-            </Button>
+              Cancel
+            </button>
           </div>
-        </ModalFooter>
+        </div>
       </div>
     </div>
   </div>
-</ModalDialog>
+</body>
 `;

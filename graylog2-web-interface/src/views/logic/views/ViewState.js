@@ -49,7 +49,11 @@ export default class ViewState {
 
   static create(): ViewState {
     // eslint-disable-next-line no-use-before-define
-    return new Builder().widgets(List()).widgetPositions({}).build();
+    return new Builder()
+      .widgets(List())
+      .widgetPositions({})
+      .titles(Map())
+      .build();
   }
 
   get fields(): FieldNameList {

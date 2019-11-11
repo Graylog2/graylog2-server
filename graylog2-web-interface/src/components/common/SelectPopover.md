@@ -1,6 +1,6 @@
 ```js
-const createReactClass = require('create-react-class');
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import { Button } from 'components/graylog';
 
 const items = [
   'Black',
@@ -48,9 +48,8 @@ const SelectPopoverExample = createReactClass({
 ```
 
 ```js
-const createReactClass = require('create-react-class');
-const Badge = require('components/graylog').Badge;
-const Button = require('components/graylog').Button;
+import createReactClass from 'create-react-class';
+import { Button, Badge } from 'components/graylog';
 
 const items = [
   'AliceBlue',
@@ -85,7 +84,7 @@ const SelectPopoverFormattedExample = createReactClass({
   formatItem(item) {
     return (
       <span>
-        <i className="fa fa-fw fa-square" style={{ color: item }} /> {item}
+        <Icon name="square" fixedWidth style={{ color: item }} /> {item}
       </span>
     )
   },
