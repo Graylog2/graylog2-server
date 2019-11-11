@@ -1,6 +1,8 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { render, cleanup, fireEvent, wait } from '@testing-library/react';
+import { browserHistory } from 'react-router';
+import Routes from 'routing/Routes';
 
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
@@ -33,42 +35,38 @@ const createViewsResponse = (count = 1) => {
 
 describe('BookmarkList', () => {
   describe('render the BookmarkList', () => {
+    afterEach(() => {
+      cleanup();
+    });
     it('should render empty', () => {
       const views = createViewsResponse(0);
-      const wrapper = mount(<BookmarkList toggleModal={() => {}}
-                                          showModal
-                                          deleteBookmark={() => {}}
-                                          views={views} />);
-      expect(wrapper.find('ModalDialog')).toMatchSnapshot();
+      const { baseElement } = render(<BookmarkList toggleModal={() => {}}
+                                                   showModal
+                                                   deleteBookmark={() => {}}
+                                                   views={views} />);
+      expect(baseElement).toMatchSnapshot();
     });
 
     it('should render with views', () => {
       const views = createViewsResponse(1);
-      const wrapper = mount(<BookmarkList toggleModal={() => {}}
-                                          showModal
-                                          deleteBookmark={() => {}}
-                                          views={views} />);
-      expect(wrapper.find('ModalDialog')).toMatchSnapshot();
+      const { baseElement } = render(<BookmarkList toggleModal={() => {}}
+                                                   showModal
+                                                   deleteBookmark={() => {}}
+                                                   views={views} />);
+      expect(baseElement).toMatchSnapshot();
     });
 
-    it('should handle toggleModal', () => {
-      const views = createViewsResponse(1);
-      const wrapper = mount(<BookmarkList toggleModal={() => {}}
-                                          showModal
-                                          deleteBookmark={() => {}}
-                                          views={views} />);
-      expect(wrapper.find('ModalDialog')).toMatchSnapshot();
-    });
-
-    it('should handle with toggle modal', () => {
+    it('should handle toggle modal', () => {
       const onToggleModal = jest.fn();
       const views = createViewsResponse(1);
 
-      const wrapper = mount(<BookmarkList toggleModal={onToggleModal}
-                                          showModal
-                                          deleteBookmark={() => {}}
-                                          views={views} />);
-      wrapper.find('button[children="Cancel"]').simulate('click');
+      const { getByText } = render(<BookmarkList toggleModal={onToggleModal}
+                                                 showModal
+                                                 deleteBookmark={() => {}}
+                                                 views={views} />);
+
+      const cancel = getByText('Cancel');
+      fireEvent.click(cancel);
       expect(onToggleModal).toBeCalledTimes(1);
     });
 
@@ -78,12 +76,14 @@ describe('BookmarkList', () => {
         return new Promise(() => {});
       });
       const views = createViewsResponse(1);
-      const wrapper = mount(<BookmarkList toggleModal={() => {}}
-                                          showModal
-                                          deleteBookmark={onDelete}
-                                          views={views} />);
-      wrapper.find('button.list-group-item').simulate('click');
-      wrapper.find('button[children="Delete"]').simulate('click');
+      const { getByText } = render(<BookmarkList toggleModal={() => {}}
+                                                 showModal
+                                                 deleteBookmark={onDelete}
+                                                 views={views} />);
+      const listItem = getByText('test-0');
+      fireEvent.click(listItem);
+      const deleteBtn = getByText('Delete');
+      fireEvent.click(deleteBtn);
       expect(window.confirm).toBeCalledTimes(1);
       expect(onDelete).toBeCalledTimes(1);
     });
@@ -92,7 +92,7 @@ describe('BookmarkList', () => {
       const onLoad = jest.fn(() => { return new Promise(() => {}); });
       const views = createViewsResponse(1);
 
-      const wrapper = mount(
+      const { getByText } = render(
         <ViewLoaderContext.Provider value={onLoad}>
           <BookmarkList toggleModal={() => {}}
                         showModal
@@ -100,9 +100,39 @@ describe('BookmarkList', () => {
                         views={views} />
         </ViewLoaderContext.Provider>,
       );
-      wrapper.find('button.list-group-item').simulate('click');
-      wrapper.find('button[children="Load"]').simulate('click');
+      const listItem = getByText('test-0');
+      fireEvent.click(listItem);
+      const loadBtn = getByText('Load');
+      fireEvent.click(loadBtn);
       expect(onLoad).toBeCalledTimes(1);
+    });
+  });
+  describe('load new bookmark', () => {
+    afterEach(() => {
+      cleanup();
+    });
+    it('should change url after load', async () => {
+      const onLoad = jest.fn(() => Promise.resolve());
+      Routes.pluginRoute = jest.fn(route => id => `${route}:${id}`);
+      browserHistory.push = jest.fn();
+      const views = createViewsResponse(1);
+
+      const { getByText } = render(
+        <ViewLoaderContext.Provider value={onLoad}>
+          <BookmarkList toggleModal={() => {}}
+                        showModal
+                        deleteBookmark={() => {}}
+                        views={views} />
+        </ViewLoaderContext.Provider>,
+      );
+      const listItem = getByText('test-0');
+      fireEvent.click(listItem);
+      const loadButton = getByText('Load');
+      fireEvent.click(loadButton);
+      await wait(() => {
+        expect(browserHistory.push).toBeCalledTimes(1);
+        expect(browserHistory.push).toHaveBeenCalledWith('SEARCH_VIEWID:foo-bar-0');
+      });
     });
   });
 });
