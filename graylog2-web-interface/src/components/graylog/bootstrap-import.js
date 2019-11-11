@@ -22,7 +22,6 @@ export {
   Tab,
   Table,
   Tabs,
-  Tooltip,
   Well,
 
   /* 👇 no custom theme colors needed 👇 */
