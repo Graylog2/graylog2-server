@@ -13,6 +13,7 @@ import Navbar from './Navbar';
 import NavDropdown from './NavDropdown';
 import Pagination from './Pagination';
 import Panel from './Panel';
+import ProgressBar from './ProgressBar';
 import SplitButton from './SplitButton';
 import Table from './Table';
 import Tooltip from './Tooltip';
@@ -33,6 +34,7 @@ export {
   NavDropdown,
   Pagination,
   Panel,
+  ProgressBar,
   SplitButton,
   Table,
   Tooltip,
