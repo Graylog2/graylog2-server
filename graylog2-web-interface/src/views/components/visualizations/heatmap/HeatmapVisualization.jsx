@@ -39,13 +39,10 @@ const COLORSCALE = [
 const _generateSeriesTitles = (config, x, y) => {
   const seriesTitles = config.series.map(s => s.function);
   const columnSeriesTitles = x.map((xLabel) => {
-    let seriesTitle;
     if (seriesTitles.length > 1) {
-      seriesTitle = seriesTitles.find(title => xLabel.endsWith(title));
-    } else {
-      seriesTitle = seriesTitles.toString();
+      return seriesTitles.find(title => xLabel.endsWith(title));
     }
-    return seriesTitle;
+    return seriesTitles.toString();
   });
   return y.map(() => columnSeriesTitles);
 };
