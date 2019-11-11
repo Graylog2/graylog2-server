@@ -46,9 +46,9 @@ const StartPage = createReactClass({
   },
 
   _redirectToStartpage() {
-    const { currentUser, currentUser: { startpage }, gettingStarted } = this.state;
+    const { currentUser: { startpage, permissions }, gettingStarted } = this.state;
     // Show getting started page if user is an admin and getting started wasn't dismissed
-    if (PermissionsMixin.isPermitted(currentUser.permissions, ['inputs:create'])) {
+    if (PermissionsMixin.isPermitted(permissions, ['inputs:create'])) {
       if (gettingStarted.show) {
         this._redirect(Routes.GETTING_STARTED);
         return;
@@ -66,7 +66,7 @@ const StartPage = createReactClass({
     }
 
     // Show search page if permitted, or streams page in other case
-    if (PermissionsMixin.isAnyPermitted(currentUser.permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
+    if (PermissionsMixin.isAnyPermitted(permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
       this._redirect(Routes.SEARCH);
     } else {
       this._redirect(Routes.STREAMS);
