@@ -36,17 +36,32 @@ const COLORSCALE = [
   [1.00, '#fde725'],
 ];
 
+const _generateSeriesTitles = (config, x, y) => {
+  const seriesTitles = config.series.map(s => s.function);
+  const columnSeriesTitles = x.map((xLabel) => {
+    let seriesTitle;
+    if (seriesTitles.length > 1) {
+      seriesTitle = seriesTitles.find(title => xLabel.endsWith(title));
+    } else {
+      seriesTitle = seriesTitles.toString();
+    }
+    return seriesTitle;
+  });
+  return y.map(() => columnSeriesTitles);
+};
+
 const _generateSeries = (type, name, x, y, z, idx, total, config): ChartDefinition => {
-  const xAxisTitle = get(config, ['_value', 'rowPivots', idx, 'field']);
-  const yAxisTitle = get(config, ['_value', 'columnPivots', idx, 'field']);
-  const seriesTitle = get(config, ['_value', 'series', idx, '_value', 'function']);
-  const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>${seriesTitle}: %{customdata}<extra></extra>`;
+  const xAxisTitle = get(config, ['rowPivots', idx, 'field']);
+  const yAxisTitle = get(config, ['columnPivots', idx, 'field']);
+  const zSeriesTitles = _generateSeriesTitles(config, y, x);
+  const hovertemplate = `${xAxisTitle}: %{y}<br>${yAxisTitle}: %{x}<br>%{text}: %{customdata}<extra></extra>`;
   return {
     type,
     name,
     x: y,
     y: x,
     z,
+    text: zSeriesTitles,
     customdata: z,
     hovertemplate,
     colorscale: COLORSCALE,
