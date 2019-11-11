@@ -16,7 +16,6 @@ export {
   Row,
   Tab,
   Tabs,
-  Tooltip,
   Well,
 
   /* 👇 no custom theme colors needed 👇 */

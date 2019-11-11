@@ -12,6 +12,7 @@ import NavDropdown from './NavDropdown';
 import Panel from './Panel';
 import SplitButton from './SplitButton';
 import Table from './Table';
+import Tooltip from './Tooltip';
 
 export {
   Alert,
@@ -28,5 +29,6 @@ export {
   Panel,
   SplitButton,
   Table,
+  Tooltip,
 };
 export * from './bootstrap-import';
