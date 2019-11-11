@@ -14,7 +14,7 @@ import { chartData } from '../ChartData';
 const BG_COLOR = '#440154';
 
 const COLORSCALE = [
-  [0.00, '#440154'],
+  [0.00, BG_COLOR],
   [0.05, '#481567'],
   [0.10, '#483677'],
   [0.15, '#453781'],
