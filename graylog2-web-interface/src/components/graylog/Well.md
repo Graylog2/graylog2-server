@@ -1,6 +1,10 @@
+### Basic
+
 ```js
 <Well>Look I'm in a well!</Well>
 ```
+
+### Size variants
 
 ```js
 <div>
