@@ -6,6 +6,7 @@ import DropdownButton from './DropdownButton';
 import HelpBlock from './HelpBlock';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
+import ListGroupItem from './ListGroupItem';
 import NavDropdown from './NavDropdown';
 import SplitButton from './SplitButton';
 
@@ -18,6 +19,7 @@ export {
   HelpBlock,
   Jumbotron,
   Label,
+  ListGroupItem,
   NavDropdown,
   SplitButton,
 };
