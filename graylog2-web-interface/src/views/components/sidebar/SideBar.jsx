@@ -28,6 +28,15 @@ const Container: React.ComponentType<{ open: boolean }> = styled.div`
   box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
 `;
 
+const SidebarHeader: React.ComponentType<{open: Boolean, hasTitle: boolean}> = styled.div`
+  ${({ open, hasTitle }) => {
+    let justifyContent = 'center';
+    if (open && hasTitle) justifyContent = 'space-between';
+    if (open && !hasTitle) justifyContent = 'flex-end';
+    return `justify-content: ${justifyContent}`;
+  }}
+`;
+
 type Props = {
   children: React.Element<any>,
   queryId: string,
@@ -133,7 +142,6 @@ class SideBar extends React.Component<Props, State> {
     const { open, selectedKey } = this.state;
     const resultsEmpty = !results || Object.keys(results).length <= 0;
     const title = viewMetadata.title || defaultNewViewTitle;
-    const shiftToRight = !title ? styles.iconRight : '';
     const icon = open
       ? 'times'
       : 'chevron-right';
@@ -143,10 +151,10 @@ class SideBar extends React.Component<Props, State> {
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={styles.sidebarContent}>
-              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarHeader} ${styles.sidebarNav} ${shiftToRight}`}>
-                {open && title && <h3 className={styles.sidebarHeadline}>{title}</h3>}
+              <SidebarHeader role="presentation" onClick={this.toggleOpen} className={styles.sidebarNav} hasTitle={title} open={open}>
+                {open && title && <h3 title={title} className={styles.sidebarHeadline}>{title}</h3>}
                 <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
-              </span>
+              </SidebarHeader>
               <div className={styles.spacer} />
               <NavItem isSelected={open && selectedKey === 'viewDescription'}
                        text="View Description"
