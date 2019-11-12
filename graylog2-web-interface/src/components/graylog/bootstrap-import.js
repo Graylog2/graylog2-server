@@ -11,7 +11,6 @@ export {
   Navbar,
   NavDropdown,
   NavItem,
-  Pager,
   Panel,
   Popover,
   ProgressBar,
@@ -34,5 +33,6 @@ export {
   ListGroup,
   OverlayTrigger,
   PanelGroup,
+  Pager,
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
