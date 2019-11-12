@@ -25,6 +25,8 @@ import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
+import org.apache.shiro.realm.AuthenticatingRealm;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.security.InMemoryRolePermissionResolver;
@@ -36,9 +38,12 @@ import org.graylog2.security.realm.RootAccountRealm;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.common.collect.ImmutableList.of;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityManager> {
@@ -47,7 +52,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
     @Inject
     public DefaultSecurityManagerProvider(MongoDbSessionDAO mongoDbSessionDAO,
                                           MongoDbAuthorizationRealm mongoDbAuthorizationRealm,
-                                          RootAccountRealm rootAccountRealm,
+                                          Map<String, AuthenticatingRealm> pluggableRealms,
                                           InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                                           OrderedAuthenticatingRealms orderedAuthenticatingRealms) {
         sm = new DefaultSecurityManager(orderedAuthenticatingRealms);
@@ -55,8 +60,13 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         if (authenticator instanceof ModularRealmAuthenticator) {
             ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
         }
-        final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(of(mongoDbAuthorizationRealm,
-                                                                                rootAccountRealm));
+
+        // root account realm might be deactivated and won't be present in that case
+        List<Realm> realms = Stream.of(mongoDbAuthorizationRealm, pluggableRealms.get(RootAccountRealm.NAME))
+                                                  .filter(Objects::nonNull)
+                                                  .collect(Collectors.toList());
+        final ModularRealmAuthorizer authorizer = new ModularRealmAuthorizer(realms);
+
         authorizer.setRolePermissionResolver(inMemoryRolePermissionResolver);
         sm.setAuthorizer(authorizer);
 
