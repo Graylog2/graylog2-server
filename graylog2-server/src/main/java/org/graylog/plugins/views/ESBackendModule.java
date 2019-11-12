@@ -19,6 +19,7 @@ package org.graylog.plugins.views;
 import com.google.inject.Scopes;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESEventList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
@@ -34,6 +35,7 @@ import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.E
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESSumOfSquaresHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESVarianceHandler;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -57,6 +59,7 @@ public class ESBackendModule extends ViewsModule {
         registerQueryBackend(ElasticsearchQueryString.NAME, ElasticsearchBackend.class);
 
         registerESSearchTypeHandler(MessageList.NAME, ESMessageList.class);
+        registerESSearchTypeHandler(EventList.NAME, ESEventList.class);
         registerESSearchTypeHandler(Pivot.NAME, ESPivot.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, ESAverageHandler.class);

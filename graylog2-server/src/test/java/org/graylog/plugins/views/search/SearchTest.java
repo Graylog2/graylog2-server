@@ -111,7 +111,7 @@ public class SearchTest {
     private SearchType searchTypeWithStreams(String streamIds) {
         final SearchType searchType = mock(SearchType.class);
         final Set<String> streamIdSet = streamIds.isEmpty() ? Collections.emptySet() : new HashSet<>(Arrays.asList(streamIds.split(",")));
-        when(searchType.streams()).thenReturn(streamIdSet);
+        when(searchType.effectiveStreams()).thenReturn(streamIdSet);
         when(searchType.id()).thenReturn(UUID.randomUUID().toString());
 
         return searchType;
