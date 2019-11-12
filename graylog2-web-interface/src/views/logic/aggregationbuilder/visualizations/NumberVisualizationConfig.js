@@ -37,10 +37,9 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map(this._value));
   }
 
-  // eslint-disable-next-line no-undef
   static create(
-    trend: $PropertyType<InternalState, 'trend'>,
-    lowerIsBetter: $PropertyType<InternalState, 'lowerIsBetter'>,
+    trend: $PropertyType<InternalState, 'trend'> = false,
+    lowerIsBetter: $PropertyType<InternalState, 'lowerIsBetter'> = false,
   ) {
     return new NumberVisualizationConfig(trend, lowerIsBetter);
   }
