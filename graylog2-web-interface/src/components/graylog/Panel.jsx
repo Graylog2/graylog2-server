@@ -12,26 +12,24 @@ const panelVariantStyles = (hex) => {
   const borderColor = darken(0.05, adjustHue(-10, hex));
 
   return css`
-    && {
+    border-color: ${borderColor};
+
+    & > .panel-heading {
+      color: ${colorLevel(backgroundColor, 9)};
+      background-color: ${backgroundColor};
       border-color: ${borderColor};
 
-      & > .panel-heading {
-        color: ${colorLevel(backgroundColor, 9)};
-        background-color: ${backgroundColor};
-        border-color: ${borderColor};
-
-        + .panel-collapse > .panel-body {
-          border-top-color: ${borderColor};
-        }
-        .badge {
-          color: ${backgroundColor};
-          background-color: ${hex};
-        }
+      + .panel-collapse > .panel-body {
+        border-top-color: ${borderColor};
       }
-      & > .panel-footer {
-        + .panel-collapse > .panel-body {
-          border-bottom-color: ${borderColor};
-        }
+      .badge {
+        color: ${backgroundColor};
+        background-color: ${hex};
+      }
+    }
+    & > .panel-footer {
+      + .panel-collapse > .panel-body {
+        border-bottom-color: ${borderColor};
       }
     }
   `;

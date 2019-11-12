@@ -140,6 +140,8 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
         assertThat(fromCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600))).isTrue();
         assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC))).isTrue();
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     private Query dummyQuery(TimeRange timeRange) {
