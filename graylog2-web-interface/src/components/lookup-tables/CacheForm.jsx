@@ -187,7 +187,7 @@ class CacheForm extends React.Component {
 
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
-    return <TagName>{title} <small>({typeName && typeName})</small></TagName>;
+    return <TagName>{title} <small>({typeName})</small></TagName>;
   };
 
   render() {
@@ -203,7 +203,7 @@ class CacheForm extends React.Component {
     const plugin = cachePlugins.filter(p => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
-    let pluginDisplayName = null;
+    let pluginDisplayName = cache.config.type;
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
       pluginDisplayName = p.displayName;
@@ -218,7 +218,6 @@ class CacheForm extends React.Component {
         documentationComponent = React.createElement(p.documentationComponent);
       }
     }
-
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page width
     if (documentationComponent) {

@@ -181,19 +181,18 @@ class DataAdapterForm extends React.Component {
 
   _renderTitle = (title, typeName, create) => {
     const TagName = create ? 'h3' : 'h2';
-    return <TagName>{title} <small>({typeName && typeName})</small></TagName>;
+    return <TagName>{title} <small>({typeName})</small></TagName>;
   };
 
   render() {
     const { dataAdapter } = this.state;
     const { create, type, title } = this.props;
-
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
     const plugin = adapterPlugins.filter(p => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
-    let pluginDisplayName = null;
+    let pluginDisplayName = dataAdapter.config.type;
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
       pluginDisplayName = p.displayName;
@@ -210,7 +209,6 @@ class DataAdapterForm extends React.Component {
         });
       }
     }
-
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page
     // width

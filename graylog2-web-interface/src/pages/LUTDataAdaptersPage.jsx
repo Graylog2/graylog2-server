@@ -116,7 +116,6 @@ const LUTDataAdaptersPage = createReactClass({
         content = (
           <Row className="content">
             <Col lg={12}>
-              {/* <h2>Data Adapter</h2> */}
               <DataAdapterForm dataAdapter={dataAdapter}
                                type={dataAdapter.config.type}
                                create={false}
