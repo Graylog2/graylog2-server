@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -33,6 +34,7 @@ import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
@@ -141,8 +143,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = true;
 
-    @Parameter(value = "content_packs_dir", validators = DirectoryPathReadableValidator.class)
-    private Path contentPacksDir = Paths.get("data", "contentpacks");
+    @Parameter(value = "content_packs_dir")
+    private Path contentPacksDir = getDataDir().resolve("contentpacks");
 
     @Parameter(value = "content_packs_auto_load", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoLoad = Collections.emptySet();

@@ -122,6 +122,11 @@ public class ContentPackLoaderPeriodical extends Periodical {
 
     @Override
     public void doRun() {
+        if (!Files.exists(contentPacksDir.toAbsolutePath())) {
+           LOG.warn("Could not find content packs directory {}. Please check your graylog configuration",
+                   contentPacksDir.toAbsolutePath());
+           return;
+        }
         final ContentPackLoaderConfig contentPackLoaderConfig =
                 clusterConfigService.getOrDefault(ContentPackLoaderConfig.class, ContentPackLoaderConfig.EMPTY);
 
