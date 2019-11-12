@@ -11,7 +11,6 @@ export {
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
-  Tab,
   Tabs,
   Well,
 

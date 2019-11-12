@@ -13,6 +13,7 @@ import Pagination from './Pagination';
 import Panel from './Panel';
 import Popover from './Popover';
 import SplitButton from './SplitButton';
+import Tab from './Tab';
 import Table from './Table';
 import Tooltip from './Tooltip';
 
@@ -32,6 +33,7 @@ export {
   Panel,
   Popover,
   SplitButton,
+  Tab,
   Table,
   Tooltip,
 };
