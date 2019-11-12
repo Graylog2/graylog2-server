@@ -1,6 +1,8 @@
 // @flow strict
-import React from 'react';
+import React, { type AbstractComponent } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { SizeMe } from 'react-sizeme';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
@@ -11,40 +13,63 @@ import Value from 'views/components/Value';
 import { ViewStore } from 'views/stores/ViewStore';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import CustomHighlighting from 'views/components/messagelist/CustomHighlighting';
-import style from './NumberVisualization.css';
-import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import Trend from './Trend';
+import AutoFontSizer from './AutoFontSizer';
 
 type Props = {
-  data: Rows,
-  width: number,
-  height: number,
+  data: Array<{ rows: Rows }>,
   fields: FieldTypeMappingsList,
+  config: {
+    visualizationConfig: NumberVisualizationConfig,
+  },
   currentView: CurrentViewType,
 };
 
-type State = {
-  fontSize: number,
-};
+const GridContainer: AbstractComponent<{}> = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 4fr 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  height: 100%;
+  width: 100%;
+`;
 
-class NumberVisualization extends React.Component<Props, State> {
+const SingleItemGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+  height: 100%;
+  width: 100%;
+`;
+
+const NumberBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  padding-bottom: 10px;
+`;
+
+const TrendBox = styled.div`
+  height: 100%;
+  width: 100%;
+`;
+
+class NumberVisualization extends React.Component<Props> {
+  _targetRef = undefined;
+
   static propTypes = {
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-    currentView: PropTypes.object.isRequired,
     data: PropTypes.arrayOf(PropTypes.object).isRequired,
     fields: PropTypes.object.isRequired,
   };
 
-  static contextType = RenderCompletionCallback;
-
-  container: HTMLElement | null;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      fontSize: 20,
-    };
-  }
 
   componentDidMount() {
     const onRenderComplete = this.context;
@@ -53,52 +78,11 @@ class NumberVisualization extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate() {
-    const container = this.getContainer();
-    if (!container) {
-      return;
-    }
-
-    const { fontSize } = this.state;
-    const { width, height } = this.props;
-    const { children } = container;
-
-    if (children.length <= 0) {
-      return;
-    }
-
-    const content = children[0];
-    const contentWidth = content.offsetWidth;
-    const contentHeight = content.offsetHeight;
-
-    const widthMultiplier = (width * 0.8) / contentWidth;
-    const heightMultiplier = (height * 0.8) / contentHeight;
-    const multiplier = Math.min(widthMultiplier, heightMultiplier);
-    if (Math.abs(1 - multiplier) <= 0.01) {
-      return;
-    }
-
-    const newFontsize = Math.floor(fontSize * multiplier);
-
-    if (fontSize !== newFontsize && Number.isFinite(newFontsize)) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({ fontSize: newFontsize });
-    }
-  }
-
-  getContainer() {
-    return this.container;
-  }
-
-  getContainerRef = (node) => {
-    this.container = node;
-  };
-
-  _extractValueAndField = (data) => {
-    if (!data || !data[0]) {
+  _extractValueAndField = (rows: Rows) => {
+    if (!rows || !rows[0]) {
       return { value: undefined, field: undefined };
     }
-    const results = data[0];
+    const results = rows[0];
     if (results.source === 'leaf') {
       const leaf = results.values.find(f => f.source === 'row-leaf');
       if (leaf && leaf.source === 'row-leaf') {
@@ -108,25 +92,51 @@ class NumberVisualization extends React.Component<Props, State> {
     return { value: undefined, field: undefined };
   };
 
+  static contextType = RenderCompletionCallback;
+
   render() {
-    const { fontSize } = this.state;
-    const { currentView, fields, data } = this.props;
+    const { config: { visualizationConfig = NumberVisualizationConfig.create() }, currentView, fields, data } = this.props;
     const { activeQuery } = currentView;
-    const { value, field } = this._extractValueAndField(data);
+    const { value, field } = this._extractValueAndField(data[0] ? data[0].rows : []);
+    const { value: previousValue } = this._extractValueAndField(data[1] ? data[1].rows : []);
     if (!field || (value !== 0 && !value)) {
       return 'N/A';
     }
 
+    const Container = visualizationConfig.trend ? GridContainer : SingleItemGrid;
+
     return (
-      <div ref={this.getContainerRef} className={style.container} style={{ fontSize: `${fontSize}px` }}>
-        <CustomHighlighting field={field} value={value}>
-          <Value field={field}
-                 type={fieldTypeFor(field, fields)}
-                 value={value}
-                 queryId={activeQuery}
-                 render={DecoratedValue} />
-        </CustomHighlighting>
-      </div>
+      <Container>
+        <NumberBox>
+          <SizeMe monitorHeight monitorWidth>
+            {({ size }) => (
+              <AutoFontSizer height={size.height} width={size.width}>
+                <CustomHighlighting field={field} value={value}>
+                  <Value field={field}
+                         type={fieldTypeFor(field, fields)}
+                         value={value}
+                         queryId={activeQuery}
+                         render={DecoratedValue} />
+                </CustomHighlighting>
+              </AutoFontSizer>
+            )}
+          </SizeMe>
+        </NumberBox>
+        {visualizationConfig.trend && (
+          <TrendBox>
+            <SizeMe monitorHeight monitorWidth>
+              {({ size }) => (
+                <AutoFontSizer height={size.height} width={size.width} target={this._targetRef}>
+                  <Trend ref={(ref) => { this._targetRef = ref; }}
+                         current={value}
+                         previous={previousValue}
+                         config={visualizationConfig} />
+                </AutoFontSizer>
+              )}
+            </SizeMe>
+          </TrendBox>
+        )}
+      </Container>
     );
   }
 }
