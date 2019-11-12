@@ -16,6 +16,7 @@ import Panel from './Panel';
 import Popover from './Popover';
 import ProgressBar from './ProgressBar';
 import SplitButton from './SplitButton';
+import Tab from './Tab';
 import Table from './Table';
 import Tooltip from './Tooltip';
 import Well from './Well';
@@ -39,6 +40,7 @@ export {
   Popover,
   ProgressBar,
   SplitButton,
+  Tab,
   Table,
   Tooltip,
   Well,
