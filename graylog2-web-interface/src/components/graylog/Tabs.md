@@ -1,6 +1,6 @@
 ### Uncontrolled
 ```js
-import Tab from './Tab';
+import { Tab } from './index';
 
 <Tabs defaultActiveKey={2} id="uncontrolled-tab-example">
   <Tab eventKey={1} title="Tab 1">
@@ -18,7 +18,8 @@ import Tab from './Tab';
 ### Controlled
 
 ```js
-import Tab from './Tab';
+import { Tab } from './index';
+
 const TabExample = () => {
   const [activeTab, setActiveTab] = React.useState(1);
 

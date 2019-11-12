@@ -9,6 +9,7 @@ const navTabsStyles = () => css`
       > a {
         &:hover {
           border-color: ${teinte.secondary.due} ${teinte.secondary.due} ${teinte.tertiary.quattro};
+          background-color: ${teinte.secondary.due};
         }
       }
 

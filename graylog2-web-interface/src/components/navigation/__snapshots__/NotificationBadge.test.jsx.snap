@@ -19,7 +19,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": true,
-            "lastClassName": "iCXaYo",
+            "lastClassName": "eiLPpa",
             "rules": Array [
               "&.nav{> li{> a{&:hover,&:focus{background-color:",
               "#F1F2F2",
@@ -44,6 +44,8 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
               "#F1F2F2",
               " ",
               "#9E1F63",
+              ";background-color:",
+              "#F1F2F2",
               ";}}&.active > a{&,&:hover,&:focus{color:",
               "#1F1F1F",
               ";background-color:",
@@ -76,7 +78,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 iCXaYo"
+        className="Nav-dzawzr-0 eiLPpa"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -84,7 +86,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 iCXaYo nav navbar-nav"
+          className="Nav-dzawzr-0 eiLPpa nav navbar-nav"
           role={null}
         >
           <LinkContainer
