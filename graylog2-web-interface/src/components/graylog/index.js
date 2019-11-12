@@ -18,6 +18,7 @@ import ProgressBar from './ProgressBar';
 import SplitButton from './SplitButton';
 import Table from './Table';
 import Tooltip from './Tooltip';
+import Well from './Well';
 
 export {
   Alert,
@@ -40,5 +41,6 @@ export {
   SplitButton,
   Table,
   Tooltip,
+  Well,
 };
 export * from './bootstrap-import';

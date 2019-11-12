@@ -1,29 +1,26 @@
 // eslint-disable-next-line no-restricted-imports
 export {
-  Checkbox, // NOTE: do we want custom or keep OS styles
-  Dropdown,
-  Form,
   FormControl,
-  InputGroup,
-  NavItem,
-  Radio, // NOTE: do we want custom or keep OS styles
-  Row,
-  Tab,
-  Tabs,
-  Well,
 
   /* 👇 no custom theme colors needed 👇 */
   ButtonGroup,
   ButtonToolbar,
   Clearfix,
+  Checkbox, // NOTE: do we want custom or keep OS styles
   Col,
   Collapse,
+  Dropdown,
+  Form,
   FormGroup,
   Grid,
+  InputGroup,
   ListGroup,
-  MenuItem,
+  NavItem,
   OverlayTrigger,
   PanelGroup,
-  Pager,
+  Radio, // NOTE: do we want custom or keep OS styles
+  Row,
+  Tab,
+  Tabs,
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
