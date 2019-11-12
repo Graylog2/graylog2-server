@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
@@ -89,7 +90,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         LOG.debug("Loading user {}", username);
 
         // special case for the locally defined user, we don't store that in MongoDB.
-        if (configuration.getRootUsername().equals(username)) {
+        if (!configuration.isRootUserDisabled() && configuration.getRootUsername().equals(username)) {
             LOG.debug("User {} is the built-in admin user", username);
             return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
         }
@@ -160,8 +161,18 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
+    @Deprecated
     public User getAdminUser() {
-        return userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId());
+        return getRootUser().orElseThrow(() ->
+            new IllegalStateException("Local admin user requested but root user is disabled in config."));
+    }
+
+    @Override
+    public Optional<User> getRootUser() {
+        if (configuration.isRootUserDisabled()) {
+            return Optional.empty();
+        }
+        return Optional.of(userFactory.createLocalAdminUser(roleService.getAdminRoleObjectId()));
     }
 
     @Override
