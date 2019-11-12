@@ -15,11 +15,12 @@ export {
   Grid,
   InputGroup,
   ListGroup,
+  MenuItem,
   NavItem,
   OverlayTrigger,
   PanelGroup,
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
-  Tabs,
+  Tab,
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';

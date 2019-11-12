@@ -2,7 +2,8 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import { breakpoint, teinte } from 'theme';
+import teinte from 'theme/teinte';
+import navTabsStyles from './styles/nav-tabs';
 
 const Nav = styled(BootstrapNav)`
   &.nav {
@@ -34,29 +35,6 @@ const Nav = styled(BootstrapNav)`
     }
   }
 
-  &.nav-tabs {
-    border-bottom-color: ${teinte.tertiary.quattro};
-
-    > li {
-      > a {
-        &:hover {
-          border-color: ${teinte.secondary.due} ${teinte.secondary.due} ${teinte.tertiary.quattro};
-        }
-      }
-
-      &.active > a {
-        &,
-        &:hover,
-        &:focus {
-          color: ${teinte.primary.tre};
-          background-color: ${teinte.primary.due};
-          border-color: ${teinte.tertiary.quattro};
-          border-bottom-color: transparent;
-        }
-      }
-    }
-  }
-
   &.nav-pills {
     > li {
       &.active > a {
@@ -70,24 +48,7 @@ const Nav = styled(BootstrapNav)`
     }
   }
 
-  &.nav-tabs.nav-justified {
-    > .active > a,
-    > .active > a:hover,
-    > .active > a:focus {
-      border-color: ${teinte.tertiary.quattro};
-    }
-
-    @media (min-width: ${breakpoint.min.sm}) {
-      > li > a {
-        border-bottom-color: ${teinte.tertiary.quattro};
-      }
-      > .active > a,
-      > .active > a:hover,
-      > .active > a:focus {
-        border-bottom-color: ${teinte.primary.due};
-      }
-    }
-  }
+  &${navTabsStyles()}
 `;
 
 export default Nav;
