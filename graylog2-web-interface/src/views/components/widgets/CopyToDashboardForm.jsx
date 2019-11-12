@@ -14,7 +14,7 @@ type Props = {
 };
 
 const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagination }, onSubmit }: Props) => {
-  const [selectedDashboard, setSelectedDashboard] = useState('');
+  const [selectedDashboard, setSelectedDashboard] = useState<?string>(null);
   const [paginationState, setPaginationState] = useState({ query: '', page: 1, perPage: 5 });
 
   const handleSearch = useCallback((query) => {
@@ -22,7 +22,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
       query,
       ...paginationState,
     });
-    setSelectedDashboard('');
+    setSelectedDashboard(null);
     DashboardsActions.search(query, paginationState.page, paginationState.perPage);
   }, [paginationState]);
 
@@ -34,7 +34,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
       perPage,
       ...paginationState,
     });
-    setSelectedDashboard('');
+    setSelectedDashboard(null);
     DashboardsActions.search(paginationState.query, page, perPage);
   }, [paginationState, setSelectedDashboard, setPaginationState]);
 
