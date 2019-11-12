@@ -5,8 +5,8 @@ import styled from 'styled-components';
 
 import menuItemStyles from './styles/menuItem';
 
-const NavDropdown = React.memo(styled(BootstrapNavDropdown)`
+const NavDropdown = styled(BootstrapNavDropdown)`
   ${menuItemStyles()};
-`);
+`;
 
 export default NavDropdown;

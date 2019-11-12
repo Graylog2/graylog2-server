@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import buttonStyles from './styles/button';
 import menuItemStyles from './styles/menuItem';
 
-const SplitButton = React.memo(styled(BootstrapSplitButton)`
+const SplitButton = styled(BootstrapSplitButton)`
   ${props => buttonStyles(props)};
 
   ~ .btn.dropdown-toggle {
@@ -14,6 +14,6 @@ const SplitButton = React.memo(styled(BootstrapSplitButton)`
 
     ${menuItemStyles({ sibling: true })};
   }
-`);
+`;
 
 export default SplitButton;
