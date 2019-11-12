@@ -1,14 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { components } from 'react-select';
+import { components as Components } from 'react-select';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { findIndex } from 'lodash';
 
 import Select from 'views/components/Select';
 import styles from './SortableSelect.css';
 
-const SortableValueList = SortableContainer(components.ValueContainer);
+const SortableValueList = SortableContainer(Components.ValueContainer);
 
 const arrayMove = (array, from, to) => {
   const result = array.slice();
@@ -35,11 +35,11 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, ...
     </SortableValueList>
   );
   const values = valueTransformer(value);
-  const SortableMultiValue = SortableElement(components.MultiValue);
-  const Item = (props) => {
-    // eslint-disable-next-line react/prop-types
-    const index = findIndex(value, v => v.field === props.data.value);
-    return <SortableMultiValue index={index} {...props} />;
+  const SortableMultiValue = SortableElement(Components.MultiValue);
+  const Item = (props: {data: {value: string}}) => {
+    const { data: { value: itemValue } } = props;
+    const index = findIndex(value, v => v.field === itemValue);
+    return <SortableMultiValue index={index} {...props} innerProps={{ title: itemValue }} />;
   };
   const _components = {
     MultiValueLabel: valueComponent,
