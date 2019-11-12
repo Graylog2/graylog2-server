@@ -133,23 +133,21 @@ class SideBar extends React.Component<Props, State> {
     const { open, selectedKey } = this.state;
     const resultsEmpty = !results || Object.keys(results).length <= 0;
     const title = viewMetadata.title || defaultNewViewTitle;
-
-    const shiftToRight = open
-      ? styles.iconRight
-      : styles.iconLeft;
+    const shiftToRight = !title ? styles.iconRight : '';
     const icon = open
       ? 'times'
       : 'chevron-right';
     return (
-      <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
+      <Container innerRef={(node) => { this.wrapperRef = node; }} open={open}>
         {open && <div className={`background ${styles.toggleArea}`} />}
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={styles.sidebarContent}>
               <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarHeader} ${styles.sidebarNav} ${shiftToRight}`}>
-                {open && title && <h3>{title}</h3>}
+                {open && title && <h3 className={styles.sidebarHeadline}>{title}</h3>}
                 <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
               </span>
+              <div className={styles.spacer} />
               <NavItem isSelected={open && selectedKey === 'viewDescription'}
                        text="View Description"
                        icon={<Icon name="info" />}

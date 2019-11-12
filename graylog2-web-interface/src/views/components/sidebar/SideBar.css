@@ -2,6 +2,14 @@
     padding-top: 20px;
 }
 
+:local(.sidebarHeader) {
+    justify-content: space-between;
+}
+
+:local(.sidebarHeadline) {
+    color: inherit
+}
+
 :local(.toggleArea) {
     position: fixed;
     top: 0;
@@ -12,17 +20,29 @@
 }
 
 :local(.sidebarNav) {
-    padding: 9px 0;
+    padding: 9px 10px;
     display: flex;
     align-items: center;
+    cursor: pointer;
+}
+
+:local(.spacer) {
+    width: 100%;
+    padding: 0 10px;
+    margin: 5px 0 10px 0;
+}
+
+:local(.spacer:after) {
+    content: ' ';
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid grey;
 }
 
 :local(.sidebarNavFont) {
-    cursor: pointer;
     font-size: 16px;
     display: inline;
-    margin-top: 5px;
-    margin-left: 20px;
+    margin-left: 10px;
     overflow: hidden;
     white-space: nowrap;
 }
@@ -51,8 +71,8 @@
     padding: 20px;
     position: absolute !important;
     bottom: 20px;
-    height: calc(100vh - 314px);
-    max-height: calc(100vh - 314px);
+    height: calc(100vh - 330px);
+    max-height: calc(100vh - 330px);
     width: 300px;
 }
 
@@ -61,7 +81,7 @@
 }
 
 :local(.sidebarIcon) {
-    width: 45px;
+    width: 25px;
     text-align: center;
     font-size: 20px;
     cursor: pointer;
@@ -69,10 +89,6 @@
 
 :local(.iconRight) {
     justify-content: flex-end;
-}
-
-:local(.iconLeft) {
-    justify-content: inherit;
 }
 
 :local(.sidebarContent) {
