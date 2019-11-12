@@ -3,7 +3,7 @@ import { Navbar as BootstrapNavbar } from 'react-bootstrap';
 import styled from 'styled-components';
 import { darken, lighten } from 'polished';
 
-import teinte from 'theme/teinte';
+import { breakpoint, teinte } from 'theme';
 
 const Navbar = styled(BootstrapNavbar)`
   &.navbar-default {
@@ -59,7 +59,7 @@ const Navbar = styled(BootstrapNavbar)`
         }
       }
 
-      @media (max-width: @grid-float-breakpoint-max) {
+      @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > li > a {
             color: ${teinte.tertiary.uno};
@@ -181,7 +181,7 @@ const Navbar = styled(BootstrapNavbar)`
         }
       }
 
-      @media (max-width: 767px) {
+      @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
             border-color: ${darken(0.10, teinte.primary.tre)};
