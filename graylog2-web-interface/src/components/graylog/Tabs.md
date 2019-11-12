@@ -1,5 +1,6 @@
+### Uncontrolled
 ```js
-import { Tabs } from './index';
+import Tab from './Tab';
 
 <Tabs defaultActiveKey={2} id="uncontrolled-tab-example">
   <Tab eventKey={1} title="Tab 1">
@@ -14,8 +15,10 @@ import { Tabs } from './index';
 </Tabs>
 ```
 
+### Controlled
+
 ```js
-import { Tabs } from './index';
+import Tab from './Tab';
 const TabExample = () => {
   const [activeTab, setActiveTab] = React.useState(1);
 
@@ -46,8 +49,10 @@ const TabExample = () => {
 <TabExample />
 ```
 
+### Tabs with Dropdown
+
 ```js
-import { Row, Col, Nav, NavItem, NavDropdown, MenuItem } from './index';
+import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from './index';
 
 <Tab.Container id="tabs-with-dropdown" defaultActiveKey="first">
   <Row className="clearfix">

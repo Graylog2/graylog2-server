@@ -9,7 +9,6 @@ export {
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
-  Tabs,
   Well,
 
   /* 👇 no custom theme colors needed 👇 */
@@ -23,7 +22,8 @@ export {
   ListGroup,
   MenuItem,
   OverlayTrigger,
-  PanelGroup,
   Pager,
+  PanelGroup,
+  Tab,
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
