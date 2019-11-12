@@ -44,14 +44,15 @@ const LUTTablesPage = createReactClass({
   errorStatesInterval: 1000,
 
   _startErrorStatesTimer() {
+    const { tables, dataAdapters } = this.state;
     this._stopErrorStatesTimer();
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
-      if (this.state.tables) {
-        tableNames = this.state.tables.map(t => t.name);
+      if (tables) {
+        tableNames = tables.map(t => t.name);
       }
       if (tableNames) {
-        const adapterNames = Object.values(this.state.dataAdapters).map(a => a.name);
+        const adapterNames = Object.values(dataAdapters).map(a => a.name);
         LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
       }
     }, this.errorStatesInterval);
@@ -65,14 +66,14 @@ const LUTTablesPage = createReactClass({
   },
 
   _loadData(props) {
+    const { pagination } = this.state;
     this._stopErrorStatesTimer();
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
     } else if (this._isCreating(props)) {
       // nothing to do, the intermediate data container will take care of loading the caches and adapters
     } else {
-      const p = this.state.pagination;
-      LookupTablesActions.searchPaginated(p.page, p.per_page, p.query);
+      LookupTablesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
   },
@@ -92,48 +93,60 @@ const LUTTablesPage = createReactClass({
   },
 
   render() {
+    const { route: { action } } = this.props;
+    const {
+      table,
+      validationErrors,
+      dataAdapter,
+      cache,
+      tables,
+      caches,
+      dataAdapters,
+      pagination,
+      errorStates,
+    } = this.state;
     let content;
-    const isShowing = this.props.route.action === 'show';
-    const isEditing = this.props.route.action === 'edit';
+    const isShowing = action === 'show';
+    const isEditing = action === 'edit';
 
     if (isShowing || isEditing) {
-      if (!this.state.table) {
+      if (!table) {
         content = <Spinner text="Loading lookup table" />;
       } else if (isEditing) {
         content = (
           <Row className="content">
             <Col lg={8}>
               <h2>Lookup Table</h2>
-              <LookupTableForm table={this.state.table}
+              <LookupTableForm table={table}
                                create={false}
                                saved={this._saved}
                                validate={this._validateTable}
-                               validationErrors={this.state.validationErrors} />
+                               validationErrors={validationErrors} />
             </Col>
           </Row>
         );
       } else {
         content = (
-          <LookupTable dataAdapter={this.state.dataAdapter}
-                       cache={this.state.cache}
-                       table={this.state.table} />
+          <LookupTable dataAdapter={dataAdapter}
+                       cache={cache}
+                       table={table} />
         );
       }
     } else if (this._isCreating(this.props)) {
       content = (
         <LookupTableCreate saved={this._saved}
                            validate={this._validateTable}
-                           validationErrors={this.state.validationErrors} />
+                           validationErrors={validationErrors} />
       );
-    } else if (!this.state || !this.state.tables) {
+    } else if (!this.state || !tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
       content = (
-        <LookupTablesOverview tables={this.state.tables}
-                              caches={this.state.caches}
-                              dataAdapters={this.state.dataAdapters}
-                              pagination={this.state.pagination}
-                              errorStates={this.state.errorStates} />
+        <LookupTablesOverview tables={tables}
+                              caches={caches}
+                              dataAdapters={dataAdapters}
+                              pagination={pagination}
+                              errorStates={errorStates} />
       );
     }
 

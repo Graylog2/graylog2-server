@@ -50,9 +50,10 @@ const LUTDataAdaptersPage = createReactClass({
     this._stopErrorStatesTimer();
 
     this.errorStatesTimer = setInterval(() => {
+      const { dataAdapters } = this.state;
       let names = null;
-      if (this.state.dataAdapters) {
-        names = this.state.dataAdapters.map(t => t.name);
+      if (dataAdapters) {
+        names = dataAdapters.map(t => t.name);
       }
       if (names) {
         LookupTablesActions.getErrors(null, null, names || null);
@@ -68,14 +69,14 @@ const LUTDataAdaptersPage = createReactClass({
   },
 
   _loadData(props) {
+    const { pagination } = this.state;
     this._stopErrorStatesTimer();
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
     } else if (this._isCreating(props)) {
       LookupTableDataAdaptersActions.getTypes();
     } else {
-      const p = this.state.pagination;
-      LookupTableDataAdaptersActions.searchPaginated(p.page, p.per_page, p.query);
+      LookupTableDataAdaptersActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
   },
@@ -95,48 +96,58 @@ const LUTDataAdaptersPage = createReactClass({
   },
 
   render() {
+    const { route: { action } } = this.props;
+    const {
+      dataAdapter,
+      validationErrors,
+      types,
+      dataAdapters,
+      pagination,
+      tableStore,
+    } = this.state;
     let content;
-    const isShowing = this.props.route.action === 'show';
-    const isEditing = this.props.route.action === 'edit';
+    const isShowing = action === 'show';
+    const isEditing = action === 'edit';
 
     if (isShowing || isEditing) {
-      if (!this.state.dataAdapter) {
+      if (!dataAdapter) {
         content = <Spinner text="Loading data adapter" />;
       } else if (isEditing) {
         content = (
           <Row className="content">
             <Col lg={12}>
-              <h2>Data Adapter</h2>
-              <DataAdapterForm dataAdapter={this.state.dataAdapter}
-                               type={this.state.dataAdapter.config.type}
+              {/* <h2>Data Adapter</h2> */}
+              <DataAdapterForm dataAdapter={dataAdapter}
+                               type={dataAdapter.config.type}
                                create={false}
+                               title="Data Adapter"
                                saved={this._saved}
                                validate={this._validateAdapter}
-                               validationErrors={this.state.validationErrors} />
+                               validationErrors={validationErrors} />
             </Col>
           </Row>
         );
       } else {
-        content = <DataAdapter dataAdapter={this.state.dataAdapter} />;
+        content = <DataAdapter dataAdapter={dataAdapter} />;
       }
     } else if (this._isCreating(this.props)) {
-      if (!this.state.types) {
+      if (!types) {
         content = <Spinner text="Loading data adapter types" />;
       } else {
         content = (
-          <DataAdapterCreate types={this.state.types}
+          <DataAdapterCreate types={types}
                              saved={this._saved}
                              validate={this._validateAdapter}
-                             validationErrors={this.state.validationErrors} />
+                             validationErrors={validationErrors} />
         );
       }
-    } else if (!this.state.dataAdapters) {
+    } else if (!dataAdapters) {
       content = <Spinner text="Loading data adapters" />;
     } else {
       content = (
-        <DataAdaptersOverview dataAdapters={this.state.dataAdapters}
-                              pagination={this.state.pagination}
-                              errorStates={this.state.tableStore.errorStates} />
+        <DataAdaptersOverview dataAdapters={dataAdapters}
+                              pagination={pagination}
+                              errorStates={tableStore.errorStates} />
       );
     }
 

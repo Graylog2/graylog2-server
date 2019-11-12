@@ -39,13 +39,13 @@ const LUTCachesPage = createReactClass({
   },
 
   _loadData(props) {
+    const { pagination } = this.state;
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
     } else if (this._isCreating(props)) {
       LookupTableCachesActions.getTypes();
     } else {
-      const p = this.state.pagination;
-      LookupTableCachesActions.searchPaginated(p.page, p.per_page, p.query);
+      LookupTableCachesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
     }
   },
 
@@ -64,47 +64,55 @@ const LUTCachesPage = createReactClass({
   },
 
   render() {
+    const { route: { action } } = this.props;
+    const {
+      cache,
+      validationErrors,
+      types,
+      caches,
+      pagination,
+    } = this.state;
     let content;
-    const isShowing = this.props.route.action === 'show';
-    const isEditing = this.props.route.action === 'edit';
+    const isShowing = action === 'show';
+    const isEditing = action === 'edit';
 
     if (isShowing || isEditing) {
-      if (!this.state.cache) {
+      if (!cache) {
         content = <Spinner text="Loading data cache" />;
       } else if (isEditing) {
         content = (
           <Row className="content">
             <Col lg={12}>
-              <h2>Data Cache</h2>
-              <CacheForm cache={this.state.cache}
-                         type={this.state.cache.config.type}
+              <CacheForm cache={cache}
+                         type={cache.config.type}
+                         title="Data Cache"
                          create={false}
                          saved={this._saved}
                          validate={this._validateCache}
-                         validationErrors={this.state.validationErrors} />
+                         validationErrors={validationErrors} />
             </Col>
           </Row>
         );
       } else {
-        content = <Cache cache={this.state.cache} />;
+        content = <Cache cache={cache} />;
       }
     } else if (this._isCreating(this.props)) {
-      if (!this.state.types) {
+      if (!types) {
         content = <Spinner text="Loading data cache types" />;
       } else {
         content = (
-          <CacheCreate types={this.state.types}
+          <CacheCreate types={types}
                        saved={this._saved}
                        validate={this._validateCache}
-                       validationErrors={this.state.validationErrors} />
+                       validationErrors={validationErrors} />
         );
       }
-    } else if (!this.state.caches) {
+    } else if (!caches) {
       content = <Spinner text="Loading caches" />;
     } else {
       content = (
-        <CachesOverview caches={this.state.caches}
-                        pagination={this.state.pagination} />
+        <CachesOverview caches={caches}
+                        pagination={pagination} />
       );
     }
 
