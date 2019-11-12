@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
@@ -13,6 +14,19 @@ import NavItem from './NavItem';
 
 const defaultNewViewTitle = 'New View';
 const defaultNewViewSummary = 'No summary.';
+
+const Container: React.ComponentType<{ open: boolean }> = styled.div`
+  grid-area: sidebar;
+  z-index: 3;
+  background: #393939;
+  color: #9e9e9e;
+  height: calc(100vh - 50px);
+  position: sticky;
+  top: 50px;
+  grid-column-start: 1;
+  grid-column-end: ${props => (props.open ? 3 : 2)};
+  box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
+`;
 
 type Props = {
   children: React.Element<any>,
@@ -117,7 +131,6 @@ class SideBar extends React.Component<Props, State> {
   render() {
     const { results, viewMetadata, children, queryId } = this.props;
     const { open, selectedKey } = this.state;
-    const gridClass = open ? 'open' : 'closed';
     const resultsEmpty = !results || Object.keys(results).length <= 0;
     const title = viewMetadata.title || defaultNewViewTitle;
 
@@ -128,12 +141,12 @@ class SideBar extends React.Component<Props, State> {
       ? 'times'
       : 'chevron-right';
     return (
-      <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
+      <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
         {open && <div className={`background ${styles.toggleArea}`} />}
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={styles.sidebarContent}>
-              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
+              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarHeader} ${styles.sidebarNav} ${shiftToRight}`}>
                 {open && title && <h3>{title}</h3>}
                 <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
               </span>
@@ -176,7 +189,7 @@ class SideBar extends React.Component<Props, State> {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     );
   }
 }

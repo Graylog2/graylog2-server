@@ -1,7 +1,8 @@
 // @flow strict
-import React, { useEffect } from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import SideBar from 'views/components/sidebar/SideBar';
@@ -39,6 +40,23 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import style from '!style/useable!css!./ExtendedSearchPage.css';
 import IfInteractive from '../components/dashboard/IfInteractive';
 import InteractiveContext from '../components/contexts/InteractiveContext';
+
+const GridContainer: React.ComponentType<{ interactive: boolean }> = styled.div`
+  ${props => (props.interactive ? css`
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 50px 250px 1fr;
+    grid-template-areas: "sidebar search";
+  ` : '')}
+`;
+
+const SearchGrid = styled.div`
+  z-index: 1;
+  padding: 15px;
+  grid-area: search;
+  grid-column-start: 2;
+  grid-column-end: 4;
+`;
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
   props => Object.assign(
@@ -89,7 +107,7 @@ const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view
 const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
 
-  useEffect(() => {
+  React.useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
@@ -124,13 +142,13 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
       </IfInteractive>
       <InteractiveContext.Consumer>
         {interactive => (
-          <div id="main-row" className={interactive ? 'grid-container' : null}>
+          <GridContainer id="main-row" interactive={interactive}>
             <IfInteractive>
               <ConnectedSideBar>
                 <ConnectedFieldList />
               </ConnectedSideBar>
             </IfInteractive>
-            <div className="search-grid">
+            <SearchGrid>
               <IfInteractive>
                 <HeaderElements />
                 <IfDashboard>
@@ -148,8 +166,8 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
                 <SearchResult />
               </ViewAdditionalContextProvider>
               <Footer />
-            </div>
-          </div>
+            </SearchGrid>
+          </GridContainer>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>
