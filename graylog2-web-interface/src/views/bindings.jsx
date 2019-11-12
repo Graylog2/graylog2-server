@@ -73,6 +73,9 @@ import StreamSearchPage from 'views/pages/StreamSearchPage';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
+import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
+import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -80,6 +83,7 @@ Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 // $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
+VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
@@ -282,6 +286,16 @@ export default {
       type: HeatmapVisualization.type,
       displayName: 'Heatmap',
       component: HeatmapVisualization,
+    },
+  ],
+  visualizationConfigTypes: [
+    {
+      type: BarVisualization.type,
+      component: BarVisualizationConfiguration,
+    },
+    {
+      type: NumberVisualization.type,
+      component: NumberVisualizationConfiguration,
     },
   ],
   creators: [
