@@ -222,7 +222,7 @@ describe('<Widget />', () => {
       ViewManagementActions.get = mockAction(jest.fn((() => Promise.resolve(dashboard1.toJSON()))));
       SearchActions.get = mockAction(jest.fn(() => Promise.resolve(searchDB1.toJSON())));
       ViewManagementActions.update = mockAction(jest.fn(() => Promise.resolve()));
-      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1.toJSON() })));
+      SearchActions.create = mockAction(jest.fn(() => Promise.resolve({ search: searchDB1 })));
       Routes.pluginRoute = jest.fn(route => id => `${route}-${id}`);
       browserHistory.push = jest.fn();
       asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
@@ -248,22 +248,33 @@ describe('<Widget />', () => {
     it('should get dashboard from backend', async () => {
       renderAndClick();
       await wait(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+      expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
     });
     it('should get corresponding search to dashboard', async () => {
       renderAndClick();
       await wait(() => expect(SearchActions.get).toHaveBeenCalledTimes(1));
+      expect(SearchActions.get).toHaveBeenCalledWith('search-1');
     });
     it('should create new search for dashboard', async () => {
       renderAndClick();
       await wait(() => expect(SearchActions.create).toHaveBeenCalledTimes(1));
+      expect(SearchActions.create).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
+        .build());
     });
     it('should update dashboard with new search and widget', async () => {
       renderAndClick();
       await wait(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
+      expect(ViewManagementActions.update).toHaveBeenCalledWith(
+        View.builder()
+          .search(Search.builder().id('search-1').build())
+          .id('new-id').type(View.Type.Dashboard)
+          .build(),
+      );
     });
     it('should redirect to updated dashboard', async () => {
       renderAndClick();
       await wait(() => expect(browserHistory.push).toHaveBeenCalledTimes(1));
+      expect(browserHistory.push).toHaveBeenCalledWith('DASHBOARDS_VIEWID-view-1');
     });
   });
 });

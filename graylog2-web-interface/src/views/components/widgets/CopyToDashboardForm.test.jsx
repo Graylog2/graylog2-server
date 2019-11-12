@@ -84,6 +84,6 @@ describe('CopyToDashboardForm', () => {
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
     const searchButton = getByText('Search');
     fireEvent.click(searchButton);
-    expect(DashboardsActions.search).toHaveBeenCalledTimes(2);
+    expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
   });
 });

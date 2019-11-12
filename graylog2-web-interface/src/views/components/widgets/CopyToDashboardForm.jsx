@@ -8,7 +8,7 @@ import { DashboardsActions, DashboardsStore } from 'views/stores/DashboardsStore
 
 type Props = {
   onCancel: () => void,
-  onSubmit: (string, string) => void,
+  onSubmit: (string, ?string) => void,
   widgetId: string,
   dashboards: DashboardsStoreState,
 };
@@ -19,28 +19,26 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
 
   const handleSearch = useCallback((query) => {
     setPaginationState({
-      query,
       ...paginationState,
+      query,
     });
     setSelectedDashboard(null);
-    DashboardsActions.search(query, paginationState.page, paginationState.perPage);
-  }, [paginationState]);
+  }, [paginationState, setSelectedDashboard, setPaginationState]);
 
-  const handleSearchReset = useCallback(() => handleSearch(''), []);
+  const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
 
   const handlePageChange = useCallback((page: number, perPage: number) => {
     setPaginationState({
+      ...paginationState,
       page,
       perPage,
-      ...paginationState,
     });
     setSelectedDashboard(null);
-    DashboardsActions.search(paginationState.query, page, perPage);
   }, [paginationState, setSelectedDashboard, setPaginationState]);
 
   useEffect(() => {
     DashboardsActions.search(paginationState.query, paginationState.page, paginationState.perPage);
-  }, []);
+  }, [paginationState]);
 
   const dashboardList = list.map((dashboard) => {
     return (
@@ -72,7 +70,7 @@ const CopyToDashboardForm = ({ widgetId, onCancel, dashboards: { list = [], pagi
       </Modal.Body>
       <Modal.Footer>
         <Button bsStyle="primary"
-                disabled={selectedDashboard === ''}
+                disabled={selectedDashboard === null}
                 onClick={() => onSubmit(widgetId, selectedDashboard)}>
           Select
         </Button>

@@ -63,15 +63,15 @@ type State = {
   showCopyToDashboard: boolean,
 };
 
+const _visualizationForType = (type) => {
+  return widgetDefinition(type).visualizationComponent;
+};
+
+const _editComponentForType = (type) => {
+  return widgetDefinition(type).editComponent;
+};
+
 class Widget extends React.Component<Props, State> {
-  static _visualizationForType(type) {
-    return widgetDefinition(type).visualizationComponent;
-  }
-
-  static _editComponentForType(type) {
-    return widgetDefinition(type).editComponent;
-  }
-
   static propTypes = {
     id: PropTypes.string.isRequired,
     view: PropTypes.object.isRequired,
@@ -133,9 +133,13 @@ class Widget extends React.Component<Props, State> {
     this.setState(({ showCopyToDashboard }) => ({ showCopyToDashboard: !showCopyToDashboard }));
   };
 
-  _onCopyToDashboard = (widgetId, dashboardId) => {
+  _onCopyToDashboard = (widgetId: string, dashboardId: ?string): void => {
     const { view } = this.props;
     const { view: activeView } = view;
+
+    if (!dashboardId) {
+      return;
+    }
 
     const updateDashboardWithNewSearch = (dashboard: View) => ({ search: newSearch }) => {
       const newDashboard = dashboard.toBuilder().search(newSearch).build();
@@ -201,7 +205,7 @@ class Widget extends React.Component<Props, State> {
       const { editing } = this.state;
       const { id, widget, height, width, fields } = this.props;
       const { config, filter } = widget;
-      const VisComponent = Widget._visualizationForType(widget.type);
+      const VisComponent = _visualizationForType(widget.type);
       return (
         <VisComponent id={id}
                       editing={editing}
@@ -225,7 +229,7 @@ class Widget extends React.Component<Props, State> {
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
-      const EditComponent = Widget._editComponentForType(widget.type);
+      const EditComponent = _editComponentForType(widget.type);
       return (
         <WidgetColorContext id={id}>
           <EditWidgetFrame>
