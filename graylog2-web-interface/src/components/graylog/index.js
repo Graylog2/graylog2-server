@@ -9,6 +9,7 @@ import Label from './Label';
 import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
 import SplitButton from './SplitButton';
+import Table from './Table';
 
 export {
   Alert,
@@ -22,5 +23,6 @@ export {
   ListGroupItem,
   Modal,
   SplitButton,
+  Table,
 };
 export * from './bootstrap-import';
