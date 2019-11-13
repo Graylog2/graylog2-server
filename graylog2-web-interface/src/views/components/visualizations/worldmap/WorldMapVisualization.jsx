@@ -22,11 +22,24 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
   const xLabels = getXLabelsFromLeafs(leafs);
   return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
 };
+const _formatSeriesForMap = (rowPivots) => {
+  return (result) => {
+    return result.map(({ name, x, y }) => {
+      const newX = x.map(_lastKey);
+      const keys = x.map(k => k.slice(0, -1)
+        .map((key, idx) => ({ [rowPivots[idx].field]: key }))
+        .reduce(_mergeObject, {}));
+      // eslint-disable-next-line no-unused-vars
+      const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+      return { keys, name, values };
+    });
+  };
+};
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
-  const hasMetric = !isEmpty(config._value.series);
+  const hasMetric = !isEmpty(config.series);
   const markerRadiusSize = !hasMetric ? 1 : undefined;
   const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
 
@@ -35,21 +48,10 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
     seriesExtractor,
     formatSeries,
     results => results.map(_arrayToMap),
+    _formatSeriesForMap(rowPivots),
   ]);
 
-  const series = pipeline(data)
-    .map(({ name, x, y }) => {
-      const newX = x.map(_lastKey);
-      const keys = x.map(k => k.slice(0, -1)
-        .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-        .reduce(_mergeObject, {}));
-      return { name, y, x: newX, keys };
-    })
-    .map(({ keys, name, x, y }) => {
-      // eslint-disable-next-line no-unused-vars
-      const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
-      return { keys, name, values };
-    });
+  const series = pipeline(data);
 
   const viewport = get(config, 'visualizationConfig.viewport');
   const _onChange = (newViewport) => {

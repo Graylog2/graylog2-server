@@ -42,7 +42,7 @@ export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
   return rows.filter(row => (row.source === 'leaf'));
 };
 
-export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<any> => leafs.map(({ key }) => key);
+export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
 export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: Value => boolean) => {
   return (results: Rows) => {
