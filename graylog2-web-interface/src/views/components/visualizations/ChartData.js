@@ -18,7 +18,7 @@ export type ExtractedSeries = Array<ChartData>;
 
 export type KeyJoiner = (Array<any>) => string;
 
-export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number) => ChartDefinition;
+export type Generator = (string, string, Array<string>, Array<any>, Array<Array<any>>, number, number, AggregationWidgetConfig) => ChartDefinition;
 
 const _defaultKeyJoiner = keys => keys.join('-');
 
@@ -56,7 +56,7 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   };
 };
 
-export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator): ((ExtractedSeries) => Array<ChartDefinition>) => {
+export const generateChart = (chartType: string, generator: Generator = _defaultChartGenerator, config: AggregationWidgetConfig): ((ExtractedSeries) => Array<ChartDefinition>) => {
   return (results: ExtractedSeries) => {
     const allCharts: Array<[string, string, Array<string>, Array<any>, Array<Array<any>>]> = results.map(([value, x, values, z]) => [
       chartType,
@@ -66,7 +66,7 @@ export const generateChart = (chartType: string, generator: Generator = _default
       z,
     ]);
 
-    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length));
+    return allCharts.map((args, idx) => generator(...args, idx, allCharts.length, config));
   };
 };
 
@@ -82,18 +82,19 @@ export const removeNulls = (): ((ExtractedSeries) => ExtractedSeries) => {
 const doNotSuffixTraceForSingleSeries = keys => (keys.length > 1 ? keys.slice(0, -1).join('-') : keys[0]);
 
 export const chartData = (
-  { rowPivots, columnPivots, series }: AggregationWidgetConfig,
+  config: AggregationWidgetConfig,
   data: Rows,
   chartType: string,
   generator: Generator = _defaultChartGenerator,
   customSeriesFormatter?: ({valuesBySeries: Object, xLabels: Array<any>}) => ExtractedSeries = formatSeries,
   leafValueMatcher?: Value => boolean,
 ): Array<ChartDefinition> => {
+  const { rowPivots, columnPivots, series } = config;
   return flow([
     transformKeys(rowPivots, columnPivots),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
-    generateChart(chartType, generator),
+    generateChart(chartType, generator, config),
   ])(data);
 };

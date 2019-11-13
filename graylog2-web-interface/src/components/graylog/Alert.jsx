@@ -35,6 +35,7 @@ const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
 });
 
 Alert.propTypes = {
+  /* Bootstrap `bsStyle` variant name */
   bsStyle: PropTypes.oneOf(bsStyles),
 };
 

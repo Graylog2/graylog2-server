@@ -27,6 +27,7 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
   const [hookComponent, setHookComponent] = useState(undefined);
 
   useEffect(() => {
+    let mounted = true;
     const { state = {} } = location;
     const { view: searchView } = state;
     if (searchView && searchView.search) {
@@ -45,8 +46,9 @@ const NewDashboardPage = ({ route, location, loadingViewHooks, executingViewHook
         },
       ).catch(e => setHookComponent(e));
     } else {
-      ViewActions.create(View.Type.Dashboard).then(() => setLoaded(true));
+      ViewActions.create(View.Type.Dashboard).then(() => mounted && setLoaded(true));
     }
+    return () => { mounted = false; };
   }, []);
 
   if (hookComponent) {

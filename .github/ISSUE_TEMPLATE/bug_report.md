@@ -1,3 +1,12 @@
+---
+name: Bug report / change request
+about: Create a report to help us improve. This includes bugs but also changing the behavior of the product.
+title: ''
+labels: bug
+assignees: ''
+
+---
+
 <!--- Provide a general summary of the issue in the Title above -->
 
 ## Expected Behavior
