@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-
+import connect from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -17,29 +17,20 @@ const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.ge
   'LookupTableCaches',
 );
 
-const LUTCachesPage = createReactClass({
-  displayName: 'LUTCachesPage',
-
-  propTypes: {
-    // eslint-disable-next-line react/no-unused-prop-types
-    params: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
-  },
-
-  mixins: [
-    Reflux.connect(LookupTableCachesStore),
-  ],
+class LUTCachesPage extends React.Component {
 
   componentDidMount() {
     this._loadData(this.props);
-  },
+  }
 
-  componentWillReceiveProps(nextProps) {
-    this._loadData(nextProps);
-  },
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this._loadData(this.props);
+    } 
+  }
 
-  _loadData(props) {
-    const { pagination } = this.state;
+  _loadData = (props) => {
+    const { pagination } = this.props;
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
     } else if (this._isCreating(props)) {
@@ -47,21 +38,20 @@ const LUTCachesPage = createReactClass({
     } else {
       LookupTableCachesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
     }
-  },
+  };
 
-  _saved() {
+  _saved = () => {
     // reset detail state
-    this.setState({ cache: undefined });
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
-  },
+  }
 
-  _isCreating(props) {
+  _isCreating = (props) => {
     return props.route.action === 'create';
-  },
+  }
 
-  _validateCache(adapter) {
+  _validateCache = (adapter) => {
     LookupTableCachesActions.validate(adapter);
-  },
+  };
 
   render() {
     const { route: { action } } = this.props;
@@ -71,7 +61,7 @@ const LUTCachesPage = createReactClass({
       types,
       caches,
       pagination,
-    } = this.state;
+    } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -141,7 +131,25 @@ const LUTCachesPage = createReactClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
+LUTCachesPage.propTypes = {
+  cache: PropTypes.object,
+  validationErrors: PropTypes.object,
+  types: PropTypes.object,
+  caches: PropTypes.array,
+  pagination: PropTypes.object.isRequired,
+  params: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired,
+};
 
-export default LUTCachesPage;
+LUTCachesPage.defaultProps = {
+  cache: null,
+  validationErrors: {},
+  types: null,
+  caches: null,
+};
+export default connect(LUTCachesPage, { cachesStore: LookupTableCachesStore }, ({ cachesStore, ...otherProps }) => ({
+  ...otherProps,
+  ...cachesStore,
+}));
