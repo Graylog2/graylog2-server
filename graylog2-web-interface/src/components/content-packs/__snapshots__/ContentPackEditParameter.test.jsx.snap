@@ -35,7 +35,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -64,7 +64,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -93,7 +93,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -143,7 +143,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -171,7 +171,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>
@@ -217,7 +217,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter title"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -246,7 +246,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter name"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -275,7 +275,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter descriptions"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -325,7 +325,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -353,7 +353,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="test"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>
@@ -399,7 +399,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -428,7 +428,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -457,7 +457,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -507,7 +507,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -535,7 +535,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>

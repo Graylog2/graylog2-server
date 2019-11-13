@@ -17,7 +17,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
       value="count()"
     />
     <span
-      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+      className="HelpBlock-i8is92-0 huFHQV help-block"
     >
       The name of the series as it appears in the chart.
     </span>

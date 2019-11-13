@@ -3,11 +3,8 @@ export {
   Checkbox, // NOTE: do we want custom or keep OS styles
   Dropdown,
   Form,
-  MenuItem,
-  Modal,
   Nav,
   Navbar,
-  NavDropdown,
   NavItem,
   Pager,
   Pagination,
@@ -17,7 +14,6 @@ export {
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
   Tab,
-  Table,
   Tabs,
   Tooltip,
   Well,
@@ -31,6 +27,7 @@ export {
   FormGroup,
   Grid,
   ListGroup,
+  MenuItem,
   OverlayTrigger,
   PanelGroup,
   /* 👆 no custom theme colors needed 👆 */

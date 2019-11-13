@@ -137,7 +137,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Give a descriptive name for this content pack.
                     </span>
@@ -166,7 +166,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Give a short summary of the content pack.
                     </span>
@@ -194,7 +194,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Give a long description of the content pack in markdown.
                     </span>
@@ -223,7 +223,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
@@ -251,7 +251,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       value=""
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Where can I find the content pack. e.g. github url
                     </span>
@@ -611,7 +611,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="Content Pack the movie"
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Give a descriptive name for this content pack.
                     </span>
@@ -640,7 +640,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="A old content pack"
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Give a short summary of the content pack.
                     </span>
@@ -668,7 +668,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="## No one dares"
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Give a long description of the content pack in markdown.
                     </span>
@@ -697,7 +697,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="Beinstein"
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                     </span>
@@ -725,7 +725,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       value="http://beinstein.com"
                     />
                     <span
-                      className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                      className="HelpBlock-i8is92-0 huFHQV help-block"
                     >
                       Where can I find the content pack. e.g. github url
                     </span>

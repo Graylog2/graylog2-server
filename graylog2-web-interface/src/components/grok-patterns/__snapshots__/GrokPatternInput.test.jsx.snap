@@ -30,7 +30,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
           value=""
         />
         <span
-          className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+          className="HelpBlock-i8is92-0 huFHQV help-block"
         >
           The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
         </span>
@@ -199,7 +199,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
           value=""
         />
         <span
-          className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+          className="HelpBlock-i8is92-0 huFHQV help-block"
         >
           The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
         </span>
