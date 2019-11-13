@@ -92,7 +92,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 dOkMiK form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
                           name="filter-streams-data-filter"
@@ -348,7 +348,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 dOkMiK form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
                           name="filter-dashboards-data-filter"
@@ -655,7 +655,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 dOkMiK form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
                           name="filter-streams-data-filter"
@@ -911,7 +911,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 dOkMiK form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
                           name="filter-dashboards-data-filter"
