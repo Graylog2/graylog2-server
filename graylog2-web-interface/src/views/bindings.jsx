@@ -297,7 +297,7 @@ export default {
     },
     {
       type: 'generic',
-      title: 'Custom Aggregation',
+      title: 'Aggregation',
       func: CreateCustomAggregation,
     },
   ],
