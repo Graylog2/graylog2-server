@@ -12,7 +12,7 @@ import {
   OverlayTrigger,
   Popover,
 } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
 import style from './SelectPopover.css';
 
