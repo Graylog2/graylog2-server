@@ -4,9 +4,6 @@ import { render, cleanup, fireEvent, wait } from '@testing-library/react';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 
-jest.mock('views/stores/QueriesStore', () => ({ QueriesActions: {} }));
-jest.mock('views/stores/ViewStore', () => ({ ViewActions: {} }));
-
 describe('QueryTitleEditModal', () => {
   afterEach(cleanup);
   const modalHeadline = 'Editing query title';
