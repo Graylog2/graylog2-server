@@ -35,7 +35,6 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   });
 };
 
-
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
   const onRenderComplete = useContext(RenderCompletionCallback);
