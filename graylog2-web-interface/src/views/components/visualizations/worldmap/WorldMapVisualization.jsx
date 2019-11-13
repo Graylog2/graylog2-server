@@ -8,6 +8,7 @@ import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualiz
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import MapVisualization from './MapVisualization';
 import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
@@ -22,19 +23,18 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
   const xLabels = getXLabelsFromLeafs(leafs);
   return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
 };
-const _formatSeriesForMap = (rowPivots) => {
-  return (result) => {
-    return result.map(({ name, x, y }) => {
-      const newX = x.map(_lastKey);
-      const keys = x.map(k => k.slice(0, -1)
-        .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-        .reduce(_mergeObject, {}));
+const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
+  return result => result.map(({ name, x, y }) => {
+    const newX = x.map(_lastKey);
+    const keys = x.map(k => k.slice(0, -1)
+      .map((key, idx) => ({ [rowPivots[idx].field]: key }))
+      .reduce(_mergeObject, {}));
       // eslint-disable-next-line no-unused-vars
-      const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
-      return { keys, name, values };
-    });
-  };
+    const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+    return { keys, name, values };
+  });
 };
+
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
   const { rowPivots } = config;
