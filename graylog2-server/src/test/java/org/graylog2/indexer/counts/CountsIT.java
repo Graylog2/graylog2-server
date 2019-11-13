@@ -29,7 +29,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -108,11 +107,6 @@ public class CountsIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.get(indexSetConfig2.id())).thenReturn(Optional.of(indexSet2));
         when(indexSet1.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_1});
         when(indexSet2.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_2});
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        deleteIndex(INDEX_NAME_1, INDEX_NAME_2);
     }
 
     @Test
@@ -202,9 +196,9 @@ public class CountsIT extends ElasticsearchBaseTest {
         } catch (IndexNotFoundException e) {
             final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
             assertThat(e)
-                .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
-                .hasMessageEndingWith(expectedErrorDetail)
-                .hasNoSuppressedExceptions();
+                    .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
+                    .hasMessageEndingWith(expectedErrorDetail)
+                    .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
         }
     }
@@ -216,21 +210,17 @@ public class CountsIT extends ElasticsearchBaseTest {
         final String indexPrefix = "very_long_list_of_indices_0123456789_counts_it_";
         final IndexSet indexSet = mock(IndexSet.class);
 
-        try {
-            for (int i = 0; i < numberOfIndices; i++) {
-                final String indexName = indexPrefix + i;
-                createIndex(indexName);
-                indexNames[i] = indexName;
-            }
-
-            when(indexSet.getManagedIndices()).thenReturn(indexNames);
-
-            final String indicesString = String.join(",", indexNames);
-            assertThat(indicesString.length()).isGreaterThanOrEqualTo(4096);
-
-            assertThat(counts.total(indexSet)).isEqualTo(0L);
-        } finally {
-            deleteIndex(indexNames);
+        for (int i = 0; i < numberOfIndices; i++) {
+            final String indexName = indexPrefix + i;
+            createIndex(indexName);
+            indexNames[i] = indexName;
         }
+
+        when(indexSet.getManagedIndices()).thenReturn(indexNames);
+
+        final String indicesString = String.join(",", indexNames);
+        assertThat(indicesString.length()).isGreaterThanOrEqualTo(4096);
+
+        assertThat(counts.total(indexSet)).isEqualTo(0L);
     }
 }

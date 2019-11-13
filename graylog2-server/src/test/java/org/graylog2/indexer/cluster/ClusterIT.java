@@ -23,7 +23,6 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,17 +55,11 @@ public class ClusterIT extends ElasticsearchBaseTest {
         createIndex(INDEX_NAME, 1, 0);
         addAliasMapping(INDEX_NAME, ALIAS_NAME);
         waitForGreenStatus(INDEX_NAME, ALIAS_NAME);
-        
+
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder().setNameFormat("cluster-it-%d").build()
         );
         cluster = new Cluster(client(), indexSetRegistry, scheduler, Duration.seconds(1L));
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        removeAliasMapping(INDEX_NAME, ALIAS_NAME);
-        deleteIndex(INDEX_NAME);
     }
 
     @Test
@@ -80,14 +73,11 @@ public class ClusterIT extends ElasticsearchBaseTest {
         final String index = createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
 
-        try {
-            final Optional<JsonNode> health = cluster.health();
-            assertThat(health)
-                    .isPresent()
-                    .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
-        } finally {
-            deleteIndex(index);
-        }
+        final Optional<JsonNode> health = cluster.health();
+        assertThat(health)
+                .isPresent()
+                .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
+
     }
 
     @Test
@@ -180,11 +170,8 @@ public class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
         when(indexSetRegistry.isUp()).thenReturn(true);
 
-        try {
-            assertThat(cluster.isHealthy()).isTrue();
-        } finally {
-            deleteIndex(index);
-        }
+        assertThat(cluster.isHealthy()).isTrue();
+
     }
 
     @Test
@@ -200,11 +187,7 @@ public class ClusterIT extends ElasticsearchBaseTest {
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{INDEX_NAME});
         when(indexSetRegistry.isUp()).thenReturn(false);
 
-        try {
-            assertThat(cluster.isHealthy()).isFalse();
-        } finally {
-            deleteIndex(index);
-        }
+        assertThat(cluster.isHealthy()).isFalse();
     }
 
     @Test

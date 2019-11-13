@@ -27,14 +27,12 @@ import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,14 +57,9 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
                 new EventBus());
     }
 
-    @After
-    public void tearDown() throws IOException {
-        deleteIndex("get_all_message_fields_0", "get_all_message_fields_1");
-    }
-
     @Test
     public void GetAllMessageFieldsForNonexistingIndexShouldReturnEmptySet() throws Exception {
-        final String[] indexNames = new String[] { "does_not_exist_" + System.nanoTime() };
+        final String[] indexNames = new String[]{"does_not_exist_" + System.nanoTime()};
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result).isNotNull().isEmpty();
@@ -76,12 +69,9 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForEmptyIndexShouldReturnEmptySet() throws Exception {
         final String indexName = createRandomIndex("get_all_message_fields_");
-        try {
-            final Set<String> result = indices.getAllMessageFields(new String[]{indexName});
-            assertThat(result).isNotNull().isEmpty();
-        } finally {
-            deleteIndex(indexName);
-        }
+
+        final Set<String> result = indices.getAllMessageFields(new String[]{indexName});
+        assertThat(result).isNotNull().isEmpty();
     }
 
     @Test
@@ -89,22 +79,22 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     public void GetAllMessageFieldsForSingleIndexShouldReturnCompleteList() throws Exception {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
-        final String[] indexNames = new String[] { "get_all_message_fields_0" };
+        final String[] indexNames = new String[]{"get_all_message_fields_0"};
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result)
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
 
-        final String[] otherIndexName = new String[] { "get_all_message_fields_1" };
+        final String[] otherIndexName = new String[]{"get_all_message_fields_1"};
 
         final Set<String> otherResult = indices.getAllMessageFields(otherIndexName);
 
         assertThat(otherResult)
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("message", "n", "source", "timestamp", "someotherfield");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("message", "n", "source", "timestamp", "someotherfield");
     }
 
     @Test
@@ -112,13 +102,13 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     public void GetAllMessageFieldsForMultipleIndicesShouldReturnCompleteList() throws Exception {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
-        final String[] indexNames = new String[] { "get_all_message_fields_0", "get_all_message_fields_1" };
+        final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result)
-            .isNotNull()
-            .hasSize(6)
-            .containsOnly("message", "n", "source", "timestamp", "fieldonlypresenthere", "someotherfield");
+                .isNotNull()
+                .hasSize(6)
+                .containsOnly("message", "n", "source", "timestamp", "fieldonlypresenthere", "someotherfield");
     }
 
     @Test
@@ -126,7 +116,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         final String indexName = "does_not_exist_" + System.nanoTime();
         assertThat(indicesExists(indexName)).isFalse();
 
-        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[] { indexName });
+        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
 
         assertThat(result).isNotNull().isEmpty();
     }
@@ -135,15 +125,12 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     @SkipDefaultIndexTemplate
     public void GetAllMessageFieldsForIndicesForEmptyIndexShouldReturnEmptySet() throws Exception {
         final String indexName = createRandomIndex("indices_it_");
-        try {
-            final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
 
-            assertThat(result)
-                    .isNotNull()
-                    .isEmpty();
-        } finally {
-            deleteIndex(indexName);
-        }
+        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
+
+        assertThat(result)
+                .isNotNull()
+                .isEmpty();
     }
 
     @Test
@@ -152,33 +139,33 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String indexName = "get_all_message_fields_0";
-        final String[] indexNames = new String[] { indexName };
+        final String[] indexNames = new String[]{indexName};
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
 
         assertThat(result)
-            .isNotNull()
-            .hasSize(1)
-            .containsOnlyKeys(indexName);
+                .isNotNull()
+                .hasSize(1)
+                .containsOnlyKeys(indexName);
 
         assertThat(result.get(indexName))
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
 
         final String otherIndexName = "get_all_message_fields_1";
-        final String[] otherIndexNames = new String[] { otherIndexName };
+        final String[] otherIndexNames = new String[]{otherIndexName};
 
         final Map<String, Set<String>> otherResult = indices.getAllMessageFieldsForIndices(otherIndexNames);
 
         assertThat(otherResult)
-            .isNotNull()
-            .hasSize(1)
-            .containsOnlyKeys(otherIndexName);
+                .isNotNull()
+                .hasSize(1)
+                .containsOnlyKeys(otherIndexName);
 
         assertThat(otherResult.get(otherIndexName))
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("someotherfield", "message", "n", "source", "timestamp");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("someotherfield", "message", "n", "source", "timestamp");
     }
 
     @Test
@@ -186,22 +173,22 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     public void GetAllMessageFieldsForIndicesForMultipleIndicesShouldReturnCompleteList() throws Exception {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
-        final String[] indexNames = new String[] { "get_all_message_fields_0", "get_all_message_fields_1" };
+        final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
 
         assertThat(result)
-            .isNotNull()
-            .hasSize(2)
-            .containsOnlyKeys("get_all_message_fields_0", "get_all_message_fields_1");
+                .isNotNull()
+                .hasSize(2)
+                .containsOnlyKeys("get_all_message_fields_0", "get_all_message_fields_1");
 
         assertThat(result.get("get_all_message_fields_0"))
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("message", "n", "source", "timestamp", "fieldonlypresenthere");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("message", "n", "source", "timestamp", "fieldonlypresenthere");
 
         assertThat(result.get("get_all_message_fields_1"))
-            .isNotNull()
-            .hasSize(5)
-            .containsOnly("message", "n", "source", "timestamp", "someotherfield");
+                .isNotNull()
+                .hasSize(5)
+                .containsOnly("message", "n", "source", "timestamp", "someotherfield");
     }
 }

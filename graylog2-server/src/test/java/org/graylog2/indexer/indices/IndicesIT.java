@@ -121,23 +121,20 @@ public class IndicesIT extends ElasticsearchBaseTest {
     @Test
     public void testClose() throws Exception {
         final String index = createRandomIndex("indices_it_");
-        try {
-            final State beforeRequest = new State.Builder().indices(index).withMetadata().build();
-            final JestResult beforeResponse = client().execute(beforeRequest);
-            assertSucceeded(beforeResponse);
-            final JsonNode beforeOpened = beforeResponse.getJsonObject().path("metadata").path("indices").path(index);
-            assertThat(beforeOpened.path("state").asText()).isEqualTo("open");
 
-            indices.close(index);
+        final State beforeRequest = new State.Builder().indices(index).withMetadata().build();
+        final JestResult beforeResponse = client().execute(beforeRequest);
+        assertSucceeded(beforeResponse);
+        final JsonNode beforeOpened = beforeResponse.getJsonObject().path("metadata").path("indices").path(index);
+        assertThat(beforeOpened.path("state").asText()).isEqualTo("open");
 
-            final State afterRequest = new State.Builder().indices(index).withMetadata().build();
-            final JestResult afterResponse = client().execute(afterRequest);
-            assertSucceeded(afterResponse);
-            final JsonNode afterOpened = afterResponse.getJsonObject().path("metadata").path("indices").path(index);
-            assertThat(afterOpened.path("state").asText()).isEqualTo("close");
-        } finally {
-            deleteIndex(index);
-        }
+        indices.close(index);
+
+        final State afterRequest = new State.Builder().indices(index).withMetadata().build();
+        final JestResult afterResponse = client().execute(afterRequest);
+        assertSucceeded(afterResponse);
+        final JsonNode afterOpened = afterResponse.getJsonObject().path("metadata").path("indices").path(index);
+        assertThat(afterOpened.path("state").asText()).isEqualTo("close");
     }
 
     @Test
@@ -146,36 +143,24 @@ public class IndicesIT extends ElasticsearchBaseTest {
         final String alias = "graylog_alias_exists";
         assertThat(indices.aliasExists(alias)).isFalse();
 
-        try {
-            addAliasMapping(index, alias);
+        addAliasMapping(index, alias);
 
-            assertThat(indices.aliasExists(alias)).isTrue();
-            assertThat(indices.exists(alias)).isFalse();
-        } finally {
-            removeAliasMapping(index, alias);
-            deleteIndex(index);
-        }
+        assertThat(indices.aliasExists(alias)).isTrue();
+        assertThat(indices.exists(alias)).isFalse();
     }
 
     @Test
     public void testAliasExistsForIndex() throws Exception {
         final String indexName = createRandomIndex("indices_it_");
-        try {
-            assertThat(indices.aliasExists(indexName)).isFalse();
-        } finally {
-            deleteIndex(indexName);
-        }
+
+        assertThat(indices.aliasExists(indexName)).isFalse();
     }
 
     @Test
     public void testIndexIfIndexExists() throws Exception {
         final String indexName = createRandomIndex("indices_it_");
 
-        try {
-            assertThat(indices.exists(indexName)).isTrue();
-        } finally {
-            deleteIndex(indexName);
-        }
+        assertThat(indices.exists(indexName)).isTrue();
     }
 
     @Test
@@ -190,14 +175,9 @@ public class IndicesIT extends ElasticsearchBaseTest {
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
-        try {
-            addAliasMapping(index, alias);
+        addAliasMapping(index, alias);
 
-            assertThat(indices.aliasTarget(alias)).contains(index);
-        } finally {
-            removeAliasMapping(index, alias);
-            deleteIndex(index);
-        }
+        assertThat(indices.aliasTarget(alias)).contains(index);
     }
 
     @Test
@@ -223,13 +203,10 @@ public class IndicesIT extends ElasticsearchBaseTest {
     @Test(expected = IndexNotFoundException.class)
     public void testTimestampStatsOfIndexWithClosedIndex() throws Exception {
         final String index = createRandomIndex("indices_it_");
-        try {
-            closeIndex(index);
 
-            indices.indexRangeStatsOfIndex(index);
-        } finally {
-            deleteIndex(index);
-        }
+        closeIndex(index);
+
+        indices.indexRangeStatsOfIndex(index);
     }
 
     @Test(expected = IndexNotFoundException.class)
@@ -242,22 +219,17 @@ public class IndicesIT extends ElasticsearchBaseTest {
         final String indexName = "index_template_test";
         final String templateName = indexSetConfig.indexTemplateName();
 
-        try {
-            final JsonNode beforeTemplates = getTemplates();
-            assertThat(beforeTemplates.path(templateName).isMissingNode()).isTrue();
+        final JsonNode beforeTemplates = getTemplates();
+        assertThat(beforeTemplates.path(templateName).isMissingNode()).isTrue();
 
-            indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet);
 
-            final JsonNode afterTemplates = getTemplates();
-            assertThat(afterTemplates.path(templateName).isObject()).isTrue();
+        final JsonNode afterTemplates = getTemplates();
+        assertThat(afterTemplates.path(templateName).isObject()).isTrue();
 
-            final JsonNode templateMetaData = afterTemplates.path(templateName);
-            assertThat(templateMetaData.path("mappings")).hasSize(1);
-            assertThat(templateMetaData.path("mappings").path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
-        } finally {
-            deleteTemplate(templateName);
-            deleteIndex(indexName);
-        }
+        final JsonNode templateMetaData = afterTemplates.path(templateName);
+        assertThat(templateMetaData.path("mappings")).hasSize(1);
+        assertThat(templateMetaData.path("mappings").path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
     }
 
     @Test
@@ -277,43 +249,35 @@ public class IndicesIT extends ElasticsearchBaseTest {
                 "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, beforeMapping)
         );
 
-        try {
-            putTemplate(templateName, templateSource);
+        putTemplate(templateName, templateSource);
 
-            final JsonNode beforeTemplate = getTemplate(templateName);
-            final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-            final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
-            assertThat(actualMapping).isEqualTo(beforeMapping);
+        final JsonNode beforeTemplate = getTemplate(templateName);
+        final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
+        final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
+        assertThat(actualMapping).isEqualTo(beforeMapping);
 
-            indices.create("index_template_test", indexSet);
+        indices.create("index_template_test", indexSet);
 
-            final JsonNode afterTemplate = getTemplate(templateName);
-            assertThat(afterTemplate.path(templateName).isObject()).isTrue();
+        final JsonNode afterTemplate = getTemplate(templateName);
+        assertThat(afterTemplate.path(templateName).isObject()).isTrue();
 
-            final JsonNode actualAfterMapping = afterTemplate.path(templateName).path("mappings");
-            assertThat(actualAfterMapping).hasSize(1);
-            assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
+        final JsonNode actualAfterMapping = afterTemplate.path(templateName).path("mappings");
+        assertThat(actualAfterMapping).hasSize(1);
+        assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
 
-            final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
-            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES).toTemplate(indexSetConfig, indexSet.getIndexWildcard());
-            assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
-        } finally {
-            deleteTemplate(templateName);
-            deleteIndex("index_template_test");
-        }
+        final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
+        final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES).toTemplate(indexSetConfig, indexSet.getIndexWildcard());
+        assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
     }
 
     @Test
     public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() throws IOException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final String indexName = createRandomIndex("indices_it_");
-        try {
-            indices.indexCreationDate(indexName).ifPresent(
-                    indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
-            );
-        } finally {
-            deleteIndex(indexName);
-        }
+
+        indices.indexCreationDate(indexName).ifPresent(
+                indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
+        );
     }
 
     @Test
@@ -340,26 +304,20 @@ public class IndicesIT extends ElasticsearchBaseTest {
 
         putTemplate(customTemplateName, templateSource);
 
-        try {
-            // Validate existing index templates
-            final JsonNode existingTemplate = getTemplate(customTemplateName);
-            assertThat(existingTemplate.path(customTemplateName).isObject()).isTrue();
+        // Validate existing index templates
+        final JsonNode existingTemplate = getTemplate(customTemplateName);
+        assertThat(existingTemplate.path(customTemplateName).isObject()).isTrue();
 
-            // Create index with custom template
-            indices.create(testIndexName, indexSet);
-            waitForGreenStatus(testIndexName);
+        // Create index with custom template
+        indices.create(testIndexName, indexSet);
+        waitForGreenStatus(testIndexName);
 
-            // Check index mapping
-            final JsonNode indexMappings = getMapping(testIndexName);
-            final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
+        // Check index mapping
+        final JsonNode indexMappings = getMapping(testIndexName);
+        final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
 
-            assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
-            assertThat(mapping.path("properties").path("source").path("type")).isEqualTo(new TextNode("text"));
-        } finally {
-            // Clean up
-            deleteTemplate(customTemplateName);
-            deleteIndex(testIndexName);
-        }
+        assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
+        assertThat(mapping.path("properties").path("source").path("type")).isEqualTo(new TextNode("text"));
     }
 
     @Test
@@ -368,11 +326,9 @@ public class IndicesIT extends ElasticsearchBaseTest {
         eventBus.register(listener);
 
         final String index = createRandomIndex("indices_it_");
-        try {
-            indices.close(index);
-        } finally {
-            deleteIndex(index);
-        }
+
+        indices.close(index);
+
 
         assertThat(listener.indicesClosedEvents).containsOnly(IndicesClosedEvent.create(index));
         assertThat(listener.indicesDeletedEvents).isEmpty();
@@ -385,11 +341,8 @@ public class IndicesIT extends ElasticsearchBaseTest {
         eventBus.register(listener);
 
         final String index = createRandomIndex("indices_it_");
-        try {
-            indices.delete(index);
-        } finally {
-            deleteIndex(index);
-        }
+
+        indices.delete(index);
 
         assertThat(listener.indicesDeletedEvents).containsOnly(IndicesDeletedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
@@ -402,13 +355,10 @@ public class IndicesIT extends ElasticsearchBaseTest {
         eventBus.register(listener);
 
         final String index = createRandomIndex("indices_it_");
-        try {
-            closeIndex(index);
 
-            indices.reopenIndex(index);
-        } finally {
-            deleteIndex(index);
-        }
+        closeIndex(index);
+
+        indices.reopenIndex(index);
 
         assertThat(listener.indicesReopenedEvents).containsOnly(IndicesReopenedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
@@ -445,22 +395,15 @@ public class IndicesIT extends ElasticsearchBaseTest {
         final String index1 = createRandomIndex("indices_it_");
         final String index2 = createRandomIndex("indices_it_");
 
-        try {
-            closeIndex(index2);
+        closeIndex(index2);
 
-            assertThat(indices.getIndices(indexSet))
-                    .containsOnly(index1, index2);
-            assertThat(indices.getIndices(indexSet, "open", "close"))
-                    .containsOnly(index1, index2);
-            assertThat(indices.getIndices(indexSet, "open"))
-                    .containsOnly(index1);
-            assertThat(indices.getIndices(indexSet, "close"))
-                    .containsOnly(index2);
-        } finally {
-            deleteIndex(index1);
-            deleteIndex(index2);
-        }
-
-        assertThat(indices.getIndices(indexSet)).isEmpty();
+        assertThat(indices.getIndices(indexSet))
+                .containsOnly(index1, index2);
+        assertThat(indices.getIndices(indexSet, "open", "close"))
+                .containsOnly(index1, index2);
+        assertThat(indices.getIndices(indexSet, "open"))
+                .containsOnly(index1);
+        assertThat(indices.getIndices(indexSet, "close"))
+                .containsOnly(index2);
     }
 }

@@ -102,28 +102,23 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No result polling index set " + indexSetId));
 
-        try {
-            assertThat(dtosNoExisting).hasSize(2);
-            assertThat(dtos).hasSize(1);
+        assertThat(dtosNoExisting).hasSize(2);
+        assertThat(dtos).hasSize(1);
 
-            assertThat(dto.indexSetId()).isEqualTo(indexSetId);
-            assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
-            assertThat(dto.id()).isNull();
-            assertThat(dto.fields()).containsOnly(
-                    FieldTypeDTO.create("message", "text"),
-                    FieldTypeDTO.create("full_message", "text"),
-                    FieldTypeDTO.create("source", "text"),
-                    FieldTypeDTO.create("http_status", "keyword"),
-                    FieldTypeDTO.create("http_response_time", "long"),
-                    FieldTypeDTO.create("timestamp", "date"),
-                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
-                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
-                    FieldTypeDTO.create("streams", "keyword")
-            );
-        } finally {
-            deleteIndex(INDEX_NAME);
-            deleteIndex("graylog_1");
-        }
+        assertThat(dto.indexSetId()).isEqualTo(indexSetId);
+        assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
+        assertThat(dto.id()).isNull();
+        assertThat(dto.fields()).containsOnly(
+                FieldTypeDTO.create("message", "text"),
+                FieldTypeDTO.create("full_message", "text"),
+                FieldTypeDTO.create("source", "text"),
+                FieldTypeDTO.create("http_status", "keyword"),
+                FieldTypeDTO.create("http_response_time", "long"),
+                FieldTypeDTO.create("timestamp", "date"),
+                FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                FieldTypeDTO.create("gl2_processing_timestamp", "date"),
+                FieldTypeDTO.create("streams", "keyword")
+        );
     }
 
     @Test
@@ -132,25 +127,20 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
 
         final IndexFieldTypesDTO dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
 
-        try {
-            assertThat(dto).isNotNull();
-            assertThat(dto.indexSetId()).isEqualTo(indexSetId);
-            assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
-            assertThat(dto.id()).isNull();
-            assertThat(dto.fields()).containsOnly(
-                    FieldTypeDTO.create("message", "text"),
-                    FieldTypeDTO.create("full_message", "text"),
-                    FieldTypeDTO.create("source", "text"),
-                    FieldTypeDTO.create("http_status", "keyword"),
-                    FieldTypeDTO.create("http_response_time", "long"),
-                    FieldTypeDTO.create("timestamp", "date"),
-                    FieldTypeDTO.create("gl2_receive_timestamp", "date"),
-                    FieldTypeDTO.create("gl2_processing_timestamp", "date"),
-                    FieldTypeDTO.create("streams", "keyword")
-            );
-        } finally {
-            deleteIndex(INDEX_NAME);
-            deleteIndex("graylog_1");
-        }
+        assertThat(dto).isNotNull();
+        assertThat(dto.indexSetId()).isEqualTo(indexSetId);
+        assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
+        assertThat(dto.id()).isNull();
+        assertThat(dto.fields()).containsOnly(
+                FieldTypeDTO.create("message", "text"),
+                FieldTypeDTO.create("full_message", "text"),
+                FieldTypeDTO.create("source", "text"),
+                FieldTypeDTO.create("http_status", "keyword"),
+                FieldTypeDTO.create("http_response_time", "long"),
+                FieldTypeDTO.create("timestamp", "date"),
+                FieldTypeDTO.create("gl2_receive_timestamp", "date"),
+                FieldTypeDTO.create("gl2_processing_timestamp", "date"),
+                FieldTypeDTO.create("streams", "keyword")
+        );
     }
 }
