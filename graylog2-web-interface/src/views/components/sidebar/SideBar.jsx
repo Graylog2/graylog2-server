@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
+import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
@@ -11,9 +11,9 @@ import styles from './SideBar.css';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
+import ViewDescription from './ViewDescription';
 
 const defaultNewViewTitle = 'New View';
-const defaultNewViewSummary = 'No summary.';
 
 const Container: React.ComponentType<{ open: boolean }> = styled.div`
   grid-area: sidebar;
@@ -48,29 +48,6 @@ type State = {
   selectedKey: string,
   open: boolean,
   disabledAutoClose: boolean,
-};
-
-const ViewDescription = (results, viewMetadata) => {
-  const formatViewDescription = (view: ViewMetaData) => {
-    const { description } = view;
-    if (description) {
-      return <span>{description}</span>;
-    }
-    return <i>No view description.</i>;
-  };
-
-  return (
-    <React.Fragment>
-      <div className={styles.viewMetadata}>
-        <small>{viewMetadata.summary || defaultNewViewSummary}</small>
-      </div>
-
-      <div className={styles.viewMetadata}>
-        <SearchResultOverview results={results} />
-      </div>
-      {formatViewDescription(viewMetadata)}
-    </React.Fragment>
-  );
 };
 
 class SideBar extends React.Component<Props, State> {

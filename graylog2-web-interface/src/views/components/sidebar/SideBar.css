@@ -61,7 +61,6 @@
 
 :local(.contentOpen) {
     padding: 20px;
-    max-height: 200px;
     white-space: nowrap;
 }
 
@@ -88,10 +87,6 @@
 
 :local(.sidebarContent) {
     overflow: hidden;
-}
-
-:local(.viewMetadata) {
-    margin-bottom: 8px;
 }
 
 .panel-group {
