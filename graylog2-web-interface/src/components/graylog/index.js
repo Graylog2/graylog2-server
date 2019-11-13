@@ -5,6 +5,7 @@ import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
 import FormControl from './FormControl';
 import HelpBlock from './HelpBlock';
+import InputGroup from './InputGroup';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
@@ -18,6 +19,7 @@ export {
   DropdownButton,
   FormControl,
   HelpBlock,
+  InputGroup,
   Jumbotron,
   Label,
   ListGroupItem,
