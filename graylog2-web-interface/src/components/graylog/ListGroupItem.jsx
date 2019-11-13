@@ -5,7 +5,8 @@ import styled, { css } from 'styled-components';
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { darken } from 'polished';
 
-import { colorLevel, useTheme } from 'theme/GraylogThemeContext';
+import { useTheme } from 'theme/GraylogThemeContext';
+import { colorLevel } from 'theme/util';
 import contrastingColor from 'util/contrastingColor';
 import bsStyleThemeVariant from './variants/bsStyle';
 
