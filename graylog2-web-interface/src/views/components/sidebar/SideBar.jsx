@@ -13,7 +13,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
 import ViewDescription from './ViewDescription';
 
-const defaultNewViewTitle = 'New View';
+const defaultNewViewTitle = 'New Search';
 
 const Container: React.ComponentType<{ open: boolean }> = styled.div`
   grid-area: sidebar;
