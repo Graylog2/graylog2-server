@@ -36,15 +36,15 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "InputGroup-sc-1a8jz8l-0",
                     "isStatic": true,
-                    "lastClassName": "fRDDLb",
+                    "lastClassName": "lpjKsW",
                     "rules": Array [
-                      "color:",
+                      ".input-group-addon{color:",
                       "#6c6c6c",
                       ";background-color:",
-                      "#F1F2F2",
+                      "#FFF",
                       ";border-color:",
                       "#DCE1E5",
-                      ";",
+                      ";}",
                     ],
                   },
                   "displayName": "InputGroup",
@@ -61,10 +61,10 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
             >
               <InputGroup
                 bsClass="input-group"
-                className="InputGroup-sc-1a8jz8l-0 fRDDLb"
+                className="InputGroup-sc-1a8jz8l-0 lpjKsW"
               >
                 <span
-                  className="InputGroup-sc-1a8jz8l-0 fRDDLb input-group"
+                  className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
                 >
                   <FormControl
                     componentClass="input"
@@ -210,15 +210,15 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "InputGroup-sc-1a8jz8l-0",
                     "isStatic": true,
-                    "lastClassName": "fRDDLb",
+                    "lastClassName": "lpjKsW",
                     "rules": Array [
-                      "color:",
+                      ".input-group-addon{color:",
                       "#6c6c6c",
                       ";background-color:",
-                      "#F1F2F2",
+                      "#FFF",
                       ";border-color:",
                       "#DCE1E5",
-                      ";",
+                      ";}",
                     ],
                   },
                   "displayName": "InputGroup",
@@ -235,10 +235,10 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
             >
               <InputGroup
                 bsClass="input-group"
-                className="InputGroup-sc-1a8jz8l-0 fRDDLb"
+                className="InputGroup-sc-1a8jz8l-0 lpjKsW"
               >
                 <span
-                  className="InputGroup-sc-1a8jz8l-0 fRDDLb input-group"
+                  className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
                 >
                   <FormControl
                     componentClass="input"
@@ -448,15 +448,15 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                   "componentStyle": ComponentStyle {
                     "componentId": "InputGroup-sc-1a8jz8l-0",
                     "isStatic": true,
-                    "lastClassName": "fRDDLb",
+                    "lastClassName": "lpjKsW",
                     "rules": Array [
-                      "color:",
+                      ".input-group-addon{color:",
                       "#6c6c6c",
                       ";background-color:",
-                      "#F1F2F2",
+                      "#FFF",
                       ";border-color:",
                       "#DCE1E5",
-                      ";",
+                      ";}",
                     ],
                   },
                   "displayName": "InputGroup",
@@ -473,10 +473,10 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
             >
               <InputGroup
                 bsClass="input-group"
-                className="InputGroup-sc-1a8jz8l-0 fRDDLb"
+                className="InputGroup-sc-1a8jz8l-0 lpjKsW"
               >
                 <span
-                  className="InputGroup-sc-1a8jz8l-0 fRDDLb input-group"
+                  className="InputGroup-sc-1a8jz8l-0 lpjKsW input-group"
                 >
                   <FormControl
                     componentClass="input"
