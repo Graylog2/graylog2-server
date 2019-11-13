@@ -19,6 +19,7 @@ const Badge = forwardRef((props, ref) => {
 });
 
 Badge.propTypes = {
+  /* Bootstrap `bsStyle` variant name */
   bsStyle: PropTypes.oneOf(bsStyles),
 };
 

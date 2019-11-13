@@ -15,7 +15,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="fade in modal"
+      class="Modal-nuree8-0 cHlGak fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -241,7 +241,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="fade in modal"
+      class="Modal-nuree8-0 cHlGak fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -348,7 +348,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                 class="list-group"
               >
                 <button
-                  class="list-group-item"
+                  class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                   type="button"
                 >
                   <h4
