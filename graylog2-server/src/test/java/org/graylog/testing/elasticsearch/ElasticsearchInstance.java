@@ -16,28 +16,39 @@
  */
 package org.graylog.testing.elasticsearch;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
+import io.searchbox.cluster.State;
+import io.searchbox.indices.DeleteIndex;
+import io.searchbox.indices.template.DeleteTemplate;
 import org.graylog.testing.PropertyLoader;
 import org.graylog2.bindings.providers.JestClientProvider;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link JestClient}.
  */
 public class ElasticsearchInstance extends ExternalResource {
+
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchInstance.class);
+
+    private static final Map<Version, ElasticsearchContainer> containersByVersion = new HashMap<>();
 
     private static final String PROPERTIES_RESOURCE_NAME = "elasticsearch.properties";
 
@@ -45,11 +56,10 @@ public class ElasticsearchInstance extends ExternalResource {
     private static final String DEFAULT_IMAGE = "elasticsearch";
     private static final String DEFAULT_VERSION = "6.5.2";
 
-    private final Network network;
     private final ElasticsearchContainer container;
     private JestClient jestClient;
     private FixtureImporter fixtureImporter = new FixtureImporter();
-    private final Version elasticsearchVersion;
+    private final Version version;
 
     public static ElasticsearchInstance create() {
         final Properties properties = PropertyLoader.loadProperties(PROPERTIES_RESOURCE_NAME);
@@ -57,40 +67,49 @@ public class ElasticsearchInstance extends ExternalResource {
         return create(properties.getProperty("version", DEFAULT_VERSION));
     }
 
-    public static ElasticsearchInstance create(String elasticsearchVersion) {
-        final Version version = Version.valueOf(elasticsearchVersion);
-        final String image;
-
-        if (version.satisfies("^6.0.0")) {
-            // The OSS image only exists for 6.0.0 and later
-            image = DEFAULT_IMAGE_OSS + ":" + version.toString();
-        } else {
-            // For older versions do not use the official image because it contains x-pack stuff we don't want
-            image = DEFAULT_IMAGE + ":" + version.toString();
-        }
+    public static ElasticsearchInstance create(String versionString) {
+        final Version version = Version.valueOf(versionString);
+        final String image = imageNameFrom(version);
 
         LOG.debug("Creating instance {}", image);
 
         return new ElasticsearchInstance(image, version);
     }
 
-    private ElasticsearchInstance(String image, Version elasticsearchVersion) {
-        this.elasticsearchVersion = elasticsearchVersion;
-        this.network = Network.newNetwork();
-        this.container = new ElasticsearchContainer(image)
-                .withNetwork(network)
+    private static String imageNameFrom(Version version) {
+        final String defaultImage = version.satisfies("^6.0.0")
+                // The OSS image only exists for 6.0.0 and later
+                ? DEFAULT_IMAGE_OSS
+                // For older versions do not use the official image because it contains x-pack stuff we don't want
+                : DEFAULT_IMAGE;
+        return defaultImage + ":" + version.toString();
+    }
+
+    private ElasticsearchInstance(String image, Version version) {
+        this.version = version;
+        this.container = createContainer(image, version);
+    }
+
+    private static ElasticsearchContainer createContainer(String image, Version version) {
+        if (!containersByVersion.containsKey(version)) {
+            containersByVersion.put(version, startNewContainerInstance(image));
+        }
+        return containersByVersion.get(version);
+    }
+
+    private static ElasticsearchContainer startNewContainerInstance(String image) {
+        final ElasticsearchContainer container = new ElasticsearchContainer(image)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .waitingFor(Wait.forHttp("/").forPort(9200));
+        container.start();
+        LOG.debug("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
+        return container;
     }
 
     @Override
     protected void before() {
-        container.start();
-
-        LOG.debug("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
-
         jestClient = new JestClientProvider(
-                ImmutableList.of(URI.create("http://"+ container.getHttpHostAddress())),
+                ImmutableList.of(URI.create("http://" + container.getHttpHostAddress())),
                 Duration.seconds(60),
                 Duration.seconds(60),
                 Duration.seconds(60),
@@ -107,24 +126,33 @@ public class ElasticsearchInstance extends ExternalResource {
 
     @Override
     protected void after() {
-        LOG.debug("Stopping container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
-        container.stop();
-        try {
-            network.close();
-        } catch (Exception e) {
-            throw new RuntimeException("Couldn't close container network", e);
-        }
+        cleanUp();
+    }
+
+    private void cleanUp() {
+        final State request = new State.Builder().withMetadata().build();
+        final JsonNode result = JestUtils.execute(jestClient, request, () -> "failed to read state").getJsonObject();
+
+        final Set<String> templates = ImmutableSet.copyOf(result.get("metadata").get("templates").fieldNames());
+
+        for (String template : templates)
+            JestUtils.execute(jestClient, new DeleteTemplate.Builder(template).build(), () -> "failed to delete template " + template);
+
+        final Set<String> indices = ImmutableSet.copyOf(result.get("metadata").get("indices").fieldNames());
+
+        for (String index : indices)
+            JestUtils.execute(jestClient, new DeleteIndex.Builder(index).build(), () -> "failed to delete index " + index);
     }
 
     public Version version() {
-        return elasticsearchVersion;
+        return version;
     }
 
     public JestClient client() {
         return jestClient;
     }
 
-    public FixtureImporter fixtureImporter() {
+    FixtureImporter fixtureImporter() {
         return fixtureImporter;
     }
 }
