@@ -100,6 +100,8 @@ public class ElasticsearchInstance extends ExternalResource {
     private static ElasticsearchContainer startNewContainerInstance(String image) {
         final ElasticsearchContainer container = new ElasticsearchContainer(image)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
+                .withEnv("discovery.type", "single-node")
+                .withEnv("action.auto_create_index", "false")
                 .waitingFor(Wait.forHttp("/").forPort(9200));
         container.start();
         LOG.debug("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
