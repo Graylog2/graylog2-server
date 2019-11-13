@@ -29,7 +29,7 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: jest.fn(() => global.api_url),
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => true),
 }));
 jest.mock('stores/sessions/SessionStore', () => ({
   isLoggedIn: jest.fn(() => true),
@@ -38,27 +38,27 @@ jest.mock('stores/sessions/SessionStore', () => ({
 
 jest.unmock('logic/rest/FetchProvider');
 
-describe('Create a new view', () => {
+describe('Create a new dashboard', () => {
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, viewsBindings));
   });
 
   afterEach(cleanup);
 
-  it('using Views Page', async () => {
-    const { getByTestId, getAllByText } = render(<AppRouter />);
-    history.push(Routes.VIEWS.LIST);
+  it('using Dashboards Page', async () => {
+    const { getByText, getAllByText } = render(<AppRouter />);
+    history.push(Routes.DASHBOARDS);
 
-    const button = await waitForElement(() => getAllByText('Create new view')[0]);
+    const button = await waitForElement(() => getAllByText('Create new dashboard')[0]);
     fireEvent.click(button);
-    await waitForElement(() => getByTestId('toggle-button'));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
   });
 
-  it('by going to the new view endpoint', async () => {
-    const { getByTestId } = render(<AppRouter />);
+  it('by going to the new dashboards endpoint', async () => {
+    const { getByText } = render(<AppRouter />);
 
-    history.push(Routes.EXTENDEDSEARCH);
+    history.push(Routes.pluginRoute('DASHBOARDS_NEW'));
 
-    await waitForElement(() => getByTestId('toggle-button'));
+    await waitForElement(() => getByText(/This dashboard has no widgets yet/));
   });
 });
