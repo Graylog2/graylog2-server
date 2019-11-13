@@ -137,7 +137,6 @@ class SideBar extends React.Component<Props, State> {
                        text="View Description"
                        icon={<Icon name="info" />}
                        onClick={this.setSelectedKey('viewDescription')}
-                       isLast={false}
                        isOpen={open}>
                 {resultsEmpty ? <Spinner /> : <ViewDescription viewMetadata={viewMetadata} results={results} />}
               </NavItem>
@@ -145,7 +144,6 @@ class SideBar extends React.Component<Props, State> {
                        text="Create"
                        icon={<Icon name="plus" />}
                        onClick={this.setSelectedKey('createWidget')}
-                       isLast={false}
                        isOpen={open}>
                 {resultsEmpty ? <Spinner /> : (
                   <AddWidgetButton onClick={this.toggleOpen}
@@ -157,7 +155,6 @@ class SideBar extends React.Component<Props, State> {
                        text="Formatting & Highlighting"
                        icon={<Icon name="paragraph" />}
                        onClick={this.setSelectedKey('highlighting')}
-                       isLast={false}
                        isOpen={open}>
                 {resultsEmpty ? <Spinner /> : <HighlightingRules />}
               </NavItem>
@@ -165,7 +162,7 @@ class SideBar extends React.Component<Props, State> {
                        text="Fields"
                        icon={<Icon name="subscript" />}
                        onClick={this.setSelectedKey('fields')}
-                       isLast
+                       expandToRight
                        isOpen={open}>
                 {resultsEmpty ? <Spinner /> : children}
               </NavItem>

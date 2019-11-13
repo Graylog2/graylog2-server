@@ -61,16 +61,15 @@
 
 :local(.contentOpen) {
     padding: 20px;
-    white-space: nowrap;
 }
 
 :local(.openFieldContent) {
-    white-space: nowrap;
-    padding: 20px;
     position: absolute !important;
-    bottom: 20px;
-    height: calc(100vh - 330px);
-    max-height: calc(100vh - 330px);
+    top: 0;
+    left: 100%;
+    border: 0;
+    bottom: 0;
+    padding: 20px;
     width: 300px;
 }
 
