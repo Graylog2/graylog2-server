@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import connect from 'stores/connect';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
