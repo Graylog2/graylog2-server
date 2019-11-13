@@ -4,7 +4,7 @@ import { Panel as BootstrapPanel } from 'react-bootstrap';
 import { adjustHue, darken } from 'polished';
 
 import teinte from 'theme/teinte';
-import { colorLevel } from 'theme/GraylogThemeContext.jsx';
+import { colorLevel } from 'theme/util';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const panelVariantStyles = (hex) => {

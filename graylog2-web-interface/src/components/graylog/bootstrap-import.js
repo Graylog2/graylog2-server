@@ -3,7 +3,6 @@ export {
   Checkbox, // NOTE: do we want custom or keep OS styles
   Dropdown,
   Form,
-  InputGroup,
   NavItem,
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles

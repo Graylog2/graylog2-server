@@ -26,7 +26,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
           className="col-sm-7"
         >
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="comment"
             label="Comment"
             maxLength={512}
@@ -65,7 +65,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
           className="col-sm-7"
         >
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="PARAM"
             label="A parameter"
             maxLength={250}

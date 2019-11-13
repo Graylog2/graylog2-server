@@ -33,7 +33,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="typeahead-wrapper"
             >
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="content-packs-filter"
                 label="Filter"
                 name="content-packs-filter"
@@ -1829,7 +1829,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="typeahead-wrapper"
             >
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="content-packs-filter"
                 label="Filter"
                 name="content-packs-filter"

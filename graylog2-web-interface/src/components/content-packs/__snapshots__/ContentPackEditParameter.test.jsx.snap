@@ -23,7 +23,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -52,7 +52,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -81,7 +81,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -110,7 +110,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={false}
             id="type"
             label="Value Type"
@@ -160,7 +160,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
@@ -205,7 +205,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -234,7 +234,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -263,7 +263,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -292,7 +292,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={true}
             id="type"
             label="Value Type"
@@ -342,7 +342,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
@@ -387,7 +387,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -416,7 +416,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -445,7 +445,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -474,7 +474,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={false}
             id="type"
             label="Value Type"
@@ -524,7 +524,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
