@@ -25,11 +25,11 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
 };
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   return result => result.map(({ name, x, y }) => {
-    const newX = x.map(_lastKey);
     const keys = x.map(k => k.slice(0, -1)
       .map((key, idx) => ({ [rowPivots[idx].field]: key }))
       .reduce(_mergeObject, {}));
-      // eslint-disable-next-line no-unused-vars
+    const newX = x.map(_lastKey);
+    // eslint-disable-next-line no-unused-vars
     const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
     return { keys, name, values };
   });
