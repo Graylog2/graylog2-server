@@ -119,7 +119,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     return (
       <span>
         <Row>
-          <Col md={2} style={{ paddingRight: '2px' }}>
+          <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px' }}>
             <DescriptionBox description="Visualization Type">
               <VisualizationTypeSelect value={visualization} onChange={this._onVisualizationChange} />
             </DescriptionBox>
@@ -141,7 +141,7 @@ export default class AggregationControls extends React.Component<Props, State> {
               <SortSelect pivots={rowPivots} series={series} sort={sort} onChange={this._onSortChange} />
             </DescriptionBox>
           </Col>
-          <Col md={2} style={{ paddingLeft: '2px' }}>
+          <Col md={2} style={{ paddingLeft: '2px', paddingRight: '10px' }}>
             <DescriptionBox description="Direction">
               <SortDirectionSelect disabled={!sort || sort.length === 0}
                                    direction={sortDirection && sortDirection.direction}
@@ -150,7 +150,7 @@ export default class AggregationControls extends React.Component<Props, State> {
           </Col>
         </Row>
         <Row style={{ height: 'calc(100% - 110px)' }}>
-          <Col md={2}>
+          <Col md={2} style={{ paddingRight: '2px', paddingLeft: '10px' }}>
             <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
@@ -162,7 +162,7 @@ export default class AggregationControls extends React.Component<Props, State> {
               </DescriptionBox>
             )}
           </Col>
-          <Col md={10} style={{ height: '100%' }}>
+          <Col md={10} style={{ height: '100%', paddingLeft: '7px', marginTop: '5px' }}>
             {childrenWithCallback}
           </Col>
         </Row>

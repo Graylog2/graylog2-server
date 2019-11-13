@@ -23,6 +23,9 @@ module.exports = {
       paths: [{
         name: 'react-bootstrap',
         message: 'Please use `components/graylog` instead.',
+      }, {
+        name: 'create-react-class',
+        message: 'Please use an ES6 or functional component instead.',
       }],
     }],
     'no-underscore-dangle': 'off',
