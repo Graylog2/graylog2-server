@@ -28,7 +28,7 @@ const Container: React.ComponentType<{ open: boolean }> = styled.div`
   box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
 `;
 
-const SidebarHeader: React.ComponentType<{open: Boolean, hasTitle: boolean}> = styled.div`
+const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled.div`
   ${({ open, hasTitle }) => {
     let justifyContent = 'center';
     if (open && hasTitle) justifyContent = 'space-between';
@@ -128,7 +128,7 @@ class SideBar extends React.Component<Props, State> {
         <div className={styles.sidebarContainer}>
           <div className="sidebar">
             <div className={styles.sidebarContent}>
-              <SidebarHeader role="presentation" onClick={this.toggleOpen} className={styles.sidebarNav} hasTitle={title} open={open}>
+              <SidebarHeader role="presentation" onClick={this.toggleOpen} className={styles.sidebarNav} hasTitle={!!title} open={open}>
                 {open && title && <h3 title={title} className={styles.sidebarHeadline}>{title}</h3>}
                 <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
               </SidebarHeader>
