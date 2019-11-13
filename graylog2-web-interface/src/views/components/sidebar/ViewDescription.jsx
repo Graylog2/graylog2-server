@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
@@ -36,6 +37,11 @@ const ViewDescription = ({ results, viewMetadata }: Props) => {
       {formatViewDescription(viewMetadata)}
     </React.Fragment>
   );
+};
+
+ViewDescription.propTypes = {
+  results: PropTypes.object.isRequired,
+  viewMetadata: PropTypes.object.isRequired,
 };
 
 export default ViewDescription;
