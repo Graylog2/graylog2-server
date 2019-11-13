@@ -62,11 +62,11 @@ public class CountsIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        createIndex(INDEX_NAME_1, 1, 0);
-        createIndex(INDEX_NAME_2, 1, 0);
-        waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
+        client().createIndex(INDEX_NAME_1, 1, 0);
+        client().createIndex(INDEX_NAME_2, 1, 0);
+        client().waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
 
-        counts = new Counts(client(), indexSetRegistry);
+        counts = new Counts(jestClient(), indexSetRegistry);
 
         final IndexSetConfig indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")
@@ -110,7 +110,7 @@ public class CountsIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void totalReturnsZeroWithEmptyIndex() throws Exception {
+    public void totalReturnsZeroWithEmptyIndex() {
         assertThat(counts.total()).isEqualTo(0L);
         assertThat(counts.total(indexSet1)).isEqualTo(0L);
         assertThat(counts.total(indexSet2)).isEqualTo(0L);
@@ -130,8 +130,8 @@ public class CountsIT extends ElasticsearchBaseTest {
                     .build();
             bulkBuilder.addAction(indexRequest);
         }
-        final BulkResult bulkResult = client().execute(bulkBuilder.build());
-        assertSucceeded(bulkResult);
+        final BulkResult bulkResult = client().executeWithExpectedSuccess(bulkBuilder.build(), "failed to execute bulk request");
+
         assertThat(bulkResult.getFailedItems()).isEmpty();
 
         // Simulate no indices for the second index set.
@@ -147,7 +147,7 @@ public class CountsIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void totalReturnsNumberOfMessages() throws Exception {
+    public void totalReturnsNumberOfMessages() {
         final Bulk.Builder bulkBuilder = new Bulk.Builder().refresh(true);
 
         final int count1 = 10;
@@ -176,8 +176,8 @@ public class CountsIT extends ElasticsearchBaseTest {
             bulkBuilder.addAction(indexRequest);
         }
 
-        final BulkResult bulkResult = client().execute(bulkBuilder.build());
-        assertSucceeded(bulkResult);
+        final BulkResult bulkResult = client().executeWithExpectedSuccess(bulkBuilder.build(), "failed to execute bulk request");
+
         assertThat(bulkResult.getFailedItems()).isEmpty();
 
         assertThat(counts.total()).isEqualTo(count1 + count2);
@@ -186,7 +186,7 @@ public class CountsIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() throws Exception {
+    public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
 
@@ -204,7 +204,7 @@ public class CountsIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void totalSucceedsWithListOfIndicesLargerThan4Kilobytes() throws Exception {
+    public void totalSucceedsWithListOfIndicesLargerThan4Kilobytes() {
         final int numberOfIndices = 100;
         final String[] indexNames = new String[numberOfIndices];
         final String indexPrefix = "very_long_list_of_indices_0123456789_counts_it_";
@@ -212,7 +212,7 @@ public class CountsIT extends ElasticsearchBaseTest {
 
         for (int i = 0; i < numberOfIndices; i++) {
             final String indexName = indexPrefix + i;
-            createIndex(indexName);
+            client().createIndex(indexName);
             indexNames[i] = indexName;
         }
 

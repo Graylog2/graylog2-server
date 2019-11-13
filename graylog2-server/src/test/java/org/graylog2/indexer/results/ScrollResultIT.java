@@ -55,10 +55,10 @@ public class ScrollResultIT extends ElasticsearchBaseTest {
                 .setParameter(Parameters.SCROLL, "1m")
                 .setParameter(Parameters.SIZE, 5)
                 .build();
-        final SearchResult searchResult = JestUtils.execute(client(), request, () -> "Exception");
+        final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
 
-        assertThat(client()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResult(client(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        assertThat(jestClient()).isNotNull();
+        final ScrollResult scrollResult = new ScrollResult(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );

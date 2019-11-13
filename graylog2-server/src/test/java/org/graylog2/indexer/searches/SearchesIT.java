@@ -171,15 +171,15 @@ public class SearchesIT extends ElasticsearchBaseTest {
             streamService,
             indices,
             indexSetRegistry,
-            client(),
+                jestClient(),
             new ScrollResult.Factory() {
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, fields);
+                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
                 }
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, scroll, fields);
+                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
                 }
             }
         );

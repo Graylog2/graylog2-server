@@ -20,11 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
-import io.searchbox.indices.DeleteIndex;
-import io.searchbox.indices.template.DeleteTemplate;
 import org.graylog.testing.PropertyLoader;
 import org.graylog2.bindings.providers.JestClientProvider;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -39,7 +36,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
+
+import static com.google.common.collect.Iterators.toArray;
 
 /**
  * This rule starts an Elasticsearch instance and provides a configured {@link JestClient}.
@@ -58,6 +56,7 @@ public class ElasticsearchInstance extends ExternalResource {
 
     private final ElasticsearchContainer container;
     private JestClient jestClient;
+    private Client client;
     private FixtureImporter fixtureImporter = new FixtureImporter();
     private final Version version;
 
@@ -124,6 +123,8 @@ public class ElasticsearchInstance extends ExternalResource {
                 false,
                 new ObjectMapperProvider().get()
         ).get();
+
+        client = new Client(jestClient);
     }
 
     @Override
@@ -135,23 +136,24 @@ public class ElasticsearchInstance extends ExternalResource {
         final State request = new State.Builder().withMetadata().build();
         final JsonNode result = JestUtils.execute(jestClient, request, () -> "failed to read state").getJsonObject();
 
-        final Set<String> templates = ImmutableSet.copyOf(result.get("metadata").get("templates").fieldNames());
+        client.deleteTemplates(metadataFieldNamesFor(result, "templates"));
+        client.deleteIndices(metadataFieldNamesFor(result, "indices"));
+    }
 
-        for (String template : templates)
-            JestUtils.execute(jestClient, new DeleteTemplate.Builder(template).build(), () -> "failed to delete template " + template);
-
-        final Set<String> indices = ImmutableSet.copyOf(result.get("metadata").get("indices").fieldNames());
-
-        for (String index : indices)
-            JestUtils.execute(jestClient, new DeleteIndex.Builder(index).build(), () -> "failed to delete index " + index);
+    private String[] metadataFieldNamesFor(JsonNode result, String templates) {
+        return toArray(result.get("metadata").get(templates).fieldNames(), String.class);
     }
 
     public Version version() {
         return version;
     }
 
-    public JestClient client() {
+    public JestClient jestClient() {
         return jestClient;
+    }
+
+    public Client client() {
+        return client;
     }
 
     FixtureImporter fixtureImporter() {

@@ -47,18 +47,19 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        final Node node = new Node(client());
-        indices = new Indices(client(),
+        final Node node = new Node(jestClient());
+        //noinspection UnstableApiUsage
+        indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
     }
 
     @Test
-    public void GetAllMessageFieldsForNonexistingIndexShouldReturnEmptySet() throws Exception {
+    public void GetAllMessageFieldsForNonexistingIndexShouldReturnEmptySet() {
         final String[] indexNames = new String[]{"does_not_exist_" + System.nanoTime()};
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
@@ -67,8 +68,8 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForEmptyIndexShouldReturnEmptySet() throws Exception {
-        final String indexName = createRandomIndex("get_all_message_fields_");
+    public void GetAllMessageFieldsForEmptyIndexShouldReturnEmptySet() {
+        final String indexName = client().createRandomIndex("get_all_message_fields_");
 
         final Set<String> result = indices.getAllMessageFields(new String[]{indexName});
         assertThat(result).isNotNull().isEmpty();
@@ -76,7 +77,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForSingleIndexShouldReturnCompleteList() throws Exception {
+    public void GetAllMessageFieldsForSingleIndexShouldReturnCompleteList() {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0"};
@@ -99,7 +100,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForMultipleIndicesShouldReturnCompleteList() throws Exception {
+    public void GetAllMessageFieldsForMultipleIndicesShouldReturnCompleteList() {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};
@@ -112,9 +113,9 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void GetAllMessageFieldsForIndicesForNonexistingIndexShouldReturnEmptySet() throws Exception {
+    public void GetAllMessageFieldsForIndicesForNonexistingIndexShouldReturnEmptySet() {
         final String indexName = "does_not_exist_" + System.nanoTime();
-        assertThat(indicesExists(indexName)).isFalse();
+        assertThat(client().indicesExists(indexName)).isFalse();
 
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
 
@@ -123,8 +124,8 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForIndicesForEmptyIndexShouldReturnEmptySet() throws Exception {
-        final String indexName = createRandomIndex("indices_it_");
+    public void GetAllMessageFieldsForIndicesForEmptyIndexShouldReturnEmptySet() {
+        final String indexName = client().createRandomIndex("indices_it_");
 
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
 
@@ -135,7 +136,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForIndicesForSingleIndexShouldReturnCompleteList() throws Exception {
+    public void GetAllMessageFieldsForIndicesForSingleIndexShouldReturnCompleteList() {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String indexName = "get_all_message_fields_0";
@@ -170,7 +171,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
 
     @Test
     @SkipDefaultIndexTemplate
-    public void GetAllMessageFieldsForIndicesForMultipleIndicesShouldReturnCompleteList() throws Exception {
+    public void GetAllMessageFieldsForIndicesForMultipleIndicesShouldReturnCompleteList() {
         importFixture("IndicesGetAllMessageFieldsIT-MultipleIndices.json");
 
         final String[] indexNames = new String[]{"get_all_message_fields_0", "get_all_message_fields_1"};

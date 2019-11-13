@@ -74,21 +74,21 @@ public class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        final Indices indices = new Indices(client(),
+        final Indices indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
-                new IndexMappingFactory(new Node(client())),
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new IndexMappingFactory(new Node(jestClient())),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));
-        poller = new IndexFieldTypePoller(client(), indices, new MetricRegistry());
+        poller = new IndexFieldTypePoller(jestClient(), indices, new MetricRegistry());
         indexSet = new TestIndexSet(indexSetConfig);
 
         importFixture("IndexFieldTypePollerIT.json");
     }
 
     @Test
-    public void poll() throws Exception {
+    public void poll() {
         final String indexSetId = indexSet.getConfig().id();
         final IndexFieldTypesDTO existingFieldTypes = IndexFieldTypesDTO.builder()
                 .indexSetId(indexSetId)

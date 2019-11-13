@@ -38,7 +38,7 @@ public class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder());
+        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class MessagesIT extends ElasticsearchBaseTest {
         source.put("source", "source");
         source.put("timestamp", "2017-04-13 15:29:00.000");
         final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
-        final DocumentResult indexResponse = client().execute(indexRequest);
+        final DocumentResult indexResponse = jestClient().execute(indexRequest);
 
         assertThat(indexResponse.isSucceeded()).isTrue();
 
