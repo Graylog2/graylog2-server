@@ -18,15 +18,16 @@ const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.ge
 );
 
 class LUTCachesPage extends React.Component {
-
   componentDidMount() {
     this._loadData(this.props);
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.location.pathname !== prevProps.location.pathname) {
+    const { location: { pathname } } = this.props;
+    const { location: { pathname: prevPathname } } = prevProps;
+    if (pathname !== prevPathname) {
       this._loadData(this.props);
-    } 
+    }
   }
 
   _loadData = (props) => {
@@ -138,8 +139,8 @@ LUTCachesPage.propTypes = {
   validationErrors: PropTypes.object,
   types: PropTypes.object,
   caches: PropTypes.array,
+  location: PropTypes.object.isRequired,
   pagination: PropTypes.object.isRequired,
-  params: PropTypes.object.isRequired,
   route: PropTypes.object.isRequired,
 };
 
