@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.bson.types.ObjectId;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.streams.StreamImpl;
@@ -98,6 +99,41 @@ public class StreamCacheServiceTest {
         cacheService.updateStreams(Collections.singleton(modifiedStream.getId()));
         streams = cacheService.getByName("title");
 
+        assertEquals(Collections.singleton(modifiedStream), streams);
+    }
+
+    @Test
+    public void purgesStreamByName() throws Exception {
+        ObjectId streamId = new ObjectId();
+        Stream stream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "title"));
+
+        when(streamService.load(stream.getId())).thenReturn(stream);
+        cacheService.updateStreams(Collections.singleton(stream.getId()));
+
+        assertThat(cacheService.getByName("title")).isNotEmpty();
+
+        when(streamService.load(stream.getId())).thenThrow(new NotFoundException());
+        cacheService.updateStreams(Collections.singleton(stream.getId()));
+
+        assertThat(cacheService.getByName("title")).isEmpty();
+    }
+
+    @Test
+    public void titleChanges() throws Exception {
+        ObjectId streamId = new ObjectId();
+        Stream stream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "title"));
+        Stream modifiedStream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "new title"));
+
+        when(streamService.load(stream.getId())).thenReturn(stream);
+        cacheService.updateStreams(Collections.singleton(stream.getId()));
+
+        when(streamService.load(stream.getId())).thenReturn(modifiedStream);
+        cacheService.updateStreams(Collections.singleton(modifiedStream.getId()));
+
+        Collection<Stream> streams = cacheService.getByName("title");
+        assertThat(streams).isEmpty();
+
+        streams = cacheService.getByName("new title");
         assertEquals(Collections.singleton(modifiedStream), streams);
     }
 
