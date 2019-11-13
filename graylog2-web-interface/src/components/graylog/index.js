@@ -7,8 +7,10 @@ import HelpBlock from './HelpBlock';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
+import Modal from './Modal';
 import NavDropdown from './NavDropdown';
 import SplitButton from './SplitButton';
+import Table from './Table';
 
 export {
   Alert,
@@ -20,7 +22,9 @@ export {
   Jumbotron,
   Label,
   ListGroupItem,
+  Modal,
   NavDropdown,
   SplitButton,
+  Table,
 };
 export * from './bootstrap-import';
