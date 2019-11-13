@@ -6,7 +6,6 @@ export {
   FormControl,
   InputGroup,
   MenuItem,
-  Modal,
   Nav,
   Navbar,
   NavDropdown,

@@ -7,6 +7,7 @@ import HelpBlock from './HelpBlock';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
+import Modal from './Modal';
 import SplitButton from './SplitButton';
 
 export {
@@ -19,6 +20,7 @@ export {
   Jumbotron,
   Label,
   ListGroupItem,
+  Modal,
   SplitButton,
 };
 export * from './bootstrap-import';
