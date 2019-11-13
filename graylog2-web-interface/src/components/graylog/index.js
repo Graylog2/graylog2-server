@@ -3,9 +3,10 @@ import Badge from './Badge';
 import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
-import Jumbotron from './Jumbotron';
 import HelpBlock from './HelpBlock';
+import Jumbotron from './Jumbotron';
 import Label from './Label';
+import ListGroupItem from './ListGroupItem';
 import SplitButton from './SplitButton';
 
 export {
@@ -14,9 +15,10 @@ export {
   Button,
   ControlLabel,
   DropdownButton,
-  Jumbotron,
   HelpBlock,
+  Jumbotron,
   Label,
+  ListGroupItem,
   SplitButton,
 };
 export * from './bootstrap-import';
