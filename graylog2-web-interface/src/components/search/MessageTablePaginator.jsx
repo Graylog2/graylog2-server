@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 
 import { Pager } from 'components/graylog';
@@ -15,10 +14,10 @@ const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 global.jQuery = $;
 require('bootstrap/js/affix');
 
-const MessageTablePaginator = createReactClass({
-  displayName: 'MessageTablePaginator',
+class MessageTablePaginator extends React.Component {
+  eventsThrottler = new EventHandlersThrottler();
 
-  propTypes: {
+  static propTypes = {
     resultCount: PropTypes.number.isRequired,
     currentPage: PropTypes.number.isRequired,
     children: PropTypes.oneOfType([
@@ -28,33 +27,31 @@ const MessageTablePaginator = createReactClass({
     onPageChange: PropTypes.func.isRequired,
     pageSize: PropTypes.number,
     position: PropTypes.string,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
-      children: undefined,
-      position: '',
-    };
-  },
+  static defaultProps = {
+    pageSize: UniversalSearchStore.DEFAULT_LIMIT,
+    children: undefined,
+    position: '',
+  };
 
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       paginationWidth: 0,
     };
-  },
+  }
 
   componentDidMount() {
     this._setPaginationWidth();
     this._initializeAffix();
     window.addEventListener('resize', this._setPaginationWidth);
-  },
+  }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._setPaginationWidth);
-  },
-
-  eventsThrottler: new EventHandlersThrottler(),
+  }
 
   _initializeAffix() {
     const { position } = this.props;
@@ -68,7 +65,7 @@ const MessageTablePaginator = createReactClass({
         },
       });
     }
-  },
+  }
 
   _setPaginationWidth() {
     const { position } = this.props;
@@ -79,20 +76,20 @@ const MessageTablePaginator = createReactClass({
         this.setState({ paginationWidth: ReactDOM.findDOMNode(this.paginatorContainer).clientWidth });
       });
     }
-  },
+  }
 
   _numberOfPages() {
     const { resultCount, pageSize } = this.props;
 
     return Math.ceil(resultCount / pageSize);
-  },
+  }
 
   _minPage() {
     const { currentPage } = this.props;
 
     const currentTenMin = Math.floor(currentPage / 10) * 10;
     return Math.max(1, currentTenMin);
-  },
+  }
 
   _maxPage() {
     const { currentPage } = this.props;
@@ -103,7 +100,7 @@ const MessageTablePaginator = createReactClass({
 
     const currentTenMax = Math.ceil((currentPage + 1) / 10) * 10;
     return Math.min(this._numberOfPages(), currentTenMax);
-  },
+  }
 
   _onPageChanged(page) {
     const { currentPage, onPageChange } = this.props;
@@ -118,7 +115,7 @@ const MessageTablePaginator = createReactClass({
     }
 
     onPageChange(newPage);
-  },
+  }
 
   render() {
     const { children, currentPage, position } = this.props;
@@ -174,11 +171,12 @@ const MessageTablePaginator = createReactClass({
     }
 
     return (
-      <div ref={(paginatorContainer) => { this.paginatorContainer = paginatorContainer; }} id={`message-table-paginator-${position}`}>
+      <div ref={(element) => { this.paginatorContainer = element; }}
+           id={`message-table-paginator-${position}`}>
         {nav}
       </div>
     );
-  },
-});
+  }
+}
 
 export default MessageTablePaginator;
