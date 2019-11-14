@@ -22,8 +22,7 @@ export default class SeriesConfiguration extends React.Component {
   _onSubmit = () => {
     const { series, name } = this.state;
     const { onClose } = this.props;
-    let newName = name;
-    if (!newName) newName = series.function;
+    const newName = name || series.function;
 
     if (newName && newName !== series.effectiveName) {
       const { config } = series;
