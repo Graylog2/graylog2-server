@@ -80,7 +80,8 @@ describe('<Sidebar />', () => {
         <TestComponent />
       </SideBar>,
     );
-    wrapper.find('SideBar__SidebarHeader').simulate('click');
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
 
     wrapper.find('div[children="View Description"]').simulate('click');
@@ -103,7 +104,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('SideBar__SidebarHeader').simulate('click');
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
     expect(wrapper.find('h3').text()).toBe('New Search');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
@@ -122,7 +123,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('SideBar__SidebarHeader').simulate('click');
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
