@@ -1,8 +1,6 @@
 import { css } from 'styled-components';
 import { breakpoint, color, util } from 'theme';
 
-// import { util } from 'theme';
-
 const navTabsStyles = () => {
   const borderColor = util.colorLevel(color.tertiary.due, -3);
 

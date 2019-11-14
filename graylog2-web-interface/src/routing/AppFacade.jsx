@@ -14,7 +14,7 @@ import 'stylesheets/graylog2.less';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 import StoreProvider from 'injection/StoreProvider';
 
-import GraylogThemeProvider from '../theme/GraylogThemeContext';
+import GraylogThemeProvider from '../theme/GraylogThemeProvider';
 
 const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');

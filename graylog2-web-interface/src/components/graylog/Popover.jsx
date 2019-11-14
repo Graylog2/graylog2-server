@@ -8,14 +8,14 @@ import { color } from 'theme';
 const borderColor = transparentize(0.8, color.primary.tre);
 const Popover = styled(BoostrapPopover)`
   & {
-    background-color: ${color.primary.due};
+    background-color: ${color.global.contentBackground};
     border-color: ${borderColor};
 
     &.top > .arrow {
       border-top-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-top-color: ${color.primary.due};
+        border-top-color: ${color.gray[100]};
       }
     }
 
@@ -23,7 +23,7 @@ const Popover = styled(BoostrapPopover)`
       border-right-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-right-color: ${color.primary.due};
+        border-right-color: ${color.gray[100]};
       }
     }
 
@@ -31,7 +31,7 @@ const Popover = styled(BoostrapPopover)`
       border-bottom-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-bottom-color: ${color.primary.due};
+        border-bottom-color: ${color.gray[100]};
       }
     }
 
@@ -39,13 +39,13 @@ const Popover = styled(BoostrapPopover)`
       border-left-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-left-color: ${color.primary.due};
+        border-left-color: ${color.gray[100]};
       }
     }
   }
 
   .popover-title {
-    background-color: ${darken(0.03, color.primary.due)};
+    background-color: ${darken(0.03, color.gray[100])};
   }
 `;
 

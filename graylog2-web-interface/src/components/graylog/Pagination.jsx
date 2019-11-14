@@ -4,20 +4,21 @@ import styled from 'styled-components';
 import { darken } from 'polished';
 
 import { color } from 'theme';
+import { readableColor } from 'theme/utils';
 
 const Pagination = styled(BootstrapPagination)`
   > li {
     > a,
     > span {
-      color: ${color.tertiary.quattro};
-      background-color: ${color.primary.due};
-      border-color: ${color.secondary.tre};
+      color: ${readableColor(color.gray[100])};
+      background-color: ${color.gray[100]};
+      border-color: ${color.gray[80]};
 
       &:hover,
       &:focus {
-        color: ${darken(0.15, color.tertiary.quattro)};
-        background-color: ${color.secondary.due};
-        border-color: ${color.secondary.tre};
+        color: ${darken(0.15, color.variant.primary)};
+        background-color: ${color.gray[90]};
+        border-color: ${color.gray[80]};
       }
     }
   }
@@ -27,9 +28,9 @@ const Pagination = styled(BootstrapPagination)`
     &,
     &:hover,
     &:focus {
-      color: ${color.primary.due};
-      background-color: ${color.tertiary.quattro};
-      border-color: ${color.tertiary.quattro};
+      color: ${readableColor(color.variant.primary)};
+      background-color: ${color.variant.primary};
+      border-color: ${color.variant.primary};
     }
   }
 
@@ -40,9 +41,9 @@ const Pagination = styled(BootstrapPagination)`
     > a,
     > a:hover,
     > a:focus {
-      color: ${darken(0.25, color.secondary.tre)};
-      background-color: ${color.primary.due};
-      border-color: ${color.secondary.tre};
+      color: ${color.gray[60]};
+      background-color: ${color.gray[100]};
+      border-color: ${color.gray[80]};
     }
   }
 `;

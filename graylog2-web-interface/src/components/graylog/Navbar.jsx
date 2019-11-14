@@ -7,46 +7,48 @@ import { breakpoint, color } from 'theme';
 
 const Navbar = styled(BootstrapNavbar)`
   &.navbar-default {
-    background-color: ${color.secondary.due};
-    border-color: ${darken(0.065, color.secondary.due)};
+    background-color: ${color.gray[90]};
+    border-color: ${color.gray[80]};
 
     .navbar-brand {
-      color: ${color.tertiary.uno};
+      color: ${color.variant.info};
       &:hover,
       &:focus {
-        color: ${darken(0.1, color.tertiary.uno)};
+        color: ${darken(0.1, color.variant.info)};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${color.primary.tre};
+      color: ${color.global.textDefault};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${color.tertiary.uno};
+        color: ${color.variant.info};
 
         &:hover,
         &:focus {
-          color: ${darken(0.25, color.tertiary.uno)};
+          color: ${darken(0.25, color.variant.info)};
           background-color: transparent;
         }
       }
+
       > .active > a {
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, color.tertiary.uno)};
-          background-color: ${darken(0.065, color.secondary.due)};
+          color: ${darken(0.15, color.variant.info)};
+          background-color: ${color.gray[80]};
         }
       }
+
       > .disabled > a {
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.25, color.secondary.tre)};
+          color: ${darken(0.25, color.gray[80])};
           background-color: transparent;
         }
       }
@@ -55,8 +57,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, color.tertiary.uno)};
-          background-color: ${darken(0.065, color.secondary.due)};
+          color: ${darken(0.15, color.variant.info)};
+          background-color: ${darken(0.065, color.gray[90])};
         }
       }
 
@@ -64,26 +66,29 @@ const Navbar = styled(BootstrapNavbar)`
         .open .dropdown-menu {
           > li > a,
           > li > .btn-link {
-            color: ${color.tertiary.uno};
+            color: ${color.variant.info};
+
             &:hover,
             &:focus {
-              color: ${darken(0.25, color.tertiary.uno)};
+              color: ${darken(0.25, color.variant.info)};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
             &:focus {
-              color: ${darken(0.15, color.tertiary.uno)};
-              background-color: ${darken(0.065, color.secondary.due)};
+              color: ${darken(0.15, color.variant.info)};
+              background-color: ${darken(0.065, color.gray[90])};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
             &:focus {
-              color: ${color.secondary.tre};
+              color: ${color.gray[80]};
               background-color: transparent;
             }
           }
@@ -92,69 +97,74 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${color.secondary.tre};
-      &:hover,
-      &:focus {
-        background-color: ${color.secondary.tre};
+      border-color: ${color.gray[80]};
+
+      :hover,
+      :focus {
+        background-color: ${color.gray[80]};
       }
+
       .icon-bar {
-        background-color: ${darken(0.25, color.secondary.tre)};
+        background-color: ${darken(0.25, color.gray[80])};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.065, color.secondary.due)};
+      border-color: ${darken(0.065, color.gray[90])};
     }
 
     .navbar-link {
-      color: ${color.tertiary.uno};
+      color: ${color.variant.info};
       &:hover {
-        color: ${darken(0.25, color.tertiary.uno)};
+        color: ${darken(0.25, color.variant.info)};
       }
     }
 
     .btn-link {
-      color: ${color.tertiary.uno};
+      color: ${color.variant.info};
+
       &:hover,
       &:focus {
-        color: ${darken(0.25, color.tertiary.uno)};
+        color: ${color.variant.dark.info};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${color.secondary.tre};
+          color: ${color.gray[80]};
         }
       }
     }
   }
 
   &.navbar-inverse {
-    background-color: ${color.primary.tre};
-    border-color: ${darken(0.15, color.primary.tre)};
+    background-color: ${color.gray[10]};
+    border-color: ${color.gray[100]};
 
     .navbar-brand {
-      color: ${lighten(0.15, color.tertiary.uno)};
+      color: ${lighten(0.15, color.variant.info)};
+
       &:hover,
       &:focus {
-        color: ${color.primary.due};
+        color: ${color.global.textAlt};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${lighten(0.15, color.primary.tre)};
+      color: ${lighten(0.15, color.global.textDefault)};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${color.secondary.due};
+        color: ${color.gray[90]};
 
         &:hover,
         &:focus {
-          color: ${color.tertiary.due};
+          color: ${color.variant.light.info};
           background-color: transparent;
         }
       }
@@ -162,15 +172,15 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${color.primary.due};
-          background-color: ${lighten(0.20, color.primary.tre)};
+          color: ${color.global.textAlt};
+          background-color: ${color.gray[20]};
         }
       }
       > .disabled > a {
         &,
         &:hover,
         &:focus {
-          color: ${lighten(0.50, color.primary.tre)};
+          color: ${lighten(0.50, color.global.textDefault)};
           background-color: transparent;
         }
       }
@@ -179,41 +189,46 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${color.primary.due};
-          background-color: ${lighten(0.20, color.primary.tre)};
+          color: ${color.global.textAlt};
+          background-color: ${color.gray[20]};
         }
       }
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
-            border-color: ${darken(0.10, color.primary.tre)};
+            border-color: ${color.gray[10]};
           }
+
           .divider {
-            background-color: ${lighten(0.20, color.primary.tre)};
+            background-color: ${color.gray[20]};
           }
+
           > li > a,
           > li > .btn-link {
-            color: ${color.secondary.due};
+            color: ${color.gray[90]};
+
             &:hover,
             &:focus {
-              color: ${color.tertiary.due};
+              color: ${color.variant.light.info};
               background-color: transparent;
             }
           }
+
           > .active > a {
             &,
             &:hover,
             &:focus {
-              color: ${color.primary.due};
-              background-color: ${lighten(0.20, color.primary.tre)};
+              color: ${color.global.textAlt};
+              background-color: ${color.gray[20]};
             }
           }
+
           > .disabled > a {
             &,
             &:hover,
             &:focus {
-              color: ${lighten(0.50, color.primary.tre)};
+              color: ${lighten(0.50, color.global.textDefault)};
               background-color: transparent;
             }
           }
@@ -222,39 +237,44 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${lighten(0.35, color.primary.tre)};
+      border-color: ${color.gray[70]};
+
       &:hover,
       &:focus {
-        background-color: ${lighten(0.35, color.primary.tre)};
+        background-color: ${color.gray[70]};
       }
+
       .icon-bar {
-        background-color: ${color.primary.due};
+        background-color: ${color.global.textAlt};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.07, color.primary.tre)};
+      border-color: ${color.gray[100]};
     }
 
     .navbar-link {
-      color: ${lighten(0.15, color.tertiary.uno)};
+      color: ${lighten(0.15, color.variant.info)};
+
       &:hover {
-        color: ${color.primary.due};
+        color: ${color.global.textAlt};
       }
     }
 
     .btn-link {
-      color: ${lighten(0.15, color.tertiary.uno)};
+      color: ${lighten(0.15, color.variant.info)};
+
       &:hover,
       &:focus {
-        color: ${color.primary.due};
+        color: ${color.global.textAlt};
       }
+
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${lighten(0.50, color.primary.tre)};
+          color: ${lighten(0.50, color.global.textDefault)};
         }
       }
     }

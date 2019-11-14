@@ -7,13 +7,13 @@ import { lighten, transparentize } from 'polished';
 import { color } from 'theme';
 
 const FormControl = memo(styled(BootstrapFormControl)`
-  color: ${color.primary.tre};
-  background-color: ${color.primary.due};
-  border-color: ${color.secondary.tre};
+  color: ${color.global.textDefault};
+  background-color: ${color.gray[100]};
+  border-color: ${color.gray[80]};
 
   &:focus {
-    border-color: ${color.tertiary.due};
-    box-shadow(inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${transparentize(0.6, color.tertiary.due)});
+    border-color: ${color.variant.light.info};
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${transparentize(0.6, color.variant.light.info)};
   }
 
   &::-moz-placeholder,
@@ -25,7 +25,7 @@ const FormControl = memo(styled(BootstrapFormControl)`
   &[disabled],
   &[readonly],
   fieldset[disabled] & {
-    background-color: ${color.secondary.tre};
+    background-color: ${color.gray[80]};
   }
 
   ~ .form-control-feedback.glyphicon { display: none; }

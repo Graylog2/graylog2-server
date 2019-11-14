@@ -7,15 +7,15 @@ import { color } from 'theme';
 
 const Modal = styled(BootstrapModal)`
   .modal-content {
-    background-color: ${color.primary.due};
-    border-color: ${transparentize(0.8, color.primary.tre)};
+    background-color: ${color.global.contentBackground};
+    border-color: ${transparentize(0.8, color.gray[0])};
 
     .modal-header {
-      border-bottom-color: ${color.secondary.tre};
+      border-bottom-color: ${color.gray[90]};
     }
 
     .modal-footer {
-      border-top-color: ${color.secondary.tre};
+      border-top-color: ${color.gray[90]};
     }
   }
 `;

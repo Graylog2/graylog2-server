@@ -1,14 +1,14 @@
 import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import { darken, lighten } from 'polished';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
+import { darken, lighten } from 'polished';
 
-import contrastingColor from 'util/contrastingColor';
+import { contrastingColor } from 'theme/utils';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const bsStyleVariants = ['danger', 'info', 'success', 'warning'];
+const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
   const lightenBorder = lighten(0.30, hex);
@@ -26,9 +26,10 @@ const alertStyles = (hex) => {
   `;
 };
 
+
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
   const StyledAlert = useMemo(
-    () => styled(BootstrapAlert)`${bsStyleThemeVariant(alertStyles)}`,
+    () => styled(BootstrapAlert)`${bsStyleThemeVariant(alertStyles, {}, styleVariants)}`,
     [bsStyle],
   );
 
@@ -38,8 +39,7 @@ const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
 });
 
 Alert.propTypes = {
-  /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(bsStyleVariants),
+  bsStyle: PropTypes.oneOf(styleVariants),
 };
 
 Alert.defaultProps = {

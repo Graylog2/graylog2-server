@@ -11,16 +11,16 @@ const Nav = styled(BootstrapNav)`
       > a {
         &:hover,
         &:focus {
-          background-color: ${color.secondary.due};
+          background-color: ${color.gray[90]};
         }
       }
 
       &.disabled > a {
-        color: ${color.secondary.tre};
+        color: ${color.global.textDefault};
 
         &:hover,
         &:focus {
-          color: ${color.secondary.tre};
+          color: ${color.global.textDefault};
         }
       }
     }
@@ -29,16 +29,16 @@ const Nav = styled(BootstrapNav)`
       &,
       &:hover,
       &:focus {
-        background-color: ${color.secondary.due};
-        border-color: ${color.tertiary.quattro};
+        background-color: ${color.gray[90]};
+        border-color: ${color.variant.primary};
       }
 
       .open > a {
         &,
         &:hover,
         &:focus {
-          color: ${color.primary.due};
-          background-color: ${color.tertiary.quattro};
+          color: ${color.gray[100]};
+          background-color: ${color.variant.primary};
         }
       }
     }

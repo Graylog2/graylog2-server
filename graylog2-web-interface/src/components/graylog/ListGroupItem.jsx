@@ -1,98 +1,91 @@
-import React, { forwardRef, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
-import { darken } from 'polished';
 
-import { useTheme } from 'theme/GraylogThemeContext';
-import { util } from 'theme';
-import contrastingColor from 'util/contrastingColor';
+import { color, util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const listGroupItemStyles = (hex) => {
-  const backgroundColor = util.colorLevel(hex, -9);
-  const textColor = util.colorLevel(hex, 6);
+const listGroupItemStyles = (hex, variant) => {
+  const backgroundColor = util.colorLevel(color.variant[variant], -9);
+  const textColor = util.readableColor(backgroundColor);
 
   return css`
-    && {
+    &.list-group-item-${variant} {
       color: ${textColor};
       background-color: ${backgroundColor};
 
-      &.list-group-item-action {
+      a&,
+      button& {
+        color: ${textColor};
+
+        .list-group-item-heading {
+          color: inherit;
+        }
+
         &:hover,
         &:focus {
           color: ${textColor};
-          background-color: ${darken(0.05, backgroundColor)};
+          background-color: ${color.variant.light[variant]};
         }
-
-        &.active {
-          color: ${contrastingColor(textColor)};
-          background-color: ${textColor};
-          border-color: ${textColor};
-        }
-      }
-
-      &.list-group-item {
-        &.active {
-          color: ${contrastingColor(hex)};
-          background-color: ${hex};
-          border-color: ${hex};
+        &.active,
+        &.active:hover,
+        &.active:focus {
+          color: ${util.readableColor(color.variant.light[variant])};
+          background-color: ${color.variant.light[variant]};
+          border-color: ${color.variant.light[variant]};
         }
       }
     }
   `;
 };
 
-const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
-  const { colors } = useTheme();
-  const StyledListGroupItem = useMemo(
-    () => {
-      return styled(BootstrapListGroupItem)`
-        &.list-group-item-action {
-          color: ${colors.primary.tre};
+const StyledListGroupItem = React.memo(styled(BootstrapListGroupItem)`
+  ${bsStyleThemeVariant(listGroupItemStyles, {}, ['success', 'info', 'warning', 'danger'])};
+  background-color: ${color.gray[90]};
+  border-color: ${color.gray[80]};
 
-          &:hover,
-          &:focus {
-            color: ${colors.primary.tre};
-            background-color: ${colors.secondary.due};
-          }
+  &.disabled,
+  &.disabled:hover,
+  &.disabled:focus {
+    color: ${color.gray[60]};
+    background-color: ${color.gray[90]};
 
-          &:active {
-            color: ${contrastingColor(colors.secondary.tre)};
-            background-color: ${colors.secondary.tre};
-          }
-        }
+    .list-group-item-text {
+      color: ${color.gray[60]};
+    }
+  }
 
-        &.list-group-item {
-          background-color: ${colors.primary.due};
-          border-color: ${colors.secondary.tre};
+  &.active,
+  &.active:hover,
+  &.active:focus {
+    color: ${color.gray[100]};
+    background-color: ${color.variant.primary};
+    border-color: ${color.variant.light.primary};
 
-          &.disabled,
-          &:disabled {
-            color: ${colors.primary.tre};
-            background-color: ${colors.primary.due};
-          }
-        }
+    .list-group-item-text {
+      color: ${color.variant.light.primary};
+    }
+  }
 
-        ${bsStyleThemeVariant(listGroupItemStyles)}
-      `;
-    },
-    [bsStyle, colors],
-  );
+  a&,
+  button& {
+    color: ${color.gray[30]};
 
-  return (
-    <StyledListGroupItem bsStyle={bsStyle} ref={ref} {...props} />
-  );
+    .list-group-item-heading {
+      color: ${color.gray[20]};
+    }
+
+    &:hover,
+    &:focus {
+      color: ${color.gray[30]};
+      background-color: ${color.gray[70]};
+    }
+  }
+`);
+
+const ListGroupItem = forwardRef((props, ref) => {
+  return <StyledListGroupItem ref={ref} {...props} />;
 });
-
-ListGroupItem.propTypes = {
-  /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
-};
-
-ListGroupItem.defaultProps = {
-  bsStyle: undefined,
-};
 
 export default ListGroupItem;

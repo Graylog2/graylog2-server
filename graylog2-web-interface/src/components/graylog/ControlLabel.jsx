@@ -5,10 +5,7 @@ import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
 import { color } from 'theme';
 
 const ControlLabel = styled(BootstrapControlLabel)`
-  color: ${color.primary.tre};
-  font-weight: bold;
-  margin-bottom: 5px;
-  display: inline-block;
+  color: ${color.global.textDefault};
 `;
 
 export default ControlLabel;

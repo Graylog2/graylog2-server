@@ -5,8 +5,8 @@ import styled from 'styled-components';
 import { color } from 'theme';
 
 const Well = styled(BootstrapWell)`
-  background-color: ${color.secondary.due};
-  border-color: ${color.secondary.tre};
+  background-color: ${color.gray[90]};
+  border-color: ${color.gray[80]};
 `;
 
 export default Well;
