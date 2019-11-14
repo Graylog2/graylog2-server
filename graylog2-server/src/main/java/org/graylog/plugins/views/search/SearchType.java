@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.engine.BackendQuery;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -61,7 +60,7 @@ public interface SearchType {
     Filter filter();
 
     @JsonProperty
-    Optional<TimeRange> timerange();
+    Optional<DerivedTimeRange> timerange();
 
     @JsonProperty
     Optional<BackendQuery> query();
@@ -104,7 +103,7 @@ public interface SearchType {
 
         @Nullable
         @JsonProperty
-        private TimeRange timeRange;
+        private DerivedTimeRange timeRange;
 
         @Nullable
         @JsonProperty
@@ -129,7 +128,7 @@ public interface SearchType {
         }
 
         @Override
-        public Optional<TimeRange> timerange() {
+        public Optional<DerivedTimeRange> timerange() {
             return Optional.ofNullable(this.timeRange);
         }
 
