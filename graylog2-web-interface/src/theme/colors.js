@@ -1,26 +1,38 @@
-// // Brand
-// const brandPrimary = '#FF3633';
-// const brandSecondary = '#FFF';
-// const brandTertiary = '#1F1F1F';
+import { darken, tint } from 'polished';
 
-// // Text
-// const textDark = '#1F1F1F';
-// const textLight = '#FFF';
-// const link = '#702785';
+const brand = {
+  primary: '#FF3633',
+  secondary: '#FFF',
+  tertiary: '#1F1F1F',
+};
 
-// // Variants
-// const variantDefault = '#1F1F1F';
-// const variantWarning = '#FFD200';
-// const variantDanger = '#AD0707';
-// const variantSuccess = '#00AE42';
-// const variantInfo = '#6DC6E7';
-// const variantPrimary = '#702785';
+const grays = {};
+const darkestGray = brand.tertiary;
+let i = 0;
+while (i < 1) {
+  grays[Math.ceil(i * 100)] = tint(i, darkestGray);
+  i += 0.10;
+}
 
-// // Grays
-// const grays = {};
+const global = {
+  textDark: grays[0],
+  textLight: grays[100],
+  backgroundColor: grays[90],
+  link: '#702785',
+  linkHover: darken(0.10, '#702785'),
+};
 
+const variants = {
+  danger: '#AD0707',
+  default: '#1F1F1F',
+  info: '#6DC6E7',
+  primary: '#702785',
+  success: '#00AE42',
+  warning: '#FFD200',
+};
 
 const colors = {
+  // Deprecated Colors
   primary: {
     uno: '#FF3633',
     due: '#FFF',
@@ -39,6 +51,11 @@ const colors = {
     cinque: '#FF6418',
     sei: '#FFD200',
   },
+  // New Colors
+  brand: { ...brand },
+  global: { ...global },
+  variant: { ...variants },
+  gray: { ...grays },
 };
 
 export default colors;

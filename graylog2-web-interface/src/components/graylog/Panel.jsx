@@ -1,6 +1,6 @@
-import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Panel as BootstrapPanel } from 'react-bootstrap';
+import styled, { css } from 'styled-components';
 import { adjustHue, darken } from 'polished';
 
 import { color, util } from 'theme';

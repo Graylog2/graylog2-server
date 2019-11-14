@@ -5,3 +5,4 @@ const utils = {
 };
 
 export default utils;
+export { colorLevel };
