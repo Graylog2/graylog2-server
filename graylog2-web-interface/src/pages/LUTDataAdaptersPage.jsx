@@ -73,7 +73,6 @@ class LUTDataAdaptersPage extends React.Component {
 
   _saved = () => {
     // reset detail state
-    this.setState({ dataAdapter: undefined });
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   }
 
@@ -94,7 +93,6 @@ class LUTDataAdaptersPage extends React.Component {
       types,
       dataAdapters,
       pagination,
-      tableStore,
     } = this.props;
     let content;
     const isShowing = action === 'show';
@@ -171,13 +169,28 @@ class LUTDataAdaptersPage extends React.Component {
 
 LUTDataAdaptersPage.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
-  params: PropTypes.object.isRequired,
+  errorStates: PropTypes.object,
+  dataAdapter: PropTypes.object,
+  validationErrors: PropTypes.object,
+  types: PropTypes.object,
+  pagination: PropTypes.object,
+  dataAdapters: PropTypes.array,
+  location: PropTypes.object.isRequired,
   route: PropTypes.object.isRequired,
 };
 
-export default connect(LUTDataAdaptersPage, { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, 
-  ({ dataAdaptersStore, lookupTableStore,...otherProps }) => ({
-  ...otherProps,
-  ...dataAdaptersStore,
-   errorStates: lookupTableStore.errorStates,
-}));
+LUTDataAdaptersPage.defaultProps = {
+  errorStates: null,
+  validationErrors: {},
+  dataAdapters: null,
+  types: null,
+  pagination: null,
+  dataAdapter: null,
+};
+
+export default connect(LUTDataAdaptersPage, { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore },
+  ({ dataAdaptersStore, lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...dataAdaptersStore,
+    errorStates: lookupTableStore.errorStates,
+  }));

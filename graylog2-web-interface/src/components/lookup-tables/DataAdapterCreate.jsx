@@ -57,7 +57,6 @@ class DataAdapterCreate extends React.Component {
     const sortedAdapters = Object.keys(types).map((key) => {
       const typeItem = types[key];
       if (adapterPlugins[typeItem.type] === undefined) {
-        console.error(`Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`);
         return { value: typeItem.type, disabled: true, label: `${typeItem.type} - missing or invalid plugin` };
       }
       return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
