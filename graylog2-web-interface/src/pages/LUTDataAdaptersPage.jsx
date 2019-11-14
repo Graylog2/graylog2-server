@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-
+import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 import { ButtonToolbar, Col, Row, Button } from 'components/graylog';
@@ -17,40 +17,30 @@ const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = Combine
 );
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LUTDataAdaptersPage = createReactClass({
-  displayName: 'LUTDataAdaptersPage',
+class LUTDataAdaptersPage extends React.Component {
+  errorStatesTimer = undefined;
 
-  propTypes: {
-    // eslint-disable-next-line react/no-unused-prop-types
-    params: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
-  },
-
-  mixins: [
-    Reflux.connect(LookupTableDataAdaptersStore),
-    Reflux.connect(LookupTablesStore, 'tableStore'),
-  ],
+  errorStatesInterval = 1000;
 
   componentDidMount() {
     this._loadData(this.props);
-  },
+  }
 
-  componentWillReceiveProps(nextProps) {
-    this._loadData(nextProps);
-  },
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this._loadData(this.props);
+    }
+  }
 
   componentWillUnmount() {
     clearInterval(this.errorStatesTimer);
-  },
+  }
 
-  errorStatesTimer: undefined,
-  errorStatesInterval: 1000,
-
-  _startErrorStatesTimer() {
+  _startErrorStatesTimer = () => {
     this._stopErrorStatesTimer();
 
     this.errorStatesTimer = setInterval(() => {
-      const { dataAdapters } = this.state;
+      const { dataAdapters } = this.props;
       let names = null;
       if (dataAdapters) {
         names = dataAdapters.map(t => t.name);
@@ -59,17 +49,17 @@ const LUTDataAdaptersPage = createReactClass({
         LookupTablesActions.getErrors(null, null, names || null);
       }
     }, this.errorStatesInterval);
-  },
+  }
 
-  _stopErrorStatesTimer() {
+  _stopErrorStatesTimer = () => {
     if (this.errorStatesTimer) {
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
-  },
+  }
 
-  _loadData(props) {
-    const { pagination } = this.state;
+  _loadData = (props) => {
+    const { pagination } = this.props;
     this._stopErrorStatesTimer();
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
@@ -79,32 +69,33 @@ const LUTDataAdaptersPage = createReactClass({
       LookupTableDataAdaptersActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
-  },
+  }
 
-  _saved() {
+  _saved = () => {
     // reset detail state
     this.setState({ dataAdapter: undefined });
     history.push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
-  },
+  }
 
-  _isCreating(props) {
+  _isCreating = (props) => {
     return props.route.action === 'create';
-  },
+  }
 
-  _validateAdapter(adapter) {
+  _validateAdapter = (adapter) => {
     LookupTableDataAdaptersActions.validate(adapter);
-  },
+  }
 
   render() {
-    const { route: { action } } = this.props;
     const {
+      route: { action },
+      errorStates,
       dataAdapter,
       validationErrors,
       types,
       dataAdapters,
       pagination,
       tableStore,
-    } = this.state;
+    } = this.props;
     let content;
     const isShowing = action === 'show';
     const isEditing = action === 'edit';
@@ -146,7 +137,7 @@ const LUTDataAdaptersPage = createReactClass({
       content = (
         <DataAdaptersOverview dataAdapters={dataAdapters}
                               pagination={pagination}
-                              errorStates={tableStore.errorStates} />
+                              errorStates={errorStates} />
       );
     }
 
@@ -175,7 +166,18 @@ const LUTDataAdaptersPage = createReactClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default LUTDataAdaptersPage;
+LUTDataAdaptersPage.propTypes = {
+  // eslint-disable-next-line react/no-unused-prop-types
+  params: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired,
+};
+
+export default connect(LUTDataAdaptersPage, { lookupTableStore: LookupTablesStore, dataAdaptersStore: LookupTableDataAdaptersStore }, 
+  ({ dataAdaptersStore, lookupTableStore,...otherProps }) => ({
+  ...otherProps,
+  ...dataAdaptersStore,
+   errorStates: lookupTableStore.errorStates,
+}));

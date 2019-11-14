@@ -53,8 +53,8 @@ class LUTCachesPage extends React.Component {
   };
 
   render() {
-    const { route: { action } } = this.props;
     const {
+      route: { action },
       cache,
       validationErrors,
       types,
