@@ -86,7 +86,7 @@ type Props = {
   text: string,
   icon: string,
   onClick: (string) => void,
-  children: React.Node,
+  children: React.Element<any>,
 }
 
 const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {

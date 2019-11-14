@@ -153,7 +153,7 @@ class SideBar extends React.Component<Props, State> {
     );
   };
 
-  navItemChildren = (navItemChildren: React.Node): React.Node => {
+  navItemChildren = (navItemChildren: React.Element<any>): React.Element<any> => {
     const { results } = this.props;
     const resultsEmpty = !results || Object.keys(results).length <= 0;
     if (resultsEmpty) {
