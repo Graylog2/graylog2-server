@@ -7,6 +7,11 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import SeriesConfiguration from './SeriesConfiguration';
 
 describe('SeriesConfiguration', () => {
+  const createNewSeries = (series, name) => {
+    const newConfig = series.config.toBuilder().name(name).build();
+    return series.toBuilder().config(newConfig).build();
+  };
+
   it('renders the configuration dialog', () => {
     const wrapper = renderer.create(<SeriesConfiguration series={Series.forFunction('count()')} onClose={() => {}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
@@ -44,16 +49,33 @@ describe('SeriesConfiguration', () => {
     const series = Series.forFunction('count()');
     const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
     const input = wrapper.find('input');
-    expect(input).toHaveProp('value', 'count()');
     const submit = wrapper.find('button');
+
+    expect(input).toHaveProp('value', 'count()');
 
     input.simulate('change', { target: { value: 'Some other value' } });
 
     submit.simulate('click');
 
-    const newSeries = series.toBuilder()
-      .config(series.config.toBuilder().name('Some other value').build())
-      .build();
+    const newSeries = createNewSeries(series, 'Some other value');
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onClose).toHaveBeenCalledWith(newSeries);
+  });
+
+  it('returns function name upon submit, when no name is defined', () => {
+    const onClose = jest.fn();
+    const series = createNewSeries(Series.forFunction('count()'), 'Some other value');
+    const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
+    const input = wrapper.find('input');
+    const submit = wrapper.find('button');
+
+    expect(input).toHaveProp('value', 'Some other value');
+
+    input.simulate('change', { target: { value: '' } });
+
+    submit.simulate('click');
+
+    const newSeries = createNewSeries(series, 'count()');
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledWith(newSeries);
   });
