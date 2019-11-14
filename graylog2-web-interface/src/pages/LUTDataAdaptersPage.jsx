@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 import connect from 'stores/connect';
 import Routes from 'routing/Routes';
@@ -27,7 +25,9 @@ class LUTDataAdaptersPage extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.location.pathname !== prevProps.location.pathname) {
+    const { location: { pathname } } = this.props;
+    const { location: { pathname: prevPathname } } = prevProps;
+    if (pathname !== prevPathname) {
       this._loadData(this.props);
     }
   }
@@ -59,7 +59,7 @@ class LUTDataAdaptersPage extends React.Component {
   }
 
   _loadData = (props) => {
-    const { pagination } = this.props;
+    const { pagination } = props;
     this._stopErrorStatesTimer();
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);

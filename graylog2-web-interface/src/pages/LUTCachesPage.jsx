@@ -29,7 +29,7 @@ class LUTCachesPage extends React.Component {
   }
 
   _loadData = (props) => {
-    const { pagination } = this.props;
+    const { pagination } = props;
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
     } else if (this._isCreating(props)) {
