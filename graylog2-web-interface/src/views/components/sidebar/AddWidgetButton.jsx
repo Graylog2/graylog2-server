@@ -10,7 +10,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 
 
-const Group = styled.h4`
+const Group = styled.div`
   margin-bottom: 20px;
   &:last-child {
     margin-bottom: 0;
