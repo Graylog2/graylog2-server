@@ -15,6 +15,8 @@ import BooleanExpression from './AggregationConditionExpressions/BooleanExpressi
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
 /* eslint-enable import/no-cycle */
 
+import { internalNodePropType } from './AggregationConditionExpressions/propTypes';
+
 import styles from './AggregationConditionExpression.css';
 
 class AggregationConditionExpression extends React.Component {
@@ -24,23 +26,22 @@ class AggregationConditionExpression extends React.Component {
     formattedFields: PropTypes.array.isRequired,
     aggregationFunctions: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
-    expression: PropTypes.shape({
-      expr: PropTypes.string,
-      left: PropTypes.object,
-      right: PropTypes.object,
-    }).isRequired,
+    expression: internalNodePropType.isRequired,
+    parent: internalNodePropType,
     level: PropTypes.number, // Internal use only
     renderLabel: PropTypes.bool,
   };
 
   static defaultProps = {
     level: 0,
+    parent: undefined,
     renderLabel: true,
   };
 
   handleAddExpression = () => {
-    const { expression, onChange } = this.props;
-    const nextExpression = emptyBooleanExpressionConfig({ operator: '&&', expression });
+    const { expression, onChange, parent } = this.props;
+    const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
+    const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression });
     onChange('conditions', nextExpression);
   };
 
@@ -71,7 +72,7 @@ class AggregationConditionExpression extends React.Component {
   };
 
   render() {
-    const { expression, renderLabel } = this.props;
+    const { expression, parent, renderLabel } = this.props;
     switch (expression.expr) {
       case 'number-ref':
         return <NumberRefExpression {...this.props} />;
@@ -79,7 +80,7 @@ class AggregationConditionExpression extends React.Component {
         return <NumberExpression {...this.props} />;
       case '&&':
       case '||':
-        return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} />;
+        return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
       case '<':
       case '<=':
       case '>':
