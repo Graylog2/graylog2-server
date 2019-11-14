@@ -9,7 +9,7 @@ import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
-import NavItem from './NavItem';
+import NavItem, { Title as NavItemTitle } from './NavItem';
 import ViewDescription from './ViewDescription';
 
 const defaultNewViewTitle = 'New Search';
@@ -37,11 +37,7 @@ const ContentOverlay = styled.div`
   background: rgba(3, 3, 3, 0.25);
 `;
 
-const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled.div`
-  padding: 9px 10px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
+const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)`
   ${({ open, hasTitle }) => {
     let justifyContent = 'center';
     if (open && hasTitle) justifyContent = 'space-between';

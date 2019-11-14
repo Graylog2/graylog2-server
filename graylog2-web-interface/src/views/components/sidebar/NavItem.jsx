@@ -12,7 +12,7 @@ type StyleProps = {
   expandRight: boolean,
 };
 
-const Title: React.ComponentType<StyleProps> = styled.div`
+export const Title: React.ComponentType<StyleProps> = styled.div`
   padding: 9px 10px;
   display: flex;
   align-items: center;
