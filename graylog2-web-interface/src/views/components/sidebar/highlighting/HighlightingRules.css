@@ -1,3 +1,7 @@
+:local(.headline) {
+    margin-bottom: 10px;
+}
+
 :local(.colorElement) {
     height: 2rem;
     width: 2rem;
@@ -6,8 +10,7 @@
 }
 
 :local(.highlightingRuleBlock) {
-    margin-left: 2rem;
-    margin-top: 1rem;
+    margin-top: 5px;
     display: flex;
 }
 
