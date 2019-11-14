@@ -28,7 +28,8 @@ import java.util.Map;
 @JsonSubTypes({
         @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
         @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-        @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class)
+        @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
+        @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class),
 })
 public abstract class TimeRange {
 
