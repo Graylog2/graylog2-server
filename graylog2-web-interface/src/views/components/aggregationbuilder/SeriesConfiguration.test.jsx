@@ -7,18 +7,18 @@ import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import SeriesConfiguration from './SeriesConfiguration';
 
 describe('SeriesConfiguration', () => {
-  const createNewSeries = (series, name) => {
+  const createNewSeries = (series = Series.forFunction('count()'), name) => {
     const newConfig = series.config.toBuilder().name(name).build();
     return series.toBuilder().config(newConfig).build();
   };
 
   it('renders the configuration dialog', () => {
-    const wrapper = renderer.create(<SeriesConfiguration series={Series.forFunction('count()')} onClose={() => {}} />);
+    const wrapper = renderer.create(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
 
   it('renders an input to change the series name', () => {
-    const wrapper = mount(<SeriesConfiguration series={Series.forFunction('count()')} onClose={() => {}} />);
+    const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
     expect(wrapper.find('input')).toHaveProp('value', 'count()');
   });
 
@@ -33,7 +33,7 @@ describe('SeriesConfiguration', () => {
 
   it('submit button calls onClose callback', () => {
     const onClose = jest.fn();
-    const series = Series.forFunction('count()');
+    const series = createNewSeries();
     const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
 
     const submit = wrapper.find('button');
@@ -46,7 +46,7 @@ describe('SeriesConfiguration', () => {
 
   it('returns changed name upon submit', () => {
     const onClose = jest.fn();
-    const series = Series.forFunction('count()');
+    const series = createNewSeries();
     const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
     const input = wrapper.find('input');
     const submit = wrapper.find('button');
@@ -64,7 +64,7 @@ describe('SeriesConfiguration', () => {
 
   it('returns original metric function name upon submit, when no name is defined', () => {
     const onClose = jest.fn();
-    const series = createNewSeries(Series.forFunction('count()'), 'Some other value');
+    const series = createNewSeries(undefined, 'Some other value');
     const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
     const input = wrapper.find('input');
     const submit = wrapper.find('button');
