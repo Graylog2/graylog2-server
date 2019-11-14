@@ -172,9 +172,9 @@ class SideBar extends React.Component<Props, State> {
     return (
       <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
         {open && <ContentOverlay />}
-        <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open}>
+        <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open} data-testid="sidebar-header">
           {open && title && <Headline title={title}>{title}</Headline>}
-          <ToggleIcon data-testid="toggle-button"><Icon name={toggleIcon} /></ToggleIcon>
+          <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
         </SidebarHeader>
         <HorizontalRuler />
         <NavItem isSelected={open && selectedKey === 'viewDescription'}

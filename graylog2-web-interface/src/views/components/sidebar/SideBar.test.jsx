@@ -80,12 +80,11 @@ describe('<Sidebar />', () => {
         <TestComponent />
       </SideBar>,
     );
-
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
-
+    wrapper.find('SideBar__SidebarHeader').simulate('click');
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
-    expect(wrapper.find('small').text()).toBe(viewMetaData.summary);
+
+    wrapper.find('div[children="View Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
   });
 
   it('should render a sidebar without title and summary', () => {
@@ -104,14 +103,12 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
+    wrapper.find('SideBar__SidebarHeader').simulate('click');
     wrapper.find('div[children="View Description"]').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('New View');
-    expect(wrapper.find('small').text()).toBe('No summary.');
-    expect(wrapper.find('div.viewMetadata').at(1).text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
-
+    expect(wrapper.find('h3').text()).toBe('New Search');
+    expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
     wrapper.find('div[children="Create"]').simulate('click');
-    expect(wrapper.find('ButtonGroup')).toExist();
+    expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
 
   it('should render passed children', () => {
@@ -125,7 +122,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
+    wrapper.find('SideBar__SidebarHeader').simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });
