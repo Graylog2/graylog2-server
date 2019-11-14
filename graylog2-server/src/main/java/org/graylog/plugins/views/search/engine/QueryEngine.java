@@ -102,7 +102,7 @@ public class QueryEngine {
                                 } else {
                                     error = new QueryError(query, cause);
                                 }
-                                LOG.error("Running query {} failed: {}", query.id(), cause);
+                                LOG.debug("Running query {} failed: {}", query.id(), cause);
                                 searchJob.addError(error);
                                 return QueryResult.failedQueryWithError(query, error);
                             }
