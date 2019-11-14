@@ -1,4 +1,8 @@
+// @flow strict
+import uuid from 'uuid/v4';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
+import AggregationWidget from '../../aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from '../../aggregationbuilder/AggregationWidgetConfig';
 
 const formatPivot = (pivot) => {
   const { type, field, config } = pivot;
@@ -22,7 +26,8 @@ const formatPivot = (pivot) => {
   };
 };
 
-export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
+const generateConfig = (id: string, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
+  id,
   type: 'pivot',
   config: {
     id: 'vals',
@@ -32,4 +37,11 @@ export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
     series: series.map(s => Object.assign({ id: s.effectiveName }, parseSeries(s.function))),
     sort: sort,
   },
-}];
+});
+
+export default ({ config }: AggregationWidget) => {
+  const chartSearchTypeId = uuid();
+  return config.visualization === 'numeric' && config.visualizationConfig && config.visualizationConfig.trend
+    ? [generateConfig(chartSearchTypeId, config), { ...(generateConfig(uuid(), config)), timerange: { type: 'offset', source: 'search_type', id: chartSearchTypeId } }]
+    : [generateConfig(chartSearchTypeId, config)];
+};
