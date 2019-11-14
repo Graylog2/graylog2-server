@@ -108,7 +108,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     </StyledButton>
   );
 
-  _renderGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
+  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
     const typeCreators = creators.filter(c => (c.type === type));
     const sortedCreators = sortBy(typeCreators, 'title');
     return sortedCreators.map(this._createMenuItem);
@@ -117,11 +117,10 @@ class AddWidgetButton extends React.Component<Props, State> {
   render() {
     const { overflowingComponents } = this.state;
     const creators: Array<Creator> = PluginStore.exports('creators');
-    const presets = this._renderGroup(creators, 'preset');
-    const generic = this._renderGroup(creators, 'generic');
+    const presets = this._createGroup(creators, 'preset');
+    const generic = this._createGroup(creators, 'generic');
     // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.Node> = Object.values(overflowingComponents);
-    console.log(components);
     return (
       <React.Fragment>
         <Group>
@@ -129,7 +128,7 @@ class AddWidgetButton extends React.Component<Props, State> {
           {generic}
         </Group>
         <Group>
-          <GroupHeadline>Aggregation</GroupHeadline>
+          <GroupHeadline>Predefined Aggregation</GroupHeadline>
           {presets}
         </Group>
         {!isEmpty(components) && (
