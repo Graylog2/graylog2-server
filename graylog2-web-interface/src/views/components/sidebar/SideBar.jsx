@@ -81,7 +81,7 @@ type Props = {
 };
 
 type State = {
-  selectedKey: string,
+  selectedKey?: string,
   open: boolean,
   disabledAutoClose: boolean,
 };
@@ -109,7 +109,7 @@ class SideBar extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      selectedKey: 'fields',
+      selectedKey: undefined,
       open: false,
       disabledAutoClose: false,
     };
@@ -132,8 +132,11 @@ class SideBar extends React.Component<Props, State> {
   };
 
   toggleOpen = () => {
-    const { open } = this.state;
-    this.setState({ open: !open });
+    const { open, selectedKey } = this.state;
+    this.setState({
+      open: !open,
+      selectedKey: open ? undefined : selectedKey,
+    });
   };
 
   toggleAutoClose = () => {
