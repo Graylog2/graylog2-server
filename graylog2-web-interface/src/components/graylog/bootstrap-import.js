@@ -5,10 +5,8 @@ export {
   Form,
   FormControl,
   InputGroup,
-  MenuItem,
   Nav,
   Navbar,
-  NavDropdown,
   NavItem,
   Pager,
   Pagination,
@@ -30,6 +28,7 @@ export {
   FormGroup,
   Grid,
   ListGroup,
+  MenuItem,
   OverlayTrigger,
   PanelGroup,
   /* 👆 no custom theme colors needed 👆 */
