@@ -62,7 +62,7 @@ describe('SeriesConfiguration', () => {
     expect(onClose).toHaveBeenCalledWith(newSeries);
   });
 
-  it('returns function name upon submit, when no name is defined', () => {
+  it('returns original metric function name upon submit, when no name is defined', () => {
     const onClose = jest.fn();
     const series = createNewSeries(Series.forFunction('count()'), 'Some other value');
     const wrapper = mount(<SeriesConfiguration series={series} onClose={onClose} />);
