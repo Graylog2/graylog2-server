@@ -39,15 +39,17 @@ public abstract class OffsetRange extends TimeRange {
 
     @Override
     public DateTime getFrom() {
-        return null;
+        throw new IllegalStateException("OffsetRange is not able to return its start point on its own. Please use DerivedTimeRange#effectiveTimeRange instead.");
     }
 
     @Override
     public DateTime getTo() {
-        return null;
+        throw new IllegalStateException("OffsetRange is not able to return its end point on its own. Please use DerivedTimeRange#effectiveTimeRange instead.");
     }
 
     @Override
+    @Deprecated
+    // Only called from pre 3.2 dashboarding functionality, which does not support offset time ranges.
     public Map<String, Object> getPersistedConfig() {
         return null;
     }
