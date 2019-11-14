@@ -37,12 +37,11 @@ const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 ### Active Items
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup>
-  {styles.map((style) => (
-    <ListGroupItem key={`lgi-${style}`} bsStyle={style.toLowerCase()} active>{style}</ListGroupItem>
-  ))}
+  <ListGroupItem href="#" active>Link 1</ListGroupItem>
+  <ListGroupItem href="#">Link 2</ListGroupItem>
+  <ListGroupItem href="#" disabled>Link 3</ListGroupItem>
 </ListGroup>
 ```
 

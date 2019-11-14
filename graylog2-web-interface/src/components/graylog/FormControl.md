@@ -1,5 +1,5 @@
 ```js
-import { FormGroup, ControlLabel, HelpBlock } from './index';
+import { FormGroup, ControlLabel, HelpBlock } from 'components/graylog';
 
 class FormExample extends React.Component {
   constructor(props, context) {
@@ -50,7 +50,7 @@ class FormExample extends React.Component {
 ```
 
 ```js
-import { FormGroup, InputGroup, Button, DropdownButton, MenuItem } from './index';
+import { FormGroup, InputGroup, Button, DropdownButton, MenuItem } from 'components/graylog';
 import Icon from 'components/common/Icon';
 
 class FormExample extends React.Component {

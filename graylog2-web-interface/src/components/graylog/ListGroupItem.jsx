@@ -28,6 +28,7 @@ const listGroupItemStyles = (hex, variant) => {
           color: ${textColor};
           background-color: ${color.variant.light[variant]};
         }
+
         &.active,
         &.active:hover,
         &.active:focus {
@@ -70,7 +71,7 @@ const StyledListGroupItem = React.memo(styled(BootstrapListGroupItem)`
 
   a&,
   button& {
-    color: ${color.gray[30]};
+    color: ${color.global.link};
 
     .list-group-item-heading {
       color: ${color.gray[20]};
@@ -78,8 +79,8 @@ const StyledListGroupItem = React.memo(styled(BootstrapListGroupItem)`
 
     &:hover,
     &:focus {
-      color: ${color.gray[30]};
-      background-color: ${color.gray[70]};
+      color: ${color.global.linkHover};
+      background-color: ${color.gray[80]};
     }
   }
 `);
