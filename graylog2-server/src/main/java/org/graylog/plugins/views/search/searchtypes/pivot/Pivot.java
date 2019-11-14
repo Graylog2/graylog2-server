@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +29,10 @@ import org.graylog.plugins.views.search.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog2.plugin.indexer.searches.timeranges.OffsetRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -118,6 +124,13 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+        @JsonSubTypes({
+                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
+                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
+                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
+                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
+        })
         public Builder timerange(@Nullable TimeRange timerange) {
             return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
         }
