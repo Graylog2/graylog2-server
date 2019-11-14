@@ -1,13 +1,13 @@
 import theme from 'styled-theming';
-import teinte from 'theme/teinte';
+import { color } from 'theme';
 
 const variantColors = {
-  danger: teinte.secondary.uno,
-  default: teinte.secondary.due,
-  info: teinte.tertiary.uno,
-  primary: teinte.tertiary.quattro,
-  success: teinte.tertiary.tre,
-  warning: teinte.tertiary.sei,
+  danger: color.secondary.uno,
+  default: color.secondary.due,
+  info: color.tertiary.uno,
+  primary: color.tertiary.quattro,
+  success: color.tertiary.tre,
+  warning: color.tertiary.sei,
 };
 const bsStyles = Object.keys(variantColors);
 
@@ -15,7 +15,7 @@ const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}, includedVarian
   const variants = includedVariants.map((variant) => {
     return {
       [variant]: {
-        teinte: cssBuilder(variantColors[variant], variant),
+        color: cssBuilder(variantColors[variant], variant),
       },
     };
   });

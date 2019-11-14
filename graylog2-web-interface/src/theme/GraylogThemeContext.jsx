@@ -2,11 +2,11 @@ import React, { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider } from 'styled-components';
 
-// TODO: make `teinte` a dynamic set of colors
-import teinte from './teinte';
+// TODO: make `colors` a dynamic set of colors
+import colors from './colors';
 import GlobalThemeStyles from './GlobalThemeStyles';
 
-const defaultValues = { colors: teinte };
+const defaultValues = { colors };
 const ThemeColor = createContext(defaultValues);
 
 function useTheme() {

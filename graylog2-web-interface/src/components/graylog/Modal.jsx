@@ -3,19 +3,19 @@ import { Modal as BootstrapModal } from 'react-bootstrap';
 import styled from 'styled-components';
 import { transparentize } from 'polished';
 
-import teinte from 'theme/teinte';
+import { color } from 'theme';
 
 const Modal = styled(BootstrapModal)`
   .modal-content {
-    background-color: ${teinte.primary.due};
-    border-color: ${transparentize(0.8, teinte.primary.tre)};
+    background-color: ${color.primary.due};
+    border-color: ${transparentize(0.8, color.primary.tre)};
 
     .modal-header {
-      border-bottom-color: ${teinte.secondary.tre};
+      border-bottom-color: ${color.secondary.tre};
     }
 
     .modal-footer {
-      border-top-color: ${teinte.secondary.tre};
+      border-top-color: ${color.secondary.tre};
     }
   }
 `;

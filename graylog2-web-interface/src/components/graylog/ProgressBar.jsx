@@ -1,12 +1,19 @@
 // eslint-disable-next-line no-restricted-imports
+<<<<<<< HEAD
 import { ProgressBar } from 'react-bootstrap';
 import { css } from 'styled-components';
 
 import teinte from 'theme/teinte';
+=======
+import { ProgressBar as BootstrapProgressBar } from 'react-bootstrap';
+import { css, createGlobalStyle } from 'styled-components';
+>>>>>>> a8b3deb61... Organizing Theme Files
 import { transparentize } from 'polished';
+
+import { color } from 'theme';
 import { variantColors } from './variants/bsStyle';
 
-const defaultStripColor = transparentize(0.75, teinte.primary.due);
+const defaultStripColor = transparentize(0.75, color.primary.due);
 
 const variants = (styles) => {
   let style = '';
@@ -22,11 +29,11 @@ const variants = (styles) => {
 
 export const progressBarStyles = css`
   .progress {
-    background-color: ${teinte.secondary.due};
+    background-color: ${color.secondary.due};
 
     .progress-bar {
-      color: ${teinte.primary.due};
-      background-color: ${teinte.tertiary.uno};
+      color: ${color.primary.due};
+      background-color: ${color.tertiary.uno};
     }
 
     .progress-striped .progress-bar,

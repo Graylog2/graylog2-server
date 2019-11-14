@@ -2,58 +2,49 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import teinte from 'theme/teinte';
-import { colorLevel } from 'theme/util';
+import { color } from 'theme';
 import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)(() => {
-  const borderColor = colorLevel(teinte.tertiary.due, -3);
-
-  return css`
-    &.nav {
-      > li {
-        > a {
-          &:hover,
-          &:focus {
-            background-color: ${colorLevel(teinte.secondary.due, -3)};
-          }
+const Nav = styled(BootstrapNav)`
+  &.nav {
+    > li {
+      > a {
+        &:hover,
+        &:focus {
+          background-color: ${color.secondary.due};
         }
+      }
 
-        &.disabled > a {
-          color: ${teinte.secondary.tre};
+      &.disabled > a {
+        color: ${color.secondary.tre};
 
-          &:hover,
-          &:focus {
-            color: ${teinte.secondary.tre};
-          }
+        &:hover,
+        &:focus {
+          color: ${color.secondary.tre};
         }
+      }
+    }
+
+    .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: ${color.secondary.due};
+        border-color: ${color.tertiary.quattro};
       }
 
       .open > a {
         &,
         &:hover,
         &:focus {
-          background-color: ${colorLevel(teinte.secondary.due, -3)};
-          border-color: ${borderColor};
+          color: ${color.primary.due};
+          background-color: ${color.tertiary.quattro};
         }
       }
     }
 
-    &.nav-pills {
-      > li {
-        &.active > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${teinte.primary.due};
-            background-color: ${borderColor};
-          }
-        }
-      }
-    }
-
-    &${navTabsStyles()}
-  `;
-});
+    &${navTabsStyles()};
+  }
+`;
 
 export default Nav;

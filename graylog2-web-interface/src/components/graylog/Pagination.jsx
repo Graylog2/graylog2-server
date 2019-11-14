@@ -3,21 +3,21 @@ import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import styled from 'styled-components';
 import { darken } from 'polished';
 
-import teinte from 'theme/teinte';
+import { color } from 'theme';
 
 const Pagination = styled(BootstrapPagination)`
   > li {
     > a,
     > span {
-      color: ${teinte.tertiary.quattro};
-      background-color: ${teinte.primary.due};
-      border-color: ${teinte.secondary.tre};
+      color: ${color.tertiary.quattro};
+      background-color: ${color.primary.due};
+      border-color: ${color.secondary.tre};
 
       &:hover,
       &:focus {
-        color: ${darken(0.15, teinte.tertiary.quattro)};
-        background-color: ${teinte.secondary.due};
-        border-color: ${teinte.secondary.tre};
+        color: ${darken(0.15, color.tertiary.quattro)};
+        background-color: ${color.secondary.due};
+        border-color: ${color.secondary.tre};
       }
     }
   }
@@ -27,9 +27,9 @@ const Pagination = styled(BootstrapPagination)`
     &,
     &:hover,
     &:focus {
-      color: ${teinte.primary.due};
-      background-color: ${teinte.tertiary.quattro};
-      border-color: ${teinte.tertiary.quattro};
+      color: ${color.primary.due};
+      background-color: ${color.tertiary.quattro};
+      border-color: ${color.tertiary.quattro};
     }
   }
 
@@ -40,9 +40,9 @@ const Pagination = styled(BootstrapPagination)`
     > a,
     > a:hover,
     > a:focus {
-      color: ${darken(0.25, teinte.secondary.tre)};
-      background-color: ${teinte.primary.due};
-      border-color: ${teinte.secondary.tre};
+      color: ${darken(0.25, color.secondary.tre)};
+      background-color: ${color.primary.due};
+      border-color: ${color.secondary.tre};
     }
   }
 `;

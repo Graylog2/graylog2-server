@@ -2,11 +2,11 @@
 import { Well as BootstrapWell } from 'react-bootstrap';
 import styled from 'styled-components';
 
-import teinte from 'theme/teinte';
+import { color } from 'theme';
 
 const Well = styled(BootstrapWell)`
-  background-color: ${teinte.secondary.due};
-  border-color: ${teinte.secondary.tre};
+  background-color: ${color.secondary.due};
+  border-color: ${color.secondary.tre};
 `;
 
 export default Well;

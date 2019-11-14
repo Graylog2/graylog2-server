@@ -2,19 +2,20 @@
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled from 'styled-components';
 import { darken, opacify, transparentize } from 'polished';
-import teinte from 'theme/teinte';
 
-const borderColor = transparentize(0.8, teinte.primary.tre);
+import { color } from 'theme';
+
+const borderColor = transparentize(0.8, color.primary.tre);
 const Popover = styled(BoostrapPopover)`
   & {
-    background-color: ${teinte.primary.due};
+    background-color: ${color.primary.due};
     border-color: ${borderColor};
 
     &.top > .arrow {
       border-top-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-top-color: ${teinte.primary.due};
+        border-top-color: ${color.primary.due};
       }
     }
 
@@ -22,7 +23,7 @@ const Popover = styled(BoostrapPopover)`
       border-right-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-right-color: ${teinte.primary.due};
+        border-right-color: ${color.primary.due};
       }
     }
 
@@ -30,7 +31,7 @@ const Popover = styled(BoostrapPopover)`
       border-bottom-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-bottom-color: ${teinte.primary.due};
+        border-bottom-color: ${color.primary.due};
       }
     }
 
@@ -38,13 +39,13 @@ const Popover = styled(BoostrapPopover)`
       border-left-color: ${opacify(0.05, borderColor)};
 
       &:after {
-        border-left-color: ${teinte.primary.due};
+        border-left-color: ${color.primary.due};
       }
     }
   }
 
   .popover-title {
-    background-color: ${darken(0.03, teinte.primary.due)};
+    background-color: ${darken(0.03, color.primary.due)};
   }
 `;
 

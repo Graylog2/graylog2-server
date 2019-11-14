@@ -1,12 +1,12 @@
 import { css } from 'styled-components';
 import { darken, lighten, getLuminance } from 'polished';
 
-import teinte from 'theme/teinte';
+import { color } from 'theme';
 import contrastingColor from 'util/contrastingColor';
 import bsStyleThemeVariant from '../variants/bsStyle';
 
 const buttonStyles = ({ bsStyle }) => {
-  const cssBuilder = (color) => {
+  const cssBuilder = (hex) => {
     const isLink = bsStyle === 'link';
 
     const fontContrast = (backgroundColor) => {
@@ -30,19 +30,19 @@ const buttonStyles = ({ bsStyle }) => {
 
     const linkBackground = 'transparent';
     const linkBorder = 'transparent';
-    const buttonColorAdjust = getLuminance(color) > 0.5 ? darken : lighten;
+    const buttonColorAdjust = getLuminance(hex) > 0.5 ? darken : lighten;
 
-    const defaultBackground = isLink ? linkBackground : color;
-    const defaultBorder = isLink ? linkBorder : buttonColorAdjust(0.05, color);
-    const defaultColor = fontContrast(color);
+    const defaultBackground = isLink ? linkBackground : hex;
+    const defaultBorder = isLink ? linkBorder : buttonColorAdjust(0.05, hex);
+    const defaultColor = fontContrast(hex);
 
-    const activeBackground = isLink ? linkBackground : buttonColorAdjust(0.10, color);
-    const activeBorder = isLink ? linkBorder : buttonColorAdjust(0.15, color);
-    const activeColor = fontContrast(buttonColorAdjust(0.10, color));
+    const activeBackground = isLink ? linkBackground : buttonColorAdjust(0.10, hex);
+    const activeBorder = isLink ? linkBorder : buttonColorAdjust(0.15, hex);
+    const activeColor = fontContrast(buttonColorAdjust(0.10, hex));
 
-    const disabledBackground = isLink ? linkBackground : buttonColorAdjust(0.20, color);
-    const disabledBorder = isLink ? linkBorder : buttonColorAdjust(0.15, color);
-    const disabledColor = fontContrast(buttonColorAdjust(0.20, color));
+    const disabledBackground = isLink ? linkBackground : buttonColorAdjust(0.20, hex);
+    const disabledBorder = isLink ? linkBorder : buttonColorAdjust(0.15, hex);
+    const disabledColor = fontContrast(buttonColorAdjust(0.20, hex));
 
     return css`
       background-color: ${defaultBackground};
@@ -82,7 +82,7 @@ const buttonStyles = ({ bsStyle }) => {
 
   return bsStyleThemeVariant(cssBuilder, {
     link: {
-      teinte: cssBuilder(teinte.tertiary.quattro),
+      teinte: cssBuilder(color.tertiary.quattro),
     },
   });
 };

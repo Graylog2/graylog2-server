@@ -1,10 +1,10 @@
 import { css } from 'styled-components';
-import { breakpoint, teinte } from 'theme';
+import { breakpoint, color, util } from 'theme';
 
-import { colorLevel } from 'theme/util';
+// import { util } from 'theme';
 
 const navTabsStyles = () => {
-  const borderColor = colorLevel(teinte.tertiary.due, -3);
+  const borderColor = util.colorLevel(color.tertiary.due, -3);
 
   return css`
     .nav-tabs {
@@ -13,8 +13,8 @@ const navTabsStyles = () => {
       > li {
         > a {
           &:hover {
-            border-color: ${teinte.secondary.due} ${teinte.secondary.due} ${borderColor};
-            background-color: ${teinte.secondary.due};
+            border-color: ${color.secondary.due} ${color.secondary.due} ${borderColor};
+            background-color: ${color.secondary.due};
           }
         }
 
@@ -22,8 +22,8 @@ const navTabsStyles = () => {
           &,
           &:hover,
           &:focus {
-            color: ${teinte.primary.tre};
-            background-color: ${teinte.primary.due};
+            color: ${color.primary.tre};
+            background-color: ${color.primary.due};
             border-color: ${borderColor};
             border-bottom-color: transparent;
           }
@@ -44,7 +44,7 @@ const navTabsStyles = () => {
           > .active > a,
           > .active > a:hover,
           > .active > a:focus {
-            border-bottom-color: ${teinte.primary.due};
+            border-bottom-color: ${color.primary.due};
           }
         }
       }

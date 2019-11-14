@@ -6,13 +6,13 @@ import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { darken } from 'polished';
 
 import { useTheme } from 'theme/GraylogThemeContext';
-import { colorLevel } from 'theme/util';
+import { util } from 'theme';
 import contrastingColor from 'util/contrastingColor';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex) => {
-  const backgroundColor = colorLevel(hex, -9);
-  const textColor = colorLevel(hex, 6);
+  const backgroundColor = util.colorLevel(hex, -9);
+  const textColor = util.colorLevel(hex, 6);
 
   return css`
     && {
