@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -107,7 +108,10 @@ public abstract class MessageList implements SearchType {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
-        public abstract Builder timerange(@Nullable TimeRange timerange);
+        public Builder timerange(@Nullable TimeRange timerange) {
+            return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
+        }
+        public abstract Builder timerange(@Nullable DerivedTimeRange timerange);
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);
