@@ -65,7 +65,7 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      const pagination = {
+      this.pagination = {
         count: response.count,
         total: response.total,
         page: response.page,
@@ -73,7 +73,6 @@ const LookupTableCachesStore = Reflux.createStore({
         query: response.query,
       };
       // this.trigger({ pagination: this.pagination, caches: response.caches });
-      this.pagination = pagination;
       this.caches = response.caches;
       this.propagateChanges();
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));

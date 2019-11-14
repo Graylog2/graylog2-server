@@ -10,7 +10,12 @@ const LookupTableDataAdaptersActions = ActionsProvider.getActions('LookupTableDa
 
 const LookupTableDataAdaptersStore = Reflux.createStore({
   listenables: [LookupTableDataAdaptersActions],
-
+  dataAdapter: null,
+  dataAdapters: undefined,
+  types: null,
+  pagination: null,
+  lookupResult: null,
+  validationErrors: {},
   init() {
     this.pagination = {
       page: 1,
@@ -27,6 +32,21 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
       pagination: this.pagination,
       validationErrors: {},
     };
+  },
+
+  getState() {
+    return {
+      dataAdapter: this.dataAdapter,
+      dataAdapters: this.dataAdapters,
+      lookupResult: this.lookupResult,
+      types: this.types,
+      pagination: this.pagination,
+      validationErrors: this.validationErrors,
+    };
+  },
+
+  propagateChanges() {
+    this.trigger(this.getState());
   },
 
   reloadPage() {
@@ -52,7 +72,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.trigger({ pagination: this.pagination, dataAdapters: response.data_adapters });
+      this.dataAdapters = response.data_adapters;
+      this.propagateChanges();
     }, this._errorHandler('Fetching lookup table data adapters failed', 'Could not retrieve the lookup dataAdapters'));
 
     LookupTableDataAdaptersActions.searchPaginated.promise(promise);
@@ -64,7 +85,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.trigger({ dataAdapter: response });
+      this.dataAdapter = response;
+      this.propagateChanges();
     }, this._errorHandler(`Fetching lookup table data adapter ${idOrName} failed`, 'Could not retrieve lookup table data adapter'));
 
     LookupTableDataAdaptersActions.get.promise(promise);
@@ -76,7 +98,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('POST', url, dataAdapter);
 
     promise.then((response) => {
-      this.trigger({ dataAdapter: response });
+      this.dataAdapter = response;
+      this.propagateChanges();
     }, this._errorHandler('Creating lookup table data adapter failed', `Could not create lookup table data adapter "${dataAdapter.name}"`));
 
     LookupTableDataAdaptersActions.create.promise(promise);
@@ -88,7 +111,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('PUT', url, dataAdapter);
 
     promise.then((response) => {
-      this.trigger({ dataAdapter: response });
+      this.dataAdapter = response;
+      this.propagateChanges();
     }, this._errorHandler('Updating lookup table data adapter failed', `Could not update lookup table data adapter "${dataAdapter.name}"`));
 
     LookupTableDataAdaptersActions.update.promise(promise);
@@ -100,7 +124,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.trigger({ types: response });
+      this.types = response;
+      this.propagateChanges();
     }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table data adapter types'));
 
     LookupTableDataAdaptersActions.getTypes.promise(promise);
@@ -121,9 +146,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('GET', this._url(`adapters/${adapterName}/query?key=${encodeURIComponent(key)}`));
 
     promise.then((response) => {
-      this.trigger({
-        lookupResult: response,
-      });
+      this.lookupResult = response;
+      this.propagateChanges();
     }, this._errorHandler('Lookup failed', `Could not lookup value for key "${key}" in lookup table data adapter "${adapterName}"`));
 
     LookupTableDataAdaptersActions.lookup.promise(promise);
@@ -136,9 +160,8 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('POST', url, adapter);
 
     promise.then((response) => {
-      this.trigger({
-        validationErrors: response.errors,
-      });
+      this.validationErrors = response.errors;
+      this.propagateChanges();
     }, this._errorHandler('Lookup table data adapter validation failed', `Could not validate lookup table data adapter "${adapter.name}"`));
     LookupTableDataAdaptersActions.validate.promise(promise);
     return promise;
