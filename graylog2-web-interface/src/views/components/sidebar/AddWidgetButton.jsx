@@ -21,7 +21,7 @@ const GroupHeadline = styled.h4`
   margin-bottom: 10px;
 `;
 
-const StyledButton = styled(Button)`
+const CreateButton = styled(Button)`
   display: block;
   margin: 5px 0;
 `;
@@ -101,11 +101,11 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
-    <StyledButton key={creator.title}
+    <CreateButton key={creator.title}
                   onClick={this._createHandlerFor(creator)}
                   disabled={creator.condition ? !creator.condition() : false}>
       {creator.title}
-    </StyledButton>
+    </CreateButton>
   );
 
   _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
