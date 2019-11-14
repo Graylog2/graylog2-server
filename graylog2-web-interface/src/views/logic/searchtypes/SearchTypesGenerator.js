@@ -12,16 +12,17 @@ export default (widgets: Array<Widget>) => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets
     .map(widget => widgetDefinition(widget.type)
-      .searchTypes(widget.config)
+      .searchTypes(widget)
       .map(searchType => Object.assign(
+        {},
+        { id: uuid(), timerange: widget.timerange, query: widget.query, streams: widget.streams },
         searchType,
-        { widgetId: widget.id, timerange: widget.timerange, query: widget.query, streams: widget.streams },
+        { widgetId: widget.id },
         filterForWidget(widget),
       )))
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set())
     .map((searchType) => {
-      const searchTypeId = uuid();
-      widgetMapping = widgetMapping.update(searchType.widgetId, new Immutable.Set(), widgetSearchTypes => widgetSearchTypes.add(searchTypeId));
+      widgetMapping = widgetMapping.update(searchType.widgetId, new Immutable.Set(), widgetSearchTypes => widgetSearchTypes.add(searchType.id));
       const typeDefinition = searchTypeDefinition(searchType.type);
       if (!typeDefinition || !typeDefinition.defaults) {
         // eslint-disable-next-line no-console
@@ -41,7 +42,7 @@ export default (widgets: Array<Widget>) => {
         .merge(streamsMap)
         .merge(
           {
-            id: searchTypeId,
+            id: searchType.id,
             type: searchType.type,
           },
         );
