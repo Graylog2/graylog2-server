@@ -59,6 +59,7 @@ public class StreamCacheService extends AbstractIdleService {
 
     // We have to support multiple streams having the same title
     private final LoadingCache<String, Set<Stream>> nameToStreams = CacheBuilder.newBuilder()
+            .maximumSize(1000L)
             .build(new CacheLoader<String, Set<Stream>>() {
                 @Override
                 public Set<Stream> load(String name) throws Exception {
