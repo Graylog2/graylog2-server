@@ -171,7 +171,7 @@ class SideBar extends React.Component<Props, State> {
       : 'chevron-right';
     return (
       <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
-        {open && <ContentOverlay />}
+        {open && <ContentOverlay onClick={this.toggleOpen} />}
         <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open} data-testid="sidebar-header">
           {open && title && <Headline title={title}>{title}</Headline>}
           <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
