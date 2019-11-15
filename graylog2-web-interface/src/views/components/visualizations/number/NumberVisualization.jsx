@@ -73,7 +73,7 @@ type Props = {
   },
 } & VisualizationComponentProps;
 
-const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizationConfig.create() }, currentView, fields, data }: Props) => {
+const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizationConfig.create() } = {}, currentView, fields, data }: Props) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
   useEffect(onRenderComplete, [onRenderComplete]);
