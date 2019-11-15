@@ -8,7 +8,6 @@ export {
   Nav,
   Navbar,
   NavItem,
-  Panel,
   Popover,
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles

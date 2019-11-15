@@ -10,6 +10,7 @@ import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
 import NavDropdown from './NavDropdown';
 import Pagination from './Pagination';
+import Panel from './Panel';
 import SplitButton from './SplitButton';
 import Table from './Table';
 
@@ -26,6 +27,7 @@ export {
   Modal,
   NavDropdown,
   Pagination,
+  Panel,
   SplitButton,
   Table,
 };
