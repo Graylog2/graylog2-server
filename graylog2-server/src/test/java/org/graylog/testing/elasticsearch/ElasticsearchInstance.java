@@ -52,7 +52,7 @@ public class ElasticsearchInstance extends ExternalResource {
 
     private static final String DEFAULT_IMAGE_OSS = "docker.elastic.co/elasticsearch/elasticsearch-oss";
     private static final String DEFAULT_IMAGE = "elasticsearch";
-    private static final String DEFAULT_VERSION = "6.5.2";
+    private static final String DEFAULT_VERSION = "6.8.4";
 
     private final ElasticsearchContainer container;
     private JestClient jestClient;
