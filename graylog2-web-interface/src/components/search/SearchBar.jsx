@@ -1,3 +1,4 @@
+/* eslint-disable */
 import $ from 'jquery';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -438,15 +439,15 @@ const SearchBar = createReactClass({
                                         onSelect={this._rangeTypeChanged}
                                         id="dropdown-timerange-selector">
                           <MenuItem eventKey="relative"
-                                    className={this.state.rangeType === 'relative' ? 'selected' : null}>
+                                    active={this.state.rangeType === 'relative'}>
                             Relative
                           </MenuItem>
                           <MenuItem eventKey="absolute"
-                                    className={this.state.rangeType === 'absolute' ? 'selected' : null}>
+                                    active={this.state.rangeType === 'absolute'}>
                             Absolute
                           </MenuItem>
                           <MenuItem eventKey="keyword"
-                                    className={this.state.rangeType === 'keyword' ? 'selected' : null}>
+                                    active={this.state.rangeType === 'keyword'}>
                             Keyword
                           </MenuItem>
                         </DropdownButton>

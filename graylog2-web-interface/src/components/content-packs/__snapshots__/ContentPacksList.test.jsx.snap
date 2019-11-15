@@ -270,12 +270,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-1"
                 onClick={[Function]}
@@ -422,12 +422,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-2"
                 onClick={[Function]}
@@ -563,12 +563,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-3"
                 onClick={[Function]}
@@ -704,12 +704,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-4"
                 onClick={[Function]}
@@ -845,12 +845,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-5"
                 onClick={[Function]}
@@ -986,12 +986,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-6"
                 onClick={[Function]}
@@ -1127,12 +1127,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-7"
                 onClick={[Function]}
@@ -1268,12 +1268,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-8"
                 onClick={[Function]}
@@ -1409,12 +1409,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-9"
                 onClick={[Function]}
@@ -1550,12 +1550,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-10"
                 onClick={[Function]}
