@@ -48,26 +48,30 @@ public abstract class RelativeRange extends TimeRange {
 
     @Override
     @JsonIgnore
-    public DateTime getFrom() { return from(); }
-    @JsonIgnore
-    public abstract DateTime from();
+    public DateTime getFrom() {
+        // TODO this should be computed once
+        if (range() > 0) {
+            return Tools.nowUTC().minus(Seconds.seconds(range()));
+        }
+        return new DateTime(0, DateTimeZone.UTC);
+    }
 
     @Override
     @JsonIgnore
-    public DateTime getTo() { return to(); }
-    @JsonIgnore
-    public abstract DateTime to();
+    public DateTime getTo() {
+        // TODO this should be fixed
+        return Tools.nowUTC();
+    }
 
     @JsonCreator
     public static RelativeRange create(@JsonProperty("type") String type, @JsonProperty("range") int range) throws InvalidRangeParametersException {
-        return builder().type(type).range(range).build();
+        return builder().type(type).checkRange(range).build();
     }
 
     public static RelativeRange create(int range) throws InvalidRangeParametersException {
         return create(RELATIVE, range);
     }
 
-    @JsonCreator
     public static Builder builder() {
         return new AutoValue_RelativeRange.Builder();
     }
@@ -81,27 +85,18 @@ public abstract class RelativeRange extends TimeRange {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract RelativeRange autoBuild();
+        public abstract RelativeRange build();
 
-        @JsonProperty
         public abstract Builder type(String type);
 
-        @JsonProperty
         public abstract Builder range(int range);
-        abstract int range();
 
-        abstract Builder from(DateTime from);
-
-        abstract Builder to(DateTime from);
-
-        public RelativeRange build() throws InvalidRangeParametersException {
-            if (range() < 0) {
+        // TODO replace with custom build()
+        public Builder checkRange(int range) throws InvalidRangeParametersException {
+            if (range < 0) {
                 throw new InvalidRangeParametersException("Range must not be negative");
             }
-
-            return from(range() > 0 ? Tools.nowUTC().minus(Seconds.seconds(range())) : new DateTime(0, DateTimeZone.UTC))
-                    .to(Tools.nowUTC())
-                    .autoBuild();
+            return range(range);
         }
     }
 
