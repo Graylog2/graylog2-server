@@ -75,9 +75,9 @@ class AggregationConditionExpression extends React.Component {
     const { expression, parent, renderLabel } = this.props;
     switch (expression.expr) {
       case 'number-ref':
-        return <NumberRefExpression {...this.props} />;
+        return <NumberRefExpression {...this.props} parent={parent} />;
       case 'number':
-        return <NumberExpression {...this.props} />;
+        return <NumberExpression {...this.props} parent={parent} />;
       case '&&':
       case '||':
         return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
@@ -89,7 +89,7 @@ class AggregationConditionExpression extends React.Component {
       default:
         return (
           <>
-            <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} />
+            <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />
             <Col md={2}>
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
