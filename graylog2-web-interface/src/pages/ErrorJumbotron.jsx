@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
-import { rgba } from 'polished';
+import { transparentize } from 'polished';
 
 import { Col, Jumbotron, Row } from 'components/graylog';
 import { color } from 'theme';
@@ -22,7 +22,7 @@ const StyledJumbotron = hex => memo(
   () => {
     return styled(Jumbotron)`
       && {
-        background-color: ${rgba(hex, 0.8)};
+        background-color: ${transparentize(0.2, color.global.contentBackground)};
         text-align: center;
       }
     `;
@@ -36,15 +36,13 @@ export const H1 = styled.h1`
 `;
 
 const ErrorJumbotron = ({ children }) => {
-  const StyledJumbo = StyledJumbotron(color.primary.due);
-
   return (
     <ContainerRow>
       <GlobalStyle />
       <Col mdOffset={2} md={8}>
-        <StyledJumbo>
+        <StyledJumbotron>
           {children}
-        </StyledJumbo>
+        </StyledJumbotron>
       </Col>
     </ContainerRow>
   );

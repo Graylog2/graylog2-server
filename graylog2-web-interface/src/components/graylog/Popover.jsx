@@ -5,7 +5,7 @@ import { darken, opacify, transparentize } from 'polished';
 
 import { color } from 'theme';
 
-const borderColor = transparentize(0.8, color.primary.tre);
+const borderColor = transparentize(0.8, color.gray[0]);
 const Popover = styled(BoostrapPopover)`
   & {
     background-color: ${color.global.contentBackground};

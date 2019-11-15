@@ -19,7 +19,7 @@ const FormControl = memo(styled(BootstrapFormControl)`
   &::-moz-placeholder,
   &:-ms-input-placeholder,
   &::-webkit-input-placeholder {
-    color: ${lighten(0.6, color.primary.tre)};
+    color: ${lighten(0.6, color.gray[60])};
   }
 
   &[disabled],
