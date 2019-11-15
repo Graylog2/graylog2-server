@@ -62,7 +62,14 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
 
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
   const { effective_timerange: effectiveTimerange } = data && data.chart ? data.chart : {};
-  const rows = Object.entries(data).map(([key, value]) => [key, value.rows])
+  const rows = Object.entries(data)
+    .map(
+      // $FlowFixMe: map claims it's `mixed`, we know it's `Result`
+      ([key, value]: [string, Result]) => [
+        key,
+        value.rows,
+      ],
+    )
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
   return (
     <FullSizeContainer>
