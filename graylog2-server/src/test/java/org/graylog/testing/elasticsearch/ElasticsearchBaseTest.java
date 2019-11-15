@@ -19,8 +19,6 @@ package org.graylog.testing.elasticsearch;
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
-import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexMapping5;
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -28,6 +26,8 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+
+import static org.graylog2.indexer.IndexMappingFactory.indexMappingFor;
 
 /**
  * This class can be used as base class for Elasticsearch integration tests.
@@ -60,17 +60,9 @@ public class ElasticsearchBaseTest {
     }
 
     private static Map<String, Map<String, Object>> getGraylogDefaultMessageTemplates(Version version) {
-        return Collections.singletonMap("graylog-test-internal", indexMapping(version).messageTemplate("*", "standard", -1));
-    }
-
-    private static IndexMapping indexMapping(Version elasticsearchVersion) {
-        switch (elasticsearchVersion.getMajorVersion()) {
-            case 5:
-                return new IndexMapping5();
-            // TODO: Needs ES 6 support
-            default:
-                throw new IllegalStateException("Only Elasticsearch 5.x is supported");
-        }
+        final Map<String, Object> template =
+                indexMappingFor(version).messageTemplate("*", "standard", -1);
+        return Collections.singletonMap("graylog-test-internal", template);
     }
 
     private void addIndexTemplates(Map<String, Map<String, Object>> templates) {
