@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.bson.types.ObjectId;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.streams.StreamImpl;
@@ -40,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("UnstableApiUsage")
 public class StreamCacheServiceTest {
 
     private StreamCacheService cacheService;
@@ -55,39 +56,36 @@ public class StreamCacheServiceTest {
     }
 
     @Test
-    public void getByName() throws Exception {
+    public void getByName() {
         // make sure getByName always returns a collection
         final Collection<Stream> streams = cacheService.getByName("nonexisting");
         assertThat(streams).isNotNull().isEmpty();
     }
 
     @Test
-    public void multipleStreamsBySameName() throws Exception {
+    public void multipleStreamsBySameName() {
         Stream stream1 = createStream(new ObjectId(), ImmutableMap.of(FIELD_TITLE, "title"));
         Stream stream2 = createStream(new ObjectId(), ImmutableMap.of(FIELD_TITLE, "title"));
         Stream stream3 = createStream(new ObjectId(), ImmutableMap.of(FIELD_TITLE, "different title"));
 
-        when(streamService.load(stream1.getId())).thenReturn(stream1);
-        when(streamService.load(stream2.getId())).thenReturn(stream2);
-        when(streamService.load(stream3.getId())).thenReturn(stream3);
-        cacheService.updateStreams(Collections.singleton(stream1.getId()));
-        cacheService.updateStreams(Collections.singleton(stream2.getId()));
-        cacheService.updateStreams(Collections.singleton(stream3.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(stream1, stream2, stream3));
+
+        cacheService.updateStreams();
 
         assertEquals(ImmutableSet.of(stream1, stream2), cacheService.getByName("title"));
         assertEquals(ImmutableSet.of(stream3), cacheService.getByName("different title"));
     }
 
     @Test
-    public void updatesStreamByName() throws Exception {
+    public void updatesStreamByName() {
         ObjectId streamId = new ObjectId();
         Stream stream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "title"));
 
         Stream modifiedStream = createStream(streamId, ImmutableMap.of(
                 FIELD_TITLE, "title", FIELD_INDEX_SET_ID, "index-set-id"));
 
-        when(streamService.load(stream.getId())).thenReturn(stream);
-        cacheService.updateStreams(Collections.singleton(stream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(stream));
+        cacheService.updateStreams();
 
         Collection<Stream> streams = cacheService.getByName("title");
 
@@ -95,40 +93,41 @@ public class StreamCacheServiceTest {
         // TreeSet comparator for containment checks
         assertEquals(Collections.singleton(stream), streams);
 
-        when(streamService.load(stream.getId())).thenReturn(modifiedStream);
-        cacheService.updateStreams(Collections.singleton(modifiedStream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(modifiedStream));
+        cacheService.updateStreams();
+
         streams = cacheService.getByName("title");
 
         assertEquals(Collections.singleton(modifiedStream), streams);
     }
 
     @Test
-    public void purgesStreamByName() throws Exception {
+    public void purgesStreamByName() {
         ObjectId streamId = new ObjectId();
         Stream stream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "title"));
 
-        when(streamService.load(stream.getId())).thenReturn(stream);
-        cacheService.updateStreams(Collections.singleton(stream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(stream));
+        cacheService.updateStreams();
 
         assertThat(cacheService.getByName("title")).isNotEmpty();
 
-        when(streamService.load(stream.getId())).thenThrow(new NotFoundException());
-        cacheService.updateStreams(Collections.singleton(stream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(Collections.emptyList());
+        cacheService.updateStreams();
 
         assertThat(cacheService.getByName("title")).isEmpty();
     }
 
     @Test
-    public void titleChanges() throws Exception {
+    public void titleChanges() {
         ObjectId streamId = new ObjectId();
         Stream stream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "title"));
         Stream modifiedStream = createStream(streamId, ImmutableMap.of(FIELD_TITLE, "new title"));
 
-        when(streamService.load(stream.getId())).thenReturn(stream);
-        cacheService.updateStreams(Collections.singleton(stream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(stream));
+        cacheService.updateStreams();
 
-        when(streamService.load(stream.getId())).thenReturn(modifiedStream);
-        cacheService.updateStreams(Collections.singleton(modifiedStream.getId()));
+        when(streamService.loadAllEnabled()).thenReturn(ImmutableList.of(modifiedStream));
+        cacheService.updateStreams();
 
         Collection<Stream> streams = cacheService.getByName("title");
         assertThat(streams).isEmpty();
