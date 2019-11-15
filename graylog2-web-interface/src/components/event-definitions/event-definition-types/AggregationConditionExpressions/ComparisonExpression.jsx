@@ -8,6 +8,8 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
+import { internalNodePropType } from './propTypes';
+
 const ComparisonExpression = (props) => {
   const { expression, level, onChildChange, onChange, renderLabel, validation } = props;
 
@@ -55,11 +57,7 @@ const ComparisonExpression = (props) => {
 };
 
 ComparisonExpression.propTypes = {
-  expression: PropTypes.shape({
-    expr: PropTypes.string,
-    left: PropTypes.object,
-    right: PropTypes.object,
-  }).isRequired,
+  expression: internalNodePropType.isRequired,
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,

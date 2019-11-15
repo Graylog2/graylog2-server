@@ -6,6 +6,8 @@ import naturalSort from 'javascript-natural-sort';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
+import { numberRefNodePropType } from './propTypes';
+
 const formatFunctions = (functions) => {
   return functions
     .sort(naturalSort)
@@ -95,10 +97,7 @@ const NumberRefExpression = ({
 NumberRefExpression.propTypes = {
   aggregationFunctions: PropTypes.array.isRequired,
   eventDefinition: PropTypes.object.isRequired,
-  expression: PropTypes.shape({
-    expr: PropTypes.string,
-    ref: PropTypes.string,
-  }).isRequired,
+  expression: numberRefNodePropType.isRequired,
   formattedFields: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,

@@ -7,6 +7,8 @@ import { Col } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
 
+import { numberExpressionNodePropType } from './propTypes';
+
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
   const handleChange = (event) => {
     const nextExpression = lodash.cloneDeep(expression);
@@ -29,10 +31,7 @@ const NumberExpression = ({ expression, onChange, renderLabel, validation }) => 
 };
 
 NumberExpression.propTypes = {
-  expression: PropTypes.shape({
-    expr: PropTypes.string,
-    value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]), // Accept string to allow clearing field
-  }).isRequired,
+  expression: numberExpressionNodePropType.isRequired,
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
   validation: PropTypes.object.isRequired,
