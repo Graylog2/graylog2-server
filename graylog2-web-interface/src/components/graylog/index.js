@@ -15,7 +15,6 @@ import Pagination from './Pagination';
 import Panel from './Panel';
 import Popover from './Popover';
 import SplitButton from './SplitButton';
-import Tab from './Tab';
 import Table from './Table';
 import Tabs from './Tabs';
 import Tooltip from './Tooltip';
