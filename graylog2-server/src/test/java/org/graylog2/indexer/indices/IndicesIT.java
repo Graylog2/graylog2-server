@@ -21,15 +21,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -59,7 +56,6 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,7 +66,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 
-public class IndicesIT extends ElasticsearchBase {
+public class IndicesIT extends ElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
@@ -95,126 +91,100 @@ public class IndicesIT extends ElasticsearchBase {
             .build();
     private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
+    @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus;
     private Indices indices;
     private IndexMappingFactory indexMappingFactory;
 
-    @Override
-    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
-        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
-        return super.elasticsearchConfiguration()
-                .indexTemplates(messageTemplates)
-                .createIndices(false)
-                .deleteAllIndices(true);
-    }
-
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
+        //noinspection UnstableApiUsage
         eventBus = new EventBus("indices-test");
-        final Node node = new Node(client());
+        final Node node = new Node(jestClient());
         indexMappingFactory = new IndexMappingFactory(node);
-        indices = new Indices(client(),
+        indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);
     }
 
     @Test
-    public void testDelete() throws Exception {
-        final String index = createRandomIndex("indices_it_");
+    public void testDelete() {
+        final String index = client().createRandomIndex("indices_it_");
         indices.delete(index);
 
-        assertThat(indicesExists(index)).isFalse();
+        assertThat(client().indicesExists(index)).isFalse();
     }
 
     @Test
-    public void testClose() throws Exception {
-        final String index = createRandomIndex("indices_it_");
-        try {
-            final State beforeRequest = new State.Builder().indices(index).withMetadata().build();
-            final JestResult beforeResponse = client().execute(beforeRequest);
-            assertSucceeded(beforeResponse);
-            final JsonNode beforeOpened = beforeResponse.getJsonObject().path("metadata").path("indices").path(index);
-            assertThat(beforeOpened.path("state").asText()).isEqualTo("open");
+    public void testClose() {
+        final String index = client().createRandomIndex("indices_it_");
 
-            indices.close(index);
+        assertThat(getIndexState(index)).isEqualTo("open");
 
-            final State afterRequest = new State.Builder().indices(index).withMetadata().build();
-            final JestResult afterResponse = client().execute(afterRequest);
-            assertSucceeded(afterResponse);
-            final JsonNode afterOpened = afterResponse.getJsonObject().path("metadata").path("indices").path(index);
-            assertThat(afterOpened.path("state").asText()).isEqualTo("close");
-        } finally {
-            deleteIndex(index);
-        }
+        indices.close(index);
+
+        assertThat(getIndexState(index)).isEqualTo("close");
+    }
+
+    private String getIndexState(String index) {
+        final State beforeRequest = new State.Builder().indices(index).withMetadata().build();
+
+        final JestResult beforeResponse = client().executeWithExpectedSuccess(beforeRequest, "failed to get index metadata");
+
+        return beforeResponse.getJsonObject().path("metadata").path("indices").path(index).path("state").asText();
     }
 
     @Test
-    public void testAliasExists() throws Exception {
-        final String index = createRandomIndex("indices_it_");
+    public void testAliasExists() {
+        final String index = client().createRandomIndex("indices_it_");
         final String alias = "graylog_alias_exists";
         assertThat(indices.aliasExists(alias)).isFalse();
 
-        try {
-            addAliasMapping(index, alias);
+        client().addAliasMapping(index, alias);
 
-            assertThat(indices.aliasExists(alias)).isTrue();
-            assertThat(indices.exists(alias)).isFalse();
-        } finally {
-            removeAliasMapping(index, alias);
-            deleteIndex(index);
-        }
+        assertThat(indices.aliasExists(alias)).isTrue();
+        assertThat(indices.exists(alias)).isFalse();
     }
 
     @Test
-    public void testAliasExistsForIndex() throws Exception {
-        final String indexName = createRandomIndex("indices_it_");
-        try {
-            assertThat(indices.aliasExists(indexName)).isFalse();
-        } finally {
-            deleteIndex(indexName);
-        }
+    public void testAliasExistsForIndex() {
+        final String indexName = client().createRandomIndex("indices_it_");
+
+        assertThat(indices.aliasExists(indexName)).isFalse();
     }
 
     @Test
-    public void testIndexIfIndexExists() throws Exception {
-        final String indexName = createRandomIndex("indices_it_");
+    public void testIndexIfIndexExists() {
+        final String indexName = client().createRandomIndex("indices_it_");
 
-        try {
-            assertThat(indices.exists(indexName)).isTrue();
-        } finally {
-            deleteIndex(indexName);
-        }
+        assertThat(indices.exists(indexName)).isTrue();
     }
 
     @Test
-    public void testExistsIfIndexDoesNotExist() throws Exception {
+    public void testExistsIfIndexDoesNotExist() {
         final String indexNotAlias = "graylog_index_does_not_exist";
         assertThat(indices.exists(indexNotAlias)).isFalse();
     }
 
     @Test
-    public void testAliasTarget() throws Exception {
-        final String index = createRandomIndex("indices_it_");
+    public void testAliasTarget() {
+        final String index = client().createRandomIndex("indices_it_");
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
-        try {
-            addAliasMapping(index, alias);
+        client().addAliasMapping(index, alias);
 
-            assertThat(indices.aliasTarget(alias)).contains(index);
-        } finally {
-            removeAliasMapping(index, alias);
-            deleteIndex(index);
-        }
+        assertThat(indices.aliasTarget(alias)).contains(index);
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testTimestampStatsOfIndex() throws Exception {
+    public void testTimestampStatsOfIndex() {
+        importFixture("IndicesIT.json");
+
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
@@ -222,8 +192,8 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
-        final String indexName = createRandomIndex("indices_it_");
+    public void testTimestampStatsOfIndexWithEmptyIndex() {
+        final String indexName = client().createRandomIndex("indices_it_");
 
         IndexRangeStats stats = indices.indexRangeStatsOfIndex(indexName);
 
@@ -232,47 +202,39 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test(expected = IndexNotFoundException.class)
-    public void testTimestampStatsOfIndexWithClosedIndex() throws Exception {
-        final String index = createRandomIndex("indices_it_");
-        try {
-            closeIndex(index);
+    public void testTimestampStatsOfIndexWithClosedIndex() {
+        final String index = client().createRandomIndex("indices_it_");
 
-            indices.indexRangeStatsOfIndex(index);
-        } finally {
-            deleteIndex(index);
-        }
+        client().closeIndex(index);
+
+        indices.indexRangeStatsOfIndex(index);
     }
 
     @Test(expected = IndexNotFoundException.class)
-    public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
+    public void testTimestampStatsOfIndexWithNonExistingIndex() {
         indices.indexRangeStatsOfIndex("does-not-exist");
     }
 
     @Test
-    public void testCreateEnsuresIndexTemplateExists() throws Exception {
+    public void testCreateEnsuresIndexTemplateExists() {
         final String indexName = "index_template_test";
         final String templateName = indexSetConfig.indexTemplateName();
 
-        try {
-            final JsonNode beforeTemplates = getTemplates();
-            assertThat(beforeTemplates.path(templateName).isMissingNode()).isTrue();
+        final JsonNode beforeTemplates = client().getTemplates();
+        assertThat(beforeTemplates.path(templateName).isMissingNode()).isTrue();
 
-            indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet);
 
-            final JsonNode afterTemplates = getTemplates();
-            assertThat(afterTemplates.path(templateName).isObject()).isTrue();
+        final JsonNode afterTemplates = client().getTemplates();
+        assertThat(afterTemplates.path(templateName).isObject()).isTrue();
 
-            final JsonNode templateMetaData = afterTemplates.path(templateName);
-            assertThat(templateMetaData.path("mappings")).hasSize(1);
-            assertThat(templateMetaData.path("mappings").path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
-        } finally {
-            deleteTemplate(templateName);
-            deleteIndex(indexName);
-        }
+        final JsonNode templateMetaData = afterTemplates.path(templateName);
+        assertThat(templateMetaData.path("mappings")).hasSize(1);
+        assertThat(templateMetaData.path("mappings").path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
     }
 
     @Test
-    public void testCreateOverwritesIndexTemplate() throws Exception {
+    public void testCreateOverwritesIndexTemplate() {
         final ObjectMapper mapper = new ObjectMapperProvider().get();
         final String templateName = indexSetConfig.indexTemplateName();
 
@@ -288,43 +250,35 @@ public class IndicesIT extends ElasticsearchBase {
                 "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, beforeMapping)
         );
 
-        try {
-            putTemplate(templateName, templateSource);
+        client().putTemplate(templateName, templateSource);
 
-            final JsonNode beforeTemplate = getTemplate(templateName);
-            final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-            final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
-            assertThat(actualMapping).isEqualTo(beforeMapping);
+        final JsonNode beforeTemplate = client().getTemplate(templateName);
+        final JsonNode actualBeforeMapping = beforeTemplate.path(templateName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
+        final Map<String, Object> actualMapping = mapper.convertValue(actualBeforeMapping, TypeReferences.MAP_STRING_OBJECT);
+        assertThat(actualMapping).isEqualTo(beforeMapping);
 
-            indices.create("index_template_test", indexSet);
+        indices.create("index_template_test", indexSet);
 
-            final JsonNode afterTemplate = getTemplate(templateName);
-            assertThat(afterTemplate.path(templateName).isObject()).isTrue();
+        final JsonNode afterTemplate = client().getTemplate(templateName);
+        assertThat(afterTemplate.path(templateName).isObject()).isTrue();
 
-            final JsonNode actualAfterMapping = afterTemplate.path(templateName).path("mappings");
-            assertThat(actualAfterMapping).hasSize(1);
-            assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
+        final JsonNode actualAfterMapping = afterTemplate.path(templateName).path("mappings");
+        assertThat(actualAfterMapping).hasSize(1);
+        assertThat(actualAfterMapping.path(IndexMapping.TYPE_MESSAGE).isObject()).isTrue();
 
-            final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
-            final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES).toTemplate(indexSetConfig, indexSet.getIndexWildcard());
-            assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
-        } finally {
-            deleteTemplate(templateName);
-            deleteIndex("index_template_test");
-        }
+        final Map<String, Object> mapping = mapper.convertValue(actualAfterMapping, TypeReferences.MAP_STRING_OBJECT);
+        final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping(IndexSetConfig.TemplateType.MESSAGES).toTemplate(indexSetConfig, indexSet.getIndexWildcard());
+        assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
     }
 
     @Test
-    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() throws IOException {
+    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final String indexName = createRandomIndex("indices_it_");
-        try {
-            indices.indexCreationDate(indexName).ifPresent(
-                    indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
-            );
-        } finally {
-            deleteIndex(indexName);
-        }
+        final String indexName = client().createRandomIndex("indices_it_");
+
+        indices.indexCreationDate(indexName).ifPresent(
+                indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
+        );
     }
 
     @Test
@@ -333,8 +287,8 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void testIndexTemplateCanBeOverridden_Elasticsearch5() throws Exception {
-        assumeTrue(getElasticsearchVersion().getMajorVersion() == 5);
+    public void testIndexTemplateCanBeOverridden_Elasticsearch5() {
+        assumeTrue(elasticsearchVersion().getMajorVersion() == 5);
 
         final String testIndexName = "graylog_override_template";
         final String customTemplateName = "custom-template";
@@ -349,41 +303,33 @@ public class IndicesIT extends ElasticsearchBase {
                 "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, customMapping)
         );
 
-        putTemplate(customTemplateName, templateSource);
+        client().putTemplate(customTemplateName, templateSource);
 
-        try {
-            // Validate existing index templates
-            final JsonNode existingTemplate = getTemplate(customTemplateName);
-            assertThat(existingTemplate.path(customTemplateName).isObject()).isTrue();
+        // Validate existing index templates
+        final JsonNode existingTemplate = client().getTemplate(customTemplateName);
+        assertThat(existingTemplate.path(customTemplateName).isObject()).isTrue();
 
-            // Create index with custom template
-            indices.create(testIndexName, indexSet);
-            waitForGreenStatus(testIndexName);
+        // Create index with custom template
+        indices.create(testIndexName, indexSet);
+        client().waitForGreenStatus(testIndexName);
 
-            // Check index mapping
-            final JsonNode indexMappings = getMapping(testIndexName);
-            final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
+        // Check index mapping
+        final JsonNode indexMappings = client().getMapping(testIndexName);
+        final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
 
-            assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
-            assertThat(mapping.path("properties").path("source").path("type")).isEqualTo(new TextNode("text"));
-        } finally {
-            // Clean up
-            deleteTemplate(customTemplateName);
-            deleteIndex(testIndexName);
-        }
+        assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
+        assertThat(mapping.path("properties").path("source").path("type")).isEqualTo(new TextNode("text"));
     }
 
     @Test
-    public void closePostsIndicesClosedEvent() throws IOException {
+    public void closePostsIndicesClosedEvent() {
         final IndicesEventListener listener = new IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = createRandomIndex("indices_it_");
-        try {
-            indices.close(index);
-        } finally {
-            deleteIndex(index);
-        }
+        final String index = client().createRandomIndex("indices_it_");
+
+        indices.close(index);
+
 
         assertThat(listener.indicesClosedEvents).containsOnly(IndicesClosedEvent.create(index));
         assertThat(listener.indicesDeletedEvents).isEmpty();
@@ -391,16 +337,13 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void deletePostsIndicesDeletedEvent() throws IOException {
+    public void deletePostsIndicesDeletedEvent() {
         final IndicesEventListener listener = new IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = createRandomIndex("indices_it_");
-        try {
-            indices.delete(index);
-        } finally {
-            deleteIndex(index);
-        }
+        final String index = client().createRandomIndex("indices_it_");
+
+        indices.delete(index);
 
         assertThat(listener.indicesDeletedEvents).containsOnly(IndicesDeletedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
@@ -408,24 +351,22 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void reopenIndexPostsIndicesReopenedEvent() throws IOException {
+    public void reopenIndexPostsIndicesReopenedEvent() {
         final IndicesEventListener listener = new IndicesEventListener();
         eventBus.register(listener);
 
-        final String index = createRandomIndex("indices_it_");
-        try {
-            closeIndex(index);
+        final String index = client().createRandomIndex("indices_it_");
 
-            indices.reopenIndex(index);
-        } finally {
-            deleteIndex(index);
-        }
+        client().closeIndex(index);
+
+        indices.reopenIndex(index);
 
         assertThat(listener.indicesReopenedEvents).containsOnly(IndicesReopenedEvent.create(index));
         assertThat(listener.indicesClosedEvents).isEmpty();
         assertThat(listener.indicesDeletedEvents).isEmpty();
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public static final class IndicesEventListener {
         final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
         final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
@@ -451,27 +392,20 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void getIndices() throws Exception {
+    public void getIndices() {
         final IndexSet indexSet = new TestIndexSet(indexSetConfig.toBuilder().indexPrefix("indices_it").build());
-        final String index1 = createRandomIndex("indices_it_");
-        final String index2 = createRandomIndex("indices_it_");
+        final String index1 = client().createRandomIndex("indices_it_");
+        final String index2 = client().createRandomIndex("indices_it_");
 
-        try {
-            closeIndex(index2);
+        client().closeIndex(index2);
 
-            assertThat(indices.getIndices(indexSet))
-                    .containsOnly(index1, index2);
-            assertThat(indices.getIndices(indexSet, "open", "close"))
-                    .containsOnly(index1, index2);
-            assertThat(indices.getIndices(indexSet, "open"))
-                    .containsOnly(index1);
-            assertThat(indices.getIndices(indexSet, "close"))
-                    .containsOnly(index2);
-        } finally {
-            deleteIndex(index1);
-            deleteIndex(index2);
-        }
-
-        assertThat(indices.getIndices(indexSet)).isEmpty();
+        assertThat(indices.getIndices(indexSet))
+                .containsOnly(index1, index2);
+        assertThat(indices.getIndices(indexSet, "open", "close"))
+                .containsOnly(index1, index2);
+        assertThat(indices.getIndices(indexSet, "open"))
+                .containsOnly(index1);
+        assertThat(indices.getIndices(indexSet, "close"))
+                .containsOnly(index2);
     }
 }
