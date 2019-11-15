@@ -128,7 +128,7 @@ const HeatmapVisualization: VisualizationComponent = ({ config, data }: Visualiz
 
 HeatmapVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
 };
 
 HeatmapVisualization.type = 'heatmap';
