@@ -1,19 +1,21 @@
-const min = {
-  xs: '480px',
-  sm: '768px',
-  md: '992px',
-  lg: '1200px',
+const sizes = {
+  xs: 480,
+  sm: 768,
+  md: 992,
+  lg: 1200,
 };
 
+const min = {};
 const max = {};
 
-Object.keys(min).forEach((bp) => {
-  max[bp] = min[bp];
+Object.keys(sizes).forEach((bp) => {
+  min[bp] = sizes[bp];
+  max[bp] = sizes[bp] - 1;
 });
 
 const breakpoints = {
-  min: { ...min },
-  max: { ...max },
+  min,
+  max,
 };
 
 export default breakpoints;
