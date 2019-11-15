@@ -13,26 +13,17 @@ const LookupTableCachesStore = Reflux.createStore({
   cache: null,
   caches: null,
   types: null,
-  pagination: null,
+  pagination: {
+    page: 1,
+    per_page: 10,
+    total: 0,
+    count: 0,
+    query: null,
+  },
   validationErrors: {},
 
-  init() {
-    this.pagination = {
-      page: 1,
-      per_page: 10,
-      total: 0,
-      count: 0,
-      query: null,
-    };
-  },
-
   getInitialState() {
-    return {
-      cache: this.cache,
-      caches: this.caches,
-      pagination: this.pagination,
-      validationErrors: this.validationErrors,
-    };
+    return this.getState();
   },
 
   getState() {
@@ -72,7 +63,6 @@ const LookupTableCachesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      // this.trigger({ pagination: this.pagination, caches: response.caches });
       this.caches = response.caches;
       this.propagateChanges();
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
@@ -125,7 +115,6 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      // this.trigger({ types: response });
       this.types = response;
       this.propagateChanges();
     }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'));

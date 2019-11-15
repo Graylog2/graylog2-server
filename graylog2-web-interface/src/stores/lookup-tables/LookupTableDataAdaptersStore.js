@@ -13,25 +13,18 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
   dataAdapter: null,
   dataAdapters: undefined,
   types: null,
-  pagination: null,
+  pagination: {
+    page: 1,
+    per_page: 10,
+    total: 0,
+    count: 0,
+    query: null,
+  },
   lookupResult: null,
   validationErrors: {},
-  init() {
-    this.pagination = {
-      page: 1,
-      per_page: 10,
-      total: 0,
-      count: 0,
-      query: null,
-    };
-  },
 
   getInitialState() {
-    return {
-      dataAdapters: undefined,
-      pagination: this.pagination,
-      validationErrors: {},
-    };
+    return this.getState();
   },
 
   getState() {

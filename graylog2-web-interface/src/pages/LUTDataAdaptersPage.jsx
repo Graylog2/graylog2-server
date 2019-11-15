@@ -168,7 +168,6 @@ class LUTDataAdaptersPage extends React.Component {
 }
 
 LUTDataAdaptersPage.propTypes = {
-  // eslint-disable-next-line react/no-unused-prop-types
   errorStates: PropTypes.object,
   dataAdapter: PropTypes.object,
   validationErrors: PropTypes.object,

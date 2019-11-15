@@ -10,7 +10,13 @@ const LookupTablesActions = ActionsProvider.getActions('LookupTables');
 
 const LookupTablesStore = Reflux.createStore({
   listenables: [LookupTablesActions],
-  pagination: null,
+  pagination: {
+    page: 1,
+    per_page: 10,
+    total: 0,
+    count: 0,
+    query: null,
+  },
   errorStates: {
     tables: {},
     caches: {},
@@ -25,25 +31,8 @@ const LookupTablesStore = Reflux.createStore({
   lookupResult: null,
   validationErrors: {},
 
-  init() {
-    this.pagination = {
-      page: 1,
-      per_page: 10,
-      total: 0,
-      count: 0,
-      query: null,
-    };
-  },
-
   getInitialState() {
-    return {
-      pagination: this.pagination,
-      errorStates: {
-        tables: {},
-        caches: {},
-        dataAdapters: {},
-      },
-    };
+    return this.getState();
   },
 
   getState() {

@@ -40,7 +40,6 @@ class LUTCachesPage extends React.Component {
   };
 
   _saved = () => {
-    // reset detail state
     history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   }
 
