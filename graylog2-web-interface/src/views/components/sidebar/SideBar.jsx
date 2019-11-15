@@ -7,7 +7,7 @@ import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
-import { Container, ContentOverlay, SidebarHeader, Headline, ToggleIcon, HorizontalRuler } from './Sidebar.styles.jsx';
+import { Container, ContentOverlay, SidebarHeader, Headline, ToggleIcon, HorizontalRuler } from './Sidebar.styles';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
