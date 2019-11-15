@@ -18,13 +18,10 @@ export const Title: React.ComponentType<StyleProps> = styled.div`
   align-items: center;
   cursor: pointer;
   position: relative;
+  color: ${({ isSelected }) => (isSelected ? '#FF3633' : 'inherit')};
+  background: ${({ isSelected }) => (isSelected ? '#393939' : 'tranparent')};
 
-  ${props => (props.isSelected ? css`
-    color: #FF3633;
-    background: #393939;
-  ` : '')}
-
-  ${props => (props.isSelected && props.expandRight ? css`
+  ${({ isSelected, expandRight }) => ((isSelected && expandRight) ? css`
     &::after {
       content: ' ';
       display: block;
@@ -61,13 +58,13 @@ const Content: React.ComponentType<StyleProps> = styled.div`
           inset 0px 13px 5px -10px #CCC,
           inset 0px -13px 5px -10px #CCC;
 
-  ${props => (props.isSelected ? css`
+  ${({ isSelected }) => (isSelected ? css`
     padding: 20px;
   ` : css`
     max-height: 0;
   `)}
 
-  ${props => (props.isSelected && props.expandRight ? css`
+  ${({ isSelected, expandRight }) => (isSelected && expandRight ? css`
     position: absolute !important;
     top: 0;
     left: 100%;
