@@ -102,7 +102,7 @@ public class Client {
         for (String index : indices)
             if (indicesExists(index)) {
                 final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
-                executeWithExpectedSuccess(deleteIndex, "fauled to delete index " + index);
+                executeWithExpectedSuccess(deleteIndex, "failed to delete index " + index);
             }
     }
 
