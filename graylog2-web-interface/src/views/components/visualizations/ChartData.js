@@ -24,11 +24,11 @@ const _defaultKeyJoiner = keys => keys.join('-');
 
 const _defaultChartGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values });
 
-const _flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ source }) => source.endsWith('leaf')) => {
+export const flattenLeafs = (leafs: Array<Leaf>, matcher: Value => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => {
   return flatten(leafs.map(l => l.values.filter(value => matcher(value)).map(v => [l.key, v])));
 };
 
-export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
+export const formatSeries = ({ valuesBySeries = {}, xLabels = [] }: {valuesBySeries: Object, xLabels: Array<any>}): ExtractedSeries => {
   return Object.keys(valuesBySeries).map(value => [
     value,
     xLabels,
@@ -37,14 +37,19 @@ export const formatSeries = ({ valuesBySeries, xLabels }: {valuesBySeries: Objec
   ]);
 };
 
+export const getLeafsFromRows = (rows: Rows): Array<Leaf> => {
+  // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
+  return rows.filter(row => (row.source === 'leaf'));
+};
+
+export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
+
 export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher?: Value => boolean) => {
   return (results: Rows) => {
-    // $FlowFixMe: Somehow flow is unable to infer that the result consists only of Leafs.
-    const leafs: Array<Leaf> = results.filter(row => (row.source === 'leaf'));
-    const xLabels: Array<any> = leafs.map(({ key }) => key);
-    const flatLeafs = _flattenLeafs(leafs, leafValueMatcher);
+    const leafs = getLeafsFromRows(results);
+    const xLabels = getXLabelsFromLeafs(leafs);
+    const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
     const valuesBySeries = {};
-
     flatLeafs.forEach(([key, value]) => {
       const joinedKey = keyJoiner(value.key);
       const targetIdx = xLabels.findIndex(l => isEqual(l, key));

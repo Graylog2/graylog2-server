@@ -8,6 +8,8 @@ import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
 import Modal from './Modal';
+import NavDropdown from './NavDropdown';
+import Panel from './Panel';
 import Popover from './Popover';
 import SplitButton from './SplitButton';
 import Table from './Table';
@@ -23,6 +25,8 @@ export {
   Label,
   ListGroupItem,
   Modal,
+  NavDropdown,
+  Panel,
   Popover,
   SplitButton,
   Table,

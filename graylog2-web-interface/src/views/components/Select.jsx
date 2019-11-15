@@ -64,7 +64,7 @@ const Select = ({ components, styles, ...rest }: Props) => {
     valueContainer,
     ...styles,
   };
-  return <ReactSelect {...rest} components={_components} styles={_styles} />;
+  return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} />;
 };
 
 Select.propTypes = {

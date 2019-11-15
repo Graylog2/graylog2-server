@@ -5,14 +5,11 @@ export {
   Form,
   FormControl,
   InputGroup,
-  MenuItem,
   Nav,
   Navbar,
-  NavDropdown,
   NavItem,
   Pager,
   Pagination,
-  Panel,
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
@@ -30,6 +27,7 @@ export {
   FormGroup,
   Grid,
   ListGroup,
+  MenuItem,
   OverlayTrigger,
   PanelGroup,
   /* 👆 no custom theme colors needed 👆 */
