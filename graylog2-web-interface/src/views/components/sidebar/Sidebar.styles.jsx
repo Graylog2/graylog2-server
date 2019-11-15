@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Title as NavItemTitle } from './NavItem';
+import { Title as NavItemTitle } from './NavItem.styles';
 
 export const Container: React.ComponentType<{ open: boolean }> = styled.div`
   grid-area: sidebar;

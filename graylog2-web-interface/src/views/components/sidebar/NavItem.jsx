@@ -2,79 +2,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { SizeMe } from 'react-sizeme';
-import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
+import { Title, TitleText, TitleIcon, Content } from './NavItem.styles';
 import CustomPropTypes from '../CustomPropTypes';
-
-type StyleProps = {
-  isSelected: boolean,
-  expandRight: boolean,
-};
-
-export const Title: React.ComponentType<StyleProps> = styled.div`
-  padding: 9px 10px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  color: ${({ isSelected }) => (isSelected ? '#FF3633' : 'inherit')};
-  background: ${({ isSelected }) => (isSelected ? '#393939' : 'tranparent')};
-
-  ${({ isSelected, expandRight }) => ((isSelected && expandRight) ? css`
-    &::after {
-      content: ' ';
-      display: block;
-      position: absolute;
-      right: 0;
-      width: 0;
-      height: 0;
-      border-top: 15px solid transparent;
-      border-right: 15px solid white;
-      border-bottom: 15px solid transparent;
-    }
-  ` : '')}
-`;
-
-const TitleText = styled.div`
-  font-size: 16px;
-  display: inline;
-  margin-left: 10px;
-  overflow: hidden;
-  white-space: nowrap;
-`;
-
-const TitleIcon = styled.div`
-  width: 25px;
-  text-align: center;
-  font-size: 20px;
-  cursor: pointer;
-`;
-
-const Content: React.ComponentType<StyleProps> = styled.div`
-  color: #666666;
-  background: #FFFFFF;
-  box-shadow:
-          inset 0px 13px 5px -10px #CCC,
-          inset 0px -13px 5px -10px #CCC;
-
-  ${({ isSelected }) => (isSelected ? css`
-    padding: 20px;
-  ` : css`
-    max-height: 0;
-  `)}
-
-  ${({ isSelected, expandRight }) => (isSelected && expandRight ? css`
-    position: absolute !important;
-    top: 0;
-    left: 100%;
-    border: 0;
-    bottom: 0;
-    padding: 20px;
-    width: 300px;
-    overflow-y: hidden;
-  ` : '')}
-`;
 
 type Props = {
   isOpen: boolean,
