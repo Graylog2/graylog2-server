@@ -15,13 +15,15 @@ const defaultVisualizationType = 'table';
 
 type OnVisualizationConfigChange = (VisualizationConfig) => void;
 
+type Result = {
+  total: number,
+  rows: Rows,
+  effective_timerange: TimeRange,
+};
+
 type Props = {
   config: AggregationWidgetConfig,
-  data: {
-    total: number,
-    rows: Rows,
-    effective_timerange: TimeRange,
-  },
+  data: { [string]: Result },
   editing?: boolean,
   toggleEdit: () => void,
   fields: FieldTypeMappingsList,
@@ -30,7 +32,7 @@ type Props = {
 
 export type VisualizationComponentProps = {|
   config: AggregationWidgetConfig,
-  data: Rows,
+  data: { [string]: Rows },
   editing?: boolean,
   effectiveTimerange: TimeRange,
   fields: FieldTypeMappingsList,
@@ -59,13 +61,15 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
   }
 
   const VisComponent = _visualizationForType(config.visualization || defaultVisualizationType);
-  const { rows } = data;
+  const { effective_timerange: effectiveTimerange } = data && data.chart ? data.chart : {};
+  const rows = Object.entries(data).map(([key, value]) => [key, value.rows])
+    .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
   return (
     <FullSizeContainer>
       {({ height, width }) => (
         <VisComponent config={config}
                       data={rows}
-                      effectiveTimerange={data.effective_timerange}
+                      effectiveTimerange={effectiveTimerange}
                       editing={editing}
                       fields={fields}
                       height={height}

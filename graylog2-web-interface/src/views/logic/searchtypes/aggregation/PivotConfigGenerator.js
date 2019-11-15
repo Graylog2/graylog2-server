@@ -1,8 +1,7 @@
-// @flow strict
 import uuid from 'uuid/v4';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import AggregationWidget from '../../aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from '../../aggregationbuilder/AggregationWidgetConfig';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const formatPivot = (pivot) => {
   const { type, field, config } = pivot;
@@ -26,8 +25,9 @@ const formatPivot = (pivot) => {
   };
 };
 
-const generateConfig = (id: string, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
+const generateConfig = (id: string, name, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
   id,
+  name,
   type: 'pivot',
   config: {
     id: 'vals',
@@ -41,7 +41,8 @@ const generateConfig = (id: string, { rollup, rowPivots, columnPivots, series, s
 
 export default ({ config }: AggregationWidget) => {
   const chartSearchTypeId = uuid();
+  // TODO: This should go into a visualization config specific function
   return config.visualization === 'numeric' && config.visualizationConfig && config.visualizationConfig.trend
-    ? [generateConfig(chartSearchTypeId, config), { ...(generateConfig(uuid(), config)), timerange: { type: 'offset', source: 'search_type', id: chartSearchTypeId } }]
-    : [generateConfig(chartSearchTypeId, config)];
+    ? [generateConfig(chartSearchTypeId, 'chart', config), { ...(generateConfig(uuid(), 'trend', config)), timerange: { type: 'offset', source: 'search_type', id: chartSearchTypeId } }]
+    : [generateConfig(chartSearchTypeId, 'chart', config)];
 };

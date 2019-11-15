@@ -17,7 +17,7 @@ type Props = {
 
 const AutoFontSizer = ({ children, target, height, width }: Props) => {
   const [fontSize, setFontSize] = useState(20);
-  const _container = useRef<mixed>();
+  const _container = useRef<?HTMLElement>();
 
   useEffect(() => {
     const container = target ? { current: { children: [target] } } : _container;

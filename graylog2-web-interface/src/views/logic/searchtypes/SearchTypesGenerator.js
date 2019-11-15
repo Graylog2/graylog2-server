@@ -28,18 +28,20 @@ export default (widgets: Array<Widget>) => {
         // eslint-disable-next-line no-console
         console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
       }
-      const defaults = typeDefinition ? typeDefinition.defaults : {};
+      const { defaults = {} } = typeDefinition || {};
       const { config, filter, timerange, query, streams } = searchType;
       const filterMap = filter ? { filter } : {};
       const timerangeMap = timerange ? { timerange } : {};
       const queryMap = query ? { query } : {};
       const streamsMap = streams ? { streams } : {};
+      const nameMap = searchType.name ? { name: searchType.name } : {};
       return new Immutable.Map(defaults)
         .merge(config)
         .merge(filterMap)
         .merge(timerangeMap)
         .merge(queryMap)
         .merge(streamsMap)
+        .merge(nameMap)
         .merge(
           {
             id: searchType.id,
