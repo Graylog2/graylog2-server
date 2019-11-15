@@ -23,7 +23,6 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -50,7 +49,7 @@ public abstract class ViewStateDTO {
     public abstract Optional<String> staticMessageListId();
 
     @JsonProperty(FIELD_TITLES)
-    public abstract Map<String, Map<String, String>> titles();
+    public abstract Titles titles();
 
     @JsonProperty(FIELD_WIDGETS)
     public abstract Set<WidgetDTO> widgets();
@@ -79,7 +78,7 @@ public abstract class ViewStateDTO {
         public abstract Builder staticMessageListId(String staticMessageListId);
 
         @JsonProperty(FIELD_TITLES)
-        public abstract Builder titles(Map<String, Map<String, String>> titles);
+        public abstract Builder titles(Titles titles);
 
         @JsonProperty(FIELD_WIDGETS)
         public abstract Builder widgets(Set<WidgetDTO> widgets);
@@ -101,7 +100,7 @@ public abstract class ViewStateDTO {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewStateDTO.Builder()
-                    .titles(Collections.emptyMap())
+                    .titles(Titles.empty())
                     .displayModeSettings(DisplayModeSettings.empty());
         }
     }

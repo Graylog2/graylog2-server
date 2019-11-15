@@ -12,8 +12,11 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 class DataAdapterForm extends React.Component {
+  validationCheckTimer = undefined;
+
   static propTypes = {
     type: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
     saved: PropTypes.func.isRequired,
     create: PropTypes.bool,
     dataAdapter: PropTypes.object,
@@ -33,8 +36,6 @@ class DataAdapterForm extends React.Component {
     validate: null,
     validationErrors: {},
   };
-
-  validationCheckTimer = undefined;
 
   constructor(props) {
     super(props);
@@ -178,17 +179,23 @@ class DataAdapterForm extends React.Component {
     return <span>{defaultText}</span>;
   };
 
+  _renderTitle = (title, typeName, create) => {
+    const TagName = create ? 'h3' : 'h2';
+    return <TagName>{title} <small>({typeName})</small></TagName>;
+  };
+
   render() {
     const { dataAdapter } = this.state;
-    const { create, type } = this.props;
-
+    const { create, type, title } = this.props;
     const adapterPlugins = PluginStore.exports('lookupTableAdapters');
 
     const plugin = adapterPlugins.filter(p => p.type === type);
     let configFieldSet = null;
     let documentationComponent = null;
+    let pluginDisplayName = dataAdapter.config.type;
     if (plugin && plugin.length > 0) {
       const p = plugin[0];
+      pluginDisplayName = p.displayName;
       configFieldSet = React.createElement(p.formComponent, {
         config: dataAdapter.config,
         handleFormEvent: this._onConfigChange,
@@ -202,7 +209,6 @@ class DataAdapterForm extends React.Component {
         });
       }
     }
-
     let documentationColumn = null;
     let formRowWidth = 8; // If there is no documentation component, we don't use the complete page
     // width
@@ -214,61 +220,63 @@ class DataAdapterForm extends React.Component {
         </Col>
       );
     }
-
     return (
-      <Row>
-        <Col lg={formRowWidth}>
-          <form className="form form-horizontal" onSubmit={this._save}>
-            <fieldset>
-              <Input type="text"
-                     id="title"
-                     name="title"
-                     label="Title"
-                     autoFocus
-                     required
-                     onChange={this._onChange}
-                     help="A short title for this data adapter."
-                     value={dataAdapter.title}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+      <>
+        {this._renderTitle(title, pluginDisplayName, create)}
+        <Row>
+          <Col lg={formRowWidth}>
+            <form className="form form-horizontal" onSubmit={this._save}>
+              <fieldset>
+                <Input type="text"
+                       id="title"
+                       name="title"
+                       label="Title"
+                       autoFocus
+                       required
+                       onChange={this._onChange}
+                       help="A short title for this data adapter."
+                       value={dataAdapter.title}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" />
 
-              <Input type="text"
-                     id="description"
-                     name="description"
-                     label="Description"
-                     onChange={this._onChange}
-                     help="Data adapter description."
-                     value={dataAdapter.description}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+                <Input type="text"
+                       id="description"
+                       name="description"
+                       label="Description"
+                       onChange={this._onChange}
+                       help="Data adapter description."
+                       value={dataAdapter.description}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9" />
 
-              <Input type="text"
-                     id="name"
-                     name="name"
-                     label="Name"
-                     required
-                     onChange={this._onChange}
-                     help={this._validationMessage('name',
-                       'The name that is being used to refer to this data adapter. Must be unique.')}
-                     value={dataAdapter.name}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9"
-                     bsStyle={this._validationState('name')} />
-            </fieldset>
-            {configFieldSet}
-            <fieldset>
-              <Row>
-                <Col mdOffset={3} md={9}>
-                  <Button type="submit" bsStyle="success">{create ? 'Create Adapter'
-                    : 'Update Adapter'}
-                  </Button>
-                </Col>
-              </Row>
-            </fieldset>
-          </form>
-        </Col>
-        {documentationColumn}
-      </Row>
+                <Input type="text"
+                       id="name"
+                       name="name"
+                       label="Name"
+                       required
+                       onChange={this._onChange}
+                       help={this._validationMessage('name',
+                         'The name that is being used to refer to this data adapter. Must be unique.')}
+                       value={dataAdapter.name}
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9"
+                       bsStyle={this._validationState('name')} />
+              </fieldset>
+              {configFieldSet}
+              <fieldset>
+                <Row>
+                  <Col mdOffset={3} md={9}>
+                    <Button type="submit" bsStyle="success">{create ? 'Create Adapter'
+                      : 'Update Adapter'}
+                    </Button>
+                  </Col>
+                </Row>
+              </fieldset>
+            </form>
+          </Col>
+          {documentationColumn}
+        </Row>
+      </>
     );
   }
 }

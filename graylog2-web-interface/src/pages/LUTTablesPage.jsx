@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-
+import connect from 'stores/connect';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
@@ -15,125 +13,130 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
-const LUTTablesPage = createReactClass({
-  displayName: 'LUTTablesPage',
+class LUTTablesPage extends React.Component {
+  errorStatesTimer = undefined;
 
-  propTypes: {
-    // eslint-disable-next-line react/no-unused-prop-types
-    params: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
-  },
-
-  mixins: [
-    Reflux.connect(LookupTablesStore),
-  ],
+  errorStatesInterval = 1000;
 
   componentDidMount() {
     this._loadData(this.props);
-  },
+  }
 
-  componentWillReceiveProps(nextProps) {
-    this._loadData(nextProps);
-  },
+  componentDidUpdate(prevProps) {
+    const { location: { pathname } } = this.props;
+    const { location: { pathname: prevPathname } } = prevProps;
+    if (pathname !== prevPathname) {
+      this._loadData(this.props);
+    }
+  }
 
   componentWillUnmount() {
     clearInterval(this.errorStatesTimer);
-  },
+  }
 
-  errorStatesTimer: undefined,
-  errorStatesInterval: 1000,
-
-  _startErrorStatesTimer() {
+  _startErrorStatesTimer = () => {
+    const { tables, dataAdapters } = this.props;
     this._stopErrorStatesTimer();
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
-      if (this.state.tables) {
-        tableNames = this.state.tables.map(t => t.name);
+      if (tables) {
+        tableNames = tables.map(t => t.name);
       }
       if (tableNames) {
-        const adapterNames = Object.values(this.state.dataAdapters).map(a => a.name);
+        const adapterNames = Object.values(dataAdapters).map(a => a.name);
         LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
       }
     }, this.errorStatesInterval);
-  },
+  }
 
-  _stopErrorStatesTimer() {
+  _stopErrorStatesTimer = () => {
     if (this.errorStatesTimer) {
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
-  },
+  }
 
-  _loadData(props) {
+  _loadData = (props) => {
+    const { pagination } = this.props;
     this._stopErrorStatesTimer();
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
     } else if (this._isCreating(props)) {
       // nothing to do, the intermediate data container will take care of loading the caches and adapters
     } else {
-      const p = this.state.pagination;
-      LookupTablesActions.searchPaginated(p.page, p.per_page, p.query);
+      LookupTablesActions.searchPaginated(pagination.page, pagination.per_page, pagination.query);
       this._startErrorStatesTimer();
     }
-  },
+  }
 
-  _saved() {
+  _saved = () => {
     // reset detail state
-    this.setState({ table: undefined });
     history.push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
-  },
+  }
 
-  _isCreating(props) {
+  _isCreating = (props) => {
     return props.route.action === 'create';
-  },
+  }
 
-  _validateTable(table) {
+  _validateTable = (table) => {
     LookupTablesActions.validate(table);
-  },
+  }
 
   render() {
+    const {
+      route: { action },
+      table,
+      validationErrors,
+      dataAdapter,
+      cache,
+      tables,
+      caches,
+      dataAdapters,
+      pagination,
+      errorStates,
+    } = this.props;
     let content;
-    const isShowing = this.props.route.action === 'show';
-    const isEditing = this.props.route.action === 'edit';
+    const isShowing = action === 'show';
+    const isEditing = action === 'edit';
 
     if (isShowing || isEditing) {
-      if (!this.state.table) {
+      if (!table) {
         content = <Spinner text="Loading lookup table" />;
       } else if (isEditing) {
         content = (
           <Row className="content">
             <Col lg={8}>
               <h2>Lookup Table</h2>
-              <LookupTableForm table={this.state.table}
+              <LookupTableForm table={table}
                                create={false}
                                saved={this._saved}
                                validate={this._validateTable}
-                               validationErrors={this.state.validationErrors} />
+                               validationErrors={validationErrors} />
             </Col>
           </Row>
         );
       } else {
         content = (
-          <LookupTable dataAdapter={this.state.dataAdapter}
-                       cache={this.state.cache}
-                       table={this.state.table} />
+          <LookupTable dataAdapter={dataAdapter}
+                       cache={cache}
+                       table={table} />
         );
       }
     } else if (this._isCreating(this.props)) {
       content = (
         <LookupTableCreate saved={this._saved}
                            validate={this._validateTable}
-                           validationErrors={this.state.validationErrors} />
+                           validationErrors={validationErrors} />
       );
-    } else if (!this.state || !this.state.tables) {
+    } else if (!tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
       content = (
-        <LookupTablesOverview tables={this.state.tables}
-                              caches={this.state.caches}
-                              dataAdapters={this.state.dataAdapters}
-                              pagination={this.state.pagination}
-                              errorStates={this.state.errorStates} />
+        <LookupTablesOverview tables={tables}
+                              caches={caches}
+                              dataAdapters={dataAdapters}
+                              pagination={pagination}
+                              errorStates={errorStates} />
       );
     }
 
@@ -162,7 +165,36 @@ const LUTTablesPage = createReactClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default LUTTablesPage;
+LUTTablesPage.propTypes = {
+  table: PropTypes.object,
+  validationErrors: PropTypes.object,
+  dataAdapter: PropTypes.object,
+  cache: PropTypes.object,
+  tables: PropTypes.array,
+  caches: PropTypes.object,
+  dataAdapters: PropTypes.object,
+  pagination: PropTypes.object,
+  location: PropTypes.object,
+  errorStates: PropTypes.object,
+  route: PropTypes.object.isRequired,
+};
+LUTTablesPage.defaultProps = {
+  errorStates: null,
+  validationErrors: {},
+  dataAdapters: null,
+  table: null,
+  cache: null,
+  caches: null,
+  tables: null,
+  location: null,
+  pagination: null,
+  dataAdapter: null,
+};
+
+export default connect(LUTTablesPage, { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
+  ...otherProps,
+  ...lookupTableStore,
+}));

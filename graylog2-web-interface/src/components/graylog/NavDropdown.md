@@ -1,5 +1,5 @@
 ```js
-import { Nav, MenuItem } from './bootstrap-import';
+import { Nav, MenuItem } from './index';
 
 <Nav>
   <NavDropdown eventKey="1" title="Dropdown" id="nav-dropdown">
