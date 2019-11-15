@@ -28,6 +28,7 @@ class CacheCreate extends React.Component {
   };
 
   _onTypeSelect = (cacheType) => {
+    const { types } = this.props;
     this.setState({
       type: cacheType,
       cache: {
@@ -35,20 +36,27 @@ class CacheCreate extends React.Component {
         title: '',
         name: '',
         description: '',
-        config: ObjectUtils.clone(this.props.types[cacheType].default_config),
+        config: ObjectUtils.clone(types[cacheType].default_config),
       },
     });
   };
 
   render() {
+    const {
+      types,
+      validate,
+      validationErrors,
+      saved,
+    } = this.props;
+    const { type, cache } = this.state;
     const cachePlugins = {};
     PluginStore.exports('lookupTableCaches').forEach((p) => {
       cachePlugins[p.type] = p;
     });
 
-    const sortedCaches = Object.keys(this.props.types).map((key) => {
-      const type = this.props.types[key];
-      return { value: type.type, label: cachePlugins[type.type].displayName };
+    const sortedCaches = Object.keys(types).map((key) => {
+      const typeItem = types[key];
+      return { value: typeItem.type, label: cachePlugins[typeItem.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (
@@ -73,16 +81,16 @@ class CacheCreate extends React.Component {
             </form>
           </Col>
         </Row>
-        {this.state.cache && (
+        {cache && (
         <Row className="content">
           <Col lg={12}>
-            <h3>Configure Cache</h3>
-            <CacheForm cache={this.state.cache}
-                       type={this.state.type}
+            <CacheForm cache={cache}
+                       type={type}
+                       title="Configure Cache"
                        create
-                       saved={this.props.saved}
-                       validationErrors={this.props.validationErrors}
-                       validate={this.props.validate} />
+                       saved={saved}
+                       validationErrors={validationErrors}
+                       validate={validate} />
           </Col>
         </Row>
         )}
