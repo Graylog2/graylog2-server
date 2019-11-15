@@ -15,6 +15,15 @@ type Props = {
   width: number,
 };
 
+const _multiplierForElement = (element, targetWidth, targetHeight) => {
+  const contentWidth = element.offsetWidth;
+  const contentHeight = element.offsetHeight;
+
+  const widthMultiplier = (targetWidth * 0.8) / contentWidth;
+  const heightMultiplier = (targetHeight * 0.8) / contentHeight;
+  return Math.min(widthMultiplier, heightMultiplier);
+};
+
 const AutoFontSizer = ({ children, target, height, width }: Props) => {
   const [fontSize, setFontSize] = useState(20);
   const _container = useRef<?HTMLElement>();
@@ -32,12 +41,8 @@ const AutoFontSizer = ({ children, target, height, width }: Props) => {
     }
 
     const contentElement = containerChildren[0];
-    const contentWidth = contentElement.offsetWidth;
-    const contentHeight = contentElement.offsetHeight;
+    const multiplier = _multiplierForElement(contentElement, width, height);
 
-    const widthMultiplier = (width * 0.8) / contentWidth;
-    const heightMultiplier = (height * 0.8) / contentHeight;
-    const multiplier = Math.min(widthMultiplier, heightMultiplier);
     if (Math.abs(1 - multiplier) <= 0.01) {
       return;
     }
@@ -50,8 +55,11 @@ const AutoFontSizer = ({ children, target, height, width }: Props) => {
     }
   }, [target, _container, fontSize, height, width]);
 
+  // $FlowFixMe: non-ideal react type declaration requires forced casting
+  const _mixedContainer: { current: mixed } = _container;
+
   return (
-    <FontSize fontSize={fontSize} ref={_container}>
+    <FontSize fontSize={fontSize} ref={_mixedContainer}>
       {children}
     </FontSize>
   );
