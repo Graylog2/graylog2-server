@@ -42,7 +42,7 @@ import IfInteractive from '../components/dashboard/IfInteractive';
 import InteractiveContext from '../components/contexts/InteractiveContext';
 
 const GridContainer: React.ComponentType<{ interactive: boolean }> = styled.div`
-  ${props => (props.interactive ? css`
+  ${({ interactive }) => (interactive ? css`
     display: grid;
     grid-template-rows: 1fr;
     grid-template-columns: 50px 250px 1fr;
