@@ -9,8 +9,8 @@ const min = {};
 const max = {};
 
 Object.keys(sizes).forEach((bp) => {
-  min[bp] = sizes[bp];
-  max[bp] = sizes[bp] - 1;
+  min[bp] = `${sizes[bp]}px`;
+  max[bp] = `${sizes[bp] - 1}px`;
 });
 
 const breakpoints = {
