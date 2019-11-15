@@ -20,12 +20,11 @@ export default class SeriesConfiguration extends React.Component {
   }
 
   _onSubmit = () => {
-    const { series, name } = this.state;
+    const { name, series, series: { config, function: functionName, effectiveName } } = this.state;
     const { onClose } = this.props;
-    const newName = name || series.function;
+    const newName = name || functionName;
 
-    if (newName && newName !== series.effectiveName) {
-      const { config } = series;
+    if (newName && newName !== effectiveName) {
       const newConfig = config.toBuilder().name(newName).build();
       const newSeries = series.toBuilder().config(newConfig).build();
       onClose(newSeries);
