@@ -55,6 +55,9 @@ public interface SearchType {
     @JsonProperty("id")
     String id();
 
+    @JsonProperty
+    Optional<String> name();
+
     @Nullable
     @JsonProperty("filter")
     Filter filter();
@@ -84,6 +87,9 @@ public interface SearchType {
          */
         @JsonProperty("type")
         String type();
+
+        @JsonProperty
+        Optional<String> name();
     }
 
     @JsonAutoDetect
@@ -94,6 +100,9 @@ public interface SearchType {
 
         @JsonProperty
         private String id;
+
+        @JsonProperty
+        private Optional<String> name;
 
         private Map<String, Object> props = Maps.newHashMap();
 
@@ -120,6 +129,11 @@ public interface SearchType {
         @Override
         public String id() {
             return id;
+        }
+
+        @Override
+        public Optional<String> name() {
+            return name;
         }
 
         @Override

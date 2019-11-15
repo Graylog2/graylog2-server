@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 @AutoValue
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class PivotResult implements SearchType.Result {
     private static final String FIELD_EFFECTIVE_TIMERANGE = "effective_timerange";
 
@@ -61,6 +63,8 @@ public abstract class PivotResult implements SearchType.Result {
     public static abstract class Builder {
 
         public abstract Builder id(String id);
+
+        public abstract Builder name(String name);
 
         abstract ImmutableList.Builder<Row> rowsBuilder();
         public Builder addRow(Row row) {

@@ -30,9 +30,6 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -77,9 +74,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 
-        return MessageList.Result.result(searchType.id())
+        final MessageList.Result.Builder resultBuilder = MessageList.Result.result(searchType.id())
                 .messages(messages)
-                .totalResults(result.getTotal())
-                .build();
+                .totalResults(result.getTotal());
+        return searchType.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
 }
