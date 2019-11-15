@@ -8,8 +8,6 @@ export {
   Nav,
   Navbar,
   NavItem,
-  Pager,
-  Pagination,
   Popover,
   ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
@@ -30,5 +28,6 @@ export {
   MenuItem,
   OverlayTrigger,
   PanelGroup,
+  Pager,
   /* 👆 no custom theme colors needed 👆 */
 } from 'react-bootstrap';
