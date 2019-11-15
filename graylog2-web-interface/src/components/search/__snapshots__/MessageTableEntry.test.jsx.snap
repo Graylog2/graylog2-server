@@ -60,12 +60,12 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                 Copy ID
               </button>
               <div
-                className="dropdown btn-group btn-group-sm btn-group-default"
+                className="dropdown btn-group btn-group-sm"
               >
                 <button
                   aria-expanded={false}
                   aria-haspopup={true}
-                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                  className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                   disabled={false}
                   id="select-stream-dropdown"
                   onClick={[Function]}
@@ -164,10 +164,10 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                       className="message-field-actions pull-right"
                     >
                       <div
-                        className="dropdown btn-group btn-group-xs btn-group-default"
+                        className="dropdown btn-group btn-group-xs"
                       >
                         <button
-                          className="SplitButton__StyledSplitButton-sc-72s76o-0 iLEGBE btn btn-xs btn-default"
+                          className="SplitButton-sc-72s76o-0 BGrOE btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -372,10 +372,10 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                       className="message-field-actions pull-right"
                     >
                       <div
-                        className="dropdown btn-group btn-group-xs btn-group-default"
+                        className="dropdown btn-group btn-group-xs"
                       >
                         <button
-                          className="SplitButton__StyledSplitButton-sc-72s76o-0 iLEGBE btn btn-xs btn-default"
+                          className="SplitButton-sc-72s76o-0 BGrOE btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"

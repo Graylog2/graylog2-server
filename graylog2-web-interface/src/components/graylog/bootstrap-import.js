@@ -5,11 +5,8 @@ export {
   Form,
   FormControl,
   InputGroup,
-  MenuItem,
-  Modal,
   Nav,
   Navbar,
-  NavDropdown,
   NavItem,
   Pager,
   Pagination,
@@ -19,7 +16,6 @@ export {
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
   Tab,
-  Table,
   Tabs,
   Tooltip,
   Well,
@@ -33,6 +29,7 @@ export {
   FormGroup,
   Grid,
   ListGroup,
+  MenuItem,
   OverlayTrigger,
   PanelGroup,
   /* 👆 no custom theme colors needed 👆 */

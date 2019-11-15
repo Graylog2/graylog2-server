@@ -37,14 +37,14 @@ class QueryTitleEditModal extends React.Component<Props, State> {
       show: true,
       titleDraft: activeQueryTitle,
     });
-  }
+  };
 
   _close = () => {
     this.setState({
       show: false,
       titleDraft: '',
     });
-  }
+  };
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;

@@ -35,13 +35,7 @@ type State = {
 };
 
 class QueryInput extends Component<Props, State> {
-  static defaultProps = {
-    disabled: false,
-    onBlur: () => {},
-    completerClass: SearchBarAutoCompletions,
-    value: '',
-    placeholder: '',
-  };
+  isFocussed: boolean;
 
   completer: AutoCompleter;
 
@@ -49,7 +43,13 @@ class QueryInput extends Component<Props, State> {
     editor: Editor,
   } | typeof undefined;
 
-  isFocussed: boolean;
+  static defaultProps = {
+    disabled: false,
+    onBlur: () => {},
+    completerClass: SearchBarAutoCompletions,
+    value: '',
+    placeholder: '',
+  };
 
   constructor(props: Props) {
     super(props);
@@ -72,6 +72,8 @@ class QueryInput extends Component<Props, State> {
         bindKey: { win: 'Enter', mac: 'Enter' },
         exec: this._onExecute,
       });
+
+      editor.commands.removeCommands(['indent', 'outdent']);
 
       editor.setFontSize(16);
 
