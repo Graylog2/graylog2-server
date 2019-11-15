@@ -167,7 +167,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.18.0</system-rules.version>
-        <testcontainers.version>1.10.2</testcontainers.version>
+        <testcontainers.version>1.12.3</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v10.13.0</nodejs.version>
