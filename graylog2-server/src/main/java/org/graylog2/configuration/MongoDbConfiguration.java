@@ -47,6 +47,10 @@ public class MongoDbConfiguration {
         return uri;
     }
 
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
     public MongoClientURI getMongoClientURI() {
         final MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
                 .connectionsPerHost(getMaxConnections())

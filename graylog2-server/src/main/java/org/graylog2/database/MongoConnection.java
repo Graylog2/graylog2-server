@@ -18,6 +18,7 @@ package org.graylog2.database;
 
 import com.mongodb.DB;
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 
 public interface MongoConnection {
@@ -38,4 +39,11 @@ public interface MongoConnection {
      * @return The configured MongoDB database.
      */
     MongoDatabase getMongoDatabase();
+
+    /**
+     * Get the client for the configured MongoDB database.
+     *
+     * @return the MongoDB client
+     */
+    MongoClient getMongoClient();
 }
