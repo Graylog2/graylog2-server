@@ -5,8 +5,8 @@ const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Defa
 
 styles.map((style, i) => {
   return (
-    <>
-      <SplitButton title={style} bsStyle={style.toLowerCase()} key={`split-button-${i}`}>
+    <span key={`split-button-${i}`} >
+      <SplitButton title={style} bsStyle={style.toLowerCase()} id={`split-button-${i}`}>
         <MenuItem header>Header</MenuItem>
         <MenuItem eventKey="1">Default</MenuItem>
         <MenuItem eventKey="2" active>Active</MenuItem>
@@ -14,7 +14,7 @@ styles.map((style, i) => {
         <MenuItem divider />
         <MenuItem eventKey="5">Separated</MenuItem>
       </SplitButton>{' '}
-    </>
+    </span>
   )
 })
 ```

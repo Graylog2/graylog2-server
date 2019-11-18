@@ -1,11 +1,10 @@
 import { css } from 'styled-components';
 import { darken, lighten, getLuminance } from 'polished';
 
-import { color } from 'theme';
 import { contrastingColor } from 'theme/utils';
 import bsStyleThemeVariant from '../variants/bsStyle';
 
-const buttonStyles = ({ bsStyle }) => {
+const buttonStyles = ({ bsStyle, color }) => {
   const cssBuilder = (hex) => {
     const isLink = bsStyle === 'link';
 
