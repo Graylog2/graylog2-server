@@ -28,7 +28,7 @@ const NodesPage = createReactClass({
     }
     if (this._hasExternalURI()) {
       return (
-        <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(Routes.GLOBAL_API_BROWSER)}>
+        <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl('/api-browser/global/index.html')}>
           Cluster Global API browser
         </ExternalLinkButton>
       );
