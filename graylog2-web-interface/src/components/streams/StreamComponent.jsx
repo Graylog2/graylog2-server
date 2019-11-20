@@ -128,21 +128,13 @@ class StreamComponent extends React.Component {
 
     return (
       <div>
-        <Row className="row-sm">
-          <Col md={8}>
+        <PaginatedList onChange={this._onPageChange}
+                       totalItems={pagination.total}>
+          <div style={{ marginBottom: 15 }}>
             <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState />
-          </Col>
-        </Row>
-        <Row>
-          <Col md={12}>
-            <PaginatedList onChange={this._onPageChange}
-                           totalItems={pagination.total}>
-              <br />
-              <br />
-              <div>{streamsList}</div>
-            </PaginatedList>
-          </Col>
-        </Row>
+          </div>
+          <div>{streamsList}</div>
+        </PaginatedList>
       </div>
     );
   }
