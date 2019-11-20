@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Row, Col, Alert } from 'components/graylog';
-import { IfPermitted, TypeAheadDataFilter, Icon, PaginatedList, SearchForm } from 'components/common';
+import { Alert, Col, Row } from 'components/graylog';
+import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 import Spinner from 'components/common/Spinner';
 import StreamList from './StreamList';
+import CreateStreamButton from './CreateStreamButton';
 
 const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
@@ -86,6 +87,9 @@ class StreamComponent extends React.Component {
   };
 
   render() {
+    const { streams, pagination, streamRuleTypes } = this.state;
+    const { currentUser, onStreamSave, indexSets } = this.props;
+
     if (this._isLoading()) {
       return (
         <div style={{ marginLeft: 10 }}>
@@ -94,15 +98,15 @@ class StreamComponent extends React.Component {
       );
     }
 
-    if (this.state.streams.length === 0) {
+    if (streams.length === 0) {
       const createStreamButton = (
         <IfPermitted permissions="streams:create">
           <CreateStreamButton bsSize="small"
                               bsStyle="link"
                               className="btn-text"
                               buttonText="Create one now"
-                              indexSets={this.props.indexSets}
-                              onSave={this.props.onStreamSave} />
+                              indexSets={indexSets}
+                              onSave={onStreamSave} />
         </IfPermitted>
       );
 
@@ -113,8 +117,6 @@ class StreamComponent extends React.Component {
       );
     }
 
-    const { streams, pagination, streamRuleTypes } = this.state;
-    const { currentUser, onStreamSave, indexSets } = this.props;
     const streamsList = (
       <StreamList streams={streams}
                   streamRuleTypes={streamRuleTypes}
