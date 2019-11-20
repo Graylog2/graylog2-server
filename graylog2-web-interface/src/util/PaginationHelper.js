@@ -1,10 +1,9 @@
+// @flow strict
 const PaginationHelper = {
-  urlGenerator: (destUrl, page, perPage, query, resolve = true) => {
-    let url;
+  urlGenerator: (destUrl: string, page: number, perPage: number, query: string, resolve: boolean = true): string => {
+    const url = `${destUrl}?page=${page}&per_page=${perPage}&resolve=${resolve.toString()}`;
     if (query) {
-      url = `${destUrl}?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=${resolve}`;
-    } else {
-      url = `${destUrl}?page=${page}&per_page=${perPage}&resolve=${resolve}`;
+      return `${url}&query=${encodeURIComponent(query)}`;
     }
     return url;
   },
