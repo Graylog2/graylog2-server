@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Alert, Col, Row } from 'components/graylog';
+import { Alert } from 'components/graylog';
 import { Icon, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
