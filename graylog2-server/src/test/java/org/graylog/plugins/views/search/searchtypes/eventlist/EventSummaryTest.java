@@ -38,7 +38,7 @@ public class EventSummaryTest {
         final List<String> streams = new ArrayList<>();
         streams.add("stream-id-1");
         streams.add("stream-id-2");
-        final Map<String, Object> rawEvent =ImmutableMap.of(
+        final Map<String, Object> rawEvent = ImmutableMap.of(
                 EventDto.FIELD_ID, "dead-beef",
                 EventDto.FIELD_MESSAGE, "message",
                 EventDto.FIELD_SOURCE_STREAMS, streams,
