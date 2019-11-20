@@ -1,10 +1,12 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+// import ClipboardJS from 'clipboard';
 
 import teinte from 'theme/teinte';
-import { Alert } from 'components/graylog';
 import Interactable from 'components/common/Interactable';
-import isLocalStorageReady from 'util/isLocalStorageReady';
+import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
+import { BootstrapModalConfirm } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
@@ -18,6 +20,7 @@ const ContentArea = styled.div`
 
 const Description = styled.p`
   color: ${teinte.primary.due};
+  margin: 9px 0 6px;
 `;
 
 const Textarea = styled.textarea`
@@ -28,23 +31,32 @@ const Textarea = styled.textarea`
 `;
 
 const StyledAlert = styled(Alert)`
-  margin-bottom: 10px;
+  && {
+    padding: 6px 12px;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const AlertNote = styled.em`
+  margin-left: 6px;
+  flex: 1;
 `;
 
 const Scratchpad = () => {
-  const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
+  const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM)) || {};
   const textareaRef = useRef();
+  const confirmationRef = useRef();
   const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
-  const [scratchData, setScratchData] = useState((storage && storage.value) || DEFAULT_SCRATCHDATA);
-  const [localStorageReady] = useState(isLocalStorageReady());
-  const [size, setSize] = useState((storage && storage.size) || undefined);
-  const [position, setPosition] = useState((storage && storage.position) || undefined);
+  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(storage.securitryConfirmed || false);
+  const [scratchData, setScratchData] = useState(storage.value || DEFAULT_SCRATCHDATA);
+  const [size, setSize] = useState(storage.size || undefined);
+  const [position, setPosition] = useState(storage.position || undefined);
 
   const writeData = (newData) => {
-    if (localStorageReady) {
-      const currentStorage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
-      localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...currentStorage, ...newData }));
-    }
+    const currentStorage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
+    localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...currentStorage, ...newData }));
   };
 
   const handleChange = () => {
@@ -64,6 +76,25 @@ const Scratchpad = () => {
     writeData({ size: newSize });
   };
 
+  const handleGotIt = () => {
+    setSecurityWarningConfirmed(true);
+    writeData({ securitryConfirmed: true });
+  };
+
+  const openConfirmClear = () => {
+    confirmationRef.open();
+  };
+
+  const handleClearText = () => {
+    writeData({ value: DEFAULT_SCRATCHDATA });
+  };
+
+  const handleCancelClear = () => {
+    confirmationRef.close();
+  };
+
+  const CopyWithIcon = (<><Icon name="copy" /> Copy</>);
+
   useEffect(() => {
     if (textareaRef.current && isScratchpadVisible) {
       textareaRef.current.focus();
@@ -82,9 +113,28 @@ const Scratchpad = () => {
       <ContentArea>
         <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
-        {!localStorageReady && (<StyledAlert bsStyle="warning">Your browser does not appear to support localStorage, so your Scratchpad may not properly restore between page changes and refreshes.</StyledAlert>)}
+        {!isSecurityWarningConfirmed && (
+          <StyledAlert bsStyle="warning" bsSize="sm">
+            <Icon name="exclamation-triangle" size="lg" />
+            <AlertNote>We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in this area.</AlertNote>
+            <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>Got It!</Button>
+          </StyledAlert>
+        )}
 
-        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} />
+        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} id="scratchpad-text-content" />
+
+        <SplitButton title={CopyWithIcon}
+                     bsStyle="info"
+                     data-clipboard-target="#scratchpad-text-content">
+          <MenuItem bsStyle="danger" onClick={openConfirmClear}><Icon name="trash" /> Clear</MenuItem>
+        </SplitButton>
+
+        <BootstrapModalConfirm ref={confirmationRef}
+                               title="Are you sure?"
+                               onConfirm={handleClearText}
+                               onCancel={handleCancelClear}>
+           This will clear out your Scratchpad content, do you wish to proceed?
+        </BootstrapModalConfirm>
       </ContentArea>
 
     </Interactable>

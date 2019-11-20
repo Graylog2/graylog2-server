@@ -8,8 +8,6 @@ import { Button } from 'components/graylog';
 import Icon from 'components/common/Icon';
 import teinte from 'theme/teinte';
 
-import 'react-mops/dist/esm/index.css';
-
 const DEFAULT_SIZE = { width: 450, height: 300 };
 const halfWidth = Math.ceil((document.body.offsetWidth / 2) - (DEFAULT_SIZE.width / 2));
 const halfHeight = Math.ceil((document.body.offsetHeight / 2) - (DEFAULT_SIZE.height / 2));
@@ -46,8 +44,7 @@ const Content = styled.div`
 `;
 
 const Header = styled.header`
-  margin: 0 0 9px;
-  padding: 6px 12px;
+  padding: 6px 12px 9px;
   display: flex;
   align-items: center;
   background-color: ${lighten(0.25, teinte.primary.tre)};
@@ -62,9 +59,15 @@ const Title = styled.h3`
   cursor: move;
 `;
 
+const DragBars = styled(Icon)`
+  color: ${teinte.secondary.tre};
+`;
+
 const Interactable = ({
   children,
   className,
+  minHeight,
+  minWidth,
   onClose,
   onDrag,
   onResize,
@@ -84,8 +87,8 @@ const Interactable = ({
   return (
     <InteractableWrapper>
       <StyledRnd default={{ ...position, ...size }}
-                 minHeight={250}
-                 minWidth={250}
+                 minHeight={minHeight}
+                 minWidth={minWidth}
                  maxHeight={document.body.offsetHeight}
                  maxWidth={document.body.offsetWidth}
                  dragHandleClassName={dragHandleClassName}
@@ -108,8 +111,8 @@ const Interactable = ({
                  position={dragPosition}
                  size={resizeSize}
                  className={className}>
-        <Header>
-          <Title ref={dragHandleRef}>{title}</Title>
+        <Header ref={dragHandleRef}>
+          <Title><DragBars name="bars" />{' '}{title}</Title>
 
           {onClose
           && (
@@ -130,6 +133,8 @@ const Interactable = ({
 Interactable.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
+  minHeight: PropTypes.number,
+  minWidth: PropTypes.number,
   onClose: PropTypes.func,
   onDrag: PropTypes.func,
   onResize: PropTypes.func,
@@ -146,6 +151,8 @@ Interactable.propTypes = {
 
 Interactable.defaultProps = {
   className: undefined,
+  minHeight: 250,
+  minWidth: 250,
   onClose: undefined,
   onDrag: () => {},
   onResize: () => {},

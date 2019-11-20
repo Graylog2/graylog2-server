@@ -1,15 +1,24 @@
 import React, { useContext } from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
 import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
+const Toggle = styled(Button)`
+  padding-left: 6px;
+  padding-right: 6px;
+`;
+
 const ScratchpadToggle = () => {
-  const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
+  const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
 
   return (
-    <Button bsStyle="link" type="button" onClick={() => setScratchpadVisibility(!isScratchpadVisible)}>
-      <i className="fa fa-edit fa-lg fa-fw" aria-label="Scratchpad" title="Scratchpad" />
-    </Button>
+    <li role="presentation">
+      <Toggle bsStyle="link" type="button" onClick={toggleScratchpadVisibility}>
+        <i className="fa fa-edit fa-lg fa-fw" aria-label="Scratchpad" title="Scratchpad" />
+      </Toggle>
+    </li>
+
   );
 };
 
