@@ -50,6 +50,7 @@ const SelectPopoverExample = createReactClass({
 ```js
 import createReactClass from 'create-react-class';
 import { Button, Badge } from 'components/graylog';
+import { Icon } from 'components/common';
 
 const items = [
   'AliceBlue',
