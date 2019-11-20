@@ -22,6 +22,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class EventSummaryTest {
     @Test
     public void testParseRawEvent() {
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final List<String> streams = new ArrayList<>();
         streams.add("stream-id-1");
         streams.add("stream-id-2");
