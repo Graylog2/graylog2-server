@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.bson.types.ObjectId;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
@@ -60,7 +61,7 @@ public abstract class StreamDTO {
 
     @JsonProperty(FIELD_OUTPUTS)
     @Nullable
-    public abstract Collection<OutputSummary> outputs();
+    public abstract Collection<ObjectId> outputs();
 
     @JsonProperty(FIELD_MATCHING_TYPE)
     public abstract String matchingType();
@@ -110,7 +111,7 @@ public abstract class StreamDTO {
     @JsonCreator
     public static StreamDTO create(@JsonProperty(FIELD_ID) String id,
                                    @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-                                   @JsonProperty(FIELD_OUTPUTS) @Nullable Collection<OutputSummary> outputs,
+                                   @JsonProperty(FIELD_OUTPUTS) @Nullable Collection<ObjectId> outputs,
                                    @JsonProperty(FIELD_MATCHING_TYPE) String matchingType,
                                    @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
                                    @JsonProperty(FIELD_CREATED_AT) String createdAt,
@@ -155,7 +156,7 @@ public abstract class StreamDTO {
         public abstract Builder creatorUserId(String creatorUserId);
 
         @JsonProperty(FIELD_OUTPUTS)
-        public abstract Builder outputs(Collection<OutputSummary> outputs);
+        public abstract Builder outputs(Collection<ObjectId> outputs);
 
         @JsonProperty(FIELD_MATCHING_TYPE)
         public abstract Builder matchingType(String matchingType);
