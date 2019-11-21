@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { mount } from 'enzyme';
 import PropTypes from 'prop-types';
 
@@ -18,25 +17,25 @@ describe('<Sidebar />', () => {
   let query;
 
   beforeEach(() => {
-    TestComponent = createReactClass({
-      propTypes: {
+    TestComponent = class TestComponentClass extends React.Component {
+      static propTypes = {
         maximumHeight: PropTypes.number,
-      },
+      }
 
-      getDefaultProps() {
-        return { maximumHeight: undefined };
-      },
+      static defaultProps = {
+        maximumHeight: undefined,
+      }
 
       getContainerHeight() {
         const { maximumHeight } = this.props;
         return maximumHeight;
-      },
+      }
 
       render() {
         expect(this.props).toHaveProperty('maximumHeight');
         return <div id="martian">Marc Watney</div>;
-      },
-    });
+      }
+    };
 
     viewMetaData = {
       activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
