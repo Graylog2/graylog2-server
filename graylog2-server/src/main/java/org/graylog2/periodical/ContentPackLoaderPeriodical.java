@@ -19,15 +19,12 @@ package org.graylog2.periodical;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
-import com.mongodb.MongoException;
-import org.graylog2.contentpacks.ContentPackLoaderConfig;
+import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -41,7 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,13 +45,12 @@ import java.util.Set;
 
 public class ContentPackLoaderPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackLoaderPeriodical.class);
-    private static final HashFunction HASH_FUNCTION = Hashing.sha256();
     private static final String FILENAME_GLOB = "*.json";
 
     private final ObjectMapper objectMapper;
     private final ContentPackService contentPackService;
     private final ContentPackPersistenceService contentPackPersistenceService;
-    private final ClusterConfigService clusterConfigService;
+    private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final UserService userService;
     private final boolean contentPacksLoaderEnabled;
     private final Path contentPacksDir;
@@ -65,15 +60,15 @@ public class ContentPackLoaderPeriodical extends Periodical {
     public ContentPackLoaderPeriodical(ObjectMapper objectMapper,
                                        ContentPackService contentPackService,
                                        ContentPackPersistenceService contentPackPersistenceService,
-                                       ClusterConfigService clusterConfigService,
+                                       ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                                        UserService userService,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
                                        @Named("content_packs_dir") Path contentPacksDir,
                                        @Named("content_packs_auto_load") Set<String> contentPacksAutoLoad) {
         this.objectMapper = objectMapper;
+        this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.contentPackService = contentPackService;
         this.contentPackPersistenceService = contentPackPersistenceService;
-        this.clusterConfigService = clusterConfigService;
         this.userService = userService;
         this.contentPacksLoaderEnabled = contentPacksLoaderEnabled;
         this.contentPacksDir = contentPacksDir;
@@ -127,15 +122,9 @@ public class ContentPackLoaderPeriodical extends Periodical {
                    contentPacksDir.toAbsolutePath());
            return;
         }
-        final ContentPackLoaderConfig contentPackLoaderConfig =
-                clusterConfigService.getOrDefault(ContentPackLoaderConfig.class, ContentPackLoaderConfig.EMPTY);
 
-        final List<Path> files = getFiles(contentPacksDir, FILENAME_GLOB);
+        final List<Path> files = getFiles(contentPacksDir);
         final Map<String, ContentPack> contentPacks = new HashMap<>(files.size());
-
-        final Set<String> loadedContentPacks = new HashSet<>(contentPackLoaderConfig.loadedContentPacks());
-        final Set<String> appliedContentPacks = new HashSet<>(contentPackLoaderConfig.appliedContentPacks());
-        final Map<String, String> checksums = new HashMap<>(contentPackLoaderConfig.checksums());
 
         for (Path file : files) {
             final String fileName = file.getFileName().toString();
@@ -146,21 +135,6 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 bytes = Files.readAllBytes(file);
             } catch (IOException e) {
                 LOG.warn("Couldn't read " + file + ". Skipping.", e);
-                continue;
-            }
-
-            final String encodedFileName = encodeFileNameForMongo(fileName);
-            final String checksum = HASH_FUNCTION.hashBytes(bytes).toString();
-            final String storedChecksum = checksums.get(encodedFileName);
-            if (storedChecksum == null) {
-                checksums.put(encodedFileName, checksum);
-            } else if (!checksum.equals(storedChecksum)) {
-                LOG.info("Checksum of {} changed (expected: {}, actual: {})", file, storedChecksum, checksum);
-                continue;
-            }
-
-            if (contentPackLoaderConfig.loadedContentPacks().contains(fileName)) {
-                LOG.debug("Skipping already loaded content pack {} (SHA-256: {})", file, storedChecksum);
                 continue;
             }
 
@@ -195,7 +169,6 @@ public class ContentPackLoaderPeriodical extends Periodical {
             }
 
             contentPacks.put(fileName, insertedContentPack.get());
-            loadedContentPacks.add(fileName);
         }
 
         LOG.debug("Applying selected content packs");
@@ -203,39 +176,34 @@ public class ContentPackLoaderPeriodical extends Periodical {
             final String fileName = entry.getKey();
             final ContentPack contentPack = entry.getValue();
 
-            if (contentPacksAutoLoad.contains(fileName) && appliedContentPacks.contains(fileName)) {
-                LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.id(), contentPack.revision(), fileName);
-                continue;
-            }
-
             if (contentPacksAutoLoad.contains(fileName)) {
-                LOG.debug("Applying content pack {}/{} ({})", contentPack.id(), contentPack.revision(), fileName);
-                contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Installed by auto loader", userService.getAdminUser().getName());
-                appliedContentPacks.add(fileName);
+                if (!contentPackInstallationPersistenceService.
+                        findByContentPackIdAndRevision(contentPack.id(),contentPack.revision()).isEmpty()) {
+                    LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.id(), contentPack.revision(), fileName);
+                    continue;
+                }
+
+                Optional<User> admin = userService.getRootUser();
+                if (admin.isPresent()) {
+                    LOG.debug("Applying content pack {}/{} ({})", contentPack.id(), contentPack.revision(), fileName);
+                    contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Installed by auto loader",
+                            admin.get().getName());
+                }
             }
-        }
 
-        final ContentPackLoaderConfig changedContentPackLoaderConfig =
-                ContentPackLoaderConfig.create(loadedContentPacks, appliedContentPacks, checksums);
-        if (!contentPackLoaderConfig.equals(changedContentPackLoaderConfig)) {
-            clusterConfigService.write(changedContentPackLoaderConfig);
         }
     }
 
-    private String encodeFileNameForMongo(String fileName) {
-        return fileName.replace('.', '*');
-    }
-
-    private List<Path> getFiles(final Path rootPath, final String glob) {
+    private List<Path> getFiles(final Path rootPath) {
         final ImmutableList.Builder<Path> files = ImmutableList.builder();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath, glob)) {
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(rootPath, ContentPackLoaderPeriodical.FILENAME_GLOB)) {
             for (Path path : directoryStream) {
                 if (!Files.isReadable(path)) {
                     LOG.debug("Skipping unreadable file {}", path);
                 }
 
                 if (!Files.isRegularFile(path)) {
-                    LOG.debug("Path {} is not a regular file. Skipping.");
+                    LOG.debug("Path {} is not a regular file. Skipping.", path);
                 }
 
                 files.add(path);
