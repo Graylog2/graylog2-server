@@ -4,13 +4,14 @@ import PropTypes from 'prop-types';
 
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 import { SearchResultOverview } from 'views/components/sidebar';
 
 const Section = styled.div`
   margin-bottom: 8px;
 `;
 
-const defaultNewViewSummary = 'No summary.';
+const defaultNewDashboardSummary = 'No dashboard summary.';
 
 type Props = {
   results: Object,
@@ -18,23 +19,27 @@ type Props = {
 };
 
 const ViewDescription = ({ results, viewMetadata }: Props) => {
-  const formatViewDescription = (view: ViewMetaData) => {
+  const formatDashboardDescription = (view: ViewMetaData) => {
     const { description } = view;
     if (description) {
       return <span>{description}</span>;
     }
-    return <i>No view description.</i>;
+    return <i>No dashboard description.</i>;
   };
 
   return (
     <React.Fragment>
-      <Section>
-        {viewMetadata.summary || defaultNewViewSummary}
-      </Section>
+      <IfDashboard>
+        <Section>
+          {viewMetadata.summary || defaultNewDashboardSummary}
+        </Section>
+      </IfDashboard>
       <Section>
         <SearchResultOverview results={results} />
       </Section>
-      {formatViewDescription(viewMetadata)}
+      <IfDashboard>
+        {formatDashboardDescription(viewMetadata)}
+      </IfDashboard>
     </React.Fragment>
   );
 };
