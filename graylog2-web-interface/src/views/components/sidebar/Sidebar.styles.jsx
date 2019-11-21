@@ -26,14 +26,12 @@ export const ContentOverlay = styled.div`
   background: rgba(3, 3, 3, 0.25);
 `;
 
-export const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)`
-${({ open, hasTitle }) => {
-    let justifyContent = 'center';
-    if (open && hasTitle) justifyContent = 'space-between';
-    if (open && !hasTitle) justifyContent = 'flex-end';
-    return `justify-content: ${justifyContent}`;
-  }}
-`;
+export const SidebarHeader: React.ComponentType<{open: boolean, hasTitle: boolean}> = styled(NavItemTitle)(({ open, hasTitle }) => {
+  let justifyContent = 'center';
+  if (open && hasTitle) justifyContent = 'space-between';
+  if (open && !hasTitle) justifyContent = 'flex-end';
+  return `justify-content: ${justifyContent}`;
+});
 
 export const Headline = styled.h3`
   color: inherit;
