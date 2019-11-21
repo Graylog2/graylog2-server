@@ -1,5 +1,6 @@
 // @flow strict
-import * as React from 'react';
+import React, { useEffect } from 'react';
+import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
@@ -41,7 +42,7 @@ import style from '!style/useable!css!./ExtendedSearchPage.css';
 import IfInteractive from '../components/dashboard/IfInteractive';
 import InteractiveContext from '../components/contexts/InteractiveContext';
 
-const GridContainer: React.ComponentType<{ interactive: boolean }> = styled.div`
+const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ${({ interactive }) => (interactive ? css`
     display: grid;
     grid-template-rows: 1fr;
@@ -107,7 +108,7 @@ const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view
 const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
   const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
 
-  React.useEffect(() => {
+  useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
