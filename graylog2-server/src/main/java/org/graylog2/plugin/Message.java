@@ -279,6 +279,7 @@ public class Message implements Messages, Indexable {
      * was involved.
      */
     private Object messageQueueId;
+    private int sequenceNr = 0;
 
     private DateTime receiveTime;
     private DateTime processingTime;
@@ -842,6 +843,14 @@ public class Message implements Messages, Indexable {
 
     public void setMessageQueueId(Object messageQueueId) {
         this.messageQueueId = messageQueueId;
+    }
+
+    public void setSequenceNr(int sequenceNr) {
+        this.sequenceNr = sequenceNr;
+    }
+
+    public int getSequenceNr() {
+        return sequenceNr;
     }
 
     @Nullable
