@@ -73,7 +73,7 @@ public abstract class LookupTable {
 
         // The default value will only be used if both single and multi value are empty
         if (result.isEmpty()) {
-            return LookupResult.withDefaults(defaultSingleValue(), defaultMultiValue());
+            return LookupResult.addDefaults(defaultSingleValue(), defaultMultiValue()).hasError(result.hasError()).build();
         }
         return result;
     }
