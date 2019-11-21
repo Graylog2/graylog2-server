@@ -190,6 +190,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         message.setJournalOffset(raw.getJournalOffset());
+        message.setSequenceNr(raw.getSequenceNr());
         message.recordTiming(serverStatus, "parse", decodeTime);
         metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 

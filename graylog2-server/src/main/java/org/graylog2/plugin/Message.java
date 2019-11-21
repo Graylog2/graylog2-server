@@ -250,6 +250,7 @@ public class Message implements Messages {
      * was involved.
      */
     private long journalOffset = Long.MIN_VALUE;
+    private int sequenceNr = 0;
 
     private DateTime receiveTime;
     private DateTime processingTime;
@@ -779,6 +780,14 @@ public class Message implements Messages {
 
     public long getJournalOffset() {
         return journalOffset;
+    }
+
+    public void setSequenceNr(int sequenceNr) {
+        this.sequenceNr = sequenceNr;
+    }
+
+    public int getSequenceNr() {
+        return sequenceNr;
     }
 
     @Nullable
