@@ -8,8 +8,8 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import AggregationControls from './AggregationControls';
-import VisualizationConfig from '../../logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 jest.mock('stores/connect', () => x => x);
 jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
