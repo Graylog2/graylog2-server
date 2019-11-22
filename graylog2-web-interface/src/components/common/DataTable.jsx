@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
+import { isEqual } from 'lodash';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
@@ -10,6 +10,8 @@ import DataTableElement from './DataTableElement';
  * input to the data table by using the the `TypeAheadDataFilter` component.
  */
 class DataTable extends React.Component {
+  typeAheadRef = React.createRef();
+
   static propTypes = {
     /** Adds a custom children element next to the data filter input. */
     children: PropTypes.node,
@@ -58,8 +60,11 @@ class DataTable extends React.Component {
      */
     useResponsiveTable: PropTypes.bool,
   };
-
+ 
   static defaultProps = {
+    children: undefined,
+    className: '',
+    filterBy: '',
     filterSuggestions: [],
     filterLabel: 'Filter',
     displayKey: 'value',
@@ -77,12 +82,17 @@ class DataTable extends React.Component {
     filteredRows: this.props.rows,
   };
 
-  componentWillReceiveProps(newProps) {
-    this.setState({
-      headers: newProps.headers,
-      rows: newProps.rows,
-      filteredRows: newProps.rows,
-    });
+  componentDidUpdate(prevProps) {
+    const { rows } = this.props;
+    if (!isEqual(prevProps.rows, rows)) {
+      this.setState({
+        headers: this.props.headers,
+        rows: this.props.rows,
+        filteredRows: this.props.rows,
+      }, () => {
+        this.typeAheadRef.current._onSearchTextChanged(window.event);
+      });
+    }
   }
 
   getFormattedHeaders = () => {
@@ -134,6 +144,7 @@ class DataTable extends React.Component {
                                  filterBy={this.props.filterBy}
                                  filterSuggestions={this.props.filterSuggestions}
                                  searchInKeys={this.props.filterKeys}
+                                 ref={this.typeAheadRef}
                                  onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
@@ -175,5 +186,7 @@ class DataTable extends React.Component {
     );
   }
 }
+
+
 
 export default DataTable;
