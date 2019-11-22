@@ -16,6 +16,7 @@ import Panel from './Panel';
 import Popover from './Popover';
 import SplitButton from './SplitButton';
 import Table from './Table';
+import Tabs from './Tabs';
 import Tooltip from './Tooltip';
 
 export {
@@ -37,6 +38,7 @@ export {
   Popover,
   SplitButton,
   Table,
+  Tabs,
   Tooltip,
 };
 export * from './bootstrap-import';
