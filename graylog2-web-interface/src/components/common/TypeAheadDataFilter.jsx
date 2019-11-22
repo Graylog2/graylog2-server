@@ -172,6 +172,7 @@ class TypeAheadDataFilter extends React.Component {
     }, this);
 
     onDataFiltered(filteredData);
+    return true;
   };
 
   render() {
