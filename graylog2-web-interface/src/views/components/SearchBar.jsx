@@ -34,11 +34,11 @@ type Props = {
     },
   },
   disableSearch: boolean,
-  performSearch: () => void,
+  onExecute: () => void,
   queryFilters: Immutable.Map,
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, performSearch, queryFilters }: Props) => {
+const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute: performSearch, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
@@ -118,7 +118,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 SearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
-  performSearch: PropTypes.func.isRequired,
+  onExecute: PropTypes.func.isRequired,
 };
 
 SearchBar.defaultProps = {

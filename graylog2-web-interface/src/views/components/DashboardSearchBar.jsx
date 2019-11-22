@@ -27,10 +27,10 @@ type Props = {
     },
   },
   disableSearch: boolean,
-  performSearch: () => void,
+  onExecute: () => void,
 };
 
-const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, performSearch }: Props) => {
+const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute: performSearch }: Props) => {
   if (!config) {
     return <Spinner />;
   }
@@ -91,7 +91,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, perfo
 DashboardSearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
-  performSearch: PropTypes.func.isRequired,
+  onExecute: PropTypes.func.isRequired,
 };
 
 DashboardSearchBar.defaultProps = {

@@ -54,7 +54,7 @@ describe('SearchBar', () => {
 
   it('should render the SearchBar', () => {
     // Empty currentQuery
-    const wrapper = mount(<SearchBar config={config} performSearch={() => {}} />);
+    const wrapper = mount(<SearchBar config={config} onExecute={() => {}} />);
     expect(wrapper.find('span').text()).toBe(' Loading...');
     expect(wrapper.find('option').length).toBe(0);
 
@@ -67,7 +67,7 @@ describe('SearchBar', () => {
 
   it('should execute a search', () => {
     const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} performSearch={executeFn} />);
+    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
     wrapper.setState({ currentQuery });
     wrapper.find('form').simulate('submit');
     expect(executeFn).toHaveBeenCalledTimes(1);
@@ -75,7 +75,7 @@ describe('SearchBar', () => {
 
   it('changing the time range type executes a new search', () => {
     const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} performSearch={executeFn} />);
+    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
     wrapper.setState({ currentQuery });
 
     const timeRangeTypeSelector = wrapper.find('TimeRangeTypeSelector');
@@ -89,7 +89,7 @@ describe('SearchBar', () => {
 
   it('changing the time range value executes a new search', () => {
     const executeFn = jest.fn();
-    const wrapper = mount(<SearchBar config={config} performSearch={executeFn} />);
+    const wrapper = mount(<SearchBar config={config} onExecute={executeFn} />);
     wrapper.setState({ currentQuery });
 
     const timeRangeInput = wrapper.find('TimeRangeInput');

@@ -225,7 +225,7 @@ describe('ExtendedSearchPage', () => {
     const wrapper = mount(<SimpleExtendedSearchPage />);
 
     const searchBar = wrapper.find('DashboardSearchBar');
-    const cb = searchBar.at(0).props().performSearch;
+    const cb = searchBar.at(0).props().onExecute;
 
     const view = { search: {} };
 
