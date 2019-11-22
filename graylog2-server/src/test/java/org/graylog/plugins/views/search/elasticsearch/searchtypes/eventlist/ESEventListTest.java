@@ -45,10 +45,32 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ESEventListTest {
 
+    @Test
+    public void testSortingOfStreamsInDoExtractResult() {
+        final ESEventList esEventList = new TestESEventList();
+        final SearchJob searchJob = mock(SearchJob.class);
+        final Query query = mock(Query.class);
+        final SearchResult searchResult = mock(SearchResult.class);
+        final MetricAggregation metricAggregation = mock(MetricAggregation.class);
+        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+
+        final EventList eventList = EventList.builder()
+                .id("search-type-id")
+                .streams(ImmutableSet.of("stream-id-1", "stream-id-2"))
+                .build();
+        final EventList.Result eventResult = (EventList.Result) esEventList.doExtractResult(searchJob, query, eventList, searchResult,
+                metricAggregation, queryContext);
+        assertThat(eventResult.events()).containsExactly(
+                eventSummary("find-1", ImmutableSet.of("stream-id-1")),
+                eventSummary("find-2", ImmutableSet.of("stream-id-2")),
+                eventSummary("find-3", ImmutableSet.of("stream-id-1", "stream-id-2"))
+        );
+    }
+
     final private static DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
     final private static DateTime timestamp = formatter.parseDateTime("2019-03-30 14:00:00");
 
-    private EventSummary eventSummaryGenerator(String id, Set<String> streams) {
+    private EventSummary eventSummary(String id, Set<String> streams) {
         return EventSummary.builder()
                 .id(id)
                 .message("message")
@@ -59,7 +81,7 @@ public class ESEventListTest {
     }
 
     static class TestESEventList extends ESEventList {
-        private Map<String, Object> hitGenerator(String id, ArrayList<String> streams) {
+        private Map<String, Object> hit(String id, ArrayList<String> streams) {
             return ImmutableMap.of(
                     EventDto.FIELD_ID, id,
                     EventDto.FIELD_MESSAGE, "message",
@@ -81,36 +103,14 @@ public class ESEventListTest {
             list7.add("stream-id-3");
 
             return ImmutableList.of(
-                    hitGenerator("find-1", list1),
-                    hitGenerator("find-2", list2),
-                    hitGenerator("find-3", list3),
-                    hitGenerator("do-not-find-1", list4),
-                    hitGenerator("do-not-find-2", list5),
-                    hitGenerator("do-not-find-3", list6),
-                    hitGenerator("do-not-find-4", list7)
+                    hit("find-1", list1),
+                    hit("find-2", list2),
+                    hit("find-3", list3),
+                    hit("do-not-find-1", list4),
+                    hit("do-not-find-2", list5),
+                    hit("do-not-find-3", list6),
+                    hit("do-not-find-4", list7)
             );
         }
-    }
-
-    @Test
-    public void testSortingOfStreamsInDoExtractResult() {
-        final ESEventList esEventList = new TestESEventList();
-        final SearchJob searchJob = mock(SearchJob.class);
-        final Query query = mock(Query.class);
-        final SearchResult searchResult = mock(SearchResult.class);
-        final MetricAggregation metricAggregation = mock(MetricAggregation.class);
-        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
-
-        final EventList eventList = EventList.builder()
-                .id("search-type-id")
-                .streams(ImmutableSet.of("stream-id-1", "stream-id-2"))
-                .build();
-        final EventList.Result eventResult = (EventList.Result) esEventList.doExtractResult(searchJob, query, eventList, searchResult,
-                metricAggregation, queryContext);
-        assertThat(eventResult.events()).containsExactly(
-                eventSummaryGenerator("find-1", ImmutableSet.of("stream-id-1")),
-                eventSummaryGenerator("find-2", ImmutableSet.of("stream-id-2")),
-                eventSummaryGenerator("find-3", ImmutableSet.of("stream-id-1", "stream-id-2"))
-        );
     }
 }
