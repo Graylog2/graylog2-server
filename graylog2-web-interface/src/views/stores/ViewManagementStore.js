@@ -81,7 +81,7 @@ const ViewManagementStore = singletonStore(
       };
     },
 
-    get(viewId: string): Promise<View> {
+    get(viewId: string): Promise<ViewJson> {
       const promise = fetch('GET', `${viewsUrl}/${viewId}`);
       ViewManagementActions.get.promise(promise);
       return promise;
