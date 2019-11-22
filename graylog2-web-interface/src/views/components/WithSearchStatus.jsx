@@ -17,8 +17,8 @@ const _disableSearch = (undeclaredParameters, parameterBindings, usedParameters)
 };
 
 const WithSearchStatus = (Component: React.AbstractComponent<any>) => connect(
-  ({ config, isDisabled, onExecute }) => {
-    return <Component disableSearch={isDisabled} onExecute={onExecute} config={config} />;
+  ({ config, isDisabled, performSearch }) => {
+    return <Component disableSearch={isDisabled} performSearch={performSearch} config={config} />;
   },
   {
     searchMetadata: SearchMetadataStore,

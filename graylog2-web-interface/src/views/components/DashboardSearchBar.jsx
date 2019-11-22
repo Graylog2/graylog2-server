@@ -15,8 +15,6 @@ import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeO
 import TimeRangeOverrideInput from 'views/components/searchbar/TimeRangeOverrideInput';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
-import View from 'views/logic/views/View';
-import { ViewStore } from 'views/stores/ViewStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
 
 type Props = {
@@ -29,19 +27,13 @@ type Props = {
     },
   },
   disableSearch: boolean,
-  onExecute: (View) => void,
+  performSearch: () => void,
 };
 
-const _performSearch = (onExecute) => {
-  const { view } = ViewStore.getInitialState();
-  onExecute(view);
-};
-
-const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute }: Props) => {
+const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, performSearch }: Props) => {
   if (!config) {
     return <Spinner />;
   }
-  const performSearch = () => _performSearch(onExecute);
   const submitForm = (event) => {
     event.preventDefault();
     performSearch();
@@ -99,7 +91,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 DashboardSearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
-  onExecute: PropTypes.func.isRequired,
+  performSearch: PropTypes.func.isRequired,
 };
 
 DashboardSearchBar.defaultProps = {

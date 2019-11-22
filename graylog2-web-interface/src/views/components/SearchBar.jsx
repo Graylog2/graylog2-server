@@ -22,13 +22,6 @@ import { QueriesActions } from 'views/stores/QueriesStore';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import { QueryFiltersActions, QueryFiltersStore } from 'views/stores/QueryFiltersStore';
-import { ViewStore } from 'views/stores/ViewStore';
-import View from 'views/logic/views/View';
-
-const _performSearch = (onExecute) => {
-  const { view } = ViewStore.getInitialState();
-  onExecute(view);
-};
 
 type Props = {
   availableStreams: Array<*>,
@@ -41,15 +34,14 @@ type Props = {
     },
   },
   disableSearch: boolean,
-  onExecute: (View) => void,
+  performSearch: () => void,
   queryFilters: Immutable.Map,
 };
 
-const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, onExecute, queryFilters }: Props) => {
+const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = false, performSearch, queryFilters }: Props) => {
   if (!currentQuery || !config) {
     return <Spinner />;
   }
-  const performSearch = () => _performSearch(onExecute);
   const submitForm = (event) => {
     event.preventDefault();
     performSearch();
@@ -126,7 +118,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 SearchBar.propTypes = {
   config: PropTypes.object.isRequired,
   disableSearch: PropTypes.bool,
-  onExecute: PropTypes.func.isRequired,
+  performSearch: PropTypes.func.isRequired,
 };
 
 SearchBar.defaultProps = {
