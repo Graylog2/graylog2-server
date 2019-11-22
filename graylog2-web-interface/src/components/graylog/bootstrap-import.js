@@ -6,7 +6,6 @@ export {
   FormControl,
   InputGroup,
   NavItem,
-  ProgressBar,
   Radio, // NOTE: do we want custom or keep OS styles
   Row,
   Well,
