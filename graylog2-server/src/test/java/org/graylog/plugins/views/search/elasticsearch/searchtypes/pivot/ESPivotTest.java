@@ -33,9 +33,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotBucketSpecHandler;
-import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESTimeHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets.ESValuesHandler;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.series.ESCountHandler;
@@ -297,5 +294,24 @@ public class ESPivotTest {
     private AbstractCharSequenceAssert<?, String> extractAggregation(DocumentContext context, String path) {
         final String fullPath = Stream.of(path.split("\\.")).map(s -> "['aggregations']['" + s + "']").reduce("$", (s1, s2) -> s1 + s2) + "['filter']['exists']['field']";
         return JsonPathAssert.assertThat(context).jsonPathAsString(fullPath);
+    }
+
+    @Test
+    public void includesCustomNameinResultIfPresent() {
+        final ESPivot esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap());
+        final Pivot pivot = Pivot.builder()
+                .id("somePivotId")
+                .name("customPivot")
+                .series(Collections.emptyList())
+                .rollup(false)
+                .build();
+        final long documentCount = 424242;
+        when(queryResult.getTotal()).thenReturn(documentCount);
+        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+
+        final SearchType.Result result = esPivot.doExtractResult(null, null, pivot, queryResult, null, null);
+        
+        assertThat(result.name()).contains("customPivot");
     }
 }
