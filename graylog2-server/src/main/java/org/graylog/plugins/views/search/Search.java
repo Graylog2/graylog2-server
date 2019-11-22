@@ -37,6 +37,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -113,7 +114,34 @@ public abstract class Search {
                     .collect(ImmutableSet.toImmutableSet());
             builder.queries(queries);
         }
+        if (state.hasNonNull("partial_results")) {
+            JsonNode path = state.path("partial_results");
+
+            Set<String> searchTypeIds = parseSearchTypesFromPartialResultsOverride(path);
+
+            Set<Query> queriesAfter = queries().stream()
+                    .filter(q -> q.searchTypes().stream().map(SearchType::id).anyMatch(searchTypeIds::contains))
+                    .map(q -> keepOnlySearchTypes(q, searchTypeIds))
+                    .collect(toSet());
+
+            builder.queries(ImmutableSet.copyOf(queriesAfter));
+        }
         return builder.build();
+    }
+
+    private Query keepOnlySearchTypes(Query query, Set<String> searchTypeWhitelist) {
+        Set<SearchType> searchTypes = query.searchTypes().stream().filter(st -> searchTypeWhitelist.contains(st.id())).collect(toSet());
+        return query.toBuilder().searchTypes(ImmutableSet.copyOf(searchTypes)).build();
+    }
+
+    private Set<String> parseSearchTypesFromPartialResultsOverride(JsonNode path) {
+        final Set<String> results = new HashSet<>();
+        if (path.has("search_types") && path.get("search_types").isArray()) {
+            for (JsonNode n : path.get("search_types"))
+                results.add(n.asText());
+        }
+        //TODO: exception if empty?
+        return results;
     }
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<ImmutableSet<String>> defaultStreamsSupplier) {

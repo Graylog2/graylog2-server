@@ -16,15 +16,22 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,10 +95,58 @@ public class SearchTest {
         assertThat(search.usedStreamIds()).containsExactlyInAnyOrder("c", "d", "e");
     }
 
+    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
+
+    @Test
+    public void keepsOnlyFilteredSearchTypeWhenOverridden() {
+        Search before = searchWithQueriesWithStreams("").toBuilder()
+                .queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
+
+        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans");
+
+        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
+
+        Set<String> searchTypesAfter = after.queries().stream()
+                .flatMap(q -> q.searchTypes().stream().map(SearchType::id)).collect(Collectors.toSet());
+
+        assertThat(searchTypesAfter).containsOnly("oans");
+    }
+
+    @NotNull
+    private Map<String, Object> partialResultsMapWithSearchTypes(String... searchTypeIds) {
+        Multimap<String, String> searchTypes = HashMultimap.create();
+        for (String id : searchTypeIds)
+            searchTypes.put("search_types", id);
+
+        Map<String, Object> executionState = new HashMap<>();
+        executionState.put("partial_results", searchTypes);
+
+        return executionState;
+    }
+
+    private MessageList messageList(String id) {
+        return MessageList.builder().id(id).build();
+    }
+
     private Search searchWithQueriesWithStreams(String... queriesWithStreams) {
         Set<Query> queries = Arrays.stream(queriesWithStreams).map(this::queryWithStreams).collect(Collectors.toSet());
 
         return Search.builder().queries(ImmutableSet.copyOf(queries)).build();
+    }
+
+    private ImmutableSet<Query> queriesWithSearchTypes(String... queriesWithSearchTypes) {
+        Set<Query> queries = Arrays.stream(queriesWithSearchTypes)
+                .map(this::queryWithSearchTypes).collect(Collectors.toSet());
+        return ImmutableSet.copyOf(queries);
+    }
+
+    private Query queryWithSearchTypes(String searchTypeIds) {
+        String[] split = searchTypeIds.isEmpty() ? new String[0] : searchTypeIds.split(",");
+        return validQueryBuilder().searchTypes(searchTypes(split)).build();
+    }
+
+    private Set<SearchType> searchTypes(String... ids) {
+        return Arrays.stream(ids).map(this::messageList).collect(Collectors.toSet());
     }
 
     private Query queryWithStreams(String streamIds) {
@@ -100,12 +155,16 @@ public class SearchTest {
     }
 
     private Query queryWithStreams(String... streamIds) {
-        Query.Builder builder = Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
+        Query.Builder builder = validQueryBuilder();
 
         if (streamIds.length > 0)
             builder = builder.filter(StreamFilter.anyIdOf(streamIds));
 
         return builder.build();
+    }
+
+    private Query.Builder validQueryBuilder() {
+        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
     }
 
     private SearchType searchTypeWithStreams(String streamIds) {
