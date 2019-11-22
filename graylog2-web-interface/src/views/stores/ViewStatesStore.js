@@ -7,7 +7,7 @@ import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewActions, ViewStore } from './ViewStore';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 type ViewStatesActionsTypes = RefluxActions<{
   add: (QueryId, ViewState) => Promise<ViewState>,

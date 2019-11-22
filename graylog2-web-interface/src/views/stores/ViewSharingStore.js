@@ -8,7 +8,7 @@ import URLUtils from 'util/URLUtils';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/views/${viewId}/share`);
 

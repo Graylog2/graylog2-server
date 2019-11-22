@@ -7,7 +7,7 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 type Color = string;
 

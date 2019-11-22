@@ -6,7 +6,7 @@ import { get, isEqual } from 'lodash';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { TitlesMap, TitleType } from './TitleTypes';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 type TitlesActionsTypes = RefluxActions<{
   set: (string, string, string) => Promise<TitlesMap>

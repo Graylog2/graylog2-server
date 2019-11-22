@@ -12,7 +12,7 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (Immutable.Set<string>) => Promise<*>,

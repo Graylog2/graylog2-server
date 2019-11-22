@@ -8,7 +8,7 @@ import URLUtils from 'util/URLUtils';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { QueryFiltersStore } from './QueryFiltersStore';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 const fieldTypesUrl = URLUtils.qualifyUrl('/views/fields');
 

@@ -6,7 +6,7 @@ import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Que
 import Query from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions } from 'views/logic/singleton';
-import type { RefluxActions } from '../stores/StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 type QueriesList = Immutable.OrderedMap<QueryId, Query>;
 

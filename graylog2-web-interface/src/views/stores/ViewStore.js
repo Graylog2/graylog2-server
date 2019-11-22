@@ -16,7 +16,7 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 export type ViewStoreState = {
   activeQuery: QueryId,

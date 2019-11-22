@@ -7,7 +7,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 import View from '../logic/views/View';
 
 export type SavedSearchesActionsType = RefluxActions<{
