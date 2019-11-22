@@ -72,7 +72,7 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void addsNameToResults() {
+    public void includesCustomNameinResultIfPresent() {
         final ESMessageList esMessageList = new ESMessageList(new ESQueryDecorators(Collections.emptySet()));
         final MessageList messageList = MessageList.builder()
                 .id("amessagelist")
