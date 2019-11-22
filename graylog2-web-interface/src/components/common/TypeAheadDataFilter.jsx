@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-
+import { isEqual } from 'lodash';
 import { Button } from 'components/graylog';
 import TypeAheadInput from 'components/common/TypeAheadInput';
 
@@ -70,6 +70,11 @@ class TypeAheadDataFilter extends React.Component {
     filters: Immutable.OrderedSet(),
     filterByKey: `${this.props.filterBy}s`,
   };
+  componentDidUpdate(prevProps) {
+    if (!isEqual(prevProps.data, this.props.data)) {
+      this.filterData();
+    }
+  }
 
   _onSearchTextChanged = (event) => {
     event.preventDefault();

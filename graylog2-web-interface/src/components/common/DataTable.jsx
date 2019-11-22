@@ -10,8 +10,6 @@ import DataTableElement from './DataTableElement';
  * input to the data table by using the the `TypeAheadDataFilter` component.
  */
 class DataTable extends React.Component {
-  typeAheadRef = React.createRef();
-
   static propTypes = {
     /** Adds a custom children element next to the data filter input. */
     children: PropTypes.node,
@@ -60,7 +58,7 @@ class DataTable extends React.Component {
      */
     useResponsiveTable: PropTypes.bool,
   };
- 
+
   static defaultProps = {
     children: undefined,
     className: '',
@@ -76,30 +74,32 @@ class DataTable extends React.Component {
     sortBy: undefined,
   };
 
-  state = {
-    headers: this.props.headers,
-    rows: this.props.rows,
-    filteredRows: this.props.rows,
-  };
+  constructor(props) {
+    super(props);
+    const { headers, rows } = this.props;
+    this.state = {
+      headers: headers,
+      rows: rows,
+      filteredRows: rows,
+    };
+    this.typeAheadRef = React.createRef();
+  }
+
 
   componentDidUpdate(prevProps) {
     const { rows } = this.props;
     if (!isEqual(prevProps.rows, rows)) {
-      this.setState({
-        headers: this.props.headers,
-        rows: this.props.rows,
-        filteredRows: this.props.rows,
-      }, () => {
-        this.typeAheadRef.current._onSearchTextChanged(window.event);
-      });
+      this._updateState();
     }
   }
 
   getFormattedHeaders = () => {
     let i = 0;
-    const formattedHeaders = this.state.headers.map((header) => {
-      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
-      i++;
+    const { headers } = this.state;
+    const { headerCellFormatter } = this.props;
+    const formattedHeaders = headers.map((header) => {
+      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={headerCellFormatter} />;
+      i += 1;
       return el;
     });
 
@@ -108,19 +108,20 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    let sortedDataRows = this.state.filteredRows;
-    if (this.props.sortByKey) {
+    const { sortByKey, sortBy, dataRowFormatter } = this.props;
+    let { filteredRows: sortedDataRows } = this.state;
+    if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+        return a[sortByKey].localeCompare(b[sortByKey]);
       });
-    } else if (this.props.sortBy) {
+    } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return this.props.sortBy(a).localeCompare(this.props.sortBy(b));
+        return sortBy(a).localeCompare(sortBy(b));
       });
     }
     const formattedDataRows = sortedDataRows.map((row) => {
-      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={this.props.dataRowFormatter} />;
-      i++;
+      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={dataRowFormatter} />;
+      i += 1;
       return el;
     });
 
@@ -131,37 +132,59 @@ class DataTable extends React.Component {
     this.setState({ filteredRows });
   };
 
+  _updateState() {
+    const { headers, rows } = this.props;
+    this.setState({
+      headers: headers,
+      rows: rows,
+      filteredRows: rows,
+    });
+  }
+
   render() {
     let filter;
-    if (this.props.filterKeys.length !== 0) {
+    const {
+      filterKeys,
+      id,
+      filterLabel,
+      filterBy,
+      displayKey,
+      filterSuggestions,
+      children,
+      noDataText,
+      className,
+      rowClassName,
+      useResponsiveTable,
+    } = this.props;
+    const { rows, filteredRows } = this.state;
+    if (filterKeys.length !== 0) {
       filter = (
         <div className="row">
           <div className="col-md-8">
-            <TypeAheadDataFilter id={`${this.props.id}-data-filter`}
-                                 label={this.props.filterLabel}
-                                 data={this.state.rows}
-                                 displayKey={this.props.displayKey}
-                                 filterBy={this.props.filterBy}
-                                 filterSuggestions={this.props.filterSuggestions}
-                                 searchInKeys={this.props.filterKeys}
-                                 ref={this.typeAheadRef}
+            <TypeAheadDataFilter id={`${id}-data-filter`}
+                                 label={filterLabel}
+                                 data={rows}
+                                 displayKey={displayKey}
+                                 filterBy={filterBy}
+                                 filterSuggestions={filterSuggestions}
+                                 searchInKeys={filterKeys}
                                  onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
-            {this.props.children}
+            {children}
           </div>
         </div>
       );
     }
 
     let data;
-    if (this.state.rows.length === 0) {
-      data = <p>{this.props.noDataText}</p>;
-    } else if (this.state.filteredRows.length === 0) {
+    if (rows.length === 0) {
+      data = <p>{noDataText}</p>;
+    } else if (filteredRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={`table ${this.props.className}`}>
+        <table className={`table ${className}`}>
           <thead>
             {this.getFormattedHeaders()}
           </thead>
@@ -175,9 +198,9 @@ class DataTable extends React.Component {
     return (
       <div>
         {filter}
-        <div className={`row ${this.props.rowClassName}`}>
+        <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
-            <div id={this.props.id} className={`data-table ${this.props.useResponsiveTable ? 'table-responsive' : ''}`}>
+            <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>
               {data}
             </div>
           </div>
@@ -186,7 +209,5 @@ class DataTable extends React.Component {
     );
   }
 }
-
-
 
 export default DataTable;
