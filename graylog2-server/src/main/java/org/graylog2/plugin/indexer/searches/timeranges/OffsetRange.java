@@ -32,7 +32,7 @@ public abstract class OffsetRange extends TimeRange {
     public abstract String source();
 
     @JsonProperty
-    public abstract String id();
+    public abstract Optional<String> id();
 
     @JsonProperty
     public abstract String offset();
@@ -54,16 +54,18 @@ public abstract class OffsetRange extends TimeRange {
         return null;
     }
 
-    private TimeRange timeRangeOfSource(String source, String id, Query query, SearchType searchType) {
+    private TimeRange timeRangeOfSource(String source, Optional<String> id, Query query, SearchType searchType) {
         switch (source.toLowerCase(Locale.ROOT)) {
             case "query":
                 return query.timerange();
             case "search_type":
+                final String searchTypeId = id
+                        .orElseThrow(() -> new RuntimeException("Search type " + searchType.id() + " has offset timerange referencing search type but id is missing!"));
                 return query.searchTypes().stream()
-                        .filter(s -> s.id().equals(id))
+                        .filter(s -> s.id().equals(searchTypeId))
                         .findFirst()
                         .map(query::effectiveTimeRange)
-                        .orElseThrow(() -> new RuntimeException("Search type " + searchType.id() + " has offset timerange referencing invalid search type: " + id));
+                        .orElseThrow(() -> new RuntimeException("Search type " + searchType.id() + " has offset timerange referencing invalid search type: " + searchTypeId));
             default:
                 throw new RuntimeException("Search type " + searchType.id() + " has offset timerange referencing invalid source: " + source);
         }
@@ -100,7 +102,7 @@ public abstract class OffsetRange extends TimeRange {
         @JsonProperty
         public abstract Builder source(String source);
         @JsonProperty
-        public abstract Builder id(String id);
+        public abstract Builder id(@Nullable String id);
         @JsonProperty
         public abstract Builder offset(@Nullable String offset);
         public Builder offset(Integer offset) {
@@ -110,6 +112,7 @@ public abstract class OffsetRange extends TimeRange {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_OffsetRange.Builder()
+                    .type(OFFSET)
                     .offset("1i");
         }
         public abstract OffsetRange build();
