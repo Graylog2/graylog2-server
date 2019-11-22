@@ -311,7 +311,7 @@ public class ESPivotTest {
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
 
         final SearchType.Result result = esPivot.doExtractResult(null, null, pivot, queryResult, null, null);
-        
+
         assertThat(result.name()).contains("customPivot");
     }
 }
