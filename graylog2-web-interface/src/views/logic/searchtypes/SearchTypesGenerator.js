@@ -1,5 +1,5 @@
 // @flow strict
-import Immutable from 'immutable';
+import * as Immutable from 'immutable';
 import uuid from 'uuid/v4';
 import Widget from 'views/logic/widgets/Widget';
 
@@ -8,7 +8,12 @@ import searchTypeDefinition from '../SearchType';
 
 const filterForWidget = widget => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
-export default (widgets: Array<Widget>) => {
+export type ResultType = {
+  searchTypes: Immutable.Set<Immutable.Map<string, any>>,
+  widgetMapping: Immutable.Map<string, Immutable.Set<string>>,
+};
+
+export default (widgets: Array<Widget>): ResultType => {
   let widgetMapping = Immutable.Map();
   const searchTypes = widgets
     .map(widget => widgetDefinition(widget.type)
