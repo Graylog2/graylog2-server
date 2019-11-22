@@ -33,9 +33,7 @@ export default class SeriesConfiguration extends React.Component {
     }
   };
 
-  _changeName = (e) => {
-    this.setState({ name: e.target.value });
-  };
+  _changeName = e => this.setState({ name: e.target.value });
 
   render() {
     const { name } = this.state;
