@@ -51,7 +51,7 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 
-    const searchType = searchTypes.toArray()[0];
+    const searchType = searchTypes.first();
     expect(searchType.get('timerange')).toEqual(Immutable.Map({ type: 'keyword', keyword: 'yesterday' }));
     expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
   });
@@ -60,7 +60,7 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([dummyWidget]);
 
-    const searchType = searchTypes.toArray()[0];
+    const searchType = searchTypes.first();
     expect(searchType.get('id')).toEqual('bar');
     expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
   });
@@ -72,7 +72,7 @@ describe('SearchTypesGenerator', () => {
 
     const { searchTypes, widgetMapping } = SearchTypesGenerator([widgetWithTimerange]);
 
-    const searchType = searchTypes.toArray()[0];
+    const searchType = searchTypes.first();
     expect(searchType.get('query')).toEqual(Immutable.Map({ type: 'elasticsearch', query_string: '_exists_:src_ip AND source:foo' }));
     expect(widgetMapping.get('dummyWidget')).toEqual(Immutable.Set([searchType.get('id')]));
   });
