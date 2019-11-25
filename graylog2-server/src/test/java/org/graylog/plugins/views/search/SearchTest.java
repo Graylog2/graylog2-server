@@ -24,7 +24,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -98,21 +97,58 @@ public class SearchTest {
     private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
 
     @Test
-    public void keepsOnlyFilteredSearchTypeWhenOverridden() {
-        Search before = searchWithQueriesWithStreams("").toBuilder()
-                .queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
+    public void keepsSingleSearchTypeWhenOverridden() {
+        Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa")).build();
 
         Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans");
 
         Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
 
-        Set<String> searchTypesAfter = after.queries().stream()
-                .flatMap(q -> q.searchTypes().stream().map(SearchType::id)).collect(Collectors.toSet());
-
-        assertThat(searchTypesAfter).containsOnly("oans");
+        assertThat(searchTypeIdsFrom(after)).containsOnly("oans");
     }
 
-    @NotNull
+    @Test
+    public void keepsMultipleSearchTypesWhenOverridden() {
+        Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
+
+        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans", "gsuffa");
+
+        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
+
+        assertThat(searchTypeIdsFrom(after)).containsExactlyInAnyOrder("oans", "gsuffa");
+    }
+
+    @Test
+    public void removesQueryIfNoneOfItsSearchTypesIsRequired() {
+        Search before = Search.builder().queries(queriesWithSearchTypes("oans,zwoa", "gsuffa")).build();
+
+        Map<String, Object> executionState = partialResultsMapWithSearchTypes("oans");
+
+        Search after = before.applyExecutionState(objectMapperProvider.get(), executionState);
+
+        String expected = idOfQueryWithSearchType(before.queries(), "oans");
+
+        assertThat(after.queries()).extracting(Query::id).containsExactly(expected);
+    }
+
+    private Set<String> searchTypeIdsFrom(Search search) {
+        return search.queries().stream()
+                .flatMap(q -> q.searchTypes().stream().map(SearchType::id))
+                .collect(Collectors.toSet());
+    }
+
+    private String idOfQueryWithSearchType(ImmutableSet<Query> queries, @SuppressWarnings("SameParameterValue") String searchTypeId) {
+        return queries.stream()
+                .filter(q -> hasSearchType(q, searchTypeId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("no matching query for search type " + searchTypeId))
+                .id();
+    }
+
+    private boolean hasSearchType(Query q, String searchTypeId) {
+        return q.searchTypes().stream().map(SearchType::id).anyMatch(id -> id.equals(searchTypeId));
+    }
+
     private Map<String, Object> partialResultsMapWithSearchTypes(String... searchTypeIds) {
         Multimap<String, String> searchTypes = HashMultimap.create();
         for (String id : searchTypeIds)
