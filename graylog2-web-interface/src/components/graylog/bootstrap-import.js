@@ -16,6 +16,7 @@ export {
   InputGroup,
   ListGroup,
   MenuItem,
+  NavItem,
   OverlayTrigger,
   Pager,
   PanelGroup,
