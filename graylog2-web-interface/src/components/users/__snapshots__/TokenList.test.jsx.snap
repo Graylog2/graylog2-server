@@ -191,7 +191,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "fnYQfY",
+                            "lastClassName": "hYkHdk",
                             "rules": Array [
                               [Function],
                             ],
@@ -215,13 +215,13 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                        className="Button__StyledButton-c9cbmb-0 dYxYaY"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -487,7 +487,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "fnYQfY",
+                                  "lastClassName": "hYkHdk",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -515,7 +515,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
                               disabled={false}
                               style={
                                 Object {
@@ -525,7 +525,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -586,7 +586,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "fnYQfY",
+                                  "lastClassName": "hYkHdk",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -615,7 +615,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -626,7 +626,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -999,7 +999,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "fnYQfY",
+                            "lastClassName": "dYxYaY",
                             "rules": Array [
                               [Function],
                             ],
@@ -1023,13 +1023,13 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                        className="Button__StyledButton-c9cbmb-0 dYxYaY"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -1317,7 +1317,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "fnYQfY",
+                                  "lastClassName": "dYxYaY",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1345,7 +1345,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
                               disabled={false}
                               style={
                                 Object {
@@ -1355,7 +1355,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -1416,7 +1416,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "fnYQfY",
+                                  "lastClassName": "dYxYaY",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1445,7 +1445,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1456,7 +1456,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -1644,7 +1644,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "fnYQfY",
+                                              "lastClassName": "dYxYaY",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1668,12 +1668,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
-                                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                          className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-primary"
+                                            className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -1799,7 +1799,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "fnYQfY",
+                                              "lastClassName": "dYxYaY",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1823,12 +1823,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
-                                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                          className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-primary"
+                                            className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"

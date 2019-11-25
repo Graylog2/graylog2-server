@@ -193,7 +193,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Button__StyledButton-c9cbmb-0",
                   "isStatic": false,
-                  "lastClassName": "fnYQfY",
+                  "lastClassName": "dRMLmK",
                   "rules": Array [
                     [Function],
                   ],
@@ -216,12 +216,12 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               block={false}
               bsClass="btn"
               bsStyle="success"
-              className="Button__StyledButton-c9cbmb-0 fnYQfY"
+              className="Button__StyledButton-c9cbmb-0 dRMLmK"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-success"
+                className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
                 disabled={false}
                 onClick={[Function]}
                 type="button"

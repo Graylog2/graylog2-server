@@ -263,7 +263,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "fnYQfY",
+                                      "lastClassName": "dRMLmK",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -287,12 +287,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                  className="Button__StyledButton-c9cbmb-0 dRMLmK"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-success"
+                                    className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -897,7 +897,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "fnYQfY",
+                                      "lastClassName": "dRMLmK",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -921,12 +921,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                  className="Button__StyledButton-c9cbmb-0 dRMLmK"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-success"
+                                    className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -1531,7 +1531,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "fnYQfY",
+                                      "lastClassName": "dRMLmK",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -1555,12 +1555,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                  className="Button__StyledButton-c9cbmb-0 dRMLmK"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-success"
+                                    className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -2165,7 +2165,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "fnYQfY",
+                                      "lastClassName": "dRMLmK",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -2189,12 +2189,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                  className="Button__StyledButton-c9cbmb-0 dRMLmK"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-success"
+                                    className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"

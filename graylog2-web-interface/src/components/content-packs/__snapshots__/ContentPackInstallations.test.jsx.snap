@@ -221,7 +221,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "fnYQfY",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -245,12 +245,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="primary"
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                    className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-sm btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -295,7 +295,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "fnYQfY",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -319,12 +319,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="info"
-                                    className="Button__StyledButton-c9cbmb-0 fnYQfY"
+                                    className="Button__StyledButton-c9cbmb-0 cAlWKw"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-sm btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"

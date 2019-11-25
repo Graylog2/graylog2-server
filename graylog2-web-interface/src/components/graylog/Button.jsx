@@ -1,5 +1,5 @@
 import React, { forwardRef, memo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Button as BootstrapButton } from 'react-bootstrap';
 
@@ -7,7 +7,7 @@ import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
 const StyledButton = styled(BootstrapButton)(
-  ({ theme }) => `${buttonStyles(theme)};`,
+  ({ theme }) => css`${buttonStyles(theme)};`,
 );
 
 const Button = memo(forwardRef((props, ref) => {

@@ -93,11 +93,6 @@ public abstract class LookupResult {
         return cacheTTL() != NO_TTL;
     }
 
-    @JsonIgnore
-    public boolean hasTTL() {
-        return cacheTTL() != NO_TTL;
-    }
-
     public static LookupResult empty() {
         return EMPTY_LOOKUP_RESULT;
     }
