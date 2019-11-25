@@ -1,7 +1,5 @@
 // eslint-disable-next-line no-restricted-imports
 export {
-  FormControl,
-
   /* 👇 no custom theme colors needed 👇 */
   ButtonGroup,
   ButtonToolbar,
@@ -13,7 +11,6 @@ export {
   Form,
   FormGroup,
   Grid,
-  InputGroup,
   ListGroup,
   MenuItem,
   NavItem,

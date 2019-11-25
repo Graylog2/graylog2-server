@@ -3,7 +3,9 @@ import Badge from './Badge';
 import Button from './Button';
 import ControlLabel from './ControlLabel';
 import DropdownButton from './DropdownButton';
+import FormControl from './FormControl';
 import HelpBlock from './HelpBlock';
+import InputGroup from './InputGroup';
 import Jumbotron from './Jumbotron';
 import Label from './Label';
 import ListGroupItem from './ListGroupItem';
@@ -27,7 +29,9 @@ export {
   Button,
   ControlLabel,
   DropdownButton,
+  FormControl,
   HelpBlock,
+  InputGroup,
   Jumbotron,
   Label,
   ListGroupItem,
@@ -45,4 +49,5 @@ export {
   Tooltip,
   Well,
 };
+
 export * from './bootstrap-import';
