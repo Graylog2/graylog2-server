@@ -1,22 +1,11 @@
-import React, { forwardRef, useMemo } from 'react';
-import styled from 'styled-components';
-import { color } from 'theme';
+import { memo } from 'react';
+import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Jumbotron as BootstrapJumbotron } from 'react-bootstrap';
 
-const Jumbotron = forwardRef((props, ref) => {
-  const StyledJumbotron = useMemo(
-    () => {
-      return styled(BootstrapJumbotron)`
-        color: ${color.global.textDefault};
-        background-color: ${color.gray[100]};
-      `;
-    }, [],
-  );
-
-  return (
-    <StyledJumbotron ref={ref} {...props} />
-  );
-});
+const Jumbotron = memo(styled(BootstrapJumbotron)(({ theme }) => css`
+  color: ${theme.color.global.textDefault};
+  background-color: ${theme.color.gray[100]};
+`));
 
 export default Jumbotron;

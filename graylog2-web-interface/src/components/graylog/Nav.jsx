@@ -2,25 +2,24 @@
 import { Nav as BootstrapNav } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { color } from 'theme';
 import navTabsStyles from './styles/nav-tabs';
 
-const Nav = styled(BootstrapNav)`
+const Nav = styled(BootstrapNav)(({ theme }) => css`
   &.nav {
     > li {
       > a {
         &:hover,
         &:focus {
-          background-color: ${color.gray[90]};
+          background-color: ${theme.color.gray[90]};
         }
       }
 
       &.disabled > a {
-        color: ${color.global.textDefault};
+        color: ${theme.color.gray[60]};
 
         &:hover,
         &:focus {
-          color: ${color.global.textDefault};
+          color: ${theme.color.gray[60]};
         }
       }
     }
@@ -29,22 +28,22 @@ const Nav = styled(BootstrapNav)`
       &,
       &:hover,
       &:focus {
-        background-color: ${color.gray[90]};
-        border-color: ${color.variant.primary};
+        background-color: ${theme.color.gray[90]};
+        border-color: ${theme.color.variant.primary};
       }
 
       .open > a {
         &,
         &:hover,
         &:focus {
-          color: ${color.gray[100]};
-          background-color: ${color.variant.primary};
+          color: ${theme.color.gray[100]};
+          background-color: ${theme.color.variant.primary};
         }
       }
     }
 
-    &${navTabsStyles()};
+  &${navTabsStyles(theme.color)}
   }
-`;
+`);
 
 export default Nav;

@@ -9,9 +9,9 @@ const brand = {
 const gray = {};
 const darkestGray = brand.tertiary;
 let i = 0;
-while (i < 1) {
-  gray[Math.ceil(i * 100)] = tint(i, darkestGray);
-  i += 0.10;
+while (i <= 100) {
+  gray[i] = tint(Math.ceil(i / 100), darkestGray);
+  i += 10;
 }
 
 const global = {

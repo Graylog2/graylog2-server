@@ -1,44 +1,39 @@
 import { css } from 'styled-components';
 
-import { color } from 'theme';
-import { contrastingColor, readableColor } from 'theme/utils';
+import { util } from 'theme';
 
-const menuItemStyles = (options = {}) => {
-  const { sibling = false } = options;
-
-  return css`
-  ${sibling && '& ~'} .dropdown-menu {
+const defaultOptions = {
+  sibiling: false,
+};
+const menuItemStyles = (color, options = defaultOptions) => css`
+  ${options.sibling ? '& ~' : '&'} .dropdown-menu {
     > li > a {
       color: ${color.global.textDefault};
-
+      font-size: 14px;
       :hover,
       :focus {
-        color: ${readableColor(color.gray[90])};
+        color: ${util.contrastingColor(color.gray[90])};
         background-color: ${color.gray[90]};
       }
     }
-
     > .active > a {
-      color: ${readableColor(color.variant.light.info)};
+      color: ${util.contrastingColor(color.variant.light.info)};
       background-color: ${color.variant.light.info};
-
       :hover,
       :focus {
-        color: ${readableColor(color.variant.info)};
+        color: ${util.contrastingColor(color.variant.info)};
         background-color: ${color.variant.info};
       }
     }
-
     > .disabled > a {
-      color: ${contrastingColor(color.gray[90], 'AA')};
+      color: ${util.contrastingColor(color.gray[90], 'AA')};
       background-color: ${color.gray[90]};
-
-      :hover {
-        color: ${contrastingColor(color.gray[90], 'AA')};
+      :hover,
+      :focus {
+        color: ${util.contrastingColor(color.gray[90], 'AA')};
       }
     }
   }
 `;
-};
 
 export default menuItemStyles;

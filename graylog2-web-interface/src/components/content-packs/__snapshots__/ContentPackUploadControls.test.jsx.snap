@@ -42,7 +42,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               "componentStyle": ComponentStyle {
                 "componentId": "Button-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "jKsGyd",
+                "lastClassName": "jVhNvv",
                 "rules": Array [
                   [Function],
                 ],
@@ -66,13 +66,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             block={false}
             bsClass="btn"
             bsStyle="success"
-            className="button Button-c9cbmb-0 jKsGyd"
+            className="button Button-c9cbmb-0 jVhNvv"
             disabled={false}
             id="upload-content-pack-button"
             onClick={[Function]}
           >
             <button
-              className="button Button-c9cbmb-0 jKsGyd btn btn-success"
+              className="button Button-c9cbmb-0 jVhNvv btn btn-success"
               disabled={false}
               id="upload-content-pack-button"
               onClick={[Function]}
@@ -127,18 +127,10 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
-                  "isStatic": true,
-                  "lastClassName": "cHlGak",
+                  "isStatic": false,
+                  "lastClassName": "kphWbh",
                   "rules": Array [
-                    ".modal-content{background-color:",
-                    "#FFF",
-                    ";border-color:",
-                    "rgba(31,31,31,0.2)",
-                    ";.modal-header{border-bottom-color:",
-                    "#DCE1E5",
-                    ";}.modal-footer{border-top-color:",
-                    "#DCE1E5",
-                    ";}}",
+                    [Function],
                   ],
                 },
                 "displayName": "Modal",
@@ -160,7 +152,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               autoFocus={true}
               backdrop="static"
               bsClass="modal"
-              className="Modal-nuree8-0 cHlGak"
+              className="Modal-nuree8-0 kphWbh"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

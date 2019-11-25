@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, memo } from 'react';
 
 // eslint-disable-next-line no-restricted-imports
 import { SplitButton as BootstrapSplitButton } from 'react-bootstrap';
@@ -8,22 +8,17 @@ import buttonStyles from './styles/button';
 import menuItemStyles from './styles/menuItem';
 import { propTypes, defaultProps } from './props/button';
 
+const StyledSplitButton = memo(styled(BootstrapSplitButton)(({ theme }) => css`
+  ${buttonStyles(theme)};
+
+  ~ .btn.dropdown-toggle {
+    ${buttonStyles(theme)};
+
+    ${menuItemStyles(theme.color, { sibling: true })};
+  }
+`));
+
 const SplitButton = forwardRef((props, ref) => {
-  const { active, bsStyle, disabled } = props;
-  const buildStyle = ({ theme }) => {
-    return css`
-      ${buttonStyles({ bsStyle, ...theme })};
-
-      ~ .btn.dropdown-toggle {
-        ${buttonStyles({ bsStyle, ...theme })};
-
-        ${menuItemStyles({ sibling: true })};
-      }
-    `;
-  };
-
-  const StyledSplitButton = useCallback(styled(BootstrapSplitButton)(buildStyle), [active, bsStyle, disabled]);
-
   return (
     <StyledSplitButton ref={ref} {...props} />
   );

@@ -2,8 +2,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import numeral from 'numeral';
-import teinte from 'theme/teinte';
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -18,15 +17,16 @@ type Props = {
   trendPreference: TrendPreference,
 };
 
-const Background: React.AbstractComponent<{trend: ?string}> = styled.div(({ trend }) => {
-  const bgColor = trend && trend === TREND_GOOD ? teinte.tertiary.tre : teinte.tertiary.quattro;
+const Background: React.AbstractComponent<{trend: ?string}> = styled.div(({ theme, trend }) => {
+  const { variant } = theme.color;
+  const bgColor = trend && trend === TREND_GOOD ? variant.success : variant.primary;
 
   return css`
     text-align: right;
 
     ${trend && css`
       background-color: ${bgColor};
-      color: ${contrastingColor(bgColor)};
+      color: ${util.contrastingColor(bgColor)};
     `}
   `;
 });

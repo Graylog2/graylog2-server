@@ -57,12 +57,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -79,11 +77,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="title"
                     >
                       Title
@@ -119,24 +117,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -162,7 +146,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Title"
@@ -175,7 +159,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="title"
                           label="Title"
                           maxLength={250}
@@ -197,12 +181,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -219,10 +201,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a descriptive title for this content pack.
                         </span>
@@ -265,12 +247,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -287,11 +267,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="name"
                     >
                       Name
@@ -327,24 +307,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -370,7 +336,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Name"
@@ -383,7 +349,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="name"
                           label="Name"
                           maxLength={250}
@@ -405,12 +371,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -427,10 +391,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           This is used as the parameter reference and must not contain a space.
                         </span>
@@ -473,12 +437,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -495,11 +457,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="description"
                     >
                       Description
@@ -535,24 +497,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -578,7 +526,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Description"
@@ -591,7 +539,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="description"
                           label="Description"
                           maxLength={250}
@@ -613,12 +561,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -635,10 +581,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a description explaining what will be done with this parameter.
                         </span>
@@ -681,12 +627,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -703,11 +647,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -744,24 +688,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -786,7 +716,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="select"
                         disabled={false}
                         inputRef={[Function]}
@@ -799,7 +729,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                         value="string"
                       >
                         <select
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           disabled={false}
                           id="type"
                           label="Value Type"
@@ -842,12 +772,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -864,10 +792,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give the type of the parameter.
                         </span>
@@ -909,12 +837,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -931,11 +857,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="default_value"
                     >
                       Default value
@@ -970,24 +896,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -1012,7 +924,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Default value"
@@ -1024,7 +936,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="default_value"
                           label="Default value"
                           maxLength={250}
@@ -1045,12 +957,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -1067,10 +977,10 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a default value if the parameter is not optional.
                         </span>
@@ -1154,12 +1064,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -1176,11 +1084,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="title"
                     >
                       Title
@@ -1216,24 +1124,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -1259,7 +1153,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Title"
@@ -1272,7 +1166,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                         value="A parameter title"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="title"
                           label="Title"
                           maxLength={250}
@@ -1294,12 +1188,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -1316,10 +1208,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a descriptive title for this content pack.
                         </span>
@@ -1362,12 +1254,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -1384,11 +1274,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="name"
                     >
                       Name
@@ -1424,24 +1314,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -1467,7 +1343,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Name"
@@ -1480,7 +1356,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                         value="A parameter name"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="name"
                           label="Name"
                           maxLength={250}
@@ -1502,12 +1378,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -1524,10 +1398,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           This is used as the parameter reference and must not contain a space.
                         </span>
@@ -1570,12 +1444,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -1592,11 +1464,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="description"
                     >
                       Description
@@ -1632,24 +1504,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -1675,7 +1533,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Description"
@@ -1688,7 +1546,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                         value="A parameter descriptions"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="description"
                           label="Description"
                           maxLength={250}
@@ -1710,12 +1568,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -1732,10 +1588,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a description explaining what will be done with this parameter.
                         </span>
@@ -1778,12 +1634,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -1800,11 +1654,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -1841,24 +1695,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -1883,7 +1723,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="select"
                         disabled={true}
                         inputRef={[Function]}
@@ -1896,7 +1736,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                         value="string"
                       >
                         <select
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           disabled={true}
                           id="type"
                           label="Value Type"
@@ -1939,12 +1779,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -1961,10 +1799,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give the type of the parameter.
                         </span>
@@ -2006,12 +1844,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -2028,11 +1864,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="default_value"
                     >
                       Default value
@@ -2067,24 +1903,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -2109,7 +1931,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Default value"
@@ -2121,7 +1943,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                         value="test"
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="default_value"
                           label="Default value"
                           maxLength={250}
@@ -2142,12 +1964,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -2164,10 +1984,10 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a default value if the parameter is not optional.
                         </span>
@@ -2232,12 +2052,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -2254,11 +2072,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="title"
                     >
                       Title
@@ -2294,24 +2112,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -2337,7 +2141,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Title"
@@ -2350,7 +2154,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="title"
                           label="Title"
                           maxLength={250}
@@ -2372,12 +2176,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -2394,10 +2196,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a descriptive title for this content pack.
                         </span>
@@ -2440,12 +2242,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -2462,11 +2262,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="name"
                     >
                       Name
@@ -2502,24 +2302,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -2545,7 +2331,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Name"
@@ -2558,7 +2344,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="name"
                           label="Name"
                           maxLength={250}
@@ -2580,12 +2366,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -2602,10 +2386,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           This is used as the parameter reference and must not contain a space.
                         </span>
@@ -2648,12 +2432,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -2670,11 +2452,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="description"
                     >
                       Description
@@ -2710,24 +2492,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -2753,7 +2521,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Description"
@@ -2766,7 +2534,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="description"
                           label="Description"
                           maxLength={250}
@@ -2788,12 +2556,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -2810,10 +2576,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a description explaining what will be done with this parameter.
                         </span>
@@ -2856,12 +2622,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -2878,11 +2642,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -2919,24 +2683,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -2961,7 +2711,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="select"
                         disabled={false}
                         inputRef={[Function]}
@@ -2974,7 +2724,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                         value="string"
                       >
                         <select
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           disabled={false}
                           id="type"
                           label="Value Type"
@@ -3017,12 +2767,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -3039,10 +2787,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give the type of the parameter.
                         </span>
@@ -3084,12 +2832,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "jmEvcm",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -3106,11 +2852,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       htmlFor="default_value"
                     >
                       Default value
@@ -3145,24 +2891,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "FormControl-sc-1amoaox-0",
-                            "isStatic": true,
-                            "lastClassName": "hdNTyr",
+                            "isStatic": false,
+                            "lastClassName": "lpicKK",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "#DCE1E5",
-                              ";&:focus{border-color:",
-                              "#6DC6E7",
-                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                              "rgba(109,198,231,0.4)",
-                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                              "#b8b8b8",
-                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                              "#DCE1E5",
-                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              [Function],
                             ],
                           },
                           "displayName": "FormControl",
@@ -3187,7 +2919,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <FormControl
                         bsClass="form-control"
-                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                        className="FormControl-sc-1amoaox-0 lpicKK"
                         componentClass="input"
                         inputRef={[Function]}
                         label="Default value"
@@ -3199,7 +2931,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                         value=""
                       >
                         <input
-                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                           id="default_value"
                           label="Default value"
                           maxLength={250}
@@ -3220,12 +2952,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "HelpBlock-i8is92-0",
-                            "isStatic": true,
-                            "lastClassName": "huFHQV",
+                            "isStatic": false,
+                            "lastClassName": "fHJMjA",
                             "rules": Array [
-                              "display:block;margin-top:5px;margin-bottom:10px;color:",
-                              "#9f9f9f",
-                              ";",
+                              [Function],
                             ],
                           },
                           "displayName": "HelpBlock",
@@ -3242,10 +2972,10 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                     >
                       <HelpBlock
                         bsClass="help-block"
-                        className="HelpBlock-i8is92-0 huFHQV"
+                        className="HelpBlock-i8is92-0 fHJMjA"
                       >
                         <span
-                          className="HelpBlock-i8is92-0 huFHQV help-block"
+                          className="HelpBlock-i8is92-0 fHJMjA help-block"
                         >
                           Give a default value if the parameter is not optional.
                         </span>

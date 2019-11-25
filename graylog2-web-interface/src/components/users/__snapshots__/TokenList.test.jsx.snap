@@ -40,12 +40,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
+                          "isStatic": false,
+                          "lastClassName": "jmEvcm",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                            [Function],
                           ],
                         },
                         "displayName": "ControlLabel",
@@ -62,11 +60,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd"
+                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       >
                         Token Name
                       </label>
@@ -103,24 +101,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "hdNTyr",
+                          "isStatic": false,
+                          "lastClassName": "lpicKK",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -142,7 +126,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                      className="FormControl-sc-1amoaox-0 lpicKK"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -151,7 +135,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -207,7 +191,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "ghlLDE",
+                            "lastClassName": "jVhNvv",
                             "rules": Array [
                               [Function],
                             ],
@@ -231,13 +215,13 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button-c9cbmb-0 ghlLDE"
+                        className="Button-c9cbmb-0 jVhNvv"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 ghlLDE btn btn-primary"
+                          className="Button-c9cbmb-0 jVhNvv btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -352,12 +336,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "jmEvcm",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -374,11 +356,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                                       htmlFor="filter-data-filter"
                                     >
                                       Filter
@@ -414,24 +396,10 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormControl-sc-1amoaox-0",
-                                            "isStatic": true,
-                                            "lastClassName": "hdNTyr",
+                                            "isStatic": false,
+                                            "lastClassName": "lpicKK",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";background-color:",
-                                              "#FFF",
-                                              ";border-color:",
-                                              "#DCE1E5",
-                                              ";&:focus{border-color:",
-                                              "#6DC6E7",
-                                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                              "rgba(109,198,231,0.4)",
-                                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                              "#b8b8b8",
-                                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                              "#DCE1E5",
-                                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "FormControl",
@@ -453,7 +421,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                                        className="FormControl-sc-1amoaox-0 lpicKK"
                                         componentClass="input"
                                         inputRef={[Function]}
                                         label="Filter"
@@ -462,7 +430,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                         type="text"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                                           id="filter-data-filter"
                                           label="Filter"
                                           name="filter-data-filter"
@@ -519,7 +487,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iKWoaE",
+                                  "lastClassName": "jVhNvv",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -547,7 +515,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 iKWoaE"
+                              className="Button-c9cbmb-0 jVhNvv"
                               disabled={false}
                               style={
                                 Object {
@@ -557,7 +525,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -618,7 +586,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iKWoaE",
+                                  "lastClassName": "jVhNvv",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -647,7 +615,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 iKWoaE"
+                              className="Button-c9cbmb-0 jVhNvv"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -658,7 +626,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -695,147 +663,103 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                 className="list-group"
               >
                 <ControlledTableListHeader>
-                  <ForwardRef
+                  <ListGroupItem
                     className="listGroupHeader"
                   >
-                    <ListGroupItem
+                    <StyledComponent
                       className="listGroupHeader"
-                    >
-                      <StyledComponent
-                        className="listGroupHeader"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "kQFEvB",
+                            "rules": Array [
+                              [Function],
                             ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
-                              "isStatic": false,
-                              "lastClassName": "igGIXt",
-                              "rules": Array [
-                                "&.list-group-item-action{color:",
-                                "#1F1F1F",
-                                ";&:hover,&:focus{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";}&:active{color:",
-                                "#424344",
-                                ";background-color:",
-                                "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";}}",
-                                [Function],
-                              ],
-                            },
-                            "displayName": "ListGroupItem",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
+                          },
+                          "displayName": "ListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                        forwardedRef={null}
+                      }
+                      forwardedRef={null}
+                    >
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        listItem={false}
                       >
-                        <ListGroupItem
-                          bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
-                          listItem={false}
+                        <span
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
                         >
-                          <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-                          >
-                            <div
-                              className="headerWrapper"
-                            />
-                          </span>
-                        </ListGroupItem>
-                      </StyledComponent>
-                    </ListGroupItem>
-                  </ForwardRef>
+                          <div
+                            className="headerWrapper"
+                          />
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem>
                 </ControlledTableListHeader>
                 <ControlledTableListItem>
-                  <ForwardRef>
-                    <ListGroupItem>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
+                  <ListGroupItem>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "kQFEvB",
+                            "rules": Array [
+                              [Function],
                             ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
-                              "isStatic": false,
-                              "lastClassName": "igGIXt",
-                              "rules": Array [
-                                "&.list-group-item-action{color:",
-                                "#1F1F1F",
-                                ";&:hover,&:focus{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";}&:active{color:",
-                                "#424344",
-                                ";background-color:",
-                                "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";}}",
-                                [Function],
-                              ],
-                            },
-                            "displayName": "ListGroupItem",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
+                          },
+                          "displayName": "ListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                        forwardedRef={null}
+                      }
+                      forwardedRef={null}
+                    >
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        listItem={false}
                       >
-                        <ListGroupItem
-                          bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
-                          listItem={false}
+                        <span
+                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
                         >
-                          <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-                          >
-                            No items to display
-                          </span>
-                        </ListGroupItem>
-                      </StyledComponent>
-                    </ListGroupItem>
-                  </ForwardRef>
+                          No items to display
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem>
                 </ControlledTableListItem>
               </div>
             </ListGroup>
@@ -924,12 +848,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
+                          "isStatic": false,
+                          "lastClassName": "jmEvcm",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                            [Function],
                           ],
                         },
                         "displayName": "ControlLabel",
@@ -946,11 +868,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd"
+                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                       >
                         Token Name
                       </label>
@@ -987,24 +909,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
-                          "isStatic": true,
-                          "lastClassName": "hdNTyr",
+                          "isStatic": false,
+                          "lastClassName": "lpicKK",
                           "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "#DCE1E5",
-                            ";&:focus{border-color:",
-                            "#6DC6E7",
-                            ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                            "rgba(109,198,231,0.4)",
-                            ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                            "#b8b8b8",
-                            ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                            "#DCE1E5",
-                            ";}~ .form-control-feedback.glyphicon{display:none;}",
+                            [Function],
                           ],
                         },
                         "displayName": "FormControl",
@@ -1026,7 +934,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 hdNTyr"
+                      className="FormControl-sc-1amoaox-0 lpicKK"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -1035,7 +943,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1091,7 +999,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "ghlLDE",
+                            "lastClassName": "jVhNvv",
                             "rules": Array [
                               [Function],
                             ],
@@ -1115,13 +1023,13 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button-c9cbmb-0 ghlLDE"
+                        className="Button-c9cbmb-0 jVhNvv"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 ghlLDE btn btn-primary"
+                          className="Button-c9cbmb-0 jVhNvv btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -1258,12 +1166,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "jmEvcm",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -1280,11 +1186,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                                       htmlFor="filter-data-filter"
                                     >
                                       Filter
@@ -1320,24 +1226,10 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "FormControl-sc-1amoaox-0",
-                                            "isStatic": true,
-                                            "lastClassName": "hdNTyr",
+                                            "isStatic": false,
+                                            "lastClassName": "lpicKK",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";background-color:",
-                                              "#FFF",
-                                              ";border-color:",
-                                              "#DCE1E5",
-                                              ";&:focus{border-color:",
-                                              "#6DC6E7",
-                                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                              "rgba(109,198,231,0.4)",
-                                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                              "#b8b8b8",
-                                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                              "#DCE1E5",
-                                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "FormControl",
@@ -1359,7 +1251,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                     >
                                       <FormControl
                                         bsClass="form-control"
-                                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                                        className="FormControl-sc-1amoaox-0 lpicKK"
                                         componentClass="input"
                                         inputRef={[Function]}
                                         label="Filter"
@@ -1368,7 +1260,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                         type="text"
                                       >
                                         <input
-                                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                          className="FormControl-sc-1amoaox-0 lpicKK form-control"
                                           id="filter-data-filter"
                                           label="Filter"
                                           name="filter-data-filter"
@@ -1425,7 +1317,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iKWoaE",
+                                  "lastClassName": "jVhNvv",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1453,7 +1345,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 iKWoaE"
+                              className="Button-c9cbmb-0 jVhNvv"
                               disabled={false}
                               style={
                                 Object {
@@ -1463,7 +1355,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -1524,7 +1416,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "iKWoaE",
+                                  "lastClassName": "jVhNvv",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1553,7 +1445,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 iKWoaE"
+                              className="Button-c9cbmb-0 jVhNvv"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1564,7 +1456,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -1601,431 +1493,366 @@ exports[`<TokenList /> should render with tokens 1`] = `
                 className="list-group"
               >
                 <ControlledTableListHeader>
-                  <ForwardRef
+                  <ListGroupItem
                     className="listGroupHeader"
                   >
-                    <ListGroupItem
+                    <StyledComponent
                       className="listGroupHeader"
-                    >
-                      <StyledComponent
-                        className="listGroupHeader"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "kQFEvB",
+                            "rules": Array [
+                              [Function],
                             ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
-                              "isStatic": false,
-                              "lastClassName": "igGIXt",
-                              "rules": Array [
-                                "&.list-group-item-action{color:",
-                                "#1F1F1F",
-                                ";&:hover,&:focus{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";}&:active{color:",
-                                "#424344",
-                                ";background-color:",
-                                "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";}}",
-                                [Function],
-                              ],
-                            },
-                            "displayName": "ListGroupItem",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
+                          },
+                          "displayName": "ListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                        forwardedRef={null}
+                      }
+                      forwardedRef={null}
+                    >
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        listItem={false}
                       >
-                        <ListGroupItem
-                          bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
-                          listItem={false}
+                        <span
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
                         >
-                          <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-                          >
-                            <div
-                              className="headerWrapper"
-                            />
-                          </span>
-                        </ListGroupItem>
-                      </StyledComponent>
-                    </ListGroupItem>
-                  </ForwardRef>
+                          <div
+                            className="headerWrapper"
+                          />
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem>
                 </ControlledTableListHeader>
                 <ControlledTableListItem
                   key="item-beef2001"
                 >
-                  <ForwardRef>
-                    <ListGroupItem>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
+                  <ListGroupItem>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "kQFEvB",
+                            "rules": Array [
+                              [Function],
                             ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
-                              "isStatic": false,
-                              "lastClassName": "igGIXt",
-                              "rules": Array [
-                                "&.list-group-item-action{color:",
-                                "#1F1F1F",
-                                ";&:hover,&:focus{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";}&:active{color:",
-                                "#424344",
-                                ";background-color:",
-                                "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";}}",
-                                [Function],
-                              ],
-                            },
-                            "displayName": "ListGroupItem",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
+                          },
+                          "displayName": "ListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                        forwardedRef={null}
+                      }
+                      forwardedRef={null}
+                    >
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        listItem={false}
                       >
-                        <ListGroupItem
-                          bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
-                          listItem={false}
+                        <span
+                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
                         >
-                          <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                          <div
+                            className="itemWrapper itemWrapperStatic"
                           >
                             <div
-                              className="itemWrapper itemWrapperStatic"
+                              className="itemActionsWrapper"
                             >
-                              <div
-                                className="itemActionsWrapper"
+                              <ButtonGroup
+                                block={false}
+                                bsClass="btn-group"
+                                justified={false}
+                                vertical={false}
                               >
-                                <ButtonGroup
-                                  block={false}
-                                  bsClass="btn-group"
-                                  justified={false}
-                                  vertical={false}
+                                <div
+                                  className="btn-group"
                                 >
-                                  <div
-                                    className="btn-group"
+                                  <clipboard-button
+                                    bsSize="xsmall"
+                                    text="beef2001"
+                                    title="Copy to clipboard"
+                                  />
+                                  <ForwardRef
+                                    bsSize="xsmall"
+                                    bsStyle="primary"
+                                    disabled={false}
+                                    onClick={[Function]}
                                   >
-                                    <clipboard-button
-                                      bsSize="xsmall"
-                                      text="beef2001"
-                                      title="Copy to clipboard"
-                                    />
-                                    <ForwardRef
+                                    <Button
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
-                                      <Button
+                                      <StyledComponent
                                         bsSize="xsmall"
                                         bsStyle="primary"
                                         disabled={false}
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "SIZES": Array [
+                                              "large",
+                                              "small",
+                                              "xsmall",
+                                            ],
+                                            "STYLES": Array [
+                                              "success",
+                                              "warning",
+                                              "danger",
+                                              "info",
+                                              "default",
+                                              "primary",
+                                              "link",
+                                            ],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Button-c9cbmb-0",
+                                              "isStatic": false,
+                                              "lastClassName": "jVhNvv",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Button",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                         onClick={[Function]}
                                       >
-                                        <StyledComponent
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
+                                          className="Button-c9cbmb-0 jVhNvv"
                                           disabled={false}
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "SIZES": Array [
-                                                "large",
-                                                "small",
-                                                "xsmall",
-                                              ],
-                                              "STYLES": Array [
-                                                "success",
-                                                "warning",
-                                                "danger",
-                                                "info",
-                                                "default",
-                                                "primary",
-                                                "link",
-                                              ],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "Button-c9cbmb-0",
-                                                "isStatic": false,
-                                                "lastClassName": "ghlLDE",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "Button",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "Button-c9cbmb-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
                                           onClick={[Function]}
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsSize="xsmall"
-                                            bsStyle="primary"
-                                            className="Button-c9cbmb-0 ghlLDE"
+                                          <button
+                                            className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
+                                            type="button"
                                           >
-                                            <button
-                                              className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
-                                              disabled={false}
-                                              onClick={[Function]}
-                                              type="button"
-                                            >
-                                              Delete
-                                            </button>
-                                          </Button>
-                                        </StyledComponent>
-                                      </Button>
-                                    </ForwardRef>
-                                  </div>
-                                </ButtonGroup>
-                              </div>
-                              <div
-                                className="header"
-                                id="token-input"
-                              >
-                                Acme
-                              </div>
+                                            Delete
+                                          </button>
+                                        </Button>
+                                      </StyledComponent>
+                                    </Button>
+                                  </ForwardRef>
+                                </div>
+                              </ButtonGroup>
                             </div>
-                          </span>
-                        </ListGroupItem>
-                      </StyledComponent>
-                    </ListGroupItem>
-                  </ForwardRef>
+                            <div
+                              className="header"
+                              id="token-input"
+                            >
+                              Acme
+                            </div>
+                          </div>
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem>
                 </ControlledTableListItem>
                 <ControlledTableListItem
                   key="item-beef2002"
                 >
-                  <ForwardRef>
-                    <ListGroupItem>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "STYLES": Array [
-                              "success",
-                              "warning",
-                              "danger",
-                              "info",
+                  <ListGroupItem>
+                    <StyledComponent
+                      forwardedComponent={
+                        Object {
+                          "$$typeof": Symbol(react.forward_ref),
+                          "STYLES": Array [
+                            "success",
+                            "warning",
+                            "danger",
+                            "info",
+                          ],
+                          "attrs": Array [],
+                          "componentStyle": ComponentStyle {
+                            "componentId": "ListGroupItem-sc-1ky0joo-0",
+                            "isStatic": false,
+                            "lastClassName": "kQFEvB",
+                            "rules": Array [
+                              [Function],
                             ],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "ListGroupItem-sc-1ky0joo-0",
-                              "isStatic": false,
-                              "lastClassName": "igGIXt",
-                              "rules": Array [
-                                "&.list-group-item-action{color:",
-                                "#1F1F1F",
-                                ";&:hover,&:focus{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#F1F2F2",
-                                ";}&:active{color:",
-                                "#424344",
-                                ";background-color:",
-                                "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";}}",
-                                [Function],
-                              ],
-                            },
-                            "displayName": "ListGroupItem",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
+                          },
+                          "displayName": "ListGroupItem",
+                          "foldedComponentIds": Array [],
+                          "render": [Function],
+                          "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                          "target": [Function],
+                          "toString": [Function],
+                          "warnTooManyClasses": [Function],
+                          "withComponent": [Function],
                         }
-                        forwardedRef={null}
+                      }
+                      forwardedRef={null}
+                    >
+                      <ListGroupItem
+                        bsClass="list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        listItem={false}
                       >
-                        <ListGroupItem
-                          bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
-                          listItem={false}
+                        <span
+                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
                         >
-                          <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                          <div
+                            className="itemWrapper itemWrapperStatic"
                           >
                             <div
-                              className="itemWrapper itemWrapperStatic"
+                              className="itemActionsWrapper"
                             >
-                              <div
-                                className="itemActionsWrapper"
+                              <ButtonGroup
+                                block={false}
+                                bsClass="btn-group"
+                                justified={false}
+                                vertical={false}
                               >
-                                <ButtonGroup
-                                  block={false}
-                                  bsClass="btn-group"
-                                  justified={false}
-                                  vertical={false}
+                                <div
+                                  className="btn-group"
                                 >
-                                  <div
-                                    className="btn-group"
+                                  <clipboard-button
+                                    bsSize="xsmall"
+                                    text="beef2002"
+                                    title="Copy to clipboard"
+                                  />
+                                  <ForwardRef
+                                    bsSize="xsmall"
+                                    bsStyle="primary"
+                                    disabled={false}
+                                    onClick={[Function]}
                                   >
-                                    <clipboard-button
-                                      bsSize="xsmall"
-                                      text="beef2002"
-                                      title="Copy to clipboard"
-                                    />
-                                    <ForwardRef
+                                    <Button
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
-                                      <Button
+                                      <StyledComponent
                                         bsSize="xsmall"
                                         bsStyle="primary"
                                         disabled={false}
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "SIZES": Array [
+                                              "large",
+                                              "small",
+                                              "xsmall",
+                                            ],
+                                            "STYLES": Array [
+                                              "success",
+                                              "warning",
+                                              "danger",
+                                              "info",
+                                              "default",
+                                              "primary",
+                                              "link",
+                                            ],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "Button-c9cbmb-0",
+                                              "isStatic": false,
+                                              "lastClassName": "jVhNvv",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "Button",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
                                         onClick={[Function]}
                                       >
-                                        <StyledComponent
+                                        <Button
+                                          active={false}
+                                          block={false}
+                                          bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
+                                          className="Button-c9cbmb-0 jVhNvv"
                                           disabled={false}
-                                          forwardedComponent={
-                                            Object {
-                                              "$$typeof": Symbol(react.forward_ref),
-                                              "SIZES": Array [
-                                                "large",
-                                                "small",
-                                                "xsmall",
-                                              ],
-                                              "STYLES": Array [
-                                                "success",
-                                                "warning",
-                                                "danger",
-                                                "info",
-                                                "default",
-                                                "primary",
-                                                "link",
-                                              ],
-                                              "attrs": Array [],
-                                              "componentStyle": ComponentStyle {
-                                                "componentId": "Button-c9cbmb-0",
-                                                "isStatic": false,
-                                                "lastClassName": "ghlLDE",
-                                                "rules": Array [
-                                                  [Function],
-                                                ],
-                                              },
-                                              "displayName": "Button",
-                                              "foldedComponentIds": Array [],
-                                              "render": [Function],
-                                              "styledComponentId": "Button-c9cbmb-0",
-                                              "target": [Function],
-                                              "toString": [Function],
-                                              "warnTooManyClasses": [Function],
-                                              "withComponent": [Function],
-                                            }
-                                          }
-                                          forwardedRef={null}
                                           onClick={[Function]}
                                         >
-                                          <Button
-                                            active={false}
-                                            block={false}
-                                            bsClass="btn"
-                                            bsSize="xsmall"
-                                            bsStyle="primary"
-                                            className="Button-c9cbmb-0 ghlLDE"
+                                          <button
+                                            className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
+                                            type="button"
                                           >
-                                            <button
-                                              className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
-                                              disabled={false}
-                                              onClick={[Function]}
-                                              type="button"
-                                            >
-                                              Delete
-                                            </button>
-                                          </Button>
-                                        </StyledComponent>
-                                      </Button>
-                                    </ForwardRef>
-                                  </div>
-                                </ButtonGroup>
-                              </div>
-                              <div
-                                className="header"
-                                id="token-input"
-                              >
-                                Hamfred
-                              </div>
+                                            Delete
+                                          </button>
+                                        </Button>
+                                      </StyledComponent>
+                                    </Button>
+                                  </ForwardRef>
+                                </div>
+                              </ButtonGroup>
                             </div>
-                          </span>
-                        </ListGroupItem>
-                      </StyledComponent>
-                    </ListGroupItem>
-                  </ForwardRef>
+                            <div
+                              className="header"
+                              id="token-input"
+                            >
+                              Hamfred
+                            </div>
+                          </div>
+                        </span>
+                      </ListGroupItem>
+                    </StyledComponent>
+                  </ListGroupItem>
                 </ControlledTableListItem>
               </div>
             </ListGroup>

@@ -221,7 +221,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "ghlLDE",
+                                        "lastClassName": "jVhNvv",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -245,12 +245,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
+                                    className="Button-c9cbmb-0 jVhNvv"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-sm btn-primary"
+                                      className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -295,7 +295,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Button-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "gZfKUo",
+                                        "lastClassName": "jVhNvv",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -319,12 +319,12 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     bsClass="btn"
                                     bsSize="small"
                                     bsStyle="info"
-                                    className="Button-c9cbmb-0 gZfKUo"
+                                    className="Button-c9cbmb-0 jVhNvv"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                      className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -369,18 +369,10 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "Modal-nuree8-0",
-                                        "isStatic": true,
-                                        "lastClassName": "cHlGak",
+                                        "isStatic": false,
+                                        "lastClassName": "kphWbh",
                                         "rules": Array [
-                                          ".modal-content{background-color:",
-                                          "#FFF",
-                                          ";border-color:",
-                                          "rgba(31,31,31,0.2)",
-                                          ";.modal-header{border-bottom-color:",
-                                          "#DCE1E5",
-                                          ";}.modal-footer{border-top-color:",
-                                          "#DCE1E5",
-                                          ";}}",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "Modal",
@@ -403,7 +395,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                                     backdrop="static"
                                     bsClass="modal"
                                     bsSize="large"
-                                    className="Modal-nuree8-0 cHlGak"
+                                    className="Modal-nuree8-0 kphWbh"
                                     dialogComponentClass={[Function]}
                                     enforceFocus={true}
                                     keyboard={true}

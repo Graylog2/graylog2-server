@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
 
-import teinte from 'theme/teinte';
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import { ScratchpadContext } from 'providers/ScratchpadProvider';
@@ -23,23 +22,23 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Description = styled.p`
-  color: ${teinte.primary.due};
+const Description = styled.p(({ theme }) => css`
+  color: ${theme.color.global.textAlt};
   margin: 9px 0 6px;
-`;
+`);
 
-const Textarea = styled.textarea(props => css`
+const Textarea = styled.textarea(({ copied, theme }) => css`
   width: 100%;
   resize: none;
   flex: 1;
   margin-bottom: 15px;
-  border: 1px solid ${props.copied ? teinte.tertiary.tre : teinte.secondary.tre};
+  border: 1px solid ${copied ? theme.color.variant.success : theme.color.gray[80]};
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
-              0 0 8px ${rgba(props.copied ? teinte.tertiary.tre : teinte.secondary.tre, 0.6)};
+              0 0 8px ${rgba(copied ? theme.color.variant.success : theme.color.gray[80], 0.6)};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
 
   :focus {
-    border-color: ${teinte.tertiary.due};
+    border-color: ${theme.color.variant.light.info};
     outline: none;
   }
 `);
@@ -64,9 +63,9 @@ const Footer = styled.footer`
   padding-bottom: 9px;
 `;
 
-const SavingMessage = styled.span(({ visible }) => `
+const SavingMessage = styled.span(({ theme, visible }) => css`
   flex: 1;
-  color: ${teinte.tertiary.tre};
+  color: ${theme.color.variant.success};
   font-style: italic;
   opacity: ${visible ? '1' : '0'};
   transition: opacity 150ms ease-in-out;

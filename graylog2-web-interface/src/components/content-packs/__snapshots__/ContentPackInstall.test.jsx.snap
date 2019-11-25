@@ -102,12 +102,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "ControlLabel-sc-1edmum5-0",
-                            "isStatic": true,
-                            "lastClassName": "iZJNbd",
+                            "isStatic": false,
+                            "lastClassName": "jmEvcm",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                              [Function],
                             ],
                           },
                           "displayName": "ControlLabel",
@@ -124,11 +122,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <ControlLabel
                         bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
+                        className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm"
                         srOnly={false}
                       >
                         <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                          className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                           htmlFor="comment"
                         >
                           Comment
@@ -167,24 +165,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
                                 "componentId": "FormControl-sc-1amoaox-0",
-                                "isStatic": true,
-                                "lastClassName": "hdNTyr",
+                                "isStatic": false,
+                                "lastClassName": "lpicKK",
                                 "rules": Array [
-                                  "color:",
-                                  "#1F1F1F",
-                                  ";background-color:",
-                                  "#FFF",
-                                  ";border-color:",
-                                  "#DCE1E5",
-                                  ";&:focus{border-color:",
-                                  "#6DC6E7",
-                                  ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                  "rgba(109,198,231,0.4)",
-                                  ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                  "#b8b8b8",
-                                  ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                  "#DCE1E5",
-                                  ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                  [Function],
                                 ],
                               },
                               "displayName": "FormControl",
@@ -209,7 +193,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         >
                           <FormControl
                             bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 hdNTyr"
+                            className="FormControl-sc-1amoaox-0 lpicKK"
                             componentClass="input"
                             inputRef={[Function]}
                             label="Comment"
@@ -221,7 +205,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             value=""
                           >
                             <input
-                              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                              className="FormControl-sc-1amoaox-0 lpicKK form-control"
                               id="comment"
                               label="Comment"
                               maxLength={512}
@@ -301,12 +285,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "ControlLabel-sc-1edmum5-0",
-                            "isStatic": true,
-                            "lastClassName": "iZJNbd",
+                            "isStatic": false,
+                            "lastClassName": "jmEvcm",
                             "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                              [Function],
                             ],
                           },
                           "displayName": "ControlLabel",
@@ -323,11 +305,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <ControlLabel
                         bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
+                        className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm"
                         srOnly={false}
                       >
                         <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                          className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm control-label"
                           htmlFor="PARAM"
                         >
                           A parameter
@@ -367,24 +349,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               "attrs": Array [],
                               "componentStyle": ComponentStyle {
                                 "componentId": "FormControl-sc-1amoaox-0",
-                                "isStatic": true,
-                                "lastClassName": "hdNTyr",
+                                "isStatic": false,
+                                "lastClassName": "lpicKK",
                                 "rules": Array [
-                                  "color:",
-                                  "#1F1F1F",
-                                  ";background-color:",
-                                  "#FFF",
-                                  ";border-color:",
-                                  "#DCE1E5",
-                                  ";&:focus{border-color:",
-                                  "#6DC6E7",
-                                  ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                  "rgba(109,198,231,0.4)",
-                                  ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                  "#b8b8b8",
-                                  ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                  "#DCE1E5",
-                                  ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                  [Function],
                                 ],
                               },
                               "displayName": "FormControl",
@@ -410,7 +378,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                         >
                           <FormControl
                             bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 hdNTyr"
+                            className="FormControl-sc-1amoaox-0 lpicKK"
                             componentClass="input"
                             inputRef={[Function]}
                             label="A parameter"
@@ -423,7 +391,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                             value="parameter"
                           >
                             <input
-                              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                              className="FormControl-sc-1amoaox-0 lpicKK form-control"
                               id="PARAM"
                               label="A parameter"
                               maxLength={250}
@@ -608,7 +576,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -631,12 +599,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -691,7 +659,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -715,13 +683,13 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -921,7 +889,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "gZfKUo",
+                                                    "lastClassName": "jVhNvv",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -945,12 +913,12 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
-                                                className="Button-c9cbmb-0 gZfKUo"
+                                                className="Button-c9cbmb-0 jVhNvv"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                                  className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -998,18 +966,10 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
-                                              "isStatic": true,
-                                              "lastClassName": "cHlGak",
+                                              "isStatic": false,
+                                              "lastClassName": "kphWbh",
                                               "rules": Array [
-                                                ".modal-content{background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "rgba(31,31,31,0.2)",
-                                                ";.modal-header{border-bottom-color:",
-                                                "#DCE1E5",
-                                                ";}.modal-footer{border-top-color:",
-                                                "#DCE1E5",
-                                                ";}}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "Modal",
@@ -1032,7 +992,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 cHlGak"
+                                          className="Modal-nuree8-0 kphWbh"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}

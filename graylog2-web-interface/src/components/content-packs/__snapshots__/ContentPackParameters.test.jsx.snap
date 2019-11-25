@@ -173,7 +173,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "gZfKUo",
+                            "lastClassName": "jVhNvv",
                             "rules": Array [
                               [Function],
                             ],
@@ -198,13 +198,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         bsClass="btn"
                         bsSize="small"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 gZfKUo"
+                        className="Button-c9cbmb-0 jVhNvv"
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
                       >
                         <button
-                          className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                          className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
                           disabled={false}
                           onClick={[Function]}
                           title="Edit Modal"
@@ -250,18 +250,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "Modal-nuree8-0",
-                            "isStatic": true,
-                            "lastClassName": "cHlGak",
+                            "isStatic": false,
+                            "lastClassName": "kphWbh",
                             "rules": Array [
-                              ".modal-content{background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "rgba(31,31,31,0.2)",
-                              ";.modal-header{border-bottom-color:",
-                              "#DCE1E5",
-                              ";}.modal-footer{border-top-color:",
-                              "#DCE1E5",
-                              ";}}",
+                              [Function],
                             ],
                           },
                           "displayName": "Modal",
@@ -284,7 +276,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 cHlGak"
+                        className="Modal-nuree8-0 kphWbh"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -436,7 +428,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -459,12 +451,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -519,7 +511,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -543,13 +535,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -732,11 +724,9 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                       className="failure"
                                     >
                                       <Badge
-                                        bsStyle="default"
                                         className="failure"
                                       >
                                         <StyledComponent
-                                          bsStyle="default"
                                           className="failure"
                                           forwardedComponent={
                                             Object {
@@ -745,7 +735,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                               "componentStyle": ComponentStyle {
                                                 "componentId": "Badge-sc-4gzqz0-0",
                                                 "isStatic": false,
-                                                "lastClassName": "cwxrQE",
+                                                "lastClassName": "iRhcGJ",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
@@ -764,12 +754,11 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                         >
                                           <Badge
                                             bsClass="badge"
-                                            bsStyle="default"
-                                            className="failure Badge-sc-4gzqz0-0 cwxrQE"
+                                            className="failure Badge-sc-4gzqz0-0 iRhcGJ"
                                             pullRight={false}
                                           >
                                             <span
-                                              className="failure Badge-sc-4gzqz0-0 cwxrQE badge badge-default"
+                                              className="failure Badge-sc-4gzqz0-0 iRhcGJ badge"
                                             >
                                               <ForwardRef
                                                 fixedWidth={false}
@@ -835,7 +824,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "ghlLDE",
+                                                    "lastClassName": "jVhNvv",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -860,13 +849,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="primary"
-                                                className="Button-c9cbmb-0 ghlLDE"
+                                                className="Button-c9cbmb-0 jVhNvv"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 title="Delete Parameter"
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                                  className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   title="Delete Parameter"
@@ -914,7 +903,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "gZfKUo",
+                                                    "lastClassName": "jVhNvv",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -939,13 +928,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xsmall"
                                                 bsStyle="info"
-                                                className="Button-c9cbmb-0 gZfKUo"
+                                                className="Button-c9cbmb-0 jVhNvv"
                                                 disabled={false}
                                                 onClick={[Function]}
                                                 title="Edit Modal"
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                                  className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   title="Edit Modal"
@@ -991,18 +980,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Modal-nuree8-0",
-                                                    "isStatic": true,
-                                                    "lastClassName": "cHlGak",
+                                                    "isStatic": false,
+                                                    "lastClassName": "kphWbh",
                                                     "rules": Array [
-                                                      ".modal-content{background-color:",
-                                                      "#FFF",
-                                                      ";border-color:",
-                                                      "rgba(31,31,31,0.2)",
-                                                      ";.modal-header{border-bottom-color:",
-                                                      "#DCE1E5",
-                                                      ";}.modal-footer{border-top-color:",
-                                                      "#DCE1E5",
-                                                      ";}}",
+                                                      [Function],
                                                     ],
                                                   },
                                                   "displayName": "Modal",
@@ -1025,7 +1006,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 backdrop="static"
                                                 bsClass="modal"
                                                 bsSize="large"
-                                                className="Modal-nuree8-0 cHlGak"
+                                                className="Modal-nuree8-0 kphWbh"
                                                 dialogComponentClass={[Function]}
                                                 enforceFocus={true}
                                                 keyboard={true}
@@ -1136,18 +1117,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "Modal-nuree8-0",
-                          "isStatic": true,
-                          "lastClassName": "cHlGak",
+                          "isStatic": false,
+                          "lastClassName": "kphWbh",
                           "rules": Array [
-                            ".modal-content{background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "rgba(31,31,31,0.2)",
-                            ";.modal-header{border-bottom-color:",
-                            "#DCE1E5",
-                            ";}.modal-footer{border-top-color:",
-                            "#DCE1E5",
-                            ";}}",
+                            [Function],
                           ],
                         },
                         "displayName": "Modal",
@@ -1169,7 +1142,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 cHlGak"
+                      className="Modal-nuree8-0 kphWbh"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -1401,7 +1374,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1424,12 +1397,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1484,7 +1457,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1508,13 +1481,13 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1782,7 +1755,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "ghlLDE",
+                                                    "lastClassName": "jVhNvv",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1806,12 +1779,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="primary"
-                                                className="Button-c9cbmb-0 ghlLDE"
+                                                className="Button-c9cbmb-0 jVhNvv"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                                  className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -1856,7 +1829,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "Button-c9cbmb-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "gZfKUo",
+                                                    "lastClassName": "jVhNvv",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1880,12 +1853,12 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                                 bsClass="btn"
                                                 bsSize="xs"
                                                 bsStyle="info"
-                                                className="Button-c9cbmb-0 gZfKUo"
+                                                className="Button-c9cbmb-0 jVhNvv"
                                                 disabled={false}
                                                 onClick={[Function]}
                                               >
                                                 <button
-                                                  className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                                  className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
                                                   disabled={false}
                                                   onClick={[Function]}
                                                   type="button"
@@ -1933,18 +1906,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
-                                              "isStatic": true,
-                                              "lastClassName": "cHlGak",
+                                              "isStatic": false,
+                                              "lastClassName": "kphWbh",
                                               "rules": Array [
-                                                ".modal-content{background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "rgba(31,31,31,0.2)",
-                                                ";.modal-header{border-bottom-color:",
-                                                "#DCE1E5",
-                                                ";}.modal-footer{border-top-color:",
-                                                "#DCE1E5",
-                                                ";}}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "Modal",
@@ -1967,7 +1932,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 cHlGak"
+                                          className="Modal-nuree8-0 kphWbh"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2055,18 +2020,10 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Modal-nuree8-0",
-                                              "isStatic": true,
-                                              "lastClassName": "cHlGak",
+                                              "isStatic": false,
+                                              "lastClassName": "kphWbh",
                                               "rules": Array [
-                                                ".modal-content{background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "rgba(31,31,31,0.2)",
-                                                ";.modal-header{border-bottom-color:",
-                                                "#DCE1E5",
-                                                ";}.modal-footer{border-top-color:",
-                                                "#DCE1E5",
-                                                ";}}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "Modal",
@@ -2089,7 +2046,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                                           backdrop="static"
                                           bsClass="modal"
                                           bsSize="large"
-                                          className="Modal-nuree8-0 cHlGak"
+                                          className="Modal-nuree8-0 kphWbh"
                                           dialogComponentClass={[Function]}
                                           enforceFocus={true}
                                           keyboard={true}
@@ -2243,7 +2200,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "gZfKUo",
+                            "lastClassName": "jVhNvv",
                             "rules": Array [
                               [Function],
                             ],
@@ -2268,13 +2225,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         bsClass="btn"
                         bsSize="small"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 gZfKUo"
+                        className="Button-c9cbmb-0 jVhNvv"
                         disabled={false}
                         onClick={[Function]}
                         title="Edit Modal"
                       >
                         <button
-                          className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                          className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
                           disabled={false}
                           onClick={[Function]}
                           title="Edit Modal"
@@ -2320,18 +2277,10 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
                             "componentId": "Modal-nuree8-0",
-                            "isStatic": true,
-                            "lastClassName": "cHlGak",
+                            "isStatic": false,
+                            "lastClassName": "kphWbh",
                             "rules": Array [
-                              ".modal-content{background-color:",
-                              "#FFF",
-                              ";border-color:",
-                              "rgba(31,31,31,0.2)",
-                              ";.modal-header{border-bottom-color:",
-                              "#DCE1E5",
-                              ";}.modal-footer{border-top-color:",
-                              "#DCE1E5",
-                              ";}}",
+                              [Function],
                             ],
                           },
                           "displayName": "Modal",
@@ -2354,7 +2303,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         backdrop="static"
                         bsClass="modal"
                         bsSize="large"
-                        className="Modal-nuree8-0 cHlGak"
+                        className="Modal-nuree8-0 kphWbh"
                         dialogComponentClass={[Function]}
                         enforceFocus={true}
                         keyboard={true}
@@ -2506,7 +2455,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -2529,12 +2478,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -2589,7 +2538,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -2613,13 +2562,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -2725,18 +2674,10 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                         "attrs": Array [],
                         "componentStyle": ComponentStyle {
                           "componentId": "Modal-nuree8-0",
-                          "isStatic": true,
-                          "lastClassName": "cHlGak",
+                          "isStatic": false,
+                          "lastClassName": "kphWbh",
                           "rules": Array [
-                            ".modal-content{background-color:",
-                            "#FFF",
-                            ";border-color:",
-                            "rgba(31,31,31,0.2)",
-                            ";.modal-header{border-bottom-color:",
-                            "#DCE1E5",
-                            ";}.modal-footer{border-top-color:",
-                            "#DCE1E5",
-                            ";}}",
+                            [Function],
                           ],
                         },
                         "displayName": "Modal",
@@ -2758,7 +2699,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                       autoFocus={true}
                       backdrop="static"
                       bsClass="modal"
-                      className="Modal-nuree8-0 cHlGak"
+                      className="Modal-nuree8-0 kphWbh"
                       dialogComponentClass={[Function]}
                       enforceFocus={true}
                       keyboard={true}
@@ -2944,7 +2885,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -2967,12 +2908,12 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button-c9cbmb-0 iKWoaE"
+                                className="submit-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="submit-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -3027,7 +2968,7 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Button-c9cbmb-0",
                                     "isStatic": false,
-                                    "lastClassName": "iKWoaE",
+                                    "lastClassName": "jVhNvv",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -3051,13 +2992,13 @@ exports[`<ContentPackParameters /> should render with empty parameters 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button-c9cbmb-0 iKWoaE"
+                                className="reset-button Button-c9cbmb-0 jVhNvv"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                                  className="reset-button Button-c9cbmb-0 jVhNvv btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"

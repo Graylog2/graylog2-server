@@ -1,8 +1,8 @@
 
 import { readableColor as polishedColor } from 'polished';
-import colors from '../colors';
+import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
 
-export default function readableColor(color, darkColor = colors.global.textDefault, lightColor = colors.global.textAlt) {
+export default function readableColor(color, darkColor = teinte.global.textDefault, lightColor = teinte.global.textAlt) {
   /**
    * Recreating `color-level` from Bootstrap's SCSS functions
    * https://github.com/twbs/bootstrap/blob/08ba61e276a6393e8e2b97d56d2feb70a24fe22c/scss/_functions.scss#L97

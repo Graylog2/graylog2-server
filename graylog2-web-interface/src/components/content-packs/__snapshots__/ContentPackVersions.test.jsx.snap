@@ -263,7 +263,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "jKsGyd",
+                                      "lastClassName": "jVhNvv",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -287,12 +287,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button-c9cbmb-0 jKsGyd"
+                                  className="Button-c9cbmb-0 jVhNvv"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 jKsGyd btn btn-sm btn-success"
+                                    className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -303,210 +303,151 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               </StyledComponent>
                             </Button>
                           </ForwardRef>
-                          <DropdownButton
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-1"
                             title="Actions"
                           >
-                            <StyledComponent
+                            <DropdownButton__StyledDropdownButton
                               bsSize="small"
                               bsStyle="info"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "DropdownButton-sc-1343dcx-0",
-                                    "isStatic": false,
-                                    "lastClassName": "iVkpkU",
-                                    "rules": Array [
-                                      [Function],
-                                      ";",
-                                      "& ~",
-                                      " .dropdown-menu{> li > a{color:",
-                                      "#1F1F1F",
-                                      ";:hover,:focus{color:",
-                                      "#484848",
-                                      ";background-color:",
-                                      "#F1F2F2",
-                                      ";}}> .active > a{background-color:",
-                                      "#6DC6E7",
-                                      ";color:",
-                                      "#f7fcfd",
-                                      ";:hover,:focus{background-color:",
-                                      "#16ACE3",
-                                      ";color:",
-                                      "#f3fafd",
-                                      ";}}> .disabled > a{color:",
-                                      "#8f8f8f",
-                                      ";:hover,:focus{background-color:",
-                                      "#F1F2F2",
-                                      ";color:",
-                                      "#b0b0b0",
-                                      ";}}}",
-                                      ";",
-                                    ],
-                                  },
-                                  "displayName": "DropdownButton",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "DropdownButton-sc-1343dcx-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               id="action-1"
                               title="Actions"
                             >
-                              <DropdownButton
+                              <StyledComponent
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 iVkpkU"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hzVhhK",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "DropdownButton__StyledDropdownButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 id="action-1"
                                 title="Actions"
                               >
-                                <Uncontrolled(Dropdown)
+                                <DropdownButton
                                   bsSize="small"
                                   bsStyle="info"
+                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                   id="action-1"
+                                  title="Actions"
                                 >
-                                  <Dropdown
-                                    bsClass="dropdown"
+                                  <Uncontrolled(Dropdown)
                                     bsSize="small"
                                     bsStyle="info"
-                                    componentClass={[Function]}
                                     id="action-1"
-                                    onToggle={[Function]}
                                   >
-                                    <ButtonGroup
-                                      block={false}
-                                      bsClass="btn-group"
+                                    <Dropdown
+                                      bsClass="dropdown"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="dropdown"
-                                      justified={false}
-                                      vertical={false}
+                                      componentClass={[Function]}
+                                      id="action-1"
+                                      onToggle={[Function]}
                                     >
-                                      <div
-                                        className="dropdown btn-group btn-group-sm btn-group-info"
+                                      <ButtonGroup
+                                        block={false}
+                                        bsClass="btn-group"
+                                        bsSize="small"
+                                        bsStyle="info"
+                                        className="dropdown"
+                                        justified={false}
+                                        vertical={false}
                                       >
-                                        <DropdownToggle
-                                          bsClass="dropdown-toggle"
-                                          bsRole="toggle"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="DropdownButton-sc-1343dcx-0 iVkpkU"
-                                          id="action-1"
-                                          key=".0"
-                                          onClick={[Function]}
-                                          onKeyDown={[Function]}
-                                          open={false}
-                                          useAnchor={false}
+                                        <div
+                                          className="dropdown btn-group btn-group-sm btn-group-info"
                                         >
-                                          <Button
-                                            active={false}
-                                            aria-expanded={false}
-                                            aria-haspopup={true}
-                                            block={false}
-                                            bsClass="btn"
+                                          <DropdownToggle
+                                            bsClass="dropdown-toggle"
+                                            bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle"
-                                            disabled={false}
+                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                             id="action-1"
+                                            key=".0"
                                             onClick={[Function]}
                                             onKeyDown={[Function]}
-                                            role="button"
+                                            open={false}
+                                            useAnchor={false}
                                           >
-                                            <button
+                                            <Button
+                                              active={false}
                                               aria-expanded={false}
                                               aria-haspopup={true}
-                                              className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle btn btn-sm btn-info"
+                                              block={false}
+                                              bsClass="btn"
+                                              bsSize="small"
+                                              bsStyle="info"
+                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle"
                                               disabled={false}
                                               id="action-1"
                                               onClick={[Function]}
                                               onKeyDown={[Function]}
                                               role="button"
-                                              type="button"
                                             >
-                                              Actions
-                                               
-                                              <span
-                                                className="caret"
-                                              />
-                                            </button>
-                                          </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu
-                                          bsClass="dropdown-menu"
-                                          bsRole="menu"
-                                          key=".1"
-                                          labelledBy="action-1"
-                                          onClose={[Function]}
-                                          onSelect={[Function]}
-                                          pullRight={false}
-                                        >
-                                          <RootCloseWrapper
-                                            disabled={true}
-                                            event="click"
-                                            onRootClose={[Function]}
-                                          >
-                                            <ul
-                                              aria-labelledby="action-1"
-                                              className="dropdown-menu"
-                                              role="menu"
-                                            >
-                                              <MenuItem
-                                                bsClass="dropdown"
+                                              <button
+                                                aria-expanded={false}
+                                                aria-haspopup={true}
+                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".0"
+                                                id="action-1"
                                                 onClick={[Function]}
                                                 onKeyDown={[Function]}
-                                                onSelect={[Function]}
+                                                role="button"
+                                                type="button"
                                               >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
-                                                >
-                                                  <SafeAnchor
-                                                    componentClass="a"
-                                                    onClick={[Function]}
-                                                    onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
-                                                  >
-                                                    <a
-                                                      href="#"
-                                                      onClick={[Function]}
-                                                      onKeyDown={[Function]}
-                                                      role="menuitem"
-                                                      tabIndex="-1"
-                                                    >
-                                                      Install
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <LinkContainer
-                                                action="push"
-                                                key=".1"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                                onlyActiveOnIndex={false}
-                                                to="/system/contentpacks/1/1/edit"
+                                                Actions
+                                                 
+                                                <span
+                                                  className="caret"
+                                                />
+                                              </button>
+                                            </Button>
+                                          </DropdownToggle>
+                                          <DropdownMenu
+                                            bsClass="dropdown-menu"
+                                            bsRole="menu"
+                                            key=".1"
+                                            labelledBy="action-1"
+                                            onClose={[Function]}
+                                            onSelect={[Function]}
+                                            pullRight={false}
+                                          >
+                                            <RootCloseWrapper
+                                              disabled={true}
+                                              event="click"
+                                              onRootClose={[Function]}
+                                            >
+                                              <ul
+                                                aria-labelledby="action-1"
+                                                className="dropdown-menu"
+                                                role="menu"
                                               >
                                                 <MenuItem
-                                                  action="push"
                                                   bsClass="dropdown"
                                                   disabled={false}
                                                   divider={false}
                                                   header={false}
+                                                  key=".0"
                                                   onClick={[Function]}
                                                   onKeyDown={[Function]}
                                                   onSelect={[Function]}
@@ -516,7 +457,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                     role="presentation"
                                                   >
                                                     <SafeAnchor
-                                                      action="push"
                                                       componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
@@ -524,166 +464,174 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                       tabIndex="-1"
                                                     >
                                                       <a
-                                                        action="push"
                                                         href="#"
                                                         onClick={[Function]}
                                                         onKeyDown={[Function]}
                                                         role="menuitem"
                                                         tabIndex="-1"
                                                       >
-                                                        Create New From Revision
+                                                        Install
                                                       </a>
                                                     </SafeAnchor>
                                                   </li>
                                                 </MenuItem>
-                                              </LinkContainer>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={true}
-                                                header={false}
-                                                key=".2"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className="divider"
+                                                <LinkContainer
+                                                  action="push"
+                                                  key=".1"
                                                   onKeyDown={[Function]}
-                                                  role="separator"
-                                                />
-                                              </MenuItem>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".3"
-                                                onClick={[Function]}
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
+                                                  onSelect={[Function]}
+                                                  onlyActiveOnIndex={false}
+                                                  to="/system/contentpacks/1/1/edit"
                                                 >
-                                                  <SafeAnchor
-                                                    componentClass="a"
+                                                  <MenuItem
+                                                    action="push"
+                                                    bsClass="dropdown"
+                                                    disabled={false}
+                                                    divider={false}
+                                                    header={false}
                                                     onClick={[Function]}
                                                     onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
+                                                    onSelect={[Function]}
                                                   >
-                                                    <a
-                                                      href="#"
+                                                    <li
+                                                      className=""
+                                                      role="presentation"
+                                                    >
+                                                      <SafeAnchor
+                                                        action="push"
+                                                        componentClass="a"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        <a
+                                                          action="push"
+                                                          href="#"
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          role="menuitem"
+                                                          tabIndex="-1"
+                                                        >
+                                                          Create New From Revision
+                                                        </a>
+                                                      </SafeAnchor>
+                                                    </li>
+                                                  </MenuItem>
+                                                </LinkContainer>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={true}
+                                                  header={false}
+                                                  key=".2"
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className="divider"
+                                                    onKeyDown={[Function]}
+                                                    role="separator"
+                                                  />
+                                                </MenuItem>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  key=".3"
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       role="menuitem"
                                                       tabIndex="-1"
                                                     >
-                                                      Delete
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <BootstrapModalWrapper
-                                                backdrop="static"
-                                                bsSize="large"
-                                                key=".4"
-                                                onClose={[Function]}
-                                                onHide={[Function]}
-                                                onKeyDown={[Function]}
-                                                onOpen={[Function]}
-                                                onSelect={[Function]}
-                                                showModal={false}
-                                              >
-                                                <Modal
+                                                      <a
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        Delete
+                                                      </a>
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                                <BootstrapModalWrapper
                                                   backdrop="static"
                                                   bsSize="large"
+                                                  key=".4"
+                                                  onClose={[Function]}
                                                   onHide={[Function]}
-                                                  show={false}
+                                                  onKeyDown={[Function]}
+                                                  onOpen={[Function]}
+                                                  onSelect={[Function]}
+                                                  showModal={false}
                                                 >
-                                                  <StyledComponent
+                                                  <Modal
                                                     backdrop="static"
                                                     bsSize="large"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "BACKDROP_TRANSITION_DURATION": 150,
-                                                        "Body": [Function],
-                                                        "Dialog": [Function],
-                                                        "Footer": [Function],
-                                                        "Header": [Function],
-                                                        "SIZES": Array [
-                                                          "large",
-                                                          "small",
-                                                        ],
-                                                        "TRANSITION_DURATION": 300,
-                                                        "Title": [Function],
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Modal-nuree8-0",
-                                                          "isStatic": true,
-                                                          "lastClassName": "cHlGak",
-                                                          "rules": Array [
-                                                            ".modal-content{background-color:",
-                                                            "#FFF",
-                                                            ";border-color:",
-                                                            "rgba(31,31,31,0.2)",
-                                                            ";.modal-header{border-bottom-color:",
-                                                            "#DCE1E5",
-                                                            ";}.modal-footer{border-top-color:",
-                                                            "#DCE1E5",
-                                                            ";}}",
-                                                          ],
-                                                        },
-                                                        "displayName": "Modal",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Modal-nuree8-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
-                                                    }
-                                                    forwardedRef={null}
                                                     onHide={[Function]}
                                                     show={false}
                                                   >
-                                                    <Modal
-                                                      animation={true}
-                                                      autoFocus={true}
+                                                    <StyledComponent
                                                       backdrop="static"
-                                                      bsClass="modal"
                                                       bsSize="large"
-                                                      className="Modal-nuree8-0 cHlGak"
-                                                      dialogComponentClass={[Function]}
-                                                      enforceFocus={true}
-                                                      keyboard={true}
-                                                      manager={
-                                                        ModalManager {
-                                                          "add": [Function],
-                                                          "containers": Array [],
-                                                          "data": Array [],
-                                                          "handleContainerOverflow": true,
-                                                          "hideSiblingNodes": true,
-                                                          "isTopModal": [Function],
-                                                          "modals": Array [],
-                                                          "remove": [Function],
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "BACKDROP_TRANSITION_DURATION": 150,
+                                                          "Body": [Function],
+                                                          "Dialog": [Function],
+                                                          "Footer": [Function],
+                                                          "Header": [Function],
+                                                          "SIZES": Array [
+                                                            "large",
+                                                            "small",
+                                                          ],
+                                                          "TRANSITION_DURATION": 300,
+                                                          "Title": [Function],
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "Modal-nuree8-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "kphWbh",
+                                                            "rules": Array [
+                                                              [Function],
+                                                            ],
+                                                          },
+                                                          "displayName": "Modal",
+                                                          "foldedComponentIds": Array [],
+                                                          "render": [Function],
+                                                          "styledComponentId": "Modal-nuree8-0",
+                                                          "target": [Function],
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
                                                       }
+                                                      forwardedRef={null}
                                                       onHide={[Function]}
-                                                      renderBackdrop={[Function]}
-                                                      restoreFocus={true}
                                                       show={false}
                                                     >
                                                       <Modal
+                                                        animation={true}
                                                         autoFocus={true}
                                                         backdrop="static"
-                                                        backdropClassName="modal-backdrop"
-                                                        backdropTransitionTimeout={150}
-                                                        containerClassName="modal-open"
-                                                        dialogTransitionTimeout={300}
+                                                        bsClass="modal"
+                                                        bsSize="large"
+                                                        className="Modal-nuree8-0 kphWbh"
+                                                        dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
                                                         manager={
@@ -698,28 +646,55 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                             "remove": [Function],
                                                           }
                                                         }
-                                                        onEntering={[Function]}
-                                                        onExited={[Function]}
                                                         onHide={[Function]}
                                                         renderBackdrop={[Function]}
                                                         restoreFocus={true}
                                                         show={false}
-                                                        transition={[Function]}
-                                                      />
-                                                    </Modal>
-                                                  </StyledComponent>
-                                                </Modal>
-                                              </BootstrapModalWrapper>
-                                            </ul>
-                                          </RootCloseWrapper>
-                                        </DropdownMenu>
-                                      </div>
-                                    </ButtonGroup>
-                                  </Dropdown>
-                                </Uncontrolled(Dropdown)>
-                              </DropdownButton>
-                            </StyledComponent>
-                          </DropdownButton>
+                                                      >
+                                                        <Modal
+                                                          autoFocus={true}
+                                                          backdrop="static"
+                                                          backdropClassName="modal-backdrop"
+                                                          backdropTransitionTimeout={150}
+                                                          containerClassName="modal-open"
+                                                          dialogTransitionTimeout={300}
+                                                          enforceFocus={true}
+                                                          keyboard={true}
+                                                          manager={
+                                                            ModalManager {
+                                                              "add": [Function],
+                                                              "containers": Array [],
+                                                              "data": Array [],
+                                                              "handleContainerOverflow": true,
+                                                              "hideSiblingNodes": true,
+                                                              "isTopModal": [Function],
+                                                              "modals": Array [],
+                                                              "remove": [Function],
+                                                            }
+                                                          }
+                                                          onEntering={[Function]}
+                                                          onExited={[Function]}
+                                                          onHide={[Function]}
+                                                          renderBackdrop={[Function]}
+                                                          restoreFocus={true}
+                                                          show={false}
+                                                          transition={[Function]}
+                                                        />
+                                                      </Modal>
+                                                    </StyledComponent>
+                                                  </Modal>
+                                                </BootstrapModalWrapper>
+                                              </ul>
+                                            </RootCloseWrapper>
+                                          </DropdownMenu>
+                                        </div>
+                                      </ButtonGroup>
+                                    </Dropdown>
+                                  </Uncontrolled(Dropdown)>
+                                </DropdownButton>
+                              </StyledComponent>
+                            </DropdownButton__StyledDropdownButton>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -761,18 +736,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
-                                  "isStatic": true,
-                                  "lastClassName": "cHlGak",
+                                  "isStatic": false,
+                                  "lastClassName": "kphWbh",
                                   "rules": Array [
-                                    ".modal-content{background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "rgba(31,31,31,0.2)",
-                                    ";.modal-header{border-bottom-color:",
-                                    "#DCE1E5",
-                                    ";}.modal-footer{border-top-color:",
-                                    "#DCE1E5",
-                                    ";}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "Modal",
@@ -795,7 +762,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 kphWbh"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -930,7 +897,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "jKsGyd",
+                                      "lastClassName": "jVhNvv",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -954,12 +921,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button-c9cbmb-0 jKsGyd"
+                                  className="Button-c9cbmb-0 jVhNvv"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 jKsGyd btn btn-sm btn-success"
+                                    className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -970,210 +937,151 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               </StyledComponent>
                             </Button>
                           </ForwardRef>
-                          <DropdownButton
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-2"
                             title="Actions"
                           >
-                            <StyledComponent
+                            <DropdownButton__StyledDropdownButton
                               bsSize="small"
                               bsStyle="info"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "DropdownButton-sc-1343dcx-0",
-                                    "isStatic": false,
-                                    "lastClassName": "iVkpkU",
-                                    "rules": Array [
-                                      [Function],
-                                      ";",
-                                      "& ~",
-                                      " .dropdown-menu{> li > a{color:",
-                                      "#1F1F1F",
-                                      ";:hover,:focus{color:",
-                                      "#484848",
-                                      ";background-color:",
-                                      "#F1F2F2",
-                                      ";}}> .active > a{background-color:",
-                                      "#6DC6E7",
-                                      ";color:",
-                                      "#f7fcfd",
-                                      ";:hover,:focus{background-color:",
-                                      "#16ACE3",
-                                      ";color:",
-                                      "#f3fafd",
-                                      ";}}> .disabled > a{color:",
-                                      "#8f8f8f",
-                                      ";:hover,:focus{background-color:",
-                                      "#F1F2F2",
-                                      ";color:",
-                                      "#b0b0b0",
-                                      ";}}}",
-                                      ";",
-                                    ],
-                                  },
-                                  "displayName": "DropdownButton",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "DropdownButton-sc-1343dcx-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               id="action-2"
                               title="Actions"
                             >
-                              <DropdownButton
+                              <StyledComponent
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 iVkpkU"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hzVhhK",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "DropdownButton__StyledDropdownButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 id="action-2"
                                 title="Actions"
                               >
-                                <Uncontrolled(Dropdown)
+                                <DropdownButton
                                   bsSize="small"
                                   bsStyle="info"
+                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                   id="action-2"
+                                  title="Actions"
                                 >
-                                  <Dropdown
-                                    bsClass="dropdown"
+                                  <Uncontrolled(Dropdown)
                                     bsSize="small"
                                     bsStyle="info"
-                                    componentClass={[Function]}
                                     id="action-2"
-                                    onToggle={[Function]}
                                   >
-                                    <ButtonGroup
-                                      block={false}
-                                      bsClass="btn-group"
+                                    <Dropdown
+                                      bsClass="dropdown"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="dropdown"
-                                      justified={false}
-                                      vertical={false}
+                                      componentClass={[Function]}
+                                      id="action-2"
+                                      onToggle={[Function]}
                                     >
-                                      <div
-                                        className="dropdown btn-group btn-group-sm btn-group-info"
+                                      <ButtonGroup
+                                        block={false}
+                                        bsClass="btn-group"
+                                        bsSize="small"
+                                        bsStyle="info"
+                                        className="dropdown"
+                                        justified={false}
+                                        vertical={false}
                                       >
-                                        <DropdownToggle
-                                          bsClass="dropdown-toggle"
-                                          bsRole="toggle"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="DropdownButton-sc-1343dcx-0 iVkpkU"
-                                          id="action-2"
-                                          key=".0"
-                                          onClick={[Function]}
-                                          onKeyDown={[Function]}
-                                          open={false}
-                                          useAnchor={false}
+                                        <div
+                                          className="dropdown btn-group btn-group-sm btn-group-info"
                                         >
-                                          <Button
-                                            active={false}
-                                            aria-expanded={false}
-                                            aria-haspopup={true}
-                                            block={false}
-                                            bsClass="btn"
+                                          <DropdownToggle
+                                            bsClass="dropdown-toggle"
+                                            bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle"
-                                            disabled={false}
+                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                             id="action-2"
+                                            key=".0"
                                             onClick={[Function]}
                                             onKeyDown={[Function]}
-                                            role="button"
+                                            open={false}
+                                            useAnchor={false}
                                           >
-                                            <button
+                                            <Button
+                                              active={false}
                                               aria-expanded={false}
                                               aria-haspopup={true}
-                                              className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle btn btn-sm btn-info"
+                                              block={false}
+                                              bsClass="btn"
+                                              bsSize="small"
+                                              bsStyle="info"
+                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle"
                                               disabled={false}
                                               id="action-2"
                                               onClick={[Function]}
                                               onKeyDown={[Function]}
                                               role="button"
-                                              type="button"
                                             >
-                                              Actions
-                                               
-                                              <span
-                                                className="caret"
-                                              />
-                                            </button>
-                                          </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu
-                                          bsClass="dropdown-menu"
-                                          bsRole="menu"
-                                          key=".1"
-                                          labelledBy="action-2"
-                                          onClose={[Function]}
-                                          onSelect={[Function]}
-                                          pullRight={false}
-                                        >
-                                          <RootCloseWrapper
-                                            disabled={true}
-                                            event="click"
-                                            onRootClose={[Function]}
-                                          >
-                                            <ul
-                                              aria-labelledby="action-2"
-                                              className="dropdown-menu"
-                                              role="menu"
-                                            >
-                                              <MenuItem
-                                                bsClass="dropdown"
+                                              <button
+                                                aria-expanded={false}
+                                                aria-haspopup={true}
+                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".0"
+                                                id="action-2"
                                                 onClick={[Function]}
                                                 onKeyDown={[Function]}
-                                                onSelect={[Function]}
+                                                role="button"
+                                                type="button"
                                               >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
-                                                >
-                                                  <SafeAnchor
-                                                    componentClass="a"
-                                                    onClick={[Function]}
-                                                    onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
-                                                  >
-                                                    <a
-                                                      href="#"
-                                                      onClick={[Function]}
-                                                      onKeyDown={[Function]}
-                                                      role="menuitem"
-                                                      tabIndex="-1"
-                                                    >
-                                                      Install
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <LinkContainer
-                                                action="push"
-                                                key=".1"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                                onlyActiveOnIndex={false}
-                                                to="/system/contentpacks/1/2/edit"
+                                                Actions
+                                                 
+                                                <span
+                                                  className="caret"
+                                                />
+                                              </button>
+                                            </Button>
+                                          </DropdownToggle>
+                                          <DropdownMenu
+                                            bsClass="dropdown-menu"
+                                            bsRole="menu"
+                                            key=".1"
+                                            labelledBy="action-2"
+                                            onClose={[Function]}
+                                            onSelect={[Function]}
+                                            pullRight={false}
+                                          >
+                                            <RootCloseWrapper
+                                              disabled={true}
+                                              event="click"
+                                              onRootClose={[Function]}
+                                            >
+                                              <ul
+                                                aria-labelledby="action-2"
+                                                className="dropdown-menu"
+                                                role="menu"
                                               >
                                                 <MenuItem
-                                                  action="push"
                                                   bsClass="dropdown"
                                                   disabled={false}
                                                   divider={false}
                                                   header={false}
+                                                  key=".0"
                                                   onClick={[Function]}
                                                   onKeyDown={[Function]}
                                                   onSelect={[Function]}
@@ -1183,7 +1091,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                     role="presentation"
                                                   >
                                                     <SafeAnchor
-                                                      action="push"
                                                       componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
@@ -1191,166 +1098,174 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                       tabIndex="-1"
                                                     >
                                                       <a
-                                                        action="push"
                                                         href="#"
                                                         onClick={[Function]}
                                                         onKeyDown={[Function]}
                                                         role="menuitem"
                                                         tabIndex="-1"
                                                       >
-                                                        Create New From Revision
+                                                        Install
                                                       </a>
                                                     </SafeAnchor>
                                                   </li>
                                                 </MenuItem>
-                                              </LinkContainer>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={true}
-                                                header={false}
-                                                key=".2"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className="divider"
+                                                <LinkContainer
+                                                  action="push"
+                                                  key=".1"
                                                   onKeyDown={[Function]}
-                                                  role="separator"
-                                                />
-                                              </MenuItem>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".3"
-                                                onClick={[Function]}
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
+                                                  onSelect={[Function]}
+                                                  onlyActiveOnIndex={false}
+                                                  to="/system/contentpacks/1/2/edit"
                                                 >
-                                                  <SafeAnchor
-                                                    componentClass="a"
+                                                  <MenuItem
+                                                    action="push"
+                                                    bsClass="dropdown"
+                                                    disabled={false}
+                                                    divider={false}
+                                                    header={false}
                                                     onClick={[Function]}
                                                     onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
+                                                    onSelect={[Function]}
                                                   >
-                                                    <a
-                                                      href="#"
+                                                    <li
+                                                      className=""
+                                                      role="presentation"
+                                                    >
+                                                      <SafeAnchor
+                                                        action="push"
+                                                        componentClass="a"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        <a
+                                                          action="push"
+                                                          href="#"
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          role="menuitem"
+                                                          tabIndex="-1"
+                                                        >
+                                                          Create New From Revision
+                                                        </a>
+                                                      </SafeAnchor>
+                                                    </li>
+                                                  </MenuItem>
+                                                </LinkContainer>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={true}
+                                                  header={false}
+                                                  key=".2"
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className="divider"
+                                                    onKeyDown={[Function]}
+                                                    role="separator"
+                                                  />
+                                                </MenuItem>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  key=".3"
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       role="menuitem"
                                                       tabIndex="-1"
                                                     >
-                                                      Delete
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <BootstrapModalWrapper
-                                                backdrop="static"
-                                                bsSize="large"
-                                                key=".4"
-                                                onClose={[Function]}
-                                                onHide={[Function]}
-                                                onKeyDown={[Function]}
-                                                onOpen={[Function]}
-                                                onSelect={[Function]}
-                                                showModal={false}
-                                              >
-                                                <Modal
+                                                      <a
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        Delete
+                                                      </a>
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                                <BootstrapModalWrapper
                                                   backdrop="static"
                                                   bsSize="large"
+                                                  key=".4"
+                                                  onClose={[Function]}
                                                   onHide={[Function]}
-                                                  show={false}
+                                                  onKeyDown={[Function]}
+                                                  onOpen={[Function]}
+                                                  onSelect={[Function]}
+                                                  showModal={false}
                                                 >
-                                                  <StyledComponent
+                                                  <Modal
                                                     backdrop="static"
                                                     bsSize="large"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "BACKDROP_TRANSITION_DURATION": 150,
-                                                        "Body": [Function],
-                                                        "Dialog": [Function],
-                                                        "Footer": [Function],
-                                                        "Header": [Function],
-                                                        "SIZES": Array [
-                                                          "large",
-                                                          "small",
-                                                        ],
-                                                        "TRANSITION_DURATION": 300,
-                                                        "Title": [Function],
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Modal-nuree8-0",
-                                                          "isStatic": true,
-                                                          "lastClassName": "cHlGak",
-                                                          "rules": Array [
-                                                            ".modal-content{background-color:",
-                                                            "#FFF",
-                                                            ";border-color:",
-                                                            "rgba(31,31,31,0.2)",
-                                                            ";.modal-header{border-bottom-color:",
-                                                            "#DCE1E5",
-                                                            ";}.modal-footer{border-top-color:",
-                                                            "#DCE1E5",
-                                                            ";}}",
-                                                          ],
-                                                        },
-                                                        "displayName": "Modal",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Modal-nuree8-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
-                                                    }
-                                                    forwardedRef={null}
                                                     onHide={[Function]}
                                                     show={false}
                                                   >
-                                                    <Modal
-                                                      animation={true}
-                                                      autoFocus={true}
+                                                    <StyledComponent
                                                       backdrop="static"
-                                                      bsClass="modal"
                                                       bsSize="large"
-                                                      className="Modal-nuree8-0 cHlGak"
-                                                      dialogComponentClass={[Function]}
-                                                      enforceFocus={true}
-                                                      keyboard={true}
-                                                      manager={
-                                                        ModalManager {
-                                                          "add": [Function],
-                                                          "containers": Array [],
-                                                          "data": Array [],
-                                                          "handleContainerOverflow": true,
-                                                          "hideSiblingNodes": true,
-                                                          "isTopModal": [Function],
-                                                          "modals": Array [],
-                                                          "remove": [Function],
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "BACKDROP_TRANSITION_DURATION": 150,
+                                                          "Body": [Function],
+                                                          "Dialog": [Function],
+                                                          "Footer": [Function],
+                                                          "Header": [Function],
+                                                          "SIZES": Array [
+                                                            "large",
+                                                            "small",
+                                                          ],
+                                                          "TRANSITION_DURATION": 300,
+                                                          "Title": [Function],
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "Modal-nuree8-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "kphWbh",
+                                                            "rules": Array [
+                                                              [Function],
+                                                            ],
+                                                          },
+                                                          "displayName": "Modal",
+                                                          "foldedComponentIds": Array [],
+                                                          "render": [Function],
+                                                          "styledComponentId": "Modal-nuree8-0",
+                                                          "target": [Function],
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
                                                       }
+                                                      forwardedRef={null}
                                                       onHide={[Function]}
-                                                      renderBackdrop={[Function]}
-                                                      restoreFocus={true}
                                                       show={false}
                                                     >
                                                       <Modal
+                                                        animation={true}
                                                         autoFocus={true}
                                                         backdrop="static"
-                                                        backdropClassName="modal-backdrop"
-                                                        backdropTransitionTimeout={150}
-                                                        containerClassName="modal-open"
-                                                        dialogTransitionTimeout={300}
+                                                        bsClass="modal"
+                                                        bsSize="large"
+                                                        className="Modal-nuree8-0 kphWbh"
+                                                        dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
                                                         manager={
@@ -1365,28 +1280,55 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                             "remove": [Function],
                                                           }
                                                         }
-                                                        onEntering={[Function]}
-                                                        onExited={[Function]}
                                                         onHide={[Function]}
                                                         renderBackdrop={[Function]}
                                                         restoreFocus={true}
                                                         show={false}
-                                                        transition={[Function]}
-                                                      />
-                                                    </Modal>
-                                                  </StyledComponent>
-                                                </Modal>
-                                              </BootstrapModalWrapper>
-                                            </ul>
-                                          </RootCloseWrapper>
-                                        </DropdownMenu>
-                                      </div>
-                                    </ButtonGroup>
-                                  </Dropdown>
-                                </Uncontrolled(Dropdown)>
-                              </DropdownButton>
-                            </StyledComponent>
-                          </DropdownButton>
+                                                      >
+                                                        <Modal
+                                                          autoFocus={true}
+                                                          backdrop="static"
+                                                          backdropClassName="modal-backdrop"
+                                                          backdropTransitionTimeout={150}
+                                                          containerClassName="modal-open"
+                                                          dialogTransitionTimeout={300}
+                                                          enforceFocus={true}
+                                                          keyboard={true}
+                                                          manager={
+                                                            ModalManager {
+                                                              "add": [Function],
+                                                              "containers": Array [],
+                                                              "data": Array [],
+                                                              "handleContainerOverflow": true,
+                                                              "hideSiblingNodes": true,
+                                                              "isTopModal": [Function],
+                                                              "modals": Array [],
+                                                              "remove": [Function],
+                                                            }
+                                                          }
+                                                          onEntering={[Function]}
+                                                          onExited={[Function]}
+                                                          onHide={[Function]}
+                                                          renderBackdrop={[Function]}
+                                                          restoreFocus={true}
+                                                          show={false}
+                                                          transition={[Function]}
+                                                        />
+                                                      </Modal>
+                                                    </StyledComponent>
+                                                  </Modal>
+                                                </BootstrapModalWrapper>
+                                              </ul>
+                                            </RootCloseWrapper>
+                                          </DropdownMenu>
+                                        </div>
+                                      </ButtonGroup>
+                                    </Dropdown>
+                                  </Uncontrolled(Dropdown)>
+                                </DropdownButton>
+                              </StyledComponent>
+                            </DropdownButton__StyledDropdownButton>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -1428,18 +1370,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
-                                  "isStatic": true,
-                                  "lastClassName": "cHlGak",
+                                  "isStatic": false,
+                                  "lastClassName": "kphWbh",
                                   "rules": Array [
-                                    ".modal-content{background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "rgba(31,31,31,0.2)",
-                                    ";.modal-header{border-bottom-color:",
-                                    "#DCE1E5",
-                                    ";}.modal-footer{border-top-color:",
-                                    "#DCE1E5",
-                                    ";}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "Modal",
@@ -1462,7 +1396,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 kphWbh"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1597,7 +1531,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "jKsGyd",
+                                      "lastClassName": "jVhNvv",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -1621,12 +1555,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button-c9cbmb-0 jKsGyd"
+                                  className="Button-c9cbmb-0 jVhNvv"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 jKsGyd btn btn-sm btn-success"
+                                    className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -1637,210 +1571,151 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               </StyledComponent>
                             </Button>
                           </ForwardRef>
-                          <DropdownButton
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-3"
                             title="Actions"
                           >
-                            <StyledComponent
+                            <DropdownButton__StyledDropdownButton
                               bsSize="small"
                               bsStyle="info"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "DropdownButton-sc-1343dcx-0",
-                                    "isStatic": false,
-                                    "lastClassName": "iVkpkU",
-                                    "rules": Array [
-                                      [Function],
-                                      ";",
-                                      "& ~",
-                                      " .dropdown-menu{> li > a{color:",
-                                      "#1F1F1F",
-                                      ";:hover,:focus{color:",
-                                      "#484848",
-                                      ";background-color:",
-                                      "#F1F2F2",
-                                      ";}}> .active > a{background-color:",
-                                      "#6DC6E7",
-                                      ";color:",
-                                      "#f7fcfd",
-                                      ";:hover,:focus{background-color:",
-                                      "#16ACE3",
-                                      ";color:",
-                                      "#f3fafd",
-                                      ";}}> .disabled > a{color:",
-                                      "#8f8f8f",
-                                      ";:hover,:focus{background-color:",
-                                      "#F1F2F2",
-                                      ";color:",
-                                      "#b0b0b0",
-                                      ";}}}",
-                                      ";",
-                                    ],
-                                  },
-                                  "displayName": "DropdownButton",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "DropdownButton-sc-1343dcx-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               id="action-3"
                               title="Actions"
                             >
-                              <DropdownButton
+                              <StyledComponent
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 iVkpkU"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hzVhhK",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "DropdownButton__StyledDropdownButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 id="action-3"
                                 title="Actions"
                               >
-                                <Uncontrolled(Dropdown)
+                                <DropdownButton
                                   bsSize="small"
                                   bsStyle="info"
+                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                   id="action-3"
+                                  title="Actions"
                                 >
-                                  <Dropdown
-                                    bsClass="dropdown"
+                                  <Uncontrolled(Dropdown)
                                     bsSize="small"
                                     bsStyle="info"
-                                    componentClass={[Function]}
                                     id="action-3"
-                                    onToggle={[Function]}
                                   >
-                                    <ButtonGroup
-                                      block={false}
-                                      bsClass="btn-group"
+                                    <Dropdown
+                                      bsClass="dropdown"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="dropdown"
-                                      justified={false}
-                                      vertical={false}
+                                      componentClass={[Function]}
+                                      id="action-3"
+                                      onToggle={[Function]}
                                     >
-                                      <div
-                                        className="dropdown btn-group btn-group-sm btn-group-info"
+                                      <ButtonGroup
+                                        block={false}
+                                        bsClass="btn-group"
+                                        bsSize="small"
+                                        bsStyle="info"
+                                        className="dropdown"
+                                        justified={false}
+                                        vertical={false}
                                       >
-                                        <DropdownToggle
-                                          bsClass="dropdown-toggle"
-                                          bsRole="toggle"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="DropdownButton-sc-1343dcx-0 iVkpkU"
-                                          id="action-3"
-                                          key=".0"
-                                          onClick={[Function]}
-                                          onKeyDown={[Function]}
-                                          open={false}
-                                          useAnchor={false}
+                                        <div
+                                          className="dropdown btn-group btn-group-sm btn-group-info"
                                         >
-                                          <Button
-                                            active={false}
-                                            aria-expanded={false}
-                                            aria-haspopup={true}
-                                            block={false}
-                                            bsClass="btn"
+                                          <DropdownToggle
+                                            bsClass="dropdown-toggle"
+                                            bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle"
-                                            disabled={false}
+                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                             id="action-3"
+                                            key=".0"
                                             onClick={[Function]}
                                             onKeyDown={[Function]}
-                                            role="button"
+                                            open={false}
+                                            useAnchor={false}
                                           >
-                                            <button
+                                            <Button
+                                              active={false}
                                               aria-expanded={false}
                                               aria-haspopup={true}
-                                              className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle btn btn-sm btn-info"
+                                              block={false}
+                                              bsClass="btn"
+                                              bsSize="small"
+                                              bsStyle="info"
+                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle"
                                               disabled={false}
                                               id="action-3"
                                               onClick={[Function]}
                                               onKeyDown={[Function]}
                                               role="button"
-                                              type="button"
                                             >
-                                              Actions
-                                               
-                                              <span
-                                                className="caret"
-                                              />
-                                            </button>
-                                          </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu
-                                          bsClass="dropdown-menu"
-                                          bsRole="menu"
-                                          key=".1"
-                                          labelledBy="action-3"
-                                          onClose={[Function]}
-                                          onSelect={[Function]}
-                                          pullRight={false}
-                                        >
-                                          <RootCloseWrapper
-                                            disabled={true}
-                                            event="click"
-                                            onRootClose={[Function]}
-                                          >
-                                            <ul
-                                              aria-labelledby="action-3"
-                                              className="dropdown-menu"
-                                              role="menu"
-                                            >
-                                              <MenuItem
-                                                bsClass="dropdown"
+                                              <button
+                                                aria-expanded={false}
+                                                aria-haspopup={true}
+                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".0"
+                                                id="action-3"
                                                 onClick={[Function]}
                                                 onKeyDown={[Function]}
-                                                onSelect={[Function]}
+                                                role="button"
+                                                type="button"
                                               >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
-                                                >
-                                                  <SafeAnchor
-                                                    componentClass="a"
-                                                    onClick={[Function]}
-                                                    onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
-                                                  >
-                                                    <a
-                                                      href="#"
-                                                      onClick={[Function]}
-                                                      onKeyDown={[Function]}
-                                                      role="menuitem"
-                                                      tabIndex="-1"
-                                                    >
-                                                      Install
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <LinkContainer
-                                                action="push"
-                                                key=".1"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                                onlyActiveOnIndex={false}
-                                                to="/system/contentpacks/1/3/edit"
+                                                Actions
+                                                 
+                                                <span
+                                                  className="caret"
+                                                />
+                                              </button>
+                                            </Button>
+                                          </DropdownToggle>
+                                          <DropdownMenu
+                                            bsClass="dropdown-menu"
+                                            bsRole="menu"
+                                            key=".1"
+                                            labelledBy="action-3"
+                                            onClose={[Function]}
+                                            onSelect={[Function]}
+                                            pullRight={false}
+                                          >
+                                            <RootCloseWrapper
+                                              disabled={true}
+                                              event="click"
+                                              onRootClose={[Function]}
+                                            >
+                                              <ul
+                                                aria-labelledby="action-3"
+                                                className="dropdown-menu"
+                                                role="menu"
                                               >
                                                 <MenuItem
-                                                  action="push"
                                                   bsClass="dropdown"
                                                   disabled={false}
                                                   divider={false}
                                                   header={false}
+                                                  key=".0"
                                                   onClick={[Function]}
                                                   onKeyDown={[Function]}
                                                   onSelect={[Function]}
@@ -1850,7 +1725,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                     role="presentation"
                                                   >
                                                     <SafeAnchor
-                                                      action="push"
                                                       componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
@@ -1858,166 +1732,174 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                       tabIndex="-1"
                                                     >
                                                       <a
-                                                        action="push"
                                                         href="#"
                                                         onClick={[Function]}
                                                         onKeyDown={[Function]}
                                                         role="menuitem"
                                                         tabIndex="-1"
                                                       >
-                                                        Create New From Revision
+                                                        Install
                                                       </a>
                                                     </SafeAnchor>
                                                   </li>
                                                 </MenuItem>
-                                              </LinkContainer>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={true}
-                                                header={false}
-                                                key=".2"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className="divider"
+                                                <LinkContainer
+                                                  action="push"
+                                                  key=".1"
                                                   onKeyDown={[Function]}
-                                                  role="separator"
-                                                />
-                                              </MenuItem>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".3"
-                                                onClick={[Function]}
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
+                                                  onSelect={[Function]}
+                                                  onlyActiveOnIndex={false}
+                                                  to="/system/contentpacks/1/3/edit"
                                                 >
-                                                  <SafeAnchor
-                                                    componentClass="a"
+                                                  <MenuItem
+                                                    action="push"
+                                                    bsClass="dropdown"
+                                                    disabled={false}
+                                                    divider={false}
+                                                    header={false}
                                                     onClick={[Function]}
                                                     onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
+                                                    onSelect={[Function]}
                                                   >
-                                                    <a
-                                                      href="#"
+                                                    <li
+                                                      className=""
+                                                      role="presentation"
+                                                    >
+                                                      <SafeAnchor
+                                                        action="push"
+                                                        componentClass="a"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        <a
+                                                          action="push"
+                                                          href="#"
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          role="menuitem"
+                                                          tabIndex="-1"
+                                                        >
+                                                          Create New From Revision
+                                                        </a>
+                                                      </SafeAnchor>
+                                                    </li>
+                                                  </MenuItem>
+                                                </LinkContainer>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={true}
+                                                  header={false}
+                                                  key=".2"
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className="divider"
+                                                    onKeyDown={[Function]}
+                                                    role="separator"
+                                                  />
+                                                </MenuItem>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  key=".3"
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       role="menuitem"
                                                       tabIndex="-1"
                                                     >
-                                                      Delete
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <BootstrapModalWrapper
-                                                backdrop="static"
-                                                bsSize="large"
-                                                key=".4"
-                                                onClose={[Function]}
-                                                onHide={[Function]}
-                                                onKeyDown={[Function]}
-                                                onOpen={[Function]}
-                                                onSelect={[Function]}
-                                                showModal={false}
-                                              >
-                                                <Modal
+                                                      <a
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        Delete
+                                                      </a>
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                                <BootstrapModalWrapper
                                                   backdrop="static"
                                                   bsSize="large"
+                                                  key=".4"
+                                                  onClose={[Function]}
                                                   onHide={[Function]}
-                                                  show={false}
+                                                  onKeyDown={[Function]}
+                                                  onOpen={[Function]}
+                                                  onSelect={[Function]}
+                                                  showModal={false}
                                                 >
-                                                  <StyledComponent
+                                                  <Modal
                                                     backdrop="static"
                                                     bsSize="large"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "BACKDROP_TRANSITION_DURATION": 150,
-                                                        "Body": [Function],
-                                                        "Dialog": [Function],
-                                                        "Footer": [Function],
-                                                        "Header": [Function],
-                                                        "SIZES": Array [
-                                                          "large",
-                                                          "small",
-                                                        ],
-                                                        "TRANSITION_DURATION": 300,
-                                                        "Title": [Function],
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Modal-nuree8-0",
-                                                          "isStatic": true,
-                                                          "lastClassName": "cHlGak",
-                                                          "rules": Array [
-                                                            ".modal-content{background-color:",
-                                                            "#FFF",
-                                                            ";border-color:",
-                                                            "rgba(31,31,31,0.2)",
-                                                            ";.modal-header{border-bottom-color:",
-                                                            "#DCE1E5",
-                                                            ";}.modal-footer{border-top-color:",
-                                                            "#DCE1E5",
-                                                            ";}}",
-                                                          ],
-                                                        },
-                                                        "displayName": "Modal",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Modal-nuree8-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
-                                                    }
-                                                    forwardedRef={null}
                                                     onHide={[Function]}
                                                     show={false}
                                                   >
-                                                    <Modal
-                                                      animation={true}
-                                                      autoFocus={true}
+                                                    <StyledComponent
                                                       backdrop="static"
-                                                      bsClass="modal"
                                                       bsSize="large"
-                                                      className="Modal-nuree8-0 cHlGak"
-                                                      dialogComponentClass={[Function]}
-                                                      enforceFocus={true}
-                                                      keyboard={true}
-                                                      manager={
-                                                        ModalManager {
-                                                          "add": [Function],
-                                                          "containers": Array [],
-                                                          "data": Array [],
-                                                          "handleContainerOverflow": true,
-                                                          "hideSiblingNodes": true,
-                                                          "isTopModal": [Function],
-                                                          "modals": Array [],
-                                                          "remove": [Function],
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "BACKDROP_TRANSITION_DURATION": 150,
+                                                          "Body": [Function],
+                                                          "Dialog": [Function],
+                                                          "Footer": [Function],
+                                                          "Header": [Function],
+                                                          "SIZES": Array [
+                                                            "large",
+                                                            "small",
+                                                          ],
+                                                          "TRANSITION_DURATION": 300,
+                                                          "Title": [Function],
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "Modal-nuree8-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "kphWbh",
+                                                            "rules": Array [
+                                                              [Function],
+                                                            ],
+                                                          },
+                                                          "displayName": "Modal",
+                                                          "foldedComponentIds": Array [],
+                                                          "render": [Function],
+                                                          "styledComponentId": "Modal-nuree8-0",
+                                                          "target": [Function],
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
                                                       }
+                                                      forwardedRef={null}
                                                       onHide={[Function]}
-                                                      renderBackdrop={[Function]}
-                                                      restoreFocus={true}
                                                       show={false}
                                                     >
                                                       <Modal
+                                                        animation={true}
                                                         autoFocus={true}
                                                         backdrop="static"
-                                                        backdropClassName="modal-backdrop"
-                                                        backdropTransitionTimeout={150}
-                                                        containerClassName="modal-open"
-                                                        dialogTransitionTimeout={300}
+                                                        bsClass="modal"
+                                                        bsSize="large"
+                                                        className="Modal-nuree8-0 kphWbh"
+                                                        dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
                                                         manager={
@@ -2032,28 +1914,55 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                             "remove": [Function],
                                                           }
                                                         }
-                                                        onEntering={[Function]}
-                                                        onExited={[Function]}
                                                         onHide={[Function]}
                                                         renderBackdrop={[Function]}
                                                         restoreFocus={true}
                                                         show={false}
-                                                        transition={[Function]}
-                                                      />
-                                                    </Modal>
-                                                  </StyledComponent>
-                                                </Modal>
-                                              </BootstrapModalWrapper>
-                                            </ul>
-                                          </RootCloseWrapper>
-                                        </DropdownMenu>
-                                      </div>
-                                    </ButtonGroup>
-                                  </Dropdown>
-                                </Uncontrolled(Dropdown)>
-                              </DropdownButton>
-                            </StyledComponent>
-                          </DropdownButton>
+                                                      >
+                                                        <Modal
+                                                          autoFocus={true}
+                                                          backdrop="static"
+                                                          backdropClassName="modal-backdrop"
+                                                          backdropTransitionTimeout={150}
+                                                          containerClassName="modal-open"
+                                                          dialogTransitionTimeout={300}
+                                                          enforceFocus={true}
+                                                          keyboard={true}
+                                                          manager={
+                                                            ModalManager {
+                                                              "add": [Function],
+                                                              "containers": Array [],
+                                                              "data": Array [],
+                                                              "handleContainerOverflow": true,
+                                                              "hideSiblingNodes": true,
+                                                              "isTopModal": [Function],
+                                                              "modals": Array [],
+                                                              "remove": [Function],
+                                                            }
+                                                          }
+                                                          onEntering={[Function]}
+                                                          onExited={[Function]}
+                                                          onHide={[Function]}
+                                                          renderBackdrop={[Function]}
+                                                          restoreFocus={true}
+                                                          show={false}
+                                                          transition={[Function]}
+                                                        />
+                                                      </Modal>
+                                                    </StyledComponent>
+                                                  </Modal>
+                                                </BootstrapModalWrapper>
+                                              </ul>
+                                            </RootCloseWrapper>
+                                          </DropdownMenu>
+                                        </div>
+                                      </ButtonGroup>
+                                    </Dropdown>
+                                  </Uncontrolled(Dropdown)>
+                                </DropdownButton>
+                              </StyledComponent>
+                            </DropdownButton__StyledDropdownButton>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -2095,18 +2004,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
-                                  "isStatic": true,
-                                  "lastClassName": "cHlGak",
+                                  "isStatic": false,
+                                  "lastClassName": "kphWbh",
                                   "rules": Array [
-                                    ".modal-content{background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "rgba(31,31,31,0.2)",
-                                    ";.modal-header{border-bottom-color:",
-                                    "#DCE1E5",
-                                    ";}.modal-footer{border-top-color:",
-                                    "#DCE1E5",
-                                    ";}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "Modal",
@@ -2129,7 +2030,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 kphWbh"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -2264,7 +2165,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "jKsGyd",
+                                      "lastClassName": "jVhNvv",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -2288,12 +2189,12 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                   bsClass="btn"
                                   bsSize="small"
                                   bsStyle="success"
-                                  className="Button-c9cbmb-0 jKsGyd"
+                                  className="Button-c9cbmb-0 jVhNvv"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 jKsGyd btn btn-sm btn-success"
+                                    className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-success"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -2304,210 +2205,151 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               </StyledComponent>
                             </Button>
                           </ForwardRef>
-                          <DropdownButton
+                          <ForwardRef
                             bsSize="small"
                             bsStyle="info"
                             id="action-4"
                             title="Actions"
                           >
-                            <StyledComponent
+                            <DropdownButton__StyledDropdownButton
                               bsSize="small"
                               bsStyle="info"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "DropdownButton-sc-1343dcx-0",
-                                    "isStatic": false,
-                                    "lastClassName": "iVkpkU",
-                                    "rules": Array [
-                                      [Function],
-                                      ";",
-                                      "& ~",
-                                      " .dropdown-menu{> li > a{color:",
-                                      "#1F1F1F",
-                                      ";:hover,:focus{color:",
-                                      "#484848",
-                                      ";background-color:",
-                                      "#F1F2F2",
-                                      ";}}> .active > a{background-color:",
-                                      "#6DC6E7",
-                                      ";color:",
-                                      "#f7fcfd",
-                                      ";:hover,:focus{background-color:",
-                                      "#16ACE3",
-                                      ";color:",
-                                      "#f3fafd",
-                                      ";}}> .disabled > a{color:",
-                                      "#8f8f8f",
-                                      ";:hover,:focus{background-color:",
-                                      "#F1F2F2",
-                                      ";color:",
-                                      "#b0b0b0",
-                                      ";}}}",
-                                      ";",
-                                    ],
-                                  },
-                                  "displayName": "DropdownButton",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "DropdownButton-sc-1343dcx-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
                               id="action-4"
                               title="Actions"
                             >
-                              <DropdownButton
+                              <StyledComponent
                                 bsSize="small"
                                 bsStyle="info"
-                                className="DropdownButton-sc-1343dcx-0 iVkpkU"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                      "isStatic": false,
+                                      "lastClassName": "hzVhhK",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "DropdownButton__StyledDropdownButton",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
                                 id="action-4"
                                 title="Actions"
                               >
-                                <Uncontrolled(Dropdown)
+                                <DropdownButton
                                   bsSize="small"
                                   bsStyle="info"
+                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                   id="action-4"
+                                  title="Actions"
                                 >
-                                  <Dropdown
-                                    bsClass="dropdown"
+                                  <Uncontrolled(Dropdown)
                                     bsSize="small"
                                     bsStyle="info"
-                                    componentClass={[Function]}
                                     id="action-4"
-                                    onToggle={[Function]}
                                   >
-                                    <ButtonGroup
-                                      block={false}
-                                      bsClass="btn-group"
+                                    <Dropdown
+                                      bsClass="dropdown"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="dropdown"
-                                      justified={false}
-                                      vertical={false}
+                                      componentClass={[Function]}
+                                      id="action-4"
+                                      onToggle={[Function]}
                                     >
-                                      <div
-                                        className="dropdown btn-group btn-group-sm btn-group-info"
+                                      <ButtonGroup
+                                        block={false}
+                                        bsClass="btn-group"
+                                        bsSize="small"
+                                        bsStyle="info"
+                                        className="dropdown"
+                                        justified={false}
+                                        vertical={false}
                                       >
-                                        <DropdownToggle
-                                          bsClass="dropdown-toggle"
-                                          bsRole="toggle"
-                                          bsSize="small"
-                                          bsStyle="info"
-                                          className="DropdownButton-sc-1343dcx-0 iVkpkU"
-                                          id="action-4"
-                                          key=".0"
-                                          onClick={[Function]}
-                                          onKeyDown={[Function]}
-                                          open={false}
-                                          useAnchor={false}
+                                        <div
+                                          className="dropdown btn-group btn-group-sm btn-group-info"
                                         >
-                                          <Button
-                                            active={false}
-                                            aria-expanded={false}
-                                            aria-haspopup={true}
-                                            block={false}
-                                            bsClass="btn"
+                                          <DropdownToggle
+                                            bsClass="dropdown-toggle"
+                                            bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="info"
-                                            className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle"
-                                            disabled={false}
+                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK"
                                             id="action-4"
+                                            key=".0"
                                             onClick={[Function]}
                                             onKeyDown={[Function]}
-                                            role="button"
+                                            open={false}
+                                            useAnchor={false}
                                           >
-                                            <button
+                                            <Button
+                                              active={false}
                                               aria-expanded={false}
                                               aria-haspopup={true}
-                                              className="DropdownButton-sc-1343dcx-0 iVkpkU dropdown-toggle btn btn-sm btn-info"
+                                              block={false}
+                                              bsClass="btn"
+                                              bsSize="small"
+                                              bsStyle="info"
+                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle"
                                               disabled={false}
                                               id="action-4"
                                               onClick={[Function]}
                                               onKeyDown={[Function]}
                                               role="button"
-                                              type="button"
                                             >
-                                              Actions
-                                               
-                                              <span
-                                                className="caret"
-                                              />
-                                            </button>
-                                          </Button>
-                                        </DropdownToggle>
-                                        <DropdownMenu
-                                          bsClass="dropdown-menu"
-                                          bsRole="menu"
-                                          key=".1"
-                                          labelledBy="action-4"
-                                          onClose={[Function]}
-                                          onSelect={[Function]}
-                                          pullRight={false}
-                                        >
-                                          <RootCloseWrapper
-                                            disabled={true}
-                                            event="click"
-                                            onRootClose={[Function]}
-                                          >
-                                            <ul
-                                              aria-labelledby="action-4"
-                                              className="dropdown-menu"
-                                              role="menu"
-                                            >
-                                              <MenuItem
-                                                bsClass="dropdown"
+                                              <button
+                                                aria-expanded={false}
+                                                aria-haspopup={true}
+                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle btn btn-sm btn-info"
                                                 disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".0"
+                                                id="action-4"
                                                 onClick={[Function]}
                                                 onKeyDown={[Function]}
-                                                onSelect={[Function]}
+                                                role="button"
+                                                type="button"
                                               >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
-                                                >
-                                                  <SafeAnchor
-                                                    componentClass="a"
-                                                    onClick={[Function]}
-                                                    onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
-                                                  >
-                                                    <a
-                                                      href="#"
-                                                      onClick={[Function]}
-                                                      onKeyDown={[Function]}
-                                                      role="menuitem"
-                                                      tabIndex="-1"
-                                                    >
-                                                      Install
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <LinkContainer
-                                                action="push"
-                                                key=".1"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                                onlyActiveOnIndex={false}
-                                                to="/system/contentpacks/1/4/edit"
+                                                Actions
+                                                 
+                                                <span
+                                                  className="caret"
+                                                />
+                                              </button>
+                                            </Button>
+                                          </DropdownToggle>
+                                          <DropdownMenu
+                                            bsClass="dropdown-menu"
+                                            bsRole="menu"
+                                            key=".1"
+                                            labelledBy="action-4"
+                                            onClose={[Function]}
+                                            onSelect={[Function]}
+                                            pullRight={false}
+                                          >
+                                            <RootCloseWrapper
+                                              disabled={true}
+                                              event="click"
+                                              onRootClose={[Function]}
+                                            >
+                                              <ul
+                                                aria-labelledby="action-4"
+                                                className="dropdown-menu"
+                                                role="menu"
                                               >
                                                 <MenuItem
-                                                  action="push"
                                                   bsClass="dropdown"
                                                   disabled={false}
                                                   divider={false}
                                                   header={false}
+                                                  key=".0"
                                                   onClick={[Function]}
                                                   onKeyDown={[Function]}
                                                   onSelect={[Function]}
@@ -2517,7 +2359,6 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                     role="presentation"
                                                   >
                                                     <SafeAnchor
-                                                      action="push"
                                                       componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
@@ -2525,166 +2366,174 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                       tabIndex="-1"
                                                     >
                                                       <a
-                                                        action="push"
                                                         href="#"
                                                         onClick={[Function]}
                                                         onKeyDown={[Function]}
                                                         role="menuitem"
                                                         tabIndex="-1"
                                                       >
-                                                        Create New From Revision
+                                                        Install
                                                       </a>
                                                     </SafeAnchor>
                                                   </li>
                                                 </MenuItem>
-                                              </LinkContainer>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={true}
-                                                header={false}
-                                                key=".2"
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className="divider"
+                                                <LinkContainer
+                                                  action="push"
+                                                  key=".1"
                                                   onKeyDown={[Function]}
-                                                  role="separator"
-                                                />
-                                              </MenuItem>
-                                              <MenuItem
-                                                bsClass="dropdown"
-                                                disabled={false}
-                                                divider={false}
-                                                header={false}
-                                                key=".3"
-                                                onClick={[Function]}
-                                                onKeyDown={[Function]}
-                                                onSelect={[Function]}
-                                              >
-                                                <li
-                                                  className=""
-                                                  role="presentation"
+                                                  onSelect={[Function]}
+                                                  onlyActiveOnIndex={false}
+                                                  to="/system/contentpacks/1/4/edit"
                                                 >
-                                                  <SafeAnchor
-                                                    componentClass="a"
+                                                  <MenuItem
+                                                    action="push"
+                                                    bsClass="dropdown"
+                                                    disabled={false}
+                                                    divider={false}
+                                                    header={false}
                                                     onClick={[Function]}
                                                     onKeyDown={[Function]}
-                                                    role="menuitem"
-                                                    tabIndex="-1"
+                                                    onSelect={[Function]}
                                                   >
-                                                    <a
-                                                      href="#"
+                                                    <li
+                                                      className=""
+                                                      role="presentation"
+                                                    >
+                                                      <SafeAnchor
+                                                        action="push"
+                                                        componentClass="a"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        <a
+                                                          action="push"
+                                                          href="#"
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          role="menuitem"
+                                                          tabIndex="-1"
+                                                        >
+                                                          Create New From Revision
+                                                        </a>
+                                                      </SafeAnchor>
+                                                    </li>
+                                                  </MenuItem>
+                                                </LinkContainer>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={true}
+                                                  header={false}
+                                                  key=".2"
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className="divider"
+                                                    onKeyDown={[Function]}
+                                                    role="separator"
+                                                  />
+                                                </MenuItem>
+                                                <MenuItem
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  key=".3"
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      componentClass="a"
                                                       onClick={[Function]}
                                                       onKeyDown={[Function]}
                                                       role="menuitem"
                                                       tabIndex="-1"
                                                     >
-                                                      Delete
-                                                    </a>
-                                                  </SafeAnchor>
-                                                </li>
-                                              </MenuItem>
-                                              <BootstrapModalWrapper
-                                                backdrop="static"
-                                                bsSize="large"
-                                                key=".4"
-                                                onClose={[Function]}
-                                                onHide={[Function]}
-                                                onKeyDown={[Function]}
-                                                onOpen={[Function]}
-                                                onSelect={[Function]}
-                                                showModal={false}
-                                              >
-                                                <Modal
+                                                      <a
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      >
+                                                        Delete
+                                                      </a>
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                                <BootstrapModalWrapper
                                                   backdrop="static"
                                                   bsSize="large"
+                                                  key=".4"
+                                                  onClose={[Function]}
                                                   onHide={[Function]}
-                                                  show={false}
+                                                  onKeyDown={[Function]}
+                                                  onOpen={[Function]}
+                                                  onSelect={[Function]}
+                                                  showModal={false}
                                                 >
-                                                  <StyledComponent
+                                                  <Modal
                                                     backdrop="static"
                                                     bsSize="large"
-                                                    forwardedComponent={
-                                                      Object {
-                                                        "$$typeof": Symbol(react.forward_ref),
-                                                        "BACKDROP_TRANSITION_DURATION": 150,
-                                                        "Body": [Function],
-                                                        "Dialog": [Function],
-                                                        "Footer": [Function],
-                                                        "Header": [Function],
-                                                        "SIZES": Array [
-                                                          "large",
-                                                          "small",
-                                                        ],
-                                                        "TRANSITION_DURATION": 300,
-                                                        "Title": [Function],
-                                                        "attrs": Array [],
-                                                        "componentStyle": ComponentStyle {
-                                                          "componentId": "Modal-nuree8-0",
-                                                          "isStatic": true,
-                                                          "lastClassName": "cHlGak",
-                                                          "rules": Array [
-                                                            ".modal-content{background-color:",
-                                                            "#FFF",
-                                                            ";border-color:",
-                                                            "rgba(31,31,31,0.2)",
-                                                            ";.modal-header{border-bottom-color:",
-                                                            "#DCE1E5",
-                                                            ";}.modal-footer{border-top-color:",
-                                                            "#DCE1E5",
-                                                            ";}}",
-                                                          ],
-                                                        },
-                                                        "displayName": "Modal",
-                                                        "foldedComponentIds": Array [],
-                                                        "render": [Function],
-                                                        "styledComponentId": "Modal-nuree8-0",
-                                                        "target": [Function],
-                                                        "toString": [Function],
-                                                        "warnTooManyClasses": [Function],
-                                                        "withComponent": [Function],
-                                                      }
-                                                    }
-                                                    forwardedRef={null}
                                                     onHide={[Function]}
                                                     show={false}
                                                   >
-                                                    <Modal
-                                                      animation={true}
-                                                      autoFocus={true}
+                                                    <StyledComponent
                                                       backdrop="static"
-                                                      bsClass="modal"
                                                       bsSize="large"
-                                                      className="Modal-nuree8-0 cHlGak"
-                                                      dialogComponentClass={[Function]}
-                                                      enforceFocus={true}
-                                                      keyboard={true}
-                                                      manager={
-                                                        ModalManager {
-                                                          "add": [Function],
-                                                          "containers": Array [],
-                                                          "data": Array [],
-                                                          "handleContainerOverflow": true,
-                                                          "hideSiblingNodes": true,
-                                                          "isTopModal": [Function],
-                                                          "modals": Array [],
-                                                          "remove": [Function],
+                                                      forwardedComponent={
+                                                        Object {
+                                                          "$$typeof": Symbol(react.forward_ref),
+                                                          "BACKDROP_TRANSITION_DURATION": 150,
+                                                          "Body": [Function],
+                                                          "Dialog": [Function],
+                                                          "Footer": [Function],
+                                                          "Header": [Function],
+                                                          "SIZES": Array [
+                                                            "large",
+                                                            "small",
+                                                          ],
+                                                          "TRANSITION_DURATION": 300,
+                                                          "Title": [Function],
+                                                          "attrs": Array [],
+                                                          "componentStyle": ComponentStyle {
+                                                            "componentId": "Modal-nuree8-0",
+                                                            "isStatic": false,
+                                                            "lastClassName": "kphWbh",
+                                                            "rules": Array [
+                                                              [Function],
+                                                            ],
+                                                          },
+                                                          "displayName": "Modal",
+                                                          "foldedComponentIds": Array [],
+                                                          "render": [Function],
+                                                          "styledComponentId": "Modal-nuree8-0",
+                                                          "target": [Function],
+                                                          "toString": [Function],
+                                                          "warnTooManyClasses": [Function],
+                                                          "withComponent": [Function],
                                                         }
                                                       }
+                                                      forwardedRef={null}
                                                       onHide={[Function]}
-                                                      renderBackdrop={[Function]}
-                                                      restoreFocus={true}
                                                       show={false}
                                                     >
                                                       <Modal
+                                                        animation={true}
                                                         autoFocus={true}
                                                         backdrop="static"
-                                                        backdropClassName="modal-backdrop"
-                                                        backdropTransitionTimeout={150}
-                                                        containerClassName="modal-open"
-                                                        dialogTransitionTimeout={300}
+                                                        bsClass="modal"
+                                                        bsSize="large"
+                                                        className="Modal-nuree8-0 kphWbh"
+                                                        dialogComponentClass={[Function]}
                                                         enforceFocus={true}
                                                         keyboard={true}
                                                         manager={
@@ -2699,28 +2548,55 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                                             "remove": [Function],
                                                           }
                                                         }
-                                                        onEntering={[Function]}
-                                                        onExited={[Function]}
                                                         onHide={[Function]}
                                                         renderBackdrop={[Function]}
                                                         restoreFocus={true}
                                                         show={false}
-                                                        transition={[Function]}
-                                                      />
-                                                    </Modal>
-                                                  </StyledComponent>
-                                                </Modal>
-                                              </BootstrapModalWrapper>
-                                            </ul>
-                                          </RootCloseWrapper>
-                                        </DropdownMenu>
-                                      </div>
-                                    </ButtonGroup>
-                                  </Dropdown>
-                                </Uncontrolled(Dropdown)>
-                              </DropdownButton>
-                            </StyledComponent>
-                          </DropdownButton>
+                                                      >
+                                                        <Modal
+                                                          autoFocus={true}
+                                                          backdrop="static"
+                                                          backdropClassName="modal-backdrop"
+                                                          backdropTransitionTimeout={150}
+                                                          containerClassName="modal-open"
+                                                          dialogTransitionTimeout={300}
+                                                          enforceFocus={true}
+                                                          keyboard={true}
+                                                          manager={
+                                                            ModalManager {
+                                                              "add": [Function],
+                                                              "containers": Array [],
+                                                              "data": Array [],
+                                                              "handleContainerOverflow": true,
+                                                              "hideSiblingNodes": true,
+                                                              "isTopModal": [Function],
+                                                              "modals": Array [],
+                                                              "remove": [Function],
+                                                            }
+                                                          }
+                                                          onEntering={[Function]}
+                                                          onExited={[Function]}
+                                                          onHide={[Function]}
+                                                          renderBackdrop={[Function]}
+                                                          restoreFocus={true}
+                                                          show={false}
+                                                          transition={[Function]}
+                                                        />
+                                                      </Modal>
+                                                    </StyledComponent>
+                                                  </Modal>
+                                                </BootstrapModalWrapper>
+                                              </ul>
+                                            </RootCloseWrapper>
+                                          </DropdownMenu>
+                                        </div>
+                                      </ButtonGroup>
+                                    </Dropdown>
+                                  </Uncontrolled(Dropdown)>
+                                </DropdownButton>
+                              </StyledComponent>
+                            </DropdownButton__StyledDropdownButton>
+                          </ForwardRef>
                         </div>
                       </ButtonToolbar>
                     </td>
@@ -2762,18 +2638,10 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
-                                  "isStatic": true,
-                                  "lastClassName": "cHlGak",
+                                  "isStatic": false,
+                                  "lastClassName": "kphWbh",
                                   "rules": Array [
-                                    ".modal-content{background-color:",
-                                    "#FFF",
-                                    ";border-color:",
-                                    "rgba(31,31,31,0.2)",
-                                    ";.modal-header{border-bottom-color:",
-                                    "#DCE1E5",
-                                    ";}.modal-footer{border-top-color:",
-                                    "#DCE1E5",
-                                    ";}}",
+                                    [Function],
                                   ],
                                 },
                                 "displayName": "Modal",
@@ -2796,7 +2664,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 cHlGak"
+                              className="Modal-nuree8-0 kphWbh"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}

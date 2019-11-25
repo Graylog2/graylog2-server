@@ -86,7 +86,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -110,13 +110,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -174,7 +174,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -198,13 +198,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -259,7 +259,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -283,13 +283,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Unsaved changes"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Unsaved changes"
@@ -354,7 +354,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -378,13 +378,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -499,7 +499,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -523,13 +523,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -587,7 +587,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -611,13 +611,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -672,7 +672,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -696,13 +696,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Saved search"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Saved search"
@@ -767,7 +767,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -791,13 +791,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -912,7 +912,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -936,13 +936,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -1000,7 +1000,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -1024,13 +1024,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={true}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={true}
                     onClick={[Function]}
                     title="Empty search"
@@ -1085,7 +1085,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -1109,13 +1109,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="Save search"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="Save search"
@@ -1180,7 +1180,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "iKWoaE",
+                      "lastClassName": "jVhNvv",
                       "rules": Array [
                         [Function],
                       ],
@@ -1204,13 +1204,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-                  className="Button-c9cbmb-0 iKWoaE"
+                  className="Button-c9cbmb-0 jVhNvv"
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"

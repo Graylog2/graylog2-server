@@ -1,15 +1,17 @@
+import { memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { InputGroup as BootstrapInputGroup } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { color } from 'theme';
-
-const InputGroup = styled(BootstrapInputGroup)`
+const InputGroup = memo(styled(BootstrapInputGroup)(({ theme }) => css`
   .input-group-addon {
-    color: ${color.gray[30]};
-    background-color: ${color.gray[100]};
-    border-color: ${color.gray[80]};
+    color: ${theme.color.gray[30]};
+    background-color: ${theme.color.gray[100]};
+    border-color: ${theme.color.gray[80]};
   }
-`;
+`));
+
+InputGroup.Addon = memo(BootstrapInputGroup.Addon);
+InputGroup.Button = memo(BootstrapInputGroup.Button);
 
 export default InputGroup;

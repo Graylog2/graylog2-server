@@ -1,14 +1,14 @@
-import { createGlobalStyle } from 'styled-components';
-import { color } from 'theme';
+import { css } from 'styled-components';
 
-const GlobalStyles = createGlobalStyle`
+const globalStyles = theme => css`
   body {
-    background-color: ${color.global.background};
-    color: ${color.global.textDefault};
+    background-color: ${theme.color.global.background};
+    color: ${theme.color.global.textDefault};
     font-family: 'Open Sans', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     overflow-x: hidden;
     margin-top: 45px;
+    min-height: calc(100vh - 45px);
   }
 
   ul {
@@ -21,14 +21,14 @@ const GlobalStyles = createGlobalStyle`
   }
 
   hr {
-    border-top: 1px solid ${color.global.background};
+    border-top: 1px solid ${theme.color.global.background};
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
     padding: 0;
     margin: 0;
-    color: ${color.gray[10]}
+    color: ${theme.color.gray[10]}
   }
 
   h1 {
@@ -54,10 +54,10 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {
-    color: ${color.global.link};
+    color: ${theme.color.global.link};
 
     :hover {
-      color: ${color.global.linkHover};
+      color: ${theme.color.global.linkHover};
     }
   }
 
@@ -73,4 +73,4 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
-export default GlobalStyles;
+export default globalStyles;

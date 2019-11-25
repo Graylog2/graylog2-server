@@ -1,36 +1,36 @@
 // eslint-disable-next-line no-restricted-imports
 import { Navbar as BootstrapNavbar } from 'react-bootstrap';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { darken, lighten } from 'polished';
 
-import { breakpoint, color } from 'theme';
+import { breakpoint } from 'theme';
 
-const Navbar = styled(BootstrapNavbar)`
+const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
   &.navbar-default {
-    background-color: ${color.gray[90]};
-    border-color: ${color.gray[80]};
+    background-color: ${theme.color.gray[90]};
+    border-color: ${theme.color.gray[80]};
 
     .navbar-brand {
-      color: ${color.variant.info};
+      color: ${theme.color.variant.info};
       &:hover,
       &:focus {
-        color: ${darken(0.1, color.variant.info)};
+        color: ${darken(0.1, theme.color.variant.info)};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${color.global.textDefault};
+      color: ${theme.color.global.textDefault};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${color.variant.info};
+        color: ${theme.color.variant.info};
 
         &:hover,
         &:focus {
-          color: ${darken(0.25, color.variant.info)};
+          color: ${darken(0.25, theme.color.variant.info)};
           background-color: transparent;
         }
       }
@@ -39,8 +39,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, color.variant.info)};
-          background-color: ${color.gray[80]};
+          color: ${darken(0.15, theme.color.variant.info)};
+          background-color: ${theme.color.gray[80]};
         }
       }
 
@@ -48,7 +48,7 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.25, color.gray[80])};
+          color: ${darken(0.25, theme.color.gray[80])};
           background-color: transparent;
         }
       }
@@ -57,8 +57,8 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${darken(0.15, color.variant.info)};
-          background-color: ${darken(0.065, color.gray[90])};
+          color: ${darken(0.15, theme.color.variant.info)};
+          background-color: ${darken(0.065, theme.color.gray[90])};
         }
       }
 
@@ -66,11 +66,11 @@ const Navbar = styled(BootstrapNavbar)`
         .open .dropdown-menu {
           > li > a,
           > li > .btn-link {
-            color: ${color.variant.info};
+            color: ${theme.color.variant.info};
 
             &:hover,
             &:focus {
-              color: ${darken(0.25, color.variant.info)};
+              color: ${darken(0.25, theme.color.variant.info)};
               background-color: transparent;
             }
           }
@@ -79,8 +79,8 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${darken(0.15, color.variant.info)};
-              background-color: ${darken(0.065, color.gray[90])};
+              color: ${darken(0.15, theme.color.variant.info)};
+              background-color: ${darken(0.065, theme.color.gray[90])};
             }
           }
 
@@ -88,7 +88,7 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${color.gray[80]};
+              color: ${theme.color.gray[80]};
               background-color: transparent;
             }
           }
@@ -97,74 +97,74 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${color.gray[80]};
+      border-color: ${theme.color.gray[80]};
 
       :hover,
       :focus {
-        background-color: ${color.gray[80]};
+        background-color: ${theme.color.gray[80]};
       }
 
       .icon-bar {
-        background-color: ${darken(0.25, color.gray[80])};
+        background-color: ${darken(0.25, theme.color.gray[80])};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${darken(0.065, color.gray[90])};
+      border-color: ${darken(0.065, theme.color.gray[90])};
     }
 
     .navbar-link {
-      color: ${color.variant.info};
+      color: ${theme.color.variant.info};
       &:hover {
-        color: ${darken(0.25, color.variant.info)};
+        color: ${darken(0.25, theme.color.variant.info)};
       }
     }
 
     .btn-link {
-      color: ${color.variant.info};
+      color: ${theme.color.variant.info};
 
       &:hover,
       &:focus {
-        color: ${color.variant.dark.info};
+        color: ${theme.color.variant.dark.info};
       }
 
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${color.gray[80]};
+          color: ${theme.color.gray[80]};
         }
       }
     }
   }
 
   &.navbar-inverse {
-    background-color: ${color.gray[10]};
-    border-color: ${color.gray[100]};
+    background-color: ${theme.color.gray[10]};
+    border-color: ${theme.color.gray[100]};
 
     .navbar-brand {
-      color: ${lighten(0.15, color.variant.info)};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover,
       &:focus {
-        color: ${color.global.textAlt};
+        color: ${theme.color.global.textAlt};
         background-color: transparent;
       }
     }
 
     .navbar-text {
-      color: ${lighten(0.15, color.global.textDefault)};
+      color: ${lighten(0.15, theme.color.global.textDefault)};
     }
 
     .navbar-nav {
       > li > a,
       > li > .btn-link {
-        color: ${color.gray[90]};
+        color: ${theme.color.gray[90]};
 
         &:hover,
         &:focus {
-          color: ${color.variant.light.info};
+          color: ${theme.color.variant.light.info};
           background-color: transparent;
         }
       }
@@ -172,15 +172,15 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${color.global.textAlt};
-          background-color: ${color.gray[20]};
+          color: ${theme.color.global.textAlt};
+          background-color: ${theme.color.gray[20]};
         }
       }
       > .disabled > a {
         &,
         &:hover,
         &:focus {
-          color: ${lighten(0.50, color.global.textDefault)};
+          color: ${lighten(0.50, theme.color.global.textDefault)};
           background-color: transparent;
         }
       }
@@ -189,28 +189,28 @@ const Navbar = styled(BootstrapNavbar)`
         &,
         &:hover,
         &:focus {
-          color: ${color.global.textAlt};
-          background-color: ${color.gray[20]};
+          color: ${theme.color.global.textAlt};
+          background-color: ${theme.color.gray[20]};
         }
       }
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
           > .dropdown-header {
-            border-color: ${color.gray[10]};
+            border-color: ${theme.color.gray[10]};
           }
 
           .divider {
-            background-color: ${color.gray[20]};
+            background-color: ${theme.color.gray[20]};
           }
 
           > li > a,
           > li > .btn-link {
-            color: ${color.gray[90]};
+            color: ${theme.color.gray[90]};
 
             &:hover,
             &:focus {
-              color: ${color.variant.light.info};
+              color: ${theme.color.variant.light.info};
               background-color: transparent;
             }
           }
@@ -219,8 +219,8 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${color.global.textAlt};
-              background-color: ${color.gray[20]};
+              color: ${theme.color.global.textAlt};
+              background-color: ${theme.color.gray[20]};
             }
           }
 
@@ -228,7 +228,7 @@ const Navbar = styled(BootstrapNavbar)`
             &,
             &:hover,
             &:focus {
-              color: ${lighten(0.50, color.global.textDefault)};
+              color: ${lighten(0.50, theme.color.global.textDefault)};
               background-color: transparent;
             }
           }
@@ -237,48 +237,48 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-toggle {
-      border-color: ${color.gray[70]};
+      border-color: ${theme.color.gray[70]};
 
       &:hover,
       &:focus {
-        background-color: ${color.gray[70]};
+        background-color: ${theme.color.gray[70]};
       }
 
       .icon-bar {
-        background-color: ${color.global.textAlt};
+        background-color: ${theme.color.global.textAlt};
       }
     }
 
     .navbar-collapse,
     .navbar-form {
-      border-color: ${color.gray[100]};
+      border-color: ${theme.color.gray[100]};
     }
 
     .navbar-link {
-      color: ${lighten(0.15, color.variant.info)};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover {
-        color: ${color.global.textAlt};
+        color: ${theme.color.global.textAlt};
       }
     }
 
     .btn-link {
-      color: ${lighten(0.15, color.variant.info)};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover,
       &:focus {
-        color: ${color.global.textAlt};
+        color: ${theme.color.global.textAlt};
       }
 
       &[disabled],
       fieldset[disabled] & {
         &:hover,
         &:focus {
-          color: ${lighten(0.50, color.global.textDefault)};
+          color: ${lighten(0.50, theme.color.global.textDefault)};
         }
       }
     }
   }
-`;
+`);
 
 export default Navbar;
