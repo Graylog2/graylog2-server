@@ -12,8 +12,14 @@ const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).to
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('../Widgets', () => ({
-  widgetDefinition: () => ({ searchTypes: () => [{}] }),
+  widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
+
+jest.mock('../SearchType', () => jest.fn(() => ({
+  type: 'pivot',
+  handler: jest.fn(),
+  defaults: {},
+})));
 
 describe('UpdateSearchForWidgets', () => {
   it('should generate a new search for the view', () => {
