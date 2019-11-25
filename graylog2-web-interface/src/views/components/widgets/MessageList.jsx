@@ -3,13 +3,13 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import connect from 'stores/connect';
-import MessageTablePaginator from 'components/search/MessageTablePaginator';
 import CombinedProvider from 'injection/CombinedProvider';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 
 import { Messages } from 'views/Constants';
 import { MessageTableEntry } from 'views/components/messagelist';
 import Field from 'views/components/Field';
+import { PaginatedList } from 'components/common';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
@@ -33,7 +33,7 @@ type Props = {
   fields: {},
   pageSize: number,
   config: MessagesWidgetConfig,
-  data: { messages: [] },
+  data: { messages: [], total: number },
   containerHeight: number,
   selectedFields: {},
   currentView: {
@@ -51,6 +51,7 @@ class MessageList extends React.Component<Props, State> {
     config: CustomPropTypes.instanceOf(MessagesWidgetConfig),
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+      total: PropTypes.number.isRequired,
     }).isRequired,
     containerHeight: PropTypes.number,
     selectedFields: PropTypes.object,
@@ -132,21 +133,12 @@ class MessageList extends React.Component<Props, State> {
     const selectedFields = this._getSelectedFields();
     const selectedColumns = Immutable.OrderedSet(selectedFields);
     const { activeQuery } = currentView;
-
     return (
-      <span>
-        { messages.length > pageSize
-        && (
-          <div className={styles.messageListPaginator}>
-            <MessageTablePaginator currentPage={Number(currentPage)}
-                                   onPageChange={newPage => this.setState({ currentPage: newPage })}
-                                   pageSize={pageSize}
-                                   position="top"
-                                   resultCount={messages.length} />
-          </div>
-        ) }
-
-        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 60px)', maxHeight: maxHeight }}>
+      <PaginatedList onChange={newPage => this.setState({ currentPage: newPage })}
+                     activePage={Number(currentPage)}
+                     totalItems={data.total}
+                     pageSize={pageSize}>
+        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 80px)', maxHeight: maxHeight }}>
           <div className="table-responsive">
             <div className={`messages-container ${styles.messageListTableHeader}`}>
               <table className="table table-condensed messages" style={{ marginTop: 0 }}>
@@ -185,7 +177,7 @@ class MessageList extends React.Component<Props, State> {
             </div>
           </div>
         </div>
-      </span>
+      </PaginatedList>
     );
   }
 }
