@@ -5,10 +5,10 @@ import { get } from 'lodash';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import ViewSharing from 'views/logic/views/sharing/ViewSharing';
 import UserShortSummary from 'views/logic/views/sharing/UserShortSummary';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
 
 const viewSharingUrl = viewId => URLUtils.qualifyUrl(`/views/${viewId}/share`);
 
