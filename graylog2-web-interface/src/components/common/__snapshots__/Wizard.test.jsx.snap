@@ -68,7 +68,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                   disabled={true}
                   onClick={[Function]}
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="xsmall"
                     bsStyle="info"
                     disabled={true}
@@ -97,17 +97,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -123,12 +123,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={true}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-info"
                           disabled={true}
                           onClick={[Function]}
                           type="button"
@@ -147,14 +147,14 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
                 <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   onClick={[Function]}
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="xsmall"
                     bsStyle="info"
                     onClick={[Function]}
@@ -181,17 +181,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -207,12 +207,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-info"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -231,7 +231,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
               </div>
             </ButtonToolbar>
@@ -468,7 +468,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                   disabled={true}
                   onClick={[Function]}
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="xsmall"
                     bsStyle="info"
                     disabled={true}
@@ -497,17 +497,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -523,12 +523,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={true}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-info"
                           disabled={true}
                           onClick={[Function]}
                           type="button"
@@ -547,14 +547,14 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
                 <ForwardRef
                   bsSize="xsmall"
                   bsStyle="info"
                   onClick={[Function]}
                 >
-                  <Button
+                  <Button__StyledButton
                     bsSize="xsmall"
                     bsStyle="info"
                     onClick={[Function]}
@@ -581,17 +581,17 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -607,12 +607,12 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                         bsClass="btn"
                         bsSize="xsmall"
                         bsStyle="info"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={false}
                         onClick={[Function]}
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-info"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-info"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -631,7 +631,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
               </div>
             </ButtonToolbar>
@@ -1032,7 +1032,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                     disabled={true}
                     onClick={[Function]}
                   >
-                    <Button
+                    <Button__StyledButton
                       bsSize="small"
                       bsStyle="info"
                       disabled={true}
@@ -1061,17 +1061,17 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1087,12 +1087,12 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                           bsClass="btn"
                           bsSize="small"
                           bsStyle="info"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={true}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                             disabled={true}
                             onClick={[Function]}
                             type="button"
@@ -1101,7 +1101,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </div>
               </Col>
@@ -1119,7 +1119,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                     bsStyle="info"
                     onClick={[Function]}
                   >
-                    <Button
+                    <Button__StyledButton
                       bsSize="small"
                       bsStyle="info"
                       onClick={[Function]}
@@ -1146,17 +1146,17 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1172,12 +1172,12 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                           bsClass="btn"
                           bsSize="small"
                           bsStyle="info"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -1186,7 +1186,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </div>
               </Col>
@@ -1431,7 +1431,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                     disabled={true}
                     onClick={[Function]}
                   >
-                    <Button
+                    <Button__StyledButton
                       bsSize="small"
                       bsStyle="info"
                       disabled={true}
@@ -1460,17 +1460,17 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1486,12 +1486,12 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                           bsClass="btn"
                           bsSize="small"
                           bsStyle="info"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={true}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                             disabled={true}
                             onClick={[Function]}
                             type="button"
@@ -1500,7 +1500,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </div>
               </Col>
@@ -1518,7 +1518,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                     bsStyle="info"
                     onClick={[Function]}
                   >
-                    <Button
+                    <Button__StyledButton
                       bsSize="small"
                       bsStyle="info"
                       onClick={[Function]}
@@ -1545,17 +1545,17 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -1571,12 +1571,12 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                           bsClass="btn"
                           bsSize="small"
                           bsStyle="info"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={false}
                           onClick={[Function]}
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                             disabled={false}
                             onClick={[Function]}
                             type="button"
@@ -1585,7 +1585,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </div>
               </Col>

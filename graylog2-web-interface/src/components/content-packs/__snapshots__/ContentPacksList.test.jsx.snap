@@ -441,7 +441,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     }
                     type="submit"
                   >
-                    <Button
+                    <Button__StyledButton
                       bsStyle="default"
                       style={
                         Object {
@@ -471,17 +471,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -501,7 +501,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={false}
                           style={
                             Object {
@@ -511,7 +511,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -524,7 +524,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
                     bsStyle="default"
@@ -537,7 +537,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     }
                     type="button"
                   >
-                    <Button
+                    <Button__StyledButton
                       bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
@@ -570,17 +570,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -601,7 +601,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -612,7 +612,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -626,7 +626,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </form>
                 <ul
@@ -1163,7 +1163,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -1190,17 +1190,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -1216,12 +1216,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -1230,7 +1230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -1986,7 +1986,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -2013,17 +2013,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -2039,12 +2039,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -2053,7 +2053,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -2744,7 +2744,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -2771,17 +2771,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -2797,12 +2797,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -2811,7 +2811,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -3501,7 +3501,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -3528,17 +3528,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -3554,12 +3554,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -3568,7 +3568,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -4259,7 +4259,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -4286,17 +4286,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -4312,12 +4312,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -4326,7 +4326,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -5017,7 +5017,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -5044,17 +5044,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -5070,12 +5070,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -5084,7 +5084,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -5775,7 +5775,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -5802,17 +5802,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -5828,12 +5828,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -5842,7 +5842,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -6533,7 +6533,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -6560,17 +6560,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -6586,12 +6586,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -6600,7 +6600,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -7290,7 +7290,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -7317,17 +7317,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -7343,12 +7343,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -7357,7 +7357,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -8048,7 +8048,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                 bsStyle="info"
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsSize="small"
                                   bsStyle="info"
                                   onClick={[Function]}
@@ -8075,17 +8075,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -8101,12 +8101,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       bsClass="btn"
                                       bsSize="small"
                                       bsStyle="info"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       disabled={false}
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-sm btn-info"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-sm btn-info"
                                         disabled={false}
                                         onClick={[Function]}
                                         type="button"
@@ -8115,7 +8115,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                               <BootstrapModalWrapper
                                 backdrop="static"
@@ -9235,7 +9235,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     }
                     type="submit"
                   >
-                    <Button
+                    <Button__StyledButton
                       bsStyle="default"
                       style={
                         Object {
@@ -9265,17 +9265,17 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -9295,7 +9295,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={false}
                           style={
                             Object {
@@ -9305,7 +9305,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="submit"
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                             disabled={false}
                             style={
                               Object {
@@ -9318,7 +9318,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                   <ForwardRef
                     bsStyle="default"
@@ -9331,7 +9331,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                     }
                     type="button"
                   >
-                    <Button
+                    <Button__StyledButton
                       bsStyle="default"
                       disabled={true}
                       onClick={[Function]}
@@ -9364,17 +9364,17 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             ],
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
-                              "componentId": "Button-c9cbmb-0",
+                              "componentId": "Button__StyledButton-c9cbmb-0",
                               "isStatic": false,
-                              "lastClassName": "jVhNvv",
+                              "lastClassName": "fnYQfY",
                               "rules": Array [
                                 [Function],
                               ],
                             },
-                            "displayName": "Button",
+                            "displayName": "Button__StyledButton",
                             "foldedComponentIds": Array [],
                             "render": [Function],
-                            "styledComponentId": "Button-c9cbmb-0",
+                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                             "target": [Function],
                             "toString": [Function],
                             "warnTooManyClasses": [Function],
@@ -9395,7 +9395,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           block={false}
                           bsClass="btn"
                           bsStyle="default"
-                          className="Button-c9cbmb-0 jVhNvv"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                           disabled={true}
                           onClick={[Function]}
                           style={
@@ -9406,7 +9406,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           type="button"
                         >
                           <button
-                            className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                             disabled={true}
                             onClick={[Function]}
                             style={
@@ -9420,7 +9420,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                           </button>
                         </Button>
                       </StyledComponent>
-                    </Button>
+                    </Button__StyledButton>
                   </ForwardRef>
                 </form>
                 <ul

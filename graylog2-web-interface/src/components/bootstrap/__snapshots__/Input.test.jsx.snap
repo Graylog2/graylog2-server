@@ -149,7 +149,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   addonAfter={null}
   bsStyle={null}
   buttonAfter={
-    <ForwardRef
+    <Memo
       bsStyle="default"
     />
   }
@@ -281,7 +281,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                       <ForwardRef
                         bsStyle="default"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                         >
                           <StyledComponent
@@ -305,17 +305,17 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -329,17 +329,17 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 jVhNvv"
+                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                             >
                               <button
-                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 type="button"
                               />
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </span>
                   </InputGroupButton>

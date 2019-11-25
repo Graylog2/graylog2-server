@@ -205,7 +205,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                         onClick={[Function]}
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="info"
                           className="button"
                           disabled={false}
@@ -235,17 +235,17 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -261,13 +261,13 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-info"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -276,14 +276,14 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="default"
                         className="button"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           className="button"
                           onClick={[Function]}
@@ -310,17 +310,17 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -335,12 +335,12 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -349,7 +349,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </form>
                   </div>
@@ -568,7 +568,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                         onClick={[Function]}
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="primary"
                           className="button"
                           onClick={[Function]}
@@ -596,17 +596,17 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -622,13 +622,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               block={false}
                               bsClass="btn"
                               bsStyle="primary"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-primary"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -637,7 +637,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="info"
@@ -646,7 +646,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                         onClick={[Function]}
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="info"
                           className="button"
                           disabled={true}
@@ -676,17 +676,17 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -702,13 +702,13 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={true}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-info"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-info"
                                 disabled={true}
                                 onClick={[Function]}
                                 type="submit"
@@ -717,14 +717,14 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="default"
                         className="button"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           className="button"
                           onClick={[Function]}
@@ -751,17 +751,17 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -776,12 +776,12 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -790,7 +790,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </form>
                   </div>
@@ -1009,7 +1009,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                         onClick={[Function]}
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="primary"
                           className="button"
                           onClick={[Function]}
@@ -1037,17 +1037,17 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -1063,13 +1063,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="primary"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-primary"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -1078,7 +1078,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="info"
@@ -1087,7 +1087,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                         onClick={[Function]}
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="info"
                           className="button"
                           disabled={false}
@@ -1117,17 +1117,17 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -1143,13 +1143,13 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="info"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                               type="submit"
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-info"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-info"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="submit"
@@ -1158,14 +1158,14 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="default"
                         className="button"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           className="button"
                           onClick={[Function]}
@@ -1192,17 +1192,17 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -1217,12 +1217,12 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="button Button-c9cbmb-0 jVhNvv"
+                              className="button Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="button Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="button Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -1231,7 +1231,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </form>
                   </div>

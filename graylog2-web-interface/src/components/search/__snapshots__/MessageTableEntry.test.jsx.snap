@@ -178,7 +178,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                             bsStyle="default"
                             href="/messages/01/01"
                           >
-                            <Button
+                            <Button__StyledButton
                               bsStyle="default"
                               href="/messages/01/01"
                             >
@@ -203,17 +203,17 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "jVhNvv",
+                                      "lastClassName": "fnYQfY",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -228,18 +228,18 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                   block={false}
                                   bsClass="btn"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 jVhNvv"
+                                  className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                   disabled={false}
                                   href="/messages/01/01"
                                 >
                                   <SafeAnchor
-                                    className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                     componentClass="a"
                                     disabled={false}
                                     href="/messages/01/01"
                                   >
                                     <a
-                                      className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                       href="/messages/01/01"
                                       onClick={[Function]}
                                       onKeyDown={[Function]}
@@ -249,7 +249,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                   </SafeAnchor>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ClipboardButton
                             action="copy"
@@ -279,7 +279,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                 disabled={false}
                                 onClick={[Function]}
                               >
-                                <Button
+                                <Button__StyledButton
                                   bsStyle="default"
                                   data-clipboard-action="copy"
                                   data-clipboard-button={true}
@@ -312,17 +312,17 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                         ],
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
-                                          "componentId": "Button-c9cbmb-0",
+                                          "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "jVhNvv",
+                                          "lastClassName": "fnYQfY",
                                           "rules": Array [
                                             [Function],
                                           ],
                                         },
-                                        "displayName": "Button",
+                                        "displayName": "Button__StyledButton",
                                         "foldedComponentIds": Array [],
                                         "render": [Function],
-                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                         "target": [Function],
                                         "toString": [Function],
                                         "warnTooManyClasses": [Function],
@@ -337,7 +337,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                       block={false}
                                       bsClass="btn"
                                       bsStyle="default"
-                                      className="Button-c9cbmb-0 jVhNvv"
+                                      className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                       data-clipboard-action="copy"
                                       data-clipboard-button={true}
                                       data-clipboard-text="01"
@@ -345,7 +345,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                        className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                         data-clipboard-action="copy"
                                         data-clipboard-button={true}
                                         data-clipboard-text="01"
@@ -357,7 +357,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                       </button>
                                     </Button>
                                   </StyledComponent>
-                                </Button>
+                                </Button__StyledButton>
                               </ForwardRef>
                             </OverlayTrigger>
                           </ClipboardButton>

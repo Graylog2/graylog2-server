@@ -161,7 +161,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   id="create-token"
                   type="submit"
                 >
-                  <Button
+                  <Button__StyledButton
                     bsStyle="primary"
                     disabled={true}
                     id="create-token"
@@ -189,17 +189,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -215,13 +215,13 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -230,7 +230,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
               </div>
             </Col>
@@ -455,7 +455,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         }
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           style={
                             Object {
@@ -485,17 +485,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -515,7 +515,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 jVhNvv"
+                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               style={
                                 Object {
@@ -525,7 +525,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -538,7 +538,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="default"
@@ -551,7 +551,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         }
                         type="button"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           disabled={true}
                           onClick={[Function]}
@@ -584,17 +584,17 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -615,7 +615,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 jVhNvv"
+                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -626,7 +626,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -640,7 +640,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </form>
                     <ul
@@ -969,7 +969,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   id="create-token"
                   type="submit"
                 >
-                  <Button
+                  <Button__StyledButton
                     bsStyle="primary"
                     disabled={true}
                     id="create-token"
@@ -997,17 +997,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           ],
                           "attrs": Array [],
                           "componentStyle": ComponentStyle {
-                            "componentId": "Button-c9cbmb-0",
+                            "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "jVhNvv",
+                            "lastClassName": "fnYQfY",
                             "rules": Array [
                               [Function],
                             ],
                           },
-                          "displayName": "Button",
+                          "displayName": "Button__StyledButton",
                           "foldedComponentIds": Array [],
                           "render": [Function],
-                          "styledComponentId": "Button-c9cbmb-0",
+                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                           "target": [Function],
                           "toString": [Function],
                           "warnTooManyClasses": [Function],
@@ -1023,13 +1023,13 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         block={false}
                         bsClass="btn"
                         bsStyle="primary"
-                        className="Button-c9cbmb-0 jVhNvv"
+                        className="Button__StyledButton-c9cbmb-0 fnYQfY"
                         disabled={true}
                         id="create-token"
                         type="submit"
                       >
                         <button
-                          className="Button-c9cbmb-0 jVhNvv btn btn-primary"
+                          className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-primary"
                           disabled={true}
                           id="create-token"
                           type="submit"
@@ -1038,7 +1038,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         </button>
                       </Button>
                     </StyledComponent>
-                  </Button>
+                  </Button__StyledButton>
                 </ForwardRef>
               </div>
             </Col>
@@ -1285,7 +1285,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         }
                         type="submit"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           style={
                             Object {
@@ -1315,17 +1315,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -1345,7 +1345,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 jVhNvv"
+                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={false}
                               style={
                                 Object {
@@ -1355,7 +1355,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -1368,7 +1368,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsStyle="default"
@@ -1381,7 +1381,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         }
                         type="button"
                       >
-                        <Button
+                        <Button__StyledButton
                           bsStyle="default"
                           disabled={true}
                           onClick={[Function]}
@@ -1414,17 +1414,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "jVhNvv",
+                                  "lastClassName": "fnYQfY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -1445,7 +1445,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 jVhNvv"
+                              className="Button__StyledButton-c9cbmb-0 fnYQfY"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1456,7 +1456,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button-c9cbmb-0 jVhNvv btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -1470,7 +1470,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </form>
                     <ul
@@ -1613,7 +1613,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                     disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
@@ -1642,17 +1642,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVhNvv",
+                                              "lastClassName": "fnYQfY",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -1668,12 +1668,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
-                                          className="Button-c9cbmb-0 jVhNvv"
+                                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
+                                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -1682,7 +1682,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                               </ButtonGroup>
@@ -1768,7 +1768,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                     disabled={false}
                                     onClick={[Function]}
                                   >
-                                    <Button
+                                    <Button__StyledButton
                                       bsSize="xsmall"
                                       bsStyle="primary"
                                       disabled={false}
@@ -1797,17 +1797,17 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                             ],
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
-                                              "componentId": "Button-c9cbmb-0",
+                                              "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "jVhNvv",
+                                              "lastClassName": "fnYQfY",
                                               "rules": Array [
                                                 [Function],
                                               ],
                                             },
-                                            "displayName": "Button",
+                                            "displayName": "Button__StyledButton",
                                             "foldedComponentIds": Array [],
                                             "render": [Function],
-                                            "styledComponentId": "Button-c9cbmb-0",
+                                            "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                             "target": [Function],
                                             "toString": [Function],
                                             "warnTooManyClasses": [Function],
@@ -1823,12 +1823,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           bsClass="btn"
                                           bsSize="xsmall"
                                           bsStyle="primary"
-                                          className="Button-c9cbmb-0 jVhNvv"
+                                          className="Button__StyledButton-c9cbmb-0 fnYQfY"
                                           disabled={false}
                                           onClick={[Function]}
                                         >
                                           <button
-                                            className="Button-c9cbmb-0 jVhNvv btn btn-xs btn-primary"
+                                            className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-xs btn-primary"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="button"
@@ -1837,7 +1837,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           </button>
                                         </Button>
                                       </StyledComponent>
-                                    </Button>
+                                    </Button__StyledButton>
                                   </ForwardRef>
                                 </div>
                               </ButtonGroup>

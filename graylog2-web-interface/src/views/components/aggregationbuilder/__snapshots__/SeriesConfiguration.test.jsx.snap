@@ -166,7 +166,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
         bsStyle="success"
         onClick={[Function]}
       >
-        <Button
+        <Button__StyledButton
           bsStyle="success"
           onClick={[Function]}
         >
@@ -191,17 +191,17 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 ],
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
-                  "componentId": "Button-c9cbmb-0",
+                  "componentId": "Button__StyledButton-c9cbmb-0",
                   "isStatic": false,
-                  "lastClassName": "jVhNvv",
+                  "lastClassName": "fnYQfY",
                   "rules": Array [
                     [Function],
                   ],
                 },
-                "displayName": "Button",
+                "displayName": "Button__StyledButton",
                 "foldedComponentIds": Array [],
                 "render": [Function],
-                "styledComponentId": "Button-c9cbmb-0",
+                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                 "target": [Function],
                 "toString": [Function],
                 "warnTooManyClasses": [Function],
@@ -216,12 +216,12 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               block={false}
               bsClass="btn"
               bsStyle="success"
-              className="Button-c9cbmb-0 jVhNvv"
+              className="Button__StyledButton-c9cbmb-0 fnYQfY"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="Button-c9cbmb-0 jVhNvv btn btn-success"
+                className="Button__StyledButton-c9cbmb-0 fnYQfY btn btn-success"
                 disabled={false}
                 onClick={[Function]}
                 type="button"
@@ -230,7 +230,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               </button>
             </Button>
           </StyledComponent>
-        </Button>
+        </Button__StyledButton>
       </ForwardRef>
     </div>
   </span>
