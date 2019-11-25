@@ -17,45 +17,34 @@
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Maps;
 import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractIdleService;
-
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class StreamCacheService extends AbstractIdleService {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamCacheService.class);
-
     private final EventBus eventBus;
     private final StreamService streamService;
     private final ScheduledExecutorService executorService;
 
-    private final SortedSetMultimap<String, Stream> nameToStream = Multimaps.synchronizedSortedSetMultimap(
-            MultimapBuilder.hashKeys()
-                    .treeSetValues(Comparator.comparing(Stream::getId))
-                    .build());
-    private final Map<String, Stream> idToStream = Maps.newConcurrentMap();
+    private volatile SetMultimap<String, Stream> nameToStream = MultimapBuilder.hashKeys().hashSetValues().build();
+    private volatile Map<String, Stream> idToStream = new HashMap<>();
 
     @Inject
     public StreamCacheService(EventBus eventBus,
@@ -67,53 +56,20 @@ public class StreamCacheService extends AbstractIdleService {
     }
 
     @Override
-    protected void startUp() throws Exception {
-        streamService.loadAllEnabled().forEach(this::updateCache);
+    protected void startUp() {
+        updateStreams();
         eventBus.register(this);
     }
 
     @Override
-    protected void shutDown() throws Exception {
+    protected void shutDown() {
         eventBus.unregister(this);
     }
 
     @Subscribe
     public void handleStreamUpdate(StreamsChangedEvent event) {
-        executorService.schedule(() -> updateStreams(event.streamIds()), 0, TimeUnit.SECONDS);
+        executorService.schedule(this::updateStreams, 0, TimeUnit.SECONDS);
     }
-
-    @VisibleForTesting
-    public void updateStreams(Collection<String> ids) {
-        for (String id : ids) {
-            LOG.debug("Updating stream id/title cache for id {}", id);
-            try {
-                final Stream stream = streamService.load(id);
-                if (stream.getDisabled()) {
-                    purgeCache(stream.getId());
-                } else {
-                    updateCache(stream);
-                }
-            } catch (NotFoundException e) {
-                // the stream was deleted, we only have to purge the existing entries
-                purgeCache(id);
-            }
-        }
-    }
-
-    private void purgeCache(String id) {
-        final Stream stream = idToStream.remove(id);
-        LOG.debug("Purging stream id/title cache for id {}, stream {}", id, stream);
-        if (stream != null) {
-            nameToStream.remove(stream.getTitle(), stream);
-        }
-    }
-
-    private void updateCache(Stream stream) {
-        LOG.debug("Updating stream id/title cache for {}/'{}'", stream.getId(), stream.getTitle());
-        idToStream.put(stream.getId(), stream);
-        nameToStream.put(stream.getTitle(), stream);
-    }
-
 
     public Collection<Stream> getByName(String name) {
         return nameToStream.get(name);
@@ -122,5 +78,19 @@ public class StreamCacheService extends AbstractIdleService {
     @Nullable
     public Stream getById(String id) {
         return idToStream.get(id);
+    }
+
+    @VisibleForTesting
+    public void updateStreams() {
+        final SetMultimap<String, Stream> streamsByName = MultimapBuilder.hashKeys().hashSetValues().build();
+        final Map<String, Stream> streamById = new HashMap<>();
+
+        streamService.loadAllEnabled().forEach(stream -> {
+            streamsByName.put(stream.getTitle(), stream);
+            streamById.put(stream.getId(), stream);
+        });
+
+        this.idToStream = streamById;
+        this.nameToStream = streamsByName;
     }
 }

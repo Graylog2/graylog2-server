@@ -1,6 +1,6 @@
 // @flow strict
 
-import type { ListenableAction } from 'views/stores/StoreTypes';
+import type { ListenableAction } from 'stores/StoreTypes';
 
 // eslint-disable-next-line arrow-parens
 const mockAction = <R: function>(fn: R): ListenableAction<R> => {
