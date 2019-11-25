@@ -28,3 +28,7 @@ declare interface jest$Matchers<R, T> {
     options?: jest$Options
   ): R;
 }
+
+declare module 'jest-styled-components' {
+  declare module.exports: any;
+}
