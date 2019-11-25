@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
@@ -50,7 +51,7 @@ public class UrlWhitelistResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get url whitelist.")
     public UrlWhitelist get() {
-        // TODO: check read permissions
+        checkPermission(RestPermissions.URL_WHITELIST_READ);
         return urlWhitelistService.get();
     }
 
@@ -59,7 +60,7 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Update url whitelist.")
     // TODO fire audit event
     public Response put(@ApiParam(name = "whitelist", required = true) final UrlWhitelist whitelist) {
-        // TODO: check write permission
+        checkPermission(RestPermissions.URL_WHITELIST_WRITE);
         urlWhitelistService.save(whitelist);
         return Response.noContent().build();
     }
