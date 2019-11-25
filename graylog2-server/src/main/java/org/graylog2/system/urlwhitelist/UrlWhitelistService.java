@@ -37,4 +37,5 @@ public class UrlWhitelistService {
     public void save(UrlWhitelist whitelist) {
         clusterConfigService.write(whitelist);
     }
+
 }

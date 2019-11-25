@@ -17,17 +17,34 @@
 package org.graylog2.system.urlwhitelist;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.base.Preconditions;
 import org.graylog.autovalue.WithBeanGetter;
 
+import java.util.Objects;
+
+import static com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+
 @JsonAutoDetect
-@AutoValue
 @WithBeanGetter
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({@Type(value = LiteralWhitelistEntry.class, name = "literal"),
+        @Type(value = RegexWhitelistEntry.class, name = "regex")})
 public abstract class WhitelistEntry {
 
-    public enum Type {
+    private final Type type;
+    private final String value;
+
+    protected WhitelistEntry(Type type, String value) {
+        Preconditions.checkNotNull(type, "Type of url whitelist entry must not be null");
+        Preconditions.checkNotNull(value, "Value of url whitelist entry must not be null");
+        this.type = type;
+        this.value = value;
+    }
+
+    enum Type {
         @JsonProperty("literal")
         LITERAL,
         @JsonProperty("regex")
@@ -35,13 +52,27 @@ public abstract class WhitelistEntry {
     }
 
     @JsonProperty("type")
-    public abstract Type type();
+    public Type type() {
+        return type;
+    }
 
     @JsonProperty("value")
-    public abstract String value();
+    public String value() {
+        return value;
+    }
 
-    @JsonCreator
-    public static WhitelistEntry create(@JsonProperty("type") Type type, @JsonProperty("value") String value) {
-        return new AutoValue_WhitelistEntry(type, value);
+    abstract boolean isWhitelisted(String url);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        final WhitelistEntry that = (WhitelistEntry) o;
+        return type == that.type && value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, value);
     }
 }

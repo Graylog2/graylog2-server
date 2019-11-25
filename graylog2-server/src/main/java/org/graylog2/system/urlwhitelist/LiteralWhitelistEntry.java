@@ -16,27 +16,15 @@
  */
 package org.graylog2.system.urlwhitelist;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.List;
-
-@JsonAutoDetect
-@AutoValue
-@WithBeanGetter
-public abstract class UrlWhitelist {
-    @JsonProperty("entries")
-    public abstract List<WhitelistEntry> entries();
-
-    @JsonCreator
-    public static UrlWhitelist create(@JsonProperty("entries") List<WhitelistEntry> entries) {
-        return new AutoValue_UrlWhitelist(entries);
+public class LiteralWhitelistEntry extends WhitelistEntry {
+    public LiteralWhitelistEntry(@JsonProperty("value") String value) {
+        super(Type.LITERAL, value);
     }
 
+    @Override
     public boolean isWhitelisted(String url) {
-        return entries().stream().anyMatch(e -> e.isWhitelisted(url));
+        return value().equals(url);
     }
 }
