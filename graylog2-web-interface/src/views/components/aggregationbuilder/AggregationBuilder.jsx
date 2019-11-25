@@ -40,7 +40,6 @@ export type VisualizationComponentProps = {|
   toggleEdit: () => void,
 |};
 
-// eslint-disable-next-line no-undef
 export type VisualizationComponent =
   { type?: string, propTypes?: any }
   & React.ComponentType<VisualizationComponentProps>;

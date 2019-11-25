@@ -21,7 +21,6 @@ type Props = {
   disabled: boolean,
   value: string,
   completers: Array<Completer>,
-  // eslint-disable-next-line no-undef
   completerClass?: Class<AutoCompleter>,
   onBlur?: (string) => void,
   onChange: (string) => Promise<string>,

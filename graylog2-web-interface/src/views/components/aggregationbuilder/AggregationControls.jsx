@@ -48,28 +48,23 @@ export default class AggregationControls extends React.Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line no-undef
   _onColumnPivotChange = (columnPivots: $PropertyType<$PropertyType<Props, 'config'>, 'columnPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRowPivotChange = (rowPivots: $PropertyType<$PropertyType<Props, 'config'>, 'rowPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().series(series).build() }));
     return true;
   };
 
-  // eslint-disable-next-line no-undef
   _onSortChange = (sort: $PropertyType<$PropertyType<Props, 'config'>, 'sort'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(sort).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
     this._setAndPropagate(state => ({
       config: state.config.toBuilder().sort(state.config.sort
@@ -77,17 +72,14 @@ export default class AggregationControls extends React.Component<Props, State> {
     }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onVisualizationChange = (visualization: $PropertyType<$PropertyType<Props, 'config'>, 'visualization'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onVisualizationConfigChange = (visualizationConfig: $PropertyType<$PropertyType<Props, 'config'>, 'visualizationConfig'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
   };

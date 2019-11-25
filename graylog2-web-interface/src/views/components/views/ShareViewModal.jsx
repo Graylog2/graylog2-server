@@ -88,7 +88,6 @@ class ShareViewModal extends React.Component<Props, State> {
   // eslint-disable-next-line react/destructuring-assignment
   _onClose = () => this.props.onClose();
 
-  // eslint-disable-next-line no-undef
   _onChange = (e: SyntheticInputEvent<HTMLInputElement>) => {
     const { view } = this.props;
     const type = e.target.name;
