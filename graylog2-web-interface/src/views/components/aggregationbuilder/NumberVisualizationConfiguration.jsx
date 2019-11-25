@@ -11,10 +11,8 @@ type Props = {
   config: NumberVisualizationConfig,
 };
 
-const trendPreferenceOptions = ['LOWER', 'NEUTRAL', 'HIGHER'].map(preference => ({
-  label: capitalize(preference),
-  value: preference,
-}));
+const _makeOption = value => ({ label: capitalize(value), value });
+const trendPreferenceOptions = ['LOWER', 'NEUTRAL', 'HIGHER'].map(_makeOption);
 
 const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.empty(), onChange }: Props) => {
   const changeTrend = useCallback(({ target: { checked } }) => onChange(config.toBuilder().trend(checked).build()), [config, onChange]);
@@ -36,7 +34,7 @@ const NumberVisualizationConfiguration = ({ config = NumberVisualizationConfig.e
                 isSearchable={false}
                 options={trendPreferenceOptions}
                 onChange={changeTrendPreference}
-                value={{ label: config.trendPreference }} />
+                value={_makeOption(config.trendPreference)} />
       </Input>
     </React.Fragment>
   );
