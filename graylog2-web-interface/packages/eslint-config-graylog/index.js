@@ -5,10 +5,12 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/react',
+    'plugin:flowtype/recommended',
   ],
   plugins: [
     'import',
     'react-hooks',
+    'flowtype',
   ],
   rules: {
     'arrow-body-style': 'off',
