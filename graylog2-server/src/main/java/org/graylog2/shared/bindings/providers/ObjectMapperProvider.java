@@ -72,7 +72,6 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
                 .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)

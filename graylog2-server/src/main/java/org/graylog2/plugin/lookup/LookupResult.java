@@ -68,7 +68,7 @@ public abstract class LookupResult {
     @Nullable
     public abstract Map<Object, Object> multiValue();
 
-    @JsonProperty("list_string_value")
+    @JsonProperty("string_list_value")
     @Nullable
     public abstract List<String> stringListValue();
 
@@ -164,7 +164,7 @@ public abstract class LookupResult {
     @JsonCreator
     public static LookupResult createFromJSON(@JsonProperty("single_value") final Object singleValue,
                                               @JsonProperty("multi_value") final Map<Object, Object> multiValue,
-                                              @JsonProperty("list_string_value") final List<String> stringListValue,
+                                              @JsonProperty("string_list_value") final List<String> stringListValue,
                                               @JsonProperty("has_error") final boolean hasError,
                                               @JsonProperty("ttl") final long cacheTTL) {
         return builder()
