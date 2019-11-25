@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
-import org.graylog.plugins.views.search.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;

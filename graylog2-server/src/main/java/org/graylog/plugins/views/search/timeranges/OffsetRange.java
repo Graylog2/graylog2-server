@@ -1,4 +1,4 @@
-package org.graylog2.plugin.indexer.searches.timeranges;
+package org.graylog.plugins.views.search.timeranges;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
@@ -20,7 +22,7 @@ import java.util.regex.Pattern;
 @AutoValue
 @JsonTypeName(OffsetRange.OFFSET)
 @JsonDeserialize(builder = OffsetRange.Builder.class)
-public abstract class OffsetRange extends TimeRange {
+public abstract class OffsetRange extends TimeRange implements DerivableTimeRange {
     public static final String OFFSET = "offset";
     private static final Pattern INTERVAL_OFFSET = Pattern.compile("(\\d+)i");
 

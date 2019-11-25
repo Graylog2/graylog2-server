@@ -1,9 +1,12 @@
-package org.graylog2.plugin.indexer.searches.timeranges;
+package org.graylog.plugins.views.search.timeranges;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.junit.Test;
 

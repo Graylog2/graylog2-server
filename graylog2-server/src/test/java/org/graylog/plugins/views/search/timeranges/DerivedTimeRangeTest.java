@@ -1,8 +1,7 @@
-package org.graylog.plugins.views.search;
+package org.graylog.plugins.views.search.timeranges;
 
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
 

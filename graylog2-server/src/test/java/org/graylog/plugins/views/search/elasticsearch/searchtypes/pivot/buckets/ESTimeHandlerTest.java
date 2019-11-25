@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets;
 
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.plugins.views.search.DerivedTimeRange;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
