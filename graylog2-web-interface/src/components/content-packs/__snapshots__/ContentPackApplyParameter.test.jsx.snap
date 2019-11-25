@@ -139,7 +139,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
               id="config-key-list"
             >
               <table
-                className="table undefined"
+                className="table "
               >
                 <thead>
                   <tr>
@@ -470,7 +470,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
               id="config-key-list"
             >
               <table
-                className="table undefined"
+                className="table "
               >
                 <thead>
                   <tr>
