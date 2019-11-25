@@ -1,3 +1,4 @@
+// @flow strict
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -5,24 +6,30 @@ import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
+type Output = {
+  id: string,
+  title: string,
+  type: string,
+};
+
 const OutputsStore = Reflux.createStore({
   OUTPUTS_URL: URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.index().url),
 
-  load(callback) {
+  load(callback: (outputs: Array<Output>) => void) {
     fetch('GET', this.OUTPUTS_URL)
       .then(callback, this._failCallback);
   },
-  loadForStreamId(streamId, callback) {
+  loadForStreamId(streamId: string, callback: (outputs: Array<Output>) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.index(streamId).url);
     fetch('GET', url)
       .then(callback, this._failCallback);
   },
-  loadAvailableTypes(callback) {
+  loadAvailableTypes(callback: (available: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
     fetch('GET', url)
       .then(callback, this._failCallback);
   },
-  loadAvailable(typeName, callback) {
+  loadAvailable(typeName: string, callback: (available: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
     fetch('GET', url)
       .then((resp) => {
@@ -30,7 +37,7 @@ const OutputsStore = Reflux.createStore({
       }, this._failCallback)
       .then(callback);
   },
-  remove(outputId, callback) {
+  remove(outputId: string, callback: (error: any) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.delete(outputId).url);
     fetch('DELETE', url)
       .then(callback, (error) => {
@@ -38,7 +45,7 @@ const OutputsStore = Reflux.createStore({
           'Could not terminate output');
       });
   },
-  save(output, callback) {
+  save(output: any, callback: (output: Output) => void) {
     const failCallback = (error) => {
       UserNotification.error(`Saving Output "${output.title}" failed with status: ${error}`,
         'Could not save Output');
@@ -49,7 +56,7 @@ const OutputsStore = Reflux.createStore({
     fetch('POST', url, output)
       .then(callback, failCallback);
   },
-  update(output, deltas, callback) {
+  update(output: Output, deltas: any, callback: (output: Output) => void) {
     const failCallback = (error) => {
       UserNotification.error(`Updating Output "${output.title}" failed with status: ${error}`,
         'Could not update Output');
@@ -60,7 +67,7 @@ const OutputsStore = Reflux.createStore({
     fetch('PUT', url, deltas)
       .then(callback, failCallback);
   },
-  _failCallback(error) {
+  _failCallback(error: string) {
     UserNotification.error(`Loading outputs failed with status: ${error}`,
       'Could not load outputs');
   },

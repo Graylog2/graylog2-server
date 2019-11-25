@@ -1,3 +1,4 @@
+// @flow strict
 import Reflux from 'reflux';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -5,8 +6,21 @@ import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
+import type { User } from './UsersStore';
+
+type Role = {
+  name: string,
+  description: string,
+  permissions: string[],
+}
+
+type RoleMembership = {
+  role: string,
+  users: User[],
+};
+
 const RolesStore = Reflux.createStore({
-  loadRoles() {
+  loadRoles(): Promise<string[]> {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
         response => response.roles,
@@ -21,7 +35,7 @@ const RolesStore = Reflux.createStore({
     return promise;
   },
 
-  createRole(role) {
+  createRole(role: Role): Promise<Role> {
     const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.createRole().url);
     const promise = fetch('POST', url, role);
 
@@ -35,7 +49,7 @@ const RolesStore = Reflux.createStore({
     return promise;
   },
 
-  updateRole(rolename, role) {
+  updateRole(rolename: string, role: Role): Promise<Role> {
     const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(encodeURIComponent(rolename)).url), role);
 
     promise.then((newRole) => {
@@ -50,7 +64,7 @@ const RolesStore = Reflux.createStore({
     return promise;
   },
 
-  deleteRole(rolename) {
+  deleteRole(rolename: string): Promise<string[]> {
     const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.deleteRole(encodeURIComponent(rolename)).url);
     const promise = fetch('DELETE', url);
 
@@ -64,7 +78,7 @@ const RolesStore = Reflux.createStore({
     });
     return promise;
   },
-  getMembers(rolename) {
+  getMembers(rolename: string): Promise<RoleMembership[]> {
     const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {

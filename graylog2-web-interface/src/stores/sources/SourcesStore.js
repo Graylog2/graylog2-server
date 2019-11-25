@@ -1,3 +1,4 @@
+// @flow strict
 import Reflux from 'reflux';
 import $ from 'jquery';
 
@@ -6,14 +7,21 @@ import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 
-const processSourcesData = (sources) => {
+type Source = {
+  name: string,
+  message_count: number,
+  percentage: number,
+};
+
+const processSourcesData = (sources: { string: number }): Array<Source> => {
   let total = 0;
   const sourcesArray = [];
-  $.each(sources, (name, count) => {
+  $.each(sources, (name: string, count: number) => {
     total += Number(count);
     sourcesArray.push({
       name: StringUtils.escapeHTML(name),
       message_count: count,
+      percentage: 0,
     });
   });
   sourcesArray.forEach((d) => {
@@ -26,7 +34,7 @@ const processSourcesData = (sources) => {
 const SourcesStore = Reflux.createStore({
   SOURCES_URL: '/sources',
 
-  loadSources(range, callback) {
+  loadSources(range: number, callback: (sources: Array<Source>) => void) {
     let url = URLUtils.qualifyUrl(this.SOURCES_URL);
     if (typeof range !== 'undefined') {
       url += `?range=${range}`;

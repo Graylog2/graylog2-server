@@ -1,3 +1,4 @@
+// @flow strict
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
@@ -5,6 +6,18 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+
+type StreamRule = {
+  field: string,
+  type: number,
+  value: string,
+  inverted: boolean,
+  description: string,
+};
+
+type Callback = {
+  (): void,
+};
 
 const StreamRulesStore = Reflux.createStore({
   callbacks: [],
@@ -15,7 +28,7 @@ const StreamRulesStore = Reflux.createStore({
 
     return promise;
   },
-  list(streamId, callback) {
+  list(streamId: string, callback: ((streamRules: Array<StreamRule>) => void)) {
     const failCallback = (error) => {
       UserNotification.error(`Fetching Stream Rules failed with status: ${error}`,
         'Could not retrieve Stream Rules');
@@ -24,7 +37,7 @@ const StreamRulesStore = Reflux.createStore({
     fetch('GET', URLUtils.qualifyUrl(ApiRoutes.StreamRulesApiController.list(streamId).url))
       .then(callback, failCallback);
   },
-  update(streamId, streamRuleId, data, callback) {
+  update(streamId: string, streamRuleId: string, data: StreamRule, callback: (() => void)) {
     const failCallback = (error) => {
       UserNotification.error(`Updating Stream Rule failed with status: ${error}`,
         'Could not update Stream Rule');
@@ -43,7 +56,7 @@ const StreamRulesStore = Reflux.createStore({
       .then(callback, failCallback)
       .then(this._emitChange.bind(this));
   },
-  remove(streamId, streamRuleId, callback) {
+  remove(streamId: string, streamRuleId: string, callback: (() => void)) {
     const failCallback = (error) => {
       UserNotification.error(`Deleting Stream Rule failed with status: ${error}`,
         'Could not delete Stream Rule');
@@ -54,7 +67,7 @@ const StreamRulesStore = Reflux.createStore({
       .then(callback, failCallback)
       .then(this._emitChange.bind(this));
   },
-  create(streamId, data, callback) {
+  create(streamId: string, data: StreamRule, callback: (() => void)) {
     const failCallback = (error) => {
       UserNotification.error(`Creating Stream Rule failed with status: ${error}`,
         'Could not create Stream Rule');
@@ -66,13 +79,13 @@ const StreamRulesStore = Reflux.createStore({
       .then(callback, failCallback)
       .then(this._emitChange.bind(this));
   },
-  onChange(callback) {
+  onChange(callback: Callback) {
     this.callbacks.push(callback);
   },
   _emitChange() {
     this.callbacks.forEach(callback => callback());
   },
-  unregister(callback) {
+  unregister(callback: Callback) {
     lodash.pull(this.callbacks, callback);
   },
 });

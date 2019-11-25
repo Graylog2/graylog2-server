@@ -1,3 +1,4 @@
+// @flow strict
 import Reflux from 'reflux';
 
 import fetch, { fetchPlainText } from 'logic/rest/FetchProvider';
@@ -5,10 +6,23 @@ import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 
+type GrokPattern = {
+  id: string,
+  name: string,
+  pattern: string,
+  content_pack: string,
+};
+
+type GrokPatternTest = {
+  name: string,
+  pattern: string,
+  sampleData: string,
+};
+
 const GrokPatternsStore = Reflux.createStore({
   URL: URLUtils.qualifyUrl('/system/grok'),
 
-  loadPatterns(callback) {
+  loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
     const failCallback = (error) => {
       UserNotification.error(`Loading Grok patterns failed with status: ${error.message}`,
         'Could not load Grok patterns');
@@ -16,9 +30,9 @@ const GrokPatternsStore = Reflux.createStore({
     // get the current list of patterns and sort it by name
     return fetch('GET', this.URL)
       .then(
-        (resp) => {
+        (resp: any) => {
           const { patterns } = resp;
-          patterns.sort((pattern1, pattern2) => {
+          patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
             return pattern1.name.toLowerCase()
               .localeCompare(pattern2.name.toLowerCase());
           });
@@ -29,7 +43,7 @@ const GrokPatternsStore = Reflux.createStore({
       );
   },
 
-  testPattern(pattern, callback, errCallback) {
+  testPattern(pattern: GrokPatternTest, callback: (request: any) => void, errCallback: (errorMessage: string) => void) {
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
@@ -57,7 +71,7 @@ const GrokPatternsStore = Reflux.createStore({
       );
   },
 
-  savePattern(pattern, callback) {
+  savePattern(pattern: GrokPattern, callback: () => void) {
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
@@ -96,7 +110,7 @@ const GrokPatternsStore = Reflux.createStore({
       );
   },
 
-  deletePattern(pattern, callback) {
+  deletePattern(pattern: GrokPattern, callback: () => void) {
     const failCallback = (error) => {
       UserNotification.error(`Deleting Grok pattern "${pattern.name}" failed with status: ${error.message}`,
         'Could not delete Grok pattern');
@@ -112,7 +126,7 @@ const GrokPatternsStore = Reflux.createStore({
       );
   },
 
-  bulkImport(patterns, replaceAll) {
+  bulkImport(patterns: string, replaceAll: boolean) {
     const failCallback = (error) => {
       let errorMessage = error.message;
       const errorBody = error.additional.body;
@@ -128,7 +142,7 @@ const GrokPatternsStore = Reflux.createStore({
         'Could not load Grok patterns');
     };
 
-    const promise = fetchPlainText('POST', `${this.URL}?replace=${replaceAll}`, patterns);
+    const promise = fetchPlainText('POST', `${this.URL}?replace=${String(replaceAll)}`, patterns);
 
     promise.catch(failCallback);
 
