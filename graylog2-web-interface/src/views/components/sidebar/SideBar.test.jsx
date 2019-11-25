@@ -103,7 +103,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('h3').text()).toBe('New Search');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
   });
@@ -122,7 +122,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
   });
@@ -139,7 +139,7 @@ describe('<Sidebar />', () => {
     );
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
     expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
   });

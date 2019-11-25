@@ -119,7 +119,7 @@ class SideBar extends React.Component<Props, State> {
         </SidebarHeader>
         <HorizontalRuler />
         <NavItem isSelected={open && selectedKey === 'viewDescription'}
-                 text="View Description"
+                 text="Description"
                  icon="info"
                  onClick={this.setSelectedKey('viewDescription')}
                  isOpen={open}>
