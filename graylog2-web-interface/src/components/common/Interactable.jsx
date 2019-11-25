@@ -23,7 +23,7 @@ const InteractableWrapper = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 1030;
   pointer-events: none;
 `;
 
@@ -51,17 +51,23 @@ const Header = styled.header`
   border-bottom: 1px solid ${teinte.primary.tre};
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  cursor: move;
 `;
 
 const Title = styled.h3`
   color: ${teinte.primary.due};
   flex: 1;
-  cursor: move;
 `;
 
 const DragBars = styled(Icon)`
   color: ${teinte.secondary.tre};
 `;
+
+/**
+ * A resizable and draggable modal component
+ *
+ * Can be controlled or uncontrolled, using [`react-rnd`](https://github.com/bokuweb/react-rnd) under the hood
+ */
 
 const Interactable = ({
   children,
@@ -74,6 +80,7 @@ const Interactable = ({
   position,
   size,
   title,
+  wrapperClassName,
 }) => {
   const dragHandleRef = useRef(null);
   const [dragHandleClassName, setDragHandleClassName] = useState(null);
@@ -85,7 +92,7 @@ const Interactable = ({
   }, []);
 
   return (
-    <InteractableWrapper>
+    <InteractableWrapper className={wrapperClassName}>
       <StyledRnd default={{ ...position, ...size }}
                  minHeight={minHeight}
                  minWidth={minWidth}
@@ -114,12 +121,9 @@ const Interactable = ({
         <Header ref={dragHandleRef}>
           <Title><DragBars name="bars" />{' '}{title}</Title>
 
-          {onClose
-          && (
-            <Button bsStyle="default" onClick={onClose} bsSize="sm">
-              <Icon name="times" size="lg" />
-            </Button>
-          )}
+          <Button bsStyle="default" onClick={onClose} bsSize="sm">
+            <Icon name="times" size="lg" />
+          </Button>
         </Header>
 
         <Content>
@@ -131,34 +135,47 @@ const Interactable = ({
 };
 
 Interactable.propTypes = {
+  /** className that will be applied to `react-rnd` */
   className: PropTypes.string,
+  /** Content of the Interactable modal */
   children: PropTypes.node.isRequired,
+  /** Minimum height that modal can be reduced to */
   minHeight: PropTypes.number,
+  /** Minimum width that modal can be reduced to */
   minWidth: PropTypes.number,
+  /** Function that is called when Interactable is closed */
   onClose: PropTypes.func,
+  /** Function that is called when Interactable has finished being dragged */
   onDrag: PropTypes.func,
+  /** Function that is called when Interactable has finished being resized */
   onResize: PropTypes.func,
+  /** If you want to control Interactable you can pass specific position */
   position: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
   }),
+  /** If you want to control Interactable you can pass specific size */
   size: PropTypes.shape({
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
+  /** Title that appears at the top of the window */
   title: PropTypes.string,
+  /** Used to style wrapping component */
+  wrapperClassName: PropTypes.string,
 };
 
 Interactable.defaultProps = {
   className: undefined,
   minHeight: 250,
   minWidth: 250,
-  onClose: undefined,
+  onClose: () => {},
   onDrag: () => {},
   onResize: () => {},
   position: DEFAULT_POSITION,
   size: DEFAULT_SIZE,
   title: '',
+  wrapperClassName: undefined,
 };
 
 export default Interactable;

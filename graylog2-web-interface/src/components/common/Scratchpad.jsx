@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-// import ClipboardJS from 'clipboard';
+import styled, { css } from 'styled-components';
+import { rgba } from 'polished';
+import ClipboardJS from 'clipboard';
 
 import teinte from 'theme/teinte';
 import Interactable from 'components/common/Interactable';
@@ -11,6 +12,7 @@ import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 const DEFAULT_SCRATCHDATA = '';
+const TEXTAREA_ID = 'scratchpad-text-content';
 
 const ContentArea = styled.div`
   display: flex;
@@ -23,12 +25,21 @@ const Description = styled.p`
   margin: 9px 0 6px;
 `;
 
-const Textarea = styled.textarea`
+const Textarea = styled.textarea(props => css`
   width: 100%;
   resize: none;
   flex: 1;
   margin-bottom: 15px;
-`;
+  border: 1px solid ${props.copied ? teinte.tertiary.tre : teinte.secondary.tre};
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
+              0 0 8px ${rgba(props.copied ? teinte.tertiary.tre : teinte.secondary.tre, 0.6)};
+  transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
+
+  :focus {
+    border-color: ${teinte.tertiary.due};
+    outline: none;
+  }
+`);
 
 const StyledAlert = styled(Alert)`
   && {
@@ -44,14 +55,22 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
+const Footer = styled.footer`
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 9px;
+`;
+
 const Scratchpad = () => {
+  let clipboard;
   const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM)) || {};
   const textareaRef = useRef();
-  const confirmationRef = useRef();
+  const confirmationModalRef = useRef();
   const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
   const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(storage.securitryConfirmed || false);
   const [scratchData, setScratchData] = useState(storage.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState(storage.size || undefined);
+  const [copied, setCopied] = useState(false);
   const [position, setPosition] = useState(storage.position || undefined);
 
   const writeData = (newData) => {
@@ -82,23 +101,37 @@ const Scratchpad = () => {
   };
 
   const openConfirmClear = () => {
-    confirmationRef.open();
+    confirmationModalRef.current.open();
   };
 
   const handleClearText = () => {
+    setScratchData(DEFAULT_SCRATCHDATA);
     writeData({ value: DEFAULT_SCRATCHDATA });
+    confirmationModalRef.current.close();
   };
 
   const handleCancelClear = () => {
-    confirmationRef.close();
+    confirmationModalRef.current.close();
   };
 
-  const CopyWithIcon = (<><Icon name="copy" /> Copy</>);
+  const CopyWithIcon = <><Icon name="copy" /> Copy</>;
 
   useEffect(() => {
     if (textareaRef.current && isScratchpadVisible) {
       textareaRef.current.focus();
     }
+
+    clipboard = new ClipboardJS('[data-clipboard-button]', {});
+    clipboard.on('success', () => {
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 1000);
+    });
+
+    return () => {
+      clipboard.destroy();
+    };
   }, [isScratchpadVisible]);
 
   if (!isScratchpadVisible) return null;
@@ -121,22 +154,26 @@ const Scratchpad = () => {
           </StyledAlert>
         )}
 
-        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} id="scratchpad-text-content" />
+        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} id={TEXTAREA_ID} copied={copied} />
 
-        <SplitButton title={CopyWithIcon}
-                     bsStyle="info"
-                     data-clipboard-target="#scratchpad-text-content">
-          <MenuItem bsStyle="danger" onClick={openConfirmClear}><Icon name="trash" /> Clear</MenuItem>
-        </SplitButton>
+        <Footer>
+          <SplitButton title={CopyWithIcon}
+                       bsStyle="info"
+                       data-clipboard-button
+                       data-clipboard-target={`#${TEXTAREA_ID}`}
+                       id="scratchpad-actions">
+            <MenuItem onClick={openConfirmClear}><Icon name="trash" /> Clear</MenuItem>
+          </SplitButton>
+        </Footer>
 
-        <BootstrapModalConfirm ref={confirmationRef}
-                               title="Are you sure?"
-                               onConfirm={handleClearText}
-                               onCancel={handleCancelClear}>
-           This will clear out your Scratchpad content, do you wish to proceed?
-        </BootstrapModalConfirm>
       </ContentArea>
 
+      <BootstrapModalConfirm ref={confirmationModalRef}
+                             title="Are you sure?"
+                             onConfirm={handleClearText}
+                             onCancel={handleCancelClear}>
+           This will clear out your Scratchpad content, do you wish to proceed?
+      </BootstrapModalConfirm>
     </Interactable>
   );
 };
