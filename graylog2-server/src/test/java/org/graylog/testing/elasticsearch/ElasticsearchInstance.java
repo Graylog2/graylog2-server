@@ -19,6 +19,7 @@ package org.graylog.testing.elasticsearch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import io.searchbox.client.JestClient;
 import io.searchbox.cluster.State;
@@ -36,6 +37,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Iterators.toArray;
 
@@ -97,13 +99,16 @@ public class ElasticsearchInstance extends ExternalResource {
     }
 
     private static ElasticsearchContainer startNewContainerInstance(String image) {
+        final Stopwatch sw = Stopwatch.createStarted();
+
         final ElasticsearchContainer container = new ElasticsearchContainer(image)
+                .withReuse(true)
                 .withEnv("ES_JAVA_OPTS", "-Xms512m -Xmx512m")
                 .withEnv("discovery.type", "single-node")
                 .withEnv("action.auto_create_index", "false")
                 .waitingFor(Wait.forHttp("/").forPort(9200));
         container.start();
-        LOG.debug("Started container {}{}", container.getContainerInfo().getId(), container.getContainerInfo().getName());
+        LOG.debug("Started container {} in {}ms", container.getContainerInfo().getName(), sw.elapsed(TimeUnit.MILLISECONDS));
         return container;
     }
 
