@@ -6,12 +6,12 @@ import teinte from 'theme/teinte';
 import contrastingColor from 'util/contrastingColor';
 
 import Icon from 'components/common/Icon';
-import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 
 type Props = {
   current: number,
   previous: ?number,
-  config: NumberVisualizationConfig,
+  trendPreference: TrendPreference,
 };
 
 const Shared = styled.div`
@@ -32,15 +32,16 @@ const TextContainer = styled.span`
   margin: 5px;
 `;
 
-const _background = (delta, lowerIsBetter) => {
-  if (delta === 0) {
-    return NeutralBackground;
+const _background = (delta, trendPreference: TrendPreference) => {
+  switch (trendPreference) {
+    case 'LOWER':
+      return delta > 0 ? BadBackground : GoodBackground;
+    case 'HIGHER':
+      return delta > 0 ? GoodBackground : BadBackground;
+    case 'NEUTRAL':
+    default:
+      return NeutralBackground;
   }
-  if (lowerIsBetter) {
-    return delta > 0 ? BadBackground : GoodBackground;
-  }
-
-  return delta > 0 ? GoodBackground : BadBackground;
 };
 
 const _trendIcon = (delta) => {
@@ -51,11 +52,11 @@ const _trendIcon = (delta) => {
   return delta > 0 ? <Icon name="arrow-circle-up" /> : <Icon name="arrow-circle-down" />;
 };
 
-const Trend = React.forwardRef<Props, any>(({ current, previous, config }: Props, ref) => {
+const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference }: Props, ref) => {
   const difference = previous ? current - previous : NaN;
   const differencePercent = previous ? difference / previous : NaN;
 
-  const Background = _background(difference, config.lowerIsBetter);
+  const Background = _background(difference, trendPreference);
   const trendIcon = _trendIcon(difference);
 
   return (

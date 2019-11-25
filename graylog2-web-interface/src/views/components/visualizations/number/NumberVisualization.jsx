@@ -113,7 +113,7 @@ const NumberVisualization = ({ config: { visualizationConfig = NumberVisualizati
                 <Trend ref={targetRef}
                        current={value}
                        previous={previousValue}
-                       config={visualizationConfig} />
+                       trendPreference={visualizationConfig.trendPreference} />
               </AutoFontSizer>
             )}
           </SizeMe>

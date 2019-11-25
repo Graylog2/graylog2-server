@@ -2,14 +2,16 @@
 import * as Immutable from 'immutable';
 import VisualizationConfig from './VisualizationConfig';
 
+export type TrendPreference = 'LOWER' | 'NEUTRAL' | 'HIGHER';
+
 type InternalState = {
   trend: boolean,
-  lowerIsBetter: boolean,
+  trendPreference: TrendPreference,
 };
 
 export type NumberVisualizationConfigJSON = {
   trend: boolean,
-  lower_is_better: boolean,
+  trend_preference: TrendPreference,
 };
 
 export default class NumberVisualizationConfig extends VisualizationConfig {
@@ -18,18 +20,18 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
   // eslint-disable-next-line no-undef
   constructor(
     trend: $PropertyType<InternalState, 'trend'>,
-    lowerIsBetter: $PropertyType<InternalState, 'lowerIsBetter'>,
+    trendPreference: $PropertyType<InternalState, 'trendPreference'>,
   ) {
     super();
-    this._value = { trend, lowerIsBetter };
+    this._value = { trend, trendPreference };
   }
 
   get trend() {
     return this._value.trend;
   }
 
-  get lowerIsBetter() {
-    return this._value.lowerIsBetter;
+  get trendPreference() {
+    return this._value.trendPreference;
   }
 
   toBuilder() {
@@ -39,23 +41,27 @@ export default class NumberVisualizationConfig extends VisualizationConfig {
 
   static create(
     trend: $PropertyType<InternalState, 'trend'> = false,
-    lowerIsBetter: $PropertyType<InternalState, 'lowerIsBetter'> = false,
+    lowerIsBetter: $PropertyType<InternalState, 'trendPreference'> = 'NEUTRAL',
   ) {
     return new NumberVisualizationConfig(trend, lowerIsBetter);
   }
 
+  static empty() {
+    return NumberVisualizationConfig.create(false, 'NEUTRAL');
+  }
+
   toJSON(): NumberVisualizationConfigJSON {
-    const { trend, lowerIsBetter } = this._value;
+    const { trend, trendPreference } = this._value;
 
     return {
       trend,
-      lower_is_better: lowerIsBetter,
+      trend_preference: trendPreference,
     };
   }
 
   static fromJSON(type: string, value: NumberVisualizationConfigJSON) {
-    const { trend, lower_is_better: lowerIsBetter } = value;
-    return NumberVisualizationConfig.create(trend, lowerIsBetter);
+    const { trend, trend_preference: trendPreference } = value;
+    return NumberVisualizationConfig.create(trend, trendPreference);
   }
 }
 
@@ -72,12 +78,12 @@ class Builder {
     return new Builder(this.value.set('trend', value));
   }
 
-  lowerIsBetter(value: $PropertyType<InternalState, 'lowerIsBetter'>): Builder {
-    return new Builder(this.value.set('lowerIsBetter', value));
+  trendPreference(value: $PropertyType<InternalState, 'trendPreference'>): Builder {
+    return new Builder(this.value.set('trendPreference', value));
   }
 
   build() {
-    const { trend, lowerIsBetter } = this.value.toObject();
-    return new NumberVisualizationConfig(trend, lowerIsBetter);
+    const { trend, trendPreference } = this.value.toObject();
+    return new NumberVisualizationConfig(trend, trendPreference);
   }
 }

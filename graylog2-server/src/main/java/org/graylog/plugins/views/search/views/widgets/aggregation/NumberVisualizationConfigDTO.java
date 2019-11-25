@@ -12,21 +12,27 @@ import com.google.auto.value.AutoValue;
 public abstract class NumberVisualizationConfigDTO implements VisualizationConfigDTO {
     public static final String NAME = "numeric";
     private static final String FIELD_TREND = "trend";
-    private static final String FIELD_LOWER_IS_BETTER = "lower_is_better";
+    private static final String FIELD_TREND_PREFERENCE = "trend_preference";
+
+    public enum TrendPreference {
+        LOWER,
+        NEUTRAL,
+        HIGHER;
+    }
 
     @JsonProperty
     public abstract boolean trend();
 
     @JsonProperty
-    public abstract boolean lowerIsBetter();
+    public abstract TrendPreference trendPreference();
 
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_TREND)
         public abstract Builder trend(boolean trend);
 
-        @JsonProperty(FIELD_LOWER_IS_BETTER)
-        public abstract Builder lowerIsBetter(boolean lowerIsBetter);
+        @JsonProperty(FIELD_TREND_PREFERENCE)
+        public abstract Builder trendPreference(TrendPreference trendPreference);
 
         public abstract NumberVisualizationConfigDTO build();
 
@@ -34,7 +40,7 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
         public static Builder builder() {
             return new AutoValue_NumberVisualizationConfigDTO.Builder()
                 .trend(false)
-                .lowerIsBetter(false);
+                .trendPreference(TrendPreference.NEUTRAL);
         }
     }
 }
