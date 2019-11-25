@@ -1,0 +1,367 @@
+{
+  "id": "5d6d03909889ecf444527f98",
+  "type": "SEARCH",
+  "title": "Author Commit History",
+  "summary": "",
+  "description": "",
+  "search_id": "5d6ce7bd5d1eb45af534399e",
+  "properties": [],
+  "state": {
+    "f678e6c5-43b1-4200-b5c3-d33eae164dea": {
+      "selected_fields": [
+        "source",
+        "message"
+      ],
+      "formatting": {
+        "highlighting": []
+      },
+      "titles": {
+        "widget": {
+          "98ccf13e-6dec-4362-bcf3-a4776f457061": "Message Count",
+          "ef9e676a-2d08-4433-b082-2617878a6e59": "All Messages",
+          "c78e9a51-2e36-4ec4-86de-9df4d29f0863": "First Commit",
+          "3d568826-fe3d-413a-99a6-09e51d82c851": "Last Commit",
+          "fb496a41-4358-4bc8-b19f-244c71fe9143": "Commit Count",
+          "897a0961-a548-4651-9ca6-f3d6f21b8379": "Commit per Weekday",
+          "ec997825-6065-4fb7-ba86-427e74109ee4": "Work Time",
+          "dc4a61b2-26e6-468e-bac2-f7702846ca92": "Project Distribution"
+        },
+        "tab": {
+          "title": "AuthorOverview"
+        }
+      },
+      "widgets": [
+        {
+          "id": "dc4a61b2-26e6-468e-bac2-f7702846ca92",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "count()": "#455a64"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "project",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "series",
+                "field": "count()",
+                "direction": "Descending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "fb496a41-4358-4bc8-b19f-244c71fe9143",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Message Count"
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "ec997825-6065-4fb7-ba86-427e74109ee4",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "count()": "#fbc02d"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "hour",
+                "type": "values",
+                "config": {
+                  "limit": 24
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "hour",
+                "direction": "Ascending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "c78e9a51-2e36-4ec4-86de-9df4d29f0863",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "min(timestamp)"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "897a0961-a548-4651-9ca6-f3d6f21b8379",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "formatting_settings": {
+              "chart_colors": {
+                "count()": "#689f38"
+              }
+            },
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "dayOfTheWeek",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              },
+              {
+                "field": "weekday",
+                "type": "values",
+                "config": {
+                  "limit": 15
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [
+              {
+                "type": "pivot",
+                "field": "dayOfTheWeek",
+                "direction": "Ascending"
+              }
+            ],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "98ccf13e-6dec-4362-bcf3-a4776f457061",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "timestamp",
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "auto",
+                    "scaling": null
+                  }
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "3d568826-fe3d-413a-99a6-09e51d82c851",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "max(timestamp)"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": null
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        },
+        {
+          "id": "ef9e676a-2d08-4433-b082-2617878a6e59",
+          "type": "messages",
+          "config": {
+            "fields": [
+              "timestamp",
+              "source",
+              "lines_add",
+              "lines_removed"
+            ],
+            "show_message_row": true
+          },
+          "timerange": null,
+          "query": null,
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": [
+          "02d6b549-6e56-451e-a2ab-6e4b257605ef"
+        ],
+        "897a0961-a548-4651-9ca6-f3d6f21b8379": [
+          "28c87846-a8b6-4b21-9aac-62a8ce886e8e"
+        ],
+        "3d568826-fe3d-413a-99a6-09e51d82c851": [
+          "fd32330f-f487-4bf3-a518-1f1bcef89aec"
+        ],
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": [
+          "122d2764-160d-4acc-a2a7-c1ec8fdad28d"
+        ],
+        "ef9e676a-2d08-4433-b082-2617878a6e59": [
+          "81e69d89-4160-431f-9b90-95d29ca4cea6"
+        ],
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": [
+          "3d6c9e26-9090-4aaf-bed8-313e75d9c477"
+        ],
+        "ec997825-6065-4fb7-ba86-427e74109ee4": [
+          "7949e87a-4a82-4e09-b939-f4c803ae12c6"
+        ],
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": [
+          "8dc4dc5c-1845-4c53-8519-8d02559ad8d7"
+        ]
+      },
+      "positions": {
+        "98ccf13e-6dec-4362-bcf3-a4776f457061": {
+          "col": 1,
+          "row": 7,
+          "height": 2,
+          "width": "Infinity"
+        },
+        "ef9e676a-2d08-4433-b082-2617878a6e59": {
+          "col": 1,
+          "row": 9,
+          "height": 6,
+          "width": "Infinity"
+        },
+        "c78e9a51-2e36-4ec4-86de-9df4d29f0863": {
+          "col": 1,
+          "row": 1,
+          "height": 2,
+          "width": 4
+        },
+        "3d568826-fe3d-413a-99a6-09e51d82c851": {
+          "col": 9,
+          "row": 1,
+          "height": 2,
+          "width": 4
+        },
+        "fb496a41-4358-4bc8-b19f-244c71fe9143": {
+          "col": 5,
+          "row": 1,
+          "height": 2,
+          "width": 4
+        },
+        "897a0961-a548-4651-9ca6-f3d6f21b8379": {
+          "col": 1,
+          "row": 3,
+          "height": 4,
+          "width": 4
+        },
+        "ec997825-6065-4fb7-ba86-427e74109ee4": {
+          "col": 5,
+          "row": 3,
+          "height": 4,
+          "width": 4
+        },
+        "dc4a61b2-26e6-468e-bac2-f7702846ca92": {
+          "col": 9,
+          "row": 3,
+          "height": 4,
+          "width": 4
+        }
+      }
+    }
+  },
+  "created_at": "2019-07-05T07:35:42.335Z",
+  "owner": "admin"
+}

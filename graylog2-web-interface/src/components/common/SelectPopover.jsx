@@ -139,7 +139,7 @@ class SelectPopover extends React.Component {
   // eslint-disable-next-line class-methods-use-this
   pickPopoverProps(props) {
     // eslint-disable-next-line react/forbid-foreign-prop-types
-    const popoverPropKeys = Object.keys(Popover.propTypes);
+    const popoverPropKeys = Object.keys(Popover.target.propTypes);
 
     return lodash.pick(props, popoverPropKeys);
   }

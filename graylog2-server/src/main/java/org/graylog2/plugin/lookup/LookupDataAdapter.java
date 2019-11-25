@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.lookup.dto.DataAdapterDto;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,18 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     private final LookupDataAdapterConfiguration config;
     private final Timer requestTimer;
     private final Timer refreshTimer;
+    private LookupResult resultWithError;
 
     private AtomicReference<Throwable> dataSourceError = new AtomicReference<>();
 
+    protected LookupDataAdapter(DataAdapterDto dto, MetricRegistry metricRegistry) {
+        this(dto.id(), dto.name(), dto.config(), metricRegistry);
+
+        final boolean errorTTLEnabled = Optional.ofNullable(dto.customErrorTTLEnabled()).orElse(false);
+        if (errorTTLEnabled && dto.customErrorTTLUnit() != null && dto.customErrorTTL() != null) {
+            this.resultWithError = LookupResult.withError(dto.customErrorTTLUnit().toMillis(dto.customErrorTTL()));
+        }
+    }
     protected LookupDataAdapter(String id, String name, LookupDataAdapterConfiguration config, MetricRegistry metricRegistry) {
         this.id = id;
         this.name = name;
@@ -50,7 +60,16 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
         this.requestTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.adapters", id, "requests"));
         this.refreshTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.adapters", id, "refresh"));
+        this.resultWithError = LookupResult.withError();
     }
+
+    public LookupResult getErrorResult() {
+        return resultWithError;
+    }
+    public LookupResult getEmptyResult() {
+        return LookupResult.empty();
+    }
+
 
     @Override
     protected void startUp() throws Exception {
@@ -116,7 +135,7 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
     public LookupResult get(Object key) {
         if (state() == State.FAILED) {
-            return LookupResult.empty();
+            return getErrorResult();
         }
         checkState(isRunning(), "Data adapter needs to be started before it can be used");
         try (final Timer.Context ignored = requestTimer.time()) {
@@ -131,9 +150,18 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         return config;
     }
 
-
+    // This factory is implemented by LookupDataAdapter plugins that have been built before Graylog 3.2.
+    // We have to keep it around to make sure older plugins still load with Graylog >=3.2.
+    // It can be removed once we decide to stop supporting old plugins.
     public interface Factory<T extends LookupDataAdapter> {
         T create(@Assisted("id") String id, @Assisted("name") String name, LookupDataAdapterConfiguration configuration);
+
+        Descriptor getDescriptor();
+    }
+
+    // This is the factory that should be implemented by LookupDataAdapter plugins which target Graylog 3.2 and later.
+    public interface Factory2<T extends LookupDataAdapter> {
+        T create(@Assisted("dto") DataAdapterDto dto);
 
         Descriptor getDescriptor();
     }

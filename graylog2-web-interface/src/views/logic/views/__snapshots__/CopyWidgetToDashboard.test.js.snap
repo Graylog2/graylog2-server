@@ -1,0 +1,138 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`copyWidgetToDashboard should copy a Widget to a dashboard 1`] = `
+Object {
+  "created_at": "2019-06-14T09:48:10.550Z",
+  "description": "",
+  "id": "5d03952f7aafdc6c1cdc014c",
+  "owner": "admin",
+  "properties": Immutable.List [],
+  "search_id": "5d9b51d6af140aba42e87469",
+  "state": Immutable.Map {
+    "f0a1f93c-8400-40de-83ac-94149dbf447c": Object {
+      "formatting": Object {
+        "highlighting": Array [],
+      },
+      "positions": Object {
+        "32889f0b-fe5a-4f18-baa0-773869d49af3": Object {
+          "col": 1,
+          "height": 6,
+          "row": 10,
+          "width": "Infinity",
+        },
+        "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": Object {
+          "col": 1,
+          "height": 3,
+          "row": 5,
+          "width": "Infinity",
+        },
+        "8532ff94-2881-42b4-b26d-080d09305e95": Object {
+          "col": 1,
+          "height": 2,
+          "row": 8,
+          "width": "Infinity",
+        },
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Object {
+          "col": 1,
+          "height": 4,
+          "row": 1,
+          "width": "Infinity",
+        },
+      },
+      "selected_fields": Array [
+        "source",
+        "message",
+      ],
+      "titles": Immutable.Map {
+        "widget": Immutable.Map {
+          "8532ff94-2881-42b4-b26d-080d09305e95": "Message Count",
+          "32889f0b-fe5a-4f18-baa0-773869d49af3": "All Messages",
+          "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": "Aggregating stddev(files_changed) by author (copy)",
+        },
+      },
+      "widget_mapping": Immutable.Map {
+        "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": Immutable.Set [
+          "dead-beef",
+        ],
+        "4d73ccaa-aabf-451a-b36e-309f55798e04": Immutable.Set [
+          "dead-beef",
+        ],
+      },
+      "widgets": Immutable.List [
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "formatting_settings": Object {
+              "chart_colors": Object {
+                "stddev(files_changed)": "#8bc34a",
+              },
+            },
+            "rollup": true,
+            "row_pivots": Array [
+              Object {
+                "config": Object {
+                  "limit": 15,
+                },
+                "field": "author",
+                "type": "values",
+              },
+            ],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": null,
+                },
+                "function": "stddev(files_changed)",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "bar",
+            "visualization_config": null,
+          },
+          "filter": undefined,
+          "id": "a8058a41-34ea-4846-83d0-1acc2fbc1d7f",
+          "query": Object {
+            "query_string": "",
+            "type": "elasticsearch",
+          },
+          "streams": Array [],
+          "timerange": null,
+          "type": "aggregation",
+        },
+        Object {
+          "config": Object {
+            "column_pivots": Array [],
+            "rollup": true,
+            "row_pivots": Array [],
+            "series": Array [
+              Object {
+                "config": Object {
+                  "name": "Message Count",
+                },
+                "function": "count()",
+              },
+            ],
+            "sort": Array [],
+            "visualization": "numeric",
+          },
+          "filter": undefined,
+          "id": "4d73ccaa-aabf-451a-b36e-309f55798e04",
+          "query": Object {
+            "query_string": "",
+            "type": "elasticsearch",
+          },
+          "streams": Array [],
+          "timerange": Object {
+            "range": 300,
+            "type": "relative",
+          },
+          "type": "aggregation",
+        },
+      ],
+    },
+  },
+  "summary": "",
+  "title": "GIT data 5",
+  "type": "DASHBOARD",
+}
+`;

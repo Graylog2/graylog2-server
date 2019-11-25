@@ -2,7 +2,8 @@
 import React from 'react';
 import { Alert } from 'components/graylog';
 
-class GuavaCacheDocumentation extends React.Component {
+class CaffeineCacheDocumentation extends React.Component {
+
   render() {
     return (
       <div>
@@ -40,4 +41,4 @@ class GuavaCacheDocumentation extends React.Component {
   }
 }
 
-export default GuavaCacheDocumentation;
+export default CaffeineCacheDocumentation;

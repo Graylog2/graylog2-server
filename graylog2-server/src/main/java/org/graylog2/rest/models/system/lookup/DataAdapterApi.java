@@ -27,6 +27,11 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.lookup.dto.DataAdapterDto.FIELD_CUSTOM_ERROR_TTL;
+import static org.graylog2.lookup.dto.DataAdapterDto.FIELD_CUSTOM_ERROR_TTL_ENABLED;
+import static org.graylog2.lookup.dto.DataAdapterDto.FIELD_CUSTOM_ERROR_TTL_UNIT;
 
 @AutoValue
 @JsonAutoDetect
@@ -49,6 +54,18 @@ public abstract class DataAdapterApi {
     @NotEmpty
     public abstract String name();
 
+    @Nullable
+    @JsonProperty(FIELD_CUSTOM_ERROR_TTL_ENABLED)
+    public abstract Boolean customErrorTTLEnabled();
+
+    @Nullable
+    @JsonProperty(FIELD_CUSTOM_ERROR_TTL)
+    public abstract Long customErrorTTL();
+
+    @Nullable
+    @JsonProperty(FIELD_CUSTOM_ERROR_TTL_UNIT)
+    public abstract TimeUnit customErrorTTLUnit();
+
     @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
@@ -67,6 +84,9 @@ public abstract class DataAdapterApi {
                 .title(dto.title())
                 .description(dto.description())
                 .name(dto.name())
+                .customErrorTTLEnabled(dto.customErrorTTLEnabled())
+                .customErrorTTL(dto.customErrorTTL())
+                .customErrorTTLUnit(dto.customErrorTTLUnit())
                 .contentPack(dto.contentPack())
                 .config(dto.config())
                 .build();
@@ -78,6 +98,9 @@ public abstract class DataAdapterApi {
                 .title(title())
                 .description(description())
                 .name(name())
+                .customErrorTTLEnabled(customErrorTTLEnabled())
+                .customErrorTTL(customErrorTTL())
+                .customErrorTTLUnit(customErrorTTLUnit())
                 .contentPack(contentPack())
                 .config(config())
                 .build();
@@ -96,6 +119,15 @@ public abstract class DataAdapterApi {
 
         @JsonProperty("name")
         public abstract Builder name(String name);
+
+        @JsonProperty(FIELD_CUSTOM_ERROR_TTL_ENABLED)
+        public abstract Builder customErrorTTLEnabled(@Nullable Boolean enabled);
+
+        @JsonProperty(FIELD_CUSTOM_ERROR_TTL)
+        public abstract Builder customErrorTTL(@Nullable Long ttl);
+
+        @JsonProperty(FIELD_CUSTOM_ERROR_TTL_UNIT)
+        public abstract Builder customErrorTTLUnit(@Nullable TimeUnit unit);
 
         @JsonProperty("content_pack")
         public abstract Builder contentPack(@Nullable String contentPack);

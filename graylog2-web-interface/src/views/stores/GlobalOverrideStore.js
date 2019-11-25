@@ -7,7 +7,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{

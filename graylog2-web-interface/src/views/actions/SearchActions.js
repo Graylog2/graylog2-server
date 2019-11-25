@@ -9,7 +9,7 @@ import Parameter from 'views/logic/parameters/Parameter';
 import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import { singletonActions } from 'views/logic/singleton';
-import type { RefluxActions } from '../stores/StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 export type CreateSearchResponse = {
   search: Search,

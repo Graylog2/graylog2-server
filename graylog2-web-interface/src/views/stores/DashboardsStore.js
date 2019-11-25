@@ -5,9 +5,9 @@ import URLUtils from 'util/URLUtils';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 import type { PaginatedViews, SortField, SortOrder } from './ViewManagementStore';
-import type { RefluxActions } from './StoreTypes';
 import View from '../logic/views/View';
 
 type DashboardsActionsType = RefluxActions<{
@@ -15,7 +15,7 @@ type DashboardsActionsType = RefluxActions<{
 }>;
 
 export type DashboardsStoreState = {
-  list: ?Array<View>,
+  list?: Array<View>,
   pagination: {
     total: number,
     page: number,

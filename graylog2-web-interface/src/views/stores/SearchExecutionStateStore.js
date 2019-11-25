@@ -2,11 +2,11 @@
 import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
-import type { RefluxActions } from './StoreTypes';
 import { ViewActions } from './ViewStore';
 
 const defaultExecutionState = SearchExecutionState.empty();

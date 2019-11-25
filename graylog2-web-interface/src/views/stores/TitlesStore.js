@@ -3,10 +3,10 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
 import type { TitlesMap, TitleType } from './TitleTypes';
-import type { RefluxActions } from './StoreTypes';
 
 type TitlesActionsTypes = RefluxActions<{
   set: (string, string, string) => Promise<TitlesMap>
