@@ -19,6 +19,7 @@ import SplitButton from './SplitButton';
 import Table from './Table';
 import Tabs from './Tabs';
 import Tooltip from './Tooltip';
+import Well from './Well';
 
 export {
   Alert,
@@ -42,5 +43,6 @@ export {
   Table,
   Tabs,
   Tooltip,
+  Well,
 };
 export * from './bootstrap-import';
