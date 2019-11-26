@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
@@ -101,6 +102,7 @@ public class ViewsBindings extends ViewsModule {
         // search types
         registerJacksonSubtype(MessageList.class);
         registerJacksonSubtype(Pivot.class);
+        registerJacksonSubtype(EventList.class);
 
         // pivot specs
         registerJacksonSubtype(Values.class);

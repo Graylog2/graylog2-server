@@ -71,6 +71,10 @@ public interface SearchType {
 
     SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
 
+    default Set<String> effectiveStreams() {
+        return streams();
+    }
+
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
      * <p>

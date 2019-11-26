@@ -138,7 +138,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         for (SearchType searchType : searchTypes) {
             final SearchSourceBuilder searchTypeSourceBuilder = queryContext.searchSourceBuilder(searchType);
 
-            final Set<String> effectiveStreamIds = searchType.streams().isEmpty() ? query.usedStreamIds() : searchType.streams();
+            final Set<String> effectiveStreamIds = searchType.effectiveStreams().isEmpty()
+                    ? query.usedStreamIds()
+                    : searchType.effectiveStreams();
 
             final BoolQueryBuilder searchTypeOverrides = QueryBuilders.boolQuery()
                     .must(searchTypeSourceBuilder.query())
@@ -230,14 +232,15 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     final Set<String> affectedIndicesForSearchType = query.searchTypes().stream()
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
-                                if (searchType.streams().isEmpty()
+                                if (searchType.effectiveStreams().isEmpty()
                                         && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
                                         && !searchType.timerange().isPresent()) {
                                     return Optional.empty();
                                 }
-                                final Set<String> usedStreamIds = searchType.streams().isEmpty()
+                                final Set<String> usedStreamIds = searchType.effectiveStreams().isEmpty()
                                         ? query.usedStreamIds()
-                                        : searchType.streams();
+                                        : searchType.effectiveStreams();
+
                                 final Set<Stream> usedStreamsOfSearchType = loadStreams(usedStreamIds);
 
                                 return Optional.of(indicesByTimeRange(query.effectiveTimeRange(searchType)).stream()
