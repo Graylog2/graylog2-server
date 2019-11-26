@@ -1,7 +1,5 @@
 import uuid from 'uuid/v4';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
-import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
 const formatPivot = (pivot) => {
   const { type, field, config } = pivot;
@@ -25,7 +23,7 @@ const formatPivot = (pivot) => {
   };
 };
 
-const generateConfig = (id: string, name, { rollup, rowPivots, columnPivots, series, sort }: AggregationWidgetConfig) => ({
+const generateConfig = (id, name, { rollup, rowPivots, columnPivots, series, sort }) => ({
   id,
   name,
   type: 'pivot',
@@ -39,7 +37,7 @@ const generateConfig = (id: string, name, { rollup, rowPivots, columnPivots, ser
   },
 });
 
-export default ({ config }: AggregationWidget) => {
+export default ({ config }) => {
   const chartSearchTypeId = uuid();
   // TODO: This should go into a visualization config specific function
   return config.visualization === 'numeric' && config.visualizationConfig && config.visualizationConfig.trend
