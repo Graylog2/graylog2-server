@@ -50,7 +50,9 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
     _formatSeriesForMap(rowPivots),
   ]);
 
-  const series = pipeline(data);
+  const rows = data.chart || Object.values(data)[0];
+
+  const series = pipeline(rows);
 
   const viewport = get(config, 'visualizationConfig.viewport');
   const _onChange = (newViewport) => {

@@ -36,13 +36,13 @@ describe('AggregationBuilder', () => {
   it('renders dummy component with rows from data', () => {
     const wrapper = mount(<AggregationBuilder config={AggregationWidgetConfig.builder().rowPivots([rowPivot]).visualization('dummy').build()}
                                               fields={{}}
-                                              data={{ total: 42, rows: [{ value: 3.1415926 }] }} />);
+                                              data={{ chart: { total: 42, rows: [{ value: 3.1415926 }] } }} />);
 
     expect(wrapper.find(EmptyResultWidget)).toHaveLength(0);
     expect(wrapper.find(EmptyAggregationContent)).toHaveLength(0);
     const dummyVisualization = wrapper.find(mockDummyVisualization);
     expect(dummyVisualization).toHaveLength(1);
-    expect(dummyVisualization).toHaveProp('data', [{ value: 3.1415926 }]);
+    expect(dummyVisualization).toHaveProp('data', { chart: [{ value: 3.1415926 }] });
   });
   it('passes through onVisualizationConfigChange to visualization', () => {
     const onVisualizationConfigChange = jest.fn();

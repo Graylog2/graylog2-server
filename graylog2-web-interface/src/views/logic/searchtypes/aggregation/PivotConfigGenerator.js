@@ -1,3 +1,4 @@
+import uuid from 'uuid/v4';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 
 const formatPivot = (pivot) => {
@@ -22,7 +23,9 @@ const formatPivot = (pivot) => {
   };
 };
 
-export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
+const generateConfig = (id, name, { rollup, rowPivots, columnPivots, series, sort }) => ({
+  id,
+  name,
   type: 'pivot',
   config: {
     id: 'vals',
@@ -32,4 +35,12 @@ export default ({ columnPivots, rowPivots, series, rollup, sort }) => [{
     series: series.map(s => Object.assign({ id: s.effectiveName }, parseSeries(s.function))),
     sort: sort,
   },
-}];
+});
+
+export default ({ config }) => {
+  const chartSearchTypeId = uuid();
+  // TODO: This should go into a visualization config specific function
+  return config.visualization === 'numeric' && config.visualizationConfig && config.visualizationConfig.trend
+    ? [generateConfig(chartSearchTypeId, 'chart', config), { ...(generateConfig(uuid(), 'trend', config)), timerange: { type: 'offset', source: 'search_type', id: chartSearchTypeId } }]
+    : [generateConfig(chartSearchTypeId, 'chart', config)];
+};

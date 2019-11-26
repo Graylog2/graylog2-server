@@ -136,7 +136,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   equals(other: any) {
     const { is } = Immutable;
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup']
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'visualizationConfig']
         .every(key => is(Immutable.fromJS(this[key]), Immutable.fromJS(other[key])));
     }
     return false;

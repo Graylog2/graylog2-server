@@ -27,7 +27,7 @@ const LineVisualization: VisualizationComponent = ({ config, data, effectiveTime
           effectiveTimerange={effectiveTimerange}
           getChartColor={getChartColor}
           setChartColor={setChartColor}
-          chartData={chartData(config, data, 'scatter', chartGenerator)} />
+          chartData={chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator)} />
 );
 
 LineVisualization.propTypes = {

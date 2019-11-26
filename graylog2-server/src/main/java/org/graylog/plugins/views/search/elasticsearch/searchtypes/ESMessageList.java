@@ -74,9 +74,9 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 
-        return MessageList.Result.result(searchType.id())
+        final MessageList.Result.Builder resultBuilder = MessageList.Result.result(searchType.id())
                 .messages(messages)
-                .totalResults(result.getTotal())
-                .build();
+                .totalResults(result.getTotal());
+        return searchType.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
 }

@@ -18,19 +18,27 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -48,6 +56,9 @@ public abstract class Pivot implements SearchType {
     @Nullable
     @JsonProperty
     public abstract String id();
+
+    @JsonProperty
+    public abstract Optional<String> name();
 
     @JsonProperty("row_groups")
     public abstract List<BucketSpec> rowGroups();
@@ -98,6 +109,9 @@ public abstract class Pivot implements SearchType {
         @JsonProperty
         public abstract Builder id(@Nullable String id);
 
+        @JsonProperty
+        public abstract Builder name(@Nullable String name);
+
         @JsonProperty("row_groups")
         public abstract Builder rowGroups(@Nullable List<BucketSpec> rowGroups);
 
@@ -117,7 +131,17 @@ public abstract class Pivot implements SearchType {
         public abstract Builder filter(@Nullable Filter filter);
 
         @JsonProperty
-        public abstract Builder timerange(@Nullable TimeRange timerange);
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
+        @JsonSubTypes({
+                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
+                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
+                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
+                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
+        })
+        public Builder timerange(@Nullable TimeRange timerange) {
+            return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
+        }
+        public abstract Builder timerange(@Nullable DerivedTimeRange timerange);
 
         @JsonProperty
         public abstract Builder query(@Nullable BackendQuery query);

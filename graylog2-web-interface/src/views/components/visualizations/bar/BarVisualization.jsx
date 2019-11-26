@@ -41,9 +41,11 @@ const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimer
 
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
 
+  const rows = data.chart || Object.values(data)[0];
+
   return (
     <XYPlot config={config}
-            chartData={chartData(config, data, 'bar', _seriesGenerator)}
+            chartData={chartData(config, rows, 'bar', _seriesGenerator)}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             setChartColor={setChartColor}

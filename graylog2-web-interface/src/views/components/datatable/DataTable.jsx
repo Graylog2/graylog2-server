@@ -23,7 +23,7 @@ type Props = {
   currentView: {
     activeQuery: string,
   },
-  data: Rows,
+  data: { chart: Rows },
   fields: FieldTypeMappingsList,
 };
 
@@ -68,7 +68,7 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   useEffect(onRenderComplete, [onRenderComplete]);
 
   const { columnPivots, rowPivots, series, rollup } = config;
-  const rows = data || [];
+  const { chart: rows = [] } = data || {};
 
   const rowFieldNames = rowPivots.map(pivot => pivot.field);
   const columnFieldNames = columnPivots.map(pivot => pivot.field);
