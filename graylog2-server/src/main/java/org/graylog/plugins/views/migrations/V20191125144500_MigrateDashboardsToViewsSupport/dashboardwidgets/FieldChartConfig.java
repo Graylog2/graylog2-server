@@ -2,24 +2,20 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties({ "rangeType", "relative" })
 public abstract class FieldChartConfig implements WidgetConfig {
-    @JsonProperty
     public abstract String valuetype();
-
-    @JsonProperty
     public abstract String renderer();
-
-    @JsonProperty
     public abstract String interpolation();
-
-    @JsonProperty
     public abstract String field();
+    public abstract String interval();
 
     @JsonCreator
     static FieldChartConfig create(
@@ -27,16 +23,18 @@ public abstract class FieldChartConfig implements WidgetConfig {
             @JsonProperty("renderer") String renderer,
             @JsonProperty("interpolation") String interpolation,
             @JsonProperty("field") String field,
+            @JsonProperty("interval") String interval,
             @JsonProperty("query") String query,
             @JsonProperty("timerange") TimeRange timerange
-    ) {
+        ) {
         return new AutoValue_FieldChartConfig(
                 query,
                 timerange,
                 valuetype,
                 renderer,
                 interpolation,
-                field
+                field,
+                interval
         );
     }
 }

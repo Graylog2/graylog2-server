@@ -19,12 +19,23 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.FieldChartConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.QuickValuesConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.QuickValuesHistogramConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultChartConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultCountConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StatsCountConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
 
 @AutoValue
 @JsonAutoDetect
-abstract class Widget {
+@JsonDeserialize(builder = Widget.Builder.class)
+public abstract class Widget {
     private static final String FIELD_ID = "id";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_DESCRIPTION = "description";
@@ -45,15 +56,36 @@ abstract class Widget {
     @JsonProperty(FIELD_CONFIG)
     abstract WidgetConfig config();
 
-    @JsonCreator
-    static Widget create(
-            @JsonProperty(FIELD_ID) String id,
-            @JsonProperty(FIELD_TYPE) String type,
-            @JsonProperty(FIELD_DESCRIPTION) String description,
-            @JsonProperty(FIELD_CACHE_TIME) int cacheTime,
-            @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-            @JsonProperty(FIELD_CONFIG) WidgetConfig config
-    ) {
-        return new AutoValue_Widget(id, type, description, cacheTime, creatorUserId, config);
+    @AutoValue.Builder
+    public static abstract class Builder {
+        @JsonProperty(FIELD_ID)
+        public abstract Builder id(String id);
+        @JsonProperty(FIELD_TYPE)
+        public abstract Builder type(String type);
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(String description);
+        @JsonProperty(FIELD_CACHE_TIME)
+        public abstract Builder cacheTime(int cacheTime);
+        @JsonProperty(FIELD_CREATOR_USER_ID)
+        public abstract Builder creatorUserId(String creatorUserId);
+        @JsonProperty(FIELD_CONFIG)
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+        @JsonSubTypes({
+                @JsonSubTypes.Type(value = FieldChartConfig.class, name = "FIELD_CHART"),
+                @JsonSubTypes.Type(value = SearchResultChartConfig.class, name = "SEARCH_RESULT_CHART"),
+                @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "SEARCH_RESULT_COUNT"),
+                @JsonSubTypes.Type(value = StatsCountConfig.class, name = "STATS_COUNT"),
+                @JsonSubTypes.Type(value = QuickValuesConfig.class, name = "QUICKVALUES"),
+                @JsonSubTypes.Type(value = QuickValuesHistogramConfig.class, name = "QUICKVALUES_HISTOGRAM"),
+                @JsonSubTypes.Type(value = WorldMapConfig.class, name = "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy")
+        })
+        public abstract Builder config(WidgetConfig config);
+
+        public abstract Widget build();
+
+        @JsonCreator
+        public static Builder builder() {
+            return new AutoValue_Widget.Builder();
+        }
     }
 }

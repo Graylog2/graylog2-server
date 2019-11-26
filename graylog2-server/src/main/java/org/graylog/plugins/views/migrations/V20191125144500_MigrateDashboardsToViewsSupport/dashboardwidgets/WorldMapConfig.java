@@ -6,21 +6,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonAutoDetect
-public abstract class SearchResultChartConfig implements WidgetConfig {
-    public abstract String interval();
+public abstract class WorldMapConfig implements WidgetConfig {
+    public abstract String field();
+    @Nullable
+    public abstract String streamId();
 
     @JsonCreator
-    static SearchResultChartConfig create(
-            @JsonProperty("interval") String interval,
+    static WorldMapConfig create(
+            @JsonProperty("field") String field,
+            @JsonProperty("stream_id") @Nullable String streamId,
             @JsonProperty("query") String query,
             @JsonProperty("timerange") TimeRange timerange
     ) {
-        return new AutoValue_SearchResultChartConfig(
+        return new AutoValue_WorldMapConfig(
                 query,
                 timerange,
-                interval
+                field,
+                streamId
         );
     }
 }
