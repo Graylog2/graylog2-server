@@ -1,65 +1,58 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-// $FlowFixMe: could not find types
 import { SizeMe } from 'react-sizeme';
 
-import styles from './SideBar.css';
+import { Icon } from 'components/common';
+import { Title, TitleText, TitleIcon, Content } from './NavItem.styles';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
   isOpen: boolean,
   isSelected: boolean,
-  isLast: boolean,
+  expandRight: boolean,
   text: string,
-  icon: React.Element<any>,
+  icon: string,
   onClick: (string) => void,
   children: React.Element<any>,
 }
 
-const NavItem = ({ isOpen, isSelected, isLast, text, children, icon, onClick }: Props) => {
-  const selectedColor = isSelected ? styles.selected : '';
+const NavItem = ({ isOpen, isSelected, expandRight, text, children, icon, onClick }: Props) => {
   // eslint-disable-next-line no-nested-ternary
-  const selected = isSelected
-    ? (isLast
-      ? styles.openFieldContent
-      : styles.contentOpen)
-    : styles.contentClosed;
-
   return (
-    <div>
-      <div role="presentation" onClick={onClick} className={`${styles.sidebarNav} ${selectedColor}`}>
-        <div className={styles.sidebarIcon}>{icon}</div>
-        {(isOpen && <div className={styles.sidebarNavFont}>{text}</div>)}
-      </div>
+    <React.Fragment>
+      <Title role="presentation" onClick={onClick} isSelected={isSelected} expandRight={expandRight}>
+        <TitleIcon><Icon name={icon} /></TitleIcon>
+        {(isOpen && <TitleText>{text}</TitleText>)}
+      </Title>
       <SizeMe monitorHeight refreshRate={100}>
         {({ size }) => {
           return (
-            <div className={`${styles.navContent} ${selected}`}>
+            <Content isSelected={isSelected} expandRight={expandRight}>
               {
                 isSelected && children
                   ? React.cloneElement(children, { listHeight: size.height - 150 })
                   : <span />
               }
-            </div>
+            </Content>
           );
         }}
       </SizeMe>
-    </div>
+    </React.Fragment>
   );
 };
 
 NavItem.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   isSelected: PropTypes.bool.isRequired,
-  isLast: PropTypes.bool,
+  expandRight: PropTypes.bool,
   text: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
 };
 
 NavItem.defaultProps = {
-  isLast: false,
+  expandRight: false,
 };
 
 export default NavItem;
