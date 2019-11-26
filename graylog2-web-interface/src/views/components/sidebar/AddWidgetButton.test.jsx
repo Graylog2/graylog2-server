@@ -26,7 +26,7 @@ const bindings = {
     },
     {
       type: 'generic',
-      title: 'Custom Aggregation',
+      title: 'Aggregation',
       func: mockAggregateActionHandler,
     },
     {
@@ -55,24 +55,15 @@ describe('AddWidgetButton', () => {
 
   const onClick = jest.fn();
 
-  it('renders a dropdown', () => {
-    const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
-
-    const buttonGroup = wrapper.find('ButtonGroup').at(0);
-    expect(buttonGroup).toHaveLength(1);
-    expect(buttonGroup.find('button')).toHaveLength(4);
-  });
   it('contains menu items for all widget types', () => {
     const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
-
-    const dropdownButton = wrapper.find('ButtonGroup');
-    ['Custom Aggregation', 'Message Count', 'Message Table', 'Parameter']
-      .forEach(title => expect(dropdownButton.find(`button[children="${title}"]`)).toExist());
+    ['Aggregation', 'Message Count', 'Message Table', 'Parameter']
+      .forEach(title => expect(wrapper.find(`button[children="${title}"]`)).toExist());
   });
   it('clicking on option to add aggregation calls AggregateActionHandler', () => {
     const wrapper = mount(<AddWidgetButton onClick={onClick} toggleAutoClose={onClick} />);
 
-    const addAggregation = wrapper.find('button[children="Custom Aggregation"]');
+    const addAggregation = wrapper.find('button[children="Aggregation"]');
     expect(addAggregation).toExist(0);
     addAggregation.simulate('click');
 

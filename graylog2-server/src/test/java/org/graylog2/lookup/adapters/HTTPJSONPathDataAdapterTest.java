@@ -56,6 +56,7 @@ public class HTTPJSONPathDataAdapterTest {
         final LookupResult result = HTTPJSONPathDataAdapter.parseBody(singlePath, multiPath, body);
 
         assertThat(result.isEmpty()).isFalse();
+        assertThat(result.hasError()).isFalse();
         assertThat(result.singleValue()).isEqualTo("world");
 
         assertThat(result.multiValue()).isNotNull();
@@ -73,6 +74,7 @@ public class HTTPJSONPathDataAdapterTest {
         final LookupResult result = HTTPJSONPathDataAdapter.parseBody(singlePath, multiPath, body);
 
         assertThat(result.isEmpty()).isFalse();
+        assertThat(result.hasError()).isFalse();
         assertThat(result.singleValue()).isEqualTo("world");
 
         assertThat(result.multiValue()).isNotNull();
@@ -82,6 +84,8 @@ public class HTTPJSONPathDataAdapterTest {
         assertThat(result.multiValue().get("value")).isInstanceOf(Collection.class);
         //noinspection unchecked,ConstantConditions
         assertThat((Collection) result.multiValue().get("value")).containsOnly("a", "b", "c");
+
+        assertThat(result.stringListValue()).containsOnly("a", "b", "c");
     }
 
     @Test
@@ -90,6 +94,6 @@ public class HTTPJSONPathDataAdapterTest {
         final JsonPath multiPath = JsonPath.compile("$.list");
         final LookupResult result = HTTPJSONPathDataAdapter.parseBody(singlePath, multiPath, emptyBody);
 
-        assertThat(result.isEmpty()).isTrue();
+        assertThat(result).isNull();
     }
 }

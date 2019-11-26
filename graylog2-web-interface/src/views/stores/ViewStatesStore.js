@@ -3,11 +3,11 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import type { QueryId } from 'views/logic/queries/Query';
 import ViewState from 'views/logic/views/ViewState';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewActions, ViewStore } from './ViewStore';
-import type { RefluxActions } from './StoreTypes';
 
 type ViewStatesActionsTypes = RefluxActions<{
   add: (QueryId, ViewState) => Promise<ViewState>,

@@ -10,23 +10,34 @@ const LookupTableCachesActions = ActionsProvider.getActions('LookupTableCaches')
 
 const LookupTableCachesStore = Reflux.createStore({
   listenables: [LookupTableCachesActions],
+  cache: null,
+  caches: null,
+  types: null,
+  pagination: {
+    page: 1,
+    per_page: 10,
+    total: 0,
+    count: 0,
+    query: null,
+  },
+  validationErrors: {},
 
-  init() {
-    this.pagination = {
-      page: 1,
-      per_page: 10,
-      total: 0,
-      count: 0,
-      query: null,
+  getInitialState() {
+    return this.getState();
+  },
+
+  getState() {
+    return {
+      cache: this.cache,
+      caches: this.caches,
+      types: this.types,
+      pagination: this.pagination,
+      validationErrors: this.validationErrors,
     };
   },
 
-  getInitialState() {
-    return {
-      caches: undefined,
-      pagination: this.pagination,
-      validationErrors: {},
-    };
+  propagateChanges() {
+    this.trigger(this.getState());
   },
 
   reloadPage() {
@@ -52,7 +63,8 @@ const LookupTableCachesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.trigger({ pagination: this.pagination, caches: response.caches });
+      this.caches = response.caches;
+      this.propagateChanges();
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
 
     LookupTableCachesActions.searchPaginated.promise(promise);
@@ -64,7 +76,8 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.trigger({ cache: response });
+      this.cache = response;
+      this.propagateChanges();
     }, this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'));
 
     LookupTableCachesActions.get.promise(promise);
@@ -76,7 +89,8 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('POST', url, cache);
 
     promise.then((response) => {
-      this.trigger({ cache: response });
+      this.cache = response;
+      this.propagateChanges();
     }, this._errorHandler('Creating lookup table cache failed', `Could not create lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.create.promise(promise);
@@ -88,7 +102,8 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('PUT', url, cache);
 
     promise.then((response) => {
-      this.trigger({ cache: response });
+      this.cache = response;
+      this.propagateChanges();
     }, this._errorHandler('Updating lookup table cache failed', `Could not update lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.update.promise(promise);
@@ -100,7 +115,8 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.trigger({ types: response });
+      this.types = response;
+      this.propagateChanges();
     }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'));
 
     LookupTableCachesActions.getTypes.promise(promise);
@@ -122,9 +138,8 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('POST', url, cache);
 
     promise.then((response) => {
-      this.trigger({
-        validationErrors: response.errors,
-      });
+      this.validationErrors = response.errors;
+      this.propagateChanges();
     }, this._errorHandler('Lookup table cache validation failed', `Could not validate lookup table cache "${cache.name}"`));
     LookupTableCachesActions.validate.promise(promise);
     return promise;

@@ -18,7 +18,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       </label>
       <span>
         <textarea
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-input"
           label="Pattern"
           name="pattern-input"
@@ -30,7 +30,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
           value=""
         />
         <span
-          className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+          className="HelpBlock-i8is92-0 huFHQV help-block"
         >
           The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
         </span>
@@ -52,7 +52,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       <span>
         <input
           autoComplete="off"
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-selector"
           label="Filter pattern"
           name="pattern-selector"
@@ -65,11 +65,11 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         
       </span>
     </div>
-    <ul
+    <div
       className="resultList"
     >
-      <li
-        className="list-group-item"
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
         id="list-item-0"
         onKeyDown={[Function]}
       >
@@ -99,9 +99,9 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-      <li
-        className="list-group-item"
+      </span>
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
         id="list-item-1"
         onKeyDown={[Function]}
       >
@@ -131,9 +131,9 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-      <li
-        className="list-group-item"
+      </span>
+      <span
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
         id="list-item-2"
         onKeyDown={[Function]}
       >
@@ -163,8 +163,8 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             </button>
           </span>
         </p>
-      </li>
-    </ul>
+      </span>
+    </div>
   </div>
 </div>
 `;
@@ -187,7 +187,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       </label>
       <span>
         <textarea
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-input"
           label="Pattern"
           name="pattern-input"
@@ -199,7 +199,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
           value=""
         />
         <span
-          className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+          className="HelpBlock-i8is92-0 huFHQV help-block"
         >
           The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
         </span>
@@ -221,7 +221,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       <span>
         <input
           autoComplete="off"
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-selector"
           label="Filter pattern"
           name="pattern-selector"

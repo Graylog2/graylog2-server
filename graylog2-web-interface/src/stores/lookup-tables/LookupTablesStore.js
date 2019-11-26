@@ -10,27 +10,50 @@ const LookupTablesActions = ActionsProvider.getActions('LookupTables');
 
 const LookupTablesStore = Reflux.createStore({
   listenables: [LookupTablesActions],
-
-  init() {
-    this.pagination = {
-      page: 1,
-      per_page: 10,
-      total: 0,
-      count: 0,
-      query: null,
-    };
+  pagination: {
+    page: 1,
+    per_page: 10,
+    total: 0,
+    count: 0,
+    query: null,
   },
+  errorStates: {
+    tables: {},
+    caches: {},
+    dataAdapters: {},
+  },
+  table: null,
+  cache: null,
+  dataAdapter: null,
+  tables: null,
+  caches: null,
+  dataAdapters: null,
+  lookupResult: null,
+  validationErrors: {},
 
   getInitialState() {
+    return this.getState();
+  },
+
+  getState() {
     return {
+      errorStates: this.errorStates,
+      table: this.table,
+      cache: this.cache,
+      dataAdapter: this.dataAdapter,
+      tables: this.tables,
+      caches: this.caches,
+      dataAdapters: this.dataAdapters,
+      lookupResult: this.lookupResult,
+      validationErrors: this.validationErrors,
       pagination: this.pagination,
-      errorStates: {
-        tables: {},
-        caches: {},
-        dataAdapters: {},
-      },
     };
   },
+
+  propagateChanges() {
+    this.trigger(this.getState());
+  },
+
 
   reloadPage() {
     const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page,
@@ -58,12 +81,10 @@ const LookupTablesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.trigger({
-        tables: response.lookup_tables,
-        caches: response.caches,
-        dataAdapters: response.data_adapters,
-        pagination: this.pagination,
-      });
+      this.tables = response.lookup_tables;
+      this.caches = response.caches;
+      this.dataAdapters = response.data_adapters;
+      this.propagateChanges();
     }, this._errorHandler('Fetching lookup tables failed', 'Could not retrieve the lookup tables'));
 
     LookupTablesActions.searchPaginated.promise(promise);
@@ -77,11 +98,10 @@ const LookupTablesStore = Reflux.createStore({
     promise.then((response) => {
       // do not propagate pagination! it will destroy the subsequent overview page's state.
       const lookupTable = response.lookup_tables[0];
-      this.trigger({
-        table: lookupTable,
-        cache: response.caches[lookupTable.cache_id],
-        dataAdapter: response.data_adapters[lookupTable.data_adapter_id],
-      });
+      this.table = lookupTable;
+      this.cache = response.caches[lookupTable.cache_id];
+      this.dataAdapter = response.data_adapters[lookupTable.data_adapter_id];
+      this.propagateChanges();
     }, this._errorHandler(`Fetching lookup table ${idOrName} failed`,
       'Could not retrieve lookup table'));
 
@@ -134,13 +154,12 @@ const LookupTablesStore = Reflux.createStore({
     const promise = fetch('POST', this._url('errorstates'), request);
 
     promise.then((response) => {
-      this.trigger({
-        errorStates: {
-          tables: response.tables || {},
-          caches: response.caches || {},
-          dataAdapters: response.data_adapters || {},
-        },
-      });
+      this.errorStates = {
+        tables: response.tables || {},
+        caches: response.caches || {},
+        dataAdapters: response.data_adapters || {},
+      };
+      this.propagateChanges();
     }, this._errorHandler('Fetching lookup table error state failed.', 'Could not error states'));
 
     LookupTablesActions.getErrors.promise(promise);
@@ -151,9 +170,8 @@ const LookupTablesStore = Reflux.createStore({
     const promise = fetch('GET', this._url(`tables/${tableName}/query?key=${encodeURIComponent(key)}`));
 
     promise.then((response) => {
-      this.trigger({
-        lookupResult: response,
-      });
+      this.lookupResult = response;
+      this.propagateChanges();
     }, this._errorHandler('Lookup failed', `Could not lookup value for key "${key}" in lookup table "${tableName}"`));
 
     LookupTablesActions.lookup.promise(promise);
@@ -187,9 +205,8 @@ const LookupTablesStore = Reflux.createStore({
     const promise = fetch('POST', url, table);
 
     promise.then((response) => {
-      this.trigger({
-        validationErrors: response.errors,
-      });
+      this.validationErrors = response.errors;
+      this.propagateChanges();
     }, this._errorHandler('Lookup table validation failed', `Could not validate lookup table "${table.name}"`));
     LookupTablesActions.validate.promise(promise);
     return promise;

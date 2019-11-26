@@ -5,7 +5,7 @@ import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
+import type { RefluxActions } from 'stores/StoreTypes';
 
 const parseSearchUrl = URLUtils.qualifyUrl('/views/search/metadata');
 const parseSearchIdUrl = id => URLUtils.qualifyUrl(`/views/search/metadata/${id}`);

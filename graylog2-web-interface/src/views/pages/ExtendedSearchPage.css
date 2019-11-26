@@ -55,39 +55,3 @@
 .xtick text, .ytick text {
     fill: #757575 !important;
 }
-
-.grid-container {
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 50px 250px 1fr;
-    grid-template-areas: "sidebar search";
-}
-
-.sidebar-grid {
-    grid-area: sidebar;
-    z-index: 3;
-    background: #393939;
-    color: #9e9e9e;
-    height: calc(100vh - 50px);
-    position: sticky;
-    top: 50px;
-    grid-column-start: 1;
-    box-shadow: 3px 0 3px rgba(0, 0, 0, .25);
-}
-
-.search-grid {
-    z-index: 1;
-    padding: 15px;
-    grid-area: search;
-    grid-column-start: 2;
-    grid-column-end: 4;
-}
-
-.open {
-    grid-column-end: 3;
-}
-
-.closed {
-    grid-column-end: 2;
-}
-

@@ -2,17 +2,18 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { AddWidgetButton, SearchResultOverview } from 'views/components/sidebar';
+
+import { AddWidgetButton } from 'views/components/sidebar';
 import { Icon, Spinner } from 'components/common';
 import type { ViewMetaData } from 'views/stores/ViewMetadataStore';
 
-import styles from './SideBar.css';
+import { Container, ContentOverlay, SidebarHeader, Headline, ToggleIcon, HorizontalRuler } from './Sidebar.styles';
 import CustomPropTypes from '../CustomPropTypes';
 import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
+import ViewDescription from './ViewDescription';
 
-const defaultNewViewTitle = 'New View';
-const defaultNewViewSummary = 'No summary.';
+const defaultNewViewTitle = 'New Search';
 
 type Props = {
   children: React.Element<any>,
@@ -22,7 +23,7 @@ type Props = {
 };
 
 type State = {
-  selectedKey: string,
+  selectedKey?: string,
   open: boolean,
   disabledAutoClose: boolean,
 };
@@ -50,7 +51,7 @@ class SideBar extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      selectedKey: 'fields',
+      selectedKey: undefined,
       open: false,
       disabledAutoClose: false,
     };
@@ -73,21 +74,16 @@ class SideBar extends React.Component<Props, State> {
   };
 
   toggleOpen = () => {
-    const { open } = this.state;
-    this.setState({ open: !open });
+    const { open, selectedKey } = this.state;
+    this.setState({
+      open: !open,
+      selectedKey: open ? undefined : selectedKey,
+    });
   };
 
   toggleAutoClose = () => {
     const { disabledAutoClose } = this.state;
     this.setState({ disabledAutoClose: !disabledAutoClose });
-  };
-
-  formatViewDescription = (view: ViewMetaData) => {
-    const { description } = view;
-    if (description) {
-      return <span>{description}</span>;
-    }
-    return <i>No view description.</i>;
   };
 
   setSelectedKey = (key: string) => {
@@ -98,85 +94,60 @@ class SideBar extends React.Component<Props, State> {
     );
   };
 
+  navItemChildren = (navItemChildren: React.Element<any>): React.Element<any> => {
+    const { results } = this.props;
+    const resultsEmpty = !results || Object.keys(results).length <= 0;
+    if (resultsEmpty) {
+      return <Spinner />;
+    }
+    return navItemChildren;
+  }
 
   render() {
     const { results, viewMetadata, children, queryId } = this.props;
     const { open, selectedKey } = this.state;
-    const gridClass = open ? 'open' : 'closed';
-    const resultsEmpty = !results || Object.keys(results).length <= 0;
-
-    const shiftToRight = open
-      ? styles.iconRight
-      : styles.iconLeft;
-    const icon = open
+    const title = viewMetadata.title || defaultNewViewTitle;
+    const toggleIcon = open
       ? 'times'
       : 'chevron-right';
     return (
-      <div ref={(node) => { this.wrapperRef = node; }} className={`sidebar-grid ${gridClass}`}>
-        {open && <div className={`background ${styles.toggleArea}`} />}
-        <div className={styles.sidebarContainer}>
-          <div className="sidebar">
-            <div className={`${styles.sidebarContent}`}>
-              <span role="presentation" onClick={this.toggleOpen} className={`${styles.sidebarNav} ${shiftToRight}`}>
-                <span data-testid="toggle-button"><Icon name={icon} className={styles.sidebarIcon} /></span>
-              </span>
-              {
-                resultsEmpty
-                  ? <Spinner />
-                  : (
-                    <React.Fragment>
-                      <NavItem isSelected={open && selectedKey === 'viewDescription'}
-                               text="View Description"
-                               icon={<Icon name="info" />}
-                               onClick={this.setSelectedKey('viewDescription')}
-                               isLast={false}
-                               isOpen={open}>
-                        <React.Fragment>
-                          <div className={styles.viewMetadata}>
-                            <h3>{viewMetadata.title || defaultNewViewTitle}</h3>
-                            <small>{viewMetadata.summary || defaultNewViewSummary}</small>
-                          </div>
-
-                          <div className={styles.viewMetadata}>
-                            <SearchResultOverview results={results} />
-                          </div>
-                          {this.formatViewDescription(viewMetadata)}
-                        </React.Fragment>
-                      </NavItem>
-                      <NavItem isSelected={open && selectedKey === 'createWidget'}
-                               text="Create"
-                               icon={<Icon name="plus" />}
-                               onClick={this.setSelectedKey('createWidget')}
-                               isLast={false}
-                               isOpen={open}>
-                        <AddWidgetButton onClick={this.toggleOpen}
-                                         toggleAutoClose={this.toggleAutoClose}
-                                         queryId={queryId} />
-
-                      </NavItem>
-                      <NavItem isSelected={open && selectedKey === 'highlighting'}
-                               text="Formatting & Highlighting"
-                               icon={<Icon name="paragraph" />}
-                               onClick={this.setSelectedKey('highlighting')}
-                               isLast={false}
-                               isOpen={open}>
-                        <HighlightingRules />
-                      </NavItem>
-                      <NavItem isSelected={open && selectedKey === 'fields'}
-                               text="Fields"
-                               icon={<Icon name="subscript" />}
-                               onClick={this.setSelectedKey('fields')}
-                               isLast
-                               isOpen={open}>
-                        {children}
-                      </NavItem>
-                    </React.Fragment>
-                  )
-              }
-            </div>
-          </div>
-        </div>
-      </div>
+      <Container ref={(node) => { this.wrapperRef = node; }} open={open}>
+        {open && <ContentOverlay onClick={this.toggleOpen} />}
+        <SidebarHeader role="presentation" onClick={this.toggleOpen} hasTitle={!!title} open={open}>
+          {open && title && <Headline title={title}>{title}</Headline>}
+          <ToggleIcon><Icon name={toggleIcon} /></ToggleIcon>
+        </SidebarHeader>
+        <HorizontalRuler />
+        <NavItem isSelected={open && selectedKey === 'viewDescription'}
+                 text="Description"
+                 icon="info"
+                 onClick={this.setSelectedKey('viewDescription')}
+                 isOpen={open}>
+          {this.navItemChildren(<ViewDescription viewMetadata={viewMetadata} results={results} />)}
+        </NavItem>
+        <NavItem isSelected={open && selectedKey === 'createWidget'}
+                 text="Create"
+                 icon="plus"
+                 onClick={this.setSelectedKey('createWidget')}
+                 isOpen={open}>
+          {this.navItemChildren(<AddWidgetButton onClick={this.toggleOpen} toggleAutoClose={this.toggleAutoClose} queryId={queryId} />)}
+        </NavItem>
+        <NavItem isSelected={open && selectedKey === 'highlighting'}
+                 text="Formatting & Highlighting"
+                 icon="paragraph"
+                 onClick={this.setSelectedKey('highlighting')}
+                 isOpen={open}>
+          {this.navItemChildren(<HighlightingRules />)}
+        </NavItem>
+        <NavItem isSelected={open && selectedKey === 'fields'}
+                 text="Fields"
+                 icon="subscript"
+                 onClick={this.setSelectedKey('fields')}
+                 expandRight
+                 isOpen={open}>
+          {this.navItemChildren(children)}
+        </NavItem>
+      </Container>
     );
   }
 }

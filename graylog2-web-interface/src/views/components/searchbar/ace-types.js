@@ -22,11 +22,13 @@ export type Command = {
     win: string,
     mac: string,
   },
+  // eslint-disable-next-line no-use-before-define
   exec: Editor => void,
 };
 
 export type Commands = {
   addCommand: Command => void,
+  removeCommands: Array<string> => void,
 };
 
 export type Popup = {
@@ -57,11 +59,11 @@ export type CompletionResult = {
 
 export type ResultsCallback = (null, Array<CompletionResult>) => void;
 
-export interface AutoCompleter {
-  getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
-}
-
 export type Position = {
   row: number,
   column: number,
 };
+
+export interface AutoCompleter {
+  getCompletions(editor: Editor, session: Session, position: Position, prefix: string, callback: ResultsCallback): void;
+}

@@ -6,7 +6,6 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 type RefreshActionsType = {
   enable: () => void,
   disable: () => void,
-  /* eslint-disable-next-line no-undef */
   setInterval: (number) => void,
 };
 

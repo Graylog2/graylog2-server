@@ -1,7 +1,6 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
-import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -12,6 +11,8 @@ import URI from 'urijs';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const NodesStore = StoreProvider.getStore('Nodes');
+
+const GLOBAL_API_BROWSER_URL = '/api-browser/global/index.html';
 
 const NodesPage = createReactClass({
   displayName: 'NodesPage',
@@ -28,7 +29,7 @@ const NodesPage = createReactClass({
     }
     if (this._hasExternalURI()) {
       return (
-        <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(Routes.GLOBAL_API_BROWSER)}>
+        <ExternalLinkButton bsStyle="info" href={URLUtils.qualifyUrl(GLOBAL_API_BROWSER_URL)}>
           Cluster Global API browser
         </ExternalLinkButton>
       );
@@ -44,7 +45,7 @@ const NodesPage = createReactClass({
   },
 
   render() {
-    const { nodes } = this.state;
+    const { nodes, currentUser } = this.state;
     return (
       <DocumentTitle title="Nodes">
         <div>
@@ -60,7 +61,7 @@ const NodesPage = createReactClass({
               {this._renderGlobalAPIButton()}
             </span>
           </PageHeader>
-          <NodesList permissions={this.state.currentUser.permissions} nodes={nodes} />
+          <NodesList permissions={currentUser.permissions} nodes={nodes} />
         </div>
       </DocumentTitle>
     );

@@ -26,14 +26,6 @@ Do you want to get paid for developing our open source product? Apply for one of
 
 Come chat with us in the [`#graylog` channel on freenode IRC](https://webchat.freenode.net/?channels=%23graylog) or create a topic in our [community discussion forums](https://community.graylog.org/).
 
-
-## Miscellaneous
-
-![YourKit](https://s3.amazonaws.com/graylog2public/images/yourkit.png)
-
-YourKit supports our open source project by sponsoring its full-featured Java Profiler. YourKit, LLC is the creator of [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp) and [YourKit .NET Profiler](http://www.yourkit.com/.net/profiler/index.jsp), innovative and intelligent tools for profiling Java and .NET applications.
-
-
 ## License
 
 _Graylog_ is released under version 3.0 of the [GNU General Public License](COPYING).

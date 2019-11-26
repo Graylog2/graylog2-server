@@ -16,13 +16,11 @@
  */
 package org.graylog2.lookup;
 
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
 import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
-import org.graylog2.lookup.caches.GuavaLookupCache;
+import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.plugin.inject.Graylog2Module;
 
@@ -37,22 +35,22 @@ public class LookupModule extends Graylog2Module {
                 NullCache.Factory.class,
                 NullCache.Config.class);
 
-        installLookupCache(GuavaLookupCache.NAME,
-                GuavaLookupCache.class,
-                GuavaLookupCache.Factory.class,
-                GuavaLookupCache.Config.class);
+        installLookupCache(CaffeineLookupCache.NAME,
+                CaffeineLookupCache.class,
+                CaffeineLookupCache.Factory.class,
+                CaffeineLookupCache.Config.class);
 
         installLookupDataAdapter(CSVFileDataAdapter.NAME,
                 CSVFileDataAdapter.class,
                 CSVFileDataAdapter.Factory.class,
                 CSVFileDataAdapter.Config.class);
 
-        installLookupDataAdapter(DnsLookupDataAdapter.NAME,
+        installLookupDataAdapter2(DnsLookupDataAdapter.NAME,
                                  DnsLookupDataAdapter.class,
                                  DnsLookupDataAdapter.Factory.class,
                                  DnsLookupDataAdapter.Config.class);
 
-        installLookupDataAdapter(HTTPJSONPathDataAdapter.NAME,
+        installLookupDataAdapter2(HTTPJSONPathDataAdapter.NAME,
                 HTTPJSONPathDataAdapter.class,
                 HTTPJSONPathDataAdapter.Factory.class,
                 HTTPJSONPathDataAdapter.Config.class);

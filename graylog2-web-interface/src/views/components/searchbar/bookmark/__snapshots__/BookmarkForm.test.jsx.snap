@@ -8,7 +8,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
     target={[Function]}
   >
     <div
-      className="popover right"
+      className="Popover-wd1j0g-0 eOAaQr popover right"
       id="bookmark-popover"
       role="tooltip"
       style={
@@ -46,7 +46,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"
@@ -84,7 +84,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
     target={[Function]}
   >
     <div
-      className="popover right"
+      className="Popover-wd1j0g-0 eOAaQr popover right"
       id="bookmark-popover"
       role="tooltip"
       style={
@@ -122,7 +122,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"
@@ -168,7 +168,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
     target={[Function]}
   >
     <div
-      className="popover right"
+      className="Popover-wd1j0g-0 eOAaQr popover right"
       id="bookmark-popover"
       role="tooltip"
       style={
@@ -206,7 +206,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"

@@ -112,6 +112,11 @@
                 <artifactId>semver4j</artifactId>
                 <version>${semver4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.mongodb</groupId>
@@ -595,10 +600,11 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.joschi.nosqlunit</groupId>
-                <artifactId>nosqlunit-elasticsearch-http</artifactId>
-                <version>${nosqlunit-elasticsearch-http.version}</version>
-                <scope>test</scope>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jukito</groupId>

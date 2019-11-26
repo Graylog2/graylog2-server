@@ -12,7 +12,7 @@ const seriesGenerator = (type, name, labels, values) => ({ type, name, x: labels
 
 const ScatterVisualization: VisualizationComponent = ({ config, data, effectiveTimerange }: VisualizationComponentProps) => (
   <XYPlot config={config}
-          chartData={chartData(config, data, 'scatter', seriesGenerator)}
+          chartData={chartData(config, data.chart || Object.values(data)[0], 'scatter', seriesGenerator)}
           effectiveTimerange={effectiveTimerange} />
 );
 

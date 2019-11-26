@@ -45,6 +45,7 @@ Search form with controlled query string and help:
 ```js
 import createReactClass from 'create-react-class';
 import { Button } from 'components/graylog';
+import { Icon } from 'components/common';
 
 const SearchFormExample = createReactClass({
   getInitialState() {

@@ -23,8 +23,20 @@ describe('HeatmapVisualization', () => {
       .visualization('heatmap')
       .build();
     const effectiveTimerange = { type: 'absolute', from: '2019-10-22T11:54:35.850Z', to: '2019-10-29T11:53:50.000Z' };
-    const plotLayout = { yaxis: { type: 'category', fixedrange: true }, xaxis: { type: 'category', fixedrange: true }, margin: { b: 80, l: 80 } };
-    const plotChartData = [{ type: 'heatmap', name: 'Heatmap Chart', x: ['100', '201', '304', '405'], y: ['00', '01'], z: [[217], [undefined, 217], [213], [undefined, 230]], transpose: true }];
+    const plotLayout = { yaxis: { type: 'category', fixedrange: true, automargin: true }, xaxis: { type: 'category', fixedrange: true, automargin: true }, plot_bgcolor: '#440154' };
+    const plotChartData = [
+      {
+        type: 'heatmap',
+        name: 'Heatmap Chart',
+        x: ['100', '201', '304', '405'],
+        y: ['00', '01'],
+        z: [[217, 'None', 213, 'None'], ['None', 217, 'None', 230]],
+        text: [['count()', 'count()', 'count()', 'count()'], ['count()', 'count()', 'count()', 'count()']],
+        customdata: [[217, 'None', 213, 'None'], ['None', 217, 'None', 230]],
+        hovertemplate: 'hour: %{y}<br>http_status: %{x}<br>%{text}: %{customdata}<extra></extra>',
+        colorscale: [[0, '#440154'], [0.05, '#481567'], [0.1, '#483677'], [0.15, '#453781'], [0.2, '#404788'], [0.3, '#39568c'], [0.35, '#33638d'], [0.4, '#2d708e'], [0.45, '#287d8e'], [0.5, '#238a8d'], [0.55, '#1f968b'], [0.6, '#20a387'], [0.65, '#29af7f'], [0.7, '#3cbb75'], [0.75, '#55c667'], [0.8, '#73d055'], [0.85, '#95d840'], [0.9, '#b8de29'], [0.95, '#dce319'], [1, '#fde725']],
+      },
+    ];
 
     const wrapper = mount(<HeatmapVisualization data={fixtures.validData}
                                                 config={config}

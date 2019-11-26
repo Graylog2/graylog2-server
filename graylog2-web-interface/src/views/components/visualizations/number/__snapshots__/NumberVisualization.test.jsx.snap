@@ -2,16 +2,15 @@
 
 exports[`NumberVisualization should render a number visualization 1`] = `
 <div
-  className="container"
-  style={
-    Object {
-      "fontSize": "20px",
-    }
-  }
+  className="NumberVisualization__SingleItemGrid-lb6dwm-1 ioFQRZ"
 >
-  <div>
+  <div
+    className="NumberVisualization__NumberBox-lb6dwm-2 hHukuE"
+  >
     <div>
-      2134342
+      <div>
+        2134342
+      </div>
     </div>
   </div>
 </div>

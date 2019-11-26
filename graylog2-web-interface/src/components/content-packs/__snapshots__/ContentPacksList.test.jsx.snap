@@ -33,7 +33,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               className="typeahead-wrapper"
             >
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="content-packs-filter"
                 label="Filter"
                 name="content-packs-filter"
@@ -78,7 +78,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -212,7 +212,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="list-group"
     >
       <span
-        className="listGroupHeader list-group-item"
+        className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="headerWrapper"
@@ -221,7 +221,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -270,12 +270,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-1"
                 onClick={[Function]}
@@ -373,7 +373,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -422,12 +422,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-2"
                 onClick={[Function]}
@@ -525,7 +525,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -563,12 +563,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-3"
                 onClick={[Function]}
@@ -666,7 +666,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -704,12 +704,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-4"
                 onClick={[Function]}
@@ -807,7 +807,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -845,12 +845,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-5"
                 onClick={[Function]}
@@ -948,7 +948,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -986,12 +986,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-6"
                 onClick={[Function]}
@@ -1089,7 +1089,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -1127,12 +1127,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-7"
                 onClick={[Function]}
@@ -1230,7 +1230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -1268,12 +1268,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-8"
                 onClick={[Function]}
@@ -1371,7 +1371,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -1409,12 +1409,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-9"
                 onClick={[Function]}
@@ -1512,7 +1512,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="list-group-item"
+        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
       >
         <div
           className="row-sm row"
@@ -1550,12 +1550,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </button>
              
             <div
-              className="dropdown btn-group btn-group-sm btn-group-default"
+              className="dropdown btn-group btn-group-sm"
             >
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 fsmAnc dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-10"
                 onClick={[Function]}
@@ -1664,7 +1664,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -1829,7 +1829,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
               className="typeahead-wrapper"
             >
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="content-packs-filter"
                 label="Filter"
                 name="content-packs-filter"
@@ -1874,7 +1874,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"
@@ -2004,7 +2004,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
       className="col-md-5"
     >
       <ul
-        className="pagination pagination-sm pagination-pagination pager"
+        className="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm pagination-pagination pager"
       >
         <li
           className="disabled"

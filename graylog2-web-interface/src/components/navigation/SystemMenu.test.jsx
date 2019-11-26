@@ -107,15 +107,15 @@ describe('SystemMenu', () => {
     });
     it('uses a default title if location is not matched', () => {
       const wrapper = mount(<SystemMenu location={{ pathname: '/' }} />);
-      expect(wrapper.find('NavDropdown')).toHaveProp('title', 'System');
+      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System');
     });
     it('uses a custom title if location is matched', () => {
       const wrapper = mount(<SystemMenu location={{ pathname: '/system/overview' }} />);
-      expect(wrapper.find('NavDropdown')).toHaveProp('title', 'System / Overview');
+      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Overview');
     });
     it('uses a custom title for a plugin route if location is matched', () => {
       const wrapper = mount(<SystemMenu location={{ pathname: '/system/licenses' }} />);
-      expect(wrapper.find('NavDropdown')).toHaveProp('title', 'System / Licenses');
+      expect(wrapper.find('NavDropdown').at(1)).toHaveProp('title', 'System / Licenses');
     });
   });
 });

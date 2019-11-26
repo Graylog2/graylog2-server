@@ -4,12 +4,20 @@ import * as Immutable from 'immutable';
 import { mount } from 'enzyme';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import asMock from 'helpers/mocking/AsMock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import AggregationControls from './AggregationControls';
 
 jest.mock('stores/connect', () => x => x);
 jest.mock('views/components/aggregationbuilder/PivotSelect', () => 'pivot-select');
+jest.mock('graylog-web-plugin/plugin', () => ({
+  PluginStore: { exports: jest.fn(() => []) },
+}));
+
+class DummyVisualizationConfig extends VisualizationConfig {}
 
 describe('AggregationControls', () => {
   // eslint-disable-next-line no-unused-vars, react/prop-types
@@ -75,5 +83,39 @@ describe('AggregationControls', () => {
       </AggregationControls>
     ));
     expect(wrapper.find('DummyComponent')).toHaveProp('onVisualizationConfigChange');
+  });
+
+  it('shows custom visualization config component', () => {
+    const CustomVisualizationConfigComponent = () => <div>This is a custom visualization config</div>;
+    const OtherCustomVisualizationConfigComponent = () => <div>This text should not be rendered</div>;
+    asMock(PluginStore.exports).mockImplementation(type => ({
+      visualizationConfigTypes: [{
+        type: 'other',
+        component: OtherCustomVisualizationConfigComponent,
+      }, {
+        type: 'customConfig',
+        component: CustomVisualizationConfigComponent,
+      }],
+    }[type] || []));
+
+    const configWithVisualizationConfig = config.toBuilder()
+      .visualization('customConfig')
+      .visualizationConfig(new DummyVisualizationConfig())
+      .build();
+    const wrapper = mount((
+      <AggregationControls config={configWithVisualizationConfig}
+                           fields={Immutable.List([])}
+                           onChange={() => {}}>
+        {children}
+      </AggregationControls>
+    ));
+
+    expect(wrapper).toIncludeText('This is a custom visualization config');
+    expect(wrapper).not.toIncludeText('This text should not be rendered');
+    expect(wrapper.find(OtherCustomVisualizationConfigComponent)).not.toExist();
+    const configComponent = wrapper.find(CustomVisualizationConfigComponent);
+    expect(configComponent).toExist();
+    expect(configComponent).toHaveProp('config', configWithVisualizationConfig.visualizationConfig);
+    expect(configComponent).toHaveProp('onChange');
   });
 });

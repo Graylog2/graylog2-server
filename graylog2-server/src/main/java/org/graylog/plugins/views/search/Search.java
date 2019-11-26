@@ -144,10 +144,15 @@ public abstract class Search {
     }
 
     Set<String> usedStreamIds() {
-        return queries().stream()
+        final Set<String> queryStreamIds = queries().stream()
                 .map(Query::usedStreamIds)
-                .reduce(Sets::union)
-                .orElseThrow(() -> new RuntimeException("Failed to get used stream IDs from query"));
+                .reduce(Collections.emptySet(), Sets::union);
+        final Set<String> searchTypeStreamIds = queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchType::effectiveStreams)
+                .reduce(Collections.emptySet(), Sets::union);
+
+        return Sets.union(queryStreamIds, searchTypeStreamIds);
     }
 
     @AutoValue.Builder

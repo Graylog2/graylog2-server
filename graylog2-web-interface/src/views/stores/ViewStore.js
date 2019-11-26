@@ -3,8 +3,9 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
+import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
-import SearchTypesGenerator from 'views/logic/searchtypes/SearchTypesGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { Properties, ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -16,7 +17,6 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
-import type { RefluxActions } from './StoreTypes';
 
 export type ViewStoreState = {
   activeQuery: QueryId,
@@ -193,21 +193,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const oldWidgets = get(this.view, 'state') && this.view.state.map(s => s.widgets);
       const newWidgets = get(view, 'state') && view.state.map(s => s.widgets);
       if (!isEqualWith(oldWidgets, newWidgets, Immutable.is)) {
-        const states = view.state;
-        const searchTypes = states.map(state => SearchTypesGenerator(state.widgets));
-
-        const search = get(view, 'search');
-        const newQueries = search.queries.map(q => q.toBuilder().searchTypes(searchTypes.get(q.id, {}).searchTypes).build());
-        const newSearch = search.toBuilder().queries(newQueries).build();
-        let newView = view.toBuilder().search(newSearch).build();
-
-        searchTypes.map(({ widgetMapping }) => widgetMapping)
-          .forEach((widgetMapping, queryId) => {
-            const newStates = newView.state;
-            if (states.has(queryId)) {
-              newView = newView.toBuilder().state(newStates.update(queryId, state => state.toBuilder().widgetMapping(widgetMapping).build())).build();
-            }
-          });
+        const newView = UpdateSearchForWidgets(view);
         return [newView, true];
       }
 

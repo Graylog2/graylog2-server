@@ -37,14 +37,14 @@ class QueryTitleEditModal extends React.Component<Props, State> {
       show: true,
       titleDraft: activeQueryTitle,
     });
-  }
+  };
 
   _close = () => {
     this.setState({
       show: false,
       titleDraft: '',
     });
-  }
+  };
 
   _onDraftSave = () => {
     const { titleDraft } = this.state;
@@ -55,7 +55,6 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     }
   };
 
-  // eslint-disable-next-line no-undef
   _onDraftChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
     this.setState({ titleDraft: evt.target.value });
   };

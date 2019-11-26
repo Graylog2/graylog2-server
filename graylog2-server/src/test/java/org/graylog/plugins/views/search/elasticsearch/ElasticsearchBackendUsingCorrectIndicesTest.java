@@ -138,8 +138,10 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         final ArgumentCaptor<DateTime> toCapture = ArgumentCaptor.forClass(DateTime.class);
         verify(indexRangeService, times(1)).find(fromCapture.capture(), toCapture.capture());
 
-        assertThat(fromCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600))).isTrue();
-        assertThat(toCapture.getValue().isEqual(new DateTime(datetimeFixture, DateTimeZone.UTC))).isTrue();
+        assertThat(fromCapture.getValue()).isEqualTo(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600));
+        assertThat(toCapture.getValue()).isEqualTo(new DateTime(datetimeFixture, DateTimeZone.UTC));
+
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     private Query dummyQuery(TimeRange timeRange) {

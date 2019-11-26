@@ -39,6 +39,7 @@ import org.graylog2.lookup.adapters.dnslookup.DnsClient;
 import org.graylog2.lookup.adapters.dnslookup.DnsLookupType;
 import org.graylog2.lookup.adapters.dnslookup.PtrDnsAnswer;
 import org.graylog2.lookup.adapters.dnslookup.TxtDnsAnswer;
+import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -87,16 +88,14 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
     private final Timer textLookupTimer;
 
     @Inject
-    public DnsLookupDataAdapter(@Assisted("id") String id,
-                                @Assisted("name") String name,
-                                @Assisted LookupDataAdapterConfiguration config,
+    public DnsLookupDataAdapter(@Assisted("dto") DataAdapterDto dto,
                                 MetricRegistry metricRegistry) {
-        super(id, name, config, metricRegistry);
-        this.config = (Config) config;
-        this.errorCounter = metricRegistry.counter(MetricRegistry.name(getClass(), id, ERROR_COUNTER));
-        this.resolveDomainNameTimer = metricRegistry.timer(MetricRegistry.name(getClass(), id, TIMER_RESOLVE_DOMAIN_NAME));
-        this.reverseLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), id, TIMER_REVERSE_LOOKUP));
-        this.textLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), id, TIMER_TEXT_LOOKUP));
+        super(dto, metricRegistry);
+        this.config = (Config) dto.config();
+        this.errorCounter = metricRegistry.counter(MetricRegistry.name(getClass(), dto.id(), ERROR_COUNTER));
+        this.resolveDomainNameTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_RESOLVE_DOMAIN_NAME));
+        this.reverseLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_REVERSE_LOOKUP));
+        this.textLookupTimer = metricRegistry.timer(MetricRegistry.name(getClass(), dto.id(), TIMER_TEXT_LOOKUP));
     }
 
     @Override
@@ -134,7 +133,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         final String trimmedKey = StringUtils.trimToNull(key.toString());
         if (trimmedKey == null) {
             LOG.debug("A blank key was supplied");
-            return LookupResult.empty();
+            return getEmptyResult();
         }
 
         LOG.debug("Beginning [{}] DNS resolution for key [{}]", config.lookupType(), trimmedKey);
@@ -194,7 +193,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", A_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getEmptyResult();
         }
 
         if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
@@ -202,7 +201,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not resolve [{}] records for hostname [{}].", A_RECORD_LABEL, key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     /**
@@ -216,11 +215,11 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         try {
             aDnsAnswers = dnsClient.resolveIPv6AddressForHostname(key.toString(), false);
         } catch (UnknownHostException e) {
-            return LookupResult.empty(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
+            return getEmptyResult(); // UnknownHostException is a valid case when the DNS record does not exist. Do not log an error.
         } catch (Exception e) {
             LOG.error("Could not resolve [{}] records for hostname [{}]. Cause [{}]", AAAA_RECORD_LABEL, key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getErrorResult();
         }
 
         if (CollectionUtils.isNotEmpty(aDnsAnswers)) {
@@ -228,7 +227,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not resolve [{}] records for hostname [{}].", AAAA_RECORD_LABEL, key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     private LookupResult buildLookupResult(List<ADnsAnswer> aDnsAnswers) {
@@ -238,7 +237,8 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         final String singleValue = aDnsAnswers.get(0).ipAddress();
         LookupResult.Builder builder = LookupResult.builder()
                                                    .single(singleValue)
-                                                   .multiValue(Collections.singletonMap(RESULTS_FIELD, aDnsAnswers));
+                                                   .multiValue(Collections.singletonMap(RESULTS_FIELD, aDnsAnswers))
+                                                   .stringListValue(ADnsAnswer.convertToStringListValue(aDnsAnswers));
 
         assignMinimumTTL(aDnsAnswers, builder);
 
@@ -277,7 +277,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
                 singleValue = ip6Answers.get(0).ipAddress();
             } else {
                 LOG.debug("Could not resolve [A/AAAA] records hostname [{}].", key);
-                return LookupResult.empty();
+                return getEmptyResult();
             }
 
             final LookupResult.Builder builder = LookupResult.builder();
@@ -290,7 +290,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
             allAnswers.addAll(ip6Answers);
 
             if (CollectionUtils.isNotEmpty(allAnswers)) {
-                builder.multiValue(Collections.singletonMap(RESULTS_FIELD, allAnswers));
+                builder.multiValue(Collections.singletonMap(RESULTS_FIELD, allAnswers)).stringListValue(ADnsAnswer.convertToStringListValue(allAnswers));
             }
 
             assignMinimumTTL(allAnswers, builder);
@@ -299,7 +299,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not resolve [A/AAAA] records for hostname [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getErrorResult();
         }
     }
 
@@ -311,7 +311,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform reverse DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getErrorResult();
         }
 
         if (dnsResponse != null) {
@@ -338,7 +338,7 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         }
 
         LOG.debug("Could not perform reverse lookup on IP address [{}]. No PTR record was found.", key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     private LookupResult performTextLookup(Object key) {
@@ -351,19 +351,20 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Could not perform TXT DNS lookup for [{}]. Cause [{}]", key, ExceptionUtils.getRootCauseMessage(e));
             errorCounter.inc();
-            return LookupResult.empty();
+            return getErrorResult();
         }
 
         if (CollectionUtils.isNotEmpty(txtDnsAnswers)) {
             final LookupResult.Builder builder = LookupResult.builder();
-            builder.multiValue(Collections.singletonMap(RAW_RESULTS_FIELD, txtDnsAnswers));
+            builder.multiValue(Collections.singletonMap(RAW_RESULTS_FIELD, txtDnsAnswers))
+                    .stringListValue(TxtDnsAnswer.convertToStringListValue(txtDnsAnswers));
             assignMinimumTTL(txtDnsAnswers, builder);
 
             return builder.build();
         }
 
         LOG.debug("Could not perform Text lookup on IP address [{}]. No TXT records were found.", key);
-        return LookupResult.empty();
+        return getEmptyResult();
     }
 
     /**
@@ -387,11 +388,9 @@ public class DnsLookupDataAdapter extends LookupDataAdapter {
         throw new UnsupportedOperationException();
     }
 
-    public interface Factory extends LookupDataAdapter.Factory<DnsLookupDataAdapter> {
+    public interface Factory extends LookupDataAdapter.Factory2<DnsLookupDataAdapter> {
         @Override
-        DnsLookupDataAdapter create(@Assisted("id") String id,
-                                    @Assisted("name") String name,
-                                    LookupDataAdapterConfiguration configuration);
+        DnsLookupDataAdapter create(@Assisted("dto") DataAdapterDto dto);
 
         @Override
         DnsLookupDataAdapter.Descriptor getDescriptor();

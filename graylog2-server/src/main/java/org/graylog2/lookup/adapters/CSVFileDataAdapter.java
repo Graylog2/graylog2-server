@@ -179,7 +179,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         final String value = lookupRef.get().get(stringKey);
 
         if (value == null) {
-            return LookupResult.empty();
+            return getEmptyResult();
         }
 
         return LookupResult.single(value);

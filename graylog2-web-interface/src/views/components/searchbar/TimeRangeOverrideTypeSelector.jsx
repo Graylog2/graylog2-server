@@ -11,19 +11,19 @@ const TimeRangeOverrideTypeSelector = ({ onSelect, value }) => (
                     onSelect={onSelect}
                     id="dropdown-timerange-selector">
       <MenuItem eventKey="disabled"
-                className={value === undefined ? 'selected' : null}>
+                active={value === undefined}>
         No Override
       </MenuItem>
       <MenuItem eventKey="relative"
-                className={value === 'relative' ? 'selected' : null}>
+                active={value === 'relative'}>
         Relative
       </MenuItem>
       <MenuItem eventKey="absolute"
-                className={value === 'absolute' ? 'selected' : null}>
+                active={value === 'absolute'}>
         Absolute
       </MenuItem>
       <MenuItem eventKey="keyword"
-                className={value === 'keyword' ? 'selected' : null}>
+                active={value === 'keyword'}>
         Keyword
       </MenuItem>
     </DropdownButton>

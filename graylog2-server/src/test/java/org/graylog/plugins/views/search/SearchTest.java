@@ -23,12 +23,15 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SearchTest {
     @Test
@@ -58,6 +61,33 @@ public class SearchTest {
         assertThat(before).isEqualTo(after);
     }
 
+    @Test
+    public void usedStreamIdsReturnsStreamIdsOfSearchTypes() {
+        final Query query1 = queryWithStreams("a,b,d").toBuilder()
+                .searchTypes(ImmutableSet.of(
+                        searchTypeWithStreams("e,f,g"),
+                        searchTypeWithStreams("a,h,b")
+                ))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query1)).build();
+
+        assertThat(search.usedStreamIds()).containsExactlyInAnyOrder("a", "b", "d", "e", "f", "g", "h");
+    }
+
+    @Test
+    public void usedStreamIdsReturnsEmptySetForMissingQueries() {
+        final Search search = Search.builder().build();
+
+        assertThat(search.usedStreamIds()).isEmpty();
+    }
+
+    @Test
+    public void usedStreamIdsReturnsQueryStreamsWhenSearchTypesAreMissing() {
+        final Search search = searchWithQueriesWithStreams("c,d,e");
+
+        assertThat(search.usedStreamIds()).containsExactlyInAnyOrder("c", "d", "e");
+    }
+
     private Search searchWithQueriesWithStreams(String... queriesWithStreams) {
         Set<Query> queries = Arrays.stream(queriesWithStreams).map(this::queryWithStreams).collect(Collectors.toSet());
 
@@ -76,5 +106,14 @@ public class SearchTest {
             builder = builder.filter(StreamFilter.anyIdOf(streamIds));
 
         return builder.build();
+    }
+
+    private SearchType searchTypeWithStreams(String streamIds) {
+        final SearchType searchType = mock(SearchType.class);
+        final Set<String> streamIdSet = streamIds.isEmpty() ? Collections.emptySet() : new HashSet<>(Arrays.asList(streamIds.split(",")));
+        when(searchType.effectiveStreams()).thenReturn(streamIdSet);
+        when(searchType.id()).thenReturn(UUID.randomUUID().toString());
+
+        return searchType;
     }
 }

@@ -1,12 +1,11 @@
 import { css } from 'styled-components';
 import { darken, lighten, getLuminance } from 'polished';
 
-import { useTheme } from 'theme/GraylogThemeContext';
+import teinte from 'theme/teinte';
 import contrastingColor from 'util/contrastingColor';
 import bsStyleThemeVariant from '../variants/bsStyle';
 
 const buttonStyles = ({ bsStyle }) => {
-  const { colors } = useTheme();
   const cssBuilder = (color) => {
     const isLink = bsStyle === 'link';
 
@@ -83,7 +82,7 @@ const buttonStyles = ({ bsStyle }) => {
 
   return bsStyleThemeVariant(cssBuilder, {
     link: {
-      teinte: cssBuilder(colors.tertiary.quattro),
+      teinte: cssBuilder(teinte.tertiary.quattro),
     },
   });
 };

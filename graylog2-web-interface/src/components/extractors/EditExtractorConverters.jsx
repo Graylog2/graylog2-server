@@ -45,7 +45,9 @@ class EditExtractorConverters extends React.Component {
   };
 
   _onConverterAdd = () => {
-    this.setState({ selectedConverter: undefined });
+    const { displayedConverters, selectedConverter } = this.state;
+    const nextDisplayedConverters = displayedConverters.concat(selectedConverter);
+    this.setState({ selectedConverter: undefined, displayedConverters: nextDisplayedConverters });
   };
 
   _onConverterChange = (converterType, converter) => {

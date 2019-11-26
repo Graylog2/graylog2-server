@@ -108,6 +108,26 @@ public abstract class ViewDTO {
         return views.stream().map(ViewDTO::id).collect(Collectors.toSet());
     }
 
+    public Optional<ViewStateDTO> findQueryContainingWidgetId(String widgetId) {
+        return state()
+                .values()
+                .stream()
+                .filter(viewStateDTO -> viewStateDTO.widgets()
+                        .stream()
+                        .map(WidgetDTO::id)
+                        .collect(Collectors.toSet())
+                        .contains(widgetId))
+                .findFirst();
+    }
+
+    public Optional<WidgetDTO> findWidgetById(String widgetId) {
+        return state().values()
+                .stream()
+                .flatMap(q -> q.widgets().stream())
+                .filter(w -> w.id().equals(widgetId))
+                .findFirst();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         @ObjectId

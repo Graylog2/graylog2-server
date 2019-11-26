@@ -15,7 +15,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="fade in modal"
+      class="Modal-nuree8-0 cHlGak fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -91,7 +91,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   </label>
                   <span>
                     <select
-                      class="form-control input-sm"
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
                       id="page-size"
                       label="Show:"
                       name="page-size"
@@ -125,7 +125,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                 class="text-center"
               >
                 <ul
-                  class="pagination pagination-sm"
+                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
                 >
                   <li
                     class="disabled"
@@ -241,7 +241,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="fade in modal"
+      class="Modal-nuree8-0 cHlGak fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -317,7 +317,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   </label>
                   <span>
                     <select
-                      class="form-control input-sm"
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
                       id="page-size"
                       label="Show:"
                       name="page-size"
@@ -348,7 +348,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                 class="list-group"
               >
                 <button
-                  class="list-group-item"
+                  class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
                   type="button"
                 >
                   <h4
@@ -365,7 +365,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                 class="text-center"
               >
                 <ul
-                  class="pagination pagination-sm"
+                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
                 >
                   <li
                     class="disabled"

@@ -29,7 +29,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="name"
                 label="Name"
                 maxLength={250}
@@ -41,7 +41,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 value=""
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Give a descriptive name for this content pack.
               </span>
@@ -58,7 +58,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="summary"
                 label="Summary"
                 maxLength={250}
@@ -70,7 +70,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 value=""
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Give a short summary of the content pack.
               </span>
@@ -87,7 +87,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <textarea
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="description"
                 label="Description"
                 name="description"
@@ -98,7 +98,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 value=""
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Give a long description of the content pack in markdown.
               </span>
@@ -115,7 +115,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="vendor"
                 label="Vendor"
                 maxLength={250}
@@ -127,7 +127,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 value=""
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Who did this content pack and how can he be reached. e.g Name and eMail
               </span>
@@ -144,7 +144,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="url"
                 label="URL"
                 maxLength={250}
@@ -155,7 +155,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                 value=""
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Where can I find the content pack. e.g. github url
               </span>
@@ -293,7 +293,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="name"
                 label="Name"
                 maxLength={250}
@@ -305,7 +305,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 value="name"
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Give a descriptive name for this content pack.
               </span>
@@ -322,7 +322,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="summary"
                 label="Summary"
                 maxLength={250}
@@ -334,7 +334,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 value="summary"
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Give a short summary of the content pack.
               </span>
@@ -351,7 +351,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <textarea
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="description"
                 label="Description"
                 name="description"
@@ -362,7 +362,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 value="description"
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Give a long description of the content pack in markdown.
               </span>
@@ -379,7 +379,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="vendor"
                 label="Vendor"
                 maxLength={250}
@@ -391,7 +391,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 value="vendor"
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Required. Who did this content pack and how can he be reached. e.g Name and eMail
               </span>
@@ -408,7 +408,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="url"
                 label="URL"
                 maxLength={250}
@@ -419,7 +419,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                 value="http://example.com"
               />
               <span
-                className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+                className="HelpBlock-i8is92-0 huFHQV help-block"
               >
                 Where can I find the content pack. e.g. github url
               </span>
@@ -439,7 +439,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
         Content Pack selection
       </h2>
       <span
-        className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+        className="HelpBlock-i8is92-0 huFHQV help-block"
       >
         You can select between installed entities from the server (
         <i

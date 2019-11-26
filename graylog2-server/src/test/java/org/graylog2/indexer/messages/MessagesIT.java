@@ -20,7 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
-import org.graylog2.ElasticsearchBase;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
@@ -33,12 +33,12 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MessagesIT extends ElasticsearchBase {
+public class MessagesIT extends ElasticsearchBaseTest {
     private Messages messages;
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder());
+        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder());
     }
 
     @Test
@@ -49,7 +49,7 @@ public class MessagesIT extends ElasticsearchBase {
         source.put("source", "source");
         source.put("timestamp", "2017-04-13 15:29:00.000");
         final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
-        final DocumentResult indexResponse = client().execute(indexRequest);
+        final DocumentResult indexResponse = jestClient().execute(indexRequest);
 
         assertThat(indexResponse.isSucceeded()).isTrue();
 

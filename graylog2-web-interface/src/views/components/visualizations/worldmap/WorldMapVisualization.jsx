@@ -1,44 +1,58 @@
 // @flow strict
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { flow, fromPairs, get, zip } from 'lodash';
+import { flow, fromPairs, get, zip, isEmpty } from 'lodash';
 
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 
 import MapVisualization from './MapVisualization';
-import { extractSeries, formatSeries } from '../ChartData';
+import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
 import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
-const arrayToMap = ([name, x, y]) => ({ name, x, y });
-const lastKey = keys => keys[keys.length - 1];
-const mergeObject = (prev, last) => Object.assign({}, prev, last);
+const _arrayToMap = ([name, x, y]) => ({ name, x, y });
+const _lastKey = keys => keys[keys.length - 1];
+const _mergeObject = (prev, last) => Object.assign({}, prev, last);
+const _createSeriesWithoutMetric = (rows: Rows) => {
+  const leafs = getLeafsFromRows(rows);
+  const xLabels = getXLabelsFromLeafs(leafs);
+  return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
+};
+const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
+  return result => result.map(({ name, x, y }) => {
+    const keys = x.map(k => k.slice(0, -1)
+      .map((key, idx) => ({ [rowPivots[idx].field]: key }))
+      .reduce(_mergeObject, {}));
+    const newX = x.map(_lastKey);
+    // eslint-disable-next-line no-unused-vars
+    const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+    return { keys, name, values };
+  });
+};
 
 const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
   const { rowPivots } = config;
+  const onRenderComplete = useContext(RenderCompletionCallback);
+  const hasMetric = !isEmpty(config.series);
+  const markerRadiusSize = !hasMetric ? 1 : undefined;
+  const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
+
   const pipeline = flow([
     transformKeys(config.rowPivots, config.columnPivots),
-    extractSeries(),
+    seriesExtractor,
     formatSeries,
-    results => results.map(arrayToMap),
+    results => results.map(_arrayToMap),
+    _formatSeriesForMap(rowPivots),
   ]);
-  const series = pipeline(data)
-    .map(({ name, x, y }) => {
-      const newX = x.map(lastKey);
-      const keys = x.map(k => k.slice(0, -1)
-        .map((key, idx) => ({ [rowPivots[idx].field]: key }))
-        .reduce(mergeObject, {}));
-      return { name, y, x: newX, keys };
-    })
-    .map(({ keys, name, x, y }) => {
-      // eslint-disable-next-line no-unused-vars
-      const values = fromPairs(zip(x, y).filter(([_, v]) => (v !== undefined)));
-      return { keys, name, values };
-    });
+
+  const rows = data.chart || Object.values(data)[0];
+
+  const series = pipeline(rows);
 
   const viewport = get(config, 'visualizationConfig.viewport');
   const _onChange = (newViewport) => {
@@ -57,6 +71,7 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
                       viewport={viewport}
                       width={width}
                       onRenderComplete={onRenderComplete}
+                      markerRadiusSize={markerRadiusSize}
                       onChange={_onChange} />
   );
 };

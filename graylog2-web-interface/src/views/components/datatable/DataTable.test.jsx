@@ -19,21 +19,23 @@ jest.mock('stores/users/CurrentUserStore', () => MockStore('listen', 'get'));
 describe('DataTable', () => {
   const currentView = { activeQuery: 'deadbeef-23' };
 
-  const data = [{
-    key: ['2018-10-04T09:43:50.000Z'],
-    source: 'leaf',
-    values: [{
-      key: ['hulud.net', 'count()'],
-      rollup: false,
-      source: 'col-leaf',
-      value: 408,
-    }, {
-      key: ['count()'],
-      rollup: true,
-      source: 'row-leaf',
-      value: 408,
+  const data = {
+    chart: [{
+      key: ['2018-10-04T09:43:50.000Z'],
+      source: 'leaf',
+      values: [{
+        key: ['hulud.net', 'count()'],
+        rollup: false,
+        source: 'col-leaf',
+        value: 408,
+      }, {
+        key: ['count()'],
+        rollup: true,
+        source: 'row-leaf',
+        value: 408,
+      }],
     }],
-  }];
+  };
 
   const columnPivot = new Pivot('source', 'values', { limit: 15 });
   const rowPivot = new Pivot('timestamp', 'time', { interval: 'auto' });
@@ -50,7 +52,7 @@ describe('DataTable', () => {
       .build();
     const wrapper = renderer.create(<DataTable config={config}
                                                currentView={currentView}
-                                               data={[]}
+                                               data={{}}
                                                fields={Immutable.List([])} />);
     expect(wrapper.toJSON()).toMatchSnapshot();
   });
@@ -89,16 +91,19 @@ describe('DataTable', () => {
 
   it('renders column pivot header without offset when rollup is disabled', () => {
     const protocolPivot = new Pivot('nf_proto_name', 'values', { limit: 15 });
-    const protocolData = [{
-      key: [],
-      values: [{
-        key: ['TCP', 'count()'],
-        value: 239,
-        rollup: false,
-        source: 'col-leaf',
-      }, { key: ['UDP', 'count()'], value: 226, rollup: false, source: 'col-leaf' }],
-      source: 'leaf',
-    }];
+    const protocolData = {
+      chart:
+        [{
+          key: [],
+          values: [{
+            key: ['TCP', 'count()'],
+            value: 239,
+            rollup: false,
+            source: 'col-leaf',
+          }, { key: ['UDP', 'count()'], value: 226, rollup: false, source: 'col-leaf' }],
+          source: 'leaf',
+        }],
+    };
 
     const config = AggregationWidgetConfig.builder()
       .rowPivots([])
@@ -116,41 +121,44 @@ describe('DataTable', () => {
   });
 
   it('passes inferred types to fields', () => {
-    const dataWithMoreSeries = [{
-      key: ['2018-10-04T09:43:50.000Z'],
-      source: 'leaf',
-      values: [{
-        key: ['hulud.net', 'count()'],
-        rollup: false,
-        source: 'col-leaf',
-        value: 408,
-      }, {
-        key: ['count()'],
-        rollup: true,
-        source: 'row-leaf',
-        value: 408,
-      }, {
-        key: ['hulud.net', 'avg(bytes)'],
-        rollup: false,
-        source: 'col-leaf',
-        value: 1430,
-      }, {
-        key: ['avg(bytes)'],
-        rollup: true,
-        source: 'row-leaf',
-        value: 927,
-      }, {
-        key: ['hulud.net', 'max(timestamp)'],
-        rollup: false,
-        source: 'col-leaf',
-        value: 1553862602136,
-      }, {
-        key: ['max(timestamp)'],
-        rollup: true,
-        source: 'row-leaf',
-        value: 1553862613857,
-      }],
-    }];
+    const dataWithMoreSeries = {
+      chart:
+        [{
+          key: ['2018-10-04T09:43:50.000Z'],
+          source: 'leaf',
+          values: [{
+            key: ['hulud.net', 'count()'],
+            rollup: false,
+            source: 'col-leaf',
+            value: 408,
+          }, {
+            key: ['count()'],
+            rollup: true,
+            source: 'row-leaf',
+            value: 408,
+          }, {
+            key: ['hulud.net', 'avg(bytes)'],
+            rollup: false,
+            source: 'col-leaf',
+            value: 1430,
+          }, {
+            key: ['avg(bytes)'],
+            rollup: true,
+            source: 'row-leaf',
+            value: 927,
+          }, {
+            key: ['hulud.net', 'max(timestamp)'],
+            rollup: false,
+            source: 'col-leaf',
+            value: 1553862602136,
+          }, {
+            key: ['max(timestamp)'],
+            rollup: true,
+            source: 'row-leaf',
+            value: 1553862613857,
+          }],
+        }],
+    };
     const avgSeries = new Series('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
 

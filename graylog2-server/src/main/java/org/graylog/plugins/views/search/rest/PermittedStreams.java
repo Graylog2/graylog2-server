@@ -38,7 +38,7 @@ public class PermittedStreams {
     public ImmutableSet<String> load(Predicate<String> isStreamIdPermitted) {
         final Set<String> result = streamService.loadAll().stream()
                 .map(org.graylog2.plugin.streams.Stream::getId)
-                // Unless explicitly queried, exclude event indices by defaulth
+                // Unless explicitly queried, exclude event indices by default
                 // Having the event indices in every search, makes sorting almost impossible
                 // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
                 // TODO: this filter can be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490

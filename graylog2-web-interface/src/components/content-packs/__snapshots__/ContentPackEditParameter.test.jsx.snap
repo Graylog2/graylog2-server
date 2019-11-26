@@ -23,7 +23,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -35,7 +35,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -52,7 +52,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -64,7 +64,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -81,7 +81,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -93,7 +93,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -110,7 +110,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={false}
             id="type"
             label="Value Type"
@@ -143,7 +143,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -160,7 +160,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
@@ -171,7 +171,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>
@@ -205,7 +205,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -217,7 +217,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter title"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -234,7 +234,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -246,7 +246,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter name"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -263,7 +263,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -275,7 +275,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="A parameter descriptions"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -292,7 +292,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={true}
             id="type"
             label="Value Type"
@@ -325,7 +325,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -342,7 +342,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
@@ -353,7 +353,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
             value="test"
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>
@@ -387,7 +387,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="title"
             label="Title"
             maxLength={250}
@@ -399,7 +399,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a descriptive title for this content pack.
           </span>
@@ -416,7 +416,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="name"
             label="Name"
             maxLength={250}
@@ -428,7 +428,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             This is used as the parameter reference and must not contain a space.
           </span>
@@ -445,7 +445,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="description"
             label="Description"
             maxLength={250}
@@ -457,7 +457,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a description explaining what will be done with this parameter.
           </span>
@@ -474,7 +474,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <select
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             disabled={false}
             id="type"
             label="Value Type"
@@ -507,7 +507,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             </option>
           </select>
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give the type of the parameter.
           </span>
@@ -524,7 +524,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
         </label>
         <span>
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="default_value"
             label="Default value"
             maxLength={250}
@@ -535,7 +535,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
             value=""
           />
           <span
-            className="HelpBlock__StyledHelpBlock-i8is92-0 cJDLsB help-block"
+            className="HelpBlock-i8is92-0 huFHQV help-block"
           >
             Give a default value if the parameter is not optional.
           </span>

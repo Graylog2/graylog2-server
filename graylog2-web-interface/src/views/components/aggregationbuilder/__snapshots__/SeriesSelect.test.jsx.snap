@@ -11,7 +11,7 @@ exports[`SeriesSelect renders with minimal props 1`] = `
     onTouchEnd={[Function]}
   >
     <div
-      className="css-1hwfws3"
+      className="css-5b48ez"
     >
       <div
         className="css-151xaom-placeholder"

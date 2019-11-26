@@ -42,6 +42,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -60,8 +61,10 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -82,14 +85,12 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     private Headers headers;
 
     @Inject
-    protected HTTPJSONPathDataAdapter(@Assisted LookupDataAdapterConfiguration config,
-                                      @Assisted("id") String id,
-                                      @Assisted("name") String name,
+    protected HTTPJSONPathDataAdapter(@Assisted("dto") DataAdapterDto dto,
                                       Engine templateEngine,
                                       OkHttpClient httpClient,
                                       MetricRegistry metricRegistry) {
-        super(id, name, config, metricRegistry);
-        this.config = (Config) config;
+        super(dto, metricRegistry);
+        this.config = (Config) dto.config();
         this.templateEngine = templateEngine;
         // TODO Add config options: caching, timeouts, custom headers, basic auth (See: https://github.com/square/okhttp/wiki/Recipes)
         this.httpClient = httpClient.newBuilder().build(); // Copy HTTP client to be able to modify it
@@ -157,7 +158,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         if (url == null) {
             LOG.error("Couldn't parse URL <%s> - returning empty result", urlString);
             httpURLErrors.mark();
-            return LookupResult.empty();
+            return getErrorResult();
         }
 
         final Request request = new Request.Builder()
@@ -171,14 +172,18 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             if (!response.isSuccessful()) {
                 LOG.warn("HTTP request for key <{}> failed: {}", key, response);
                 httpRequestErrors.mark();
-                return LookupResult.empty();
+                return getErrorResult();
             }
 
-            return parseBody(singleJsonPath, multiJsonPath, response.body().byteStream());
+            final LookupResult result = parseBody(singleJsonPath, multiJsonPath, response.body().byteStream());
+            if (result == null) {
+                return getErrorResult();
+            }
+            return result;
         } catch (IOException e) {
             LOG.error("HTTP request error for key <{}>", key, e);
             httpRequestErrors.mark();
-            return LookupResult.empty();
+            return getErrorResult();
         } finally {
             time.stop();
         }
@@ -198,6 +203,13 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                     if (multiValue instanceof Map) {
                         //noinspection unchecked
                         builder = builder.multiValue((Map<Object, Object>) multiValue);
+                    } else if (multiValue instanceof List) {
+                        //noinspection unchecked
+                        final List<String> stringList = ((List<Object>) multiValue).stream().map(Object::toString).collect(Collectors.toList());
+                        builder = builder.stringListValue(stringList);
+
+                        // for backwards compatibility
+                        builder = builder.multiSingleton(multiValue);
                     } else {
                         builder = builder.multiSingleton(multiValue);
                     }
@@ -220,17 +232,17 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                 }
             } catch (PathNotFoundException e) {
                 LOG.warn("Couldn't read single JSONPath from response - returning empty result ({})", e.getMessage());
-                return LookupResult.empty();
+                return null;
             }
         } catch (InvalidJsonException e) {
             LOG.error("Couldn't parse JSON response", e);
-            return LookupResult.empty();
+            return null;
         } catch (ClassCastException e) {
             LOG.error("Couldn't assign value type", e);
-            return LookupResult.empty();
+            return null;
         } catch (Exception e) {
             LOG.error("Unexpected error parsing JSON response", e);
-            return LookupResult.empty();
+            return null;
         }
     }
 
@@ -238,11 +250,9 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     public void set(Object key, Object value) {
     }
 
-    public interface Factory extends LookupDataAdapter.Factory<HTTPJSONPathDataAdapter> {
+    public interface Factory extends LookupDataAdapter.Factory2<HTTPJSONPathDataAdapter> {
         @Override
-        HTTPJSONPathDataAdapter create(@Assisted("id") String id,
-                                       @Assisted("name") String name,
-                                       LookupDataAdapterConfiguration configuration);
+        HTTPJSONPathDataAdapter create(@Assisted("dto") DataAdapterDto dto);
 
         @Override
         Descriptor getDescriptor();

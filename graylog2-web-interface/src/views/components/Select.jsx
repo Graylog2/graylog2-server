@@ -11,6 +11,11 @@ const MultiValueRemove = (props) => {
   );
 };
 
+const valueContainer = base => ({
+  ...base,
+  minWidth: '6.5vw',
+});
+
 const multiValue = base => ({
   ...base,
   backgroundColor: '#ebf5ff',
@@ -40,18 +45,26 @@ type Props = {
   styles: { [string]: any }
 };
 
+
+const ValueWithTitle = (props: {data: { label: string }}) => {
+  const { data: { label } } = props;
+  return <Components.MultiValue {...props} innerProps={{ title: label }} />;
+};
+
 const Select = ({ components, styles, ...rest }: Props) => {
   const _components = {
     MultiValueRemove,
+    MultiValue: components.MultiValue || ValueWithTitle,
     ...components,
   };
   const _styles = {
     multiValue,
     multiValueLabel,
     multiValueRemove,
+    valueContainer,
     ...styles,
   };
-  return <ReactSelect {...rest} components={_components} styles={_styles} />;
+  return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} />;
 };
 
 Select.propTypes = {

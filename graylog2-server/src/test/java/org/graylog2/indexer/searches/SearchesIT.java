@@ -20,14 +20,11 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.Configuration;
-import org.graylog2.ElasticsearchBase;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
@@ -86,7 +83,7 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchesIT extends ElasticsearchBase {
+public class SearchesIT extends ElasticsearchBaseTest {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
 
@@ -162,14 +159,6 @@ public class SearchesIT extends ElasticsearchBase {
     private MetricRegistry metricRegistry;
     private Searches searches;
 
-    @Override
-    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
-        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
-        return super.elasticsearchConfiguration()
-                .indexTemplates(messageTemplates)
-                .deleteAllIndices(true);
-    }
-
     @Before
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
@@ -182,23 +171,24 @@ public class SearchesIT extends ElasticsearchBase {
             streamService,
             indices,
             indexSetRegistry,
-            client(),
+                jestClient(),
             new ScrollResult.Factory() {
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, fields);
+                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
                 }
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, scroll, fields);
+                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
                 }
             }
         );
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCountWithoutFilter() throws Exception {
+        importFixture("SearchesIT.json");
+
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -207,8 +197,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCountWithFilter() throws Exception {
+        importFixture("SearchesIT.json");
+
         final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .id("id")
                 .title("title")
@@ -241,8 +232,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCountWithInvalidFilter() throws Exception {
+        importFixture("SearchesIT.json");
+
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
@@ -252,8 +244,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void countRecordsMetrics() throws Exception {
+        importFixture("SearchesIT.json");
+
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -266,8 +259,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTerms() throws Exception {
+        importFixture("SearchesIT.json");
+
         TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -283,8 +277,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsWithNonExistingIndex() throws Exception {
+        importFixture("SearchesIT.json");
+
         final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
                 .orderedBy(IndexRange.COMPARATOR)
                 .add(MongoIndexRange.create(INDEX_NAME,
@@ -317,8 +312,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void termsRecordsMetrics() throws Exception {
+        importFixture("SearchesIT.json");
+
         TermsResult result = searches.terms("n", 25, "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -335,8 +331,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsAscending() throws Exception {
+        importFixture("SearchesIT.json");
+
         TermsResult result = searches.terms("n", 1, "*", null, AbsoluteRange.create(
             new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
             new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)), Sorting.Direction.ASC);
@@ -349,8 +346,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT, locations = "SearchesIT-terms_stats.json")
     public void testTermsStats() throws Exception {
+        importFixture("SearchesIT-terms_stats.json");
+
         TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -364,8 +362,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT, locations = "SearchesIT-terms_stats.json")
     public void termsStatsRecordsMetrics() throws Exception {
+        importFixture("SearchesIT-terms_stats.json");
+
         TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
@@ -384,8 +383,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testFieldStats() throws Exception {
+        importFixture("SearchesIT.json");
+
         FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -402,8 +402,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void fieldStatsRecordsMetrics() throws Exception {
+        importFixture("SearchesIT.json");
+
         FieldStatsResult result = searches.fieldStats("n", "*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
@@ -420,9 +421,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testHistogram() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.HOUR, range);
 
@@ -438,9 +440,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testHistogramWithNonExistingIndex() throws Exception {
+        importFixture("SearchesIT.json");
+
         final SortedSet<IndexRange> indexRanges = ImmutableSortedSet
                 .orderedBy(IndexRange.COMPARATOR)
                 .add(MongoIndexRange.create(INDEX_NAME,
@@ -473,8 +476,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void histogramRecordsMetrics() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
 
@@ -490,9 +494,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testFieldHistogram() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.HOUR, null, range, false);
 
@@ -509,9 +514,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithMonth() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MONTH, null, range, false);
 
@@ -526,9 +532,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithQuarter() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.QUARTER, null, range, false);
 
@@ -543,9 +550,10 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
     public void testFieldHistogramWithYear() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.YEAR, null, range, false);
 
@@ -560,8 +568,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void fieldHistogramRecordsMetrics() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
 
@@ -748,8 +757,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void searchDoesNotIncludeJestMetadata() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchResult searchResult = searches.search("_id:1", range, 0, 0, Sorting.DEFAULT);
 
@@ -759,8 +769,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void fieldStatsDoesNotIncludeJestMetadata() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final FieldStatsResult fieldStatsResult = searches.fieldStats("n", "_id:1", range);
 
@@ -772,8 +783,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void searchReturnsCorrectTotalHits() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchResult searchResult = searches.search("*", range, 5, 0, Sorting.DEFAULT);
 
@@ -784,8 +796,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void searchReturnsResultWithSelectiveFields() throws Exception {
+        importFixture("SearchesIT.json");
+
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query("*")
@@ -802,8 +815,9 @@ public class SearchesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void scrollReturnsResultWithSelectiveFields() throws Exception {
+        importFixture("SearchesIT.json");
+
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
         final ScrollResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null);

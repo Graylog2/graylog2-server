@@ -1,5 +1,4 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import IsolatedScroll from 'react-isolated-scroll';
@@ -12,7 +11,7 @@ import {
   OverlayTrigger,
   Popover,
 } from 'components/graylog';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 
 import style from './SelectPopover.css';
 
@@ -21,8 +20,8 @@ import style from './SelectPopover.css';
  * the options with the mouse. The component can (optionally) filter options with a text input
  * and customize how items are displayed with a function.
  */
-const SelectPopover = createReactClass({
-  propTypes: {
+class SelectPopover extends React.Component {
+  static propTypes = {
     /** Provides an ID for this popover element. */
     id: PropTypes.string.isRequired,
     /** Indicates where the popover should appear. */
@@ -61,32 +60,30 @@ const SelectPopover = createReactClass({
     clearSelectionText: PropTypes.string,
     /** Indicates whether items will be clickable or not. */
     disabled: PropTypes.bool,
-  },
+  };
 
-  getDefaultProps() {
-    return {
-      placement: 'bottom',
-      triggerAction: 'click',
-      items: [],
-      itemFormatter: item => item,
-      multiple: false,
-      selectedItems: [],
-      displayDataFilter: true,
-      filterPlaceholder: 'Type to filter',
-      clearSelectionText: 'Clear selection',
-      disabled: false,
-    };
-  },
+  static defaultProps = {
+    placement: 'bottom',
+    triggerAction: 'click',
+    items: [],
+    itemFormatter: item => item,
+    multiple: false,
+    selectedItems: [],
+    displayDataFilter: true,
+    filterPlaceholder: 'Type to filter',
+    clearSelectionText: 'Clear selection',
+    disabled: false,
+  };
 
-  getInitialState() {
-    const { items, selectedItems } = this.props;
+  constructor(props) {
+    super(props);
 
-    return {
+    this.state = {
       filterText: '',
-      filteredItems: items,
-      selectedItems: selectedItems,
+      filteredItems: props.items,
+      selectedItems: props.selectedItems,
     };
-  },
+  }
 
   componentWillReceiveProps(nextProps) {
     const { items, selectedItems } = this.props;
@@ -98,17 +95,17 @@ const SelectPopover = createReactClass({
     if (items !== nextProps.items) {
       this.filterData(filterText, nextProps.items);
     }
-  },
+  }
 
   handleSelectionChange(nextSelection) {
     const { onItemSelect } = this.props;
     this.setState({ selectedItems: nextSelection });
     onItemSelect(nextSelection, () => this.overlay.hide());
-  },
+  }
 
   clearItemSelection() {
     this.handleSelectionChange([]);
-  },
+  }
 
   handleItemSelection(item) {
     return () => {
@@ -125,24 +122,27 @@ const SelectPopover = createReactClass({
 
       this.handleSelectionChange(nextSelectedItems);
     };
-  },
+  }
 
   filterData(filterText, items) {
     const newFilteredItems = items.filter(item => item.match(new RegExp(filterText, 'i')));
     this.setState({ filterText: filterText, filteredItems: newFilteredItems });
-  },
+  }
 
   handleFilterChange(items) {
     return (event) => {
       const filterText = event.target.value.trim();
       this.filterData(filterText, items);
     };
-  },
+  }
 
+  // eslint-disable-next-line class-methods-use-this
   pickPopoverProps(props) {
-    const popoverPropKeys = Object.keys(Popover.propTypes);
+    // eslint-disable-next-line react/forbid-foreign-prop-types
+    const popoverPropKeys = Object.keys(Popover.target.propTypes);
+
     return lodash.pick(props, popoverPropKeys);
-  },
+  }
 
   renderDataFilter(items) {
     const { filterPlaceholder } = this.props;
@@ -156,7 +156,7 @@ const SelectPopover = createReactClass({
                      onChange={this.handleFilterChange(items)} />
       </FormGroup>
     );
-  },
+  }
 
   renderClearSelectionItem() {
     const { clearSelectionText } = this.props;
@@ -166,12 +166,21 @@ const SelectPopover = createReactClass({
         <Icon name="times" fixedWidth className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
-  },
+  }
 
   render() {
-    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, ...otherProps } = this.props;
-    const popoverProps = this.pickPopoverProps(otherProps);
+    const {
+      displayDataFilter,
+      itemFormatter,
+      items,
+      placement,
+      triggerAction,
+      triggerNode,
+      disabled,
+      ...otherProps
+    } = this.props;
     const { filteredItems, selectedItems } = this.state;
+    const popoverProps = this.pickPopoverProps(otherProps);
 
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
@@ -203,7 +212,7 @@ const SelectPopover = createReactClass({
         {triggerNode}
       </OverlayTrigger>
     );
-  },
-});
+  }
+}
 
 export default SelectPopover;

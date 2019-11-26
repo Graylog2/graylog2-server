@@ -28,6 +28,7 @@ class DataAdapterCreate extends React.Component {
   };
 
   _onTypeSelect = (adapterType) => {
+    const { types } = this.props;
     this.setState({
       type: adapterType,
       dataAdapter: {
@@ -35,24 +36,32 @@ class DataAdapterCreate extends React.Component {
         title: '',
         name: '',
         description: '',
-        config: ObjectUtils.clone(this.props.types[adapterType].default_config),
+        config: ObjectUtils.clone(types[adapterType].default_config),
       },
     });
   };
 
   render() {
+    const {
+      types,
+      validate,
+      validationErrors,
+      saved,
+    } = this.props;
+    const { type, dataAdapter } = this.state;
     const adapterPlugins = {};
     PluginStore.exports('lookupTableAdapters').forEach((p) => {
       adapterPlugins[p.type] = p;
     });
 
-    const sortedAdapters = Object.keys(this.props.types).map((key) => {
-      const type = this.props.types[key];
-      if (adapterPlugins[type.type] === undefined) {
-        console.error(`Plugin component for data adapter type ${type.type} is missing - invalid or missing plugin?`);
-        return { value: type.type, disabled: true, label: `${type.type} - missing or invalid plugin` };
+    const sortedAdapters = Object.keys(types).map((key) => {
+      const typeItem = types[key];
+      if (adapterPlugins[typeItem.type] === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(`Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`);
+        return { value: typeItem.type, disabled: true, label: `${typeItem.type} - missing or invalid plugin` };
       }
-      return { value: type.type, label: adapterPlugins[type.type].displayName };
+      return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (
@@ -77,16 +86,16 @@ class DataAdapterCreate extends React.Component {
             </form>
           </Col>
         </Row>
-        {this.state.dataAdapter && (
+        {dataAdapter && (
         <Row className="content">
           <Col lg={12}>
-            <h3>Configure Adapter</h3>
-            <DataAdapterForm dataAdapter={this.state.dataAdapter}
-                             type={this.state.type}
+            <DataAdapterForm dataAdapter={dataAdapter}
+                             type={type}
                              create
-                             validate={this.props.validate}
-                             validationErrors={this.props.validationErrors}
-                             saved={this.props.saved} />
+                             title="Configure Adapter"
+                             validate={validate}
+                             validationErrors={validationErrors}
+                             saved={saved} />
           </Col>
         </Row>
         )}

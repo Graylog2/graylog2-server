@@ -63,13 +63,7 @@
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
-        <it.es.httpPort>19200</it.es.httpPort>
-        <it.es.transportPort>19300</it.es.transportPort>
         <it.es.version>5.6.12</it.es.version>
-        <it.es.instanceCount>1</it.es.instanceCount>
-        <it.es.clusterName>test</it.es.clusterName>
-        <it.es.await>false</it.es.await>
-        <it.es.skip>false</it.es.skip>
     </properties>
 
     <dependencies>
@@ -80,6 +74,10 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.rholder</groupId>
@@ -373,8 +371,14 @@
             <artifactId>nosqlunit-mongodb</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.joschi.nosqlunit</groupId>
-            <artifactId>nosqlunit-elasticsearch-http</artifactId>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.github.fakemongo</groupId>
@@ -985,17 +989,12 @@
             </build>
         </profile>
         <profile>
-            <id>integration-tests-elasticsearch-5</id>
+            <id>integration-tests-elasticsearch</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
                 <property>
-                    <name>it.ElasticsearchVersion</name>
-                    <value>5</value>
+                    <name>it.es</name>
                 </property>
             </activation>
-            <properties>
-                <it.es.version>5.6.12</it.es.version>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -1003,7 +1002,7 @@
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
                             <forkCount>1</forkCount>
-                            <skip>${it.es.skip}</skip>
+                            <skip>false</skip>
                             <!-- prevent ForkedBooter from stealing window focus on Mac OS -->
                             <argLine>-Djava.awt.headless=true</argLine>
                         </configuration>
@@ -1012,35 +1011,6 @@
                                 <goals>
                                     <goal>integration-test</goal>
                                     <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.alexcojocaru</groupId>
-                        <artifactId>elasticsearch-maven-plugin</artifactId>
-                        <configuration>
-                            <skip>${it.es.skip}</skip>
-                            <version>${it.es.version}</version>
-                            <clusterName>${it.es.clusterName}</clusterName>
-                            <httpPort>${it.es.httpPort}</httpPort>
-                            <transportPort>${it.es.transportPort}</transportPort>
-                            <instanceCount>${it.es.instanceCount}</instanceCount>
-                            <setAwait>${it.es.await}</setAwait>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>start-elasticsearch</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>runforked</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop-elasticsearch</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
                                 </goals>
                             </execution>
                         </executions>

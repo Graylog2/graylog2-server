@@ -109,6 +109,7 @@ class DnsAdapterFieldSet extends React.Component {
                        update={this.updateCacheTTLOverride}
                        value={config.cache_ttl_override}
                        unit={config.cache_ttl_override_unit || 'MINUTES'}
+                       units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
                        enabled={config.cache_ttl_override_enabled}
                        labelClassName="col-sm-3"
                        wrapperClassName="col-sm-9" />
