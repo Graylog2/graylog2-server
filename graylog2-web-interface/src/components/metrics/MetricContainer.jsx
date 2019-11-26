@@ -1,5 +1,6 @@
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
 import TimeHelper from 'util/TimeHelper';
 
@@ -7,9 +8,19 @@ import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
+import type { ClusterMetric } from 'stores/metrics/MetricsStore';
+
 const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
-class MetricContainer extends React.Component {
+type Props = {
+  metrics: ClusterMetric,
+  metricsUpdatedAt: number,
+  name: string,
+  zeroOnMissing: boolean,
+  children: React.Node,
+};
+
+class MetricContainer extends React.Component<Props> {
   static propTypes = {
     metrics: PropTypes.shape({
       nodeId: PropTypes.string,
@@ -46,7 +57,7 @@ class MetricContainer extends React.Component {
     // these components on a page that triggers a re-render more often - e.g. by having another setInterval - the
     // calculation in CounterRate will break.
     const { metricsUpdatedAt } = this.props;
-    if (metricsUpdatedAt && nextProps.metricsUpdatedAt) {
+    if (metricsUpdatedAt !== null && nextProps.metricsUpdatedAt) {
       return nextProps.metricsUpdatedAt > metricsUpdatedAt;
     }
     return true;
@@ -64,8 +75,8 @@ class MetricContainer extends React.Component {
     }
     let throughput = Object.keys(metrics)
       .map(nodeId => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
-      .reduce((one, two) => {
-        return { throughput: (one.throughput || 0) + (two.throughput || 0) };
+      .reduce((accumulator: { throughput?: number }, currentMetric: { throughput: ?number }): { throughput?: number } => {
+        return { throughput: (accumulator.throughput || 0) + (currentMetric.throughput || 0) };
       }, {});
     if (zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
