@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -30,6 +31,7 @@ abstract class KeywordRange extends TimeRange {
     @JsonProperty
     abstract String keyword();
 
+    @JsonCreator
     static KeywordRange create(@JsonProperty("type") String type, @JsonProperty("keyword") String keyword) {
         return builder().type(type).keyword(keyword).build();
     }

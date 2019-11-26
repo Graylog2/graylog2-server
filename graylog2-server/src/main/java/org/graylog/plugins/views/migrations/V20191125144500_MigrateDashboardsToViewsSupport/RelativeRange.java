@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
@@ -33,6 +34,7 @@ abstract class RelativeRange extends TimeRange {
     @JsonProperty
     abstract int range();
 
+    @JsonCreator
     static RelativeRange create(@JsonProperty("type") String type, @JsonProperty("range") int range) {
         return builder().type(type).range(range).build();
     }

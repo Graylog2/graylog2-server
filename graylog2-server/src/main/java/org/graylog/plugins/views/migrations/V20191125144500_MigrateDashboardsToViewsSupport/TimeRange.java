@@ -17,8 +17,16 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-abstract class TimeRange {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = AbsoluteRange.class, name = "absolute"),
+        @JsonSubTypes.Type(value = KeywordRange.class, name = "keyword"),
+        @JsonSubTypes.Type(value = RelativeRange.class, name = "relative")
+})
+public abstract class TimeRange {
     @JsonProperty
     abstract String type();
 }

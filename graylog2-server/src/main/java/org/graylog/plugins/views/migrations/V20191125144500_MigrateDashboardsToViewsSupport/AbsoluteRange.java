@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
@@ -41,6 +42,7 @@ abstract class AbsoluteRange extends TimeRange {
         return new AutoValue_AbsoluteRange.Builder();
     }
 
+    @JsonCreator
     static AbsoluteRange create(@JsonProperty("type") String type,
                                        @JsonProperty("from") DateTime from,
                                        @JsonProperty("to") DateTime to) {

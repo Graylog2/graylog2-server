@@ -20,8 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-
-import java.util.Map;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
 
 @AutoValue
 @JsonAutoDetect
@@ -44,7 +43,7 @@ abstract class Widget {
     @JsonProperty(FIELD_CREATOR_USER_ID)
     abstract String creatorUserId();
     @JsonProperty(FIELD_CONFIG)
-    abstract Map<String, Object> config();
+    abstract WidgetConfig config();
 
     @JsonCreator
     static Widget create(
@@ -53,7 +52,7 @@ abstract class Widget {
             @JsonProperty(FIELD_DESCRIPTION) String description,
             @JsonProperty(FIELD_CACHE_TIME) int cacheTime,
             @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-            @JsonProperty(FIELD_CONFIG) Map<String, Object> config
+            @JsonProperty(FIELD_CONFIG) WidgetConfig config
     ) {
         return new AutoValue_Widget(id, type, description, cacheTime, creatorUserId, config);
     }
