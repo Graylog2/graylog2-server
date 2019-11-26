@@ -37,9 +37,6 @@ abstract class Pivot implements SearchType {
         return NAME;
     }
 
-    @JsonProperty
-    abstract String id();
-
     @JsonProperty("row_groups")
     abstract List<BucketSpec> rowGroups();
 
@@ -70,34 +67,25 @@ abstract class Pivot implements SearchType {
     @AutoValue.Builder
     static abstract class Builder {
 
-        @JsonProperty
         abstract Builder id(@Nullable String id);
 
-        @JsonProperty("row_groups")
         abstract Builder rowGroups(@Nullable List<BucketSpec> rowGroups);
 
-        @JsonProperty("column_groups")
         abstract Builder columnGroups(@Nullable List<BucketSpec> columnGroups);
 
-        @JsonProperty
         abstract Builder series(List<SeriesSpec> series);
 
-        @JsonProperty
         abstract Builder sort(List<SortSpec> sort);
 
-        @JsonProperty
         abstract Builder rollup(boolean rollup);
 
-        @JsonProperty
         abstract Builder timerange(@Nullable TimeRange timerange);
 
-        @JsonProperty
         abstract Builder query(@Nullable ElasticsearchQueryString query);
         Builder query(String query) {
             return query(ElasticsearchQueryString.create(query));
         }
 
-        @JsonProperty
         abstract Builder streams(Set<String> streams);
 
         abstract Pivot build();

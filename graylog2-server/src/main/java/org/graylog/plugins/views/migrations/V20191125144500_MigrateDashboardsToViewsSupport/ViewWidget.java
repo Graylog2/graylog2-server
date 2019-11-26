@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -23,12 +24,14 @@ import org.graylog.autovalue.WithBeanGetter;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
 abstract class ViewWidget {
+    private static final String TYPE_AGGREGATION = "aggregation";
+    private static final String TYPE_MESSAGES = "messages";
+
     private static final String FIELD_ID = "id";
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_FILTER = "filter";
@@ -48,10 +51,10 @@ abstract class ViewWidget {
     abstract String filter();
 
     @JsonProperty(FIELD_TIMERANGE)
-    abstract Optional<TimeRange> timerange();
+    abstract TimeRange timerange();
 
     @JsonProperty(FIELD_QUERY)
-    abstract Optional<ElasticsearchQueryString> query();
+    abstract ElasticsearchQueryString query();
 
     @JsonProperty(FIELD_STREAMS)
     abstract Set<String> streams();
@@ -61,6 +64,27 @@ abstract class ViewWidget {
 
     static Builder builder() {
         return new AutoValue_ViewWidget.Builder().streams(Collections.emptySet());
+    }
+
+    @JsonIgnore
+    Set<SearchType> toSearchTypes() {
+        switch (type()) {
+            case TYPE_AGGREGATION: return Collections.singleton(
+                    Pivot.builder()
+                            .query(query())
+                            .streams(streams())
+                            .timerange(timerange())
+                            .build()
+            );
+            case TYPE_MESSAGES: return Collections.singleton(
+                    MessageList.builder()
+                            .query(query())
+                            .streams(streams())
+                            .timerange(timerange())
+                            .build()
+            );
+        }
+        throw new RuntimeException("Invalid widget type: " + type());
     }
 
     @AutoValue.Builder

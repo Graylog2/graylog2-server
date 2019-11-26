@@ -23,6 +23,9 @@ import java.util.Set;
 
 public interface SearchType {
     @JsonProperty
+    String id();
+
+    @JsonProperty
     Optional<TimeRange> timerange();
 
     @JsonProperty

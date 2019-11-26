@@ -80,7 +80,11 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 .map(widget -> migrateWidget(widget, recordMigratedWidgetIds, recordWidgetTitle))
                 .collect(Collectors.toSet());
 
-        final Map<String, ViewWidgetPosition> newViewWidgetPositions = migrateWidgetPositions(dashboard, migratedWidgetIds, newViewWidgets);
+        final Map<String, ViewWidgetPosition> newViewWidgetPositions = migrateWidgetPositions(
+                dashboard,
+                Collections.unmodifiableMap(migratedWidgetIds),
+                Collections.unmodifiableSet(newViewWidgets)
+        );
 
         final Map<String, Set<String>> newWidgetMapping = new HashMap<>(newViewWidgets.size());
         final BiConsumer<String, String> recordWidgetMapping = (String viewWidgetId, String searchTypeId) -> newWidgetMapping
@@ -89,7 +93,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final DateTime createdAt = DateTime.parse(dashboard.createdAt());
 
         final Set<SearchType> newSearchTypes = newViewWidgets.stream()
-                .map(viewWidget -> createSearchType(viewWidget, recordWidgetMapping))
+                .flatMap(viewWidget -> createSearchType(viewWidget, recordWidgetMapping).stream())
                 .collect(Collectors.toSet());
         final Query newQuery = Query.create(newId(), RelativeRange.create(300),"", newSearchTypes);
         final Set<Query> newQueries = Collections.singleton(newQuery);
@@ -111,7 +115,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 newSearch.id(),
                 Collections.singletonMap(newId(), newViewState),
                 Optional.ofNullable(dashboard.creatorUserId()),
-                createdAt)
+                createdAt
         );
 
         recordMigratedDashboardIds.apply(dashboard.id(), newView.id());
@@ -120,8 +124,10 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         return newView;
     }
 
-    private SearchType createSearchType(ViewWidget viewWidget, BiConsumer<String, String> recordWidgetMapping) {
-        return null;
+    private Set<SearchType> createSearchType(ViewWidget viewWidget, BiConsumer<String, String> recordWidgetMapping) {
+        final Set<SearchType> searchTypes = viewWidget.toSearchTypes();
+        searchTypes.forEach(searchType -> recordWidgetMapping.accept(viewWidget.id(), searchType.id()));
+        return searchTypes;
     }
 
     private ViewWidget migrateWidget(Widget widget,
