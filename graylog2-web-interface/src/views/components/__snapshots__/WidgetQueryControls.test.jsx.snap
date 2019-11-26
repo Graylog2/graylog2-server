@@ -85,7 +85,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           
           <span>
             <select
-              class="relative form-control"
+              class="relative FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="relative-timerange-selector"
               label=""
               name="relative"

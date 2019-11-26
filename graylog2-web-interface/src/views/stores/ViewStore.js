@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
@@ -16,7 +17,6 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
-import type { RefluxActions } from './StoreTypes';
 
 export type ViewStoreState = {
   activeQuery: QueryId,

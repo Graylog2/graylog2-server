@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import { widgetDefinition } from 'views/logic/Widgets';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
@@ -12,7 +13,6 @@ import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { ViewStore } from './ViewStore';
 import { ViewStatesActions, ViewStatesStore } from './ViewStatesStore';
 import type { TitleType } from './TitleTypes';
-import type { RefluxActions } from './StoreTypes';
 
 type CurrentViewStateActionsType = RefluxActions<{
   fields: (Immutable.Set<string>) => Promise<*>,

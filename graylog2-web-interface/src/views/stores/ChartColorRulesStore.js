@@ -3,11 +3,11 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions, WidgetStore } from 'views/stores/WidgetStore';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
 
 type Color = string;
 

@@ -18,7 +18,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       </label>
       <span>
         <textarea
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-input"
           label="Pattern"
           name="pattern-input"
@@ -52,7 +52,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       <span>
         <input
           autoComplete="off"
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-selector"
           label="Filter pattern"
           name="pattern-selector"
@@ -187,7 +187,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       </label>
       <span>
         <textarea
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-input"
           label="Pattern"
           name="pattern-input"
@@ -221,7 +221,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
       <span>
         <input
           autoComplete="off"
-          className="form-control"
+          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
           id="pattern-selector"
           label="Filter pattern"
           name="pattern-selector"

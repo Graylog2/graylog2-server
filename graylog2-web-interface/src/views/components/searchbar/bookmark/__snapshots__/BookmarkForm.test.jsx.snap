@@ -46,7 +46,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"
@@ -122,7 +122,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"
@@ -206,7 +206,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
               Title
             </label>
             <input
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               onChange={[Function]}
               placeholder="Enter title"
               type="text"

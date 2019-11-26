@@ -8,8 +8,14 @@ import copyWidgetToDashboard from './CopyWidgetToDashboard';
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 jest.mock('../Widgets', () => ({
-  widgetDefinition: () => ({ searchTypes: () => [{}] }),
+  widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
+
+jest.mock('../SearchType', () => jest.fn(() => ({
+  type: 'pivot',
+  handler: jest.fn(),
+  defaults: {},
+})));
 
 const cwd = dirname(__filename);
 const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());

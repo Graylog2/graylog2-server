@@ -55,7 +55,6 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     }
   };
 
-  // eslint-disable-next-line no-undef
   _onDraftChange = (evt: SyntheticInputEvent<HTMLInputElement>) => {
     this.setState({ titleDraft: evt.target.value });
   };

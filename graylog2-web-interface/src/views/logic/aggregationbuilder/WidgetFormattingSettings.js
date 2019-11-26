@@ -14,7 +14,6 @@ export type WidgetFormattingSettingsJSON = {
 export default class WidgetFormattingSettings {
   _value: InternalState;
 
-  // eslint-disable-next-line no-undef
   constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     this._value = { chartColors };
   }
@@ -28,7 +27,6 @@ export default class WidgetFormattingSettings {
     return new Builder(Immutable.Map(this._value));
   }
 
-  // eslint-disable-next-line no-undef
   static create(chartColors: $PropertyType<InternalState, 'chartColors'>) {
     return new WidgetFormattingSettings(chartColors);
   }
@@ -66,7 +64,6 @@ class Builder {
     this.value = value;
   }
 
-  // eslint-disable-next-line no-undef
   chartColors(value: $PropertyType<InternalState, 'chartColors'>) {
     return new Builder(this.value.set('chartColors', value));
   }

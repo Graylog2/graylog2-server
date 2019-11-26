@@ -6,11 +6,11 @@ import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import StoreProvider from 'injection/StoreProvider';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { ViewJson } from 'views/logic/views/View';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { RefluxActions } from './StoreTypes';
 
 export type SortOrder = 'asc' | 'desc';
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Dropdown, MenuItem, Icon } from 'components/graylog';
+import { Dropdown, MenuItem } from 'components/graylog';
+import { Icon } from 'components/common';
+
 import styles from './DashboardWidgetHeader.css';
 
 /**
@@ -18,8 +20,10 @@ class WidgetActionToggle extends React.Component {
   };
 
   handleClick = (e) => {
+    const { onClick } = this.props;
+
     e.preventDefault();
-    this.props.onClick(e);
+    onClick(e);
   };
 
   render() {
