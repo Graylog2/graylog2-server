@@ -3,8 +3,6 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
-import TimeHelper from 'util/TimeHelper';
-
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -32,7 +30,8 @@ const MetricContainer = createReactClass({
   },
 
   componentWillMount() {
-    MetricsActions.addGlobal(this.props.name);
+    const { name } = this.props;
+    MetricsActions.addGlobal(name);
   },
 
   shouldComponentUpdate(_, nextState) {
@@ -40,33 +39,36 @@ const MetricContainer = createReactClass({
     // This component and the CounterRate component expect to be rendered every second or less often. When using
     // these components on a page that triggers a re-render more often - e.g. by having another setInterval - the
     // calculation in CounterRate will break.
-    if (this.state.metricsUpdatedAt && nextState.metricsUpdatedAt) {
-      return nextState.metricsUpdatedAt > this.state.metricsUpdatedAt;
+    const { metricsUpdatedAt } = this.state;
+    if (metricsUpdatedAt && nextState.metricsUpdatedAt) {
+      return nextState.metricsUpdatedAt > metricsUpdatedAt;
     }
     return true;
   },
 
   componentWillUnmount() {
-    MetricsActions.removeGlobal(this.props.name);
+    const { name } = this.props;
+    MetricsActions.removeGlobal(name);
   },
 
   render() {
-    if (!this.state.metrics) {
+    const { metrics } = this.state;
+    if (!metrics) {
       return (<span>Loading...</span>);
     }
-    const fullName = this.props.name;
-    let throughput = Object.keys(this.state.metrics)
-      .map(nodeId => MetricsExtractor.getValuesForNode(this.state.metrics[nodeId], { throughput: fullName }))
+    const { children, name: fullName, zeroOnMissing } = this.props;
+    let throughput = Object.keys(metrics)
+      .map(nodeId => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
       .reduce((one, two) => {
         return { throughput: (one.throughput || 0) + (two.throughput || 0) };
       }, {});
-    if (this.props.zeroOnMissing && (!throughput || !throughput.throughput)) {
+    if (zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
     }
     return (
       <div>
         {
-        React.Children.map(this.props.children, (child) => {
+        React.Children.map(children, (child) => {
           return React.cloneElement(child, { metric: { full_name: fullName, count: throughput.throughput } });
         })
       }
