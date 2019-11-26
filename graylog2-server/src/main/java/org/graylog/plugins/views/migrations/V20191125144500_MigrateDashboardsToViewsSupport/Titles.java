@@ -16,13 +16,11 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 @AutoValue
 abstract class Titles {
@@ -31,16 +29,7 @@ abstract class Titles {
     @JsonValue
     abstract Map<String, Map<String, String>> titles();
 
-    @JsonCreator
-    static Titles of(Map<String, Map<String, String>> titles) {
-        return new AutoValue_Titles(titles);
-    }
-
-    static Titles empty() {
-        return of(Collections.emptyMap());
-    }
-
-    Optional<String> widgetTitle(String widgetId) {
-        return Optional.ofNullable(titles().getOrDefault(KEY_WIDGETS, Collections.emptyMap()).get(widgetId));
+    static Titles ofWidgetTitles(Map<String, String> titles) {
+        return new AutoValue_Titles(Collections.singletonMap(KEY_WIDGETS, titles));
     }
 }

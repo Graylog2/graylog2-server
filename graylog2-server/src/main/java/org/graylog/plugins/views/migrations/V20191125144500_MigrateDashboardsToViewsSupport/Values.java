@@ -20,16 +20,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+public abstract class Values implements BucketSpec {
+    public static final String NAME = "values";
 
     @JsonProperty
-    abstract String type();
+    public String type() { return NAME; }
 
     @JsonProperty
-    abstract String queryString();
+    public abstract String field();
 
-    static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    @JsonProperty
+    public abstract int limit();
+
+    public static Values create(String field, int limit) {
+        return new AutoValue_Values(field, limit);
     }
 }
+

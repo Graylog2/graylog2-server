@@ -16,20 +16,38 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Set;
+
 @AutoValue
-abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+@JsonAutoDetect
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class Query {
+    @JsonProperty
+    public abstract String id();
 
     @JsonProperty
-    abstract String type();
+    public abstract TimeRange timerange();
 
+    @Nullable
     @JsonProperty
-    abstract String queryString();
+    public Object filter() { return null; }
 
-    static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    @Nonnull
+    @JsonProperty
+    public abstract ElasticsearchQueryString query();
+
+    @Nonnull
+    @JsonProperty("search_types")
+    public abstract Set<SearchType> searchTypes();
+
+    static Query create(String id, TimeRange timeRange, String query, Set<SearchType> searchTypes) {
+        return new AutoValue_Query(id, timeRange, ElasticsearchQueryString.create(query), searchTypes);
     }
 }

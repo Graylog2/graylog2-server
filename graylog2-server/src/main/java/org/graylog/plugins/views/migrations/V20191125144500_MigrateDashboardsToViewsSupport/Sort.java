@@ -16,20 +16,23 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.elasticsearch.search.sort.SortOrder;
 
 @AutoValue
-abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+abstract class Sort {
 
     @JsonProperty
-    abstract String type();
+    abstract String field();
 
     @JsonProperty
-    abstract String queryString();
+    abstract SortOrder order();
 
-    static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    @JsonCreator
+    static Sort create(String field, SortOrder order) {
+        return new AutoValue_Sort(field, order);
     }
+
 }

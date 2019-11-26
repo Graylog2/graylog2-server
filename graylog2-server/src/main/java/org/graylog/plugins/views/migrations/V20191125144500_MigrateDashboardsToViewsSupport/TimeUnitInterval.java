@@ -20,16 +20,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+public abstract class TimeUnitInterval {
+    public static final String type = "timeunit";
 
     @JsonProperty
-    abstract String type();
+    public String type() { return type; };
 
     @JsonProperty
-    abstract String queryString();
+    public abstract String timeunit();
 
-    static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    static TimeUnitInterval create(String timeunit) {
+        return new AutoValue_TimeUnitInterval(timeunit);
     }
 }

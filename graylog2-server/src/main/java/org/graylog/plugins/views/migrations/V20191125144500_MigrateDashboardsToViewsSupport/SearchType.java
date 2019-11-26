@@ -17,19 +17,17 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 
-@AutoValue
-abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+import java.util.Optional;
+import java.util.Set;
+
+public interface SearchType {
+    @JsonProperty
+    Optional<TimeRange> timerange();
 
     @JsonProperty
-    abstract String type();
+    Optional<ElasticsearchQueryString> query();
 
     @JsonProperty
-    abstract String queryString();
-
-    static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
-    }
+    Set<String> streams();
 }

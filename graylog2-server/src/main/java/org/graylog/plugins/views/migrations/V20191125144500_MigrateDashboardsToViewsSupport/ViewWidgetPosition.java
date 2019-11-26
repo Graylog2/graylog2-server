@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -27,34 +26,29 @@ import org.graylog.autovalue.WithBeanGetter;
 @WithBeanGetter
 abstract class ViewWidgetPosition {
     @JsonProperty("col")
-    abstract Position col();
+    abstract int col();
 
     @JsonProperty("row")
-    abstract Position row();
+    abstract int row();
 
     @JsonProperty("height")
-    abstract Position height();
+    abstract int height();
 
     @JsonProperty("width")
-    abstract Position width();
+    abstract int width();
+
+    static Builder builder() { return new AutoValue_ViewWidgetPosition.Builder(); }
 
     @AutoValue.Builder
     static abstract class Builder {
-        @JsonProperty("col")
-        abstract Builder col(Position col);
+        abstract Builder col(int col);
 
-        @JsonProperty("row")
-        abstract Builder row(Position row);
+        abstract Builder row(int row);
 
-        @JsonProperty("height")
-        abstract Builder height(Position height);
+        abstract Builder height(int height);
 
-        @JsonProperty("width")
-        abstract Builder width(Position width);
+        abstract Builder width(int width);
 
         abstract ViewWidgetPosition build();
-
-        @JsonCreator
-        static Builder create() { return new AutoValue_ViewWidgetPosition.Builder(); }
     }
 }

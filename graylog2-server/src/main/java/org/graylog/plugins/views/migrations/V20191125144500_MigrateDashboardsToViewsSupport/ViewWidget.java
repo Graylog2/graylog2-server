@@ -16,9 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
@@ -29,7 +27,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = ViewWidget.Builder.class)
 @WithBeanGetter
 abstract class ViewWidget {
     private static final String FIELD_ID = "id";
@@ -62,6 +59,10 @@ abstract class ViewWidget {
     @JsonProperty(FIELD_CONFIG)
     abstract Map<String, Object> config();
 
+    static Builder builder() {
+        return new AutoValue_ViewWidget.Builder().streams(Collections.emptySet());
+    }
+
     @AutoValue.Builder
     static abstract class Builder {
         @JsonProperty(FIELD_ID)
@@ -87,10 +88,5 @@ abstract class ViewWidget {
         abstract Builder config(Map<String, Object> config);
 
         abstract ViewWidget build();
-
-        @JsonCreator
-        static Builder builder() {
-            return new AutoValue_ViewWidget.Builder().streams(Collections.emptySet());
-        }
     }
 }

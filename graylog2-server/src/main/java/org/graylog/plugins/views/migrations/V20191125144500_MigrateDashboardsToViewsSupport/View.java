@@ -16,14 +16,10 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -35,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = View.Builder.class)
 @WithBeanGetter
 abstract class View {
     enum Type {
@@ -78,10 +73,14 @@ abstract class View {
     abstract String searchId();
 
     @JsonProperty(FIELD_PROPERTIES)
-    abstract Set<String> properties();
+    Set<String> properties() {
+        return Collections.emptySet();
+    }
 
     @JsonProperty(FIELD_REQUIRES)
-    abstract Map<String, Object> requires();
+    Map<String, Object> requires() {
+        return Collections.emptyMap();
+    }
 
     @JsonProperty(FIELD_STATE)
     abstract Map<String, ViewState> state();
@@ -92,58 +91,15 @@ abstract class View {
     @JsonProperty(FIELD_CREATED_AT)
     abstract DateTime createdAt();
 
-    static Builder builder() {
-        return Builder.create();
-    }
-
-    @AutoValue.Builder
-    static abstract class Builder {
-        @ObjectId
-        @Id
-        @JsonProperty(FIELD_ID)
-        abstract Builder id(String id);
-
-        @JsonProperty(FIELD_TYPE)
-        abstract Builder type(Type type);
-
-        @JsonProperty(FIELD_TITLE)
-        abstract Builder title(String title);
-
-        @JsonProperty(FIELD_SUMMARY)
-        abstract Builder summary(String summary);
-
-        @JsonProperty(FIELD_DESCRIPTION)
-        abstract Builder description(String description);
-
-        @JsonProperty(FIELD_SEARCH_ID)
-        abstract Builder searchId(String searchId);
-
-        @JsonProperty(FIELD_PROPERTIES)
-        abstract Builder properties(Set<String> properties);
-
-        @JsonProperty(FIELD_REQUIRES)
-        abstract Builder requires(Map<String, Object> requirements);
-
-        @JsonProperty(FIELD_OWNER)
-        @Nullable
-        abstract Builder owner(String owner);
-
-        @JsonProperty(FIELD_CREATED_AT)
-        abstract Builder createdAt(DateTime createdAt);
-
-        @JsonProperty(FIELD_STATE)
-        abstract Builder state(Map<String, ViewState> state);
-
-        @JsonCreator
-        static Builder create() {
-            return new AutoValue_View.Builder()
-                    .summary("")
-                    .description("")
-                    .properties(ImmutableSet.of())
-                    .requires(Collections.emptyMap())
-                    .createdAt(DateTime.now(DateTimeZone.UTC));
-        }
-
-        abstract View build();
+    static View create(String id,
+                       Type type,
+                       String title,
+                       String summary,
+                       String description,
+                       String searchId,
+                       Map<String, ViewState> state,
+                       Optional<String> owner,
+                       DateTime createdAt) {
+        return new AutoValue_View(id, type, title, summary, description, searchId, state, owner, createdAt);
     }
 }
