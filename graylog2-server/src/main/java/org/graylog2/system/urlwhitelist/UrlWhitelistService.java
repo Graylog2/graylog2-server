@@ -38,4 +38,9 @@ public class UrlWhitelistService {
         clusterConfigService.write(whitelist);
     }
 
+    // TODO: add some kind of caching so that we don't fetch from db on every whitelist check
+    public boolean isWhitelisted(String url) {
+        return get().isWhitelisted(url);
+    }
+
 }
