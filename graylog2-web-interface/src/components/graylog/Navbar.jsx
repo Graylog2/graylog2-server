@@ -12,7 +12,6 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
     .navbar-brand {
       color: ${theme.color.variant.info};
-
       &:hover,
       &:focus {
         color: ${darken(0.1, theme.color.variant.info)};
@@ -31,7 +30,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
         &:hover,
         &:focus {
-          color: ${theme.color.variant.dark.info};
+          color: ${darken(0.25, theme.color.variant.info)};
           background-color: transparent;
         }
       }
@@ -67,24 +66,30 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         .open .dropdown-menu {
           > li > a {
             color: ${theme.color.variant.info};
-          }
-        }
 
-        > .active > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${darken(0.15, theme.color.variant.info)};
-            background-color: ${darken(0.065, theme.color.gray[90])};
+            &:hover,
+            &:focus {
+              color: ${darken(0.25, theme.color.variant.info)};
+              background-color: transparent;
+            }
           }
-        }
 
-        > .disabled > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.color.gray[80]};
-            background-color: transparent;
+          > .active > a {
+            &,
+            &:hover,
+            &:focus {
+              color: ${darken(0.15, theme.color.variant.info)};
+              background-color: ${darken(0.065, theme.color.gray[90])};
+            }
+          }
+
+          > .disabled > a {
+            &,
+            &:hover,
+            &:focus {
+              color: ${theme.color.gray[80]};
+              background-color: transparent;
+            }
           }
         }
       }
@@ -111,7 +116,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     .navbar-link {
       color: ${theme.color.variant.info};
       &:hover {
-        color: ${theme.color.variant.dark.info};
+        color: ${darken(0.25, theme.color.variant.info)};
       }
     }
 
@@ -123,9 +128,8 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
         color: ${theme.color.variant.dark.info};
       }
 
-      .btn-link {
-        color: ${theme.color.variant.info};
-
+      &[disabled],
+      fieldset[disabled] & {
         &:hover,
         &:focus {
           color: ${theme.color.gray[80]};
@@ -136,10 +140,10 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
 
   &.navbar-inverse {
     background-color: ${theme.color.gray[10]};
-    border-color: ${theme.color.gray[100]};
+    border-color: ${theme.color.gray[30]};
 
     .navbar-brand {
-      color: ${theme.color.variant.light.info};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover,
       &:focus {
@@ -163,7 +167,6 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
           background-color: transparent;
         }
       }
-
       > .active > a {
         &,
         &:hover,
@@ -172,7 +175,6 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
           background-color: ${theme.color.gray[20]};
         }
       }
-
       > .disabled > a {
         &,
         &:hover,
@@ -200,43 +202,34 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
           .divider {
             background-color: ${theme.color.gray[20]};
           }
-        }
 
-        > .disabled > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${lighten(0.50, theme.color.global.textDefault)};
-            background-color: transparent;
+          > li > a,
+          > li > .btn-link {
+            color: ${theme.color.gray[90]};
+
+            &:hover,
+            &:focus {
+              color: ${theme.color.variant.light.info};
+              background-color: transparent;
+            }
           }
-        }
 
-        > li > a,
-        > li > .btn-link {
-          color: ${theme.color.gray[90]};
-
-          &:hover,
-          &:focus {
-            color: ${theme.color.variant.light.info};
-            background-color: transparent;
+          > .active > a {
+            &,
+            &:hover,
+            &:focus {
+              color: ${theme.color.global.textAlt};
+              background-color: ${theme.color.gray[20]};
+            }
           }
-        }
 
-        > .active > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${theme.color.global.textAlt};
-            background-color: ${theme.color.gray[20]};
-          }
-        }
-
-        > .disabled > a {
-          &,
-          &:hover,
-          &:focus {
-            color: ${lighten(0.50, theme.color.global.textDefault)};
-            background-color: transparent;
+          > .disabled > a {
+            &,
+            &:hover,
+            &:focus {
+              color: ${lighten(0.50, theme.color.global.textDefault)};
+              background-color: transparent;
+            }
           }
         }
       }
@@ -261,7 +254,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .navbar-link {
-      color: ${theme.color.variant.light.info};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover {
         color: ${theme.color.global.textAlt};
@@ -269,16 +262,15 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .btn-link {
-      color: ${theme.color.variant.light.info};
+      color: ${lighten(0.15, theme.color.variant.info)};
 
       &:hover,
       &:focus {
         color: ${theme.color.global.textAlt};
       }
 
-      .btn-link {
-        color: ${theme.color.variant.light.info};
-
+      &[disabled],
+      fieldset[disabled] & {
         &:hover,
         &:focus {
           color: ${lighten(0.50, theme.color.global.textDefault)};
