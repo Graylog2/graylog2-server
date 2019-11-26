@@ -1,62 +1,67 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 
-import StoreProvider from 'injection/StoreProvider';
+import TimeHelper from 'util/TimeHelper';
 
-import ActionsProvider from 'injection/ActionsProvider';
-
+import CombinedProvider from 'injection/CombinedProvider';
+import connect from 'stores/connect';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
-const MetricsStore = StoreProvider.getStore('Metrics');
-const MetricsActions = ActionsProvider.getActions('Metrics');
+const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
-const MetricContainer = createReactClass({
-  displayName: 'MetricContainer',
-
-  propTypes: {
+class MetricContainer extends React.Component {
+  static propTypes = {
+    metrics: PropTypes.shape({
+      nodeId: PropTypes.string,
+      nodeMetrics: PropTypes.shape({
+        metricName: PropTypes.string,
+        metricData: PropTypes.shape({
+          type: PropTypes.oneOf(['gauge', 'counter', 'meter', 'timer']),
+          full_name: PropTypes.string,
+          metric: PropTypes.object,
+          name: PropTypes.string,
+        }),
+      }),
+    }),
+    metricsUpdatedAt: PropTypes.number,
     name: PropTypes.string.isRequired,
     zeroOnMissing: PropTypes.bool,
     children: PropTypes.node.isRequired,
-  },
+  };
 
-  mixins: [Reflux.connect(MetricsStore)],
+  static defaultProps = {
+    metrics: {},
+    metricsUpdatedAt: TimeHelper.nowInSeconds(),
+    zeroOnMissing: true,
+  };
 
-  getDefaultProps() {
-    return {
-      zeroOnMissing: true,
-    };
-  },
-
-  componentWillMount() {
+  componentDidMount() {
     const { name } = this.props;
     MetricsActions.addGlobal(name);
-  },
+  }
 
-  shouldComponentUpdate(_, nextState) {
+  shouldComponentUpdate(nextProps) {
     // Do not render this component and it's children when no metric data has changed.
     // This component and the CounterRate component expect to be rendered every second or less often. When using
     // these components on a page that triggers a re-render more often - e.g. by having another setInterval - the
     // calculation in CounterRate will break.
-    const { metricsUpdatedAt } = this.state;
-    if (metricsUpdatedAt && nextState.metricsUpdatedAt) {
-      return nextState.metricsUpdatedAt > metricsUpdatedAt;
+    const { metricsUpdatedAt } = this.props;
+    if (metricsUpdatedAt && nextProps.metricsUpdatedAt) {
+      return nextProps.metricsUpdatedAt > metricsUpdatedAt;
     }
     return true;
-  },
+  }
 
   componentWillUnmount() {
     const { name } = this.props;
     MetricsActions.removeGlobal(name);
-  },
+  }
 
   render() {
-    const { metrics } = this.state;
+    const { children, metrics, name: fullName, zeroOnMissing } = this.props;
     if (!metrics) {
       return (<span>Loading...</span>);
     }
-    const { children, name: fullName, zeroOnMissing } = this.props;
     let throughput = Object.keys(metrics)
       .map(nodeId => MetricsExtractor.getValuesForNode(metrics[nodeId], { throughput: fullName }))
       .reduce((one, two) => {
@@ -74,7 +79,13 @@ const MetricContainer = createReactClass({
       }
       </div>
     );
-  },
-});
+  }
+}
 
-export default MetricContainer;
+export default connect(MetricContainer,
+  { metricsStore: MetricsStore },
+  ({ metricsStore, ...otherProps }) => ({
+    ...otherProps,
+    metrics: metricsStore.metrics,
+    metricsUpdatedAt: metricsStore.metricsUpdatedAt,
+  }));
