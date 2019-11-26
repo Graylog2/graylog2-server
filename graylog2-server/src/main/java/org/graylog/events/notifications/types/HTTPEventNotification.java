@@ -34,6 +34,7 @@ import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +58,14 @@ public class HTTPEventNotification implements EventNotification {
     private final EventNotificationService notificationCallbackService;
     private final ObjectMapper objectMapper;
     private final OkHttpClient httpClient;
+    private final UrlWhitelistService whitelistService;
 
     @Inject
-    public HTTPEventNotification(EventNotificationService notificationCallbackService,
-                                 ObjectMapper objectMapper,
-                                 final OkHttpClient httpClient) {
+    public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper, final OkHttpClient httpClient, UrlWhitelistService whitelistService) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
+        this.whitelistService = whitelistService;
     }
 
     @Override
@@ -75,6 +76,10 @@ public class HTTPEventNotification implements EventNotification {
         if (httpUrl == null) {
             throw new TemporaryEventNotificationException(
                     "Malformed URL: <" + config.url() + "> in notification <" + ctx.notificationId() + ">");
+        }
+
+        if (!whitelistService.isWhitelisted(config.url())) {
+            throw new TemporaryEventNotificationException("URL <" + config.url() + "> is not whitelisted.");
         }
 
         ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
