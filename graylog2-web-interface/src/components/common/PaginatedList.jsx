@@ -40,10 +40,14 @@ class PaginatedList extends React.Component {
     showPageSizeSelect: true,
   };
 
-  state = {
-    currentPage: this.props.activePage > 0 ? this.props.activePage : 1,
-    pageSize: this.props.pageSize,
-  };
+  constructor(props) {
+    super(props);
+    const { activePage, pageSize } = props;
+    this.state = {
+      currentPage: activePage > 0 ? activePage : 1,
+      pageSize: pageSize,
+    };
+  }
 
   componentWillReceiveProps(nextProps) {
     const { pageSize, activePage } = this.props;
@@ -57,46 +61,54 @@ class PaginatedList extends React.Component {
   }
 
   _onChangePageSize = (event) => {
+    const { onChange } = this.props;
+    const { currentPage } = this.state;
     event.preventDefault();
     const pageSize = Number(event.target.value);
     this.setState({ pageSize: pageSize });
-    this.props.onChange(this.state.currentPage, pageSize);
+    onChange(currentPage, pageSize);
   };
 
   _onChangePage = (eventKey, event) => {
+    const { onChange } = this.props;
+    const { pageSize } = this.state;
     event.preventDefault();
     const pageNo = Number(eventKey);
     this.setState({ currentPage: pageNo });
-    this.props.onChange(pageNo, this.state.pageSize);
+    onChange(pageNo, pageSize);
   };
 
   _pageSizeSelect = () => {
-    if (!this.props.showPageSizeSelect) {
+    const { showPageSizeSelect, pageSizes } = this.props;
+    const { pageSize } = this.state;
+    if (!showPageSizeSelect) {
       return null;
     }
     return (
       <div className="form-inline page-size" style={{ float: 'right' }}>
-        <Input id="page-size" type="select" bsSize="small" label="Show:" value={this.state.pageSize} onChange={this._onChangePageSize}>
-          {this.props.pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
+        <Input id="page-size" type="select" bsSize="small" label="Show:" value={pageSize} onChange={this._onChangePageSize}>
+          {pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
         </Input>
       </div>
     );
   };
 
   render() {
-    const numberPages = Math.ceil(this.props.totalItems / this.state.pageSize);
+    const { totalItems, children } = this.props;
+    const { pageSize, currentPage } = this.state;
+    const numberPages = Math.ceil(totalItems / pageSize);
 
     return (
       <>
         {this._pageSizeSelect()}
 
-        {this.props.children}
+        {children}
 
         <div className="text-center">
           <Pagination bsSize="small"
                       items={numberPages}
                       maxButtons={10}
-                      activePage={this.state.currentPage}
+                      activePage={currentPage}
                       onSelect={this._onChangePage}
                       prev
                       next
