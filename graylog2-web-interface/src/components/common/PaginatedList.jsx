@@ -87,7 +87,7 @@ class PaginatedList extends React.Component {
     const numberPages = Math.ceil(this.props.totalItems / this.state.pageSize);
 
     return (
-      <span>
+      <>
         {this._pageSizeSelect()}
 
         {this.props.children}
@@ -103,7 +103,7 @@ class PaginatedList extends React.Component {
                       first
                       last />
         </div>
-      </span>
+      </>
     );
   }
 }
