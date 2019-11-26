@@ -5,13 +5,28 @@ import { Input } from 'components/bootstrap';
 
 const defaultPageSizes = [10, 50, 100];
 
+type Props = {
+  children: React.node,
+  onChange: (currentPage: number, pageSize: number) => void,
+  activePage?: number,
+  pageSize?: number,
+  pageSizes?: Array<number>,
+  totalItems: number,
+  showPageSizeSelect: boolean
+}
+
+type State = {
+  currentPage: number,
+  pageSize: number
+}
+
 /**
  * Wrapper component around an element that renders pagination
  * controls and provides a callback when the page or page size change.
  * You still need to fetch or filter the data yourself to ensure that
  * the selected page is displayed on screen.
  */
-class PaginatedList extends React.Component {
+class PaginatedList extends React.Component<Props, State> {
   static propTypes = {
     /** React element containing items of the current selected page. */
     children: PropTypes.node.isRequired,
@@ -40,7 +55,7 @@ class PaginatedList extends React.Component {
     showPageSizeSelect: true,
   };
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props);
     const { activePage, pageSize } = props;
     this.state = {
