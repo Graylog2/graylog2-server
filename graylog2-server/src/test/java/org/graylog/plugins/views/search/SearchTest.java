@@ -152,10 +152,10 @@ public class SearchTest {
     private Map<String, Object> partialResultsMapWithSearchTypes(String... searchTypeIds) {
         Multimap<String, String> searchTypes = HashMultimap.create();
         for (String id : searchTypeIds)
-            searchTypes.put("search_types", id);
+            searchTypes.put("keep_search_types", id);
 
         Map<String, Object> executionState = new HashMap<>();
-        executionState.put("partial_results", searchTypes);
+        executionState.put("global_override", searchTypes);
 
         return executionState;
     }

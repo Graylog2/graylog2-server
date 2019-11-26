@@ -37,13 +37,13 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.ImmutableSet.of;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
 
 @AutoValue
@@ -91,6 +91,7 @@ public abstract class Search {
         return Optional.ofNullable(parameterIndex.get(parameterName));
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
         final Builder builder = toBuilder();
 
@@ -99,11 +100,10 @@ public abstract class Search {
         if (state.hasNonNull("parameter_bindings")) {
             final ImmutableSet<Parameter> parameters = parameters().stream()
                     .map(param -> param.applyExecutionState(objectMapper, state.path("parameter_bindings")))
-                    .collect(ImmutableSet.toImmutableSet());
+                    .collect(toImmutableSet());
             builder.parameters(parameters);
         }
         if (state.hasNonNull("queries") || state.hasNonNull("global_override")) {
-
             final ImmutableSet<Query> queries = queries().stream()
                     .map(query -> {
                         final JsonNode queryOverride = state.hasNonNull("global_override")
@@ -111,37 +111,11 @@ public abstract class Search {
                                 : state.path("queries").path(query.id());
                         return query.applyExecutionState(objectMapper, queryOverride);
                     })
-                    .collect(ImmutableSet.toImmutableSet());
+                    .filter(Query::hasSearchTypes)
+                    .collect(toImmutableSet());
             builder.queries(queries);
         }
-        if (state.hasNonNull("partial_results")) {
-            JsonNode path = state.path("partial_results");
-
-            Set<String> searchTypeIds = parseSearchTypesFromPartialResultsOverride(path);
-
-            Set<Query> queriesAfter = queries().stream()
-                    .filter(q -> q.searchTypes().stream().map(SearchType::id).anyMatch(searchTypeIds::contains))
-                    .map(q -> keepOnlySearchTypes(q, searchTypeIds))
-                    .collect(toSet());
-
-            builder.queries(ImmutableSet.copyOf(queriesAfter));
-        }
         return builder.build();
-    }
-
-    private Query keepOnlySearchTypes(Query query, Set<String> searchTypeWhitelist) {
-        Set<SearchType> searchTypes = query.searchTypes().stream().filter(st -> searchTypeWhitelist.contains(st.id())).collect(toSet());
-        return query.toBuilder().searchTypes(ImmutableSet.copyOf(searchTypes)).build();
-    }
-
-    private Set<String> parseSearchTypesFromPartialResultsOverride(JsonNode path) {
-        final Set<String> results = new HashSet<>();
-        if (path.has("search_types") && path.get("search_types").isArray()) {
-            for (JsonNode n : path.get("search_types"))
-                results.add(n.asText());
-        }
-        //TODO: exception if empty?
-        return results;
     }
 
     public Search addStreamsToQueriesWithoutStreams(Supplier<ImmutableSet<String>> defaultStreamsSupplier) {
