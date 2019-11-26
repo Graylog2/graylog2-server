@@ -34,6 +34,7 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,16 +61,16 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     private final HTTPFileRetriever httpFileRetriever;
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(Collections.emptyMap());
     private final DSVParser dsvParser;
+    private final UrlWhitelistService whitelistService;
 
     @Inject
-    public DSVHTTPDataAdapter(@Assisted("id") String id,
-                              @Assisted("name") String name,
-                              @Assisted LookupDataAdapterConfiguration config,
-                              MetricRegistry metricRegistry,
-                              HTTPFileRetriever httpFileRetriever) {
+    public DSVHTTPDataAdapter(@Assisted("id") String id, @Assisted("name") String name,
+                              @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
+                              HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService) {
         super(id, name, config, metricRegistry);
         this.config = (DSVHTTPDataAdapter.Config) config;
         this.httpFileRetriever = httpFileRetriever;
+        this.whitelistService = whitelistService;
         this.dsvParser = new DSVParser(
                 this.config.ignorechar(),
                 this.config.lineSeparator(),
@@ -92,7 +93,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
 
-        final Optional<String> response = httpFileRetriever.fetchFileIfNotModified(config.url());
+        final Optional<String> response = fetchFileIfNotModified();
 
         response.ifPresent(body -> lookupRef.set(dsvParser.parse(body)));
     }
@@ -105,7 +106,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
         try {
-            final Optional<String> response = this.httpFileRetriever.fetchFileIfNotModified(config.url());
+            final Optional<String> response = fetchFileIfNotModified();
 
             response.ifPresent(body -> {
                 LOG.debug("DSV file {} has changed, updating data", config.url());
@@ -295,6 +296,19 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
             public abstract DSVHTTPDataAdapter.Config.Builder checkPresenceOnly(Boolean checkPresenceOnly);
 
             public abstract DSVHTTPDataAdapter.Config build();
+        }
+    }
+
+    private Optional<String> fetchFileIfNotModified() throws Exception {
+        if (!whitelistService.isWhitelisted(config.url())) {
+            throw new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted.");
+        }
+        return httpFileRetriever.fetchFileIfNotModified(config.url());
+    }
+
+    public static class UrlNotWhitelistedException extends Exception {
+        UrlNotWhitelistedException(String message) {
+            super(message);
         }
     }
 }
