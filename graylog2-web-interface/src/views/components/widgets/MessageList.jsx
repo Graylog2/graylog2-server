@@ -18,6 +18,7 @@ import CustomPropTypes from 'views/components/CustomPropTypes';
 import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import { SearchActions } from 'views/stores/SearchStore';
 
 import styles from './MessageList.css';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -111,6 +112,32 @@ class MessageList extends React.Component<Props, State> {
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   };
 
+  _handlePageChange = (newPage: number) => {
+    // execute search with new offset
+    const { pageSize, currentView: { activeQuery } } = this.props;
+    const searchTypeId = 'search-type-id';
+    const executionState = {
+      partial_request: {
+        search_type: [searchTypeId],
+      },
+      global_overwrite: {
+        [activeQuery]: {
+          search_types: {
+            searchTypeId: {
+              limit: pageSize,
+              offset: pageSize * (newPage - 1),
+            },
+          },
+        },
+      },
+    };
+    SearchActions.execute(executionState).then(() => {
+      this.setState({
+        currentPage: newPage,
+      });
+    });
+  }
+
   render() {
     const { containerHeight, data, fields, currentView, pageSize = 7, config } = this.props;
     let maxHeight = '';
@@ -118,6 +145,7 @@ class MessageList extends React.Component<Props, State> {
       maxHeight = containerHeight - 60;
     }
     const messages = (data && data.messages) || [];
+    const totalAmount = (data && data.total) || 0;
     const { currentPage, expandedMessages } = this.state;
     const messageSlice = messages
       .slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -134,11 +162,12 @@ class MessageList extends React.Component<Props, State> {
     const selectedColumns = Immutable.OrderedSet(selectedFields);
     const { activeQuery } = currentView;
     return (
-      <PaginatedList onChange={newPage => this.setState({ currentPage: newPage })}
+      <PaginatedList onChange={this._handlePageChange}
                      activePage={Number(currentPage)}
-                     totalItems={data.total}
+                     showPageSizeSelect={false}
+                     totalItems={totalAmount}
                      pageSize={pageSize}>
-        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 80px)', maxHeight: maxHeight }}>
+        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 50px)', maxHeight: maxHeight }}>
           <div className="table-responsive">
             <div className={`messages-container ${styles.messageListTableHeader}`}>
               <table className="table table-condensed messages" style={{ marginTop: 0 }}>
