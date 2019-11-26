@@ -83,7 +83,7 @@ const cssBuilder = (hex, variant) => {
   `;
 };
 
-const buttonStyles = ({ color }) => {
+const buttonStyles = (color) => {
   return bsStyleThemeVariant(cssBuilder, {
     link: {
       teinte: cssBuilder(color.global.link),

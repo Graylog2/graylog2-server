@@ -149,7 +149,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   addonAfter={null}
   bsStyle={null}
   buttonAfter={
-    <Memo
+    <ForwardRef
       bsStyle="default"
     />
   }

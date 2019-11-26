@@ -6,15 +6,15 @@ import { Button as BootstrapButton } from 'react-bootstrap';
 import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
-const StyledButton = styled(BootstrapButton)(
-  ({ theme }) => css`${buttonStyles(theme)};`,
-);
+const StyledButton = memo(styled(BootstrapButton)(({ theme }) => css`
+  ${buttonStyles(theme.color)};
+`));
 
-const Button = memo(forwardRef((props, ref) => {
+const Button = forwardRef((props, ref) => {
   return (
     <StyledButton ref={ref} {...props} />
   );
-}));
+});
 
 Button.propTypes = propTypes;
 

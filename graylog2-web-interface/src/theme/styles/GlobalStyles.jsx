@@ -71,6 +71,6 @@ const globalStyles = theme => css`
     outline: none;
     outline-offset: 0;
   }
-`;
+`);
 
 export default globalStyles;

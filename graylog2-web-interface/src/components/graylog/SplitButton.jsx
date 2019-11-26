@@ -9,10 +9,10 @@ import menuItemStyles from './styles/menuItem';
 import { propTypes, defaultProps } from './props/button';
 
 const StyledSplitButton = memo(styled(BootstrapSplitButton)(({ theme }) => css`
-  ${buttonStyles(theme)};
+  ${buttonStyles(theme.color)};
 
   ~ .btn.dropdown-toggle {
-    ${buttonStyles(theme)};
+    ${buttonStyles(theme.color)};
 
     ${menuItemStyles(theme.color, { sibling: true })};
   }

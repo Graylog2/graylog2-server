@@ -8,7 +8,7 @@ import buttonStyles from './styles/button';
 import { propTypes, defaultProps } from './props/button';
 
 const StyledDropdownButton = memo(styled(BootstrapDropdownButton)(({ theme }) => css`
-  ${buttonStyles(theme)};
+  ${buttonStyles(theme.color)};
   ${menuItemStyles(theme.color, { sibling: true })};
 `));
 
@@ -21,6 +21,5 @@ const DropdownButton = forwardRef((props, ref) => {
 DropdownButton.propTypes = propTypes;
 
 DropdownButton.defaultProps = defaultProps;
-
 
 export default DropdownButton;
