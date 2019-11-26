@@ -59,7 +59,7 @@ const MetricContainer = createReactClass({
       .map(nodeId => MetricsExtractor.getValuesForNode(this.state.metrics[nodeId], { throughput: fullName }))
       .reduce((one, two) => {
         return { throughput: (one.throughput || 0) + (two.throughput || 0) };
-      });
+      }, {});
     if (this.props.zeroOnMissing && (!throughput || !throughput.throughput)) {
       throughput = { throughput: 0 };
     }
