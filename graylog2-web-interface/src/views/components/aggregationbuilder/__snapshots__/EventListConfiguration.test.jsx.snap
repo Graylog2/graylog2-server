@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventListConfiguration should render minimal 1`] = `
+<div>
+  <form>
+    <div
+      class="form-group"
+    >
+      <div
+        class="checkbox"
+      >
+        <label
+          title=""
+        >
+          <input
+            type="checkbox"
+            value="false"
+          />
+          Enable Event Annotation
+        </label>
+      </div>
+    </div>
+  </form>
+</div>
+`;
