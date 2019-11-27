@@ -64,7 +64,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     <button
                       aria-expanded={false}
                       aria-haspopup={true}
-                      className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-info"
+                      className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
                       id="action-1"
                       onClick={[Function]}
@@ -169,7 +169,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     <button
                       aria-expanded={false}
                       aria-haspopup={true}
-                      className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-info"
+                      className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
                       id="action-2"
                       onClick={[Function]}
@@ -274,7 +274,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     <button
                       aria-expanded={false}
                       aria-haspopup={true}
-                      className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-info"
+                      className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
                       id="action-3"
                       onClick={[Function]}
@@ -379,7 +379,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                     <button
                       aria-expanded={false}
                       aria-haspopup={true}
-                      className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-info"
+                      className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-info"
                       disabled={false}
                       id="action-4"
                       onClick={[Function]}

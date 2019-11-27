@@ -23,7 +23,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -173,7 +173,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -323,7 +323,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -480,7 +480,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -637,7 +637,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -794,7 +794,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -951,7 +951,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -1108,7 +1108,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
@@ -1265,7 +1265,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
       <button
         aria-expanded={false}
         aria-haspopup={true}
-        className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-default"
+        className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-default"
         disabled={false}
         id="refresh-options-dropdown"
         onClick={[Function]}
