@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import styled from 'styled-components';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
@@ -23,6 +24,16 @@ import { SearchActions } from 'views/stores/SearchStore';
 import styles from './MessageList.css';
 import RenderCompletionCallback from './RenderCompletionCallback';
 
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-rows: 1fr max-content;
+  height: 100%;
+
+  .pagination {
+    margin-bottom: 0;
+  }
+`;
+
 const { InputsActions } = CombinedProvider.get('Inputs');
 
 type State = {
@@ -35,7 +46,6 @@ type Props = {
   pageSize: number,
   config: MessagesWidgetConfig,
   data: { messages: [], total: number },
-  containerHeight: number,
   selectedFields: {},
   currentView: {
     activeQuery: string,
@@ -54,14 +64,12 @@ class MessageList extends React.Component<Props, State> {
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
     }).isRequired,
-    containerHeight: PropTypes.number,
     selectedFields: PropTypes.object,
     currentView: PropTypes.object,
   };
 
   static defaultProps = {
     pageSize: Messages.DEFAULT_LIMIT,
-    containerHeight: undefined,
     selectedFields: Immutable.Set(),
     currentView: { view: {}, activeQuery: undefined },
     config: undefined,
@@ -108,7 +116,7 @@ class MessageList extends React.Component<Props, State> {
     this.setState({ expandedMessages: newSet });
   };
 
-  _fieldTypeFor = (fieldName, fields : Immutable.List) => {
+  _fieldTypeFor = (fieldName, fields: Immutable.List) => {
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   };
 
@@ -139,11 +147,7 @@ class MessageList extends React.Component<Props, State> {
   }
 
   render() {
-    const { containerHeight, data, fields, currentView, pageSize = 7, config } = this.props;
-    let maxHeight = '';
-    if (containerHeight) {
-      maxHeight = containerHeight - 60;
-    }
+    const { data, fields, currentView, pageSize = 7, config } = this.props;
     const messages = (data && data.messages) || [];
     const totalAmount = (data && data.total) || 0;
     const { currentPage, expandedMessages } = this.state;
@@ -162,51 +166,53 @@ class MessageList extends React.Component<Props, State> {
     const selectedColumns = Immutable.OrderedSet(selectedFields);
     const { activeQuery } = currentView;
     return (
-      <PaginatedList onChange={this._handlePageChange}
-                     activePage={Number(currentPage)}
-                     showPageSizeSelect={false}
-                     totalItems={totalAmount}
-                     pageSize={pageSize}>
-        <div className="search-results-table" style={{ overflow: 'auto', height: 'calc(100% - 50px)', maxHeight: maxHeight }}>
-          <div className="table-responsive">
-            <div className={`messages-container ${styles.messageListTableHeader}`}>
-              <table className="table table-condensed messages" style={{ marginTop: 0 }}>
-                <thead>
-                  <tr>
-                    {selectedColumns.toSeq().map((selectedFieldName) => {
-                      return (
-                        <th key={selectedFieldName}
-                            style={this._columnStyle(selectedFieldName)}>
-                          <Field type={this._fieldTypeFor(selectedFieldName, fields)}
-                                 name={selectedFieldName}
-                                 queryId={activeQuery} />
-                        </th>
-                      );
-                    })}
-                  </tr>
-                </thead>
-                {messageSlice.map((message) => {
-                  const messageKey = `${message.index}-${message.id}`;
-                  return (
-                    <AdditionalContext.Provider key={messageKey}
-                                                value={{ message }}>
-                      <MessageTableEntry fields={fields}
-                                         disableSurroundingSearch
-                                         message={message}
-                                         showMessageRow={config && config.showMessageRow}
-                                         selectedFields={selectedColumns}
-                                         expanded={expandedMessages.contains(messageKey)}
-                                         toggleDetail={this._toggleMessageDetail}
-                                         highlight
-                                         expandAllRenderAsync={false} />
-                    </AdditionalContext.Provider>
-                  );
-                })}
-              </table>
+      <Wrapper>
+        <PaginatedList onChange={this._handlePageChange}
+                       activePage={Number(currentPage)}
+                       showPageSizeSelect={false}
+                       totalItems={totalAmount}
+                       pageSize={pageSize}>
+          <div className="search-results-table" style={{ overflow: 'auto' }}>
+            <div className="table-responsive">
+              <div className={`messages-container ${styles.messageListTableHeader}`}>
+                <table className="table table-condensed messages" style={{ marginTop: 0 }}>
+                  <thead>
+                    <tr>
+                      {selectedColumns.toSeq().map((selectedFieldName) => {
+                        return (
+                          <th key={selectedFieldName}
+                              style={this._columnStyle(selectedFieldName)}>
+                            <Field type={this._fieldTypeFor(selectedFieldName, fields)}
+                                   name={selectedFieldName}
+                                   queryId={activeQuery} />
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  </thead>
+                  {messageSlice.map((message) => {
+                    const messageKey = `${message.index}-${message.id}`;
+                    return (
+                      <AdditionalContext.Provider key={messageKey}
+                                                  value={{ message }}>
+                        <MessageTableEntry fields={fields}
+                                           disableSurroundingSearch
+                                           message={message}
+                                           showMessageRow={config && config.showMessageRow}
+                                           selectedFields={selectedColumns}
+                                           expanded={expandedMessages.contains(messageKey)}
+                                           toggleDetail={this._toggleMessageDetail}
+                                           highlight
+                                           expandAllRenderAsync={false} />
+                      </AdditionalContext.Provider>
+                    );
+                  })}
+                </table>
+              </div>
             </div>
           </div>
-        </div>
-      </PaginatedList>
+        </PaginatedList>
+      </Wrapper>
     );
   }
 }

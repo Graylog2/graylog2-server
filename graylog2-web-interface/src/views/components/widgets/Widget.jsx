@@ -258,43 +258,41 @@ class Widget extends React.Component<Props, State> {
     return (
       <WidgetColorContext id={id}>
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-          <span>
-            <InteractiveContext.Consumer>
-              {interactive => (
-                <WidgetHeader title={title}
-                              hideDragHandle={!interactive}
-                              onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                              editing={editing}>
-                  <IfInteractive>
-                    <WidgetHorizontalStretch widgetId={widget.id}
-                                             widgetType={widget.type}
-                                             onStretch={onPositionsChange}
-                                             position={position} />
-                    {' '}
-                    <WidgetActionDropdown>
-                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                      <IfSearch>
-                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
-                      </IfSearch>
-                      <MenuItem divider />
-                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                    </WidgetActionDropdown>
-                    {showCopyToDashboard
+          <InteractiveContext.Consumer>
+            {interactive => (
+              <WidgetHeader title={title}
+                            hideDragHandle={!interactive}
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <IfInteractive>
+                  <WidgetHorizontalStretch widgetId={widget.id}
+                                           widgetType={widget.type}
+                                           onStretch={onPositionsChange}
+                                           position={position} />
+                  {' '}
+                  <WidgetActionDropdown>
+                    <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                    <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                    <IfSearch>
+                      <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
+                    </IfSearch>
+                    <MenuItem divider />
+                    <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                  </WidgetActionDropdown>
+                  {showCopyToDashboard
                     && (
                       <CopyToDashboard widgetId={id}
                                        onSubmit={this._onCopyToDashboard}
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
-                  </IfInteractive>
-                </WidgetHeader>
-              )}
-            </InteractiveContext.Consumer>
-            <WidgetErrorBoundary>
+                </IfInteractive>
+              </WidgetHeader>
+            )}
+          </InteractiveContext.Consumer>
+          <WidgetErrorBoundary>
 
-              {visualization}
-            </WidgetErrorBoundary>
-          </span>
+            {visualization}
+          </WidgetErrorBoundary>
         </WidgetFrame>
       </WidgetColorContext>
     );

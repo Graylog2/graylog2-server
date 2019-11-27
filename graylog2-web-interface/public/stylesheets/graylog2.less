@@ -1060,7 +1060,9 @@ td.limited {
 .dashboard .widget {
   height: inherit;
   margin: 0;
-  padding: 15px;
+  padding: 20px;
+  display: grid;
+  grid-template-rows: max-content minmax(10px, 1fr);
 }
 
 .dashboard .widget .widget-top {
@@ -2056,7 +2058,6 @@ span.blob {
 
 .search-results-table {
   border-left: 2px solid #e3e3e3;
-  margin-left: -13px;
   overflow-y: auto;
   width: 100%;
 }
