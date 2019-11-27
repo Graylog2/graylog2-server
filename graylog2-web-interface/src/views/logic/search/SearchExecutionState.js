@@ -6,6 +6,13 @@ import type { QueryString, TimeRange } from '../queries/Query';
 export type GlobalOverride = {
   timerange?: TimeRange,
   query?: QueryString,
+  keep_search_types?: string[],
+  search_types?: {
+    [searchTypeId: string]: {
+      limit: number;
+      offset: number;
+    };
+  }
 };
 
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
