@@ -8,47 +8,41 @@ exports[`<Widget /> should render with empty props 1`] = `
       data-widget-id="widgetId"
       style="overflow: hidden;"
     >
-      <div
-        style="height: 95%; padding: 5px;"
+      <widget-header
+        editing="false"
+        hidedraghandle="false"
+        title="Widget Title"
       >
         <span>
-          <widget-header
-            editing="false"
-            hidedraghandle="false"
-            title="Widget Title"
+          <i
+            class="fa fa-arrows-h button"
+            role="link"
+            tabindex="0"
+          />
+        </span>
+         
+        <span
+          role="presentation"
+        >
+          <span
+            role="presentation"
           >
             <span>
               <i
-                class="fa fa-arrows-h button"
-                role="link"
-                tabindex="0"
+                class="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+                data-testid="widgetActionDropDown"
               />
             </span>
-             
-            <span
-              role="presentation"
-            >
-              <span
-                role="presentation"
-              >
-                <span>
-                  <i
-                    class="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
-                    data-testid="widgetActionDropDown"
-                  />
-                </span>
-              </span>
-            </span>
-          </widget-header>
-          <div
-            class="spinnerContainer"
-          >
-            <i
-              class="fa fa-refresh spinner fa-3x"
-              data-testid="loading-widget"
-            />
-          </div>
+          </span>
         </span>
+      </widget-header>
+      <div
+        class="spinnerContainer"
+      >
+        <i
+          class="fa fa-refresh spinner fa-3x"
+          data-testid="loading-widget"
+        />
       </div>
     </div>
   </div>

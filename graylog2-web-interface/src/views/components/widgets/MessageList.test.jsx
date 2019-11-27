@@ -82,6 +82,7 @@ describe('MessageList', () => {
                                         fields={Immutable.List(fields)} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
+
   it('provides a message context for each individual entry', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
@@ -93,6 +94,7 @@ describe('MessageList', () => {
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
   });
+
   it('renders also when `inputs` is undefined', () => {
     InputsStore.getInitialState = jest.fn(() => ({ inputs: undefined }));
     const config = MessagesWidgetConfig.builder().fields([]).build();
