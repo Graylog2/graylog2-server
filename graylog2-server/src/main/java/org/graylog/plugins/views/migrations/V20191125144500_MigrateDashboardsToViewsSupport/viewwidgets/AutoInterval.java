@@ -14,22 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
-public abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+public abstract class AutoInterval implements Interval {
+    public static final String type = "auto";
+    private static final String FIELD_SCALING = "scaling";
 
     @JsonProperty
-    abstract String type();
+    public abstract String type();
 
-    @JsonProperty
-    abstract String queryString();
+    @JsonProperty(FIELD_SCALING)
+    public abstract Optional<Double> scaling();
 
-    public static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder type(String type);
+        public abstract Builder scaling(@Nullable Double scaling);
+
+        public abstract AutoInterval build();
+
+        static Builder builder() { return new AutoValue_AutoInterval.Builder().type(type); };
     }
 }
+

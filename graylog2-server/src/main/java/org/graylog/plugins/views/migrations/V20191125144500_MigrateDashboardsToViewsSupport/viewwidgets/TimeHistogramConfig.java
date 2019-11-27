@@ -14,22 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class ElasticsearchQueryString {
-    static final String NAME = "elasticsearch";
+public abstract class TimeHistogramConfig implements PivotConfig {
+    public static final String NAME = "time";
+    static final String FIELD_INTERVAL = "interval";
 
-    @JsonProperty
-    abstract String type();
+    @JsonProperty(FIELD_INTERVAL)
+    public abstract Interval interval();
 
-    @JsonProperty
-    abstract String queryString();
+    public static Builder builder() {
+        return new AutoValue_TimeHistogramConfig.Builder();
+    }
 
-    public static ElasticsearchQueryString create(String query) {
-        return new AutoValue_ElasticsearchQueryString(NAME, query);
+    @AutoValue.Builder
+    public abstract static class Builder {
+        @JsonProperty(FIELD_INTERVAL)
+        public abstract Builder interval(Interval interval);
+
+        public abstract TimeHistogramConfig build();
     }
 }

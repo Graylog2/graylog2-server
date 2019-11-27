@@ -16,21 +16,21 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ViewWidgetConfig;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
-abstract class ViewWidget {
+public abstract class ViewWidget {
     private static final String TYPE_AGGREGATION = "aggregation";
-    private static final String TYPE_MESSAGES = "messages";
 
     private static final String FIELD_ID = "id";
     private static final String FIELD_TYPE = "type";
@@ -60,57 +60,56 @@ abstract class ViewWidget {
     abstract Set<String> streams();
 
     @JsonProperty(FIELD_CONFIG)
-    abstract Map<String, Object> config();
+    abstract ViewWidgetConfig config();
 
-    static Builder builder() {
-        return new AutoValue_ViewWidget.Builder().streams(Collections.emptySet());
+    abstract Builder toBuilder();
+
+    private static String newId() {
+        return new UUID().toString();
+    }
+
+    public static Builder builder() {
+        return new AutoValue_ViewWidget.Builder()
+                .id(newId())
+                .type(TYPE_AGGREGATION)
+                .streams(Collections.emptySet());
     }
 
     @JsonIgnore
     Set<SearchType> toSearchTypes() {
-        switch (type()) {
-            case TYPE_AGGREGATION: return Collections.singleton(
-                    Pivot.builder()
-                            .query(query())
-                            .streams(streams())
-                            .timerange(timerange())
-                            .build()
-            );
-            case TYPE_MESSAGES: return Collections.singleton(
-                    MessageList.builder()
-                            .query(query())
-                            .streams(streams())
-                            .timerange(timerange())
-                            .build()
-            );
-        }
-        throw new RuntimeException("Invalid widget type: " + type());
+        return Collections.singleton(
+                Pivot.builder()
+                        .query(query())
+                        .streams(streams())
+                        .timerange(timerange())
+                        .build()
+        );
     }
 
     @AutoValue.Builder
-    static abstract class Builder {
+    public static abstract class Builder {
         @JsonProperty(FIELD_ID)
-        abstract Builder id(String id);
+        public abstract Builder id(String id);
 
         @JsonProperty(FIELD_TYPE)
-        abstract Builder type(String type);
+        public abstract Builder type(String type);
 
         @JsonProperty(FIELD_FILTER)
         @Nullable
-        abstract Builder filter(String filter);
+        public abstract Builder filter(String filter);
 
         @JsonProperty(FIELD_TIMERANGE)
-        abstract Builder timerange(@Nullable TimeRange timerange);
+        public abstract Builder timerange(@Nullable TimeRange timerange);
 
         @JsonProperty(FIELD_QUERY)
-        abstract Builder query(@Nullable ElasticsearchQueryString query);
+        public abstract Builder query(@Nullable ElasticsearchQueryString query);
 
         @JsonProperty(FIELD_STREAMS)
-        abstract Builder streams(Set<String> streams);
+        public abstract Builder streams(Set<String> streams);
 
         @JsonProperty(FIELD_CONFIG)
-        abstract Builder config(Map<String, Object> config);
+        public abstract Builder config(ViewWidgetConfig config);
 
-        abstract ViewWidget build();
+        public abstract ViewWidget build();
     }
 }

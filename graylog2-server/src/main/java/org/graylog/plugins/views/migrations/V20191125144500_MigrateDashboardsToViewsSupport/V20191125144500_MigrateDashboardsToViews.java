@@ -77,7 +77,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final BiConsumer<String, String> recordWidgetTitle = newWidgetTitles::put;
 
         final Set<ViewWidget> newViewWidgets = dashboard.widgets().stream()
-                .map(widget -> migrateWidget(widget, recordMigratedWidgetIds, recordWidgetTitle))
+                .flatMap(widget -> migrateWidget(widget, recordMigratedWidgetIds, recordWidgetTitle).stream())
                 .collect(Collectors.toSet());
 
         final Map<String, ViewWidgetPosition> newViewWidgetPositions = migrateWidgetPositions(
@@ -130,17 +130,17 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         return searchTypes;
     }
 
-    private ViewWidget migrateWidget(Widget widget,
+    private Set<ViewWidget> migrateWidget(Widget widget,
                                      BiConsumer<String, String> recordMigratedWidgetIds,
                                      BiConsumer<String, String> recordWidgetTitle) {
-        final String viewWidgetId = newId();
-        final ViewWidget viewWidget = ViewWidget.builder()
-                .id(viewWidgetId)
-                .build();
-        recordWidgetTitle.accept(viewWidgetId, widget.description());
-        recordMigratedWidgetIds.accept(widget.id(), viewWidgetId);
+        final Set<ViewWidget> viewWidgets = widget.toViewWidgets();
 
-        return viewWidget;
+        viewWidgets.forEach(viewWidget -> {
+            recordWidgetTitle.accept(viewWidget.id(), widget.description());
+            recordMigratedWidgetIds.accept(widget.id(), viewWidget.id());
+        });
+
+        return viewWidgets;
     }
 
     private Stream<Map.Entry<String, ViewWidgetPosition>> migrateWidgetPosition(WidgetPosition widgetPosition, Widget widget, Set<ViewWidget> viewWidgets) {

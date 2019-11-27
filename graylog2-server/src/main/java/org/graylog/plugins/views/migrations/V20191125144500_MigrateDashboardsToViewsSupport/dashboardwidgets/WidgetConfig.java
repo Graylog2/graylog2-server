@@ -1,9 +1,11 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
+
+import java.util.Collections;
+import java.util.Set;
 
 public interface WidgetConfig {
     @JsonProperty
@@ -11,4 +13,8 @@ public interface WidgetConfig {
 
     @JsonProperty
     TimeRange timerange();
+
+    default Set<ViewWidget> toViewWidgets() {
+        return Collections.emptySet();
+    }
 }

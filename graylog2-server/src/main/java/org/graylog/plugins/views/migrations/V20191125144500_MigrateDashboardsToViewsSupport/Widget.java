@@ -32,6 +32,8 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
 
+import java.util.Set;
+
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = Widget.Builder.class)
@@ -43,18 +45,16 @@ public abstract class Widget {
     private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     private static final String FIELD_CONFIG = "config";
 
-    @JsonProperty(FIELD_ID)
     abstract String id();
-    @JsonProperty(FIELD_TYPE)
     abstract String type();
-    @JsonProperty(FIELD_DESCRIPTION)
     abstract String description();
-    @JsonProperty(FIELD_CACHE_TIME)
     abstract int cacheTime();
-    @JsonProperty(FIELD_CREATOR_USER_ID)
     abstract String creatorUserId();
-    @JsonProperty(FIELD_CONFIG)
     abstract WidgetConfig config();
+
+    Set<ViewWidget> toViewWidgets() {
+        return config().toViewWidgets();
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {
