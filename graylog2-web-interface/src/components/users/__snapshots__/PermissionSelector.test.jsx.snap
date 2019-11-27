@@ -3,7 +3,7 @@
 exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 <div>
   <div
-    className="Tabs-sc-1hzj2zf-0 bVstbC"
+    className="Tabs-sc-1hzj2zf-0 izkieo"
     id="permissionSelectorTabs"
   >
     <ul
@@ -567,7 +567,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 exports[`<PermissionSelector /> should render with set permissions 1`] = `
 <div>
   <div
-    className="Tabs-sc-1hzj2zf-0 bVstbC"
+    className="Tabs-sc-1hzj2zf-0 izkieo"
     id="permissionSelectorTabs"
   >
     <ul
