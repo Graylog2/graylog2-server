@@ -90,7 +90,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final BiConsumer<String, String> recordWidgetMapping = (String viewWidgetId, String searchTypeId) -> newWidgetMapping
                 .merge(viewWidgetId, Collections.singleton(searchTypeId), Sets::union);
 
-        final DateTime createdAt = DateTime.parse(dashboard.createdAt());
+        final DateTime createdAt = dashboard.createdAt();
 
         final Set<SearchType> newSearchTypes = newViewWidgets.stream()
                 .flatMap(viewWidget -> createSearchType(viewWidget, recordWidgetMapping).stream())

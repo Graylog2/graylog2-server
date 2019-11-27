@@ -18,8 +18,8 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.google.common.collect.Streams;
 import org.bson.types.ObjectId;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
@@ -32,7 +32,7 @@ class DashboardsService {
     private final JacksonDBCollection<Dashboard, ObjectId> db;
 
     @Inject
-    DashboardsService(MongoConnection mongoConnection, ObjectMapperProvider mapper) {
+    DashboardsService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 Dashboard.class,
                 ObjectId.class,

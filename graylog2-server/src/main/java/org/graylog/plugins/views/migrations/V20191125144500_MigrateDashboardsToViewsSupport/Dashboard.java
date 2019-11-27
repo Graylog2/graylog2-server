@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -54,7 +55,7 @@ abstract class Dashboard {
     abstract String creatorUserId();
 
     @JsonProperty(FIELD_CREATED_AT)
-    abstract String createdAt();
+    abstract DateTime createdAt();
 
     @JsonProperty(EMBEDDED_POSITIONS)
     abstract Map<String, WidgetPosition> widgetPositions();
@@ -69,7 +70,7 @@ abstract class Dashboard {
             @JsonProperty(FIELD_DESCRIPTION) String description,
             @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
             @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
-            @JsonProperty(FIELD_CREATED_AT) String createdAt,
+            @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
             @JsonProperty(EMBEDDED_POSITIONS) Map<String, WidgetPosition> widgetPositions,
             @JsonProperty(EMBEDDED_WIDGETS) List<Widget> widgets
     ) {
