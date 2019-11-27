@@ -25,38 +25,38 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = WidgetPosition.Builder.class)
-abstract class WidgetPosition {
+public abstract class WidgetPosition {
 
     @JsonProperty("width")
-    abstract int width();
+    public abstract int width();
 
     @JsonProperty("height")
-    abstract int height();
+    public abstract int height();
 
     @JsonProperty("col")
-    abstract int col();
+    public abstract int col();
 
     @JsonProperty("row")
-    abstract int row();
+    public abstract int row();
 
     @AutoValue.Builder
-    abstract static class Builder {
-        abstract WidgetPosition build();
+    public abstract static class Builder {
+        public abstract WidgetPosition build();
 
         @JsonProperty("width")
-        abstract Builder width(int width);
+        public abstract Builder width(int width);
 
         @JsonProperty("height")
-        abstract Builder height(int height);
+        public abstract Builder height(int height);
 
         @JsonProperty("col")
-        abstract Builder col(int col);
+        public abstract Builder col(int col);
 
         @JsonProperty("row")
-        abstract Builder row(int row);
+        public abstract Builder row(int row);
 
         @JsonCreator
-        static Builder create() {
+        public static Builder create() {
             return new AutoValue_WidgetPosition.Builder();
         }
     }

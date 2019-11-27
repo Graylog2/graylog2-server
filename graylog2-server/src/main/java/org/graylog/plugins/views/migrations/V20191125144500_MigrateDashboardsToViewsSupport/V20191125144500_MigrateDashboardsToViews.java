@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +35,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20191125144500_MigrateDashboardsToViews.class);
@@ -143,16 +141,6 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         return viewWidgets;
     }
 
-    private Stream<Map.Entry<String, ViewWidgetPosition>> migrateWidgetPosition(WidgetPosition widgetPosition, Widget widget, Set<ViewWidget> viewWidgets) {
-        final ViewWidgetPosition newPosition = ViewWidgetPosition.builder()
-                .col(widgetPosition.col())
-                .row(widgetPosition.row())
-                .height(widgetPosition.height())
-                .width(widgetPosition.width())
-                .build();
-        return Stream.of(new AbstractMap.SimpleEntry<>(viewWidgets.iterator().next().id(), newPosition));
-    }
-
     private Map<String, ViewWidgetPosition> migrateWidgetPositions(Dashboard dashboard, Map<String, Set<String>> migratedWidgetIds, Set<ViewWidget> viewWidgets) {
         return dashboard.widgetPositions().entrySet().stream()
                 .flatMap(entry -> {
@@ -171,7 +159,9 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                             .filter(widget -> widget.id().equals(entry.getKey()))
                             .findFirst()
                             .orElseThrow(() -> new RuntimeException("Unable to find widget with id <" + entry.getKey()));
-                    return migrateWidgetPosition(widgetPosition, dashboardWidget, newViewWidgets);
+                    return dashboardWidget.config().toViewWidgetPositions(newViewWidgets, dashboardWidget, widgetPosition)
+                            .entrySet()
+                            .stream();
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

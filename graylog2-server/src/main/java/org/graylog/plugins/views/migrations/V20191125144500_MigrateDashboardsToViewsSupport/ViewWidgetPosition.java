@@ -24,7 +24,7 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @JsonDeserialize(builder = ViewWidgetPosition.Builder.class)
 @WithBeanGetter
-abstract class ViewWidgetPosition {
+public abstract class ViewWidgetPosition {
     @JsonProperty("col")
     abstract int col();
 
@@ -37,18 +37,18 @@ abstract class ViewWidgetPosition {
     @JsonProperty("width")
     abstract int width();
 
-    static Builder builder() { return new AutoValue_ViewWidgetPosition.Builder(); }
+    public static Builder builder() { return new AutoValue_ViewWidgetPosition.Builder(); }
 
     @AutoValue.Builder
-    static abstract class Builder {
-        abstract Builder col(int col);
+    public static abstract class Builder {
+        public abstract Builder col(int col);
 
-        abstract Builder row(int row);
+        public abstract Builder row(int row);
 
-        abstract Builder height(int height);
+        public abstract Builder height(int height);
 
-        abstract Builder width(int width);
+        public abstract Builder width(int width);
 
-        abstract ViewWidgetPosition build();
+        public abstract ViewWidgetPosition build();
     }
 }

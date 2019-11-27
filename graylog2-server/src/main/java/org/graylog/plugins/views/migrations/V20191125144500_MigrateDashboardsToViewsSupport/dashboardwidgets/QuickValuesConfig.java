@@ -6,9 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidgetPosition;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.WidgetPosition;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
@@ -18,6 +22,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -96,6 +101,43 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
         }
 
         return viewWidgets.build();
+    }
+
+    @Override
+    public Map<String, ViewWidgetPosition> toViewWidgetPositions(Set<ViewWidget> viewWidgets, Widget oldWidget, WidgetPosition widgetPosition) {
+        if (viewWidgets.size() == 1) {
+            return super.toViewWidgetPositions(viewWidgets, oldWidget, widgetPosition);
+        }
+
+        final ViewWidget pieWidget = viewWidgets.stream()
+                .filter(viewWidget -> viewWidget.config().visualization().equals(VISUALIZATION_PIE))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unable to retrieve pie widget again."));
+
+        final int newPieHeight = (int) Math.ceil(widgetPosition.height() / 2d);
+        final ViewWidgetPosition piePosition = ViewWidgetPosition.builder()
+                .col(widgetPosition.col())
+                .row(widgetPosition.row())
+                .height(newPieHeight)
+                .width(widgetPosition.width())
+                .build();
+
+        final ViewWidget tableWidget = viewWidgets.stream()
+                .filter(viewWidget -> viewWidget.config().visualization().equals(VISUALIZATION_TABLE))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unable to retrieve table widget again."));
+
+        final ViewWidgetPosition tablePosition = ViewWidgetPosition.builder()
+                .col(widgetPosition.col())
+                .row(widgetPosition.row() + newPieHeight)
+                .height(widgetPosition.height() - newPieHeight)
+                .width(widgetPosition.width())
+                .build();
+
+        return ImmutableMap.of(
+                pieWidget.id(), piePosition,
+                tableWidget.id(), tablePosition
+        );
     }
 
     @JsonCreator

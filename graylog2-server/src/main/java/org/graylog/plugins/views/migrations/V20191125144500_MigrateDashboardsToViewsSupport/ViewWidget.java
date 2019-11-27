@@ -42,7 +42,7 @@ public abstract class ViewWidget {
     private static final String FIELD_STREAMS = "streams";
 
     @JsonProperty(FIELD_ID)
-    abstract String id();
+    public abstract String id();
 
     @JsonProperty(FIELD_TYPE)
     abstract String type();
@@ -61,7 +61,7 @@ public abstract class ViewWidget {
     abstract Set<String> streams();
 
     @JsonProperty(FIELD_CONFIG)
-    abstract AggregationConfig config();
+    public abstract AggregationConfig config();
 
     private static String newId() {
         return new UUID().toString();
