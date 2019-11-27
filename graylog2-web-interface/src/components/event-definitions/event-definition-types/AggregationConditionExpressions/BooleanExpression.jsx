@@ -5,10 +5,10 @@ import lodash from 'lodash';
 import { Select } from 'components/common';
 import { Clearfix, Col, FormControl, FormGroup } from 'components/graylog';
 
+import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
+
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression.jsx';
-
-import { internalNodePropType } from './propTypes';
 
 const BooleanExpression = (props) => {
   const { expression, level, onChildChange, parent, onChange } = props;

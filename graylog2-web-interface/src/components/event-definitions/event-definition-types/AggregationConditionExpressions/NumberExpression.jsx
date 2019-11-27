@@ -7,7 +7,7 @@ import { Col } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
 
-import { numberExpressionNodePropType } from './propTypes';
+import { numberExpressionNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 const NumberExpression = ({ expression, onChange, renderLabel, validation }) => {
   const handleChange = (event) => {

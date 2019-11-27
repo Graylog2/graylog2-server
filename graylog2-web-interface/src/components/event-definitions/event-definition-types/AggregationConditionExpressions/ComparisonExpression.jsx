@@ -5,10 +5,10 @@ import lodash from 'lodash';
 import { Select } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 
+import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
+
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
-
-import { internalNodePropType } from './propTypes';
 
 const ComparisonExpression = (props) => {
   const { expression, level, onChildChange, onChange, renderLabel, validation } = props;

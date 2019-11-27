@@ -7,6 +7,8 @@ import { Icon } from 'components/common';
 
 import { emptyBooleanExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
+import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
+
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
 /* eslint-disable import/no-cycle */
@@ -14,8 +16,6 @@ import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpr
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
 /* eslint-enable import/no-cycle */
-
-import { internalNodePropType } from './AggregationConditionExpressions/propTypes';
 
 import styles from './AggregationConditionExpression.css';
 
