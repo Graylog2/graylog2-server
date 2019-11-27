@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.plugin.streams.Stream;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +45,14 @@ public class EntityDescriptorIds {
 
     public static EntityDescriptorIds of(Collection<EntityDescriptor> entityDescriptors) {
         final ImmutableMap<EntityDescriptor, String> descriptorIds = entityDescriptors.stream()
-                .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> UUID.randomUUID().toString()));
+                .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> {
+                    final String id = d.id().id();
+                    if (Stream.isDefaultStream(id)) {
+                        return id;
+                    } else {
+                        return UUID.randomUUID().toString();
+                    }
+                }));
 
         return new EntityDescriptorIds(descriptorIds);
     }
