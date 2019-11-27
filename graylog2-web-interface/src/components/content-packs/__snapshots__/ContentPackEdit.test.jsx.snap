@@ -471,7 +471,9 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
 `;
 
 exports[`<ContentPackEdit /> should render spinner with no content pack 1`] = `
-<span>
+<span
+  className="Spinner__Wrapper-hg0ct4-0 hyHIAb"
+>
   <i
     className="fa fa-spinner fa-spin"
   />
