@@ -1,34 +1,35 @@
-const UserNotification = require('util/UserNotification');
-const URLUtils = require('util/URLUtils');
+// @flow strict
+import Reflux from 'reflux';
 
-// Need to use explicit require here to be able to access the User interface
-import UsersStore = require("./UsersStore");
+import fetch from 'logic/rest/FetchProvider';
+import ApiRoutes from 'routing/ApiRoutes';
+import URLUtils from 'util/URLUtils';
+import UserNotification from 'util/UserNotification';
 
-const ApiRoutes = require('routing/ApiRoutes');
-const fetch = require('logic/rest/FetchProvider').default;
+import type { User } from './UsersStore';
 
-interface Role {
-  name: string;
-  description: string;
-  permissions: string[];
+type Role = {
+  name: string,
+  description: string,
+  permissions: string[],
 }
 
-interface RoleMembership {
-  role: string;
-  users: UsersStore.User[];
-}
+type RoleMembership = {
+  role: string,
+  users: User[],
+};
 
-const RolesStore = {
+const RolesStore = Reflux.createStore({
   loadRoles(): Promise<string[]> {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.listRoles().url))
       .then(
         response => response.roles,
-        error => {
+        (error) => {
           if (error.additional.status !== 404) {
-            UserNotification.error("Loading role list failed with status: " + error,
-              "Could not load role list");
+            UserNotification.error(`Loading role list failed with status: ${error}`,
+              'Could not load role list');
           }
-        }
+        },
       );
 
     return promise;
@@ -39,10 +40,10 @@ const RolesStore = {
     const promise = fetch('POST', url, role);
 
     promise.then((newRole) => {
-      UserNotification.success("Role \"" + newRole.name + "\" was created successfully");
+      UserNotification.success(`Role "${newRole.name}" was created successfully`);
     }, (error) => {
-      UserNotification.error("Creating role \"" + role.name + "\" failed with status: " + error,
-        "Could not create role");
+      UserNotification.error(`Creating role "${role.name}" failed with status: ${error}`,
+        'Could not create role');
     });
 
     return promise;
@@ -52,11 +53,11 @@ const RolesStore = {
     const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(encodeURIComponent(rolename)).url), role);
 
     promise.then((newRole) => {
-      UserNotification.success("Role \"" + newRole.name + "\" was updated successfully");
+      UserNotification.success(`Role "${newRole.name}" was updated successfully`);
     }, (error) => {
       if (error.additional.status !== 404) {
-        UserNotification.error("Updating role failed with status: " + error,
-          "Could not update role");
+        UserNotification.error(`Updating role failed with status: ${error}`,
+          'Could not update role');
       }
     });
 
@@ -68,11 +69,11 @@ const RolesStore = {
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
-      UserNotification.success("Role \"" + rolename + "\" was deleted successfully");
+      UserNotification.success(`Role "${rolename}" was deleted successfully`);
     }, (error) => {
       if (error.additional.status !== 404) {
-        UserNotification.error("Deleting role failed with status: " + error,
-          "Could not delete role");
+        UserNotification.error(`Deleting role failed with status: ${error}`,
+          'Could not delete role');
       }
     });
     return promise;
@@ -82,12 +83,12 @@ const RolesStore = {
     const promise = fetch('GET', url);
     promise.catch((error) => {
       if (error.additional.status !== 404) {
-        UserNotification.error("Could not load role's members with status: " + error,
-          "Could not load role members");
+        UserNotification.error(`Could not load role's members with status: ${error}`,
+          'Could not load role members');
       }
     });
     return promise;
-  }
-};
+  },
+});
 
-export = RolesStore;
+export default RolesStore;
