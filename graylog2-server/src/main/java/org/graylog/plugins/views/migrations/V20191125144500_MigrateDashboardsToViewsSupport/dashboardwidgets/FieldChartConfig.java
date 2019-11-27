@@ -9,11 +9,9 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeHistogramConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeUnitInterval;
 
 import java.util.Collections;
 import java.util.Set;
@@ -21,9 +19,7 @@ import java.util.Set;
 @AutoValue
 @JsonAutoDetect
 @JsonIgnoreProperties({"rangeType", "relative", "from", "to", "keyword"})
-public abstract class FieldChartConfig implements WidgetConfig {
-    private static String TIMESTAMP_FIELD = "timestamp";
-
+public abstract class FieldChartConfig extends WidgetConfigBase implements WidgetConfig {
     public abstract String valuetype();
 
     public abstract String renderer();
@@ -67,13 +63,6 @@ public abstract class FieldChartConfig implements WidgetConfig {
         return Series.createFromString(mapFunction(valuetype()) + "(" + field() + ")").build();
     }
 
-    private Interval timestampInterval() {
-        switch (interval()) {
-            case "minute": return TimeUnitInterval.builder().unit(TimeUnitInterval.IntervalUnit.MINUTES).value(1).build();
-        }
-        throw new RuntimeException("Unable to map interval: " + interval());
-    }
-
     public Set<ViewWidget> toViewWidgets() {
         return Collections.singleton(
                 ViewWidget.builder()
@@ -84,7 +73,7 @@ public abstract class FieldChartConfig implements WidgetConfig {
                                         .rowPivots(Collections.singletonList(
                                                 Pivot.timeBuilder()
                                                 .field(TIMESTAMP_FIELD)
-                                                .config(TimeHistogramConfig.builder().interval(timestampInterval()).build())
+                                                .config(TimeHistogramConfig.builder().interval(timestampInterval(interval())).build())
                                                 .build()
                                         ))
                                         .series(Collections.singletonList(series()))
