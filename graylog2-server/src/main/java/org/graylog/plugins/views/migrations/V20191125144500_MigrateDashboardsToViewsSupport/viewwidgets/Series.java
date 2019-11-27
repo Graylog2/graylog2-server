@@ -18,11 +18,17 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.SeriesSpec;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @AutoValue
 public abstract class Series {
     private static final String FIELD_CONFIG = "config";
     private static final String FIELD_FUNCTION = "function";
+
+    private static final Pattern destructuringPattern = Pattern.compile("(\\w+)\\((\\w+)?\\)");
 
     @JsonProperty(FIELD_CONFIG)
     public abstract SeriesConfig config();
@@ -41,6 +47,17 @@ public abstract class Series {
 
     public static Series create(String function, String field) {
         return buildFromString(function + "(" + field + ")").build();
+    }
+
+    public SeriesSpec toSeriesSpec() {
+        final Matcher matcher = destructuringPattern.matcher(function());
+        if (matcher.matches()) {
+            final String functionName = matcher.group(1);
+            final String optionalFieldName = matcher.group(2);
+            return SeriesSpec.create(functionName, function(), optionalFieldName);
+        }
+
+        throw new RuntimeException("Unable to parse function: " + function());
     }
 
     @AutoValue.Builder

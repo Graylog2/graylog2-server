@@ -18,15 +18,19 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.BucketSpec;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Time;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Values;
 
 @AutoValue
 public abstract class Pivot {
-    private static String TYPE_TIME = "time";
-    private static String TYPE_VALUES = "values";
+    private static final String TYPE_TIME = "time";
+    private static final String TYPE_VALUES = "values";
 
     static final String FIELD_FIELD_NAME = "field";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIG = "config";
+
 
     @JsonProperty(FIELD_FIELD_NAME)
     public abstract String field();
@@ -45,6 +49,22 @@ public abstract class Pivot {
     public static Builder valuesBuilder() {
         return new AutoValue_Pivot.Builder()
                 .type(TYPE_VALUES);
+    }
+
+    public BucketSpec toBucketSpec() {
+        switch (type()) {
+            case TYPE_TIME:
+                final TimeHistogramConfig timeConfig = (TimeHistogramConfig)config();
+                final TimeUnitInterval interval = (TimeUnitInterval)timeConfig.interval();
+                final org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval mergedInterval = org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval.create(""+ interval.value() + interval.unit());
+
+                return Time.create(field(), mergedInterval);
+            case TYPE_VALUES:
+                final ValueConfig valueConfig = (ValueConfig)config();
+                return Values.create(field(), valueConfig.limit());
+        }
+
+        throw new RuntimeException("Invalid pivot type when creating bucket spec: " + type());
     }
 
     @AutoValue.Builder

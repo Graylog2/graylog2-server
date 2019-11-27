@@ -19,21 +19,26 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
-public abstract class Time implements BucketSpec {
-    public static final String NAME = "time";
-
-    @Override
-    public String type() { return NAME; }
+public abstract class SeriesSpec {
+    @JsonProperty
+    public abstract String type();
 
     @JsonProperty
-    public abstract String field();
+    @Nullable
+    public abstract String id();
 
     @JsonProperty
-    public abstract TimeUnitInterval interval();
+    public abstract Optional<String> field();
 
-    public static Time create(String field, TimeUnitInterval interval) {
-        return new AutoValue_Time(field, interval);
+    public String literal() {
+        return type() + "(" + field().orElse("") + ")";
+    }
+
+    public static SeriesSpec create(String type, String id, String field) {
+        return new AutoValue_SeriesSpec(type, id, Optional.ofNullable(field));
     }
 }
-

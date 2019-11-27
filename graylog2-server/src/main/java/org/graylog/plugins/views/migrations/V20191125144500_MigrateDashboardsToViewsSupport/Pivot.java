@@ -16,10 +16,9 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -56,8 +55,13 @@ abstract class Pivot implements SearchType {
     @JsonProperty
     Object filter() { return null; }
 
+    private static String newId() {
+        return new UUID().toString();
+    }
+
     static Builder builder() {
         return new AutoValue_Pivot.Builder()
+                .id(newId())
                 .rowGroups(of())
                 .columnGroups(of())
                 .sort(of())

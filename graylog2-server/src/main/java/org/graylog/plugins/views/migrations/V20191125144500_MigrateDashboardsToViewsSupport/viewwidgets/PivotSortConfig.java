@@ -19,6 +19,8 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.PivotSort;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.SortSpec;
 
 @AutoValue
 public abstract class PivotSortConfig implements SortConfig {
@@ -35,6 +37,11 @@ public abstract class PivotSortConfig implements SortConfig {
     @Override
     @JsonProperty(FIELD_DIRECTION)
     public abstract Direction direction();
+
+    @Override
+    public SortSpec toSortSpec() {
+        return PivotSort.create(field(),toDirection());
+    }
 
     @JsonCreator
     public static PivotSortConfig create(@JsonProperty(FIELD_FIELD) String field,

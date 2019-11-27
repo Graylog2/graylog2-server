@@ -16,24 +16,29 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class Time implements BucketSpec {
-    public static final String NAME = "time";
+@JsonAutoDetect
+public abstract class SeriesSort implements SortSpec {
+    public static final String Type = "series";
 
     @Override
-    public String type() { return NAME; }
+    @JsonProperty(TYPE_FIELD)
+    public abstract String type();
 
-    @JsonProperty
+    @Override
+    @JsonProperty(FIELD_FIELD)
     public abstract String field();
 
-    @JsonProperty
-    public abstract TimeUnitInterval interval();
+    @Override
+    @JsonProperty(FIELD_DIRECTION)
+    public abstract Direction direction();
 
-    public static Time create(String field, TimeUnitInterval interval) {
-        return new AutoValue_Time(field, interval);
+    public static SeriesSort create(@JsonProperty(FIELD_FIELD) String field,
+                                    @JsonProperty(FIELD_DIRECTION) Direction direction) {
+        return new AutoValue_SeriesSort(Type, field, direction);
     }
 }
-

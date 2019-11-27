@@ -29,7 +29,7 @@ public abstract class TimeUnitInterval {
     @JsonProperty
     public abstract String timeunit();
 
-    static TimeUnitInterval create(String timeunit) {
+    public static TimeUnitInterval create(String timeunit) {
         return new AutoValue_TimeUnitInterval(timeunit);
     }
 }
