@@ -12,6 +12,8 @@ export default function colorLevel(colorHex, level = 0) {
    */
   const colorBase = level > 0 ? teinte.global.textDefault : teinte.global.textAlt;
   const absLevel = Math.abs(level) * 0.08; // TODO: make 8% a theme variable
+  const upperLevel = absLevel > 1 ? 1 : absLevel;
+  const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
-  return mix(absLevel, colorBase, colorHex);
+  return mix(mixLevel, colorBase, colorHex);
 }

@@ -3,20 +3,15 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { darken, lighten } from 'polished';
 
-import { contrastingColor } from 'theme/utils';
+import { contrastingColor, colorLevel } from 'theme/utils';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
-  const lightenBorder = lighten(0.30, hex);
-  const borderColor = lightenBorder === '#fff' ? darken(0.08, hex) : lightenBorder;
-
-  const lightenBackground = lighten(0.40, hex);
-  const backgroundColor = lightenBackground === '#fff' ? darken(0.05, hex) : lightenBackground;
-
+  const borderColor = colorLevel(hex, -8);
+  const backgroundColor = colorLevel(hex, -10);
   const textColor = contrastingColor(backgroundColor);
 
   return css`
