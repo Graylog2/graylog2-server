@@ -45,7 +45,7 @@ type Props = {
   fields: {},
   pageSize: number,
   config: MessagesWidgetConfig,
-  data: { messages: [], total: number },
+  data: { messages: [], total: number, id: string },
   selectedFields: {},
   currentView: {
     activeQuery: string,
@@ -63,6 +63,7 @@ class MessageList extends React.Component<Props, State> {
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
     }).isRequired,
     selectedFields: PropTypes.object,
     currentView: PropTypes.object,
@@ -122,22 +123,17 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (newPage: number) => {
     // execute search with new offset
-    const { pageSize, currentView: { activeQuery } } = this.props;
-    const searchTypeId = 'search-type-id';
+    const { pageSize, data: { id: searchTypeId } } = this.props;
     const executionState = {
-      partial_request: {
-        search_type: [searchTypeId],
-      },
       global_overwrite: {
-        [activeQuery]: {
-          search_types: {
-            searchTypeId: {
-              limit: pageSize,
-              offset: pageSize * (newPage - 1),
-            },
+        search_types: {
+          [searchTypeId]: {
+            limit: pageSize,
+            offset: pageSize * (newPage - 1),
           },
         },
       },
+      keep_search_types: [searchTypeId],
     };
     SearchActions.execute(executionState).then(() => {
       this.setState({
