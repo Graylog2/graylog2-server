@@ -21,6 +21,9 @@ import com.google.auto.value.AutoValue;
 
 @AutoValue
 public abstract class Pivot {
+    private static String TYPE_TIME = "time";
+    private static String TYPE_VALUES = "values";
+
     static final String FIELD_FIELD_NAME = "field";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIG = "config";
@@ -34,8 +37,9 @@ public abstract class Pivot {
     @JsonProperty(FIELD_CONFIG)
     public abstract PivotConfig config();
 
-    public static Builder builder() {
-        return new AutoValue_Pivot.Builder();
+    public static Builder timeBuilder() {
+        return new AutoValue_Pivot.Builder()
+                .type(TYPE_TIME);
     }
 
     @AutoValue.Builder
