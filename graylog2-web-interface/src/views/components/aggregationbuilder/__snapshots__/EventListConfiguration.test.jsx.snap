@@ -14,7 +14,6 @@ exports[`EventListConfiguration should render minimal 1`] = `
         >
           <input
             type="checkbox"
-            value="false"
           />
           Enable Event Annotation
         </label>

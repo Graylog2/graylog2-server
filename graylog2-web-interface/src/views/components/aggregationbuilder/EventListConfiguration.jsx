@@ -5,14 +5,17 @@ import { Checkbox, FormGroup } from 'components/graylog';
 
 type Props = {
   enabled: boolean,
-  onChange: () => void,
+  onChange: (value: boolean) => void,
 };
 
 const EventListConfiguration = ({ enabled, onChange }: Props) => {
   return (
     <form>
       <FormGroup>
-        <Checkbox onChange={onChange} value={enabled}>Enable Event Annotation</Checkbox>
+        {/* eslint-disable-next-line no-undef */ /* $FlowFixMe: checked is part of target */}
+        <Checkbox onChange={(event: SyntheticEvent<HTMLInputElement>) => onChange(event.target.checked)} checked={enabled}>
+          Enable Event Annotation
+        </Checkbox>
       </FormGroup>
     </form>
   );

@@ -25,6 +25,8 @@ import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfi
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
 import PivotTransformer from 'views/logic/searchresulttransformers/PivotTransformer';
 
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
+
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
@@ -171,6 +173,11 @@ export default {
     {
       type: 'pivot',
       handler: PivotHandler,
+      defaults: {},
+    },
+    {
+      type: 'events',
+      handler: EventHandler,
       defaults: {},
     },
   ],
