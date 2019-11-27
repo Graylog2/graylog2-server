@@ -41,10 +41,10 @@ export const emptyComparisonExpressionConfig = () => {
   };
 };
 
-export const emptyBooleanExpressionConfig = ({ operator = '&&', expression }) => {
+export const emptyBooleanExpressionConfig = ({ operator = '&&', left = emptyComparisonExpressionConfig(), right = emptyComparisonExpressionConfig() }) => {
   return {
     expr: operator,
-    left: expression,
-    right: emptyComparisonExpressionConfig(),
+    left: left,
+    right: right,
   };
 };
