@@ -153,7 +153,7 @@ public abstract class MessageList implements SearchType {
     }
 
     @AutoValue
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public abstract static class Result implements SearchType.Result {
 
         @Override
