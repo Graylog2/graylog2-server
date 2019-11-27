@@ -82,9 +82,7 @@ class DataTable extends React.Component {
       rows: rows,
       filteredRows: rows,
     };
-    this.typeAheadRef = React.createRef();
   }
-
 
   componentDidUpdate(prevProps) {
     const { rows } = this.props;
