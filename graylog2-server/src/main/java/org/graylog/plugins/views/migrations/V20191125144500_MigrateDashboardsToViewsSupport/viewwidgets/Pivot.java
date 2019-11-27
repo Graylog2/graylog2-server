@@ -42,6 +42,11 @@ public abstract class Pivot {
                 .type(TYPE_TIME);
     }
 
+    public static Builder valuesBuilder() {
+        return new AutoValue_Pivot.Builder()
+                .type(TYPE_VALUES);
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder field(String field);
