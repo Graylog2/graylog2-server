@@ -55,6 +55,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -95,6 +96,8 @@ public class PipelineFacadeTest {
     private PipelineStreamConnectionsService connectionsService;
     @Mock
     private RuleService ruleService;
+    @Mock
+    private StreamService streamService;
 
     private PipelineFacade facade;
 
@@ -108,7 +111,7 @@ public class PipelineFacadeTest {
         pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
 
-        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService);
+        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
     }
 
     @Test
