@@ -30,22 +30,6 @@ public abstract class FieldChartConfig extends WidgetConfigBase implements Widge
 
     public abstract String interval();
 
-    private String mapFunction(String function) {
-        switch (function) {
-            case "total": return "sum";
-            case "mean": return "avg";
-            case "std_deviation": return "stddev";
-            case "cardinality": return "card";
-            case "count":
-            case "variance":
-            case "min":
-            case "max":
-            case "sum":
-                return function;
-        }
-        throw new RuntimeException("Unable to map function from field chart widget: " + function);
-    }
-
     private String visualization() {
         switch (renderer()) {
             case "bar":
@@ -60,7 +44,7 @@ public abstract class FieldChartConfig extends WidgetConfigBase implements Widge
     }
 
     private Series series() {
-        return Series.createFromString(mapFunction(valuetype()) + "(" + field() + ")").build();
+        return Series.create(mapStatsFunction(valuetype()), field());
     }
 
     public Set<ViewWidget> toViewWidgets() {

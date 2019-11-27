@@ -16,17 +16,19 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class SearchResultCountConfig implements WidgetConfig {
+public abstract class SearchResultCountConfig extends WidgetConfigBase implements WidgetConfig {
+    private static final String NUMERIC_VISUALIZATION = "numeric";
+
     public abstract Boolean lowerIsBetter();
 
     public abstract Boolean trend();
 
     private Series series() {
-        return Series.createFromString("count()").build();
+        return countSeries();
     }
 
     private String visualization() {
-        return "numeric";
+        return NUMERIC_VISUALIZATION;
     }
 
     @Override

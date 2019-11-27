@@ -24,7 +24,7 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
     private String visualization() { return "line"; }
 
     private Series series() {
-        return Series.createFromString("count()").config(SeriesConfig.builder().name("Messages").build()).build();
+        return Series.buildFromString("count()").config(SeriesConfig.builder().name("Messages").build()).build();
     }
 
     @Override

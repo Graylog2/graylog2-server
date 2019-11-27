@@ -35,8 +35,12 @@ public abstract class Series {
                 .config(SeriesConfig.empty());
     }
 
-    public static Builder createFromString(String function) {
+    public static Builder buildFromString(String function) {
         return builder().function(function).config(SeriesConfig.empty());
+    }
+
+    public static Series create(String function, String field) {
+        return buildFromString(function + "(" + field + ")").build();
     }
 
     @AutoValue.Builder

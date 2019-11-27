@@ -20,7 +20,7 @@ abstract class WidgetConfigBase implements WidgetConfig {
     }
 
     Series countSeries() {
-        return Series.createFromString("count()").build();
+        return Series.buildFromString("count()").build();
     }
 
     SortConfig.Direction sortDirection(String sortOrder) {
@@ -42,5 +42,21 @@ abstract class WidgetConfigBase implements WidgetConfig {
         return ViewWidget.builder()
                 .query(ElasticsearchQueryString.create(query()))
                 .timerange(timerange());
+    }
+
+    String mapStatsFunction(String function) {
+        switch (function) {
+            case "total": return "sum";
+            case "mean": return "avg";
+            case "std_deviation": return "stddev";
+            case "cardinality": return "card";
+            case "count":
+            case "variance":
+            case "min":
+            case "max":
+            case "sum":
+                return function;
+        }
+        throw new RuntimeException("Unable to map statistical function: " + function);
     }
 }
