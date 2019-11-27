@@ -13,6 +13,16 @@ class SearchResult {
   forId(queryId) {
     return this.results[queryId];
   }
+
+  updateSearchTypes(searchTypeResults) {
+    const updatedResult = this.result;
+    _.forEach(searchTypeResults, (searchTypeResult) => {
+      const searchTypeId = searchTypeResult.id;
+      const searchQuery = Object.values(this.result.results).find(query => query.search_types[searchTypeId]);
+      updatedResult.results[searchQuery.query.id].search_types[searchTypeId] = searchTypeResult;
+    });
+    return new SearchResult(updatedResult);
+  }
 }
 
 export default SearchResult;

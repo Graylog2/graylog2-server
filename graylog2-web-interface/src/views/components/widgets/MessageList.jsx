@@ -148,7 +148,6 @@ class MessageList extends React.Component<Props, State> {
     const totalAmount = (data && data.total) || 0;
     const { currentPage, expandedMessages } = this.state;
     const messageSlice = messages
-      .slice((currentPage - 1) * pageSize, currentPage * pageSize)
       .map((m) => {
         return {
           fields: m.message,
