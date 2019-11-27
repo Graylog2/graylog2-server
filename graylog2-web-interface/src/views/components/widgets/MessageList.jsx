@@ -132,14 +132,13 @@ class MessageList extends React.Component<Props, State> {
             offset: pageSize * (newPage - 1),
           },
         },
+        keep_search_types: [searchTypeId],
       },
-      keep_search_types: [searchTypeId],
     };
     RefreshActions.disable();
-    SearchActions.execute(executionState).then(() => {
-      this.setState({
-        currentPage: newPage,
-      });
+    SearchActions.execute(executionState);
+    this.setState({
+      currentPage: newPage,
     });
   }
 
