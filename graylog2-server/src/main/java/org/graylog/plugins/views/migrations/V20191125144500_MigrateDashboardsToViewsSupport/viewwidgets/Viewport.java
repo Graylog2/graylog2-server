@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -31,6 +30,18 @@ public abstract class Viewport {
     @JsonProperty
     public abstract int zoom();
 
+    private static Builder builder() {
+        return new AutoValue_Viewport.Builder();
+    }
+
+    static Viewport empty() {
+        return Viewport.builder()
+                .centerX(0)
+                .centerY(0)
+                .zoom(32)
+                .build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty("center_x")
@@ -43,10 +54,5 @@ public abstract class Viewport {
         public abstract Builder zoom(int zoom);
 
         public abstract Viewport build();
-
-        @JsonCreator
-        public static Builder builder() {
-            return new AutoValue_Viewport.Builder();
-        }
     }
 }
