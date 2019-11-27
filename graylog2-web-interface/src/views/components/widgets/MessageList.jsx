@@ -125,7 +125,7 @@ class MessageList extends React.Component<Props, State> {
     // execute search with new offset
     const { pageSize, data: { id: searchTypeId } } = this.props;
     const executionState = {
-      global_overwrite: {
+      global_override: {
         search_types: {
           [searchTypeId]: {
             limit: pageSize,
