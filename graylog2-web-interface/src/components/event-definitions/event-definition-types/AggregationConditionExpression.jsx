@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 
-import { emptyBooleanExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
+import { emptyBooleanExpressionConfig, enrichExpressionTree } from 'logic/alerts/AggregationExpressionConfig';
 
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
@@ -28,6 +28,7 @@ class AggregationConditionExpression extends React.Component {
     onChange: PropTypes.func.isRequired,
     expression: internalNodePropType.isRequired,
     parent: internalNodePropType,
+    groupNodes: PropTypes.array.isRequired,
     level: PropTypes.number, // Internal use only
     renderLabel: PropTypes.bool,
   };
@@ -43,6 +44,16 @@ class AggregationConditionExpression extends React.Component {
     const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression });
     onChange('conditions', nextExpression);
+  };
+
+  handleAddGroup = () => {
+    const { expression, onChange, parent } = this.props;
+    const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
+    const groupOperator = prevOperator === '&&' ? '||' : '&&';
+    const groupExpression = enrichExpressionTree(emptyBooleanExpressionConfig({ operator: groupOperator }));
+    const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
+    onChange('conditions', nextExpression);
+    onChange('groups', groupExpression.id);
   };
 
   handleDeleteExpression = () => {
@@ -72,7 +83,7 @@ class AggregationConditionExpression extends React.Component {
   };
 
   render() {
-    const { expression, parent, renderLabel } = this.props;
+    const { expression, groupNodes, parent, renderLabel } = this.props;
     switch (expression.expr) {
       case 'number-ref':
         return <NumberRefExpression {...this.props} parent={parent} />;
@@ -80,7 +91,7 @@ class AggregationConditionExpression extends React.Component {
         return <NumberExpression {...this.props} parent={parent} />;
       case '&&':
       case '||':
-        return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
+        return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} groupNodes={groupNodes} />;
       case '<':
       case '<=':
       case '>':
@@ -96,6 +107,7 @@ class AggregationConditionExpression extends React.Component {
                   <ButtonToolbar>
                     <Button bsSize="sm" onClick={this.handleDeleteExpression}><Icon name="minus" fixedWidth /></Button>
                     <Button bsSize="sm" onClick={this.handleAddExpression}><Icon name="plus" fixedWidth /></Button>
+                    <Button bsSize="sm" onClick={this.handleAddGroup}><Icon name="code-fork" fixedWidth /></Button>
                   </ButtonToolbar>
                 </div>
               </FormGroup>

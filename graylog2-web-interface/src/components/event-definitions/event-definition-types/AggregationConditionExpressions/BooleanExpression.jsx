@@ -11,7 +11,7 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import AggregationConditionExpression from '../AggregationConditionExpression.jsx';
 
 const BooleanExpression = (props) => {
-  const { expression, level, onChildChange, parent, onChange } = props;
+  const { expression, groupNodes, level, onChildChange, parent, onChange } = props;
 
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
@@ -19,9 +19,11 @@ const BooleanExpression = (props) => {
     onChange('conditions', nextExpression);
   };
 
+  const isGroupNode = !parent || parent.expr !== expression.expr || groupNodes.includes(expression.id);
+
   return (
     <>
-      {(!parent || parent.expr !== expression.expr) && (
+      {(isGroupNode) && (
         <Col md={12}>
           <div className="form-inline" style={{ marginBottom: '15px', fontSize: '14px' }}>
             <FormGroup>
@@ -63,6 +65,7 @@ const BooleanExpression = (props) => {
 
 BooleanExpression.propTypes = {
   expression: internalNodePropType.isRequired,
+  groupNodes: PropTypes.array.isRequired,
   parent: internalNodePropType,
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
