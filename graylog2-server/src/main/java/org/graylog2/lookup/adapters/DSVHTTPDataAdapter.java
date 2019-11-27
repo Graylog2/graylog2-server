@@ -43,7 +43,6 @@ import javax.inject.Inject;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
@@ -92,8 +91,11 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         if (config.refreshInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
+        if (!whitelistService.isWhitelisted(config.url())) {
+            throw new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted.");
+        }
 
-        final Optional<String> response = fetchFileIfNotModified();
+        final Optional<String> response = httpFileRetriever.fetchFileIfNotModified(config.url());
 
         response.ifPresent(body -> lookupRef.set(dsvParser.parse(body)));
     }
@@ -105,8 +107,18 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
+        if (!whitelistService.isWhitelisted(config.url())) {
+            setError(new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted."));
+            return;
+        }
+
+        boolean urlWasNotWhitelisted = getError().filter(UrlNotWhitelistedException.class::isInstance).isPresent();
+
         try {
-            final Optional<String> response = fetchFileIfNotModified();
+            // reload file if the url was blacklisted so that any errors with the file will surface again
+            final Optional<String> response = urlWasNotWhitelisted ?
+                    this.httpFileRetriever.fetchFile(config.url()) :
+                    this.httpFileRetriever.fetchFileIfNotModified(config.url());
 
             response.ifPresent(body -> {
                 LOG.debug("DSV file {} has changed, updating data", config.url());
@@ -114,7 +126,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
                 cachePurge.purgeAll();
                 clearError();
             });
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("Couldn't check data adapter <{}> DSV file {} for updates: {} {}", name(), config.url(), e.getClass().getCanonicalName(), e.getMessage());
             setError(e);
         }
@@ -297,13 +309,6 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
             public abstract DSVHTTPDataAdapter.Config build();
         }
-    }
-
-    private Optional<String> fetchFileIfNotModified() throws Exception {
-        if (!whitelistService.isWhitelisted(config.url())) {
-            throw new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted.");
-        }
-        return httpFileRetriever.fetchFileIfNotModified(config.url());
     }
 
     public static class UrlNotWhitelistedException extends Exception {
