@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -35,6 +34,10 @@ public abstract class BarVisualizationConfig implements VisualizationConfig {
     @JsonProperty
     public abstract BarMode barmode();
 
+    public static Builder builder() {
+        return new AutoValue_BarVisualizationConfig.Builder();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -42,10 +45,5 @@ public abstract class BarVisualizationConfig implements VisualizationConfig {
         public abstract Builder barmode(BarMode barMode);
 
         public abstract BarVisualizationConfig build();
-
-        @JsonCreator
-        public static Builder builder() {
-            return new AutoValue_BarVisualizationConfig.Builder();
-        }
     }
 }

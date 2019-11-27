@@ -36,14 +36,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     public abstract String stackedFields();
 
     private Series series() {
-        return Series.createFromString("count()").build();
-    }
-
-    private Pivot valuesPivotForField(String field, int limit) {
-        return Pivot.valuesBuilder()
-                .field(field)
-                .config(ValueConfig.ofLimit(limit))
-                .build();
+        return countSeries();
     }
 
     private List<Pivot> stackedFieldPivots() {
@@ -66,11 +59,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     }
 
     private SortConfig.Direction order() {
-        switch (sortOrder()) {
-            case "asc": return SortConfig.Direction.Ascending;
-            case "desc": return SortConfig.Direction.Descending;
-        }
-        throw new RuntimeException("Unable to parse sort order: "  + sortOrder());
+        return sortDirection(sortOrder());
     }
 
     private SortConfig sort() {

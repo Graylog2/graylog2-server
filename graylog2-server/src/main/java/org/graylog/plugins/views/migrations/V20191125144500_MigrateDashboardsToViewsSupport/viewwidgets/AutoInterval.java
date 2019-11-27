@@ -33,14 +33,18 @@ public abstract class AutoInterval implements Interval {
     @JsonProperty(FIELD_SCALING)
     public abstract Optional<Double> scaling();
 
+    static Builder builder() { return new AutoValue_AutoInterval.Builder().type(type); };
+
+    public static AutoInterval create() {
+        return AutoInterval.builder().build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder type(String type);
         public abstract Builder scaling(@Nullable Double scaling);
 
         public abstract AutoInterval build();
-
-        static Builder builder() { return new AutoValue_AutoInterval.Builder().type(type); };
     }
 }
 
