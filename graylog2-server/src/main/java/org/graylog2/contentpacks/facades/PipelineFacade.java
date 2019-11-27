@@ -164,7 +164,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
             else {
                 if (EntityDescriptorIds.isDefaultStreamDescriptor(descriptor)) {
                     try {
-                        streamService.load(descriptor.id().id());
+                        streams.add(streamService.load(descriptor.id().id()));
                     }
                     catch (NotFoundException e) {
                         LOG.warn("Default stream {} not found!", descriptor.id().id(), e);
