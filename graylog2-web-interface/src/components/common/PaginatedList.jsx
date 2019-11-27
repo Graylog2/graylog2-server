@@ -1,16 +1,17 @@
+// @flow strict
 import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 import { Pagination } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 
 const defaultPageSizes = [10, 50, 100];
 
 type Props = {
-  children: React.node,
+  children: React.Node,
   onChange: (currentPage: number, pageSize: number) => void,
-  activePage?: number,
-  pageSize?: number,
-  pageSizes?: Array<number>,
+  activePage: number,
+  pageSize: number,
+  pageSizes: Array<number>,
   totalItems: number,
   showPageSizeSelect: boolean
 }
@@ -64,7 +65,7 @@ class PaginatedList extends React.Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     const { pageSize, activePage } = this.props;
 
     if (activePage !== nextProps.activePage) {
@@ -76,6 +77,7 @@ class PaginatedList extends React.Component<Props, State> {
   }
 
   _onChangePageSize = (event) => {
+    console.log('_onChangePageSize', event);
     const { onChange } = this.props;
     const { currentPage } = this.state;
     event.preventDefault();
@@ -84,11 +86,10 @@ class PaginatedList extends React.Component<Props, State> {
     onChange(currentPage, pageSize);
   };
 
-  _onChangePage = (eventKey, event) => {
+  _onChangePage = (pageNo: number, event: MouseEvent) => {
     const { onChange } = this.props;
     const { pageSize } = this.state;
     event.preventDefault();
-    const pageNo = Number(eventKey);
     this.setState({ currentPage: pageNo });
     onChange(pageNo, pageSize);
   };
