@@ -62,8 +62,6 @@ public abstract class ViewWidget {
     @JsonProperty(FIELD_CONFIG)
     abstract ViewWidgetConfig config();
 
-    abstract Builder toBuilder();
-
     private static String newId() {
         return new UUID().toString();
     }
