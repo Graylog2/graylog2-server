@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +73,13 @@ public abstract class AggregationConfig implements ViewWidgetConfig {
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder rowPivots(List<Pivot> rowPivots);
+        public Builder rowPivots(Pivot... rowPivots) {
+            return rowPivots(Arrays.asList(rowPivots));
+        }
         public abstract Builder columnPivots(List<Pivot> columnPivots);
+        public Builder columnPivots(Pivot... columnPivots) {
+            return columnPivots(Arrays.asList(columnPivots));
+        }
         public abstract Builder series(List<Series> series);
         public abstract Builder sort(List<SortConfig> sort);
         public abstract Builder visualization(String visualization);

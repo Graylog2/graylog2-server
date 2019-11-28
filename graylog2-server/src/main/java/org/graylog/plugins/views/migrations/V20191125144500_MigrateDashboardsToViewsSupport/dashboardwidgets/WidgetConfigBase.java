@@ -1,15 +1,12 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets;
 
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ElasticsearchQueryString;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.SortConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeHistogramConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeUnitInterval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ValueConfig;
-
-import java.util.Collections;
 
 abstract class WidgetConfigBase implements WidgetConfig {
     static String TIMESTAMP_FIELD = "timestamp";
@@ -18,6 +15,13 @@ abstract class WidgetConfigBase implements WidgetConfig {
         return Pivot.valuesBuilder()
                 .field(field)
                 .config(ValueConfig.ofLimit(limit))
+                .build();
+    }
+
+    Pivot timestampPivot(String interval) {
+        return Pivot.timeBuilder()
+                .field(TIMESTAMP_FIELD)
+                .config(TimeHistogramConfig.builder().interval(timestampInterval(interval)).build())
                 .build();
     }
 
@@ -41,13 +45,6 @@ abstract class WidgetConfigBase implements WidgetConfig {
         throw new RuntimeException("Unable to map interval: " + interval);
     }
 
-    ViewWidget.Builder createViewWidget() {
-        final ViewWidget.Builder viewWidgetBuilder = ViewWidget.builder()
-                .query(ElasticsearchQueryString.create(query()))
-                .timerange(timerange());
-        return streamId().map(streamId -> viewWidgetBuilder.streams(Collections.singleton(streamId))).orElse(viewWidgetBuilder);
-    }
-
     String mapStatsFunction(String function) {
         switch (function) {
             case "total": return "sum";
@@ -62,5 +59,18 @@ abstract class WidgetConfigBase implements WidgetConfig {
                 return function;
         }
         throw new RuntimeException("Unable to map statistical function: " + function);
+    }
+
+    String mapRendererToVisualization(String renderer) {
+        switch (renderer) {
+            case "bar":
+            case "line":
+                return renderer;
+            case "area":
+                // TODO: Do something about
+                throw new RuntimeException("Area chart is unsupported");
+            case "scatterplot": return "scatter";
+        }
+        throw new RuntimeException("Unable to map renderer to visualization: " + renderer);
     }
 }

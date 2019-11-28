@@ -1,6 +1,5 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidgetPosition;
@@ -8,19 +7,11 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.WidgetPosition;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface WidgetConfig {
-    @JsonProperty
-    String query();
-
-    @JsonProperty
     TimeRange timerange();
-
-    @JsonProperty
-    Optional<String> streamId();
 
     default Set<ViewWidget> toViewWidgets() {
         throw new RuntimeException("Missing strategy to transform dashboard widget to view widget in class " + this.getClass().getSimpleName());
@@ -34,6 +25,6 @@ public interface WidgetConfig {
                 .width(widgetPosition.width())
                 .build();
         return viewWidgets.stream()
-                .collect(Collectors.toMap(ViewWidget::id,viewWidget -> newPosition));
+                .collect(Collectors.toMap(ViewWidget::id, viewWidget -> newPosition));
     }
 }

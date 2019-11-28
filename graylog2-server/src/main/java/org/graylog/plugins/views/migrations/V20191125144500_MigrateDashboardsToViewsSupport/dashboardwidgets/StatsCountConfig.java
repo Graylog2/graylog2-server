@@ -17,7 +17,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class StatsCountConfig extends WidgetConfigBase implements WidgetConfig {
+public abstract class StatsCountConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String NUMERIC_VISUALIZATION = "numeric";
 
     public abstract String field();
@@ -59,8 +59,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
             @JsonProperty("timerange") TimeRange timerange
     ) {
         return new AutoValue_StatsCountConfig(
-                query,
                 timerange,
+                query,
                 field,
                 statsFunction,
                 lowerIsBetter,

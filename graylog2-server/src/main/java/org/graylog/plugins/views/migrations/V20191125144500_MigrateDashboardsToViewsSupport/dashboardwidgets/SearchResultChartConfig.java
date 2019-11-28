@@ -20,7 +20,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class SearchResultChartConfig extends WidgetConfigBase implements WidgetConfig {
+public abstract class SearchResultChartConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     public abstract String interval();
 
     private String visualization() { return "bar"; }
@@ -59,8 +59,8 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_SearchResultChartConfig(
-                query,
                 timerange,
+                query,
                 Optional.ofNullable(streamId),
                 interval
         );

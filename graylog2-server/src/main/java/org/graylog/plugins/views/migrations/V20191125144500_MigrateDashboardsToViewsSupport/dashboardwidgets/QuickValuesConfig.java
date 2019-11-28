@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class QuickValuesConfig extends WidgetConfigBase implements WidgetConfig {
+public abstract class QuickValuesConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String VISUALIZATION_PIE = "pie";
     private static final String VISUALIZATION_TABLE = "table";
 
@@ -159,8 +159,8 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_QuickValuesConfig(
-                query,
                 timerange,
+                query,
                 Optional.ofNullable(streamId),
                 field,
                 showDataTable,

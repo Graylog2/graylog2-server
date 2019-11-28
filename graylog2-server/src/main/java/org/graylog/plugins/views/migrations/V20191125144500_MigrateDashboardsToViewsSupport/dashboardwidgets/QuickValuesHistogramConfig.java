@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implements WidgetConfig {
+public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String BAR_VISUALIZATION = "bar";
 
     public abstract String field();
@@ -101,8 +101,8 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_QuickValuesHistogramConfig(
-                query,
                 timerange,
+                query,
                 Optional.ofNullable(streamId),
                 field,
                 limit,
