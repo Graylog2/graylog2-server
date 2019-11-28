@@ -142,24 +142,25 @@ class MessageList extends React.Component<Props, State> {
     });
   }
 
-  render() {
-    const { data, fields, currentView, pageSize = 7, config } = this.props;
+  _getFormattedMessages = () => {
+    const { data } = this.props;
     const messages = (data && data.messages) || [];
-    const totalAmount = (data && data.total) || 0;
+    return messages.map(m => ({
+      fields: m.message,
+      formatted_fields: MessageFieldsFilter.filterFields(m.message),
+      id: m.message._id,
+      index: m.index,
+      highlight_ranges: m.highlight_ranges,
+    }));
+  };
+
+  render() {
+    const { data, fields, currentView: { activeQuery }, pageSize = 7, config } = this.props;
     const { currentPage, expandedMessages } = this.state;
-    const messageSlice = messages
-      .map((m) => {
-        return {
-          fields: m.message,
-          formatted_fields: MessageFieldsFilter.filterFields(m.message),
-          id: m.message._id,
-          index: m.index,
-          highlight_ranges: m.highlight_ranges,
-        };
-      });
+    const totalAmount = (data && data.total) || 0;
+    const formattedMessages = this._getFormattedMessages();
     const selectedFields = this._getSelectedFields();
     const selectedColumns = Immutable.OrderedSet(selectedFields);
-    const { activeQuery } = currentView;
     return (
       <Wrapper>
         <PaginatedList onChange={this._handlePageChange}
@@ -185,7 +186,7 @@ class MessageList extends React.Component<Props, State> {
                       })}
                     </tr>
                   </thead>
-                  {messageSlice.map((message) => {
+                  {formattedMessages.map((message) => {
                     const messageKey = `${message.index}-${message.id}`;
                     return (
                       <AdditionalContext.Provider key={messageKey}
