@@ -18,8 +18,9 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
+import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { SearchActions } from 'views/stores/SearchStore';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 import styles from './MessageList.css';
 import RenderCompletionCallback from './RenderCompletionCallback';
@@ -47,6 +48,7 @@ type Props = {
   config: MessagesWidgetConfig,
   data: { messages: [], total: number, id: string },
   selectedFields: {},
+  effectiveTimerange: TimeRange,
   currentView: {
     activeQuery: string,
     view: {
@@ -64,6 +66,11 @@ class MessageList extends React.Component<Props, State> {
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
       id: PropTypes.string.isRequired,
+    }).isRequired,
+    effectiveTimerange: PropTypes.shape({
+      from: PropTypes.string.isRequired,
+      to: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
     }).isRequired,
     selectedFields: PropTypes.object,
     currentView: PropTypes.object,
@@ -123,7 +130,8 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (newPage: number) => {
     // execute search with new offset
-    const { pageSize, data: { id: searchTypeId } } = this.props;
+    const { pageSize, data: { id: searchTypeId }, effectiveTimerange } = this.props;
+
     const executionState = {
       global_override: {
         search_types: {
@@ -133,6 +141,7 @@ class MessageList extends React.Component<Props, State> {
           },
         },
         keep_search_types: [searchTypeId],
+        timerange: effectiveTimerange,
       },
     };
     RefreshActions.disable();
@@ -217,4 +226,11 @@ export default connect(MessageList,
   {
     selectedFields: SelectedFieldsStore,
     currentView: ViewStore,
-  });
+    searches: SearchStore,
+  }, props => Object.assign(
+    {},
+    props,
+    {
+      effectiveTimerange: props.searches.result.results[props.currentView.activeQuery].effectiveTimerange,
+    },
+  ));
