@@ -23,13 +23,18 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckRequest;
+import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlwhitelist.UrlWhitelist;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -61,9 +66,22 @@ public class UrlWhitelistResource extends RestResource {
     @Timed
     @ApiOperation(value = "Update url whitelist.")
     @AuditEvent(type = AuditEventTypes.URL_WHITELIST_UPDATE)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response put(@ApiParam(name = "whitelist", required = true) final UrlWhitelist whitelist) {
         checkPermission(RestPermissions.URL_WHITELIST_WRITE);
         urlWhitelistService.save(whitelist);
         return Response.noContent().build();
+    }
+
+    @POST
+    @Path("/check")
+    @Timed
+    @ApiOperation(value = "Check if a url is whitelisted.")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public WhitelistCheckResponse check(@ApiParam(name = "url", required = true)
+                             @Valid /*@NotNull*/ final WhitelistCheckRequest checkRequest) {
+        checkPermission(RestPermissions.URL_WHITELIST_READ);
+        final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
+        return WhitelistCheckResponse.create(checkRequest.url(), isWhitelisted);
     }
 }
