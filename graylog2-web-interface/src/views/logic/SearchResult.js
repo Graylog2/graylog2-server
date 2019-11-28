@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { mapValues, get } from 'lodash';
 import QueryResult from './QueryResult';
 import SearchError from './SearchError';
 
@@ -6,8 +6,8 @@ class SearchResult {
   constructor(result) {
     this.result = result;
 
-    this.results = _.mapValues(result.results, queryResult => new QueryResult(queryResult));
-    this.errors = _.get(result, 'errors', []).map(error => new SearchError(error));
+    this.results = mapValues(result.results, queryResult => new QueryResult(queryResult));
+    this.errors = get(result, 'errors', []).map(error => new SearchError(error));
   }
 
   forId(queryId) {
@@ -16,12 +16,27 @@ class SearchResult {
 
   updateSearchTypes(searchTypeResults) {
     const updatedResult = this.result;
-    _.forEach(searchTypeResults, (searchTypeResult) => {
-      const searchTypeId = searchTypeResult.id;
-      const searchQuery = Object.values(this.result.results).find(query => query.search_types[searchTypeId]);
-      updatedResult.results[searchQuery.query.id].search_types[searchTypeId] = searchTypeResult;
+    searchTypeResults.forEach((searchTypeResult) => {
+      const searchQuery = this._getQueryBySearchTypeId(searchTypeResult.id);
+      updatedResult.results[searchQuery.query.id].search_types[searchTypeResult.id] = searchTypeResult;
     });
     return new SearchResult(updatedResult);
+  }
+
+  getSearchTypesFromResponse(searchTypeIds) {
+    const searchTypes = searchTypeIds.map((searchTypeId) => {
+      const relatedQuery = this._getQueryBySearchTypeId(searchTypeId);
+      return SearchResult._getSearchTypeFromQuery(relatedQuery, searchTypeId);
+    });
+    return searchTypes;
+  }
+
+  _getQueryBySearchTypeId(searchTypeId) {
+    return Object.values(this.result.results).find(query => SearchResult._getSearchTypeFromQuery(query, searchTypeId));
+  }
+
+  static _getSearchTypeFromQuery(query, searchTypeId) {
+    return (query && query.search_types) ? query.search_types[searchTypeId] : undefined;
   }
 }
 

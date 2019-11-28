@@ -1,7 +1,7 @@
 // @flow strict
 import Reflux from 'reflux';
 import Bluebird from 'bluebird';
-import { debounce, get, isEqual, forEach, values } from 'lodash';
+import { debounce, get, isEqual } from 'lodash';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -25,18 +25,6 @@ const createSearchUrl = URLUtils.qualifyUrl('/views/search');
 const displayError = (error) => {
   // eslint-disable-next-line no-console
   console.error(error);
-};
-
-const getSearchTypesFromResponse = (searchResult, searchTypeIds) => {
-  const searchTypes = {};
-  const apiResopnse = searchResult.result;
-  forEach(searchTypeIds, (searchTypeId) => {
-    const updatedSearchType = values(apiResopnse.results)
-      .find(query => query.search_types[searchTypeId])
-      .search_types[searchTypeId];
-    searchTypes[searchTypeId] = updatedSearchType;
-  });
-  return searchTypes;
 };
 
 Bluebird.config({ cancellation: true });
@@ -132,7 +120,7 @@ export const SearchStore = singletonStore(
           .then((searchResult) => {
             const updatedSearchTypeIds = get(executionState, 'global_override.keep_search_types');
             if (updatedSearchTypeIds) {
-              const updatedSearchTypes = getSearchTypesFromResponse(searchResult, updatedSearchTypeIds);
+              const updatedSearchTypes = searchResult.getSearchTypesFromResponse(updatedSearchTypeIds);
               this.result = this.result.updateSearchTypes(updatedSearchTypes);
             } else {
               this.result = searchResult;
