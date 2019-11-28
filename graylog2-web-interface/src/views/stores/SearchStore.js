@@ -114,17 +114,12 @@ export const SearchStore = singletonStore(
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
+      console.log('execute', this.search);
       if (this.search) {
         const { widgetMapping, search } = this.view;
         this.executePromise = this.trackJob(search, executionState)
           .then((searchResult) => {
-            const updatedSearchTypeIds = get(executionState, 'globalOverride.keep_search_types');
-            if (updatedSearchTypeIds) {
-              const updatedSearchTypes = searchResult.getSearchTypesFromResponse(updatedSearchTypeIds);
-              this.result = this.result.updateSearchTypes(updatedSearchTypes);
-            } else {
-              this.result = searchResult;
-            }
+            this.result = searchResult;
             this.widgetMapping = widgetMapping;
             this._trigger();
             this.executePromise = undefined;
@@ -140,6 +135,36 @@ export const SearchStore = singletonStore(
       const promise = SearchActions.execute(this.executionState);
       SearchActions.executeWithCurrentState.promise(promise);
       return promise;
+    },
+
+    reexecuteSearchTypes(searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+      if (this.executePromise && this.executePromise.cancel) {
+        this.executePromise.cancel();
+      }
+
+
+      if (this.search) {
+        const { widgetMapping, search } = this.view;
+        const searchTypeIds = Object.keys(searchTypes);
+        const globalOverride = {
+          search_types: searchTypes,
+          keep_search_types: searchTypeIds,
+          timerange: effectiveTimerange,
+        };
+        const executionState = new SearchExecutionState(undefined, globalOverride);
+        this.executePromise = this.trackJob(search, executionState)
+          .then((searchResult) => {
+            const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
+            this.result = this.result.updateSearchTypes(updatedSearchTypes);
+            this.widgetMapping = widgetMapping;
+            this._trigger();
+            this.executePromise = undefined;
+            return { result: searchResult, widgetMapping };
+          }, displayError);
+        SearchActions.execute.promise(this.executePromise);
+        return this.executePromise;
+      }
+      throw new Error('Unable to execute search when no search is loaded!');
     },
 
     parameters(newParameters: Array<Parameter>): Promise<View> {

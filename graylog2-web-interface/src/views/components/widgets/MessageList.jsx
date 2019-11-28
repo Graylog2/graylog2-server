@@ -129,24 +129,14 @@ class MessageList extends React.Component<Props, State> {
     return (fields.find(f => f.name === fieldName) || { type: FieldType.Unknown }).type;
   };
 
-  _handlePageChange = (newPage: number) => {
+  _handlePageChange = (pageNo: number) => {
     // execute search with new offset
     const { pageSize, data: { id: searchTypeId }, effectiveTimerange } = this.props;
-    const globalOverride = {
-      searchTypes: {
-        [searchTypeId]: {
-          limit: pageSize,
-          offset: pageSize * (newPage - 1),
-        },
-      },
-      keepSearchTypes: [searchTypeId],
-      timerange: effectiveTimerange,
-    };
-    const executionState = new SearchExecutionState(undefined, globalOverride);
+    const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
     RefreshActions.disable();
-    SearchActions.execute(executionState);
+    SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange);
     this.setState({
-      currentPage: newPage,
+      currentPage: pageNo,
     });
   }
 
