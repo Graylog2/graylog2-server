@@ -70,6 +70,7 @@ export default {
     });
     const yValues: Array<number> = values.map(() => 0);
     return {
+      hovertemplate: '%{text}',
       mode: 'markers',
       name: eventsDisplayName,
       type: 'scatter',

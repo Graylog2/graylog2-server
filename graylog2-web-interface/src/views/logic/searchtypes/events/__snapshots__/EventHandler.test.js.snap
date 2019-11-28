@@ -3,6 +3,7 @@
 exports[`EventHandler convert should convert events to chart data and shapes 1`] = `
 Object {
   "eventChartData": Object {
+    "hovertemplate": "%{text}",
     "marker": Object {
       "color": "#d3d3d3",
       "size": 5,

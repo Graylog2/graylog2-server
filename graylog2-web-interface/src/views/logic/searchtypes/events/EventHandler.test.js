@@ -23,6 +23,7 @@ describe('EventHandler convert', () => {
   it('should convert events to char data', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event]));
     expect(result).toEqual({
+      hovertemplate: '%{text}',
       marker: {
         color: '#d3d3d3',
         size: 5,
@@ -40,6 +41,7 @@ describe('EventHandler convert', () => {
   it('should group duplicate events by timestamp and convert events to char data', () => {
     const result = EventHandler.toChartData(groupByTimestamp([event, event, event]));
     expect(result).toEqual({
+      hovertemplate: '%{text}',
       marker: {
         color: '#d3d3d3',
         size: 5,
