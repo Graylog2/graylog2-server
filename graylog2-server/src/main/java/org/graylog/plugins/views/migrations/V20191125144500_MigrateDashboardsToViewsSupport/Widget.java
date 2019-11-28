@@ -75,6 +75,7 @@ public abstract class Widget {
                 @JsonSubTypes.Type(value = SearchResultChartConfig.class, name = "SEARCH_RESULT_CHART"),
                 @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "SEARCH_RESULT_COUNT"),
                 @JsonSubTypes.Type(value = StatsCountConfig.class, name = "STATS_COUNT"),
+                @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "STREAM_SEARCH_RESULT_COUNT"),
                 @JsonSubTypes.Type(value = QuickValuesConfig.class, name = "QUICKVALUES"),
                 @JsonSubTypes.Type(value = QuickValuesHistogramConfig.class, name = "QUICKVALUES_HISTOGRAM"),
                 @JsonSubTypes.Type(value = WorldMapConfig.class, name = "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy")
