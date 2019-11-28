@@ -38,7 +38,7 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
                         .visualization(NUMERIC_VISUALIZATION)
                         .visualizationConfig(
                                 NumberVisualizationConfig.builder()
-                                        .trend(true)
+                                        .trend(trend())
                                         .trendPreference(lowerIsBetter()
                                                 ? NumberVisualizationConfig.TrendPreference.LOWER
                                                 : NumberVisualizationConfig.TrendPreference.HIGHER)
