@@ -221,6 +221,19 @@
         <dependency>
             <groupId>org.glassfish.jersey.ext</groupId>
             <artifactId>jersey-bean-validation</artifactId>
+            <exclusions>
+                <!-- Exclude the old org.hibernate:hibernate-validator transitive dependency from
+                     jersey-bean-validation to make sure jersey is using the newer
+                     org.hibernate.validator:hibernate-validator (changed groupId) one.
+                     This fixes validation of objects in our REST API.
+                     See: https://github.com/Graylog2/graylog2-server/issues/5402
+                     (This can probably be removed once we use a newer jersey version that depends
+                     on a more recent hibernate-validator) -->
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
