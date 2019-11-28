@@ -168,7 +168,7 @@ class MessageList extends React.Component<Props, State> {
                        showPageSizeSelect={false}
                        totalItems={totalAmount}
                        pageSize={pageSize}>
-          <div className="search-results-table" style={{ overflow: 'auto' }}>
+          <div className="search-results-table" key={`message-list-page-${currentPage}`}>
             <div className="table-responsive">
               <div className={`messages-container ${styles.messageListTableHeader}`}>
                 <table className="table table-condensed messages" style={{ marginTop: 0 }}>
