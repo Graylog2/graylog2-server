@@ -4,14 +4,16 @@ import { mount } from 'enzyme';
 import * as Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
+import { TIMESTAMP_FIELD, Messages } from 'views/Constants';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { AdditionalContext } from 'views/logic/ActionContext';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
-import { TIMESTAMP_FIELD } from 'views/Constants';
 import { SelectedFieldsStore } from 'views/stores/SelectedFieldsStore';
-import InputsStore from 'stores/inputs/InputsStore';
+import { SearchActions } from 'views/stores/SearchStore';
+import { RefreshActions } from 'views/stores/RefreshStore';
 import * as messageList from 'views/components/messagelist';
+import InputsStore from 'stores/inputs/InputsStore';
 import MessageList from './MessageList';
 import RenderCompletionCallback from './RenderCompletionCallback';
 import InputsActions from '../../../actions/inputs/InputsActions';
@@ -43,6 +45,16 @@ jest.mock('views/stores/SelectedFieldsStore', () => ({
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
 }));
+jest.mock('views/stores/SearchStore', () => ({
+  SearchActions: {
+    execute: jest.fn(),
+  },
+}));
+jest.mock('views/stores/RefreshStore', () => ({
+  RefreshActions: {
+    disable: jest.fn(),
+  },
+}));
 jest.mock('legacy/result-histogram', () => 'Histogram');
 jest.mock('components/search/MessageTablePaginator', () => 'message-table-paginator');
 jest.mock('views/components/messagelist');
@@ -60,11 +72,18 @@ describe('MessageList', () => {
           file_name: 'frank.txt',
           timestamp: '2018-09-26T12:42:49.234Z',
         },
-      }],
+      },
+    ],
+    total: 1,
+
   };
   beforeEach(() => {
     // eslint-disable-next-line import/namespace
     messageList.MessageTableEntry = MessageTableEntry;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should render with and without fields', () => {
@@ -114,6 +133,39 @@ describe('MessageList', () => {
     );
     mount(<Component />);
     expect(InputsActions.list).toHaveBeenCalled();
+  });
+
+  it('fetches another page, with correct executionState', () => {
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const executionState = {
+      global_override: {
+        search_types: {
+          [data.id]: {
+            limit: Messages.DEFAULT_LIMIT,
+            offset: Messages.DEFAULT_LIMIT,
+          },
+        },
+        keep_search_types: [data.id],
+      },
+    };
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config} />);
+    wrapper.find('[aria-label="Next"]').simulate('click');
+    expect(SearchActions.execute).toHaveBeenCalledWith(executionState);
+  });
+
+  it('disables refresh actions, when using pagination', () => {
+    const config = MessagesWidgetConfig.builder().fields([]).build();
+    const secondPageSize = 10;
+    const wrapper = mount(<MessageList editing
+                                       data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
+                                       fields={Immutable.List([])}
+                                       config={config} />);
+    wrapper.find('[aria-label="Next"]').simulate('click');
+    expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
   });
 
   it('calls render completion callback after first render', () => {
