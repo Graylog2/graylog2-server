@@ -1,5 +1,5 @@
 // @flow strict
-import { uniq } from 'lodash';
+import { groupBy } from 'lodash';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 
@@ -12,6 +12,8 @@ export type Event = {
 };
 
 export type Events = Array<Event>;
+
+type GroupedEvents = { [string]: Events };
 
 type Shape = {
   type: 'line',
@@ -35,16 +37,37 @@ export default {
 
   toVisualizationData(events: Events = [],
     formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): { eventChartData: ChartDefinition, shapes: Shapes } {
+    const groupedEvents: GroupedEvents = groupBy(events, e => e.timestamp);
     return {
-      eventChartData: this.toChartData(events),
-      shapes: this.toShapeData(events, formattingSettings),
+      eventChartData: this.toChartData(groupedEvents),
+      shapes: this.toShapeData(Object.keys(groupedEvents), formattingSettings),
     };
   },
 
-  toChartData(events: Events = []): ChartDefinition {
-    const values: Array<[string, string]> = uniq(events.map(event => [event.timestamp, event.message]));
+  transformGroupedEvents(events: GroupedEvents): [[string, Event | number]] {
+    // $FlowFixMe Object.entries has only mixed values.
+    return Object.entries(events).map(([timestamp:string, eventArray:Events]) => {
+      if (!(eventArray instanceof Array)) {
+        throw new Error('Unexpected data type');
+      }
+
+      if (eventArray.length > 1) {
+        return [timestamp, eventArray.length];
+      }
+
+      return [timestamp, eventArray[0]];
+    });
+  },
+
+  toChartData(events: GroupedEvents): ChartDefinition {
+    const values = this.transformGroupedEvents(events);
     const xValues: Array<string> = values.map(v => v[0]);
-    const textValues: Array<string> = values.map(v => v[1]);
+    const textValues: Array<string> = values.map((e) => {
+      if (Object.prototype.hasOwnProperty.call(e[1], 'message')) {
+        return e[1].message;
+      }
+      return `${e[1]} alerts occurred.`;
+    });
     const yValues: Array<number> = values.map(() => 0);
     return {
       mode: 'markers',
@@ -55,23 +78,23 @@ export default {
       y: yValues,
       text: textValues,
       marker: {
-        size: 3,
+        size: 5,
         color: '#d3d3d3',
       },
     };
   },
 
-  toShapeData(events: Events = [], formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): Shapes {
+  toShapeData(timestamps: Array<string>, formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): Shapes {
     const { chartColors } = formattingSettings;
     const shapeColor = chartColors[eventsDisplayName] || '#d3d3d3';
-    return events.map(event => ({
+    return timestamps.map(timestamp => ({
       layer: 'below',
       type: 'line',
       yref: 'paper',
       y0: 0,
       y1: 1,
-      x0: event.timestamp,
-      x1: event.timestamp,
+      x0: timestamp,
+      x1: timestamp,
       opacity: 0.5,
       line: {
         color: shapeColor,
