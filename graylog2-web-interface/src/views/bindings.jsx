@@ -76,6 +76,7 @@ import type { ActionHandlerArguments, ActionHandlerCondition } from './component
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
 import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
+import AreaVisualization from './components/visualizations/area/AreaVisualization';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -247,6 +248,11 @@ export default {
     },
   ],
   visualizationTypes: [
+    {
+      type: AreaVisualization.type,
+      displayName: 'Area Chat',
+      component: AreaVisualization,
+    },
     {
       type: BarVisualization.type,
       displayName: 'Bar Chart',
