@@ -55,7 +55,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         final String queryString = this.esQueryDecorators.decorate(((ElasticsearchQueryString)query.query()).queryString(), job, query, Collections.emptySet());
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
-                .size(messageList.limit() - messageList.offset())
+                .size(messageList.limit())
                 .from(messageList.offset())
                 .highlighter(new HighlightBuilder().requireFieldMatch(false)
                         .highlightQuery(QueryBuilders.queryStringQuery(queryString))
