@@ -7,10 +7,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.NumberVisualizationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.WorldMapVisualizationConfig;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -40,7 +38,6 @@ public abstract class WorldMapConfig extends WidgetConfigBase implements WidgetC
                         .rowPivots(Collections.singletonList(fieldPivot()))
                         .series(Collections.singletonList(series()))
                         .visualization(MAP_VISUALIZATION)
-                        .visualizationConfig(WorldMapVisualizationConfig.create())
                         .build());
         return Collections.singleton(
                 streamId()
