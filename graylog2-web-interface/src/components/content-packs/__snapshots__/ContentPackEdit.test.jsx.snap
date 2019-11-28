@@ -9,7 +9,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       className="subnavigation col-md-2"
     >
       <ul
-        className="Nav-dzawzr-0 eiLPpa nav nav-pills nav-stacked"
+        className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
         role={null}
       >
         <li
@@ -489,7 +489,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       className="subnavigation col-md-2"
     >
       <ul
-        className="Nav-dzawzr-0 eiLPpa nav nav-pills nav-stacked"
+        className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
         role={null}
       >
         <li

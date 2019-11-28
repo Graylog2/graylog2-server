@@ -37,7 +37,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
       </div>
     </div>
     <ul
-      className="Nav-dzawzr-0 eiLPpa nav nav-pills"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills"
       role={null}
     >
       <li
@@ -128,7 +128,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
       </div>
     </div>
     <ul
-      className="Nav-dzawzr-0 eiLPpa nav nav-pills"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills"
       role={null}
     >
       <li
@@ -197,7 +197,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
     className="subnavigation col-md-2"
   >
     <ul
-      className="Nav-dzawzr-0 eiLPpa nav nav-pills nav-stacked"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
       role={null}
     >
       <li
@@ -288,7 +288,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
     className="subnavigation col-md-2"
   >
     <ul
-      className="Nav-dzawzr-0 eiLPpa nav nav-pills nav-stacked"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
       role={null}
     >
       <li
