@@ -28,6 +28,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.QuickValuesHistogramConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultChartConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultCountConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StackedChartConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StatsCountConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
@@ -74,8 +75,9 @@ public abstract class Widget {
                 @JsonSubTypes.Type(value = FieldChartConfig.class, name = "FIELD_CHART"),
                 @JsonSubTypes.Type(value = SearchResultChartConfig.class, name = "SEARCH_RESULT_CHART"),
                 @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "SEARCH_RESULT_COUNT"),
-                @JsonSubTypes.Type(value = StatsCountConfig.class, name = "STATS_COUNT"),
                 @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "STREAM_SEARCH_RESULT_COUNT"),
+                @JsonSubTypes.Type(value = StackedChartConfig.class, name = "STACKED_CHART"),
+                @JsonSubTypes.Type(value = StatsCountConfig.class, name = "STATS_COUNT"),
                 @JsonSubTypes.Type(value = QuickValuesConfig.class, name = "QUICKVALUES"),
                 @JsonSubTypes.Type(value = QuickValuesHistogramConfig.class, name = "QUICKVALUES_HISTOGRAM"),
                 @JsonSubTypes.Type(value = WorldMapConfig.class, name = "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy")

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ElasticsearchQueryString;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
@@ -33,6 +34,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
         }
         return Collections.singleton(ViewWidget.builder()
                 .timerange(timerange())
+                .query(ElasticsearchQueryString.create("*"))
                 .config(AggregationConfig.builder()
                         .rowPivots(timestampPivot(interval()))
                         .series(series)
