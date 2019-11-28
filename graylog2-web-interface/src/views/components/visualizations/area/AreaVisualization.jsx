@@ -38,7 +38,7 @@ const AreaVisualization: VisualizationComponent = ({ config, data, effectiveTime
 
 AreaVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.object)).isRequired,
 };
 
 AreaVisualization.type = 'area';
