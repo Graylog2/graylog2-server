@@ -9,6 +9,8 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeUnitInterval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ValueConfig;
 
+import java.util.Collections;
+
 abstract class WidgetConfigBase implements WidgetConfig {
     static String TIMESTAMP_FIELD = "timestamp";
 
@@ -40,9 +42,10 @@ abstract class WidgetConfigBase implements WidgetConfig {
     }
 
     ViewWidget.Builder createViewWidget() {
-        return ViewWidget.builder()
+        final ViewWidget.Builder viewWidgetBuilder = ViewWidget.builder()
                 .query(ElasticsearchQueryString.create(query()))
                 .timerange(timerange());
+        return streamId().map(streamId -> viewWidgetBuilder.streams(Collections.singleton(streamId))).orElse(viewWidgetBuilder);
     }
 
     String mapStatsFunction(String function) {

@@ -21,9 +21,11 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.SortConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ValueConfig;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -153,11 +155,13 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
             @JsonProperty("limit") Integer limit,
             @JsonProperty("data_table_limit") Integer dataTableLimit,
             @JsonProperty("sort_order") String sortOrder,
-            @JsonProperty("stacked_fields") String stackedFields
+            @JsonProperty("stacked_fields") String stackedFields,
+            @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_QuickValuesConfig(
                 query,
                 timerange,
+                Optional.ofNullable(streamId),
                 field,
                 showDataTable,
                 showPieChart,

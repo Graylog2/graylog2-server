@@ -33,19 +33,13 @@ public abstract class WorldMapConfig extends WidgetConfigBase implements WidgetC
 
     @Override
     public Set<ViewWidget> toViewWidgets() {
-        final ViewWidget.Builder viewWidgetBuilder = createViewWidget()
+        return Collections.singleton(createViewWidget()
                 .config(AggregationConfig.builder()
                         .rowPivots(Collections.singletonList(fieldPivot()))
                         .series(Collections.singletonList(series()))
                         .visualization(MAP_VISUALIZATION)
-                        .build());
-        return Collections.singleton(
-                streamId()
-                        .map(Collections::singleton)
-                        .map(viewWidgetBuilder::streams)
-                        .orElse(viewWidgetBuilder)
-                        .build()
-        );
+                        .build())
+                .build());
     }
 
     @JsonCreator

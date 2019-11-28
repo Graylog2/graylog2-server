@@ -13,7 +13,9 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.SeriesConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeHistogramConfig;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
@@ -53,11 +55,13 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
     static SearchResultChartConfig create(
             @JsonProperty("interval") String interval,
             @JsonProperty("query") String query,
-            @JsonProperty("timerange") TimeRange timerange
+            @JsonProperty("timerange") TimeRange timerange,
+            @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_SearchResultChartConfig(
                 query,
                 timerange,
+                Optional.ofNullable(streamId),
                 interval
         );
     }

@@ -32,7 +32,7 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
 
     @Override
     public Set<ViewWidget> toViewWidgets() {
-        final ViewWidget.Builder viewWidgetBuilder = createViewWidget()
+        return Collections.singleton(createViewWidget()
                 .config(AggregationConfig.builder()
                         .series(Collections.singletonList(series()))
                         .visualization(NUMERIC_VISUALIZATION)
@@ -44,14 +44,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
                                                 : NumberVisualizationConfig.TrendPreference.HIGHER)
                                         .build()
                         )
-                        .build());
-        return Collections.singleton(
-                streamId()
-                        .map(Collections::singleton)
-                        .map(viewWidgetBuilder::streams)
-                        .orElse(viewWidgetBuilder)
-                        .build()
-        );
+                        .build())
+                .build());
     }
 
     @JsonCreator
