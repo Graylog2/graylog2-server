@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -45,7 +46,9 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     }
 
     private List<Pivot> stackedFieldPivots() {
-        return Splitter.on(",")
+        return Strings.isNullOrEmpty(stackedFields())
+                ? Collections.emptyList()
+                : Splitter.on(",")
                 .splitToList(stackedFields())
                 .stream()
                 .map(fieldName -> valuesPivotForField(fieldName, 15))

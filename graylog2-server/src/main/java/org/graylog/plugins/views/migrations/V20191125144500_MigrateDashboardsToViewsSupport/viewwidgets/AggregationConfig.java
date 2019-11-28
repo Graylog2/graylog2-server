@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @AutoValue
 public abstract class AggregationConfig implements ViewWidgetConfig {
@@ -51,8 +52,7 @@ public abstract class AggregationConfig implements ViewWidgetConfig {
     public abstract String visualization();
 
     @JsonProperty(FIELD_VISUALIZATION_CONFIG)
-    @Nullable
-    public abstract VisualizationConfig visualizationConfig();
+    public abstract Optional<VisualizationConfig> visualizationConfig();
 
     @JsonProperty(FIELD_FORMATTING_SETTINGS)
     @Nullable
@@ -66,7 +66,7 @@ public abstract class AggregationConfig implements ViewWidgetConfig {
                 .columnPivots(Collections.emptyList())
                 .rowPivots(Collections.emptyList())
                 .sort(Collections.emptyList())
-                .rollup(false);
+                .rollup(true);
     }
 
     @AutoValue.Builder

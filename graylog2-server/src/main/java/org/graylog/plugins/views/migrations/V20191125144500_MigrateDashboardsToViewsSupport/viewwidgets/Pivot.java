@@ -56,7 +56,8 @@ public abstract class Pivot {
             case TYPE_TIME:
                 final TimeHistogramConfig timeConfig = (TimeHistogramConfig)config();
                 final TimeUnitInterval interval = (TimeUnitInterval)timeConfig.interval();
-                final org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval mergedInterval = org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval.create(""+ interval.value() + interval.unit());
+                final String esUnit = mapUnit(interval.unit());
+                final org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval mergedInterval = org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval.create("" + interval.value() + esUnit);
 
                 return Time.create(field(), mergedInterval);
             case TYPE_VALUES:
@@ -65,6 +66,20 @@ public abstract class Pivot {
         }
 
         throw new RuntimeException("Invalid pivot type when creating bucket spec: " + type());
+    }
+
+    private String mapUnit(TimeUnitInterval.IntervalUnit unit) {
+        switch (unit) {
+            case SECONDS: return "s";
+            case MINUTES: return "m";
+            case HOURS: return "h";
+            case DAYS: return "d";
+            case WEEKS: return "w";
+            case MONTHS: return "M";
+            case YEARS: return "y";
+        }
+
+        throw new RuntimeException("Unable to map interval unit: " + unit);
     }
 
     @AutoValue.Builder

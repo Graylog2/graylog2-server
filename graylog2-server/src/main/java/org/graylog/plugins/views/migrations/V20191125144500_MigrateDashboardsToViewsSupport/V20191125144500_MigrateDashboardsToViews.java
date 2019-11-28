@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,10 +40,17 @@ import java.util.stream.Collectors;
 public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20191125144500_MigrateDashboardsToViews.class);
     private final DashboardsService dashboardsService;
+    private final SearchService searchService;
+    private final ViewService viewService;
 
     @Inject
-    public V20191125144500_MigrateDashboardsToViews(DashboardsService dashboardsService) {
+    public V20191125144500_MigrateDashboardsToViews(
+            DashboardsService dashboardsService,
+            SearchService searchService,
+            ViewService viewService) {
         this.dashboardsService = dashboardsService;
+        this.searchService = searchService;
+        this.viewService = viewService;
     }
 
     @Override
@@ -57,14 +65,19 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Map<String, Set<String>> widgetIdMigrationMapping = new HashMap<>();
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
-        final Set<View> newViews = this.dashboardsService.streamAll()
+        final Map<View, Search> newViews = this.dashboardsService.streamAll()
                 .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        newViews.forEach((view, search) -> {
+            searchService.save(search);
+            viewService.save(view);
+        });
 
         final MigrationCompleted migrationCompleted = MigrationCompleted.create(dashboardIdToViewId, widgetIdMigrationMapping);
     }
 
-    private View migrateDashboard(Dashboard dashboard,
+    private Map.Entry<View, Search> migrateDashboard(Dashboard dashboard,
                                   BiFunction<String, String, String> recordMigratedDashboardIds,
                                   Consumer<Map<String, Set<String>>> recordMigratedWidgetMap) {
         final Map<String, Set<String>> migratedWidgetIds = new HashMap<>(dashboard.widgets().size());
@@ -95,7 +108,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 .collect(Collectors.toSet());
         final Query newQuery = Query.create(newId(), RelativeRange.create(300),"", newSearchTypes);
         final Set<Query> newQueries = Collections.singleton(newQuery);
-        final Search newSearch = Search.create(newId(), newQueries, dashboard.creatorUserId(), createdAt);
+        final Search newSearch = Search.create(newQueries, dashboard.creatorUserId(), createdAt);
 
         final ViewState newViewState = ViewState.create(
                 Titles.ofWidgetTitles(newWidgetTitles).withQueryTitle(dashboard.title()),
@@ -105,13 +118,12 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         );
 
         final View newView = View.create(
-                newId(),
                 View.Type.DASHBOARD,
                 dashboard.title(),
-                "",
+                "This dashboard was migrated automatically.",
                 dashboard.description(),
                 newSearch.id(),
-                Collections.singletonMap(newId(), newViewState),
+                Collections.singletonMap(newQuery.id(), newViewState),
                 Optional.ofNullable(dashboard.creatorUserId()),
                 createdAt
         );
@@ -119,7 +131,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         recordMigratedDashboardIds.apply(dashboard.id(), newView.id());
         recordMigratedWidgetMap.accept(migratedWidgetIds);
 
-        return newView;
+        return new AbstractMap.SimpleEntry<>(newView, newSearch);
     }
 
     private Set<SearchType> createSearchType(ViewWidget viewWidget, BiConsumer<String, String> recordWidgetMapping) {

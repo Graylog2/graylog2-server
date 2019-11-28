@@ -21,7 +21,7 @@ import java.util.Set;
 public abstract class SearchResultChartConfig extends WidgetConfigBase implements WidgetConfig {
     public abstract String interval();
 
-    private String visualization() { return "line"; }
+    private String visualization() { return "bar"; }
 
     private Series series() {
         return Series.buildFromString("count()").config(SeriesConfig.builder().name("Messages").build()).build();

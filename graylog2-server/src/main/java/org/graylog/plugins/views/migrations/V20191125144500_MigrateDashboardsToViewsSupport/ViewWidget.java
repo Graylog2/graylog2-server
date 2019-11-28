@@ -20,8 +20,10 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.NumberVisualizationConfig;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -76,18 +78,30 @@ public abstract class ViewWidget {
 
     @JsonIgnore
     Set<SearchType> toSearchTypes() {
-        return Collections.singleton(
-                Pivot.builder()
-                        .query(query())
-                        .streams(streams())
-                        .timerange(timerange())
-                        .rollup(config().rollup())
-                        .rowGroups(config().rowPivots().stream().map(pivot -> pivot.toBucketSpec()).collect(Collectors.toList()))
-                        .columnGroups(config().columnPivots().stream().map(pivot -> pivot.toBucketSpec()).collect(Collectors.toList()))
-                        .series(config().series().stream().map(series -> series.toSeriesSpec()).collect(Collectors.toList()))
-                        .sort(config().sort().stream().map(sort -> sort.toSortSpec()).collect(Collectors.toList()))
-                        .build()
-        );
+        final Pivot.Builder chartBuilder = Pivot.builder()
+                .name("chart")
+                .query(query())
+                .streams(streams())
+                .timerange(timerange())
+                .rollup(config().rollup())
+                .rowGroups(config().rowPivots().stream().map(pivot -> pivot.toBucketSpec()).collect(Collectors.toList()))
+                .columnGroups(config().columnPivots().stream().map(pivot -> pivot.toBucketSpec()).collect(Collectors.toList()))
+                .series(config().series().stream().map(series -> series.toSeriesSpec()).collect(Collectors.toList()))
+                .sort(config().sort().stream().map(sort -> sort.toSortSpec()).collect(Collectors.toList()));
+
+        if (config().visualization().equals("numeric") && config().visualizationConfig()
+                .map(visualizationConfig -> ((NumberVisualizationConfig) visualizationConfig).trend())
+                .orElse(false)) {
+            final Pivot chart = chartBuilder.build();
+            final Pivot trend = chartBuilder
+                    .newId()
+                    .name("trend")
+                    .timerange(OffsetRange.ofSearchTypeId(chart.id()))
+                    .build();
+
+            return ImmutableSet.of(chart, trend);
+        }
+        return Collections.singleton(chartBuilder.build());
     }
 
     @AutoValue.Builder

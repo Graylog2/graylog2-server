@@ -91,8 +91,11 @@ abstract class View {
     @JsonProperty(FIELD_CREATED_AT)
     abstract DateTime createdAt();
 
-    static View create(String id,
-                       Type type,
+    private static String newId() {
+        return new org.bson.types.ObjectId().toHexString();
+    }
+
+    static View create(Type type,
                        String title,
                        String summary,
                        String description,
@@ -100,6 +103,6 @@ abstract class View {
                        Map<String, ViewState> state,
                        Optional<String> owner,
                        DateTime createdAt) {
-        return new AutoValue_View(id, type, title, summary, description, searchId, state, owner, createdAt);
+        return new AutoValue_View(newId(), type, title, summary, description, searchId, state, owner, createdAt);
     }
 }
