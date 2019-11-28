@@ -58,9 +58,4 @@ public class MongoConnectionForTests implements MongoConnection {
 
         return mongoDatabase;
     }
-
-    @Override
-    public MongoClient getMongoClient() {
-        return (MongoClient) mongoClient;
-    }
 }

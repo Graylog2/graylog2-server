@@ -133,9 +133,4 @@ public class MongoConnectionImpl implements MongoConnection {
     public MongoDatabase getMongoDatabase() {
         return mongoDatabase;
     }
-
-    @Override
-    public MongoClient getMongoClient() {
-        return m;
-    }
 }
