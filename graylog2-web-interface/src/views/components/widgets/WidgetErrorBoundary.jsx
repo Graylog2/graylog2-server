@@ -27,4 +27,4 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
       ? <WidgetFailed error={error} />
       : children;
   }
-};
+}
