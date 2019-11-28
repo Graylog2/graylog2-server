@@ -6,6 +6,7 @@ import { AggregationType } from 'views/components/aggregationbuilder/Aggregation
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 
 import type { ChartDefinition } from '../ChartData';
 import { chartData } from '../ChartData';
@@ -33,12 +34,21 @@ const LineVisualization: VisualizationComponent = ({ config, data, effectiveTime
     y: values,
     line: { shape: toPlotly(interpolation) },
   }), [interpolation]);
+
+  const chartDataResult = chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator);
+  const layout = {};
+  if (config.eventAnnotation && data.events) {
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    chartDataResult.push(eventChartData);
+    layout.shapes = shapes;
+  }
+
   return (
     <XYPlot config={config}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             setChartColor={setChartColor}
-            chartData={chartData(config, data.chart || Object.values(data)[0], 'scatter', chartGenerator)} />
+            chartData={chartDataResult} />
   );
 };
 
