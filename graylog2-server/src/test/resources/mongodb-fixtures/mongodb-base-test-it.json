@@ -1,0 +1,16 @@
+{
+  "test_1": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefaffe"
+      },
+      "hello": "world"
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeefafff"
+      },
+      "another": "test"
+    }
+  ]
+}
