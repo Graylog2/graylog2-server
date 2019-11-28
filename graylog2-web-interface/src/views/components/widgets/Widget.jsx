@@ -40,6 +40,7 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
+import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 type Props = {
   id: string,
@@ -253,7 +254,8 @@ class Widget extends React.Component<Props, State> {
     }
     return (
       <WidgetColorContext id={id}>
-        <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
+        <WidgetErrorBoundary>
+          <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
           <span>
             <InteractiveContext.Consumer>
               {interactive => (
@@ -288,7 +290,8 @@ class Widget extends React.Component<Props, State> {
             </InteractiveContext.Consumer>
             {visualization}
           </span>
-        </WidgetFrame>
+          </WidgetFrame>
+        </WidgetErrorBoundary>
       </WidgetColorContext>
     );
   }
