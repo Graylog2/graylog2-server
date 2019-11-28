@@ -32,7 +32,6 @@ class Parameter {
 
   static __registrations: { [string]: typeof Parameter } = {};
 
-
   constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ?ParameterBinding) {
     this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
   }
@@ -70,7 +69,7 @@ class Parameter {
   }
 
   static fromJSON(value: ParameterJson): Parameter {
-    const { type } = value;
+    const { type = 'value-parameter-v1' } = value; // default to ValueParameter in case type is empty
     const implementingClass = Parameter.__registrations[type.toLocaleLowerCase()];
 
     if (implementingClass) {
