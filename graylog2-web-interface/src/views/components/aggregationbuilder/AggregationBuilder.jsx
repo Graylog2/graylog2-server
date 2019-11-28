@@ -63,7 +63,7 @@ const _visualizationForType = (type: string): VisualizationComponent => {
   return visualization.component;
 };
 
-const getResult = (value: RowResult|EventResult): Rows|Events => {
+const getResult = (value: RowResult | EventResult): Rows | Events => {
   if (value.type === 'events') {
     return value.events;
   }
@@ -80,7 +80,7 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
   const rows = Object.entries(data)
     .map(
       // $FlowFixMe: map claims it's `mixed`, we know it's `RowResult`
-      ([key, value]: [string, RowResult]|['events', EventResult]) => [
+      ([key, value]: [string, RowResult] | ['events', EventResult]) => [
         key,
         getResult(value),
       ],

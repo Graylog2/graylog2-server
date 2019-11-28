@@ -116,6 +116,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
+    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter'].findIndex(x => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
@@ -156,7 +157,7 @@ export default class AggregationControls extends React.Component<Props, State> {
             <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
-            {config.isTimeline && (
+            {showEventConfiguration && (
               <DescriptionBox description="Event Annotations"
                               help="Configuration to render event annotations to a timebased widget">
                 <EventListConfiguration enabled={config.eventAnnotation} onChange={this._onSetEventAnnotation} />
