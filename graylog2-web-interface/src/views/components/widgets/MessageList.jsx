@@ -20,6 +20,7 @@ import { ViewStore } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import { SearchActions, SearchStore } from 'views/stores/SearchStore';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import styles from './MessageList.css';
@@ -131,19 +132,17 @@ class MessageList extends React.Component<Props, State> {
   _handlePageChange = (newPage: number) => {
     // execute search with new offset
     const { pageSize, data: { id: searchTypeId }, effectiveTimerange } = this.props;
-
-    const executionState = {
-      global_override: {
-        search_types: {
-          [searchTypeId]: {
-            limit: pageSize,
-            offset: pageSize * (newPage - 1),
-          },
+    const globalOverride = {
+      searchTypes: {
+        [searchTypeId]: {
+          limit: pageSize,
+          offset: pageSize * (newPage - 1),
         },
-        keep_search_types: [searchTypeId],
-        timerange: effectiveTimerange,
       },
+      keepSearchTypes: [searchTypeId],
+      timerange: effectiveTimerange,
     };
+    const executionState = new SearchExecutionState(undefined, globalOverride);
     RefreshActions.disable();
     SearchActions.execute(executionState);
     this.setState({

@@ -118,7 +118,7 @@ export const SearchStore = singletonStore(
         const { widgetMapping, search } = this.view;
         this.executePromise = this.trackJob(search, executionState)
           .then((searchResult) => {
-            const updatedSearchTypeIds = get(executionState, 'global_override.keep_search_types');
+            const updatedSearchTypeIds = get(executionState, 'globalOverride.keep_search_types');
             if (updatedSearchTypeIds) {
               const updatedSearchTypes = searchResult.getSearchTypesFromResponse(updatedSearchTypeIds);
               this.result = this.result.updateSearchTypes(updatedSearchTypes);
