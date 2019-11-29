@@ -47,6 +47,11 @@ abstract class WidgetConfigBase implements WidgetConfig {
         switch (interval) {
             case "minute": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1);
             case "hour": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.HOURS, 1);
+            case "day": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.DAYS, 1);
+            case "week": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.WEEKS, 1);
+            case "month": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MONTHS, 1);
+            case "quarter": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MONTHS, 3);
+            case "year": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.YEARS, 1);
         }
         throw new RuntimeException("Unable to map interval: " + interval);
     }
