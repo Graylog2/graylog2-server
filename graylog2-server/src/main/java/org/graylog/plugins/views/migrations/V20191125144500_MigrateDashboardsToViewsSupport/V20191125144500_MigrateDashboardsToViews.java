@@ -19,6 +19,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.eaio.uuid.UUID;
 import com.google.common.collect.Sets;
 import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,18 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private final DashboardsService dashboardsService;
     private final SearchService searchService;
     private final ViewService viewService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public V20191125144500_MigrateDashboardsToViews(
             DashboardsService dashboardsService,
             SearchService searchService,
-            ViewService viewService) {
+            ViewService viewService,
+            ClusterConfigService clusterConfigService) {
         this.dashboardsService = dashboardsService;
         this.searchService = searchService;
         this.viewService = viewService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -60,6 +64,11 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
 
     @Override
     public void upgrade() {
+        if (hasBeenRunSuccessfully()) {
+            LOG.debug("Migration already completed.");
+            return;
+        }
+
         final Map<String, String> dashboardIdToViewId = new HashMap<>();
         final BiFunction<String, String, String> recordMigratedDashboardIds = dashboardIdToViewId::put;
         final Map<String, Set<String>> widgetIdMigrationMapping = new HashMap<>();
@@ -75,6 +84,16 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         });
 
         final MigrationCompleted migrationCompleted = MigrationCompleted.create(dashboardIdToViewId, widgetIdMigrationMapping);
+
+        writeMigrationCompleted(migrationCompleted);
+    }
+
+    private void writeMigrationCompleted(MigrationCompleted migrationCompleted) {
+        this.clusterConfigService.write(migrationCompleted);
+    }
+
+    private boolean hasBeenRunSuccessfully() {
+        return clusterConfigService.get(MigrationCompleted.class) != null;
     }
 
     private Map.Entry<View, Search> migrateDashboard(Dashboard dashboard,
