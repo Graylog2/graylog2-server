@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.eaio.uuid.UUID;
 import com.google.common.collect.Sets;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -44,17 +43,23 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private final SearchService searchService;
     private final ViewService viewService;
     private final ClusterConfigService clusterConfigService;
+    private final RandomObjectIdProvider randomObjectIdProvider;
+    private final RandomUUIDProvider randomUUIDProvider;
 
     @Inject
     public V20191125144500_MigrateDashboardsToViews(
             DashboardsService dashboardsService,
             SearchService searchService,
             ViewService viewService,
-            ClusterConfigService clusterConfigService) {
+            ClusterConfigService clusterConfigService,
+            RandomObjectIdProvider randomObjectIdProvider,
+            RandomUUIDProvider randomUUIDProvider) {
         this.dashboardsService = dashboardsService;
         this.searchService = searchService;
         this.viewService = viewService;
         this.clusterConfigService = clusterConfigService;
+        this.randomObjectIdProvider = randomObjectIdProvider;
+        this.randomUUIDProvider = randomUUIDProvider;
     }
 
     @Override
@@ -125,9 +130,9 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Set<SearchType> newSearchTypes = newViewWidgets.stream()
                 .flatMap(viewWidget -> createSearchType(viewWidget, recordWidgetMapping).stream())
                 .collect(Collectors.toSet());
-        final Query newQuery = Query.create(newId(), RelativeRange.create(300),"", newSearchTypes);
+        final Query newQuery = Query.create(randomUUIDProvider.get(), RelativeRange.create(300),"", newSearchTypes);
         final Set<Query> newQueries = Collections.singleton(newQuery);
-        final Search newSearch = Search.create(newQueries, dashboard.creatorUserId(), createdAt);
+        final Search newSearch = Search.create(randomObjectIdProvider.get(), newQueries, dashboard.creatorUserId(), createdAt);
 
         final ViewState newViewState = ViewState.create(
                 Titles.ofWidgetTitles(newWidgetTitles).withQueryTitle(dashboard.title()),
@@ -137,6 +142,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         );
 
         final View newView = View.create(
+                randomObjectIdProvider.get(),
                 View.Type.DASHBOARD,
                 dashboard.title(),
                 "This dashboard was migrated automatically.",
@@ -154,7 +160,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     }
 
     private Set<SearchType> createSearchType(ViewWidget viewWidget, BiConsumer<String, String> recordWidgetMapping) {
-        final Set<SearchType> searchTypes = viewWidget.toSearchTypes();
+        final Set<SearchType> searchTypes = viewWidget.toSearchTypes(randomUUIDProvider);
         searchTypes.forEach(searchType -> recordWidgetMapping.accept(viewWidget.id(), searchType.id()));
         return searchTypes;
     }
@@ -162,7 +168,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private Set<ViewWidget> migrateWidget(Widget widget,
                                      BiConsumer<String, String> recordMigratedWidgetIds,
                                      BiConsumer<String, String> recordWidgetTitle) {
-        final Set<ViewWidget> viewWidgets = widget.toViewWidgets();
+        final Set<ViewWidget> viewWidgets = widget.toViewWidgets(this.randomUUIDProvider);
 
         viewWidgets.forEach(viewWidget -> {
             recordWidgetTitle.accept(viewWidget.id(), widget.description());
@@ -175,7 +181,6 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private Map<String, ViewWidgetPosition> migrateWidgetPositions(Dashboard dashboard, Map<String, Set<String>> migratedWidgetIds, Set<ViewWidget> viewWidgets) {
         return dashboard.widgetPositions().entrySet().stream()
                 .flatMap(entry -> {
-                    // TODO: Also handle Quickvalues widget being destructured into two widgets
                     final WidgetPosition widgetPosition = entry.getValue();
                     final Set<String> viewWidgetIds = migratedWidgetIds.get(entry.getKey());
                     final Set<ViewWidget> newViewWidgets = viewWidgetIds.stream()
@@ -194,9 +199,5 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                             .entrySet()
                             .stream();
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private String newId() {
-        return new UUID().toString();
     }
 }

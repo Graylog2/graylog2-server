@@ -53,8 +53,8 @@ public abstract class Widget {
     abstract String creatorUserId();
     abstract WidgetConfig config();
 
-    Set<ViewWidget> toViewWidgets() {
-        return config().toViewWidgets();
+    Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
+        return config().toViewWidgets(randomUUIDProvider);
     }
 
     @AutoValue.Builder

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ElasticsearchQueryString;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
@@ -24,7 +25,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
     public abstract List<StackedSeries> series();
 
     @Override
-    public Set<ViewWidget> toViewWidgets() {
+    public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
         final List<Series> series = series().stream()
                 .map(s -> Series.create(mapStatsFunction(s.statisticalFunction()), s.field()))
                 .collect(Collectors.toList());
@@ -33,6 +34,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
             throw new RuntimeException("Stacked charts with differing queries are not yet supported!");
         }
         return Collections.singleton(ViewWidget.builder()
+                .id(randomUUIDProvider.get())
                 .timerange(timerange())
                 .query(ElasticsearchQueryString.create("*"))
                 .config(AggregationConfig.builder()

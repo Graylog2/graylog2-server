@@ -14,8 +14,9 @@ public interface WidgetConfigWithQueryAndStreams extends WidgetConfig {
     @JsonProperty
     Optional<String> streamId();
 
-    default ViewWidget.Builder createViewWidget() {
+    default ViewWidget.Builder createViewWidget(String id) {
         final ViewWidget.Builder viewWidgetBuilder = ViewWidget.builder()
+                .id(id)
                 .query(ElasticsearchQueryString.create(query()))
                 .timerange(timerange());
         return streamId().map(streamId -> viewWidgetBuilder.streams(Collections.singleton(streamId))).orElse(viewWidgetBuilder);

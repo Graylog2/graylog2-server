@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -65,20 +64,16 @@ public abstract class ViewWidget {
     @JsonProperty(FIELD_CONFIG)
     public abstract AggregationConfig config();
 
-    private static String newId() {
-        return new UUID().toString();
-    }
-
     public static Builder builder() {
         return new AutoValue_ViewWidget.Builder()
-                .id(newId())
                 .type(TYPE_AGGREGATION)
                 .streams(Collections.emptySet());
     }
 
     @JsonIgnore
-    Set<SearchType> toSearchTypes() {
+    Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider) {
         final Pivot.Builder chartBuilder = Pivot.builder()
+                .id(randomUUIDProvider.get())
                 .name("chart")
                 .query(query())
                 .streams(streams())
@@ -92,9 +87,10 @@ public abstract class ViewWidget {
         if (config().visualization().equals("numeric") && config().visualizationConfig()
                 .map(visualizationConfig -> ((NumberVisualizationConfig) visualizationConfig).trend())
                 .orElse(false)) {
-            final Pivot chart = chartBuilder.build();
+            final Pivot chart = chartBuilder
+                    .build();
             final Pivot trend = chartBuilder
-                    .newId()
+                    .id(randomUUIDProvider.get())
                     .name("trend")
                     .timerange(OffsetRange.ofSearchTypeId(chart.id()))
                     .build();

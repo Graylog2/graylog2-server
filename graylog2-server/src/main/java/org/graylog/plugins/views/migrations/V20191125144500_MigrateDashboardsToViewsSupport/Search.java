@@ -61,15 +61,12 @@ abstract class Search {
     @JsonProperty(FIELD_CREATED_AT)
     abstract DateTime createdAt();
 
-    private static String newId() {
-        return new org.bson.types.ObjectId().toHexString();
-    }
-
     static Search create(
+            String id,
             Set<Query> queries,
             String owner,
             DateTime createdAt
     ) {
-        return new AutoValue_Search(newId(), queries, Optional.ofNullable(owner), createdAt);
+        return new AutoValue_Search(id, queries, Optional.ofNullable(owner), createdAt);
     }
 }

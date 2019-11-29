@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
@@ -31,8 +32,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
     }
 
     @Override
-    public Set<ViewWidget> toViewWidgets() {
-        return Collections.singleton(createViewWidget()
+    public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
+        return Collections.singleton(createViewWidget(randomUUIDProvider.get())
                 .config(AggregationConfig.builder()
                         .series(Collections.singletonList(series()))
                         .visualization(NUMERIC_VISUALIZATION)
