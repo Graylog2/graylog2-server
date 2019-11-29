@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckRequest;
 import org.graylog2.rest.models.system.urlwhitelist.WhitelistCheckResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -77,6 +78,7 @@ public class UrlWhitelistResource extends RestResource {
     @Path("/check")
     @Timed
     @ApiOperation(value = "Check if a url is whitelisted.")
+    @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
     public WhitelistCheckResponse check(@ApiParam(name = "url", required = true)
                              @Valid /*@NotNull*/ final WhitelistCheckRequest checkRequest) {
