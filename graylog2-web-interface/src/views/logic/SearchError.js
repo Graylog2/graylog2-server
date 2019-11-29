@@ -20,7 +20,7 @@ export default class SearchError {
 
   get searchTypeId() { return this._state.search_type_id; }
 
-  get executionLimit() { return this._state.result_window_limit; }
+  get resultWindowLimit() { return this._state.result_window_limit; }
 
   get type() { return this._state.type; }
 }

@@ -93,13 +93,13 @@ class MessageList extends React.Component<Props, State> {
   }
 
 
-  _validPagesErrorMessage = (errors = []) => {
+  _resultWindowLimitMessage = (errors = []) => {
     const { pageSize } = this.props;
-    const executionLimitError = errors.find(error => error.executionLimit);
-    if (executionLimitError) {
-      const { executionLimit } = executionLimitError;
-      const validPages = Math.floor(executionLimit / pageSize);
-      return { description: `With the current limit of ${executionLimit} and a page size of ${pageSize} messages, you can use the first ${validPages} pages.` };
+    const resultWindowLimitError = errors.find(error => error.resultWindowLimit);
+    if (resultWindowLimitError) {
+      const { resultWindowLimit } = resultWindowLimitError;
+      const validPages = Math.floor(resultWindowLimit / pageSize);
+      return { description: `Elasticsearch limits the search result to ${resultWindowLimit} messages. With a page size of ${pageSize} messages, you can use the first ${validPages} pages.` };
     }
     return undefined;
   }
@@ -111,12 +111,14 @@ class MessageList extends React.Component<Props, State> {
     RefreshActions.disable();
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       let errors = [...response.result.errors];
-      const validPagesInfo = this._validPagesErrorMessage(response.result.errors);
-      if (validPagesInfo) {
-        errors = [
-          validPagesInfo,
-          ...errors,
-        ];
+      if (!isEmpty(errors)) {
+        const validPagesInfo = this._resultWindowLimitMessage(response.result.errors);
+        if (validPagesInfo) {
+          errors = [
+            validPagesInfo,
+            ...errors,
+          ];
+        }
       }
       this.setState({
         errors,
