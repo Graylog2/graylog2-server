@@ -1,4 +1,4 @@
-import { mapValues, get } from 'lodash';
+import { mapValues, get, compact } from 'lodash';
 import QueryResult from './QueryResult';
 import SearchError from './SearchError';
 
@@ -28,7 +28,7 @@ class SearchResult {
       const relatedQuery = this._getQueryBySearchTypeId(searchTypeId);
       return SearchResult._getSearchTypeFromQuery(relatedQuery, searchTypeId);
     });
-    return searchTypes;
+    return compact(searchTypes);
   }
 
   _getQueryBySearchTypeId(searchTypeId) {
