@@ -14,6 +14,7 @@ import SearchResult from 'views/logic/SearchResult';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
+import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
@@ -111,24 +112,24 @@ export const SearchStore = singletonStore(
     },
 
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
-      if (this.executePromise && this.executePromise.cancel) {
-        this.executePromise.cancel();
-      }
-      console.log('execute', this.search);
-      if (this.search) {
-        const { widgetMapping, search } = this.view;
-        this.executePromise = this.trackJob(search, executionState)
-          .then((searchResult) => {
-            this.result = searchResult;
-            this.widgetMapping = widgetMapping;
-            this._trigger();
-            this.executePromise = undefined;
-            return { result: searchResult, widgetMapping };
-          }, displayError);
-        SearchActions.execute.promise(this.executePromise);
-        return this.executePromise;
-      }
-      throw new Error('Unable to execute search when no search is loaded!');
+      const handleSearchResult = (searchResult: SearchResult) => searchResult;
+      return this._executePromise(executionState, handleSearchResult);
+    },
+
+    reexecuteSearchTypes(searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+      const searchTypeIds = Object.keys(searchTypes);
+      const globalOverride: GlobalOverride = {
+        search_types: searchTypes,
+        keep_search_types: searchTypeIds,
+        timerange: effectiveTimerange,
+      };
+      const executionState = new SearchExecutionState(undefined, globalOverride);
+      const handleSearchResult = (searchResult: SearchResult): SearchResult => {
+        const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
+        const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
+        return updatedResult;
+      };
+      return this._executePromise(executionState, handleSearchResult);
     },
 
     executeWithCurrentState(): Promise<SearchExecutionResult> {
@@ -137,29 +138,26 @@ export const SearchStore = singletonStore(
       return promise;
     },
 
-    reexecuteSearchTypes(searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    parameters(newParameters: Array<Parameter>): Promise<View> {
+      const newSearch = this.search.toBuilder().parameters(newParameters).build();
+      const promise = ViewActions.search(newSearch);
+      SearchActions.parameters.promise(promise);
+      return promise;
+    },
+
+    _executePromise(executionState: SearchExecutionState, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
-
-
       if (this.search) {
         const { widgetMapping, search } = this.view;
-        const searchTypeIds = Object.keys(searchTypes);
-        const globalOverride = {
-          search_types: searchTypes,
-          keep_search_types: searchTypeIds,
-          timerange: effectiveTimerange,
-        };
-        const executionState = new SearchExecutionState(undefined, globalOverride);
         this.executePromise = this.trackJob(search, executionState)
-          .then((searchResult) => {
-            const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
-            this.result = this.result.updateSearchTypes(updatedSearchTypes);
+          .then((result: SearchResult) => {
+            this.result = handleSearchResult(result);
             this.widgetMapping = widgetMapping;
             this._trigger();
             this.executePromise = undefined;
-            return { result: searchResult, widgetMapping };
+            return { result, widgetMapping };
           }, displayError);
         SearchActions.execute.promise(this.executePromise);
         return this.executePromise;
@@ -167,15 +165,10 @@ export const SearchStore = singletonStore(
       throw new Error('Unable to execute search when no search is loaded!');
     },
 
-    parameters(newParameters: Array<Parameter>): Promise<View> {
-      const newSearch = this.search.toBuilder().parameters(newParameters).build();
-      const promise = ViewActions.search(newSearch);
-      SearchActions.parameters.promise(promise);
-      return promise;
-    },
     _state(): InternalState {
       return { search: this.search, result: this.result, widgetMapping: this.widgetMapping };
     },
+
     _trigger() {
       this.trigger(this._state());
     },
