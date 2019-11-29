@@ -31,7 +31,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map({ barmode }));
   }
 
-  static create(barmode : BarMode) {
+  static create(barmode: BarMode) {
     return new BarVisualizationConfig(barmode);
   }
 
