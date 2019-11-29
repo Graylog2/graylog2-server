@@ -19,6 +19,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
 import type { WidgetMapping } from 'views/logic/views/View';
+import type { TimeRange } from 'views/logic/queries/Query';
 import { singletonStore } from 'views/logic/singleton';
 
 const createSearchUrl = URLUtils.qualifyUrl('/views/search');
