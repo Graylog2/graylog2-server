@@ -5,6 +5,12 @@ const SearchActions = {
       listen: jest.fn(),
     },
   },
+  reexecuteSearchTypes: {
+    listen: jest.fn(),
+    completed: {
+      listen: jest.fn(),
+    },
+  },
 };
 
 // eslint-disable-next-line global-require
@@ -24,9 +30,10 @@ describe('SearchLoadingStateStore', () => {
   it('registers to SearchStore for search executions', () => {
     // eslint-disable-next-line no-unused-vars
     const { SearchLoadingStateStore } = loadSUT();
-
     expect(SearchActions.execute.listen).toHaveBeenCalledTimes(1);
     expect(SearchActions.execute.completed.listen).toHaveBeenCalledTimes(1);
+    expect(SearchActions.reexecuteSearchTypes.listen).toHaveBeenCalledTimes(1);
+    expect(SearchActions.reexecuteSearchTypes.completed.listen).toHaveBeenCalledTimes(1);
   });
 
   it('initial state is indicating that no loading is in progress', () => {
@@ -43,6 +50,18 @@ describe('SearchLoadingStateStore', () => {
     });
 
     const executeCallback = SearchActions.execute.listen.mock.calls[0][0];
+
+    executeCallback();
+  });
+
+  it('sets state to loading when search is reexecuted for search types', (done) => {
+    const { SearchLoadingStateStore } = loadSUT();
+    SearchLoadingStateStore.listen(({ isLoading }) => {
+      expect(isLoading).toBeTruthy();
+      done();
+    });
+
+    const executeCallback = SearchActions.reexecuteSearchTypes.listen.mock.calls[0][0];
 
     executeCallback();
   });
