@@ -77,7 +77,6 @@ class PaginatedList extends React.Component<Props, State> {
   }
 
   _onChangePageSize = (event) => {
-    console.log('_onChangePageSize', event);
     const { onChange } = this.props;
     const { currentPage } = this.state;
     event.preventDefault();
