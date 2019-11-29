@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -50,13 +51,18 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
 
 
     private List<Pivot> stackedFieldPivots() {
-        return Strings.isNullOrEmpty(stackedFields())
+        final Pivot fieldPivot = valuesPivotForField(field(), limit());
+        final List<Pivot> stackedFieldsPivots = Strings.isNullOrEmpty(stackedFields())
                 ? Collections.emptyList()
                 : Splitter.on(",")
                 .splitToList(stackedFields())
                 .stream()
                 .map(fieldName -> valuesPivotForField(fieldName, limit()))
                 .collect(Collectors.toList());
+        return ImmutableList.<Pivot>builder()
+                .add(fieldPivot)
+                .addAll(stackedFieldsPivots)
+                .build();
     }
 
     @Override
