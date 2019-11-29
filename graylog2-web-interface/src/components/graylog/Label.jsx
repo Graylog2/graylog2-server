@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -17,9 +17,14 @@ const labelStyles = (hex) => {
 };
 
 const Label = forwardRef(({ bsStyle, ...props }, ref) => {
-  const StyledLabel = useCallback(styled(BootstrapLabel)`
-    ${bsStyleThemeVariant(labelStyles)}
-  `, [bsStyle]);
+  const StyledLabel = useMemo(
+    () => {
+      return styled(BootstrapLabel)`
+        ${bsStyleThemeVariant(labelStyles)}
+      `;
+    },
+    [bsStyle],
+  );
 
   return (
     <StyledLabel bsStyle={bsStyle} ref={ref} {...props} />

@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { darken, lighten } from 'polished';
@@ -25,9 +25,14 @@ const alertStyles = (hex) => {
 };
 
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
-  const StyledAlert = useCallback(styled(BootstrapAlert)`
-    ${bsStyleThemeVariant(alertStyles)}
-  `, [bsStyle]);
+  const StyledAlert = useMemo(
+    () => {
+      return styled(BootstrapAlert)`
+        ${bsStyleThemeVariant(alertStyles)}
+      `;
+    },
+    [bsStyle],
+  );
 
   return (
     <StyledAlert bsStyle={bsStyle} ref={ref} {...props} />
