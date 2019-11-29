@@ -309,11 +309,13 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         }
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             if (HttpUrl.parse(url()) == null) {
                 errors.put("url", "Invalid URL.");
+            } else if (!validationContext.getUrlWhitelistService().isWhitelisted(url())) {
+                errors.put("url", "URL <" + url() + "> is not whitelisted.");
             }
 
             try {

@@ -262,11 +262,13 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         }
 
         @Override
-        public Optional<Multimap<String, String>> validate() {
+        public Optional<Multimap<String, String>> validate(LookupDataAdapterValidationContext validationContext) {
             final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
 
             if (HttpUrl.parse(url()) == null) {
                 errors.put("url", "Unable to parse url: " + url());
+            } else if (!validationContext.getUrlWhitelistService().isWhitelisted(url())) {
+                errors.put("url", "URL <" + url() + "> is not whitelisted.");
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
