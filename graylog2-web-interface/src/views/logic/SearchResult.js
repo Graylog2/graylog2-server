@@ -15,7 +15,7 @@ class SearchResult {
   }
 
   updateSearchTypes(searchTypeResults) {
-    const updatedResult = this.result;
+    const updatedResult = new SearchResult(this.result).result;
     searchTypeResults.forEach((searchTypeResult) => {
       const searchQuery = this._getQueryBySearchTypeId(searchTypeResult.id);
       updatedResult.results[searchQuery.query.id].search_types[searchTypeResult.id] = searchTypeResult;
