@@ -46,8 +46,12 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations', 'listen'),
 }));
 jest.mock('views/stores/SearchStore', () => ({
+  SearchStore: MockStore(
+    'listen',
+    ['getInitialState', () => ({ result: { results: { somequery: { effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' } } } } })],
+  ),
   SearchActions: {
-    execute: jest.fn(),
+    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve()),
   },
 }));
 jest.mock('views/stores/RefreshStore', () => ({
@@ -135,26 +139,21 @@ describe('MessageList', () => {
     expect(InputsActions.list).toHaveBeenCalled();
   });
 
-  it('fetches another page, with correct executionState', () => {
+  it('reexecute query for search type, when using pagination', () => {
     const config = MessagesWidgetConfig.builder().fields([]).build();
     const secondPageSize = 10;
-    const executionState = {
-      global_override: {
-        search_types: {
-          [data.id]: {
-            limit: Messages.DEFAULT_LIMIT,
-            offset: Messages.DEFAULT_LIMIT,
-          },
-        },
-        keep_search_types: [data.id],
-      },
+    const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
+    const effectiveTimerange = {
+      from: '2019-11-15T14:40:48.666Z',
+      to: '2019-11-29T14:40:48.666Z',
+      type: 'absolute',
     };
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
-    expect(SearchActions.execute).toHaveBeenCalledWith(executionState);
+    expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
   });
 
   it('disables refresh actions, when using pagination', () => {
