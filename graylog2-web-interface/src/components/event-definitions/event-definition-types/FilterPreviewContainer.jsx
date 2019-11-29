@@ -22,12 +22,6 @@ const PREVIEW_PERMISSIONS = [
 ];
 
 class FilterPreviewContainer extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    filterPreview: PropTypes.object.isRequired,
-    currentUser: PropTypes.object.isRequired,
-  };
-
   state = {
     queryId: uuid(),
     searchTypeId: uuid(),
@@ -64,6 +58,12 @@ class FilterPreviewContainer extends React.Component {
 
     FilterPreviewActions.search(search);
   }, 250);
+
+  static propTypes = {
+    eventDefinition: PropTypes.object.isRequired,
+    filterPreview: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
+  };
 
   componentDidMount() {
     const { eventDefinition } = this.props;

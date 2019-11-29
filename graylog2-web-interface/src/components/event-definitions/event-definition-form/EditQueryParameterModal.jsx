@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
-import { Button, Panel } from 'react-bootstrap';
+import { Button, Panel } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { Select } from 'components/common';

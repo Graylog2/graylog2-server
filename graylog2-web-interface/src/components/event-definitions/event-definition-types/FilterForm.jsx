@@ -35,15 +35,6 @@ const PREVIEW_PERMISSIONS = [
 ];
 
 class FilterForm extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    lookupTables: PropTypes.object.isRequired,
-    validation: PropTypes.object.isRequired,
-    streams: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-    currentUser: PropTypes.object.isRequired,
-  };
-
   formatStreamIds = lodash.memoize(
     (streamIds) => {
       const { streams } = this.props;
@@ -91,6 +82,15 @@ class FilterForm extends React.Component {
       this._syncParamsWithQuery(res.undeclared);
     });
   }, 250);
+
+  static propTypes = {
+    eventDefinition: PropTypes.object.isRequired,
+    lookupTables: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
+    streams: PropTypes.array.isRequired,
+    onChange: PropTypes.func.isRequired,
+    currentUser: PropTypes.object.isRequired,
+  };
 
   constructor(props) {
     super(props);
@@ -203,13 +203,12 @@ class FilterForm extends React.Component {
     };
     const parameterButtons = eventDefinition.config.query_parameters.map((queryParam) => {
       return (
-        <EditQueryParameterModal
-          key={queryParam.name}
-          queryParameter={queryParam}
-          eventDefinition={eventDefinition}
-          lookupTables={lookupTables.tables || []}
-          validation={validation}
-          onChange={debug} />
+        <EditQueryParameterModal key={queryParam.name}
+                                 queryParameter={queryParam}
+                                 eventDefinition={eventDefinition}
+                                 lookupTables={lookupTables.tables || []}
+                                 validation={validation}
+                                 onChange={debug} />
       );
     });
 
