@@ -1,12 +1,18 @@
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets;
 
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AreaVisualizationConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interpolation;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interval;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.LineVisualizationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.SortConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeHistogramConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeUnitInterval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ValueConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.VisualizationConfig;
+
+import java.util.Optional;
 
 abstract class WidgetConfigBase implements WidgetConfig {
     static String TIMESTAMP_FIELD = "timestamp";
@@ -65,12 +71,28 @@ abstract class WidgetConfigBase implements WidgetConfig {
         switch (renderer) {
             case "bar":
             case "line":
-                return renderer;
             case "area":
-                // TODO: Do something about
-                throw new RuntimeException("Area chart is unsupported");
+                return renderer;
             case "scatterplot": return "scatter";
         }
         throw new RuntimeException("Unable to map renderer to visualization: " + renderer);
+    }
+
+    Optional<VisualizationConfig> createVisualizationConfig(String renderer, String interpolation) {
+        switch (renderer) {
+            case "line":
+                return Optional.of(
+                        LineVisualizationConfig.builder()
+                                .interpolation(Interpolation.fromLegacyValue(interpolation))
+                                .build()
+                );
+            case "area":
+                return Optional.of(
+                        AreaVisualizationConfig.builder()
+                                .interpolation(Interpolation.fromLegacyValue(interpolation))
+                                .build()
+                );
+        }
+        return Optional.empty();
     }
 }

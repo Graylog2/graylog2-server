@@ -4,15 +4,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ElasticsearchQueryString;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.VisualizationConfig;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,17 +34,22 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
         if (series().stream().map(StackedSeries::query).distinct().count() > 1) {
             throw new RuntimeException("Stacked charts with differing queries are not yet supported!");
         }
+        final AggregationConfig.Builder configBuilder = AggregationConfig.builder()
+                .rowPivots(timestampPivot(interval()))
+                .series(series)
+                .visualization(mapRendererToVisualization(renderer()));
+
         return Collections.singleton(ViewWidget.builder()
                 .id(randomUUIDProvider.get())
                 .timerange(timerange())
-                .query(ElasticsearchQueryString.create("*"))
-                .config(AggregationConfig.builder()
-                        .rowPivots(timestampPivot(interval()))
-                        .series(series)
-                        .visualization(mapRendererToVisualization(renderer()))
-                        .build())
+                .query("*")
+                .config(visualizationConfig().map(configBuilder::visualizationConfig).orElse(configBuilder).build())
                 .build()
         );
+    }
+
+    private Optional<VisualizationConfig> visualizationConfig() {
+        return createVisualizationConfig(renderer(), interpolation());
     }
 
     @JsonCreator

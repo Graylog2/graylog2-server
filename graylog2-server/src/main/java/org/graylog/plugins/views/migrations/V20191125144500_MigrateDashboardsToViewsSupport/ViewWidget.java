@@ -116,7 +116,10 @@ public abstract class ViewWidget {
         public abstract Builder timerange(@Nullable TimeRange timerange);
 
         @JsonProperty(FIELD_QUERY)
-        public abstract Builder query(@Nullable ElasticsearchQueryString query);
+        abstract Builder query(@Nullable ElasticsearchQueryString query);
+        public Builder query(String query) {
+            return query(ElasticsearchQueryString.create(query));
+        }
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);

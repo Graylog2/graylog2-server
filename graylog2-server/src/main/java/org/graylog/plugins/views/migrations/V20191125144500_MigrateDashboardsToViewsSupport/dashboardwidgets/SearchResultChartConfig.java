@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ElasticsearchQueryString;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -35,7 +34,7 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
         return Collections.singleton(
                 ViewWidget.builder()
                         .id(randomUUIDProvider.get())
-                        .query(ElasticsearchQueryString.create(query()))
+                        .query(query())
                         .timerange(timerange())
                         .config(
                                 AggregationConfig.builder()
