@@ -72,17 +72,6 @@ const Table = styled.table`
     overflow: hidden;
   }
 
-  tr.message-row .message-wrapper:after {
-    content: "";
-    text-align: right;
-    position: absolute;
-    width: 99%;
-    left: 5px;
-    top: 4.5em;
-    height: 1.5em;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 95%);
-  }
-
   tr.message-detail-row {
     display: none;
   }
