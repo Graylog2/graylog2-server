@@ -76,7 +76,7 @@ class PaginatedList extends React.Component<Props, State> {
     }
   }
 
-  _onChangePageSize = (event) => {
+  _onChangePageSize = (event: SyntheticInputEvent<HTMLLinkElement>) => {
     const { onChange } = this.props;
     const { currentPage } = this.state;
     event.preventDefault();
