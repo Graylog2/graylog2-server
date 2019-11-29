@@ -18,6 +18,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.BucketInterval;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -33,7 +34,12 @@ public abstract class AutoInterval implements Interval {
     @JsonProperty(FIELD_SCALING)
     public abstract Optional<Double> scaling();
 
-    static Builder builder() { return new AutoValue_AutoInterval.Builder().type(type); };
+    @Override
+    public BucketInterval toBucketInterval() {
+        return org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.AutoInterval.create();
+    }
+
+    private static Builder builder() { return new AutoValue_AutoInterval.Builder().type(type); };
 
     public static AutoInterval create() {
         return AutoInterval.builder().build();

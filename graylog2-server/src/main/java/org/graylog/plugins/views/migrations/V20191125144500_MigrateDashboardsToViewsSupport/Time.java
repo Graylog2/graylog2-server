@@ -30,9 +30,9 @@ public abstract class Time implements BucketSpec {
     public abstract String field();
 
     @JsonProperty
-    public abstract TimeUnitInterval interval();
+    public abstract BucketInterval interval();
 
-    public static Time create(String field, TimeUnitInterval interval) {
+    public static Time create(String field, BucketInterval interval) {
         return new AutoValue_Time(field, interval);
     }
 }

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.BucketInterval;
 
 import java.util.Locale;
 
@@ -62,6 +63,26 @@ public abstract class TimeUnitInterval implements Interval {
 
     @JsonProperty(FIELD_UNIT)
     public abstract IntervalUnit unit();
+
+    @Override
+    public BucketInterval toBucketInterval() {
+        final String esUnit = mapUnit(unit());
+        return org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeUnitInterval.create(value() + esUnit);
+    }
+
+    private String mapUnit(TimeUnitInterval.IntervalUnit unit) {
+        switch (unit) {
+            case SECONDS: return "s";
+            case MINUTES: return "m";
+            case HOURS: return "h";
+            case DAYS: return "d";
+            case WEEKS: return "w";
+            case MONTHS: return "M";
+            case YEARS: return "y";
+        }
+
+        throw new RuntimeException("Unable to map interval unit: " + unit);
+    }
 
     private static Builder builder() {
         return new AutoValue_TimeUnitInterval.Builder().type(type);

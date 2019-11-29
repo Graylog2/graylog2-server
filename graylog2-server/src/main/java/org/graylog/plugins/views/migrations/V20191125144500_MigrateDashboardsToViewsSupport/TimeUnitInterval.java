@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-public abstract class TimeUnitInterval {
+public abstract class TimeUnitInterval implements BucketInterval {
     public static final String type = "timeunit";
 
     @JsonProperty
