@@ -77,6 +77,10 @@ import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations
 import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
 import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
 import AreaVisualization from './components/visualizations/area/AreaVisualization';
+import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import AreaVisualizationConfig from './logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import LineVisualizationConfiguration from './components/aggregationbuilder/LineVisualizationConfiguration';
+import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -85,6 +89,10 @@ VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualiz
 // $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
+// $FlowFixMe: type is not undefined in this case.
+VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
+// $FlowFixMe: type is not undefined in this case.
+VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
@@ -296,8 +304,16 @@ export default {
   ],
   visualizationConfigTypes: [
     {
+      type: AreaVisualization.type,
+      component: AreaVisualizationConfiguration,
+    },
+    {
       type: BarVisualization.type,
       component: BarVisualizationConfiguration,
+    },
+    {
+      type: LineVisualization.type,
+      component: LineVisualizationConfiguration,
     },
     {
       type: NumberVisualization.type,
