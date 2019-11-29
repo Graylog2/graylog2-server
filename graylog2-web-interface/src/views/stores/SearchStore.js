@@ -113,7 +113,8 @@ export const SearchStore = singletonStore(
 
     execute(executionState: SearchExecutionState): Promise<SearchExecutionResult> {
       const handleSearchResult = (searchResult: SearchResult) => searchResult;
-      return this._executePromise(executionState, handleSearchResult);
+      const startActionPromise = executePromise => SearchActions.execute.promise(executePromise);
+      return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
     reexecuteSearchTypes(searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
@@ -129,7 +130,8 @@ export const SearchStore = singletonStore(
         const updatedResult = this.result.updateSearchTypes(updatedSearchTypes);
         return updatedResult;
       };
-      return this._executePromise(executionState, handleSearchResult);
+      const startActionPromise = executePromise => SearchActions.reexecuteSearchTypes.promise(executePromise);
+      return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
     executeWithCurrentState(): Promise<SearchExecutionResult> {
@@ -145,7 +147,7 @@ export const SearchStore = singletonStore(
       return promise;
     },
 
-    _executePromise(executionState: SearchExecutionState, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
+    _executePromise(executionState: SearchExecutionState, startActionPromise: (promise: Promise<SearchResult>) => void, handleSearchResult: (result: SearchResult) => SearchResult): Promise<SearchExecutionResult> {
       if (this.executePromise && this.executePromise.cancel) {
         this.executePromise.cancel();
       }
@@ -159,7 +161,7 @@ export const SearchStore = singletonStore(
             this.executePromise = undefined;
             return { result, widgetMapping };
           }, displayError);
-        SearchActions.execute.promise(this.executePromise);
+        startActionPromise(this.executePromise);
         return this.executePromise;
       }
       throw new Error('Unable to execute search when no search is loaded!');
