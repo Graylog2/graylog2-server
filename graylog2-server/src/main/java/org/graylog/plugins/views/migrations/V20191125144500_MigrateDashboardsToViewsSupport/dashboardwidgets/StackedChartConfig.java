@@ -16,6 +16,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
     public abstract String renderer();
     public abstract String interpolation();
     public abstract List<StackedSeries> series();
+    public abstract Optional<String> streamId();
 
     @Override
     public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
@@ -56,12 +58,12 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
 
                     final AggregationConfig.Builder configBuilder = configBuilderTemplate.series(series);
 
-                    return ViewWidget.builder()
+                    final ViewWidget.Builder viewWidgetBuilder = ViewWidget.builder()
                             .id(randomUUIDProvider.get())
                             .timerange(timerange())
                             .query(query)
-                            .config(visualizationConfig().map(configBuilder::visualizationConfig).orElse(configBuilder).build())
-                            .build();
+                            .config(visualizationConfig().map(configBuilder::visualizationConfig).orElse(configBuilder).build());
+                    return streamId().map(streamId -> viewWidgetBuilder.streams(Collections.singleton(streamId))).orElse(viewWidgetBuilder).build();
                 }).collect(Collectors.toSet());
     }
 
@@ -94,8 +96,9 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
             @JsonProperty("interval") String interval,
             @JsonProperty("renderer") String renderer,
             @JsonProperty("interpolation") String interpolation,
-            @JsonProperty("series") List<StackedSeries> series
+            @JsonProperty("series") List<StackedSeries> series,
+            @JsonProperty("stream_id") @Nullable String streamId
     ) {
-        return new AutoValue_StackedChartConfig(timeRange, interval, renderer, interpolation, series);
+        return new AutoValue_StackedChartConfig(timeRange, interval, renderer, interpolation, series, Optional.ofNullable(streamId));
     }
 }
