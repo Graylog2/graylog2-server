@@ -84,6 +84,8 @@ public class HTTPJSONPathDataAdapterTest {
         assertThat(result.multiValue().get("value")).isInstanceOf(Collection.class);
         //noinspection unchecked,ConstantConditions
         assertThat((Collection) result.multiValue().get("value")).containsOnly("a", "b", "c");
+
+        assertThat(result.stringListValue()).containsOnly("a", "b", "c");
     }
 
     @Test

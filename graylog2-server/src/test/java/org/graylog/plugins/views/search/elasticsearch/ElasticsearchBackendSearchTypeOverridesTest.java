@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -61,7 +62,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                             .id("pivot1")
                             .series(Collections.singletonList(Average.builder().field("field1").build()))
                             .rollup(true)
-                            .timerange(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z"))
+                            .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
                             .build()
             );
             add(

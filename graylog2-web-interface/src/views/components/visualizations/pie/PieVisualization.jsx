@@ -61,7 +61,7 @@ const setChartColor = (chart, colorMap) => {
 };
 
 const PieVisualization: VisualizationComponent = ({ config, data }: VisualizationComponentProps) => (
-  <GenericPlot chartData={chartData(config, data, 'pie', _generateSeries)}
+  <GenericPlot chartData={chartData(config, data.chart || Object.values(data)[0], 'pie', _generateSeries)}
                getChartColor={getChartColor}
                setChartColor={setChartColor} />
 );
