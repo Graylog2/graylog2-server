@@ -16,8 +16,6 @@ export const SearchLoadingStateStore = singletonStore(
     init() {
       SearchActions.execute.listen(this.loading);
       SearchActions.execute.completed.listen(this.finished);
-      SearchActions.reexecuteSearchTypes.listen(this.loading);
-      SearchActions.reexecuteSearchTypes.completed.listen(this.finished);
     },
     getInitialState() {
       return this._state();
