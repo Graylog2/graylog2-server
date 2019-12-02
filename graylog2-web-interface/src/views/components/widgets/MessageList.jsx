@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 import connect from 'stores/connect';
-import { isEmpty } from 'lodash';
+import { isEmpty, get } from 'lodash';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { Messages } from 'views/Constants';
@@ -163,6 +163,6 @@ export default connect(MessageList,
     {},
     props,
     {
-      effectiveTimerange: props.searches.result.results[props.currentView.activeQuery].effectiveTimerange,
+      effectiveTimerange: get(props, ['searches', 'result', 'results', props.currentView.activeQuery, 'effectiveTimerange']),
     },
   ));
