@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Alert, Table } from 'components/graylog';
+import { Button, Table } from 'components/graylog';
 import { IfPermitted, Select, Icon } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
@@ -47,14 +47,14 @@ class UrlWhiteListConfig extends React.Component {
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
     update.entries[idx].value = this.inputs[`ref${idx}`].input.value;
-    this.setState({ config: update });
+    this._update(update);
   }
 
   _onUpdateUrl = (type, value) => {
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
     Object.assign(update.entries[update.entries.findIndex(el => el.value === value)] = { value, type });
-    this.setState({ config: update });
+    this._update(update);
   }
 
   _saveConfig = () => {
@@ -67,15 +67,15 @@ class UrlWhiteListConfig extends React.Component {
 
   _onRemove = (idx) => {
     return () => {
-      const { config: { entries } } = this.state;
-      const update = ObjectUtils.clone(entries);
-      update.splice(idx, 1);
-      this.setState({
-        config: {
-          entries: update,
-        },
-      });
+      const { config } = this.state;
+      const update = ObjectUtils.clone(config);
+      update.entries.splice(idx, 1);
+      this._update(update);
     };
+  }
+
+  _update = (config) => {
+    this.setState({ config });
   }
 
   _urlWhiteListForm = () => {

@@ -1,6 +1,5 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
 import { Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -17,19 +16,12 @@ import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 
 import {} from 'components/maps/configurations';
 
+import 'components/configurations/ConfigurationStyles.css';
+
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
-const style = require('!style/useable!css!components/configurations/ConfigurationStyles.css');
-
 class ConfigurationsPage extends React.Component {
-  // mixins: [Reflux.connect(ConfigurationsStore)],
-
-  state = {
-    configuration: null,
-  }
-
-
    SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
 
    MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig'
@@ -41,7 +33,6 @@ class ConfigurationsPage extends React.Component {
    URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist'
 
    componentDidMount() {
-     style.use();
      ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
      ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
      ConfigurationActions.list(this.SIDECAR_CONFIG);
@@ -54,7 +45,6 @@ class ConfigurationsPage extends React.Component {
    }
 
    componentWillUnmount() {
-     style.unuse();
    }
 
 
@@ -94,7 +84,7 @@ class ConfigurationsPage extends React.Component {
 
     // Put two plugin config components per row.
     while (pluginConfigs.length > 0) {
-      idx++;
+      idx += 1;
       rows.push(
         <Row key={`plugin-config-row-${idx}`}>
           <Col md={6}>
@@ -207,6 +197,11 @@ class ConfigurationsPage extends React.Component {
     );
   }
 }
+
+
+ConfigurationsPage.propTypes = {
+  configuration: PropTypes.object.isRequired,
+};
 
 export default connect(ConfigurationsPage, { configurationsStore: ConfigurationsStore }, ({ configurationsStore, ...otherProps }) => ({
   ...configurationsStore,
