@@ -11,6 +11,7 @@ exports[`<Widget /> should render with empty props 1`] = `
       <widget-header
         editing="false"
         hidedraghandle="false"
+        loading="false"
         title="Widget Title"
       >
         <span>

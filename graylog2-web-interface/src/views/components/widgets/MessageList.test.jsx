@@ -94,14 +94,16 @@ describe('MessageList', () => {
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
     const wrapper1 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)} />);
+                                        fields={Immutable.List(fields)}
+                                        showLoadingSpinner={() => {}} />);
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(<MessageList editing
                                         data={data}
-                                        fields={Immutable.List(fields)} />);
+                                        fields={Immutable.List(fields)}
+                                        showLoadingSpinner={() => {}} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
 
@@ -111,7 +113,8 @@ describe('MessageList', () => {
     const wrapper = mount(<MessageList editing
                                        data={data}
                                        fields={Immutable.List(fields)}
-                                       config={config} />);
+                                       config={config}
+                                       showLoadingSpinner={() => {}} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
@@ -123,7 +126,8 @@ describe('MessageList', () => {
     mount(<MessageList editing
                        data={data}
                        fields={Immutable.List([])}
-                       config={config} />);
+                       config={config}
+                       showLoadingSpinner={() => {}} />);
   });
 
   it('refreshs Inputs list upon mount', () => {
@@ -132,7 +136,8 @@ describe('MessageList', () => {
       <MessageList editing
                    data={data}
                    fields={Immutable.List([])}
-                   config={config} />
+                   config={config}
+                   showLoadingSpinner={() => {}} />
     );
     mount(<Component />);
     expect(InputsActions.list).toHaveBeenCalled();
@@ -150,7 +155,8 @@ describe('MessageList', () => {
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
-                                       config={config} />);
+                                       config={config}
+                                       showLoadingSpinner={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
   });
@@ -161,7 +167,8 @@ describe('MessageList', () => {
     const wrapper = mount(<MessageList editing
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
-                                       config={config} />);
+                                       config={config}
+                                       showLoadingSpinner={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
   });
@@ -172,7 +179,8 @@ describe('MessageList', () => {
       <MessageList editing
                    data={data}
                    fields={Immutable.List([])}
-                   config={config} />
+                   config={config}
+                   showLoadingSpinner={() => {}} />
     );
     return new Promise((resolve) => {
       const onRenderComplete = jest.fn(resolve);
