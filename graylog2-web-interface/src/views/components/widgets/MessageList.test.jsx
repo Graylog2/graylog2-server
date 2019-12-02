@@ -60,7 +60,6 @@ jest.mock('views/stores/RefreshStore', () => ({
   },
 }));
 jest.mock('legacy/result-histogram', () => 'Histogram');
-jest.mock('components/search/MessageTablePaginator', () => 'message-table-paginator');
 jest.mock('views/components/messagelist');
 
 describe('MessageList', () => {

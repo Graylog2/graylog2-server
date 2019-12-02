@@ -113,7 +113,7 @@ type Props = {
   config: MessagesWidgetConfig,
   selectedFields: {},
   activeQueryId: string,
-  messages: []
+  messages: Array<Object>
 };
 
 class MessageTable extends React.Component<Props, State> {

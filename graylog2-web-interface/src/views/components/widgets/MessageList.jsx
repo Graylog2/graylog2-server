@@ -45,7 +45,7 @@ type Props = {
   fields: {},
   pageSize: number,
   config: MessagesWidgetConfig,
-  data: { messages: [], total: number, id: string },
+  data: { messages: Array<Object>, total: number, id: string },
   selectedFields: {},
   effectiveTimerange: TimeRange,
   currentView: {
