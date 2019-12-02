@@ -43,10 +43,10 @@ type State = {
 
 type Props = {
   fields: {},
-  pageSize: number,
-  config: MessagesWidgetConfig,
+  pageSize?: number,
+  config?: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
-  selectedFields: {},
+  selectedFields?: {},
   effectiveTimerange: TimeRange,
   currentView: {
     activeQuery: string,
@@ -72,13 +72,12 @@ class MessageList extends React.Component<Props, State> {
       type: PropTypes.string.isRequired,
     }).isRequired,
     selectedFields: PropTypes.object,
-    currentView: PropTypes.object,
+    currentView: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set(),
-    currentView: { view: {}, activeQuery: undefined },
     config: undefined,
   };
 

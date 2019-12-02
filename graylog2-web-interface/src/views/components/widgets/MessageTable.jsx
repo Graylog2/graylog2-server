@@ -1,5 +1,6 @@
 // @flow strict
 import React from 'react';
+import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -7,6 +8,7 @@ import { AdditionalContext } from 'views/logic/ActionContext';
 import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
+import CustomPropTypes from 'views/components/CustomPropTypes';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
 
@@ -110,13 +112,26 @@ type State = {
 
 type Props = {
   fields: {},
-  config: MessagesWidgetConfig,
-  selectedFields: {},
+  config?: MessagesWidgetConfig,
+  selectedFields?: {},
   activeQueryId: string,
   messages: Array<Object>
 };
 
 class MessageTable extends React.Component<Props, State> {
+  static propTypes = {
+    activeQueryId: PropTypes.string.isRequired,
+    config: CustomPropTypes.instanceOf(MessagesWidgetConfig),
+    fields: CustomPropTypes.FieldListType.isRequired,
+    messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selectedFields: PropTypes.object,
+  }
+
+  static defaultProps = {
+    config: undefined,
+    selectedFields: Immutable.Set(),
+  };
+
   state = {
     expandedMessages: Immutable.Set(),
   };
