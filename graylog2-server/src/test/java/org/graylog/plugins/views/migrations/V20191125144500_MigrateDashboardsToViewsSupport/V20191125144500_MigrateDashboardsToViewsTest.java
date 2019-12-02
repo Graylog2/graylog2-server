@@ -115,6 +115,21 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         );
     }
 
+    @Test
+    @MongoDBFixtures("ops_dashboards.json")
+    public void migrateOpsDashboards() {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.dashboardToViewMigrationIds())
+                .containsAllEntriesOf(ImmutableMap.of(
+                        "5ddf8ed5b2d44b2e04472992", "5de0e98900002a0017000002",
+                        "5ddf8ed6b2d44b2e044729a2", "5de0e98900002a0017000004",
+                        "5ddf8ed7b2d44b2e044729b1", "5de0e98900002a0017000006",
+                        "5ddf8ed8b2d44b2e044729d2", "5de0e98900002a0017000008",
+                        "5ddf8ed8b2d44b2e044729d8", "5de0e98900002a001700000a"));
+    }
+
     private MigrationCompleted captureMigrationCompleted() {
         final ArgumentCaptor<MigrationCompleted> migrationCompletedCaptor = ArgumentCaptor.forClass(MigrationCompleted.class);
         verify(clusterConfigService, times(1)).write(migrationCompletedCaptor.capture());
