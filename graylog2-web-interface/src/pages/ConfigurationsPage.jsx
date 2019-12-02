@@ -4,7 +4,7 @@ import Reflux from 'reflux';
 import { Row, Col } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
+import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -13,52 +13,60 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
+import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 
 import {} from 'components/maps/configurations';
 
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
-const ConfigurationsPage = createReactClass({
-  displayName: 'ConfigurationsPage',
-  mixins: [Reflux.connect(ConfigurationsStore)],
+const style = require('!style/useable!css!components/configurations/ConfigurationStyles.css');
 
-  getInitialState() {
-    return {
-      configuration: null,
-    };
-  },
+class ConfigurationsPage extends React.Component {
+  // mixins: [Reflux.connect(ConfigurationsStore)],
 
-  componentDidMount() {
-    this.style.use();
-    ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
-    ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
-    ConfigurationActions.list(this.SIDECAR_CONFIG);
-    ConfigurationActions.list(this.EVENTS_CONFIG);
+  state = {
+    configuration: null,
+  }
 
-    PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
-      ConfigurationActions.list(systemConfig.configType);
-    });
-  },
 
-  componentWillUnmount() {
-    this.style.unuse();
-  },
+   SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
 
-  style: require('!style/useable!css!components/configurations/ConfigurationStyles.css'),
-  SEARCHES_CLUSTER_CONFIG: 'org.graylog2.indexer.searches.SearchesClusterConfig',
-  MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
-  SIDECAR_CONFIG: 'org.graylog.plugins.sidecar.system.SidecarConfiguration',
-  EVENTS_CONFIG: 'org.graylog.events.configuration.EventsConfiguration',
+   MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig'
 
-  _getConfig(configType) {
-    if (this.state.configuration && this.state.configuration[configType]) {
-      return this.state.configuration[configType];
+   SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration'
+
+   EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration'
+
+   URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist'
+
+   componentDidMount() {
+     style.use();
+     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
+     ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
+     ConfigurationActions.list(this.SIDECAR_CONFIG);
+     ConfigurationActions.list(this.EVENTS_CONFIG);
+     ConfigurationActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
+
+     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
+       ConfigurationActions.list(systemConfig.configType);
+     });
+   }
+
+   componentWillUnmount() {
+     style.unuse();
+   }
+
+
+  _getConfig = (configType) => {
+    const { configuration } = this.props;
+    if (configuration && configuration[configType]) {
+      return configuration[configType];
     }
     return null;
-  },
+  }
 
-  _onUpdate(configType) {
+  _onUpdate = (configType) => {
     return (config) => {
       switch (configType) {
         case this.MESSAGE_PROCESSORS_CONFIG:
@@ -67,9 +75,9 @@ const ConfigurationsPage = createReactClass({
           return ConfigurationActions.update(configType, config);
       }
     };
-  },
+  }
 
-  _pluginConfigs() {
+  _pluginConfigs = () => {
     return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
       return React.createElement(systemConfig.component, {
         key: `system-configuration-${idx}`,
@@ -77,9 +85,9 @@ const ConfigurationsPage = createReactClass({
         updateConfig: this._onUpdate(systemConfig.configType),
       });
     });
-  },
+  }
 
-  _pluginConfigRows() {
+  _pluginConfigRows = () => {
     const pluginConfigs = this._pluginConfigs();
     const rows = [];
     let idx = 0;
@@ -100,17 +108,19 @@ const ConfigurationsPage = createReactClass({
     }
 
     return rows;
-  },
+  }
 
   render() {
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
     const eventsConfig = this._getConfig(this.EVENTS_CONFIG);
+    const urlwhitelistConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
     let eventsConfigComponent;
+    let urlwhitelistConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -143,7 +153,14 @@ const ConfigurationsPage = createReactClass({
     } else {
       eventsConfigComponent = (<Spinner />);
     }
-
+    if (urlwhitelistConfig) {
+      urlwhitelistConfigComponent = (
+        <UrlWhiteListConfig config={urlwhitelistConfig}
+                            updateConfig={this._onUpdate(this.URL_WHITELIST_CONFIG)} />
+      );
+    } else {
+      eventsConfigComponent = (<Spinner />);
+    }
     const pluginConfigRows = this._pluginConfigRows();
 
     return (
@@ -168,6 +185,9 @@ const ConfigurationsPage = createReactClass({
             <Col md={6}>
               {eventsConfigComponent}
             </Col>
+            <Col md={6}>
+              {urlwhitelistConfigComponent}
+            </Col>
           </Row>
 
           {pluginConfigRows.length > 0 && (
@@ -185,7 +205,10 @@ const ConfigurationsPage = createReactClass({
         </span>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default ConfigurationsPage;
+export default connect(ConfigurationsPage, { configurationsStore: ConfigurationsStore }, ({ configurationsStore, ...otherProps }) => ({
+  ...configurationsStore,
+  ...otherProps,
+}));
