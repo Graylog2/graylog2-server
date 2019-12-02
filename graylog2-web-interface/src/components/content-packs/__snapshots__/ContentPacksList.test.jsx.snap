@@ -275,7 +275,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-1"
                 onClick={[Function]}
@@ -427,7 +427,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-2"
                 onClick={[Function]}
@@ -568,7 +568,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-3"
                 onClick={[Function]}
@@ -709,7 +709,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-4"
                 onClick={[Function]}
@@ -850,7 +850,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-5"
                 onClick={[Function]}
@@ -991,7 +991,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-6"
                 onClick={[Function]}
@@ -1132,7 +1132,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-7"
                 onClick={[Function]}
@@ -1273,7 +1273,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-8"
                 onClick={[Function]}
@@ -1414,7 +1414,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-9"
                 onClick={[Function]}
@@ -1555,7 +1555,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-10"
                 onClick={[Function]}

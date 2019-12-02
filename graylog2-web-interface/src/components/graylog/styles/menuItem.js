@@ -32,7 +32,8 @@ const menuItemStyles = (options = {}) => {
     > .disabled > a {
       color: ${contrastingColor(teinte.primary.tre, 'AA')};
 
-      :hover {
+      :hover,
+      :focus {
         background-color: ${teinte.secondary.due};
         color: ${contrastingColor(teinte.primary.tre, 'AAA')};
       }

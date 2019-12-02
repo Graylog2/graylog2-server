@@ -65,7 +65,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                 <button
                   aria-expanded={false}
                   aria-haspopup={true}
-                  className="DropdownButton-sc-1343dcx-0 SWXQL dropdown-toggle btn btn-sm btn-default"
+                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                   disabled={false}
                   id="select-stream-dropdown"
                   onClick={[Function]}
@@ -167,7 +167,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                         className="dropdown btn-group btn-group-xs"
                       >
                         <button
-                          className="SplitButton-sc-72s76o-0 lbQJBN btn btn-xs btn-default"
+                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -375,7 +375,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                         className="dropdown btn-group btn-group-xs"
                       >
                         <button
-                          className="SplitButton-sc-72s76o-0 lbQJBN btn btn-xs btn-default"
+                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
