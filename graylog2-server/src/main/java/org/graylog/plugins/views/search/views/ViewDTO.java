@@ -63,6 +63,7 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder> {
     public static final String FIELD_SUMMARY = "summary";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SEARCH_ID = "search_id";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
     public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
@@ -94,6 +95,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder> {
 
     @JsonProperty(FIELD_SEARCH_ID)
     public abstract String searchId();
+
+    @JsonProperty(FIELD_CONTENT_PACK)
+    public abstract Optional<String> contentPack();
 
     @JsonProperty(FIELD_PROPERTIES)
     public abstract ImmutableSet<String> properties();
@@ -161,6 +165,9 @@ public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder> {
 
         @JsonProperty(FIELD_SEARCH_ID)
         public abstract Builder searchId(String searchId);
+
+        @JsonProperty(FIELD_CONTENT_PACK)
+        public abstract Builder contentPack(@Nullable String contentPack);
 
         abstract ImmutableSet.Builder<String> propertiesBuilder();
 

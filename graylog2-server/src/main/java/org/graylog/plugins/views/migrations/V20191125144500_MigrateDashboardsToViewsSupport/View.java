@@ -44,6 +44,7 @@ abstract class View {
     private static final String FIELD_SUMMARY = "summary";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_SEARCH_ID = "search_id";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
     private static final String FIELD_PROPERTIES = "properties";
     private static final String FIELD_REQUIRES = "requires";
     private static final String FIELD_STATE = "state";
@@ -72,6 +73,9 @@ abstract class View {
     @JsonProperty(FIELD_SEARCH_ID)
     abstract String searchId();
 
+    @JsonProperty(FIELD_CONTENT_PACK)
+    abstract Optional<String> contentPack();
+
     @JsonProperty(FIELD_PROPERTIES)
     Set<String> properties() {
         return Collections.emptySet();
@@ -97,9 +101,10 @@ abstract class View {
                        String summary,
                        String description,
                        String searchId,
+                       Optional<String> contentPack,
                        Map<String, ViewState> state,
                        Optional<String> owner,
                        DateTime createdAt) {
-        return new AutoValue_View(id, type, title, summary, description, searchId, state, owner, createdAt);
+        return new AutoValue_View(id, type, title, summary, description, searchId, contentPack, state, owner, createdAt);
     }
 }

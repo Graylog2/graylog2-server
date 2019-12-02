@@ -148,6 +148,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 "This dashboard was migrated automatically.",
                 dashboard.description(),
                 newSearch.id(),
+                dashboard.contentPack(),
                 Collections.singletonMap(newQuery.id(), newViewState),
                 Optional.ofNullable(dashboard.creatorUserId()),
                 createdAt
