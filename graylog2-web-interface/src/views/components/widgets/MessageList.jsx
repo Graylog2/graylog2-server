@@ -43,7 +43,7 @@ type State = {
 
 type Props = {
   fields: {},
-  pageSize?: number,
+  pageSize: number,
   config?: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
   selectedFields?: {},
