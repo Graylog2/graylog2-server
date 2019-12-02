@@ -38,7 +38,9 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
                                         .rowPivots(Collections.singletonList(
                                                 Pivot.timeBuilder()
                                                         .field(TIMESTAMP_FIELD)
-                                                        .config(TimeHistogramConfig.builder().interval(timestampInterval(interval())).build())
+                                                        .config(TimeHistogramConfig.builder()
+                                                                .interval(ApproximatedAutoInterval.of(interval(), timerange()))
+                                                                .build())
                                                         .build()
                                         ))
                                         .series(Collections.singletonList(series()))

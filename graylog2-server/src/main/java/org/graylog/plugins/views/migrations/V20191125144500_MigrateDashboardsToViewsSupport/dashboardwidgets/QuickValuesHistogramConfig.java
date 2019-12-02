@@ -77,7 +77,7 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
                                                         .config(TimeHistogramConfig.builder()
                                                                 .interval(
                                                                         interval()
-                                                                                .map(this::timestampInterval)
+                                                                                .map(interval -> ApproximatedAutoInterval.of(interval, timerange()))
                                                                                 .orElse(AutoInterval.create())
                                                                 ).build())
                                                         .build()

@@ -2,13 +2,11 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AreaVisualizationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interpolation;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Interval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.LineVisualizationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.SortConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeHistogramConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.TimeUnitInterval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.ValueConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.VisualizationConfig;
 
@@ -27,7 +25,7 @@ abstract class WidgetConfigBase implements WidgetConfig {
     Pivot timestampPivot(String interval) {
         return Pivot.timeBuilder()
                 .field(TIMESTAMP_FIELD)
-                .config(TimeHistogramConfig.builder().interval(timestampInterval(interval)).build())
+                .config(TimeHistogramConfig.builder().interval(ApproximatedAutoInterval.of(interval, timerange())).build())
                 .build();
     }
 
@@ -41,19 +39,6 @@ abstract class WidgetConfigBase implements WidgetConfig {
             case "desc": return SortConfig.Direction.Descending;
         }
         throw new RuntimeException("Unable to parse sort order: "  + sortOrder);
-    }
-
-    Interval timestampInterval(String interval) {
-        switch (interval) {
-            case "minute": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1);
-            case "hour": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.HOURS, 1);
-            case "day": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.DAYS, 1);
-            case "week": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.WEEKS, 1);
-            case "month": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MONTHS, 1);
-            case "quarter": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MONTHS, 3);
-            case "year": return TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.YEARS, 1);
-        }
-        throw new RuntimeException("Unable to map interval: " + interval);
     }
 
     String mapStatsFunction(String function) {
