@@ -187,43 +187,42 @@ class MessageTable extends React.Component<Props, State> {
     const selectedFields = this._getSelectedFields();
     const selectedColumns = Immutable.OrderedSet(selectedFields);
     return (
-      <div className="search-results-table">
-        <div className="table-responsive">
-          <Table className="table table-condensed" style={{ marginTop: 0 }}>
-            <TableHead>
-              <tr>
-                {selectedColumns.toSeq().map((selectedFieldName) => {
-                  return (
-                    <th key={selectedFieldName}
-                        style={this._columnStyle(selectedFieldName)}>
-                      <Field type={this._fieldTypeFor(selectedFieldName, fields)}
-                             name={selectedFieldName}
-                             queryId={activeQueryId} />
-                    </th>
-                  );
-                })}
-              </tr>
-            </TableHead>
-            {formattedMessages.map((message) => {
-              const messageKey = `${message.index}-${message.id}`;
-              return (
-                <AdditionalContext.Provider key={messageKey}
-                                            value={{ message }}>
-                  <MessageTableEntry fields={fields}
-                                     disableSurroundingSearch
-                                     message={message}
-                                     showMessageRow={config && config.showMessageRow}
-                                     selectedFields={selectedColumns}
-                                     expanded={expandedMessages.contains(messageKey)}
-                                     toggleDetail={this._toggleMessageDetail}
-                                     highlight
-                                     expandAllRenderAsync={false} />
-                </AdditionalContext.Provider>
-              );
-            })}
-          </Table>
-        </div>
+      <div className="table-responsive">
+        <Table className="table table-condensed" style={{ marginTop: 0 }}>
+          <TableHead>
+            <tr>
+              {selectedColumns.toSeq().map((selectedFieldName) => {
+                return (
+                  <th key={selectedFieldName}
+                      style={this._columnStyle(selectedFieldName)}>
+                    <Field type={this._fieldTypeFor(selectedFieldName, fields)}
+                           name={selectedFieldName}
+                           queryId={activeQueryId} />
+                  </th>
+                );
+              })}
+            </tr>
+          </TableHead>
+          {formattedMessages.map((message) => {
+            const messageKey = `${message.index}-${message.id}`;
+            return (
+              <AdditionalContext.Provider key={messageKey}
+                                          value={{ message }}>
+                <MessageTableEntry fields={fields}
+                                   disableSurroundingSearch
+                                   message={message}
+                                   showMessageRow={config && config.showMessageRow}
+                                   selectedFields={selectedColumns}
+                                   expanded={expandedMessages.contains(messageKey)}
+                                   toggleDetail={this._toggleMessageDetail}
+                                   highlight
+                                   expandAllRenderAsync={false} />
+              </AdditionalContext.Provider>
+            );
+          })}
+        </Table>
       </div>
+
     );
   }
 }
