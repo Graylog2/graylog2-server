@@ -79,7 +79,7 @@ public class ApproximatedAutoInterval {
     private static Interval ofAbsoluteRange(String interval, AbsoluteRange absoluteRange) {
         final Duration duration = parseInterval(interval);
 
-        final long absoluteTimeRangeDurationInSeconds = absoluteRange.to().getMillis() - absoluteRange.from().getMillis() / 1000;
+        final long absoluteTimeRangeDurationInSeconds = (absoluteRange.to().getMillis() - absoluteRange.from().getMillis()) / 1000;
         final double absoluteScaling = scalingForAutoTimeRange(absoluteTimeRangeDurationInSeconds, duration);
         if (absoluteScaling < 0.5 || absoluteScaling > 8.0) {
             return timestampInterval(interval);
