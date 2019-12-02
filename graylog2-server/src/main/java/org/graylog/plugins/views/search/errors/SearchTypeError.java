@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.views.search.Query;
 
 import javax.annotation.Nonnull;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +51,7 @@ public class SearchTypeError extends QueryError {
     }
 
     private Integer parseResultLimit(String description) {
-        if (description.toLowerCase().contains("result window is too large")) {
+        if (description.toLowerCase(Locale.US).contains("result window is too large")) {
             final Matcher matcher = Pattern.compile("[0-9]+").matcher(description);
             if (matcher.find())
                 return Integer.parseInt(matcher.group(0));
