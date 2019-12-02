@@ -250,7 +250,7 @@ export default {
   visualizationTypes: [
     {
       type: AreaVisualization.type,
-      displayName: 'Area Chat',
+      displayName: 'Area Chart',
       component: AreaVisualization,
     },
     {
