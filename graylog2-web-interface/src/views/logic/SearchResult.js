@@ -1,13 +1,26 @@
+import { Map, List } from 'immutable';
 import { mapValues, get, compact } from 'lodash';
 import QueryResult from './QueryResult';
 import SearchError from './SearchError';
 
 class SearchResult {
   constructor(result) {
-    this.result = result;
+    this._result = new Map(result);
 
-    this.results = mapValues(result.results, queryResult => new QueryResult(queryResult));
-    this.errors = get(result, 'errors', []).map(error => new SearchError(error));
+    this._results = new Map(mapValues(result.results, queryResult => new QueryResult(queryResult)));
+    this._errors = new List(get(result, 'errors', []).map(error => new SearchError(error)));
+  }
+
+  get result() {
+    return this._result.toJS();
+  }
+
+  get results() {
+    return this._results.toJS();
+  }
+
+  get errors() {
+    return this._errors.toJS();
   }
 
   forId(queryId) {
@@ -15,7 +28,7 @@ class SearchResult {
   }
 
   updateSearchTypes(searchTypeResults) {
-    const updatedResult = new SearchResult(this.result).result;
+    const updatedResult = this.result;
     searchTypeResults.forEach((searchTypeResult) => {
       const searchQuery = this._getQueryBySearchTypeId(searchTypeResult.id);
       updatedResult.results[searchQuery.query.id].search_types[searchTypeResult.id] = searchTypeResult;
