@@ -40,6 +40,7 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
+import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 type Props = {
   id: string,
@@ -243,7 +244,10 @@ class Widget extends React.Component<Props, State> {
                              editting={editing}
                              id={id}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                {visualization}
+                <WidgetErrorBoundary>
+
+                  {visualization}
+                </WidgetErrorBoundary>
               </EditComponent>
             </MeasureDimensions>
             <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
@@ -286,7 +290,10 @@ class Widget extends React.Component<Props, State> {
                 </WidgetHeader>
               )}
             </InteractiveContext.Consumer>
-            {visualization}
+            <WidgetErrorBoundary>
+
+              {visualization}
+            </WidgetErrorBoundary>
           </span>
         </WidgetFrame>
       </WidgetColorContext>
