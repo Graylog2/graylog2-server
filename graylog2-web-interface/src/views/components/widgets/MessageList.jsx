@@ -89,8 +89,15 @@ class MessageList extends React.Component<Props, State> {
   componentDidMount() {
     const onRenderComplete = this.context;
     InputsActions.list().then(() => (onRenderComplete && onRenderComplete()));
+    SearchActions.execute.completed.listen(this._resetPagination);
   }
 
+  _resetPagination = () => {
+    const { currentPage } = this.state;
+    if (currentPage !== 1) {
+      this.setState({ currentPage: 1 });
+    }
+  }
 
   _resultWindowLimitMessage = (errors = []) => {
     const { pageSize } = this.props;
