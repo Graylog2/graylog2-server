@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';

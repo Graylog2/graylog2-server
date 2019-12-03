@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackInstallations from 'components/content-packs/ContentPackInstallations';

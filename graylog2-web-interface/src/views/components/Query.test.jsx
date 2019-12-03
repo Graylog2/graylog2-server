@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 import Immutable from 'immutable';
 import mockComponent from 'helpers/mocking/MockComponent';
 

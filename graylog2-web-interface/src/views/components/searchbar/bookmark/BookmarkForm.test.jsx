@@ -1,7 +1,7 @@
 // @flow strict
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import 'helpers/mocking/react-dom_mock';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 import ClipboardJS from 'clipboard';
 import ClipboardButton from './ClipboardButton';
 

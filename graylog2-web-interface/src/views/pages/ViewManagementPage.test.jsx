@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { mountWithTheme as mount, shallowWithTheme as shallow } from 'theme/enzymeWithTheme';
 import { StoreMock } from 'helpers/mocking';
 import mockComponent from 'helpers/mocking/MockComponent';
 

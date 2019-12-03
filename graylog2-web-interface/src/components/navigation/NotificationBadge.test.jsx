@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
 
 jest.mock('stores/connect', () => x => x);

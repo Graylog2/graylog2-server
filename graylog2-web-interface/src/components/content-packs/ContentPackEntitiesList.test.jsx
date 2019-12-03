@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
 import renderer from 'react-test-renderer';
 import 'helpers/mocking/react-dom_mock';
 
