@@ -139,7 +139,11 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                         "componentStyle": ComponentStyle {
                           "componentId": "Button__StyledButton-c9cbmb-0",
                           "isStatic": false,
+<<<<<<< HEAD
                           "lastClassName": "dRMLmK",
+=======
+                          "lastClassName": "jKsGyd",
+>>>>>>> 05ef39a0e... Enzyme tests passing
                           "rules": Array [
                             [Function],
                           ],
@@ -164,14 +168,22 @@ exports[`RequirementsProvided throws Component if not all requirements are provi
                       block={false}
                       bsClass="btn"
                       bsStyle="success"
+<<<<<<< HEAD
                       className="Button__StyledButton-c9cbmb-0 dRMLmK"
+=======
+                      className="Button-c9cbmb-0 jKsGyd"
+>>>>>>> 05ef39a0e... Enzyme tests passing
                       disabled={false}
                       onClick={[Function]}
                       type="submit"
                     >
                       <button
                         action="push"
+<<<<<<< HEAD
                         className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
+=======
+                        className="Button-c9cbmb-0 jKsGyd btn btn-success"
+>>>>>>> 05ef39a0e... Enzyme tests passing
                         disabled={false}
                         onClick={[Function]}
                         type="submit"
