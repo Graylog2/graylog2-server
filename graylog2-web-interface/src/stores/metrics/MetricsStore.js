@@ -1,8 +1,9 @@
+// @flow strict
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import TimeHelper from 'util/TimeHelper';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -13,6 +14,54 @@ const SessionStore = StoreProvider.getStore('Session');
 const NodesStore = StoreProvider.getStore('Nodes');
 const SessionActions = ActionsProvider.getActions('Session');
 const MetricsActions = ActionsProvider.getActions('Metrics');
+
+type CounterMetric = {
+  metric: {
+    count: number,
+  },
+  type: 'counter',
+};
+
+type GaugeMetric = {
+  metric: {
+    value: number,
+  },
+  type: 'gauge',
+};
+
+type MeterMetric = {
+  metric: {
+    rate: {
+      total: number,
+    },
+  },
+  type: 'meter',
+};
+
+type TimerMetric = {
+  metric: {
+    rate: {
+      total: number,
+    },
+  },
+  type: 'timer',
+};
+
+type BaseMetric<T> = {
+  full_name: string,
+  name: string,
+} & T;
+
+export type NodeMetric = {
+  [metricName: string]: BaseMetric<CounterMetric>
+    | BaseMetric<GaugeMetric>
+    | BaseMetric<MeterMetric>
+    | BaseMetric<TimerMetric>,
+}
+
+export type ClusterMetric = {
+  [nodeId: string]: NodeMetric,
+};
 
 const MetricsStore = Reflux.createStore({
   listenables: [MetricsActions, SessionActions],
@@ -45,7 +94,7 @@ const MetricsStore = Reflux.createStore({
 
     // First collect all node metric registrations
     Object.keys(localRegistrations)
-      .filter(nodeId => Object.keys(localRegistrations[nodeId].length > 0))
+      .filter(nodeId => Object.keys(localRegistrations[nodeId]).length > 0)
       .forEach((nodeId) => {
         Object.keys(localRegistrations[nodeId])
           .filter(metricName => localRegistrations[nodeId][metricName] > 0)
@@ -82,7 +131,7 @@ const MetricsStore = Reflux.createStore({
   },
   list() {
     if (!SessionStore.isLoggedIn()) {
-      return;
+      return null;
     }
 
     const metricsToFetch = this._metricsToFetch(this.registrations, this.globalRegistrations);
