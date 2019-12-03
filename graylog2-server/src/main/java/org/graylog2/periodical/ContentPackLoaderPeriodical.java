@@ -24,7 +24,6 @@ import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
@@ -51,28 +50,25 @@ public class ContentPackLoaderPeriodical extends Periodical {
     private final ContentPackService contentPackService;
     private final ContentPackPersistenceService contentPackPersistenceService;
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
-    private final UserService userService;
     private final boolean contentPacksLoaderEnabled;
     private final Path contentPacksDir;
-    private final Set<String> contentPacksAutoLoad;
+    private final Set<String> contentPacksAutoInstall;
 
     @Inject
     public ContentPackLoaderPeriodical(ObjectMapper objectMapper,
                                        ContentPackService contentPackService,
                                        ContentPackPersistenceService contentPackPersistenceService,
                                        ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
-                                       UserService userService,
                                        @Named("content_packs_loader_enabled") boolean contentPacksLoaderEnabled,
                                        @Named("content_packs_dir") Path contentPacksDir,
-                                       @Named("content_packs_auto_load") Set<String> contentPacksAutoLoad) {
+                                       @Named("content_packs_auto_install") Set<String> contentPacksAutoInstall) {
         this.objectMapper = objectMapper;
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.contentPackService = contentPackService;
         this.contentPackPersistenceService = contentPackPersistenceService;
-        this.userService = userService;
         this.contentPacksLoaderEnabled = contentPacksLoaderEnabled;
         this.contentPacksDir = contentPacksDir;
-        this.contentPacksAutoLoad = ImmutableSet.copyOf(contentPacksAutoLoad);
+        this.contentPacksAutoInstall = ImmutableSet.copyOf(contentPacksAutoInstall);
     }
 
     @Override
@@ -176,19 +172,15 @@ public class ContentPackLoaderPeriodical extends Periodical {
             final String fileName = entry.getKey();
             final ContentPack contentPack = entry.getValue();
 
-            if (contentPacksAutoLoad.contains(fileName)) {
+            if (contentPacksAutoInstall.contains(fileName)) {
                 if (!contentPackInstallationPersistenceService.
                         findByContentPackIdAndRevision(contentPack.id(),contentPack.revision()).isEmpty()) {
                     LOG.debug("Content pack {}/{} ({}) already applied. Skipping.", contentPack.id(), contentPack.revision(), fileName);
                     continue;
                 }
 
-                Optional<User> admin = userService.getRootUser();
-                if (admin.isPresent()) {
-                    LOG.debug("Applying content pack {}/{} ({})", contentPack.id(), contentPack.revision(), fileName);
-                    contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Installed by auto loader",
-                            admin.get().getName());
-                }
+                contentPackService.installContentPack(contentPack, Collections.emptyMap(),
+                        "Installed by auto loader", "local:admin");
             }
 
         }
