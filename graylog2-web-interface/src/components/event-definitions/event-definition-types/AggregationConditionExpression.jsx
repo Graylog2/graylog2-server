@@ -29,7 +29,6 @@ class AggregationConditionExpression extends React.Component {
     onChange: PropTypes.func.isRequired,
     expression: internalNodePropType.isRequired,
     parent: internalNodePropType,
-    groupNodes: PropTypes.array.isRequired,
     level: PropTypes.number, // Internal use only
     renderLabel: PropTypes.bool,
   };
@@ -54,7 +53,6 @@ class AggregationConditionExpression extends React.Component {
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
     onChange('conditions', nextExpression);
-    onChange('groups', nextExpression.id);
   };
 
   handleDeleteExpression = () => {
@@ -90,7 +88,7 @@ class AggregationConditionExpression extends React.Component {
   };
 
   render() {
-    const { expression, groupNodes, parent, renderLabel } = this.props;
+    const { expression, parent, renderLabel } = this.props;
 
     switch (expression.expr) {
       case 'number-ref':
@@ -104,8 +102,7 @@ class AggregationConditionExpression extends React.Component {
         return (
           <BooleanExpression {...this.props}
                              onChildChange={this.handleChildChange}
-                             parent={parent}
-                             groupNodes={groupNodes} />
+                             parent={parent} />
         );
       case '<':
       case '<=':

@@ -31,7 +31,6 @@ const BooleanExpression = (props) => {
 
 BooleanExpression.propTypes = {
   expression: internalNodePropType.isRequired,
-  groupNodes: PropTypes.array.isRequired,
   parent: internalNodePropType,
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,

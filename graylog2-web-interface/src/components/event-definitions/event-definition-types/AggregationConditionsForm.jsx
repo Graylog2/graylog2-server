@@ -29,24 +29,8 @@ class AggregationConditionsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  constructor(props) {
-    super(props);
-    const { eventDefinition } = this.props;
-    this.state = {
-      groupNodes: [],
-      expression: eventDefinition.config.conditions.expression || initialEmptyConditionConfig,
-    };
-  }
-
   handleChange = (key, update) => {
     const { eventDefinition, onChange } = this.props;
-    if (key === 'groups') {
-      const { groupNodes } = this.state;
-      const nextGroupNodes = groupNodes.concat(update);
-      this.setState({ groupNodes: nextGroupNodes });
-      return;
-    }
-
     if (key === 'conditions') {
       // Propagate empty comparison expression, if the last expression was removed
       const nextConditions = update || emptyComparisonExpressionConfig();
@@ -66,7 +50,8 @@ class AggregationConditionsForm extends React.Component {
   };
 
   render() {
-    const { expression, groupNodes } = this.state;
+    const { eventDefinition } = this.props;
+    const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
 
     return (
       <React.Fragment>
@@ -74,7 +59,6 @@ class AggregationConditionsForm extends React.Component {
 
         <Row>
           <AggregationConditionExpression expression={expression}
-                                          groupNodes={groupNodes}
                                           {...this.props}
                                           onChange={this.handleChange} />
         </Row>
