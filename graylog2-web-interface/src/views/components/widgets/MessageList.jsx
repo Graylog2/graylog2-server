@@ -25,7 +25,6 @@ import RenderCompletionCallback from './RenderCompletionCallback';
 
 const { InputsActions } = CombinedProvider.get('Inputs');
 
-
 const Wrapper = styled.div`
   display: grid;
   grid-template-rows: 1fr max-content;

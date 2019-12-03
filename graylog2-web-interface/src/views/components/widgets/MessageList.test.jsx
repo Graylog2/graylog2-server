@@ -51,7 +51,7 @@ jest.mock('views/stores/SearchStore', () => ({
     ['getInitialState', () => ({ result: { results: { somequery: { effectiveTimerange: { from: '2019-11-15T14:40:48.666Z', to: '2019-11-29T14:40:48.666Z', type: 'absolute' } } } } })],
   ),
   SearchActions: {
-    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve()),
+    reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
   },
 }));
 jest.mock('views/stores/RefreshStore', () => ({
@@ -92,16 +92,20 @@ describe('MessageList', () => {
   it('should render with and without fields', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([TIMESTAMP_FIELD, 'file_name']));
+    const config = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
     const wrapper1 = mount(<MessageList editing
                                         data={data}
+                                        config={config}
                                         fields={Immutable.List(fields)}
                                         showLoadingSpinner={() => {}} />);
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
+    const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
     SelectedFieldsStore.getInitialState = jest.fn(() => Immutable.Set([]));
     const wrapper2 = mount(<MessageList editing
                                         data={data}
+                                        config={emptyConfig}
                                         fields={Immutable.List(fields)}
                                         showLoadingSpinner={() => {}} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
