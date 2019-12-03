@@ -1,14 +1,19 @@
 import { fromJS } from 'immutable';
 import { mapValues, get, compact } from 'lodash';
 import QueryResult from './QueryResult';
-import SearchError from './SearchError';
+import SearchError, { ResultWindowLimitError } from './SearchError';
 
 class SearchResult {
   constructor(result) {
     this._result = fromJS(result);
 
     this._results = fromJS(mapValues(result.results, queryResult => new QueryResult(queryResult)));
-    this._errors = fromJS(get(result, 'errors', []).map(error => new SearchError(error)));
+    this._errors = fromJS(get(result, 'errors', []).map((error) => {
+      if (error.result_window_limit) {
+        return new ResultWindowLimitError(error, this);
+      }
+      return new SearchError(error);
+    }));
   }
 
   get result() {

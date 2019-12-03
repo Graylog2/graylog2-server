@@ -99,17 +99,6 @@ class MessageList extends React.Component<Props, State> {
     }
   }
 
-  _resultWindowLimitMessage = (errors = []) => {
-    const { pageSize } = this.props;
-    const resultWindowLimitError = errors.find(error => error.resultWindowLimit);
-    if (resultWindowLimitError) {
-      const { resultWindowLimit } = resultWindowLimitError;
-      const validPages = Math.floor(resultWindowLimit / pageSize);
-      return { description: `Elasticsearch limits the search result to ${resultWindowLimit} messages. With a page size of ${pageSize} messages, you can use the first ${validPages} pages.` };
-    }
-    return undefined;
-  }
-
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
     const { pageSize, data: { id: searchTypeId }, effectiveTimerange, setLoadingState } = this.props;
@@ -118,18 +107,8 @@ class MessageList extends React.Component<Props, State> {
     setLoadingState(true);
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
       setLoadingState(false);
-      let errors = [...response.result.errors];
-      if (!isEmpty(errors)) {
-        const validPagesInfo = this._resultWindowLimitMessage(response.result.errors);
-        if (validPagesInfo) {
-          errors = [
-            validPagesInfo,
-            ...errors,
-          ];
-        }
-      }
       this.setState({
-        errors,
+        errors: response.result.errors,
         currentPage: pageNo,
       });
     });

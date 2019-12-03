@@ -52,6 +52,7 @@ jest.mock('views/stores/SearchStore', () => ({
   ),
   SearchActions: {
     reexecuteSearchTypes: jest.fn().mockReturnValue(Promise.resolve({ result: { errors: [] } })),
+    execute: { completed: { listen: jest.fn() } },
   },
 }));
 jest.mock('views/stores/RefreshStore', () => ({
