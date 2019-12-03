@@ -24,6 +24,7 @@ const ComparisonExpression = (props) => {
       <Row className="row-sm">
         <AggregationConditionExpression {...props}
                                         expression={expression.left}
+                                        parent={expression}
                                         onChange={onChildChange('left')}
                                         level={level + 1} />
 
@@ -49,6 +50,7 @@ const ComparisonExpression = (props) => {
         </Col>
         <AggregationConditionExpression {...props}
                                         expression={expression.right}
+                                        parent={expression}
                                         onChange={onChildChange('right')}
                                         level={level + 1} />
       </Row>

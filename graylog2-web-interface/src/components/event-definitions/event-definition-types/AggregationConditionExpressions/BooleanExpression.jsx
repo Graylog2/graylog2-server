@@ -1,52 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import lodash from 'lodash';
 
-import { Select } from 'components/common';
-import { Clearfix, Col, FormControl, FormGroup } from 'components/graylog';
+import { Clearfix } from 'components/graylog';
 
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 // eslint-disable-next-line import/no-cycle
-import AggregationConditionExpression from '../AggregationConditionExpression.jsx';
+import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const BooleanExpression = (props) => {
-  const { expression, groupNodes, level, onChildChange, parent, onChange } = props;
-
-  const handleOperatorChange = (nextOperator) => {
-    const nextExpression = lodash.cloneDeep(expression);
-    nextExpression.expr = nextOperator;
-    onChange('conditions', nextExpression);
-  };
-
-  const isGroupNode = !parent || parent.expr !== expression.expr || groupNodes.includes(expression.id);
+  const { expression, level, onChildChange } = props;
 
   return (
     <>
-      {(isGroupNode) && (
-        <Col md={12}>
-          <div className="form-inline" style={{ marginBottom: '15px', fontSize: '14px' }}>
-            <FormGroup>
-              <FormControl.Static>Messages must meet </FormControl.Static>
-            </FormGroup>
-            <FormGroup style={{ width: '100px', marginLeft: '1em', marginRight: '1em' }}>
-              <Select id="boolean-operator"
-                      matchProp="label"
-                      size="small"
-                      onChange={handleOperatorChange}
-                      options={[
-                        { label: 'all', value: '&&' },
-                        { label: 'any', value: '||' },
-                      ]}
-                      value={expression.expr} />
-            </FormGroup>
-            <FormGroup>
-              <FormControl.Static> of the following rules:</FormControl.Static>
-            </FormGroup>
-          </div>
-        </Col>
-      )}
-      <Clearfix />
       <AggregationConditionExpression {...props}
                                       expression={expression.left}
                                       parent={expression}

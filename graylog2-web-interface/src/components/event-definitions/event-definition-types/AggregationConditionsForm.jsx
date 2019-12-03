@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Row } from 'components/graylog';
-import { emptyComparisonExpressionConfig, enrichExpressionTree, cleanExpressionTree } from 'logic/alerts/AggregationExpressionConfig';
+import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 
@@ -34,7 +34,7 @@ class AggregationConditionsForm extends React.Component {
     const { eventDefinition } = this.props;
     this.state = {
       groupNodes: [],
-      expression: enrichExpressionTree(eventDefinition.config.conditions.expression || initialEmptyConditionConfig),
+      expression: eventDefinition.config.conditions.expression || initialEmptyConditionConfig,
     };
   }
 
@@ -55,10 +55,8 @@ class AggregationConditionsForm extends React.Component {
       const seriesReferences = extractSeriesReferences(nextConditions);
       const nextSeries = eventDefinition.config.series.filter(s => seriesReferences.includes(s.id));
 
-      // Keep enriched expression tree with existing IDs, propagate cleaned up tree
-      this.setState({ expression: enrichExpressionTree(nextConditions) });
       onChange({
-        conditions: { expression: cleanExpressionTree(nextConditions) },
+        conditions: { expression: nextConditions },
         series: nextSeries,
       });
       return;

@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import { Button, ButtonToolbar, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 
-import { emptyBooleanExpressionConfig, enrichExpressionTree } from 'logic/alerts/AggregationExpressionConfig';
+import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
@@ -15,6 +15,7 @@ import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpr
 // We render the expression tree recursively, so complex expressions need to refer back to this component
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
 import ComparisonExpression from './AggregationConditionExpressions/ComparisonExpression';
+import GroupExpression from './AggregationConditionExpressions/GroupExpression';
 /* eslint-enable import/no-cycle */
 
 import styles from './AggregationConditionExpression.css';
@@ -50,10 +51,10 @@ class AggregationConditionExpression extends React.Component {
     const { expression, onChange, parent } = this.props;
     const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
-    const groupExpression = enrichExpressionTree(emptyBooleanExpressionConfig({ operator: groupOperator }));
+    const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
     onChange('conditions', nextExpression);
-    onChange('groups', groupExpression.id);
+    onChange('groups', nextExpression.id);
   };
 
   handleDeleteExpression = () => {
@@ -67,9 +68,15 @@ class AggregationConditionExpression extends React.Component {
 
       let nextUpdate = update;
       if (key === 'conditions') {
+        // A null update indicates that one of the branches got removed
         if (update === null) {
-          // This happens when one of the branches got removed. Replace the current tree with the still existing branch.
-          nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
+          if (branch === 'child') {
+            // If this is the last branch of a group, remove the group altogether
+            nextUpdate = null;
+          } else {
+            // Otherwise replace the current tree with the still existing branch
+            nextUpdate = branch === 'child' ? null : expression[(branch === 'left' ? 'right' : 'left')];
+          }
         } else {
           // Propagate the update in the expression tree.
           const nextExpression = lodash.cloneDeep(expression);
@@ -84,14 +91,22 @@ class AggregationConditionExpression extends React.Component {
 
   render() {
     const { expression, groupNodes, parent, renderLabel } = this.props;
+
     switch (expression.expr) {
       case 'number-ref':
         return <NumberRefExpression {...this.props} parent={parent} />;
       case 'number':
         return <NumberExpression {...this.props} parent={parent} />;
+      case 'group':
+        return <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
       case '&&':
       case '||':
-        return <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} groupNodes={groupNodes} />;
+        return (
+          <BooleanExpression {...this.props}
+                             onChildChange={this.handleChildChange}
+                             parent={parent}
+                             groupNodes={groupNodes} />
+        );
       case '<':
       case '<=':
       case '>':
