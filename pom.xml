@@ -171,8 +171,8 @@
         <testcontainers.version>1.12.3</testcontainers.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v10.13.0</nodejs.version>
-        <yarn.version>v1.12.3</yarn.version>
+        <nodejs.version>v12.13.1</nodejs.version>
+        <yarn.version>v1.19.2</yarn.version>
 
         <!-- Plugin versions -->
         <license-maven.version>2.11</license-maven.version>
@@ -302,7 +302,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>1.8.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.alexcojocaru</groupId>

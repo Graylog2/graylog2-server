@@ -26,9 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
@@ -41,15 +39,15 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
+import static java.util.stream.Collectors.toSet;
 
 @AutoValue
 @JsonAutoDetect
@@ -57,12 +55,6 @@ import static com.google.common.collect.ImmutableSortedSet.of;
 @JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
-
-    /**
-     * Implicitly created by {@link Builder#build} to make looking up search types easier and quicker. Simply a unique index by ID.
-     */
-    @JsonIgnore
-    private ImmutableMap<String, SearchType> searchTypesIndex;
 
     @JsonProperty
     public abstract String id();
@@ -106,7 +98,8 @@ public abstract class Query {
         final boolean hasTimerange = state.hasNonNull("timerange");
         final boolean hasQuery = state.hasNonNull("query");
         final boolean hasSearchTypes = state.hasNonNull("search_types");
-        if (hasTimerange || hasQuery || hasSearchTypes) {
+        final boolean hasKeepSearchTypes = state.hasNonNull("keep_search_types");
+        if (hasTimerange || hasQuery || hasSearchTypes || hasKeepSearchTypes) {
             final Builder builder = toBuilder();
             if (hasTimerange) {
                 try {
@@ -134,21 +127,47 @@ public abstract class Query {
                 );
                 builder.query(newQuery);
             }
-            if (hasSearchTypes) {
-                // copy all existing search types, we'll update them by id if necessary below
-                Map<String, SearchType> updatedSearchTypes = Maps.newHashMap(searchTypesIndex);
+            if (hasSearchTypes || hasKeepSearchTypes) {
+                final Set<SearchType> searchTypesToKeep = hasKeepSearchTypes
+                        ? filterForWhiteListFromState(searchTypes(), state)
+                        : searchTypes();
 
-                state.path("search_types").fields().forEachRemaining(stateEntry -> {
-                    final String id = stateEntry.getKey();
-                    final SearchType searchType = searchTypesIndex.get(id);
-                    final SearchType updatedSearchType = searchType.applyExecutionContext(objectMapper, stateEntry.getValue());
-                    updatedSearchTypes.put(id, updatedSearchType);
-                });
-                builder.searchTypes(ImmutableSet.copyOf(updatedSearchTypes.values()));
+                final Set<SearchType> searchTypesWithOverrides = applyAvailableOverrides(objectMapper, state, searchTypesToKeep);
+
+                builder.searchTypes(ImmutableSet.copyOf(searchTypesWithOverrides));
             }
             return builder.build();
         }
         return this;
+    }
+
+    private Set<SearchType> filterForWhiteListFromState(Set<SearchType> previousSearchTypes, JsonNode state) {
+        final Set<String> whitelist = parseSearchTypesWhitelistFrom(state);
+
+        return previousSearchTypes.stream()
+                .filter(st -> whitelist.contains(st.id()))
+                .collect(toSet());
+    }
+
+    private Set<String> parseSearchTypesWhitelistFrom(JsonNode state) {
+        final String key = "keep_search_types";
+        final Set<String> results = new HashSet<>();
+        if (state.has(key) && state.get(key).isArray()) {
+            for (JsonNode n : state.get(key))
+                results.add(n.asText());
+        }
+        return results;
+    }
+
+    private Set<SearchType> applyAvailableOverrides(ObjectMapper objectMapper, JsonNode state, Set<SearchType> searchTypes) {
+        final JsonNode searchTypesState = state.path("search_types");
+
+        return searchTypes.stream().map(st -> {
+            if (searchTypesState.has(st.id())) {
+                return st.applyExecutionContext(objectMapper, searchTypesState.path(st.id()));
+            } else
+                return st;
+        }).collect(toSet());
     }
 
     public static Query emptyRoot() {
@@ -168,7 +187,7 @@ public abstract class Query {
                             .filter(filter -> filter instanceof StreamFilter)
                             .map(streamFilter -> ((StreamFilter) streamFilter).streamId())
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toSet());
+                            .collect(toSet());
                 })
                 .orElse(Collections.emptySet());
     }
@@ -188,6 +207,10 @@ public abstract class Query {
             return streamIdFilter;
         }
         return AndFilter.and(streamIdFilter, filter);
+    }
+
+    boolean hasSearchTypes() {
+        return !searchTypes().isEmpty();
     }
 
     @AutoValue.Builder
@@ -218,9 +241,7 @@ public abstract class Query {
         }
 
         public Query build() {
-            final Query query = autoBuild();
-            query.searchTypesIndex = Maps.uniqueIndex(query.searchTypes(), SearchType::id);
-            return query;
+            return autoBuild();
         }
     }
 }
