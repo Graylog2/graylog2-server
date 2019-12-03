@@ -21,25 +21,18 @@ import org.graylog.plugins.views.search.Query;
 
 import javax.annotation.Nonnull;
 
-public class SearchTypeError extends QueryError {
-    @Nonnull
-    private final String searchTypeId;
+public class ResultWindowLimitError extends SearchTypeError {
 
-    public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, Throwable throwable) {
-        super(query, throwable);
+    private final int resultWindowLimit;
 
-        this.searchTypeId = searchTypeId;
+    ResultWindowLimitError(@Nonnull Query query, @Nonnull String searchTypeId, int resultWindowLimit, Throwable throwable) {
+        super(query, searchTypeId, throwable);
+
+        this.resultWindowLimit = resultWindowLimit;
     }
 
-    public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, String description) {
-        super(query, description);
-
-        this.searchTypeId = searchTypeId;
-    }
-
-    @Nonnull
-    @JsonProperty("search_type_id")
-    public String searchTypeId() {
-        return searchTypeId;
+    @JsonProperty("result_window_limit")
+    public Integer getResultWindowLimit() {
+        return resultWindowLimit;
     }
 }
