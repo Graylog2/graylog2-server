@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import WidgetFailed from './WidgetFailed';
+import ErrorWidget from './ErrorWidget';
 
 type State = {
   error?: Error,
@@ -24,7 +24,7 @@ export default class WidgetErrorBoundary extends React.Component<Props, State> {
     const { error } = this.state;
     const { children } = this.props;
     return error
-      ? <WidgetFailed error={error} />
+      ? <ErrorWidget title="While rendering this widget, the following error occurred:" errors={[{ description: error.toString() }]} />
       : children;
   }
 }
