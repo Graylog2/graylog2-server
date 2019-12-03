@@ -44,7 +44,7 @@ type State = {
 type Props = {
   fields: {},
   pageSize: number,
-  config?: MessagesWidgetConfig,
+  config: MessagesWidgetConfig,
   data: { messages: Array<Object>, total: number, id: string },
   selectedFields?: {},
   effectiveTimerange: TimeRange,
@@ -61,7 +61,7 @@ class MessageList extends React.Component<Props, State> {
   static propTypes = {
     fields: CustomPropTypes.FieldListType.isRequired,
     pageSize: PropTypes.number,
-    config: CustomPropTypes.instanceOf(MessagesWidgetConfig),
+    config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
       total: PropTypes.number.isRequired,
@@ -80,7 +80,6 @@ class MessageList extends React.Component<Props, State> {
   static defaultProps = {
     pageSize: Messages.DEFAULT_LIMIT,
     selectedFields: Immutable.Set(),
-    config: undefined,
   };
 
   state = {

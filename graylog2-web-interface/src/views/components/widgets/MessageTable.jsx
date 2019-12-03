@@ -112,7 +112,7 @@ type State = {
 
 type Props = {
   fields: {},
-  config?: MessagesWidgetConfig,
+  config: MessagesWidgetConfig,
   selectedFields?: {},
   activeQueryId: string,
   messages: Array<Object>
@@ -121,14 +121,13 @@ type Props = {
 class MessageTable extends React.Component<Props, State> {
   static propTypes = {
     activeQueryId: PropTypes.string.isRequired,
-    config: CustomPropTypes.instanceOf(MessagesWidgetConfig),
+    config: CustomPropTypes.instanceOf(MessagesWidgetConfig).isRequired,
     fields: CustomPropTypes.FieldListType.isRequired,
     messages: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedFields: PropTypes.object,
   }
 
   static defaultProps = {
-    config: undefined,
     selectedFields: Immutable.Set(),
   };
 
