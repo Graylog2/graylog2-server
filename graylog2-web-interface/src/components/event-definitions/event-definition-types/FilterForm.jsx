@@ -198,10 +198,11 @@ class FilterForm extends React.Component {
 
   renderQueryParameters = () => {
     const { eventDefinition, onChange, lookupTables, validation } = this.props;
+    const { query_parameters: queryParameters } = eventDefinition.config;
     const debug = (key, val) => {
       onChange(key, val);
     };
-    const parameterButtons = eventDefinition.config.query_parameters.map((queryParam) => {
+    const parameterButtons = queryParameters.map((queryParam) => {
       return (
         <EditQueryParameterModal key={queryParam.name}
                                  queryParameter={queryParam}

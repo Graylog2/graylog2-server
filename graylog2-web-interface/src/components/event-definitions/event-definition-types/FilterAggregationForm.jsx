@@ -15,6 +15,7 @@ const conditionTypes = {
 
 const initialFilterConfig = {
   query: '',
+  query_parameters: [],
   streams: [],
   search_within_ms: 60 * 1000,
   execute_every_ms: 60 * 1000,
