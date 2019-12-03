@@ -97,7 +97,7 @@ describe('MessageList', () => {
                                         data={data}
                                         config={config}
                                         fields={Immutable.List(fields)}
-                                        showLoadingSpinner={() => {}} />);
+                                        setLoadingState={() => {}} />);
 
     expect(wrapper1.find('span[role="presentation"]').length).toBe(2);
 
@@ -107,7 +107,7 @@ describe('MessageList', () => {
                                         data={data}
                                         config={emptyConfig}
                                         fields={Immutable.List(fields)}
-                                        showLoadingSpinner={() => {}} />);
+                                        setLoadingState={() => {}} />);
     expect(wrapper2.find('span[role="presentation"]').length).toBe(0);
   });
 
@@ -118,7 +118,7 @@ describe('MessageList', () => {
                                        data={data}
                                        fields={Immutable.List(fields)}
                                        config={config}
-                                       showLoadingSpinner={() => {}} />);
+                                       setLoadingState={() => {}} />);
     const messageTableEntry = wrapper.find('MessageTableEntry');
     const td = messageTableEntry.find('td').at(0);
     expect(td.props().children).toMatchSnapshot();
@@ -131,7 +131,7 @@ describe('MessageList', () => {
                        data={data}
                        fields={Immutable.List([])}
                        config={config}
-                       showLoadingSpinner={() => {}} />);
+                       setLoadingState={() => {}} />);
   });
 
   it('refreshs Inputs list upon mount', () => {
@@ -141,7 +141,7 @@ describe('MessageList', () => {
                    data={data}
                    fields={Immutable.List([])}
                    config={config}
-                   showLoadingSpinner={() => {}} />
+                   setLoadingState={() => {}} />
     );
     mount(<Component />);
     expect(InputsActions.list).toHaveBeenCalled();
@@ -160,7 +160,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
-                                       showLoadingSpinner={() => {}} />);
+                                       setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(SearchActions.reexecuteSearchTypes).toHaveBeenCalledWith(searchTypePayload, effectiveTimerange);
   });
@@ -172,7 +172,7 @@ describe('MessageList', () => {
                                        data={{ ...data, total: Messages.DEFAULT_LIMIT + secondPageSize }}
                                        fields={Immutable.List([])}
                                        config={config}
-                                       showLoadingSpinner={() => {}} />);
+                                       setLoadingState={() => {}} />);
     wrapper.find('[aria-label="Next"]').simulate('click');
     expect(RefreshActions.disable).toHaveBeenCalledTimes(1);
   });
@@ -184,7 +184,7 @@ describe('MessageList', () => {
                    data={data}
                    fields={Immutable.List([])}
                    config={config}
-                   showLoadingSpinner={() => {}} />
+                   setLoadingState={() => {}} />
     );
     return new Promise((resolve) => {
       const onRenderComplete = jest.fn(resolve);

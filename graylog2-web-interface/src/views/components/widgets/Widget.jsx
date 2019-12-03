@@ -223,7 +223,7 @@ class Widget extends React.Component<Props, State> {
                       height={height}
                       width={width}
                       filter={filter}
-                      showLoadingSpinner={this._setLoadingState}
+                      setLoadingState={this._setLoadingState}
                       toggleEdit={this._onToggleEdit} />
       );
     }

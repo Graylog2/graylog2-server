@@ -47,7 +47,7 @@ type Props = {
   data: { messages: Array<Object>, total: number, id: string },
   selectedFields?: {},
   effectiveTimerange: TimeRange,
-  showLoadingSpinner: (loading: boolean) => void,
+  setLoadingState: (loading: boolean) => void,
   currentView: {
     activeQuery: string,
     view: {
@@ -72,7 +72,7 @@ class MessageList extends React.Component<Props, State> {
       type: PropTypes.string.isRequired,
     }).isRequired,
     selectedFields: PropTypes.object,
-    showLoadingSpinner: PropTypes.func.isRequired,
+    setLoadingState: PropTypes.func.isRequired,
     currentView: PropTypes.object.isRequired,
   };
 
@@ -105,12 +105,12 @@ class MessageList extends React.Component<Props, State> {
 
   _handlePageChange = (pageNo: number) => {
     // execute search with new offset
-    const { pageSize, data: { id: searchTypeId }, effectiveTimerange, showLoadingSpinner } = this.props;
+    const { pageSize, data: { id: searchTypeId }, effectiveTimerange, setLoadingState } = this.props;
     const searchTypePayload = { [searchTypeId]: { limit: pageSize, offset: pageSize * (pageNo - 1) } };
     RefreshActions.disable();
-    showLoadingSpinner(true);
+    setLoadingState(true);
     SearchActions.reexecuteSearchTypes(searchTypePayload, effectiveTimerange).then((response) => {
-      showLoadingSpinner(false);
+      setLoadingState(false);
       let errors = [...response.result.errors];
       if (!isEmpty(errors)) {
         const validPagesInfo = this._resultWindowLimitMessage(response.result.errors);
