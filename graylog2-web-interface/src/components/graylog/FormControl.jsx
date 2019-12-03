@@ -31,4 +31,7 @@ const FormControl = memo(styled(BootstrapFormControl)`
   ~ .form-control-feedback.glyphicon { display: none; }
 `);
 
+FormControl.Static = BootstrapFormControl.Static;
+FormControl.Feedback = BootstrapFormControl.Feedback;
+
 export default FormControl;
