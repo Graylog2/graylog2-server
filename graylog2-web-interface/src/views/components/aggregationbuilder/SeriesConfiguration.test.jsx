@@ -1,10 +1,5 @@
 import React from 'react';
-<<<<<<< HEAD
 import { mount } from 'wrappedEnzyme';
-=======
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
->>>>>>> 05ef39a0e... Enzyme tests passing
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';

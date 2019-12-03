@@ -86,11 +86,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -114,21 +110,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -186,11 +174,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -214,21 +198,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -283,11 +259,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -311,21 +283,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Unsaved changes"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Unsaved changes"
@@ -390,11 +354,7 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -418,21 +378,13 @@ exports[`BookmarkControls render the BookmarkControls should render dirty 1`] = 
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -547,11 +499,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -575,21 +523,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -647,11 +587,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -675,21 +611,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Empty search"
@@ -744,11 +672,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -772,21 +696,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Saved search"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Saved search"
@@ -851,11 +767,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -879,21 +791,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty 1`
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"
@@ -1008,11 +912,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -1036,21 +936,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Export to new dashboard"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Export to new dashboard"
@@ -1108,11 +1000,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -1136,21 +1024,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={true}
                   onClick={[Function]}
                   title="Empty search"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={true}
                     onClick={[Function]}
                     title="Empty search"
@@ -1205,11 +1085,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -1233,21 +1109,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="Save search"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="Save search"
@@ -1312,11 +1180,7 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                     "componentStyle": ComponentStyle {
                       "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-<<<<<<< HEAD
                       "lastClassName": "hYkHdk",
-=======
-                      "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                       "rules": Array [
                         [Function],
                       ],
@@ -1340,21 +1204,13 @@ exports[`BookmarkControls render the BookmarkControls should render not dirty wi
                   block={false}
                   bsClass="btn"
                   bsStyle="default"
-<<<<<<< HEAD
                   className="Button__StyledButton-c9cbmb-0 hYkHdk"
-=======
-                  className="Button-c9cbmb-0 iKWoaE"
->>>>>>> 05ef39a0e... Enzyme tests passing
                   disabled={false}
                   onClick={[Function]}
                   title="List of saved searches"
                 >
                   <button
-<<<<<<< HEAD
                     className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
-=======
-                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
->>>>>>> 05ef39a0e... Enzyme tests passing
                     disabled={false}
                     onClick={[Function]}
                     title="List of saved searches"

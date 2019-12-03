@@ -105,11 +105,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                   "isStatic": false,
-<<<<<<< HEAD
                                   "lastClassName": "dXZEpb",
-=======
-                                  "lastClassName": "gNbYGy",
->>>>>>> 05ef39a0e... Enzyme tests passing
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -130,20 +126,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-<<<<<<< HEAD
                               className="Badge__StyledBadge-sc-4gzqz0-0 dXZEpb"
-=======
-                              className="Badge-sc-4gzqz0-0 gNbYGy"
->>>>>>> 05ef39a0e... Enzyme tests passing
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-<<<<<<< HEAD
                                 className="Badge__StyledBadge-sc-4gzqz0-0 dXZEpb badge badge-danger"
-=======
-                                className="Badge-sc-4gzqz0-0 gNbYGy badge badge-danger"
->>>>>>> 05ef39a0e... Enzyme tests passing
                                 id="notification-badge"
                               >
                                 42

@@ -316,11 +316,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "FormControl-sc-1amoaox-0",
                                   "isStatic": false,
-<<<<<<< HEAD
                                   "lastClassName": "lpicKK",
-=======
-                                  "lastClassName": "iKWoaE",
->>>>>>> 05ef39a0e... Enzyme tests passing
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -342,7 +338,6 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                             placeholder=""
                             type="text"
                           >
-<<<<<<< HEAD
                             <FormControl
                               bsClass="form-control"
                               className="FormControl-sc-1amoaox-0 lpicKK"
@@ -360,20 +355,6 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                 name="inputWithButton"
                                 placeholder=""
                                 type="text"
-=======
-                            <Button
-                              active={false}
-                              block={false}
-                              bsClass="btn"
-                              bsStyle="default"
-                              className="Button-c9cbmb-0 iKWoaE"
-                              disabled={false}
-                            >
-                              <button
-                                className="Button-c9cbmb-0 iKWoaE btn btn-default"
-                                disabled={false}
-                                type="button"
->>>>>>> 05ef39a0e... Enzyme tests passing
                               />
                             </FormControl>
                           </StyledComponent>
