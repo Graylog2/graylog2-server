@@ -51,7 +51,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                   role="toolbar"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-success"
+                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-success"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -156,7 +156,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                   role="toolbar"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-success"
+                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-success"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -261,7 +261,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                   role="toolbar"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-success"
+                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-success"
                     disabled={false}
                     onClick={[Function]}
                     type="button"
@@ -366,7 +366,7 @@ exports[`<ContentPackVersions /> should render with content pack versions 1`] = 
                   role="toolbar"
                 >
                   <button
-                    className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-success"
+                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-success"
                     disabled={false}
                     onClick={[Function]}
                     type="button"

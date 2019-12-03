@@ -8,7 +8,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -158,7 +158,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: fa
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -308,7 +308,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -465,7 +465,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -622,7 +622,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -779,7 +779,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -936,7 +936,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1093,7 +1093,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
@@ -1250,7 +1250,7 @@ exports[`RefreshControls rendering it renders refresh controlls with enabled: tr
     className="RefreshControls__FlexibleButtonGroup-sc-1pygk8n-1 etyOYS btn-group"
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+      className="Button-c9cbmb-0 GLfOY btn btn-default"
       disabled={false}
       onClick={[Function]}
       type="button"
