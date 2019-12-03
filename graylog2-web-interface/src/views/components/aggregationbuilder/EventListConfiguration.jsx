@@ -12,8 +12,8 @@ const EventListConfiguration = ({ enabled, onChange }: Props) => {
   return (
     <form>
       <FormGroup>
-        {/* eslint-disable-next-line no-undef */ /* $FlowFixMe: checked is part of target */}
-        <Checkbox onChange={(event: SyntheticEvent<HTMLInputElement>) => onChange(event.target.checked)} checked={enabled}>
+        {/* eslint-disable-next-line no-undef */}
+        <Checkbox onChange={(event: SyntheticInputEvent<HTMLInputElement>) => onChange(event.target.checked)} checked={enabled}>
           Enable Event Annotation
         </Checkbox>
       </FormGroup>
