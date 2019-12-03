@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
 
@@ -28,8 +27,8 @@ describe('<ContentPacksList />', () => {
   ];
 
   it('should render with empty content packs', () => {
-    const wrapper = renderer.create(<ContentPacksList contentPacks={[]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPacksList contentPacks={[]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with content packs', () => {
@@ -37,8 +36,8 @@ describe('<ContentPacksList />', () => {
       1: { 1: { installation_count: 1 } },
       2: { 5: { installation_count: 2 } },
     };
-    const wrapper = renderer.create(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPacksList contentPacks={contentPacks} contentPackMetadata={metadata} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should do pagination', () => {

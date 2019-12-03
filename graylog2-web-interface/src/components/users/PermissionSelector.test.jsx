@@ -1,7 +1,6 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
-import { mount } from 'enzyme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import PermissionSelector from 'components/users/PermissionSelector';
@@ -17,11 +16,11 @@ describe('<PermissionSelector />', () => {
   ]);
 
   it('should render with empty permissions', () => {
-    const wrapper = renderer.create(<PermissionSelector streams={streams}
-                                                        permissions={Immutable.Set([])}
-                                                        dashboards={dashboards}
-                                                        onChange={() => {}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={Immutable.Set([])}
+                                              dashboards={dashboards}
+                                              onChange={() => {}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with set permissions', () => {
@@ -30,11 +29,11 @@ describe('<PermissionSelector />', () => {
       'streams:edit:02',
       'dashboards:read:02',
     ]);
-    const wrapper = renderer.create(<PermissionSelector streams={streams}
-                                                        permissions={permissions}
-                                                        dashboards={dashboards}
-                                                        onChange={() => {}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<PermissionSelector streams={streams}
+                                              permissions={permissions}
+                                              dashboards={dashboards}
+                                              onChange={() => {}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should allow reading when clicked on "Allow reading"', () => {

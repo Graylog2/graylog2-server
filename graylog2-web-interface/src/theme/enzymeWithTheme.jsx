@@ -13,7 +13,7 @@ const GraylogThemeProvider = ({ children }) => {
 
 GraylogThemeProvider.propTypes = {
   children: PropTypes.node.isRequired,
-}
+};
 
 export const shallowWithTheme = (Component, options = {}) => shallow(Component, {
   wrappingComponent: GraylogThemeProvider,
@@ -24,3 +24,10 @@ export const mountWithTheme = (Component, options = {}) => mount(Component, {
   wrappingComponent: GraylogThemeProvider,
   ...options,
 });
+
+
+export * from 'enzyme';
+export {
+  mountWithTheme as mount,
+  shallowWithTheme as shallow,
+}

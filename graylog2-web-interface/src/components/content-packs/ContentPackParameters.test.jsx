@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
@@ -11,8 +11,8 @@ describe('<ContentPackParameters />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render a parameter', () => {
@@ -44,7 +44,7 @@ describe('<ContentPackParameters />', () => {
       )
       .entities([entity])
       .build();
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

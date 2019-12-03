@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';

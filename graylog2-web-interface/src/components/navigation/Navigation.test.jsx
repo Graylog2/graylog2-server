@@ -1,5 +1,5 @@
 import React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockComponent from 'helpers/mocking/MockComponent';

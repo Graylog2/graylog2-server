@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import { RefreshActions } from 'views/stores/RefreshStore';
@@ -21,8 +20,8 @@ jest.mock('views/stores/RefreshStore', () => ({
 describe('RefreshControls', () => {
   describe('rendering', () => {
     const verifyRendering = ({ enabled, interval }) => {
-      const wrapper = renderer.create(<RefreshControls refreshConfig={{ enabled, interval }} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<RefreshControls refreshConfig={{ enabled, interval }} />);
+      expect(wrapper).toMatchSnapshot();
     };
 
     it.each`

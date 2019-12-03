@@ -1,5 +1,5 @@
 import React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';

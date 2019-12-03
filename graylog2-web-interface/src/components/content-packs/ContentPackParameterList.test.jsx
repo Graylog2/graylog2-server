@@ -1,6 +1,5 @@
 import React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
-import renderer from 'react-test-renderer';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -10,8 +9,8 @@ import ContentPackParameterList from 'components/content-packs/ContentPackParame
 describe('<ContentPackParameterList />', () => {
   it('should render with empty parameters with readOnly', () => {
     const contentPack = ContentPack.builder().build();
-    const wrapper = renderer.create(<ContentPackParameterList contentPack={contentPack} readOnly />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with parameters with readOnly', () => {
@@ -25,14 +24,14 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .build();
-    const wrapper = renderer.create(<ContentPackParameterList contentPack={contentPack} readOnly />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} readOnly />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with empty parameters without readOnly', () => {
     const contentPack = ContentPack.builder().build();
-    const wrapper = renderer.create(<ContentPackParameterList contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with parameters without readOnly', () => {
@@ -46,8 +45,8 @@ describe('<ContentPackParameterList />', () => {
     const contentPack = ContentPack.builder()
       .parameters(parameters)
       .build();
-    const wrapper = renderer.create(<ContentPackParameterList contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameterList contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should delete a parameter', () => {

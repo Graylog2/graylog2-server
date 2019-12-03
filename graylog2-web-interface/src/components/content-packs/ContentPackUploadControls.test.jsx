@@ -1,12 +1,12 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackUploadControls from 'components/content-packs/ContentPackUploadControls';
 
 describe('<ContentPackUploadControls />', () => {
   it('should render', () => {
-    const wrapper = renderer.create(<ContentPackUploadControls />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackUploadControls />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'theme/enzymeWithTheme';
 import Widget from 'components/widgets/Widget';
 
 describe('<Widget />', () => {

@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, wait, fireEvent, cleanup } from '@testing-library/react';
+import { render, wait, fireEvent, cleanup } from 'theme/rtlWithTheme';
 import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
 import Routes from 'routing/Routes';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from 'theme/rtlWithTheme';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import UserPreferencesButton from 'components/users/UserPreferencesButton';

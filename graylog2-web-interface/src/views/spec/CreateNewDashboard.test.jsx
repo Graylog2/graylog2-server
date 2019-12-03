@@ -3,7 +3,7 @@
  */
 // @flow strict
 import * as React from 'react';
-import { cleanup, waitForElement, render, fireEvent } from '@testing-library/react';
+import { cleanup, waitForElement, render, fireEvent } from 'theme/rtlWithTheme';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore } from 'helpers/mocking';

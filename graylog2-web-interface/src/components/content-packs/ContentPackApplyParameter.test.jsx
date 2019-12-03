@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 import Entity from 'logic/content-packs/Entity';
 
@@ -25,22 +24,22 @@ describe('<ContentPackApplyParameter />', () => {
   const appliedParameterReadOnly = { configKey: 'configuration.port', paramName: parameter.name, readOnly: true };
 
   it('should render with full props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
-                                                               parameters={[parameter]}
-                                                               appliedParameter={[appliedParameter]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[appliedParameter]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with readOnly', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity}
-                                                               parameters={[parameter]}
-                                                               appliedParameter={[appliedParameterReadOnly]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackApplyParameter entity={entity}
+                                                     parameters={[parameter]}
+                                                     appliedParameter={[appliedParameterReadOnly]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with minimal props', () => {
-    const wrapper = renderer.create(<ContentPackApplyParameter entity={entity} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackApplyParameter entity={entity} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should apply a parameter', () => {

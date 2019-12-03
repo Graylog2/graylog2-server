@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import TokenList from 'components/users/TokenList';
@@ -14,13 +13,13 @@ describe('<TokenList />', () => {
   ];
 
   it('should render with empty tokens', () => {
-    const wrapper = renderer.create(<TokenList tokens={[]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<TokenList tokens={[]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with tokens', () => {
-    const wrapper = renderer.create(<TokenList tokens={tokens} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<TokenList tokens={tokens} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should add new token and delete existing ones', () => {

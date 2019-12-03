@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import Wizard from 'components/common/Wizard';
@@ -13,23 +12,23 @@ describe('<Wizard />', () => {
   ];
 
   it('should render with 3 steps', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with 3 steps and children', () => {
-    const wrapper = renderer.create(<Wizard steps={steps}><span>Preview</span></Wizard>);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps}><span>Preview</span></Wizard>);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} horizontal />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} horizontal />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps and children', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+    expect(wrapper).toMatchSnapshot();
   });
 
   describe('When used in an uncontrolled way', () => {

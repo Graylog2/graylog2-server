@@ -1,5 +1,5 @@
 import React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import AppConfig from '../../util/AppConfig';
 
 const findLink = (wrapper, title) => wrapper.find(`NavigationLink[description="${title}"]`);

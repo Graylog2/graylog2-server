@@ -1,593 +1,2938 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
-<div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
-    >
-      <h2>
-        General Information
-      </h2>
-      <br />
-      <form
-        className="content-selection-form"
-        id="content-selection-form"
-        onSubmit={[Function]}
-      >
-        <fieldset>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="name"
-                label="Name"
-                maxLength={250}
-                name="name"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Give a descriptive name for this content pack.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="summary"
-            >
-              Summary
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="summary"
-                label="Summary"
-                maxLength={250}
-                name="summary"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Give a short summary of the content pack.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <span>
-              <textarea
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="description"
-                label="Description"
-                name="description"
-                onChange={[Function]}
-                placeholder=""
-                rows={6}
-                type="textarea"
-                value=""
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Give a long description of the content pack in markdown.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="vendor"
-            >
-              Vendor
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="vendor"
-                label="Vendor"
-                maxLength={250}
-                name="vendor"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value=""
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Who did this content pack and how can he be reached. e.g Name and eMail
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="url"
-            >
-              URL
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="url"
-                label="URL"
-                maxLength={250}
-                name="url"
-                onChange={[Function]}
-                placeholder=""
-                type="text"
-                value=""
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Where can I find the content pack. e.g. github url
-              </span>
-            </span>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
-    >
-      <h2>
-        Content Pack selection
-      </h2>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
+<ContentPackSelection
+  contentPack={
+    Object {
+      "description": "",
+      "entities": Array [],
+      "id": "29ed3415-3368-401e-819a-2e34bb028591",
+      "name": "",
+      "parameters": Array [],
+      "rev": 1,
+      "summary": "",
+      "url": "",
+      "v": 1,
+      "vendor": "",
+    }
+  }
+  edit={false}
+  entities={Object {}}
+  onStateChange={[Function]}
+  selectedEntities={Object {}}
+>
+  <div>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
       <div
-        className="search"
-        style={
-          Object {
-            "marginTop": 15,
-          }
-        }
+        className="row"
       >
-        <form
-          className="form-inline"
-          onSubmit={[Function]}
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
         >
           <div
-            className="form-group has-feedback"
+            className="col-lg-8 col-sm-offset-1"
           >
-            <input
-              autoComplete="off"
-              className="query form-control"
-              id="common-search-form-query-input"
-              onChange={[Function]}
-              placeholder="Enter search query..."
-              spellCheck="false"
-              style={
-                Object {
-                  "width": "auto",
-                }
-              }
-              type="text"
-              value=""
-            />
-          </div>
-          <div
-            className="form-group"
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-          >
-            <button
-              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              type="submit"
+            <h2>
+              General Information
+            </h2>
+            <br />
+            <form
+              className="content-selection-form"
+              id="content-selection-form"
+              onSubmit={[Function]}
             >
-              Filter
-            </button>
+              <fieldset>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Give a descriptive name for this content pack."
+                  id="name"
+                  label="Name"
+                  maxLength={250}
+                  name="name"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value=""
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="name"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="name"
+                            >
+                              Name
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Name"
+                            maxLength={250}
+                            name="name"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value=""
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Name"
+                              maxLength={250}
+                              name="name"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Name"
+                                maxLength={250}
+                                name="name"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="name"
+                                  label="Name"
+                                  maxLength={250}
+                                  name="name"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Give a descriptive name for this content pack.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Give a short summary of the content pack."
+                  id="summary"
+                  label="Summary"
+                  maxLength={250}
+                  name="summary"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value=""
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="summary"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="summary"
+                            >
+                              Summary
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Summary"
+                            maxLength={250}
+                            name="summary"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value=""
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Summary"
+                              maxLength={250}
+                              name="summary"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Summary"
+                                maxLength={250}
+                                name="summary"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="summary"
+                                  label="Summary"
+                                  maxLength={250}
+                                  name="summary"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Give a short summary of the content pack.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Give a long description of the content pack in markdown."
+                  id="description"
+                  label="Description"
+                  name="description"
+                  onChange={[Function]}
+                  placeholder=""
+                  rows={6}
+                  type="textarea"
+                  value=""
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="description"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="description"
+                            >
+                              Description
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="textarea"
+                            inputRef={[Function]}
+                            label="Description"
+                            name="description"
+                            onChange={[Function]}
+                            placeholder=""
+                            rows={6}
+                            type="textarea"
+                            value=""
+                          >
+                            <StyledComponent
+                              componentClass="textarea"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Description"
+                              name="description"
+                              onChange={[Function]}
+                              placeholder=""
+                              rows={6}
+                              type="textarea"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+                                label="Description"
+                                name="description"
+                                onChange={[Function]}
+                                placeholder=""
+                                rows={6}
+                                type="textarea"
+                                value=""
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="description"
+                                  label="Description"
+                                  name="description"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  rows={6}
+                                  type="textarea"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Give a long description of the content pack in markdown.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                  id="vendor"
+                  label="Vendor"
+                  maxLength={250}
+                  name="vendor"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value=""
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="vendor"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="vendor"
+                            >
+                              Vendor
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Vendor"
+                            maxLength={250}
+                            name="vendor"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value=""
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Vendor"
+                              maxLength={250}
+                              name="vendor"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Vendor"
+                                maxLength={250}
+                                name="vendor"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="vendor"
+                                  label="Vendor"
+                                  maxLength={250}
+                                  name="vendor"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Where can I find the content pack. e.g. github url"
+                  id="url"
+                  label="URL"
+                  maxLength={250}
+                  name="url"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="text"
+                  value=""
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="url"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="url"
+                            >
+                              URL
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="URL"
+                            maxLength={250}
+                            name="url"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="text"
+                            value=""
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="URL"
+                              maxLength={250}
+                              name="url"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="URL"
+                                maxLength={250}
+                                name="url"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="url"
+                                  label="URL"
+                                  maxLength={250}
+                                  name="url"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Where can I find the content pack. e.g. github url
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+              </fieldset>
+            </form>
           </div>
-          <div
-            className="form-group"
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-          >
-            <button
-              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              onClick={[Function]}
-              type="reset"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
+        </Col>
       </div>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-8 col-sm-offset-1"
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
-      <ul
-        className="list"
-      />
-    </div>
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
+        >
+          <div
+            className="col-lg-8 col-sm-offset-1"
+          >
+            <h2>
+              Content Pack selection
+            </h2>
+          </div>
+        </Col>
+      </div>
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
+    >
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
+        >
+          <div
+            className="col-lg-8 col-sm-offset-1"
+          >
+            <SearchForm
+              buttonLeftMargin={5}
+              id="filter-input"
+              label={null}
+              loadingLabel="Loading..."
+              onQueryChange={[Function]}
+              onReset={[Function]}
+              onSearch={[Function]}
+              placeholder="Enter search query..."
+              query=""
+              queryHelpComponent={null}
+              queryWidth="auto"
+              resetButtonLabel="Reset"
+              searchBsStyle="default"
+              searchButtonLabel="Filter"
+              topMargin={15}
+              useLoadingState={false}
+              wrapperClass="search"
+            >
+              <div
+                className="search"
+                style={
+                  Object {
+                    "marginTop": 15,
+                  }
+                }
+              >
+                <form
+                  className="form-inline"
+                  onSubmit={[Function]}
+                >
+                  <div
+                    className="form-group has-feedback"
+                  >
+                    <input
+                      autoComplete="off"
+                      className="query form-control"
+                      id="common-search-form-query-input"
+                      onChange={[Function]}
+                      placeholder="Enter search query..."
+                      spellCheck="false"
+                      style={
+                        Object {
+                          "width": "auto",
+                        }
+                      }
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    className="form-group"
+                    style={
+                      Object {
+                        "marginLeft": 5,
+                      }
+                    }
+                  >
+                    <ForwardRef
+                      bsStyle="default"
+                      className="submit-button"
+                      disabled={false}
+                      type="submit"
+                    >
+                      <Button
+                        bsStyle="default"
+                        className="submit-button"
+                        disabled={false}
+                        type="submit"
+                      >
+                        <StyledComponent
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "iKWoaE",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          type="submit"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="submit-button Button-c9cbmb-0 iKWoaE"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <button
+                              className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                              disabled={false}
+                              type="submit"
+                            >
+                              Filter
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button>
+                    </ForwardRef>
+                  </div>
+                  <div
+                    className="form-group"
+                    style={
+                      Object {
+                        "marginLeft": 5,
+                      }
+                    }
+                  >
+                    <ForwardRef
+                      bsStyle="default"
+                      className="reset-button"
+                      onClick={[Function]}
+                      type="reset"
+                    >
+                      <Button
+                        bsStyle="default"
+                        className="reset-button"
+                        onClick={[Function]}
+                        type="reset"
+                      >
+                        <StyledComponent
+                          bsStyle="default"
+                          className="reset-button"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "iKWoaE",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="reset-button Button-c9cbmb-0 iKWoaE"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <button
+                              className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              Reset
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button>
+                    </ForwardRef>
+                  </div>
+                </form>
+              </div>
+            </SearchForm>
+          </div>
+        </Col>
+      </div>
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
+    >
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          sm={8}
+          smOffset={1}
+        >
+          <div
+            className="col-lg-8 col-sm-8 col-sm-offset-1"
+          >
+            <ExpandableList>
+              <ul
+                className="list"
+              />
+            </ExpandableList>
+          </div>
+        </Col>
+      </div>
+    </Row>
   </div>
-</div>
+</ContentPackSelection>
 `;
 
 exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
-<div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
-    >
-      <h2>
-        General Information
-      </h2>
-      <br />
-      <form
-        className="content-selection-form"
-        id="content-selection-form"
-        onSubmit={[Function]}
-      >
-        <fieldset>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="name"
-                label="Name"
-                maxLength={250}
-                name="name"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value="name"
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Give a descriptive name for this content pack.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="summary"
-            >
-              Summary
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="summary"
-                label="Summary"
-                maxLength={250}
-                name="summary"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value="summary"
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Give a short summary of the content pack.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <span>
-              <textarea
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="description"
-                label="Description"
-                name="description"
-                onChange={[Function]}
-                placeholder=""
-                rows={6}
-                type="textarea"
-                value="description"
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Give a long description of the content pack in markdown.
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="vendor"
-            >
-              Vendor
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="vendor"
-                label="Vendor"
-                maxLength={250}
-                name="vendor"
-                onChange={[Function]}
-                placeholder=""
-                required={true}
-                type="text"
-                value="vendor"
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Required. Who did this content pack and how can he be reached. e.g Name and eMail
-              </span>
-            </span>
-          </div>
-          <div
-            className="form-group"
-          >
-            <label
-              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-              htmlFor="url"
-            >
-              URL
-            </label>
-            <span>
-              <input
-                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                id="url"
-                label="URL"
-                maxLength={250}
-                name="url"
-                onChange={[Function]}
-                placeholder=""
-                type="text"
-                value="http://example.com"
-              />
-              <span
-                className="HelpBlock-i8is92-0 huFHQV help-block"
-              >
-                Where can I find the content pack. e.g. github url
-              </span>
-            </span>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
-    >
-      <h2>
-        Content Pack selection
-      </h2>
-      <span
-        className="HelpBlock-i8is92-0 huFHQV help-block"
-      >
-        You can select between installed entities from the server (
-        <i
-          className="fa fa-server"
-        />
-        ) or entities from the former content pack revision (
-        <i
-          className="fa fa-archive contentPackEntity"
-        />
-        ).
-      </span>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-offset-1"
+<ContentPackSelection
+  contentPack={
+    Object {
+      "description": "description",
+      "entities": Array [],
+      "id": "df2947da-2624-45e4-b210-221cff5bb193",
+      "name": "name",
+      "parameters": Array [],
+      "rev": 1,
+      "summary": "summary",
+      "url": "http://example.com",
+      "v": 1,
+      "vendor": "vendor",
+    }
+  }
+  edit={true}
+  entities={
+    Object {
+      "spaceship": Array [
+        Object {
+          "constraints": Array [],
+          "data": Object {
+            "title": Object {
+              "type": "string",
+              "value": "breq",
+            },
+          },
+          "id": "beef123",
+          "type": Object {
+            "name": "spaceship",
+            "version": "1",
+          },
+          "v": "1",
+        },
+      ],
+    }
+  }
+  onStateChange={[Function]}
+  selectedEntities={Object {}}
+>
+  <div>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
       <div
-        className="search"
-        style={
-          Object {
-            "marginTop": 15,
-          }
-        }
+        className="row"
       >
-        <form
-          className="form-inline"
-          onSubmit={[Function]}
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
         >
           <div
-            className="form-group has-feedback"
+            className="col-lg-8 col-sm-offset-1"
           >
-            <input
-              autoComplete="off"
-              className="query form-control"
-              id="common-search-form-query-input"
-              onChange={[Function]}
-              placeholder="Enter search query..."
-              spellCheck="false"
-              style={
-                Object {
-                  "width": "auto",
-                }
-              }
-              type="text"
-              value=""
-            />
-          </div>
-          <div
-            className="form-group"
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-          >
-            <button
-              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              type="submit"
+            <h2>
+              General Information
+            </h2>
+            <br />
+            <form
+              className="content-selection-form"
+              id="content-selection-form"
+              onSubmit={[Function]}
             >
-              Filter
-            </button>
+              <fieldset>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Give a descriptive name for this content pack."
+                  id="name"
+                  label="Name"
+                  maxLength={250}
+                  name="name"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value="name"
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="name"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="name"
+                            >
+                              Name
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Name"
+                            maxLength={250}
+                            name="name"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value="name"
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Name"
+                              maxLength={250}
+                              name="name"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="name"
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Name"
+                                maxLength={250}
+                                name="name"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="name"
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="name"
+                                  label="Name"
+                                  maxLength={250}
+                                  name="name"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value="name"
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Give a descriptive name for this content pack.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Give a short summary of the content pack."
+                  id="summary"
+                  label="Summary"
+                  maxLength={250}
+                  name="summary"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value="summary"
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="summary"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="summary"
+                            >
+                              Summary
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Summary"
+                            maxLength={250}
+                            name="summary"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value="summary"
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Summary"
+                              maxLength={250}
+                              name="summary"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="summary"
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Summary"
+                                maxLength={250}
+                                name="summary"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="summary"
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="summary"
+                                  label="Summary"
+                                  maxLength={250}
+                                  name="summary"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value="summary"
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Give a short summary of the content pack.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Give a long description of the content pack in markdown."
+                  id="description"
+                  label="Description"
+                  name="description"
+                  onChange={[Function]}
+                  placeholder=""
+                  rows={6}
+                  type="textarea"
+                  value="description"
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="description"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="description"
+                            >
+                              Description
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="textarea"
+                            inputRef={[Function]}
+                            label="Description"
+                            name="description"
+                            onChange={[Function]}
+                            placeholder=""
+                            rows={6}
+                            type="textarea"
+                            value="description"
+                          >
+                            <StyledComponent
+                              componentClass="textarea"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Description"
+                              name="description"
+                              onChange={[Function]}
+                              placeholder=""
+                              rows={6}
+                              type="textarea"
+                              value="description"
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+                                label="Description"
+                                name="description"
+                                onChange={[Function]}
+                                placeholder=""
+                                rows={6}
+                                type="textarea"
+                                value="description"
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="description"
+                                  label="Description"
+                                  name="description"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  rows={6}
+                                  type="textarea"
+                                  value="description"
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Give a long description of the content pack in markdown.
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Required. Who did this content pack and how can he be reached. e.g Name and eMail"
+                  id="vendor"
+                  label="Vendor"
+                  maxLength={250}
+                  name="vendor"
+                  onChange={[Function]}
+                  placeholder=""
+                  required={true}
+                  type="text"
+                  value="vendor"
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="vendor"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="vendor"
+                            >
+                              Vendor
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="Vendor"
+                            maxLength={250}
+                            name="vendor"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            type="text"
+                            value="vendor"
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Vendor"
+                              maxLength={250}
+                              name="vendor"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              type="text"
+                              value="vendor"
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Vendor"
+                                maxLength={250}
+                                name="vendor"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="vendor"
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="vendor"
+                                  label="Vendor"
+                                  maxLength={250}
+                                  name="vendor"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value="vendor"
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+                <Input
+                  addonAfter={null}
+                  bsStyle={null}
+                  buttonAfter={null}
+                  help="Where can I find the content pack. e.g. github url"
+                  id="url"
+                  label="URL"
+                  maxLength={250}
+                  name="url"
+                  onChange={[Function]}
+                  placeholder=""
+                  type="text"
+                  value="http://example.com"
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    controlId="url"
+                    validationState={null}
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                        >
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="url"
+                            >
+                              URL
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="input"
+                            inputRef={[Function]}
+                            label="URL"
+                            maxLength={250}
+                            name="url"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="text"
+                            value="http://example.com"
+                          >
+                            <StyledComponent
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="URL"
+                              maxLength={250}
+                              name="url"
+                              onChange={[Function]}
+                              placeholder=""
+                              type="text"
+                              value="http://example.com"
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="URL"
+                                maxLength={250}
+                                name="url"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value="http://example.com"
+                              >
+                                <input
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="url"
+                                  label="URL"
+                                  maxLength={250}
+                                  name="url"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="text"
+                                  value="http://example.com"
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  Where can I find the content pack. e.g. github url
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </Input>
+              </fieldset>
+            </form>
           </div>
-          <div
-            className="form-group"
-            style={
-              Object {
-                "marginLeft": 5,
-              }
-            }
-          >
-            <button
-              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              onClick={[Function]}
-              type="reset"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
+        </Col>
       </div>
-    </div>
-  </div>
-  <div
-    className="row"
-  >
-    <div
-      className="col-lg-8 col-sm-8 col-sm-offset-1"
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
     >
-      <ul
-        className="list"
+      <div
+        className="row"
       >
-        <li
-          className=""
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
         >
           <div
-            className="listItemContainer"
+            className="col-lg-8 col-sm-offset-1"
           >
-            <label
-              className="checkbox-inline"
-              title=""
-            >
-              <input
-                checked={false}
-                disabled={false}
-                onChange={[Function]}
-                type="checkbox"
-              />
-            </label>
-            <div
-              className="expandBoxContainer"
+            <h2>
+              Content Pack selection
+            </h2>
+            <HelpBlock>
+              <StyledComponent
+                forwardedComponent={
+                  Object {
+                    "$$typeof": Symbol(react.forward_ref),
+                    "attrs": Array [],
+                    "componentStyle": ComponentStyle {
+                      "componentId": "HelpBlock-i8is92-0",
+                      "isStatic": true,
+                      "lastClassName": "huFHQV",
+                      "rules": Array [
+                        "display:block;margin-top:5px;margin-bottom:10px;color:",
+                        "#9f9f9f",
+                        ";",
+                      ],
+                    },
+                    "displayName": "HelpBlock",
+                    "foldedComponentIds": Array [],
+                    "render": [Function],
+                    "styledComponentId": "HelpBlock-i8is92-0",
+                    "target": [Function],
+                    "toString": [Function],
+                    "warnTooManyClasses": [Function],
+                    "withComponent": [Function],
+                  }
+                }
+                forwardedRef={null}
+              >
+                <HelpBlock
+                  bsClass="help-block"
+                  className="HelpBlock-i8is92-0 huFHQV"
+                >
+                  <span
+                    className="HelpBlock-i8is92-0 huFHQV help-block"
+                  >
+                    You can select between installed entities from the server (
+                    <ForwardRef
+                      fixedWidth={false}
+                      inverse={false}
+                      name="server"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-server"
+                      />
+                    </ForwardRef>
+                    ) or entities from the former content pack revision (
+                    <ForwardRef
+                      className="contentPackEntity"
+                      fixedWidth={false}
+                      inverse={false}
+                      name="archive"
+                      pulse={false}
+                      spin={false}
+                    >
+                      <i
+                        className="fa fa-archive contentPackEntity"
+                      />
+                    </ForwardRef>
+                    ).
+                  </span>
+                </HelpBlock>
+              </StyledComponent>
+            </HelpBlock>
+          </div>
+        </Col>
+      </div>
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
+    >
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          smOffset={1}
+        >
+          <div
+            className="col-lg-8 col-sm-offset-1"
+          >
+            <SearchForm
+              buttonLeftMargin={5}
+              id="filter-input"
+              label={null}
+              loadingLabel="Loading..."
+              onQueryChange={[Function]}
+              onReset={[Function]}
+              onSearch={[Function]}
+              placeholder="Enter search query..."
+              query=""
+              queryHelpComponent={null}
+              queryWidth="auto"
+              resetButtonLabel="Reset"
+              searchBsStyle="default"
+              searchButtonLabel="Filter"
+              topMargin={15}
+              useLoadingState={false}
+              wrapperClass="search"
             >
               <div
-                className="fa-stack expandBox"
-                onClick={[Function]}
-                role="button"
-                tabIndex={0}
+                className="search"
+                style={
+                  Object {
+                    "marginTop": 15,
+                  }
+                }
               >
-                <i
-                  className="fa fa-circle-thin fa-stack-1x iconBackground"
-                />
-                <i
-                  className="fa fa-angle-up fa-stack-1x"
-                />
+                <form
+                  className="form-inline"
+                  onSubmit={[Function]}
+                >
+                  <div
+                    className="form-group has-feedback"
+                  >
+                    <input
+                      autoComplete="off"
+                      className="query form-control"
+                      id="common-search-form-query-input"
+                      onChange={[Function]}
+                      placeholder="Enter search query..."
+                      spellCheck="false"
+                      style={
+                        Object {
+                          "width": "auto",
+                        }
+                      }
+                      type="text"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    className="form-group"
+                    style={
+                      Object {
+                        "marginLeft": 5,
+                      }
+                    }
+                  >
+                    <ForwardRef
+                      bsStyle="default"
+                      className="submit-button"
+                      disabled={false}
+                      type="submit"
+                    >
+                      <Button
+                        bsStyle="default"
+                        className="submit-button"
+                        disabled={false}
+                        type="submit"
+                      >
+                        <StyledComponent
+                          bsStyle="default"
+                          className="submit-button"
+                          disabled={false}
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "iKWoaE",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          type="submit"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="submit-button Button-c9cbmb-0 iKWoaE"
+                            disabled={false}
+                            type="submit"
+                          >
+                            <button
+                              className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                              disabled={false}
+                              type="submit"
+                            >
+                              Filter
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button>
+                    </ForwardRef>
+                  </div>
+                  <div
+                    className="form-group"
+                    style={
+                      Object {
+                        "marginLeft": 5,
+                      }
+                    }
+                  >
+                    <ForwardRef
+                      bsStyle="default"
+                      className="reset-button"
+                      onClick={[Function]}
+                      type="reset"
+                    >
+                      <Button
+                        bsStyle="default"
+                        className="reset-button"
+                        onClick={[Function]}
+                        type="reset"
+                      >
+                        <StyledComponent
+                          bsStyle="default"
+                          className="reset-button"
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "SIZES": Array [
+                                "large",
+                                "small",
+                                "xsmall",
+                              ],
+                              "STYLES": Array [
+                                "success",
+                                "warning",
+                                "danger",
+                                "info",
+                                "default",
+                                "primary",
+                                "link",
+                              ],
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "Button-c9cbmb-0",
+                                "isStatic": false,
+                                "lastClassName": "iKWoaE",
+                                "rules": Array [
+                                  [Function],
+                                ],
+                              },
+                              "displayName": "Button",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "Button-c9cbmb-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
+                          }
+                          forwardedRef={null}
+                          onClick={[Function]}
+                          type="reset"
+                        >
+                          <Button
+                            active={false}
+                            block={false}
+                            bsClass="btn"
+                            bsStyle="default"
+                            className="reset-button Button-c9cbmb-0 iKWoaE"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="reset"
+                          >
+                            <button
+                              className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                              disabled={false}
+                              onClick={[Function]}
+                              type="reset"
+                            >
+                              Reset
+                            </button>
+                          </Button>
+                        </StyledComponent>
+                      </Button>
+                    </ForwardRef>
+                  </div>
+                </form>
               </div>
-            </div>
-            <span
-              className="header"
-            >
-              <span
-                onClick={[Function]}
-                role="button"
-                tabIndex={0}
-              >
-                Spaceship
-              </span>
-            </span>
+            </SearchForm>
           </div>
+        </Col>
+      </div>
+    </Row>
+    <Row
+      bsClass="row"
+      componentClass="div"
+    >
+      <div
+        className="row"
+      >
+        <Col
+          bsClass="col"
+          componentClass="div"
+          lg={8}
+          sm={8}
+          smOffset={1}
+        >
           <div
-            className="expandableContent"
-          />
-        </li>
-      </ul>
-    </div>
+            className="col-lg-8 col-sm-8 col-sm-offset-1"
+          >
+            <ExpandableList>
+              <ul
+                className="list"
+              >
+                <ExpandableListItem
+                  checked={false}
+                  expandable={true}
+                  expanded={false}
+                  header="Spaceship"
+                  indetermined={false}
+                  key="spaceship"
+                  onChange={[Function]}
+                  padded={false}
+                  selectable={true}
+                  stayExpanded={false}
+                >
+                  <li
+                    className=""
+                  >
+                    <div
+                      className="listItemContainer"
+                    >
+                      <Checkbox
+                        bsClass="checkbox"
+                        checked={false}
+                        disabled={false}
+                        inline={true}
+                        inputRef={[Function]}
+                        onChange={[Function]}
+                        title=""
+                      >
+                        <label
+                          className="checkbox-inline"
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            onChange={[Function]}
+                            type="checkbox"
+                          />
+                        </label>
+                      </Checkbox>
+                      <div
+                        className="expandBoxContainer"
+                      >
+                        <div
+                          className="fa-stack expandBox"
+                          onClick={[Function]}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <ForwardRef
+                            className="fa-stack-1x iconBackground"
+                            fixedWidth={false}
+                            inverse={false}
+                            name="circle-thin"
+                            pulse={false}
+                            spin={false}
+                          >
+                            <i
+                              className="fa fa-circle-thin fa-stack-1x iconBackground"
+                            />
+                          </ForwardRef>
+                          <ForwardRef
+                            className="fa-stack-1x"
+                            fixedWidth={false}
+                            inverse={false}
+                            name="angle-up"
+                            pulse={false}
+                            spin={false}
+                          >
+                            <i
+                              className="fa fa-angle-up fa-stack-1x"
+                            />
+                          </ForwardRef>
+                        </div>
+                      </div>
+                      <span
+                        className="header"
+                      >
+                        <span
+                          onClick={[Function]}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          Spaceship
+                        </span>
+                      </span>
+                    </div>
+                    <div
+                      className="expandableContent"
+                    />
+                  </li>
+                </ExpandableListItem>
+              </ul>
+            </ExpandableList>
+          </div>
+        </Col>
+      </div>
+    </Row>
   </div>
-</div>
+</ContentPackSelection>
 `;

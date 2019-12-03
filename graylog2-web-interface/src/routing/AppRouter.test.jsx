@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'theme/enzymeWithTheme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import { CombinedProviderMock as MockCombinedProvider, StoreMock as MockStore } from 'helpers/mocking';

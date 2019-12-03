@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import * as Immutable from 'immutable';
 
 import { StoreMock as MockStore } from 'helpers/mocking';

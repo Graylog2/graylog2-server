@@ -1,14 +1,13 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mountWithTheme as mount } from 'theme/enzymeWithTheme';
+import { mount } from 'theme/enzymeWithTheme';
 import 'helpers/mocking/react-dom_mock';
 
 import ColumnPivotConfiguration from './ColumnPivotConfiguration';
 
 describe('<ColumnPivotConfiguraiton />', () => {
   it('should render as expected', () => {
-    const wrapper = renderer.create(<ColumnPivotConfiguration rollup />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ColumnPivotConfiguration rollup />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should change config when clicked on checkbox', () => {

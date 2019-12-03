@@ -4,7 +4,7 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
 <div>
   <span>
     <button
-      class="Button-c9cbmb-0 GLfOY btn btn-success"
+      class="Button-c9cbmb-0 jKsGyd btn btn-success"
       data-testid="user-preferences-button"
       type="button"
     >
