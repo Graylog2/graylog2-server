@@ -192,7 +192,7 @@ exports[`WidgetQueryControls should do something 1`] = `
         </a>
       </div>
       <button
-        class="pull-left search-button-execute Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
+        class="pull-left search-button-execute Button-c9cbmb-0 GLfOY btn btn-success"
         type="submit"
       >
         <i

@@ -72,7 +72,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -84,7 +84,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="text-right col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -318,7 +318,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   }
                 >
                   <button
-                    className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     type="submit"
                   >
@@ -334,7 +334,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   }
                 >
                   <button
-                    className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
@@ -546,7 +546,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -558,7 +558,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="text-right col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -792,7 +792,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   }
                 >
                   <button
-                    className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     type="submit"
                   >
@@ -808,7 +808,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   }
                 >
                   <button
-                    className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
