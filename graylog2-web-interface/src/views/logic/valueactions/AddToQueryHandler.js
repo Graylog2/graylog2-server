@@ -10,7 +10,7 @@ import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalO
 import type { ElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { ActionHandler } from 'views/components/actions/ActionHandler';
 import QueryManipulationHandler from './QueryManipulationHandler';
-import type { GlobalOverride } from '../search/SearchExecutionState';
+import GlobalOverride from '../search/GlobalOverride';
 
 export default class AddToQueryHandler extends QueryManipulationHandler {
   formatTimestampForES = (value: string) => {

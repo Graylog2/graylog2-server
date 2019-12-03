@@ -4,8 +4,8 @@ import moment from 'moment';
 import { isEmpty } from 'lodash';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions } from 'stores/StoreTypes';
 import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';

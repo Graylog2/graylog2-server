@@ -14,7 +14,8 @@ import SearchResult from 'views/logic/SearchResult';
 import SearchActions from 'views/actions/SearchActions';
 import Search from 'views/logic/search/Search';
 import type { CreateSearchResponse, SearchId, SearchExecutionResult } from 'views/actions/SearchActions';
-import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type { MessageListOptions } from 'views/logic/search/GlobalOverride';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import Parameter from 'views/logic/parameters/Parameter';
@@ -118,13 +119,14 @@ export const SearchStore = singletonStore(
       return this._executePromise(executionState, startActionPromise, handleSearchResult);
     },
 
-    reexecuteSearchTypes(searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
+    reexecuteSearchTypes(searchTypes: MessageListOptions, effectiveTimerange?: TimeRange): Promise<SearchExecutionResult> {
       const searchTypeIds = Object.keys(searchTypes);
-      const globalOverride: GlobalOverride = {
-        search_types: searchTypes,
-        keep_search_types: searchTypeIds,
-        timerange: effectiveTimerange,
-      };
+      const globalOverride: GlobalOverride = new GlobalOverride(
+        effectiveTimerange,
+        undefined,
+        searchTypeIds,
+        searchTypes,
+      );
       const executionState = new SearchExecutionState(undefined, globalOverride);
       const handleSearchResult = (searchResult: SearchResult): SearchResult => {
         const updatedSearchTypes = searchResult.getSearchTypesFromResponse(searchTypeIds);
