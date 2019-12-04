@@ -1,0 +1,158 @@
+package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearch;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearchService;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Query;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Search;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchService;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchType;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.AggregationWidget;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.MessagesWidget;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.Position;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomObjectIdProvider;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomUUIDProvider;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.Titles;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.View;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ViewService;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ViewState;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ViewWidget;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ViewWidgetPosition;
+import org.graylog2.migrations.Migration;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.time.ZonedDateTime;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20191203120602_MigrateSavedSearchesToViews.class);
+
+    private final ClusterConfigService clusterConfigService;
+    private final SavedSearchService savedSearchService;
+    private final SearchService searchService;
+    private final ViewService viewService;
+    private final RandomObjectIdProvider randomObjectIdProvider;
+    private final RandomUUIDProvider randomUUIDProvider;
+
+    @Inject
+    public V20191203120602_MigrateSavedSearchesToViews(ClusterConfigService clusterConfigService,
+                                                       SavedSearchService savedSearchService,
+                                                       SearchService searchService,
+                                                       ViewService viewService,
+                                                       RandomObjectIdProvider randomObjectIdProvider,
+                                                       RandomUUIDProvider randomUUIDProvider) {
+        this.clusterConfigService = clusterConfigService;
+        this.savedSearchService = savedSearchService;
+        this.searchService = searchService;
+        this.viewService = viewService;
+        this.randomObjectIdProvider = randomObjectIdProvider;
+        this.randomUUIDProvider = randomUUIDProvider;
+    }
+
+    @Override
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2019-12-03T12:06:02Z");
+    }
+
+    @Override
+    public void upgrade() {
+        if (hasBeenRunSuccessfully()) {
+            LOG.debug("Migration already completed.");
+            return;
+        }
+
+        this.savedSearchService.streamAll()
+                .map(savedSearch -> migrateSavedSearch(savedSearch));
+
+        //writeMigrationCompleted(migrationCompleted);
+    }
+
+    private Map.Entry<View, Search> migrateSavedSearch(SavedSearch savedSearch) {
+        final String histogramId = randomUUIDProvider.get();
+        final String messageListId = randomUUIDProvider.get();
+        final Set<ViewWidget> widgets = ImmutableSet.of(
+                AggregationWidget.create(histogramId),
+                MessagesWidget.create(messageListId, savedSearch.query().fieldsList())
+        );
+        final Map<String, Set<String>> widgetMapping = new HashMap<>(widgets.size());
+
+        final Set<SearchType> searchTypes = widgets.stream()
+                .flatMap(widget -> {
+                    final Set<SearchType> widgetSearchTypes = widget.toSearchTypes(randomUUIDProvider);
+                    widgetMapping.put(widget.id(), widgetSearchTypes.stream().map(SearchType::id).collect(Collectors.toSet()));
+                    return widgetSearchTypes.stream();
+                })
+                .collect(Collectors.toSet());
+        final Query query = Query.create(randomUUIDProvider.get(),
+                savedSearch.query().toTimeRange(),
+                savedSearch.query().query(),
+                searchTypes);
+        final Search newSearch = Search.create(randomObjectIdProvider.get(), Collections.singleton(query), savedSearch.creatorUserId(), savedSearch.createdAt());
+
+        final Titles titles = Titles.ofWidgetTitles(ImmutableMap.of(
+                histogramId, "Message Count",
+                messageListId, "All Messages"
+        ));
+        final Map<String, ViewWidgetPosition> widgetPositions = ImmutableMap.of(
+                histogramId, ViewWidgetPosition.builder()
+                        .col(Position.fromInt(1))
+                        .row(Position.fromInt(1))
+                        .height(Position.fromInt(2))
+                        .width(Position.infinity())
+                        .build(),
+                messageListId, ViewWidgetPosition.builder()
+                        .col(Position.fromInt(1))
+                        .row(Position.fromInt(3))
+                        .height(Position.fromInt(6))
+                        .width(Position.infinity())
+                        .build()
+        );
+        final ViewState viewState = ViewState.create(titles, widgets, widgetMapping, widgetPositions);
+        final View newView = View.create(
+                randomObjectIdProvider.get(),
+                savedSearch.title(),
+                "This Search was migrated automatically from a Saved Search.",
+                "",
+                newSearch.id(),
+                Collections.singletonMap(query.id(), viewState),
+                Optional.of(savedSearch.creatorUserId()),
+                savedSearch.createdAt()
+                );
+
+        return new AbstractMap.SimpleEntry<>(newView, newSearch);
+    }
+
+    private boolean hasBeenRunSuccessfully() {
+        return clusterConfigService.get(MigrationCompleted.class) != null;
+    }
+
+    private void writeMigrationCompleted(MigrationCompleted migrationCompleted) {
+        this.clusterConfigService.write(migrationCompleted);
+    }
+
+    @AutoValue
+    public abstract static class MigrationCompleted {
+        public static final String FIELD_SAVED_SEARCH_IDS = "saved_search_ids";
+
+        @JsonProperty(FIELD_SAVED_SEARCH_IDS)
+        public abstract Set<String> savedSearchIds();
+
+        @JsonCreator
+        public static MigrationCompleted create(@JsonProperty(FIELD_SAVED_SEARCH_IDS) Set<String> savedSearchIds) {
+            return new AutoValue_V20191203120602_MigrateSavedSearchesToViews_MigrationCompleted(savedSearchIds);
+        }
+    }
+}
