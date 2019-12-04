@@ -4,11 +4,12 @@ import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
 
 import teinte from 'theme/teinte';
-import InteractableModal from 'components/common/InteractableModal';
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
 import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
+/* NOTE: common components are cyclical dependencies, so they need to be directly imported */
+import InteractableModal from 'components/common/InteractableModal';
+import Icon from 'components/common/Icon';
 
 const LOCALSTORAGE_ITEM = 'gl-scratchpad';
 const DEFAULT_SCRATCHDATA = '';
@@ -67,7 +68,7 @@ const Scratchpad = () => {
   const textareaRef = useRef();
   const confirmationModalRef = useRef();
   const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
-  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(storage.securitryConfirmed || false);
+  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(storage.securityConfirmed || false);
   const [scratchData, setScratchData] = useState(storage.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState(storage.size || undefined);
   const [copied, setCopied] = useState(false);
@@ -97,7 +98,7 @@ const Scratchpad = () => {
 
   const handleGotIt = () => {
     setSecurityWarningConfirmed(true);
-    writeData({ securitryConfirmed: true });
+    writeData({ securityConfirmed: true });
   };
 
   const openConfirmClear = () => {

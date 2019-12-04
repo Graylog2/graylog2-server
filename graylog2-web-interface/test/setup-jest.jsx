@@ -12,16 +12,14 @@ registerBuiltinStores();
 
 configure({ adapter: new Adapter() });
 
-const originalWarn = console.warn;
+const consoleWarn = console.warn;
 
 console.warn = jest.fn((...args) => {
   if (!args[0] || !args[0].includes('react-async-component-lifecycle-hooks')) {
-    originalWarn(format(...args));
+    consoleWarn(format(...args));
   }
 });
 
 console.error = jest.fn((...args) => {
-  if (!args[0] || !args[0].includes('react-async-component-lifecycle-hooks')) {
-    throw new Error(format(...args));
-  }
+  throw new Error(format(...args));
 });
