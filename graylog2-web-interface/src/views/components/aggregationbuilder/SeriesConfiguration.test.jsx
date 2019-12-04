@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';

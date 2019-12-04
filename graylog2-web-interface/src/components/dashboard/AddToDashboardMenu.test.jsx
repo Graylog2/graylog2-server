@@ -5,7 +5,7 @@ import 'jquery-ui/ui/widget';
 import 'jquery-ui/ui/widgets/mouse';
 import React from 'react';
 import Immutable from 'immutable';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import PermissionsMixin from 'util/PermissionsMixin';

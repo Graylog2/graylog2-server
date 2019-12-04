@@ -6,7 +6,7 @@ import {} from 'jquery-ui/ui/effect';
 import {} from 'jquery-ui/ui/plugin';
 import {} from 'jquery-ui/ui/widget';
 import {} from 'jquery-ui/ui/widgets/mouse';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import MessageTableEntry from 'components/search/MessageTableEntry';
 

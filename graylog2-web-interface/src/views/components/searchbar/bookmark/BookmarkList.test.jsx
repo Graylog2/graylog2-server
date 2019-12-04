@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, cleanup, fireEvent, wait } from 'theme/rtlWithTheme';
+import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 import Routes from 'routing/Routes';
 

@@ -1,7 +1,7 @@
 // @flow strict
 import type { PluginMetadata } from 'views/logic/views/View';
 import * as React from 'react';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import View from 'views/logic/views/View';

@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import 'helpers/mocking/react-dom_mock';

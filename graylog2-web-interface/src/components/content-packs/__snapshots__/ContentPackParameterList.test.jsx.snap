@@ -7,7 +7,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters with r
     Object {
       "description": "",
       "entities": Array [],
-      "id": "48aa18b8-9394-4e5d-a547-632ee693fa2a",
+      "id": "ac02bc30-a805-4437-9e37-4bb1be76d29f",
       "name": "",
       "parameters": Array [],
       "rev": 1,
@@ -304,7 +304,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
     Object {
       "description": "",
       "entities": Array [],
-      "id": "b17a45f7-2695-439a-9f06-1ed97a70c729",
+      "id": "3f75386b-1cec-44d5-95ba-24a85a39ef8a",
       "name": "",
       "parameters": Array [],
       "rev": 1,
@@ -807,7 +807,7 @@ exports[`<ContentPackParameterList /> should render with parameters with readOnl
     Object {
       "description": "",
       "entities": Array [],
-      "id": "94da15e4-1b5c-493e-b800-f47e645ed8c7",
+      "id": "0ab9b51b-2f29-449f-b353-e4e68d01c5b3",
       "name": "",
       "parameters": Array [
         Object {
@@ -1289,7 +1289,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
     Object {
       "description": "",
       "entities": Array [],
-      "id": "8f9da015-9da2-4a35-9fec-64c4d66f8847",
+      "id": "7e11c965-4efa-4ae7-bf7a-2a5fcbbfddc4",
       "name": "",
       "parameters": Array [
         Object {

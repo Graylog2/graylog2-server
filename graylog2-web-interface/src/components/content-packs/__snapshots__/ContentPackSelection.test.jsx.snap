@@ -6,7 +6,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
     Object {
       "description": "",
       "entities": Array [],
-      "id": "29ed3415-3368-401e-819a-2e34bb028591",
+      "id": "45af619b-4580-418b-8943-ef72f26dca11",
       "name": "",
       "parameters": Array [],
       "rev": 1,
@@ -1386,7 +1386,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
     Object {
       "description": "description",
       "entities": Array [],
-      "id": "df2947da-2624-45e4-b210-221cff5bb193",
+      "id": "13ea6c59-9455-48c5-8843-e44ce74cd2af",
       "name": "name",
       "parameters": Array [],
       "rev": 1,

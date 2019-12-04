@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 
 import AppErrorBoundary from './AppErrorBoundary';
 
@@ -87,7 +87,7 @@ describe('AppErrorBoundary', () => {
         message: 'Oh no, a banana peel fell on the party gorilla\'s head!',
         stack: 'This the stack trace.',
       });
-      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in RootFinder (created by WrapperComponent)\n    in ThemeProvider (created by GraylogThemeProvider)\n    in GraylogThemeProvider (created by WrapperComponent)\n    in WrapperComponent' });
+      expect(errorPage).toHaveProp('info', { componentStack: '\n    in ErroneusComponent\n    in AppErrorBoundary (created by WrapperComponent)\n    in RootFinder (created by WrapperComponent)\n    in ThemeProvider (created by WrappingContainer)\n    in WrappingContainer (created by WrapperComponent)\n    in WrapperComponent' });
     });
   });
 

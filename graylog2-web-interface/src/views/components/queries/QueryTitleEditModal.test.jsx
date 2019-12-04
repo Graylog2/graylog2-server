@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, fireEvent, wait } from 'theme/rtlWithTheme';
+import { render, cleanup, fireEvent, wait } from 'wrappedTestingLibrary';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 

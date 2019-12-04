@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'theme/enzymeWithTheme';
+import { mount } from 'wrappedEnzyme';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import WidgetCreationModal from './WidgetCreationModal';
 

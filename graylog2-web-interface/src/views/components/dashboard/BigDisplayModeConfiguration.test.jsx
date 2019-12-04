@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, fireEvent, waitForElement } from 'theme/rtlWithTheme';
+import { render, cleanup, fireEvent, waitForElement } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { toBeDisabled } from '@testing-library/jest-dom';
 
