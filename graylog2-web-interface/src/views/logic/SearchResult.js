@@ -46,7 +46,7 @@ class SearchResult {
       const relatedQuery = this._getQueryBySearchTypeId(searchTypeId);
       return SearchResult._getSearchTypeFromQuery(relatedQuery, searchTypeId);
     });
-    return compact(searchTypes);
+    return SearchResult._filterFailedSearchTypes(searchTypes);
   }
 
   _getQueryBySearchTypeId(searchTypeId) {
@@ -55,6 +55,10 @@ class SearchResult {
 
   static _getSearchTypeFromQuery(query, searchTypeId) {
     return (query && query.search_types) ? query.search_types[searchTypeId] : undefined;
+  }
+
+  static _filterFailedSearchTypes(searchTypes) {
+    return compact(searchTypes);
   }
 }
 
