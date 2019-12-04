@@ -5,9 +5,9 @@ import Navigation from 'components/navigation/Navigation';
 import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
+import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
-import { ScratchpadProvider } from './context/ScratchpadProvider';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';

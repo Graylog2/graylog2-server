@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import styled from 'styled-components';
 
 import { Button } from 'components/graylog';
-import { ScratchpadContext } from 'routing/context/ScratchpadProvider';
+import { ScratchpadContext } from 'providers/ScratchpadProvider';
 
 const Toggle = styled(Button)`
   padding-left: 6px;
