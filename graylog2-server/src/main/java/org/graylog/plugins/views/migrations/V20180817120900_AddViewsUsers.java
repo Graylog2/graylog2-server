@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.migrations;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 
@@ -40,10 +39,10 @@ public class V20180817120900_AddViewsUsers extends Migration {
     @Override
     public void upgrade() {
         helpers.ensureBuiltinRole("Views User", "Allows using views and extended searches (built-in)", ImmutableSet.of(
-                ViewsRestPermissions.VIEW_USE,
-                ViewsRestPermissions.VIEW_CREATE,
-                ViewsRestPermissions.EXTENDEDSEARCH_USE,
-                ViewsRestPermissions.EXTENDEDSEARCH_CREATE
+                LegacyPermissions.VIEW_USE,
+                LegacyPermissions.VIEW_CREATE,
+                LegacyPermissions.EXTENDEDSEARCH_USE,
+                LegacyPermissions.EXTENDEDSEARCH_CREATE
         ));
     }
 }
