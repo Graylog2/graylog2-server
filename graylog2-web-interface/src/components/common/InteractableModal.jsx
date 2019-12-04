@@ -17,7 +17,7 @@ const DEFAULT_POSITION = {
   y: stayOnScreenHeight,
 };
 
-const InteractableWrapper = styled.div`
+const InteractableModalWrapper = styled.div`
   position: fixed;
   top: 0;
   right: 0;
@@ -69,7 +69,7 @@ const DragBars = styled(Icon)`
  * Can be controlled or uncontrolled, using [`react-rnd`](https://github.com/bokuweb/react-rnd) under the hood
  */
 
-const Interactable = ({
+const InteractableModal = ({
   children,
   className,
   minHeight,
@@ -92,7 +92,7 @@ const Interactable = ({
   }, []);
 
   return (
-    <InteractableWrapper className={wrapperClassName}>
+    <InteractableModalWrapper className={wrapperClassName}>
       <StyledRnd default={{ ...position, ...size }}
                  minHeight={minHeight}
                  minWidth={minWidth}
@@ -130,31 +130,31 @@ const Interactable = ({
           {children}
         </Content>
       </StyledRnd>
-    </InteractableWrapper>
+    </InteractableModalWrapper>
   );
 };
 
-Interactable.propTypes = {
+InteractableModal.propTypes = {
   /** className that will be applied to `react-rnd` */
   className: PropTypes.string,
-  /** Content of the Interactable modal */
+  /** Content of the InteractableModal modal */
   children: PropTypes.node.isRequired,
   /** Minimum height that modal can be reduced to */
   minHeight: PropTypes.number,
   /** Minimum width that modal can be reduced to */
   minWidth: PropTypes.number,
-  /** Function that is called when Interactable is closed */
+  /** Function that is called when InteractableModal is closed */
   onClose: PropTypes.func,
-  /** Function that is called when Interactable has finished being dragged */
+  /** Function that is called when InteractableModal has finished being dragged */
   onDrag: PropTypes.func,
-  /** Function that is called when Interactable has finished being resized */
+  /** Function that is called when InteractableModal has finished being resized */
   onResize: PropTypes.func,
-  /** If you want to control Interactable you can pass specific position */
+  /** If you want to control InteractableModal you can pass specific position */
   position: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
   }),
-  /** If you want to control Interactable you can pass specific size */
+  /** If you want to control InteractableModal you can pass specific size */
   size: PropTypes.shape({
     height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -165,7 +165,7 @@ Interactable.propTypes = {
   wrapperClassName: PropTypes.string,
 };
 
-Interactable.defaultProps = {
+InteractableModal.defaultProps = {
   className: undefined,
   minHeight: 250,
   minWidth: 250,
@@ -178,4 +178,4 @@ Interactable.defaultProps = {
   wrapperClassName: undefined,
 };
 
-export default Interactable;
+export default InteractableModal;

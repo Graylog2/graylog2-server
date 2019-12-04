@@ -4,7 +4,7 @@ import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
 
 import teinte from 'theme/teinte';
-import Interactable from 'components/common/Interactable';
+import InteractableModal from 'components/common/InteractableModal';
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
 import { BootstrapModalConfirm } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -137,12 +137,12 @@ const Scratchpad = () => {
   if (!isScratchpadVisible) return null;
 
   return (
-    <Interactable title="Scratchpad"
-                  onClose={() => setScratchpadVisibility(false)}
-                  onDrag={handleDrag}
-                  onResize={handleSize}
-                  size={size}
-                  position={position}>
+    <InteractableModal title="Scratchpad"
+                       onClose={() => setScratchpadVisibility(false)}
+                       onDrag={handleDrag}
+                       onResize={handleSize}
+                       size={size}
+                       position={position}>
       <ContentArea>
         <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
 
@@ -174,7 +174,7 @@ const Scratchpad = () => {
                              onCancel={handleCancelClear}>
            This will clear out your Scratchpad content, do you wish to proceed?
       </BootstrapModalConfirm>
-    </Interactable>
+    </InteractableModal>
   );
 };
 
