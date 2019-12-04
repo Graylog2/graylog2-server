@@ -30,7 +30,7 @@ const App = ({ children, currentUser, location }) => {
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
         <Icon name="arrow-up" />
       </div>
-      <Scratchpad />
+      <Scratchpad loginName={currentUser.username} />
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>

@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
@@ -10,8 +11,9 @@ import { ScratchpadContext } from 'providers/ScratchpadProvider';
 /* NOTE: common components are cyclical dependencies, so they need to be directly imported */
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
+import Store from 'logic/local-storage/Store';
 
-const LOCALSTORAGE_ITEM = 'gl-scratchpad';
+const LOCALSTORAGE_PREFIX = 'gl-scratchpad-';
 const DEFAULT_SCRATCHDATA = '';
 const TEXTAREA_ID = 'scratchpad-text-content';
 
@@ -62,21 +64,22 @@ const Footer = styled.footer`
   padding-bottom: 9px;
 `;
 
-const Scratchpad = () => {
+const Scratchpad = ({ loginName }) => {
   let clipboard;
-  const storage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM)) || {};
+  const localStorageItem = `${LOCALSTORAGE_PREFIX}${loginName}`;
+  const scratchpadStore = Store.get(localStorageItem) || {};
   const textareaRef = useRef();
   const confirmationModalRef = useRef();
   const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
-  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(storage.securityConfirmed || false);
-  const [scratchData, setScratchData] = useState(storage.value || DEFAULT_SCRATCHDATA);
-  const [size, setSize] = useState(storage.size || undefined);
+  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(scratchpadStore.securityConfirmed || false);
+  const [scratchData, setScratchData] = useState(scratchpadStore.value || DEFAULT_SCRATCHDATA);
+  const [size, setSize] = useState(scratchpadStore.size || undefined);
   const [copied, setCopied] = useState(false);
-  const [position, setPosition] = useState(storage.position || undefined);
+  const [position, setPosition] = useState(scratchpadStore.position || undefined);
 
   const writeData = (newData) => {
-    const currentStorage = JSON.parse(localStorage.getItem(LOCALSTORAGE_ITEM));
-    localStorage.setItem(LOCALSTORAGE_ITEM, JSON.stringify({ ...currentStorage, ...newData }));
+    const currentStorage = Store.get(localStorageItem);
+    Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
   const handleChange = () => {
@@ -177,6 +180,10 @@ const Scratchpad = () => {
       </BootstrapModalConfirm>
     </InteractableModal>
   );
+};
+
+Scratchpad.propTypes = {
+  loginName: PropTypes.string.isRequired,
 };
 
 export default Scratchpad;
