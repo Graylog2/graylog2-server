@@ -1,22 +1,22 @@
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 import { opacify, transparentize } from 'polished';
 
-const Popover = styled(BoostrapPopover)((props) => {
-  const { color } = props.theme;
-  const borderColor = transparentize(0.8, color.gray[0]);
+const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
+  const borderColor = transparentize(0.8, theme.color.gray[0]);
 
   return css`
     & {
-      background-color: ${color.global.contentBackground};
+      background-color: ${theme.color.global.contentBackground};
       border-color: ${borderColor};
 
       &.top > .arrow {
         border-top-color: ${opacify(0.05, borderColor)};
 
         &:after {
-          border-top-color: ${color.gray[100]};
+          border-top-color: ${theme.color.gray[100]};
         }
       }
 
@@ -24,7 +24,7 @@ const Popover = styled(BoostrapPopover)((props) => {
         border-right-color: ${opacify(0.05, borderColor)};
 
         &:after {
-          border-right-color: ${color.gray[100]};
+          border-right-color: ${theme.color.gray[100]};
         }
       }
 
@@ -32,7 +32,7 @@ const Popover = styled(BoostrapPopover)((props) => {
         border-bottom-color: ${opacify(0.05, borderColor)};
 
         &:after {
-          border-bottom-color: ${color.gray[100]};
+          border-bottom-color: ${theme.color.gray[100]};
         }
       }
 
@@ -40,15 +40,19 @@ const Popover = styled(BoostrapPopover)((props) => {
         border-left-color: ${opacify(0.05, borderColor)};
 
         &:after {
-          border-left-color: ${color.gray[100]};
+          border-left-color: ${theme.color.gray[100]};
         }
       }
     }
 
     .popover-title {
-      background-color: ${color.gray[90]};
+      background-color: ${theme.color.gray[90]};
     }
   `;
 });
+
+const Popover = (props) => {
+  return <StyledPopover {...props} />;
+};
 
 export default Popover;

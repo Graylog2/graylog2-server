@@ -10,9 +10,12 @@ const navTabsStyles = () => css(({ theme }) => {
 
       > li {
         > a {
+          color: ${borderColor};
+
           &:hover {
             border-color: ${theme.color.gray[90]} ${theme.color.gray[90]} ${borderColor};
             background-color: ${theme.color.gray[90]};
+            color: ${theme.color.variant.info};
           }
         }
 
@@ -24,6 +27,17 @@ const navTabsStyles = () => css(({ theme }) => {
             background-color: ${theme.color.gray[100]};
             border-color: ${borderColor};
             border-bottom-color: transparent;
+          }
+        }
+
+        &.disabled > a {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.color.gray[60]};
+            background-color: ${theme.color.gray[100]};
+            border-color: ${theme.color.gray[100]} ${theme.color.gray[100]} ${borderColor};
+            cursor: not-allowed;
           }
         }
       }

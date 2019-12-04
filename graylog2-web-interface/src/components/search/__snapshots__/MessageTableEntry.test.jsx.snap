@@ -2024,11 +2024,11 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                         <OverlayTrigger
                                           defaultOverlayShown={false}
                                           overlay={
-                                            <ForwardRef(Popover)
+                                            <Popover
                                               id="popover-trigger-hover-focus"
                                             >
                                               This timestamp is rendered in your timezone.
-                                            </ForwardRef(Popover)>
+                                            </Popover>
                                           }
                                           trigger={
                                             Array [
