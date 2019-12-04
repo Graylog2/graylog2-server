@@ -17,6 +17,7 @@
 package org.graylog2.migrations;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.commons.lang3.StringUtils;
@@ -159,7 +160,8 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         @JsonProperty("created_whitelist")
         public abstract String createdWhitelist();
 
-        public static MigrationCompleted create(String createdWhitelist) {
+        @JsonCreator
+        public static MigrationCompleted create(@JsonProperty("created_whitelist") String createdWhitelist) {
             return new AutoValue_V20191129134600_CreateInitialUrlWhitelist_MigrationCompleted(createdWhitelist);
         }
     }
