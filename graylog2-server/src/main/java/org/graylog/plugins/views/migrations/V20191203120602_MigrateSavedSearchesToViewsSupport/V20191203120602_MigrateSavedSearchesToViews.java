@@ -147,8 +147,8 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
         final ViewState viewState = ViewState.create(titles, widgets, widgetMapping, widgetPositions);
         final View newView = View.create(
                 randomObjectIdProvider.get(),
-                savedSearch.title(),
-                "This Search was migrated automatically from a Saved Search.",
+                "Saved Search: " + savedSearch.title(),
+                "This Search was migrated automatically from the \"" + savedSearch.title() + "\".",
                 "",
                 newSearch.id(),
                 Collections.singletonMap(query.id(), viewState),
