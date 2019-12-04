@@ -39,7 +39,7 @@ public abstract class AggregationConfig {
     @JsonProperty(FIELD_ROW_PIVOTS)
     public List<Pivot> rowPivots() {
         return Collections.singletonList(Pivot.timeBuilder()
-                .config(AutoInterval.create())
+                .config(TimeHistogramConfig.create())
                 .field(TIMESTAMP_FIELD)
                 .build());
     }

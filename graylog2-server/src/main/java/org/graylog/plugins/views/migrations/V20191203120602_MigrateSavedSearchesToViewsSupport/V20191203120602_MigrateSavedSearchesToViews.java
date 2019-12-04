@@ -92,13 +92,18 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
 
         final Map<String, String> savedSearchToViewsMap = new HashMap<>();
 
-        this.savedSearchService.streamAll()
+        final Map<View, Search> newViews = this.savedSearchService.streamAll()
                 .map(savedSearch -> {
                     final Map.Entry<View, Search> newView = migrateSavedSearch(savedSearch);
                     savedSearchToViewsMap.put(savedSearch.id(), newView.getKey().id());
                     return newView;
                 })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        newViews.forEach((view, search) -> {
+            viewService.save(view);
+            searchService.save(search);
+        });
 
         final MigrationCompleted migrationCompleted = MigrationCompleted.create(savedSearchToViewsMap);
         writeMigrationCompleted(migrationCompleted);
@@ -148,7 +153,7 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
         final View newView = View.create(
                 randomObjectIdProvider.get(),
                 "Saved Search: " + savedSearch.title(),
-                "This Search was migrated automatically from the \"" + savedSearch.title() + "\".",
+                "This Search was migrated automatically from the \"" + savedSearch.title() + "\" saved search.",
                 "",
                 newSearch.id(),
                 Collections.singletonMap(query.id(), viewState),

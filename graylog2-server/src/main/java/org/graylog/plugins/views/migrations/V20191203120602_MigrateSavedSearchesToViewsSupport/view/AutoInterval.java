@@ -45,10 +45,6 @@ public abstract class AutoInterval implements Interval {
         return AutoInterval.builder().build();
     }
 
-    public static AutoInterval create(Double scaling) {
-        return AutoInterval.builder().scaling(scaling).build();
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder type(String type);
