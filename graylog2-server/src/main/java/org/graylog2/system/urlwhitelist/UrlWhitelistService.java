@@ -30,8 +30,20 @@ public class UrlWhitelistService {
         this.clusterConfigService = clusterConfigService;
     }
 
+    /**
+     * Gets the whitelist by reading from the cluster configuration.
+     *
+     * <p>There should always be a whitelist which is created by an initial migration but if there is none, we return a
+     * whitelist matching all URLs.</p>
+     *
+     * <p> This is  because we can't easily guarantee that migrations are run before other services are started. On a
+     * system that didn't have a whitelist before, we have to add the URLs configured e.g. in lookup table data adapters
+     * to the whitelist by running a migration. If the services start before the migration has run, the configured URLs
+     * have to pass the whitelist though, otherwise the services won't be able to run properly. Once the migration has
+     * run, these URLs will have been added to whitelist and we are fine.</p>
+     */
     public UrlWhitelist get() {
-        return clusterConfigService.getOrDefault(UrlWhitelist.class, UrlWhitelist.create(Collections.emptyList()));
+        return clusterConfigService.getOrDefault(UrlWhitelist.class, createCatchAllDefault());
     }
 
     public void save(UrlWhitelist whitelist) {
@@ -41,6 +53,10 @@ public class UrlWhitelistService {
     // TODO: add some kind of caching so that we don't fetch from db on every whitelist check
     public boolean isWhitelisted(String url) {
         return get().isWhitelisted(url);
+    }
+
+    private UrlWhitelist createCatchAllDefault() {
+        return UrlWhitelist.create(Collections.singletonList(new RegexWhitelistEntry(".*")));
     }
 
 }

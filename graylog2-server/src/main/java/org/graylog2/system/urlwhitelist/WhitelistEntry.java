@@ -61,7 +61,7 @@ public abstract class WhitelistEntry {
         return value;
     }
 
-    abstract boolean isWhitelisted(String url);
+    public abstract boolean isWhitelisted(String url);
 
     @Override
     public boolean equals(Object o) {
@@ -74,5 +74,10 @@ public abstract class WhitelistEntry {
     @Override
     public int hashCode() {
         return Objects.hash(type, value);
+    }
+
+    @Override
+    public String toString() {
+        return "WhitelistEntry{" + "type=" + type + ", value='" + value + '\'' + '}';
     }
 }
