@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Table } from 'components/graylog';
@@ -9,20 +9,37 @@ import Input from 'components/bootstrap/Input';
 
 import ObjectUtils from 'util/ObjectUtils';
 
-class UrlWhiteListConfig extends React.Component {
-  configModal: null;
+type Url = {
+  value: string,
+  type: string,
+};
 
-  constructor(props) {
+type Config = {
+  entries: Array<Url>
+};
+
+type State = {
+  config: Config
+};
+
+type Props = {
+  config: Config,
+  updateConfig: (config: Config) => Promise<void>,
+};
+class UrlWhiteListConfig extends React.Component<Props, State> {
+  configModal: ?BootstrapModalForm;
+
+  inputs = {};
+
+  constructor(props: Props) {
     super(props);
-
-    this.inputs = [];
     const { config } = this.props;
     this.state = {
       config,
     };
   }
 
-  _summary = () => {
+  _summary = (): React.Element<'tr'>[] => {
     const { config: { entries } } = this.props;
     return entries.map((urlConfig, idx) => {
       return (
@@ -43,14 +60,14 @@ class UrlWhiteListConfig extends React.Component {
     this.configModal.close();
   }
 
-  _onInputChange = (event, idx) => {
+  _onInputChange = (event: KeyboardEvent, idx: number) => {
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
     update.entries[idx].value = this.inputs[`ref${idx}`].input.value;
     this._update(update);
   }
 
-  _onUpdateUrl = (type, value) => {
+  _onUpdateUrl = (type: string, value: string) => {
     const { config } = this.state;
     const update = ObjectUtils.clone(config);
     Object.assign(update.entries[update.entries.findIndex(el => el.value === value)] = { value, type });
@@ -65,7 +82,7 @@ class UrlWhiteListConfig extends React.Component {
     });
   }
 
-  _onRemove = (idx) => {
+  _onRemove = (idx: number) => {
     return () => {
       const { config } = this.state;
       const update = ObjectUtils.clone(config);
@@ -74,11 +91,11 @@ class UrlWhiteListConfig extends React.Component {
     };
   }
 
-  _update = (config) => {
+  _update = (config: Config) => {
     this.setState({ config });
   }
 
-  _urlWhiteListForm = () => {
+  _urlWhiteListForm = (): React.Element<'tr'>[] => {
     const { config: { entries } } = this.state;
     const options = [{ value: 'literal', label: 'Literal' }, { value: 'regex', label: 'Regex' }];
     return entries.map((url, idx) => {
@@ -121,7 +138,8 @@ class UrlWhiteListConfig extends React.Component {
     });
   }
 
-  _onAdd = () => {
+  _onAdd = (event: MouseEvent) => {
+    event.preventDefault();
     const { config: { entries } } = this.state;
     const update = ObjectUtils.clone(entries);
     update.push({ value: '' });
@@ -173,7 +191,7 @@ class UrlWhiteListConfig extends React.Component {
               {this._urlWhiteListForm()}
             </tbody>
           </Table>
-          <Button bsSize="xs" onClick={this._onAdd}>Add Url</Button>
+          <Button bsSize="xs" onClick={event => this._onAdd(event)}>Add Url</Button>
         </BootstrapModalForm>
       </div>
     );
