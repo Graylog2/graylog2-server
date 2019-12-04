@@ -91,6 +91,29 @@ const InteractableModal = ({
     setDragHandleClassName(dragHandleRef.current.classList[0]);
   }, []);
 
+  const handleDragStop = (event, newPosition) => {
+    const { x, y, node } = newPosition;
+    const width = parseFloat(node.style.width);
+    const height = parseFloat(node.style.height);
+
+    const tooFarLeft = x < -width;
+    const tooFarRight = x > document.body.offsetWidth + width;
+    const newRight = tooFarRight ? document.body.offsetWidth - width : x;
+    const newX = tooFarLeft ? 0 : newRight;
+
+    const tooFarUp = y < -height;
+    const tooFarDown = y > document.body.offsetHeight + height;
+    const newDown = tooFarDown ? document.body.offsetHeight - height : y;
+    const newY = tooFarUp ? 0 : newDown;
+
+    const setPosition = {
+      x: newX,
+      y: newY,
+    };
+    setDragPosition(setPosition);
+    onDrag(setPosition);
+  };
+
   return (
     <InteractableModalWrapper className={wrapperClassName}>
       <StyledRnd default={{ ...position, ...size }}
@@ -99,14 +122,7 @@ const InteractableModal = ({
                  maxHeight={document.body.offsetHeight}
                  maxWidth={document.body.offsetWidth}
                  dragHandleClassName={dragHandleClassName}
-                 onDragStop={(event, newPosition) => {
-                   const setPosition = {
-                     x: newPosition.x,
-                     y: newPosition.y,
-                   };
-                   setDragPosition(setPosition);
-                   onDrag(setPosition);
-                 }}
+                 onDragStop={handleDragStop}
                  onResizeStop={(event, direction, ref) => {
                    const newSize = {
                      width: ref.style.width,
