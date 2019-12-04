@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.google.common.collect.ImmutableList.of;
-
 @AutoValue
 public abstract class Pivot implements SearchType {
     static final String NAME = "pivot";
@@ -39,33 +37,52 @@ public abstract class Pivot implements SearchType {
     }
 
     @JsonProperty
-    public abstract Optional<String> name();
+    public Optional<String> name() {
+        return Optional.of("chart");
+    }
+
+    @Override
+    public Optional<TimeRange> timerange() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ElasticsearchQueryString> query() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Set<String> streams() {
+        return Collections.emptySet();
+    }
 
     @JsonProperty("row_groups")
     abstract List<Time> rowGroups();
 
     @JsonProperty("column_groups")
-    abstract List<Time> columnGroups();
+    List<Time> columnGroups() {
+        return Collections.emptyList();
+    }
 
     @JsonProperty
     abstract List<SeriesSpec> series();
 
     @JsonProperty
-    abstract List<SortSpec> sort();
+    List<Object> sort() {
+        return Collections.emptyList();
+    }
 
     @JsonProperty
-    abstract boolean rollup();
+    boolean rollup() {
+        return true;
+    }
 
     @Nullable
     @JsonProperty
     Object filter() { return null; }
 
     public static Builder builder() {
-        return new AutoValue_Pivot.Builder()
-                .rowGroups(of())
-                .columnGroups(of())
-                .sort(of())
-                .streams(Collections.emptySet());
+        return new AutoValue_Pivot.Builder();
     }
 
     @AutoValue.Builder
@@ -73,26 +90,9 @@ public abstract class Pivot implements SearchType {
 
         public abstract Builder id(@Nullable String id);
 
-        public abstract Builder name(@Nullable String name);
-
         public abstract Builder rowGroups(@Nullable List<Time> rowGroups);
 
-        public abstract Builder columnGroups(@Nullable List<Time> columnGroups);
-
         public abstract Builder series(List<SeriesSpec> series);
-
-        public abstract Builder sort(List<SortSpec> sort);
-
-        public abstract Builder rollup(boolean rollup);
-
-        public abstract Builder timerange(@Nullable TimeRange timerange);
-
-        public abstract Builder query(@Nullable ElasticsearchQueryString query);
-        public Builder query(String query) {
-            return query(ElasticsearchQueryString.create(query));
-        }
-
-        public abstract Builder streams(Set<String> streams);
 
         public abstract Pivot build();
     }

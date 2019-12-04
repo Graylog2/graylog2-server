@@ -27,6 +27,9 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Pivot.Builder;
+import static org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Pivot.builder;
+
 @AutoValue
 @WithBeanGetter
 public abstract class AggregationWidget implements ViewWidget {
@@ -56,7 +59,7 @@ public abstract class AggregationWidget implements ViewWidget {
 
     @JsonProperty(FIELD_TIMERANGE)
     @Nullable
-    TimeRange timerange() {
+    private TimeRange timerange() {
         return null;
     }
 
@@ -80,17 +83,10 @@ public abstract class AggregationWidget implements ViewWidget {
 
     @JsonIgnore
     public Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider) {
-        final org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Pivot.Builder chartBuilder = org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Pivot.builder()
+        final Builder chartBuilder = builder()
                 .id(randomUUIDProvider.get())
-                .name("chart")
-                .query(query())
-                .streams(streams())
-                .timerange(timerange())
-                .rollup(config().rollup())
                 .rowGroups(config().rowPivots().stream().map(Pivot::toBucketSpec).collect(Collectors.toList()))
-                .columnGroups(config().columnPivots().stream().map(Pivot::toBucketSpec).collect(Collectors.toList()))
-                .series(config().series().stream().map(Series::toSeriesSpec).collect(Collectors.toList()))
-                .sort(Collections.emptyList());
+                .series(config().series().stream().map(Series::toSeriesSpec).collect(Collectors.toList()));
 
         return Collections.singleton(chartBuilder.build());
     }
