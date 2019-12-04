@@ -26,6 +26,8 @@ import java.util.List;
 @AutoValue
 public abstract class AggregationConfig {
     public static final String NAME = "aggregation";
+    private static final String TIMESTAMP_FIELD = "timestamp";
+
     static final String FIELD_ROW_PIVOTS = "row_pivots";
     static final String FIELD_COLUMN_PIVOTS = "column_pivots";
     static final String FIELD_SERIES = "series";
@@ -36,11 +38,14 @@ public abstract class AggregationConfig {
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public List<Pivot> rowPivots() {
-        return Collections.singletonList(Pivot.timeBuilder().build());
+        return Collections.singletonList(Pivot.timeBuilder()
+                .config(AutoInterval.create())
+                .field(TIMESTAMP_FIELD)
+                .build());
     }
 
     @JsonProperty(FIELD_COLUMN_PIVOTS)
-    public List<Pivot> columnPivots() {
+    List<Pivot> columnPivots() {
         return Collections.emptyList();
     }
 

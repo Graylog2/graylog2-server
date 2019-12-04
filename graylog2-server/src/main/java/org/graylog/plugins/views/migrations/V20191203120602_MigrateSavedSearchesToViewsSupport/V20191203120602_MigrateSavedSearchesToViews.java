@@ -74,10 +74,18 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
             return;
         }
 
-        this.savedSearchService.streamAll()
-                .map(savedSearch -> migrateSavedSearch(savedSearch));
+        final Map<String, String> savedSearchToViewsMap = new HashMap<>();
 
-        //writeMigrationCompleted(migrationCompleted);
+        this.savedSearchService.streamAll()
+                .map(savedSearch -> {
+                    final Map.Entry<View, Search> newView = migrateSavedSearch(savedSearch);
+                    savedSearchToViewsMap.put(savedSearch.id(), newView.getKey().id());
+                    return newView;
+                })
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        final MigrationCompleted migrationCompleted = MigrationCompleted.create(savedSearchToViewsMap);
+        writeMigrationCompleted(migrationCompleted);
     }
 
     private Map.Entry<View, Search> migrateSavedSearch(SavedSearch savedSearch) {
@@ -130,7 +138,7 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
                 Collections.singletonMap(query.id(), viewState),
                 Optional.of(savedSearch.creatorUserId()),
                 savedSearch.createdAt()
-                );
+        );
 
         return new AbstractMap.SimpleEntry<>(newView, newSearch);
     }
@@ -145,13 +153,13 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
 
     @AutoValue
     public abstract static class MigrationCompleted {
-        public static final String FIELD_SAVED_SEARCH_IDS = "saved_search_ids";
+        static final String FIELD_SAVED_SEARCH_IDS = "saved_search_ids";
 
         @JsonProperty(FIELD_SAVED_SEARCH_IDS)
-        public abstract Set<String> savedSearchIds();
+        public abstract Map<String, String> savedSearchIds();
 
         @JsonCreator
-        public static MigrationCompleted create(@JsonProperty(FIELD_SAVED_SEARCH_IDS) Set<String> savedSearchIds) {
+        static MigrationCompleted create(@JsonProperty(FIELD_SAVED_SEARCH_IDS) Map<String, String> savedSearchIds) {
             return new AutoValue_V20191203120602_MigrateSavedSearchesToViews_MigrationCompleted(savedSearchIds);
         }
     }

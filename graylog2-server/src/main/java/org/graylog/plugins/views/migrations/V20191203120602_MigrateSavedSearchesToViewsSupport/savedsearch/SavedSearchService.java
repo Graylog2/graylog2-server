@@ -16,7 +16,7 @@ public class SavedSearchService {
     private final JacksonDBCollection<SavedSearch, ObjectId> db;
 
     @Inject
-    SavedSearchService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
+    public SavedSearchService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 SavedSearch.class,
                 ObjectId.class,
@@ -25,7 +25,7 @@ public class SavedSearchService {
 
     public Stream<SavedSearch> streamAll() {
         final DBCursor<SavedSearch> cursor = db.find(DBQuery.empty());
-        return Streams.stream((Iterable<SavedSearch>) cursor).onClose(cursor::close);
+        return Streams.stream(cursor.iterator()).onClose(cursor::close);
     }
 }
 

@@ -34,7 +34,7 @@ public abstract class View {
     @Id
     @Nullable
     @JsonProperty(FIELD_ID)
-    abstract String id();
+    public abstract String id();
 
     @JsonProperty(FIELD_TYPE)
     String type() {

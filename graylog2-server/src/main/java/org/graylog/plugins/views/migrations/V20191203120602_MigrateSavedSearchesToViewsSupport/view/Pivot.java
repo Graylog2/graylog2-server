@@ -38,21 +38,21 @@ public abstract class Pivot {
     }
 
     @JsonProperty(FIELD_CONFIG)
-    public abstract TimeHistogramConfig config();
+    public abstract AutoInterval config();
 
     public static Builder timeBuilder() {
         return new AutoValue_Pivot.Builder();
     }
 
     public Time toBucketSpec() {
-        return Time.create(field(), config().interval().toBucketInterval());
+        return Time.create(field(), config().toBucketInterval());
     }
 
     @AutoValue.Builder
     public static abstract class Builder {
         public abstract Builder field(String field);
 
-        public abstract Builder config(TimeHistogramConfig config);
+        public abstract Builder config(AutoInterval config);
 
         public abstract Pivot build();
     }
