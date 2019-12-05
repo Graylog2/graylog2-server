@@ -95,15 +95,23 @@ const InteractableModal = ({
     const { x, y, node } = newPosition;
     const width = parseFloat(node.style.width);
     const height = parseFloat(node.style.height);
+    const bodyWidth = document.body.offsetWidth;
+    const bodyHeight = document.body.offsetHeight;
+    const boundingBox = {
+      top: 0,
+      right: bodyWidth - width,
+      bottom: bodyHeight - height,
+      left: 0,
+    };
 
-    const tooFarLeft = x < -width;
-    const tooFarRight = x > document.body.offsetWidth + width;
-    const newRight = tooFarRight ? document.body.offsetWidth - width : x;
+    const tooFarLeft = x < boundingBox.left;
+    const tooFarRight = x > boundingBox.right;
+    const newRight = tooFarRight ? bodyWidth - width : x;
     const newX = tooFarLeft ? 0 : newRight;
 
-    const tooFarUp = y < -height;
-    const tooFarDown = y > document.body.offsetHeight + height;
-    const newDown = tooFarDown ? document.body.offsetHeight - height : y;
+    const tooFarUp = y < boundingBox.top;
+    const tooFarDown = y > boundingBox.bottom;
+    const newDown = tooFarDown ? bodyHeight - height : y;
     const newY = tooFarUp ? 0 : newDown;
 
     const setPosition = {
