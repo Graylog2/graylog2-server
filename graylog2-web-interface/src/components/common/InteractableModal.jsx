@@ -183,8 +183,8 @@ InteractableModal.propTypes = {
 
 InteractableModal.defaultProps = {
   className: undefined,
-  minHeight: 250,
-  minWidth: 250,
+  minHeight: 350,
+  minWidth: 350,
   onClose: () => {},
   onDrag: () => {},
   onResize: () => {},
