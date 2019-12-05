@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.NonImplementedWidget;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -45,6 +46,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -166,6 +168,63 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_dashboard-expected_views.json"), false);
         JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_dashboard-expected_searches.json"), false);
+    }
+
+    @Test
+    @MongoDBFixtures("sample_dashboard_with_unknown_widget.json")
+    public void migrateSampleDashboardWithUnknownWidget() {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.dashboardToViewMigrationIds())
+                .containsAllEntriesOf(Collections.singletonMap("5c7fc3f9f38ed741ac154697", "5de0e98900002a0017000002"));
+        assertThat(migrationCompleted.widgetMigrationIds()).containsAllEntriesOf(
+                ImmutableMap.<String, Set<String>>builder()
+                        .put("05b03c7b-fe23-4789-a1c8-a38a583d3ba6", ImmutableSet.of("0000016e-b690-4272-0000-016eb690426f"))
+                        .put("10c1b3f9-6b34-4b34-9457-892d12b84151", ImmutableSet.of("0000016e-b690-4275-0000-016eb690426f"))
+                        .put("2afb1838-24ee-489f-929f-ef7d47485021", ImmutableSet.of("0000016e-b690-4276-0000-016eb690426f"))
+                        .put("40c9cf4e-0956-4dc1-9ccd-83868fa83277", ImmutableSet.of("0000016e-b690-4270-0000-016eb690426f"))
+                        .put("4a192616-51d3-474e-9e18-a680f2577769", ImmutableSet.of("0000016e-b690-427b-0000-016eb690426f"))
+                        .put("5020d62d-24a0-4b0c-8819-78e668cc2428", ImmutableSet.of("5020d62d-24a0-4b0c-8819-78e668cc2428"))
+                        .put("6f2cc355-bcbb-4b3f-be01-bfba299aa51a", ImmutableSet.of("0000016e-b690-4273-0000-016eb690426f", "0000016e-b690-4274-0000-016eb690426f"))
+                        .put("76b7f7e1-76ac-486b-894b-bc31bf4808f1", ImmutableSet.of("0000016e-b690-4277-0000-016eb690426f"))
+                        .put("91b37752-e3a8-4274-910f-3d66d19f1028", ImmutableSet.of("0000016e-b690-427a-0000-016eb690426f"))
+                        .put("9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3", ImmutableSet.of("0000016e-b690-4279-0000-016eb690426f"))
+                        .put("a8eadf94-6494-4271-8c0e-3c8d08e65623", ImmutableSet.of("0000016e-b690-426f-0000-016eb690426f"))
+                        .put("d9be20a1-82d7-427b-8a2d-c7ea9cd114de", ImmutableSet.of("0000016e-b690-427d-0000-016eb690426f"))
+                        .put("da111daa-0d0a-47b9-98ed-8b8aa8a4f575", ImmutableSet.of("0000016e-b690-4278-0000-016eb690426f"))
+                        .put("e9efdfaf-f7be-47ca-97fe-871c05a24d3c", ImmutableSet.of("0000016e-b690-4271-0000-016eb690426f"))
+                        .put("f6e9d960-9cc8-4d16-b3c8-770501b2709f", ImmutableSet.of("0000016e-b690-427c-0000-016eb690426f"))
+                        .build()
+        );
+
+        final ArgumentCaptor<View> viewCaptor = ArgumentCaptor.forClass(View.class);
+        verify(viewService, times(1)).save(viewCaptor.capture());
+        final View view = viewCaptor.getValue();
+        final Optional<ViewWidget> nonImplementedWidget = view.state().get("0000016e-b690-428f-0000-016eb690426f").widgets()
+                .stream()
+                .filter(widget -> widget instanceof NonImplementedWidget)
+                .findFirst();
+        assertThat(nonImplementedWidget).isPresent();
+        assertThat(nonImplementedWidget.get()).isEqualTo(NonImplementedWidget.create(
+                "5020d62d-24a0-4b0c-8819-78e668cc2428",
+                "TOTALLY_UNKNOWN_WIDGET",
+                ImmutableMap.<String, Object>builder()
+                        .put("valuetype", "total")
+                        .put("renderer", "line")
+                        .put("interpolation", "linear")
+                        .put("timerange", ImmutableMap.<String, Object>of(
+                                "type", "relative",
+                                "range", 28800
+                        ))
+                        .put("rangeType", "relative")
+                        .put("field", "nf_bytes")
+                        .put("query", "")
+                        .put("interval", "minute")
+                        .put("relative", 28800)
+                        .build()
+                )
+        );
     }
 
     @Test
