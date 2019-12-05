@@ -45,7 +45,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 
   return (
     <ScrollToHint value={query.query_string || ''}>
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Row className="content">
         <Col md={12}>
           <form method="GET" onSubmit={submitForm}>
             <Row className="no-bm">
