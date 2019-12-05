@@ -39,10 +39,10 @@ public class V20180817120900_AddViewsUsers extends Migration {
     @Override
     public void upgrade() {
         helpers.ensureBuiltinRole("Views User", "Allows using views and extended searches (built-in)", ImmutableSet.of(
-                LegacyPermissions.VIEW_USE,
-                LegacyPermissions.VIEW_CREATE,
-                LegacyPermissions.EXTENDEDSEARCH_USE,
-                LegacyPermissions.EXTENDEDSEARCH_CREATE
+                LegacyViewsPermissions.VIEW_USE,
+                LegacyViewsPermissions.VIEW_CREATE,
+                LegacyViewsPermissions.EXTENDEDSEARCH_USE,
+                LegacyViewsPermissions.EXTENDEDSEARCH_CREATE
         ));
     }
 }
