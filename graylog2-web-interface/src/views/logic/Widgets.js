@@ -13,9 +13,15 @@ import FieldType from './fieldtypes/FieldType';
 
 const widgetsKey = 'enterpriseWidgets';
 
+const _findWidgetDefinition = type => PluginStore.exports(widgetsKey)
+  .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+
 export function widgetDefinition(type) {
-  return PluginStore.exports(widgetsKey)
-    .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+  const typeDefinition = _findWidgetDefinition(type);
+  if (typeDefinition) {
+    return typeDefinition;
+  }
+  return _findWidgetDefinition('default');
 }
 
 export const resultHistogram = (id = uuid()) => AggregationWidget.builder()

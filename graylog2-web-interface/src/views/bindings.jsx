@@ -89,6 +89,7 @@ import LineVisualizationConfiguration from './components/aggregationbuilder/Line
 import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
+import UnknownWidget from './components/widgets/UnknownWidget';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -170,6 +171,11 @@ export default {
         }
         return 'Untitled Aggregation';
       },
+    },
+    {
+      type: 'default',
+      visualizationComponent: UnknownWidget,
+      editComponent: UnknownWidget,
     },
   ],
   searchTypes: [

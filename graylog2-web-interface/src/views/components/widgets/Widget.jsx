@@ -24,6 +24,11 @@ import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
+import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { TimeRange } from 'views/logic/queries/Query';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -63,6 +68,24 @@ type State = {
   loading: boolean;
   oldConfig?: WidgetConfig,
   showCopyToDashboard: boolean,
+};
+
+export type Result = {
+  total: number,
+  rows: Rows,
+  effective_timerange: TimeRange,
+};
+
+export type OnVisualizationConfigChange = (VisualizationConfig) => void;
+
+export type WidgetProps = {
+  config: AggregationWidgetConfig,
+  data: { [string]: Result },
+  editing?: boolean,
+  toggleEdit: () => void,
+  fields: FieldTypeMappingsList,
+  onVisualizationConfigChange: OnVisualizationConfigChange,
+  type: string,
 };
 
 const _visualizationForType = (type) => {
@@ -224,6 +247,7 @@ class Widget extends React.Component<Props, State> {
                       width={width}
                       filter={filter}
                       setLoadingState={this._setLoadingState}
+                      type={widget.type}
                       toggleEdit={this._onToggleEdit} />
       );
     }
@@ -249,8 +273,9 @@ class Widget extends React.Component<Props, State> {
                             editing={editing} />
               <EditComponent config={config}
                              fields={fields}
-                             editting={editing}
+                             editing={editing}
                              id={id}
+                             type={widget.type}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
                 <WidgetErrorBoundary>
 
