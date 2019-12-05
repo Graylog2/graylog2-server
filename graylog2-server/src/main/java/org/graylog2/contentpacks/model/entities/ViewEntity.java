@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize
+@JsonDeserialize(builder = ViewEntity.Builder.class)
 @WithBeanGetter
 public abstract class ViewEntity {
     public enum Type {
