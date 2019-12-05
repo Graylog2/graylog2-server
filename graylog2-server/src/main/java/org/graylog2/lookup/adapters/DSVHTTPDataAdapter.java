@@ -30,6 +30,8 @@ import okhttp3.HttpUrl;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.adapters.dsvhttp.DSVParser;
 import org.graylog2.lookup.adapters.dsvhttp.HTTPFileRetriever;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -61,15 +63,18 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     private final AtomicReference<Map<String, String>> lookupRef = new AtomicReference<>(Collections.emptyMap());
     private final DSVParser dsvParser;
     private final UrlWhitelistService whitelistService;
+    private final NotificationService notificationService;
 
     @Inject
     public DSVHTTPDataAdapter(@Assisted("id") String id, @Assisted("name") String name,
-                              @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
-                              HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService) {
+            @Assisted LookupDataAdapterConfiguration config, MetricRegistry metricRegistry,
+            HTTPFileRetriever httpFileRetriever, UrlWhitelistService whitelistService,
+            NotificationService notificationService) {
         super(id, name, config, metricRegistry);
         this.config = (DSVHTTPDataAdapter.Config) config;
         this.httpFileRetriever = httpFileRetriever;
         this.whitelistService = whitelistService;
+        this.notificationService = notificationService;
         this.dsvParser = new DSVParser(
                 this.config.ignorechar(),
                 this.config.lineSeparator(),
@@ -92,6 +97,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
         if (!whitelistService.isWhitelisted(config.url())) {
+            publishSystemNotificationForWhitelistFailure();
             throw new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted.");
         }
 
@@ -109,6 +115,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
         if (!whitelistService.isWhitelisted(config.url())) {
             setError(new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted."));
+            publishSystemNotificationForWhitelistFailure();
             return;
         }
 
@@ -317,5 +324,18 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         UrlNotWhitelistedException(String message) {
             super(message);
         }
+    }
+
+    private void publishSystemNotificationForWhitelistFailure() {
+        final String title = "URL not whitelisted.";
+        final String description =
+                "A \"DSV File from HTTP\" lookup adapter is trying to access a URL which is not whitelisted. Please " +
+                        "check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.url() +"\"]";
+        final Notification notification = notificationService.buildNow()
+                .addType(Notification.Type.GENERIC)
+                .addSeverity(Notification.Severity.NORMAL)
+                .addDetail("title", title)
+                .addDetail("description", description);
+        notificationService.publishIfFirst(notification);
     }
 }

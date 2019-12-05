@@ -33,6 +33,8 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
@@ -59,13 +61,16 @@ public class HTTPEventNotification implements EventNotification {
     private final ObjectMapper objectMapper;
     private final OkHttpClient httpClient;
     private final UrlWhitelistService whitelistService;
+    private final NotificationService notificationService;
 
     @Inject
-    public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper, final OkHttpClient httpClient, UrlWhitelistService whitelistService) {
+    public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper, final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+            NotificationService notificationService) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
         this.whitelistService = whitelistService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -78,12 +83,14 @@ public class HTTPEventNotification implements EventNotification {
                     "Malformed URL: <" + config.url() + "> in notification <" + ctx.notificationId() + ">");
         }
 
+        ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
+        final EventNotificationModelData model = getModel(ctx, backlog);
+
         if (!whitelistService.isWhitelisted(config.url())) {
+            publishSystemNotificationForWhitelistFailure(config.url(), model.eventDefinitionTitle());
             throw new TemporaryEventNotificationException("URL <" + config.url() + "> is not whitelisted.");
         }
 
-        ImmutableList<MessageSummary> backlog = notificationCallbackService.getBacklogForEvent(ctx);
-        final EventNotificationModelData model = getModel(ctx, backlog);
         final byte[] body;
         try {
             body = objectMapper.writeValueAsBytes(model);
@@ -123,5 +130,21 @@ public class HTTPEventNotification implements EventNotification {
                 .event(ctx.event())
                 .backlog(backlog)
                 .build();
+    }
+
+    private void publishSystemNotificationForWhitelistFailure(String url, String eventNotificationTitle) {
+        // This method is synchronized to reduce the chance of emitting multiple notifications at the same time
+        synchronized (HTTPEventNotification.class) {
+            final String title = "URL not whitelisted.";
+            final String description = "The alert notification \"" + eventNotificationTitle +
+                    "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
+                    url + "\"]";
+            final Notification notification = notificationService.buildNow()
+                    .addType(Notification.Type.GENERIC)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("title", title)
+                    .addDetail("description", description);
+            notificationService.publishIfFirst(notification);
+        }
     }
 }
