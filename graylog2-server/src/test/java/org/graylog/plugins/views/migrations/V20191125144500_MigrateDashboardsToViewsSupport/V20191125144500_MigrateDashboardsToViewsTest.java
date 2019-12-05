@@ -33,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -98,7 +97,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.dashboardToViewMigrationIds()).isEmpty();
+        assertThat(migrationCompleted.migratedDashboardIds()).isEmpty();
         assertThat(migrationCompleted.widgetMigrationIds()).isEmpty();
     }
 
@@ -108,8 +107,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.dashboardToViewMigrationIds())
-                .containsAllEntriesOf(Collections.singletonMap("5c7fc3f9f38ed741ac154697", "5de0e98900002a0017000002"));
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5c7fc3f9f38ed741ac154697");
         assertThat(migrationCompleted.widgetMigrationIds()).containsAllEntriesOf(
                 ImmutableMap.<String, Set<String>>builder()
                         .put("05b03c7b-fe23-4789-a1c8-a38a583d3ba6", ImmutableSet.of("0000016e-b690-4273-0000-016eb690426f"))
@@ -137,13 +135,14 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.dashboardToViewMigrationIds())
-                .containsAllEntriesOf(ImmutableMap.of(
-                        "5ddf8ed5b2d44b2e04472992", "5de0e98900002a0017000002",
-                        "5ddf8ed6b2d44b2e044729a2", "5de0e98900002a0017000004",
-                        "5ddf8ed7b2d44b2e044729b1", "5de0e98900002a0017000006",
-                        "5ddf8ed8b2d44b2e044729d2", "5de0e98900002a0017000008",
-                        "5ddf8ed8b2d44b2e044729d8", "5de0e98900002a001700000a"));
+        assertThat(migrationCompleted.migratedDashboardIds())
+                .containsExactlyInAnyOrder(
+                        "5ddf8ed5b2d44b2e04472992",
+                        "5ddf8ed6b2d44b2e044729a2",
+                        "5ddf8ed7b2d44b2e044729b1",
+                        "5ddf8ed8b2d44b2e044729d2",
+                        "5ddf8ed8b2d44b2e044729d8"
+                );
     }
 
     private MigrationCompleted captureMigrationCompleted() {
