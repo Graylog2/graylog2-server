@@ -18,6 +18,8 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
@@ -31,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
+import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -51,11 +54,14 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
 
     private final ObjectMapper objectMapper;
     private final ViewService viewService;
+    private final SearchDbService searchDbService;
 
     @Inject
     public ViewFacade(ObjectMapper objectMapper,
+                      SearchDbService searchDbService,
                       ViewService viewService) {
         this.objectMapper = objectMapper;
+        this.searchDbService = searchDbService;
         this.viewService = viewService;
     }
 
@@ -78,12 +84,18 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
            }
            viewStateMap.put(entry.getKey(), viewStateBuilder.build());
         }
+
+        SearchEntity searchEntity = exportSearch(view.searchId()).orElseThrow(
+                () -> new IllegalArgumentException("View has no valid search")
+        );
+
         final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
                 .type(view.type())
                 .title(ValueReference.of(view.title()))
                 .summary(ValueReference.of(view.summary()))
                 .description(ValueReference.of(view.description()))
                 .state(viewStateMap)
+                .search(searchEntity)
                 .requires(view.requires())
                 .properties(view.properties())
                 .createdAt(view.createdAt());
@@ -100,6 +112,23 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
                 .type(ModelTypes.VIEW_V1)
                 .data(data)
                 .build();
+    }
+
+    private Optional<SearchEntity> exportSearch(String searchId) {
+        final Optional<Search> optionalSearch = searchDbService.get(searchId);
+        if (!optionalSearch.isPresent()) {
+            return Optional.empty();
+        }
+        final Search search = optionalSearch.get();
+        final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
+                .queries(search.queries())
+                .parameters(search.parameters())
+                .requires(search.requires())
+                .createdAt(search.createdAt());
+        if (search.owner().isPresent()) {
+            searchEntityBuilder.owner(search.owner().get());
+        }
+        return Optional.of(searchEntityBuilder.build());
     }
 
     @Override
@@ -149,8 +178,10 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
             viewStateMap.put(entry.getKey(), viewStateDTO);
         }
 
+        final Search search = decodeSearch(viewEntity.search());
         final ViewDTO.Builder viewBuilder = ViewDTO.builder()
                 .title(viewEntity.title().asString(parameters))
+                .searchId(search.id())
                 .summary(viewEntity.summary().asString(parameters))
                 .description(viewEntity.description().asString(parameters))
                 .type(viewEntity.dtoType())
@@ -161,8 +192,20 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
         if (viewEntity.owner().isPresent()) {
             viewBuilder.owner(viewEntity.owner().get());
         }
-        final ViewDTO peristedView = viewService.save(viewBuilder.build());
-        return NativeEntity.create(entityV1.id(), peristedView.id(), TYPE_V1, peristedView.title(), peristedView);
+        final ViewDTO persistedView = viewService.save(viewBuilder.build());
+        return NativeEntity.create(entityV1.id(), persistedView.id(), TYPE_V1, persistedView.title(), persistedView);
+    }
+
+    private Search decodeSearch(SearchEntity entity) {
+        final Search.Builder searchBuilder = Search.builder()
+                .queries(entity.queries())
+                .parameters(entity.parameters())
+                .requires(entity.requires())
+                .createdAt(entity.createdAt());
+        if (entity.owner().isPresent()) {
+            searchBuilder.owner(entity.owner().get());
+        }
+        return searchDbService.save(searchBuilder.build());
     }
 
     @Override

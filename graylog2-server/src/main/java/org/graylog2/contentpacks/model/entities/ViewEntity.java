@@ -11,8 +11,6 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -34,7 +32,7 @@ public abstract class ViewEntity {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_SUMMARY = "summary";
     public static final String FIELD_DESCRIPTION = "description";
-    public static final String FIELD_SEARCH_ID = "search_id";
+    public static final String FIELD_SEARCH = "search";
     public static final String FIELD_PROPERTIES = "properties";
     public static final String FIELD_REQUIRES = "requires";
     public static final String FIELD_STATE = "state";
@@ -56,9 +54,8 @@ public abstract class ViewEntity {
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract ValueReference description();
 
-    // TODO: Must contain the search itself
-    @JsonProperty(FIELD_SEARCH_ID)
-    public abstract String searchId();
+    @JsonProperty(FIELD_SEARCH)
+    public abstract SearchEntity search();
 
     @JsonProperty(FIELD_PROPERTIES)
     public abstract ImmutableSet<String> properties();
@@ -117,9 +114,8 @@ public abstract class ViewEntity {
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(ValueReference description);
 
-        // TODO must contain whole search
-        @JsonProperty(FIELD_SEARCH_ID)
-        public abstract Builder searchId(String searchId);
+        @JsonProperty(FIELD_SEARCH)
+        public abstract Builder search(SearchEntity search);
 
         abstract ImmutableSet.Builder<String> propertiesBuilder();
 
