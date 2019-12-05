@@ -1,0 +1,247 @@
+[ {
+  "id" : "5de0e98900002a0017000006",
+  "title" : "Saved Search: Can I give you a keyword?",
+  "summary" : "This Search was migrated automatically from the \"Can I give you a keyword?\" saved search.",
+  "description" : "",
+  "search_id" : "5de0e98900002a0017000005",
+  "state" : {
+    "0000016e-b690-427d-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-4279-0000-016eb690426f" : "Message Count",
+          "0000016e-b690-427a-0000-016eb690426f" : "All Messages"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-4279-0000-016eb690426f",
+        "config" : {
+          "sort" : [ ],
+          "series" : [ {
+            "function" : "count()",
+            "config" : { }
+          } ],
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            },
+            "type" : "time"
+          } ],
+          "column_pivots" : [ ],
+          "rollup" : true,
+          "visualization" : "bar",
+          "formatting_settings" : null
+        },
+        "type" : "aggregation",
+        "query" : null,
+        "filter" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      }, {
+        "id" : "0000016e-b690-427a-0000-016eb690426f",
+        "config" : {
+          "fields" : [ "message", "source" ],
+          "show_message_row" : true
+        },
+        "type" : "messages",
+        "query" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-427a-0000-016eb690426f" : [ "0000016e-b690-427c-0000-016eb690426f" ],
+        "0000016e-b690-4279-0000-016eb690426f" : [ "0000016e-b690-427b-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-4279-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : "Infinity"
+        },
+        "0000016e-b690-427a-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 6,
+          "width" : "Infinity"
+        }
+      },
+      "static_message_list_id" : null,
+      "display_mode_settings" : { },
+      "selected_fields" : null
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-12-03T13:19:02.025Z",
+  "type" : "SEARCH",
+  "requires" : { },
+  "content_pack" : null,
+  "properties" : [ ]
+}, {
+  "id" : "5de0e98900002a0017000002",
+  "title" : "Saved Search: Sophon",
+  "summary" : "This Search was migrated automatically from the \"Sophon\" saved search.",
+  "description" : "",
+  "search_id" : "5de0e98900002a0017000001",
+  "state" : {
+    "0000016e-b690-4273-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-426f-0000-016eb690426f" : "Message Count",
+          "0000016e-b690-4270-0000-016eb690426f" : "All Messages"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-426f-0000-016eb690426f",
+        "config" : {
+          "sort" : [ ],
+          "series" : [ {
+            "function" : "count()",
+            "config" : { }
+          } ],
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            },
+            "type" : "time"
+          } ],
+          "column_pivots" : [ ],
+          "rollup" : true,
+          "visualization" : "bar",
+          "formatting_settings" : null
+        },
+        "type" : "aggregation",
+        "query" : null,
+        "filter" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      }, {
+        "id" : "0000016e-b690-4270-0000-016eb690426f",
+        "config" : {
+          "fields" : [ "message", "source" ],
+          "show_message_row" : true
+        },
+        "type" : "messages",
+        "query" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-426f-0000-016eb690426f" : [ "0000016e-b690-4271-0000-016eb690426f" ],
+        "0000016e-b690-4270-0000-016eb690426f" : [ "0000016e-b690-4272-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-426f-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : "Infinity"
+        },
+        "0000016e-b690-4270-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 6,
+          "width" : "Infinity"
+        }
+      },
+      "static_message_list_id" : null,
+      "display_mode_settings" : { },
+      "selected_fields" : null
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-03-05T10:51:05.900Z",
+  "type" : "SEARCH",
+  "requires" : { },
+  "content_pack" : null,
+  "properties" : [ ]
+}, {
+  "id" : "5de0e98900002a0017000004",
+  "title" : "Saved Search: The Absolute Search",
+  "summary" : "This Search was migrated automatically from the \"The Absolute Search\" saved search.",
+  "description" : "",
+  "search_id" : "5de0e98900002a0017000003",
+  "state" : {
+    "0000016e-b690-4278-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-4274-0000-016eb690426f" : "Message Count",
+          "0000016e-b690-4275-0000-016eb690426f" : "All Messages"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-4274-0000-016eb690426f",
+        "config" : {
+          "sort" : [ ],
+          "series" : [ {
+            "function" : "count()",
+            "config" : { }
+          } ],
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : null
+              }
+            },
+            "type" : "time"
+          } ],
+          "column_pivots" : [ ],
+          "rollup" : true,
+          "visualization" : "bar",
+          "formatting_settings" : null
+        },
+        "type" : "aggregation",
+        "query" : null,
+        "filter" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      }, {
+        "id" : "0000016e-b690-4275-0000-016eb690426f",
+        "config" : {
+          "fields" : [ "message", "source" ],
+          "show_message_row" : true
+        },
+        "type" : "messages",
+        "query" : null,
+        "timerange" : null,
+        "streams" : [ ]
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-4275-0000-016eb690426f" : [ "0000016e-b690-4277-0000-016eb690426f" ],
+        "0000016e-b690-4274-0000-016eb690426f" : [ "0000016e-b690-4276-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-4274-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : "Infinity"
+        },
+        "0000016e-b690-4275-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 6,
+          "width" : "Infinity"
+        }
+      },
+      "static_message_list_id" : null,
+      "display_mode_settings" : { },
+      "selected_fields" : null
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-12-03T13:18:47.602Z",
+  "type" : "SEARCH",
+  "requires" : { },
+  "content_pack" : null,
+  "properties" : [ ]
+} ]

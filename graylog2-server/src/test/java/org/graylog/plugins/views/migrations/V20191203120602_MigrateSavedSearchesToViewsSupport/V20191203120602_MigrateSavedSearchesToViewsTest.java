@@ -16,20 +16,24 @@
  */
 package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.V20191203120602_MigrateSavedSearchesToViews.MigrationCompleted;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearchService;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.Search;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.search.SearchService;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomObjectIdProvider;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RandomUUIDProvider;
+import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.View;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.ViewService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,8 +41,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.skyscreamer.jsonassert.JSONAssert;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +72,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
     private ViewService viewService;
 
     private Migration migration;
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     static class StaticRandomObjectIdProvider extends RandomObjectIdProvider {
         private final Date date;
@@ -109,7 +123,7 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
 
     @Test
     @MongoDBFixtures("sample_saved_searches.json")
-    public void migrateSampleSavedSearches() {
+    public void migrateSampleSavedSearches() throws Exception {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
@@ -120,11 +134,41 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
                         "5de660c6b2d44b5813c1d806", "5de0e98900002a0017000006"
                 )
         );
+
+        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
+        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
+
+        verify(viewService, times(3)).save(newViewsCaptor.capture());
+        verify(searchService, times(3)).save(newSearchesCaptor.capture());
+
+        final List<View> newViews = newViewsCaptor.getAllValues();
+        final List<Search> newSearches = newSearchesCaptor.getAllValues();
+
+        assertThat(newViews).hasSize(3);
+        assertThat(newSearches).hasSize(3);
+
+        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_searches-expected_views.json"), false);
+        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_searches-expected_searches.json"), false);
     }
 
     private MigrationCompleted captureMigrationCompleted() {
         final ArgumentCaptor<MigrationCompleted> migrationCompletedCaptor = ArgumentCaptor.forClass(MigrationCompleted.class);
         verify(clusterConfigService, times(1)).write(migrationCompletedCaptor.capture());
         return migrationCompletedCaptor.getValue();
+    }
+
+    private String toJSON(Object object) throws JsonProcessingException {
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+    }
+
+    private String resourceFile(String filename) {
+        try {
+            final URL resource = this.getClass().getResource(filename);
+            final Path path = Paths.get(resource.toURI());
+            final byte[] bytes = Files.readAllBytes(path);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
