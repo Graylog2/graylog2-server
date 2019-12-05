@@ -1,6 +1,6 @@
 import { mount, shallow } from 'enzyme';
 
-import WrappingContainer from './wrappingContainer';
+import WrappingContainer from './WrappingContainer';
 
 export const shallowWithWrapper = (Component, options = {}) => shallow(Component, {
   wrappingComponent: WrappingContainer,
@@ -16,4 +16,4 @@ export * from 'enzyme';
 export {
   mountWithWrapper as mount,
   shallowWithWrapper as shallow,
-}
+};

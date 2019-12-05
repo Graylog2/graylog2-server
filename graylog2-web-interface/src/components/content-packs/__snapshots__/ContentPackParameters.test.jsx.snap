@@ -37,7 +37,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
           "v": "1.0",
         },
       ],
-      "id": "740d4790-58ee-4776-ac90-99e0803d0d59",
+      "id": "ff678afe-dee3-4322-8d7f-36e944b0cd66",
       "name": "",
       "parameters": Array [
         Object {
@@ -110,7 +110,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       "v": "1.0",
                     },
                   ],
-                  "id": "740d4790-58ee-4776-ac90-99e0803d0d59",
+                  "id": "ff678afe-dee3-4322-8d7f-36e944b0cd66",
                   "name": "",
                   "parameters": Array [
                     Object {
@@ -1280,7 +1280,7 @@ exports[`<ContentPackParameters /> should render a parameter 1`] = `
                       "v": "1.0",
                     },
                   ],
-                  "id": "740d4790-58ee-4776-ac90-99e0803d0d59",
+                  "id": "ff678afe-dee3-4322-8d7f-36e944b0cd66",
                   "name": "",
                   "parameters": Array [
                     Object {
