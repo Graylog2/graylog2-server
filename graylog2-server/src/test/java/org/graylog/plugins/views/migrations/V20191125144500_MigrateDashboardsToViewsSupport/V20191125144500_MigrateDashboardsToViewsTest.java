@@ -55,7 +55,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -176,25 +175,24 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.dashboardToViewMigrationIds())
-                .containsAllEntriesOf(Collections.singletonMap("5c7fc3f9f38ed741ac154697", "5de0e98900002a0017000002"));
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5c7fc3f9f38ed741ac154697");
         assertThat(migrationCompleted.widgetMigrationIds()).containsAllEntriesOf(
                 ImmutableMap.<String, Set<String>>builder()
-                        .put("05b03c7b-fe23-4789-a1c8-a38a583d3ba6", ImmutableSet.of("0000016e-b690-4272-0000-016eb690426f"))
-                        .put("10c1b3f9-6b34-4b34-9457-892d12b84151", ImmutableSet.of("0000016e-b690-4275-0000-016eb690426f"))
-                        .put("2afb1838-24ee-489f-929f-ef7d47485021", ImmutableSet.of("0000016e-b690-4276-0000-016eb690426f"))
-                        .put("40c9cf4e-0956-4dc1-9ccd-83868fa83277", ImmutableSet.of("0000016e-b690-4270-0000-016eb690426f"))
-                        .put("4a192616-51d3-474e-9e18-a680f2577769", ImmutableSet.of("0000016e-b690-427b-0000-016eb690426f"))
+                        .put("05b03c7b-fe23-4789-a1c8-a38a583d3ba6", ImmutableSet.of("0000016e-b690-426f-0000-016eb690426f"))
+                        .put("10c1b3f9-6b34-4b34-9457-892d12b84151", ImmutableSet.of("0000016e-b690-4270-0000-016eb690426f"))
+                        .put("2afb1838-24ee-489f-929f-ef7d47485021", ImmutableSet.of("0000016e-b690-4271-0000-016eb690426f"))
+                        .put("40c9cf4e-0956-4dc1-9ccd-83868fa83277", ImmutableSet.of("0000016e-b690-4272-0000-016eb690426f"))
+                        .put("4a192616-51d3-474e-9e18-a680f2577769", ImmutableSet.of("0000016e-b690-4273-0000-016eb690426f"))
                         .put("5020d62d-24a0-4b0c-8819-78e668cc2428", ImmutableSet.of("5020d62d-24a0-4b0c-8819-78e668cc2428"))
-                        .put("6f2cc355-bcbb-4b3f-be01-bfba299aa51a", ImmutableSet.of("0000016e-b690-4273-0000-016eb690426f", "0000016e-b690-4274-0000-016eb690426f"))
-                        .put("76b7f7e1-76ac-486b-894b-bc31bf4808f1", ImmutableSet.of("0000016e-b690-4277-0000-016eb690426f"))
-                        .put("91b37752-e3a8-4274-910f-3d66d19f1028", ImmutableSet.of("0000016e-b690-427a-0000-016eb690426f"))
-                        .put("9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3", ImmutableSet.of("0000016e-b690-4279-0000-016eb690426f"))
-                        .put("a8eadf94-6494-4271-8c0e-3c8d08e65623", ImmutableSet.of("0000016e-b690-426f-0000-016eb690426f"))
-                        .put("d9be20a1-82d7-427b-8a2d-c7ea9cd114de", ImmutableSet.of("0000016e-b690-427d-0000-016eb690426f"))
-                        .put("da111daa-0d0a-47b9-98ed-8b8aa8a4f575", ImmutableSet.of("0000016e-b690-4278-0000-016eb690426f"))
-                        .put("e9efdfaf-f7be-47ca-97fe-871c05a24d3c", ImmutableSet.of("0000016e-b690-4271-0000-016eb690426f"))
-                        .put("f6e9d960-9cc8-4d16-b3c8-770501b2709f", ImmutableSet.of("0000016e-b690-427c-0000-016eb690426f"))
+                        .put("6f2cc355-bcbb-4b3f-be01-bfba299aa51a", ImmutableSet.of("0000016e-b690-4274-0000-016eb690426f", "0000016e-b690-4275-0000-016eb690426f"))
+                        .put("76b7f7e1-76ac-486b-894b-bc31bf4808f1", ImmutableSet.of("0000016e-b690-4276-0000-016eb690426f"))
+                        .put("91b37752-e3a8-4274-910f-3d66d19f1028", ImmutableSet.of("0000016e-b690-4277-0000-016eb690426f"))
+                        .put("9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3", ImmutableSet.of("0000016e-b690-4278-0000-016eb690426f"))
+                        .put("a8eadf94-6494-4271-8c0e-3c8d08e65623", ImmutableSet.of("0000016e-b690-4279-0000-016eb690426f"))
+                        .put("d9be20a1-82d7-427b-8a2d-c7ea9cd114de", ImmutableSet.of("0000016e-b690-427a-0000-016eb690426f"))
+                        .put("da111daa-0d0a-47b9-98ed-8b8aa8a4f575", ImmutableSet.of("0000016e-b690-427b-0000-016eb690426f"))
+                        .put("e9efdfaf-f7be-47ca-97fe-871c05a24d3c", ImmutableSet.of("0000016e-b690-427c-0000-016eb690426f"))
+                        .put("f6e9d960-9cc8-4d16-b3c8-770501b2709f", ImmutableSet.of("0000016e-b690-427d-0000-016eb690426f"))
                         .build()
         );
 
