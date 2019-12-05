@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
+import { debounce } from 'lodash';
 
 import teinte from 'theme/teinte';
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
@@ -12,6 +13,7 @@ import { ScratchpadContext } from 'providers/ScratchpadProvider';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';
+import UserNotification from 'util/UserNotification';
 
 const LOCALSTORAGE_PREFIX = 'gl-scratchpad-';
 const DEFAULT_SCRATCHDATA = '';
@@ -82,12 +84,13 @@ const Scratchpad = ({ loginName }) => {
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
-  const handleChange = () => {
+  const handleChange = debounce(() => {
     const { value } = textareaRef.current;
 
+    UserNotification.success('Scratchpad data successfully saved.', 'Auto-Saved');
     setScratchData(value);
     writeData({ value: textareaRef.current.value });
-  };
+  }, 300);
 
   const handleDrag = (newPosition) => {
     setPosition(newPosition);
