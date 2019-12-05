@@ -3,6 +3,9 @@ import { mount } from 'enzyme';
 import { StoreMock } from 'helpers/mocking';
 
 jest.mock('components/search/MessageDetail', () => 'message-detail');
+// We need to mock the spinner here, because it's a hook component, which gets returned by the ShowMessagePage.
+// This does not work in combination with the require() we are using in beforeEach()
+jest.mock('components/common/Spinner', () => 'div');
 
 const message = {
   id: '20f683d2-a874-11e9-8a11-0242ac130004',
