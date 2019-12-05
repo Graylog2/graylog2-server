@@ -148,7 +148,7 @@ const Scratchpad = ({ loginName }) => {
                        size={size}
                        position={position}>
       <ContentArea>
-        <Description>Accusamus atque iste natus officiis laudantium mollitia numquam voluptatibus voluptates! Eligendi, totam dignissimos ipsum obcaecati corrupti qui omnis quibusdam fuga consequatur suscipit!</Description>
+        <Description>You can use this space to store notes and other information while interacting with Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.</Description>
 
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning" bsSize="sm">
