@@ -28,12 +28,12 @@ import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -74,8 +74,8 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
             return;
         }
 
-        final Map<String, String> dashboardIdToViewId = new HashMap<>();
-        final BiFunction<String, String, String> recordMigratedDashboardIds = dashboardIdToViewId::put;
+        final Set<String> dashboardIdToViewId = new HashSet<>();
+        final Consumer<String> recordMigratedDashboardIds = dashboardIdToViewId::add;
         final Map<String, Set<String>> widgetIdMigrationMapping = new HashMap<>();
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
@@ -102,7 +102,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
     }
 
     private Map.Entry<View, Search> migrateDashboard(Dashboard dashboard,
-                                  BiFunction<String, String, String> recordMigratedDashboardIds,
+                                  Consumer<String> recordMigratedDashboardIds,
                                   Consumer<Map<String, Set<String>>> recordMigratedWidgetMap) {
         final Map<String, Set<String>> migratedWidgetIds = new HashMap<>(dashboard.widgets().size());
         final BiConsumer<String, String> recordMigratedWidgetIds = (String before, String after) -> migratedWidgetIds
@@ -142,7 +142,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         );
 
         final View newView = View.create(
-                randomObjectIdProvider.get(),
+                dashboard.id(),
                 View.Type.DASHBOARD,
                 dashboard.title(),
                 "This dashboard was migrated automatically.",
@@ -154,7 +154,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 createdAt
         );
 
-        recordMigratedDashboardIds.apply(dashboard.id(), newView.id());
+        recordMigratedDashboardIds.accept(dashboard.id());
         recordMigratedWidgetMap.accept(migratedWidgetIds);
 
         return new AbstractMap.SimpleEntry<>(newView, newSearch);
