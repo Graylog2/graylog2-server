@@ -1,3 +1,4 @@
+// @flow
 import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -8,7 +9,14 @@ import ActionsProvider from 'injection/ActionsProvider';
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const urlPrefix = '/system/cluster_config';
+export type Url = {
+  value: string,
+  type: string,
+};
 
+export type Config = {
+  entries: Array<Url>
+};
 const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],
 

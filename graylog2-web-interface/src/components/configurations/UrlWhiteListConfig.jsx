@@ -3,19 +3,11 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, Table } from 'components/graylog';
-import { IfPermitted, Select, Icon } from 'components/common';
+import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import Input from 'components/bootstrap/Input';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
+import type { Config, Url } from 'stores/configurations/ConfigurationsStore';
 
-type Url = {
-  value: string,
-  type: string,
-};
-
-type Config = {
-  entries: Array<Url>
-};
 
 type State = {
   config: Config
@@ -68,7 +60,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     });
   }
 
-  _update = (urls: Array) => {
+  _update = (urls: Array<Url>) => {
     this.setState({ config: { entries: urls } });
   }
 
