@@ -36,6 +36,7 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -98,7 +99,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         }
         if (!whitelistService.isWhitelisted(config.url())) {
             publishSystemNotificationForWhitelistFailure();
-            throw new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted.");
+            throw UrlNotWhitelistedException.forUrl(config.url());
         }
 
         final Optional<String> response = httpFileRetriever.fetchFileIfNotModified(config.url());
@@ -114,7 +115,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
         if (!whitelistService.isWhitelisted(config.url())) {
-            setError(new UrlNotWhitelistedException("URL <" + config.url() + "> is not whitelisted."));
+            setError(UrlNotWhitelistedException.forUrl(config.url()));
             publishSystemNotificationForWhitelistFailure();
             return;
         }
@@ -317,12 +318,6 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
             public abstract DSVHTTPDataAdapter.Config.Builder checkPresenceOnly(Boolean checkPresenceOnly);
 
             public abstract DSVHTTPDataAdapter.Config build();
-        }
-    }
-
-    public static class UrlNotWhitelistedException extends Exception {
-        UrlNotWhitelistedException(String message) {
-            super(message);
         }
     }
 

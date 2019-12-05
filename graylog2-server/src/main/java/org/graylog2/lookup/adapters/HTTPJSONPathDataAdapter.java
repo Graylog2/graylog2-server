@@ -49,6 +49,7 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -162,7 +163,12 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         if (!urlWhitelistService.isWhitelisted(urlString)) {
             LOG.error("URL <{}> is not whitelisted. Aborting lookup request.", urlString);
             publishSystemNotificationForWhitelistFailure();
+            setError(UrlNotWhitelistedException.forUrl(urlString));
             return getErrorResult();
+        } else {
+            // we use this kind of error reporting mechanism only for whitelist errors, so we can safely clear the
+            // error here
+            clearError();
         }
 
         final HttpUrl url = HttpUrl.parse(urlString);
