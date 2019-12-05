@@ -1,20 +1,25 @@
+// @flow strict
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
 import ObjectUtils from 'util/ObjectUtils';
+import type { Url } from 'stores/configurations/ConfigurationsStore';
 
-const UrlWhitelistForm = ({ urls, update }) => {
+type Props = {
+  urls: Array<Url>,
+  update: (state: Array<Url>) => void
+};
+const UrlWhitelistForm = ({ urls, update }: Props) => {
   const options = [{ value: 'literal', label: 'Literal' }, { value: 'regex', label: 'Regex' }];
   const inputs = {};
   const [state, setState] = useState(urls);
   const onAdd = (event) => {
     event.preventDefault();
     setState([...state, { value: '', type: 'literal' }]);
-    update(state);
   };
-  const onRemove = (event, idx) => {
+  const onRemove = (event: MouseEvent, idx: number) => {
     event.preventDefault();
     // eslint-disable-next-line prefer-const
     let stateUpdate = ObjectUtils.clone(state);
