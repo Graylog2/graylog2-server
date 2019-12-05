@@ -21,7 +21,12 @@ export function widgetDefinition(type) {
   if (typeDefinition) {
     return typeDefinition;
   }
-  return _findWidgetDefinition('default');
+  const defaultType = _findWidgetDefinition('default');
+  if (defaultType) {
+    return defaultType;
+  }
+
+  throw new Error(`Neither a widget of type "${type}" nor a default widget are registered!`);
 }
 
 export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
