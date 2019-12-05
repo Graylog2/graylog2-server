@@ -48,7 +48,7 @@ const UnknownWidget = ({ config, type }: WidgetProps) => (
 
       <Row>
         <ol>
-          <li>You created this widget using a plugin that is not available anymore.</li>
+          <li>You created this widget using a plugin that is now missing.</li>
           <li>This widget was part of a legacy dashboard and created by a plugin that is not available anymore.</li>
         </ol>
       </Row>
