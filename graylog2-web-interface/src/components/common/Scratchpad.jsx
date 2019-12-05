@@ -13,7 +13,6 @@ import { ScratchpadContext } from 'providers/ScratchpadProvider';
 import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';
-import UserNotification from 'util/UserNotification';
 
 const LOCALSTORAGE_PREFIX = 'gl-scratchpad-';
 const DEFAULT_SCRATCHDATA = '';
@@ -62,12 +61,21 @@ const AlertNote = styled.em`
 
 const Footer = styled.footer`
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
   padding-bottom: 9px;
 `;
 
+const SavingMessage = styled.span(({ visible }) => `
+  flex: 1;
+  color: ${teinte.tertiary.tre};
+  font-style: italic;
+  opacity: ${visible ? '1' : '0'};
+  transition: opacity 150ms ease-in-out;
+`);
+
 const Scratchpad = ({ loginName }) => {
   let clipboard;
+  let handleChangeTimeout;
   const localStorageItem = `${LOCALSTORAGE_PREFIX}${loginName}`;
   const scratchpadStore = Store.get(localStorageItem) || {};
   const textareaRef = useRef();
@@ -77,20 +85,31 @@ const Scratchpad = ({ loginName }) => {
   const [scratchData, setScratchData] = useState(scratchpadStore.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState(scratchpadStore.size || undefined);
   const [copied, setCopied] = useState(false);
+  const [recentlySaved, setRecentlySaved] = useState(false);
   const [position, setPosition] = useState(scratchpadStore.position || undefined);
 
-  const writeData = (newData) => {
+  const writeData = (newData, callback) => {
     const currentStorage = Store.get(localStorageItem);
     Store.set(localStorageItem, { ...currentStorage, ...newData });
+    callback();
   };
 
-  const handleChange = debounce(() => {
+  const handleChange = () => {
+    let resetSavingMessage;
     const { value } = textareaRef.current;
-
-    UserNotification.success('Scratchpad data successfully saved.', 'Auto-Saved');
     setScratchData(value);
-    writeData({ value: textareaRef.current.value });
-  }, 300);
+
+    clearTimeout(handleChangeTimeout);
+    handleChangeTimeout = setTimeout(() => {
+      resetSavingMessage.cancel();
+      setRecentlySaved(true);
+      writeData({ value }, () => {
+        resetSavingMessage = debounce(() => {
+          setRecentlySaved(false);
+        }, 1000);
+      });
+    }, 750);
+  };
 
   const handleDrag = (newPosition) => {
     setPosition(newPosition);
@@ -164,6 +183,7 @@ const Scratchpad = ({ loginName }) => {
         <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} id={TEXTAREA_ID} copied={copied} />
 
         <Footer>
+          <SavingMessage visible={recentlySaved}><Icon name="hdd-o" /> Saved!</SavingMessage>
           <SplitButton title={CopyWithIcon}
                        bsStyle="info"
                        data-clipboard-button
