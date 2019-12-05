@@ -94,20 +94,19 @@ const Scratchpad = ({ loginName }) => {
     callback();
   };
 
+  const resetSavingMessage = debounce(() => {
+    setRecentlySaved(false);
+  }, 1000);
+
   const handleChange = () => {
-    let resetSavingMessage;
     const { value } = textareaRef.current;
     setScratchData(value);
 
     clearTimeout(handleChangeTimeout);
     handleChangeTimeout = setTimeout(() => {
-      resetSavingMessage.cancel();
       setRecentlySaved(true);
-      writeData({ value }, () => {
-        resetSavingMessage = debounce(() => {
-          setRecentlySaved(false);
-        }, 1000);
-      });
+      resetSavingMessage.cancel();
+      writeData({ value }, resetSavingMessage);
     }, 750);
   };
 
@@ -157,6 +156,7 @@ const Scratchpad = ({ loginName }) => {
 
     return () => {
       clipboard.destroy();
+      resetSavingMessage.cancel();
     };
   }, [isScratchpadVisible]);
 
