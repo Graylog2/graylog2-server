@@ -32,6 +32,11 @@ const Row = styled.div`
   }
 `;
 
+const OrderedList = styled.ol`
+  padding: 0;
+  list-style: decimal inside none;
+`;
+
 const UnknownWidget = ({ config, type }: WidgetProps) => (
   <Container>
     <IconContainer>
@@ -39,7 +44,7 @@ const UnknownWidget = ({ config, type }: WidgetProps) => (
     </IconContainer>
     <Description>
       <Row>
-        <strong>Unknown Widget</strong>
+        <strong>Unknown Widget: {type}</strong>
       </Row>
       <Row>
         Unfortunately we are not able to render this widget, because we do not know how to handle widgets of
@@ -47,10 +52,10 @@ const UnknownWidget = ({ config, type }: WidgetProps) => (
       </Row>
 
       <Row>
-        <ol>
+        <OrderedList>
           <li>You created this widget using a plugin that is now missing.</li>
           <li>This widget was part of a legacy dashboard and created by a plugin that is not available anymore.</li>
-        </ol>
+        </OrderedList>
       </Row>
 
       <Row>
