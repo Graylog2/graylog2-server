@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.contenpacks.responses;
+package org.graylog2.rest.models.system.contentpacks.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
 import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class CatalogResolveRequest {
+public abstract class CatalogIndexResponse {
     @JsonProperty("entities")
-    public abstract ImmutableSet<EntityDescriptor> entities();
+    public abstract Set<EntityExcerpt> entities();
 
     @JsonCreator
-    public static CatalogResolveRequest create(@JsonProperty("entities") Set<EntityDescriptor> entities) {
-        return new AutoValue_CatalogResolveRequest(ImmutableSet.copyOf(entities));
+    public static CatalogIndexResponse create(@JsonProperty("entities") Set<EntityExcerpt> entities) {
+        return new AutoValue_CatalogIndexResponse(entities);
     }
 }

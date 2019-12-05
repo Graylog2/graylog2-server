@@ -28,9 +28,9 @@ import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-import org.graylog2.rest.models.system.contenpacks.responses.CatalogIndexResponse;
-import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveRequest;
-import org.graylog2.rest.models.system.contenpacks.responses.CatalogResolveResponse;
+import org.graylog2.rest.models.system.contentpacks.responses.CatalogIndexResponse;
+import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveRequest;
+import org.graylog2.rest.models.system.contentpacks.responses.CatalogResolveResponse;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
