@@ -1,26 +1,15 @@
-/**
- * This file is part of Graylog.
- *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
-package org.graylog.plugins.views.search.views;
+package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.views.DisplayModeSettings;
+import org.graylog.plugins.views.search.views.FormattingSettings;
+import org.graylog.plugins.views.search.views.Titles;
+import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -28,9 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = ViewStateDTO.Builder.class)
+@JsonDeserialize(builder = ViewStateEntity.Builder.class)
 @WithBeanGetter
-public abstract class ViewStateDTO {
+public abstract class ViewStateEntity {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
     static final String FIELD_TITLES = "titles";
@@ -99,11 +88,11 @@ public abstract class ViewStateDTO {
         @JsonProperty(FIELD_DISPLAY_MODE_SETTINGS)
         public abstract Builder displayModeSettings(DisplayModeSettings displayModeSettings);
 
-        public abstract ViewStateDTO build();
+        public abstract ViewStateEntity build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ViewStateDTO.Builder()
+            return new AutoValue_ViewStateEntity.Builder()
                     .titles(Titles.empty())
                     .displayModeSettings(DisplayModeSettings.empty());
         }

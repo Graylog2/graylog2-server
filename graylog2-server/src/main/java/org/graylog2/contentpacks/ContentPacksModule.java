@@ -31,6 +31,7 @@ import org.graylog2.contentpacks.facades.PipelineFacade;
 import org.graylog2.contentpacks.facades.PipelineRuleFacade;
 import org.graylog2.contentpacks.facades.RootEntityFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
+import org.graylog2.contentpacks.facades.ViewFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
 
@@ -56,6 +57,7 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(PipelineRuleFacade.TYPE_V1, PipelineRuleFacade.class);
         addEntityFacade(RootEntityFacade.TYPE, RootEntityFacade.class);
         addEntityFacade(StreamFacade.TYPE_V1, StreamFacade.class);
+        addEntityFacade(ViewFacade.TYPE_V1, ViewFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
         addConstraintChecker(PluginVersionConstraintChecker.class);
