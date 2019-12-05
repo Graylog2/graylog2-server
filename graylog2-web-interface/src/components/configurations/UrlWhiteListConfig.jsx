@@ -6,8 +6,7 @@ import { Button, Table } from 'components/graylog';
 import { IfPermitted, Select, Icon } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import Input from 'components/bootstrap/Input';
-
-import ObjectUtils from 'util/ObjectUtils';
+import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 
 type Url = {
   value: string,
@@ -60,76 +59,19 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     this.configModal.close();
   }
 
-  _onInputChange = (event: KeyboardEvent, idx: number) => {
-    const { config } = this.state;
-    const update = ObjectUtils.clone(config);
-    update.entries[idx].value = this.inputs[`ref${idx}`].input.value;
-    this._update(update);
-  }
-
-  _onUpdateUrl = (type: string, value: string) => {
-    const { config } = this.state;
-    const update = ObjectUtils.clone(config);
-    Object.assign(update.entries[update.entries.findIndex(el => el.value === value)] = { value, type });
-    this._update(update);
-  }
-
   _saveConfig = () => {
     const { config } = this.state;
+    console.log(config);
     const { updateConfig } = this.props;
     updateConfig(config).then(() => {
       this._closeModal();
     });
   }
 
-  _onRemove = (idx: number) => {
-    return () => {
-      const { config } = this.state;
-      const update = ObjectUtils.clone(config);
-      update.entries.splice(idx, 1);
-      this._update(update);
-    };
+  _update = (urls: Array) => {
+    this.setState({ config: { entries: urls } });
   }
 
-  _update = (config: Config) => {
-    this.setState({ config });
-  }
-
-  _urlWhiteListForm = (): React.Element<'tr'>[] => {
-    const { config: { entries } } = this.state;
-    const options = [{ value: 'literal', label: 'Literal' }, { value: 'regex', label: 'Regex' }];
-    return entries.map((url, idx) => {
-      return (
-        // eslint-disable-next-line react/no-array-index-key
-        <tr key={idx + 1}>
-          <td>{idx + 1}</td>
-          <td>
-            <Input type="text"
-                   ref={(elem) => { this.inputs[`ref${idx}`] = elem; }}
-                   onChange={event => this._onInputChange(event, idx)}
-                   defaultValue={url.value}
-                   required />
-          </td>
-          <td>
-            <Input required
-                   autoFocus>
-              <Select placeholder="Select Cache Type"
-                      clearable={false}
-                      options={options}
-                      matchProp="label"
-                      onChange={option => this._onUpdateUrl(option, url.value)}
-                      value={url.type} />
-            </Input>
-          </td>
-          <td>
-            <span className="">
-              <Icon name="fa-trash" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
-            </span>
-          </td>
-        </tr>
-      );
-    });
-  }
 
   _resetConfig = () => {
     const { config } = this.props;
@@ -138,19 +80,9 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     });
   }
 
-  _onAdd = (event: MouseEvent) => {
-    event.preventDefault();
-    const { config: { entries } } = this.state;
-    const update = ObjectUtils.clone(entries);
-    update.push({ value: '' });
-    this.setState({
-      config: {
-        entries: update,
-      },
-    });
-  };
 
   render() {
+    const { config: { entries } } = this.props;
     return (
       <div>
         <h2>URL Whitelist Configuration</h2>
@@ -178,20 +110,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
                             submitButtonText="Save">
 
           <h3>Urls</h3>
-          <Table striped bordered condense className="top-margin">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Url</th>
-                <th>Type</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {this._urlWhiteListForm()}
-            </tbody>
-          </Table>
-          <Button bsSize="xs" onClick={event => this._onAdd(event)}>Add Url</Button>
+          <UrlWhiteListForm urls={entries} update={this._update} />
         </BootstrapModalForm>
       </div>
     );
