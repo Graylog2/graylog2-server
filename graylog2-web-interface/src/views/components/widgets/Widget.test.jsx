@@ -60,7 +60,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
         type: 'default',
         visualizationComponent: () => <span>Unknown widget</span>,
         editComponent: () => <span>Unknown widget in edit mode</span>,
-      }
+      },
     ]),
   },
 }));
