@@ -180,7 +180,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -196,7 +196,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -270,7 +270,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -286,7 +286,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -324,7 +324,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
       className="col-sm-6"
     >
       <button
-        className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+        className="Button-c9cbmb-0 GLfOY btn btn-primary"
         disabled={false}
         id="create"
         onClick={[Function]}
@@ -338,7 +338,7 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
         href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22%22%2C%0A%20%20%22summary%22%3A%20%22%22%2C%0A%20%20%22description%22%3A%20%22%22%2C%0A%20%20%22vendor%22%3A%20%22%22%2C%0A%20%20%22url%22%3A%20%22%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-info"
           disabled={false}
           id="download"
           onClick={[Function]}
@@ -457,7 +457,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               </h2>
               <br />
               <div
-                className="well"
+                className="Well-sc-19gs1oc-0 kezSPd well"
               >
                 <div
                   dangerouslySetInnerHTML={
@@ -548,7 +548,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -564,7 +564,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -638,7 +638,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -654,7 +654,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -692,7 +692,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
       className="col-sm-6"
     >
       <button
-        className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+        className="Button-c9cbmb-0 GLfOY btn btn-primary"
         disabled={false}
         id="create"
         onClick={[Function]}
@@ -706,7 +706,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
         href="data:text/plain;charset=utf-8,%7B%0A%20%20%22v%22%3A%201%2C%0A%20%20%22id%22%3A%20%22dead-beef%22%2C%0A%20%20%22rev%22%3A%201%2C%0A%20%20%22name%22%3A%20%22name%22%2C%0A%20%20%22summary%22%3A%20%22summary%22%2C%0A%20%20%22description%22%3A%20%22descr%22%2C%0A%20%20%22vendor%22%3A%20%22vendor%22%2C%0A%20%20%22url%22%3A%20%22http%3A%2F%2Fexample.com%22%2C%0A%20%20%22parameters%22%3A%20%5B%5D%2C%0A%20%20%22entities%22%3A%20%5B%5D%0A%7D"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-info"
           disabled={false}
           id="download"
           onClick={[Function]}

@@ -38,6 +38,7 @@ import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
@@ -64,8 +65,11 @@ import org.graylog.plugins.views.search.views.sharing.SpecificRolesStrategy;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsers;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsersStrategy;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
@@ -101,6 +105,7 @@ public class ViewsBindings extends ViewsModule {
         // search types
         registerJacksonSubtype(MessageList.class);
         registerJacksonSubtype(Pivot.class);
+        registerJacksonSubtype(EventList.class);
 
         // pivot specs
         registerJacksonSubtype(Values.class);
@@ -171,6 +176,9 @@ public class ViewsBindings extends ViewsModule {
     private void registerVisualizationConfigSubtypes() {
         registerJacksonSubtype(WorldMapVisualizationConfigDTO.class);
         registerJacksonSubtype(BarVisualizationConfigDTO.class);
+        registerJacksonSubtype(NumberVisualizationConfigDTO.class);
+        registerJacksonSubtype(LineVisualizationConfigDTO.class);
+        registerJacksonSubtype(AreaVisualizationConfigDTO.class);
     }
 
     private void registerViewSharingSubtypes() {

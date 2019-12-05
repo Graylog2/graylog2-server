@@ -29,7 +29,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="name"
                 label="Name"
                 maxLength={250}
@@ -58,7 +58,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="summary"
                 label="Summary"
                 maxLength={250}
@@ -87,7 +87,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <textarea
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="description"
                 label="Description"
                 name="description"
@@ -115,7 +115,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="vendor"
                 label="Vendor"
                 maxLength={250}
@@ -144,7 +144,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="url"
                 label="URL"
                 maxLength={250}
@@ -222,7 +222,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             }
           >
             <button
-              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               type="submit"
             >
@@ -238,7 +238,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             }
           >
             <button
-              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               onClick={[Function]}
               type="reset"
@@ -293,7 +293,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="name"
                 label="Name"
                 maxLength={250}
@@ -322,7 +322,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="summary"
                 label="Summary"
                 maxLength={250}
@@ -351,7 +351,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <textarea
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="description"
                 label="Description"
                 name="description"
@@ -379,7 +379,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="vendor"
                 label="Vendor"
                 maxLength={250}
@@ -408,7 +408,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             </label>
             <span>
               <input
-                className="form-control"
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                 id="url"
                 label="URL"
                 maxLength={250}
@@ -499,7 +499,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             }
           >
             <button
-              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               type="submit"
             >
@@ -515,7 +515,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             }
           >
             <button
-              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               onClick={[Function]}
               type="reset"

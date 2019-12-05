@@ -3,6 +3,7 @@
 exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 <div>
   <div
+    className="Tabs-sc-1hzj2zf-0 izkieo"
     id="permissionSelectorTabs"
   >
     <ul
@@ -92,7 +93,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
                           name="filter-streams-data-filter"
@@ -103,7 +104,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -115,7 +116,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -139,7 +140,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="form-group"
@@ -170,7 +171,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -182,7 +183,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -190,7 +191,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -234,7 +235,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -246,7 +247,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -254,7 +255,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -348,7 +349,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
                           name="filter-dashboards-data-filter"
@@ -359,7 +360,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -371,7 +372,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -395,7 +396,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="form-group"
@@ -426,7 +427,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -438,7 +439,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -446,7 +447,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -490,7 +491,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -502,7 +503,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -510,7 +511,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -566,6 +567,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
 exports[`<PermissionSelector /> should render with set permissions 1`] = `
 <div>
   <div
+    className="Tabs-sc-1hzj2zf-0 izkieo"
     id="permissionSelectorTabs"
   >
     <ul
@@ -655,7 +657,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                           id="filter-streams-data-filter"
                           label="Filter Streams"
                           name="filter-streams-data-filter"
@@ -666,7 +668,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -678,7 +680,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -702,7 +704,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="form-group"
@@ -733,7 +735,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -745,7 +747,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
+                          className="Button-c9cbmb-0 GLfOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -753,7 +755,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -797,7 +799,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -809,7 +811,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -817,7 +819,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
+                          className="Button-c9cbmb-0 GLfOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -911,7 +913,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="typeahead-wrapper"
                       >
                         <input
-                          className="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                           id="filter-dashboards-data-filter"
                           label="Filter Dashboards"
                           name="filter-dashboards-data-filter"
@@ -922,7 +924,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       </div>
                     </div>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={false}
                       style={
                         Object {
@@ -934,7 +936,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       Filter
                     </button>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                      className="Button-c9cbmb-0 GLfOY btn btn-default"
                       disabled={true}
                       onClick={[Function]}
                       style={
@@ -958,7 +960,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 className="list-group"
               >
                 <span
-                  className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="form-group"
@@ -989,7 +991,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -1001,7 +1003,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1009,7 +1011,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1053,7 +1055,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                   </div>
                 </span>
                 <span
-                  className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                 >
                   <div
                     className="itemWrapper "
@@ -1065,7 +1067,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         className="btn-group btn-group-sm"
                       >
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-info active"
+                          className="Button-c9cbmb-0 GLfOY btn btn-info active"
                           disabled={false}
                           onClick={[Function]}
                           type="button"
@@ -1073,7 +1075,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                           Allow reading
                         </button>
                         <button
-                          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                          className="Button-c9cbmb-0 GLfOY btn btn-default"
                           disabled={false}
                           onClick={[Function]}
                           type="button"

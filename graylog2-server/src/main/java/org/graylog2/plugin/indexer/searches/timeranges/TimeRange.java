@@ -42,6 +42,7 @@ public abstract class TimeRange {
     public abstract DateTime getTo();
 
     @JsonIgnore
+    // TODO: remove this when pre 3.2 dashboarding is removed.
     public abstract Map<String, Object> getPersistedConfig();
 
 }

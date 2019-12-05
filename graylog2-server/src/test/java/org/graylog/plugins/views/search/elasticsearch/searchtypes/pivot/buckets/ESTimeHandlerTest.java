@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.buckets;
 
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.pivot.ESPivot;
@@ -80,7 +81,7 @@ public class ESTimeHandlerTest {
     public void timeSpecIntervalIsCalculatedOnPivotTimerangeIfOverridden() throws InvalidRangeParametersException {
         final ArgumentCaptor<TimeRange> timeRangeCaptor = ArgumentCaptor.forClass(TimeRange.class);
         when(interval.toDateHistogramInterval(timeRangeCaptor.capture())).thenReturn(DateHistogramInterval.DAY);
-        when(pivot.timerange()).thenReturn(Optional.of(RelativeRange.create(4242)));
+        when(pivot.timerange()).thenReturn(Optional.of(DerivedTimeRange.of(RelativeRange.create(4242))));
 
         this.esTimeHandler.doCreateAggregation("foobar", pivot, time, esPivot, queryContext, query);
 

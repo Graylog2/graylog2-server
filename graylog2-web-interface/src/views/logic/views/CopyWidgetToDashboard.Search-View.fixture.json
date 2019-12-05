@@ -1,0 +1,110 @@
+{
+  "type": "SEARCH",
+  "search_id": "5db0729ed8304f4fd010f833",
+  "state": {
+    "1f93b002-44ed-458d-90b2-5bfd1c50045d": {
+      "titles": {
+        "widget": {
+          "9f194c3a-3db8-4d9a-8b93-8f356477d976": "Message Count",
+          "6a8eebc7-53f3-447e-8f81-f997d42a376a": "All Messages"
+        }
+      },
+      "widgets": [
+        {
+          "id": "9f194c3a-3db8-4d9a-8b93-8f356477d976",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [
+              {
+                "field": "timestamp",
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "auto"
+                  }
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": null
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar"
+          },
+          "streams": []
+        },
+        {
+          "id": "6a8eebc7-53f3-447e-8f81-f997d42a376a",
+          "type": "messages",
+          "config": {
+            "fields": [
+              "timestamp",
+              "source"
+            ],
+            "show_message_row": true
+          },
+          "streams": []
+        },
+        {
+          "id": "4d73ccaa-aabf-451a-b36e-309f55798e04",
+          "type": "aggregation",
+          "config": {
+            "column_pivots": [],
+            "rollup": true,
+            "row_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Message Count"
+                },
+                "function": "count()"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric"
+          },
+          "streams": []
+        }
+      ],
+      "widget_mapping": {
+        "9f194c3a-3db8-4d9a-8b93-8f356477d976": [
+          "a6bf206a-9c95-4b4f-b7f6-7a72f8faaa53"
+        ],
+        "6a8eebc7-53f3-447e-8f81-f997d42a376a": [
+          "8c88b360-0321-4868-9642-5d8dd6979856"
+        ],
+        "4d73ccaa-aabf-451a-b36e-309f55798e04": [
+          "aad57131-ad8d-4721-8762-196ca0d880a4"
+        ]
+      },
+      "positions": {
+        "9f194c3a-3db8-4d9a-8b93-8f356477d976": {
+          "col": 1,
+          "row": 5,
+          "height": 2,
+          "width": "Infinity"
+        },
+        "6a8eebc7-53f3-447e-8f81-f997d42a376a": {
+          "col": 1,
+          "row": 7,
+          "height": 6,
+          "width": "Infinity"
+        },
+        "4d73ccaa-aabf-451a-b36e-309f55798e04": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        }
+      }
+    }
+  },
+  "created_at": "2019-10-23T15:32:23.956Z"
+}

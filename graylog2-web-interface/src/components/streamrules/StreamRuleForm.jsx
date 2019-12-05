@@ -1,18 +1,21 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { Col } from 'components/graylog';
-import { Input } from 'components/bootstrap';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { Col, Well } from 'components/graylog';
+import { Input, BootstrapModalForm } from 'components/bootstrap';
 import { TypeAheadFieldInput, Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
+import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
+
 import DocsHelper from 'util/DocsHelper';
 import Version from 'util/Version';
 import FormsUtils from 'util/FormsUtils';
 
-import HumanReadableStreamRule from 'components/streamrules//HumanReadableStreamRule';
-
 class StreamRuleForm extends React.Component {
+  FIELD_PRESENCE_RULE_TYPE = 5;
+
+  ALWAYS_MATCH_RULE_TYPE = 7;
+
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
     streamRule: PropTypes.object,
@@ -24,33 +27,38 @@ class StreamRuleForm extends React.Component {
     streamRule: { field: '', type: 1, value: '', inverted: false, description: '' },
   };
 
-  state = this.props.streamRule;
+  constructor(props) {
+    super(props);
 
-  FIELD_PRESENCE_RULE_TYPE = 5;
-
-  ALWAYS_MATCH_RULE_TYPE = 7;
-
-  modal = undefined;
+    this.state = props.streamRule;
+    this.modal = undefined;
+  }
 
   _resetValues = () => {
-    this.setState(this.props.streamRule);
+    const { streamRule } = this.props;
+
+    this.setState(streamRule);
   };
 
   _onSubmit = () => {
-    if (this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.state.field = '';
+    const { type } = this.state;
+    const { streamRule, onSubmit } = this.props;
+
+    if (type === this.ALWAYS_MATCH_RULE_TYPE) {
+      this.setState({ field: '' });
     }
-    if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE || this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
-      this.state.value = '';
+    if (type === this.FIELD_PRESENCE_RULE_TYPE || type === this.ALWAYS_MATCH_RULE_TYPE) {
+      this.setState({ value: '' });
     }
-    this.props.onSubmit(this.props.streamRule.id, this.state);
+    onSubmit(streamRule.id, this.state);
     this.modal.close();
   };
 
   _formatStreamRuleType = (streamRuleType) => {
     return (
       <option key={`streamRuleType${streamRuleType.id}`}
-              value={streamRuleType.id}>{streamRuleType.short_desc}
+              value={streamRuleType.id}>
+        {streamRuleType.short_desc}
       </option>
     );
   };
@@ -72,15 +80,16 @@ class StreamRuleForm extends React.Component {
 
   render() {
     const { field, type, value, inverted, description } = this.state;
+    const { streamRuleTypes: ruleTypes, title } = this.props;
 
-    const streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
+    const streamRuleTypes = ruleTypes.map(this._formatStreamRuleType);
     const fieldBox = (String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
       ? <TypeAheadFieldInput id="field-input" type="text" required label="Field" name="field" defaultValue={field} onChange={this.handleChange} autoFocus /> : '');
     const valueBox = (String(type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(type) !== String(this.ALWAYS_MATCH_RULE_TYPE)
       ? <Input id="Value" type="text" required label="Value" name="value" value={value} onChange={this.handleChange} /> : '');
     return (
       <BootstrapModalForm ref={(c) => { this.modal = c; }}
-                          title={this.props.title}
+                          title={title}
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save"
                           formProps={{ id: 'StreamRuleForm' }}>
@@ -98,24 +107,24 @@ class StreamRuleForm extends React.Component {
             <p>
               <strong>Result:</strong>
               {' '}
-              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
+              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={ruleTypes} />
             </p>
           </Col>
           <Col md={4}>
-            <div className="well well-sm matcher-github">
-              The server will try to convert to strings or numbers based on the matcher type as good as it
-              can.
+            <Well bsSize="small" className="matcher-github">
+              The server will try to convert to strings or numbers based on the matcher type as well as it can.
 
               <br /><br />
               <Icon name="github" />
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
-                 target="_blank"> Take a look at the matcher code on GitHub
+                 target="_blank"
+                 rel="noopener noreferrer"> Take a look at the matcher code on GitHub
               </a>
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
                                                                       text={<Icon name="lightbulb-o" />} />
-            </div>
+            </Well>
           </Col>
         </div>
       </BootstrapModalForm>

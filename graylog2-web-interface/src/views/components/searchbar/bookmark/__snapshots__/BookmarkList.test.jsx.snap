@@ -56,7 +56,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     type="submit"
                   >
                     Search
@@ -67,7 +67,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -91,7 +91,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   </label>
                   <span>
                     <select
-                      class="form-control input-sm"
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
                       id="page-size"
                       label="Show:"
                       name="page-size"
@@ -199,21 +199,21 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+              class="Button-c9cbmb-0 GLfOY btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
               type="button"
             >
               Cancel
@@ -282,7 +282,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     type="submit"
                   >
                     Search
@@ -293,7 +293,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -317,7 +317,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   </label>
                   <span>
                     <select
-                      class="form-control input-sm"
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
                       id="page-size"
                       label="Show:"
                       name="page-size"
@@ -348,7 +348,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                 class="list-group"
               >
                 <button
-                  class="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+                  class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
                   type="button"
                 >
                   <h4
@@ -449,21 +449,21 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+              class="Button-c9cbmb-0 GLfOY btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
               type="button"
             >
               Cancel

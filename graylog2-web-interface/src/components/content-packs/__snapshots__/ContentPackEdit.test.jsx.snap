@@ -9,7 +9,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
       className="subnavigation col-md-2"
     >
       <ul
-        className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+        className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
         role={null}
       >
         <li
@@ -72,7 +72,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -84,7 +84,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
           className="text-right col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -125,7 +125,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="name"
                       label="Name"
                       maxLength={250}
@@ -154,7 +154,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="summary"
                       label="Summary"
                       maxLength={250}
@@ -183,7 +183,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </label>
                   <span>
                     <textarea
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="description"
                       label="Description"
                       name="description"
@@ -211,7 +211,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="vendor"
                       label="Vendor"
                       maxLength={250}
@@ -240,7 +240,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="url"
                       label="URL"
                       maxLength={250}
@@ -318,7 +318,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   }
                 >
                   <button
-                    className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     type="submit"
                   >
@@ -334,7 +334,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                   }
                 >
                   <button
-                    className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
@@ -489,7 +489,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
       className="subnavigation col-md-2"
     >
       <ul
-        className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+        className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
         role={null}
       >
         <li
@@ -546,7 +546,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={true}
             onClick={[Function]}
             type="button"
@@ -558,7 +558,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
           className="text-right col-xs-6"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+            className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -599,7 +599,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="name"
                       label="Name"
                       maxLength={250}
@@ -628,7 +628,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="summary"
                       label="Summary"
                       maxLength={250}
@@ -657,7 +657,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </label>
                   <span>
                     <textarea
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="description"
                       label="Description"
                       name="description"
@@ -685,7 +685,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="vendor"
                       label="Vendor"
                       maxLength={250}
@@ -714,7 +714,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </label>
                   <span>
                     <input
-                      className="form-control"
+                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                       id="url"
                       label="URL"
                       maxLength={250}
@@ -792,7 +792,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   }
                 >
                   <button
-                    className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     type="submit"
                   >
@@ -808,7 +808,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   }
                 >
                   <button
-                    className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                    className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
@@ -986,7 +986,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                   </h2>
                   <br />
                   <div
-                    className="well"
+                    className="Well-sc-19gs1oc-0 kezSPd well"
                   >
                     <div
                       dangerouslySetInnerHTML={

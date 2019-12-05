@@ -20,6 +20,10 @@ type Props = {
   executingViewHooks: Array<ViewHook>,
   loadingViewHooks: Array<ViewHook>,
   location: {
+    state?: {
+      view: ?View,
+      widgetId: ?string,
+    },
     query: { [string]: any },
   },
   params: {
@@ -39,6 +43,10 @@ class ShowViewPage extends React.Component<Props, State> {
   static propTypes = {
     location: PropTypes.shape({
       query: PropTypes.object,
+      state: PropTypes.shape({
+        view: PropTypes.object,
+        widgetId: PropTypes.string,
+      }),
     }).isRequired,
     params: PropTypes.shape({
       viewId: PropTypes.string.isRequired,
@@ -65,6 +73,7 @@ class ShowViewPage extends React.Component<Props, State> {
 
   loadView = (viewId: string): Promise<?View> => {
     const { location, loadingViewHooks, executingViewHooks, viewLoader } = this.props;
+    // eslint-disable-next-line react/prop-types
     const { query } = location;
 
     return viewLoader(

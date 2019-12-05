@@ -4,13 +4,13 @@ import * as Immutable from 'immutable';
 import { get, isEqual } from 'lodash';
 import type { RecordFactory, RecordOf } from 'immutable';
 
+import type { RefluxActions } from 'stores/StoreTypes';
 import ViewState from 'views/logic/views/ViewState';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import HighlightingRule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import type { Value } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import { CurrentViewStateActions, CurrentViewStateStore } from './CurrentViewStateStore';
-import type { RefluxActions } from './StoreTypes';
 
 type HighlightingRulesActionsType = RefluxActions<{
   add: (HighlightingRule) => Promise<Array<HighlightingRule>>,

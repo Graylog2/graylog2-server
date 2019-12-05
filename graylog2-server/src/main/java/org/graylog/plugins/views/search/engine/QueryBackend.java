@@ -73,7 +73,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
                 return effectiveRange.get();
             }
         }
-        return AbsoluteRange.create(query.timerange().getFrom(), query.timerange().getTo());
+        return AbsoluteRange.create(effectiveTimeRange.getFrom(), effectiveTimeRange.getTo());
     }
 
     // TODO we can probably push job, query and predecessorResults into the GeneratedQueryContext to simplify the signature

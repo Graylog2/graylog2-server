@@ -1,65 +1,56 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Widget /> should render with empty props 1`] = `
-<div
-  className="widget"
-  data-widget-id="widgetId"
-  style={
-    Object {
-      "overflow": "hidden",
-    }
-  }
->
-  <div
-    style={
-      Object {
-        "height": "95%",
-        "padding": "5px",
-      }
-    }
-  >
-    <span>
-      <widget-header
-        editing={false}
-        hideDragHandle={false}
-        onRename={[Function]}
-        title="Widget Title"
+<body>
+  <div>
+    <div
+      class="widget"
+      data-widget-id="widgetId"
+      style="overflow: hidden;"
+    >
+      <div
+        style="height: 95%; padding: 5px;"
       >
         <span>
-          <i
-            className="fa fa-arrows-h button"
-            onClick={[Function]}
-            role="link"
-            tabIndex={0}
-          />
-        </span>
-         
-        <span
-          onClick={[Function]}
-          onMouseDown={[Function]}
-          role="presentation"
-        >
-          <span
-            onClick={[Function]}
-            onKeyDown={[Function]}
-            role="presentation"
+          <widget-header
+            editing="false"
+            hidedraghandle="false"
+            title="Widget Title"
           >
             <span>
               <i
-                className="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+                class="fa fa-arrows-h button"
+                role="link"
+                tabindex="0"
               />
             </span>
-          </span>
+             
+            <span
+              role="presentation"
+            >
+              <span
+                role="presentation"
+              >
+                <span>
+                  <i
+                    class="fa fa-chevron-down widgetActionDropdownCaret tonedDown"
+                    data-testid="widgetActionDropDown"
+                  />
+                </span>
+              </span>
+            </span>
+          </widget-header>
+          <div
+            class="spinnerContainer"
+          >
+            <i
+              class="fa fa-refresh spinner fa-3x"
+              data-testid="loading-widget"
+            />
+          </div>
         </span>
-      </widget-header>
-      <div
-        className="spinnerContainer"
-      >
-        <i
-          className="fa fa-refresh spinner fa-3x"
-        />
       </div>
-    </span>
+    </div>
   </div>
-</div>
+</body>
 `;

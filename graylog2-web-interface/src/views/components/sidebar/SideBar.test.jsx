@@ -1,9 +1,10 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import { mount } from 'enzyme';
 import PropTypes from 'prop-types';
 
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
+import View from 'views/logic/views/View';
 import QueryResult from '../../logic/QueryResult';
 
 // eslint-disable-next-line global-require
@@ -16,25 +17,25 @@ describe('<Sidebar />', () => {
   let query;
 
   beforeEach(() => {
-    TestComponent = createReactClass({
-      propTypes: {
+    TestComponent = class TestComponentClass extends React.Component {
+      static propTypes = {
         maximumHeight: PropTypes.number,
-      },
+      }
 
-      getDefaultProps() {
-        return { maximumHeight: undefined };
-      },
+      static defaultProps = {
+        maximumHeight: undefined,
+      }
 
       getContainerHeight() {
         const { maximumHeight } = this.props;
         return maximumHeight;
-      },
+      }
 
       render() {
         expect(this.props).toHaveProperty('maximumHeight');
         return <div id="martian">Marc Watney</div>;
-      },
-    });
+      }
+    };
 
     viewMetaData = {
       activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
@@ -70,7 +71,7 @@ describe('<Sidebar />', () => {
     jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
   });
 
-  it('should render a sidebar', () => {
+  it('should render and open when clicking on header', () => {
     const SideBar = loadSUT();
     const wrapper = mount(
       <SideBar viewMetadata={viewMetaData}
@@ -81,14 +82,11 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
-
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
-    expect(wrapper.find('small').text()).toBe(viewMetaData.summary);
   });
 
-  it('should render a sidebar without title and summary', () => {
+  it('should render with a default title and a description', () => {
     const emptyViewMetaData = {
       activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
       id: '5b34f4c44880a54df9616380',
@@ -104,14 +102,62 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
-    wrapper.find('div[children="View Description"]').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('New View');
-    expect(wrapper.find('small').text()).toBe('No summary.');
-    expect(wrapper.find('div.viewMetadata').at(1).text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('h3').text()).toBe('New Search');
+    expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
+  });
 
+  it('should render a summary and descirption, for dashboard view', () => {
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <SideBar viewMetadata={viewMetaData}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.summary);
+    expect(wrapper.find('ViewDescription').text()).toContain(viewMetaData.description);
+  });
+
+  it('should not render a summary and descirption, if the view is not a dashboard', () => {
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <SideBar viewMetadata={viewMetaData}
+               toggleOpen={jest.fn}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </SideBar>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    wrapper.find('div[children="Description"]').simulate('click');
+    expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.summary);
+    expect(wrapper.find('ViewDescription').text()).not.toContain(viewMetaData.description);
+  });
+
+  it('should render widget create options', () => {
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <SideBar viewMetadata={viewMetaData}
+               toggleOpen={jest.fn}
+               queryId={query.id}
+               results={queryResult}>
+        <TestComponent />
+      </SideBar>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Create"]').simulate('click');
-    expect(wrapper.find('ButtonGroup')).toExist();
+    expect(wrapper.find('AddWidgetButton').text()).toContain('Predefined Aggregation');
   });
 
   it('should render passed children', () => {
@@ -125,7 +171,7 @@ describe('<Sidebar />', () => {
       </SideBar>,
     );
 
-    wrapper.find('[data-testid="toggle-button"]').simulate('click');
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Fields"]').simulate('click');
     expect(wrapper.find('div#martian').text()).toBe('Marc Watney');
   });

@@ -193,7 +193,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         processRows(resultBuilder, queryResult, queryContext, pivot, pivot.rowGroups(), new ArrayDeque<>(), aggregations);
 
-        return resultBuilder.build();
+        return pivot.name().map(resultBuilder::name).orElse(resultBuilder).build();
     }
 
     private long extractDocumentCount(SearchResult queryResult, Pivot pivot, ESGeneratedQueryContext queryContext) {

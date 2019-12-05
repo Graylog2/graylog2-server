@@ -26,6 +26,7 @@ import org.graylog2.lookup.LookupDefaultSingleValue;
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +68,10 @@ public abstract class LookupResult {
     @Nullable
     public abstract Map<Object, Object> multiValue();
 
+    @JsonProperty("string_list_value")
+    @Nullable
+    public abstract List<String> stringListValue();
+
 
     @JsonProperty("has_error")
     public abstract boolean hasError();
@@ -80,7 +85,7 @@ public abstract class LookupResult {
 
     @JsonIgnore
     public boolean isEmpty() {
-        return singleValue() == null && multiValue() == null;
+        return singleValue() == null && multiValue() == null && stringListValue() == null;
     }
 
     @JsonIgnore
@@ -159,11 +164,13 @@ public abstract class LookupResult {
     @JsonCreator
     public static LookupResult createFromJSON(@JsonProperty("single_value") final Object singleValue,
                                               @JsonProperty("multi_value") final Map<Object, Object> multiValue,
+                                              @JsonProperty("string_list_value") final List<String> stringListValue,
                                               @JsonProperty("has_error") final boolean hasError,
                                               @JsonProperty("ttl") final long cacheTTL) {
         return builder()
                 .singleValue(singleValue)
                 .multiValue(multiValue)
+                .stringListValue(stringListValue)
                 .hasError(hasError)
                 .cacheTTL(cacheTTL)
                 .build();
@@ -183,6 +190,7 @@ public abstract class LookupResult {
         // We don't want users of this class to set a generic Object single value
         abstract Builder singleValue(Object singleValue);
         public abstract Builder multiValue(Map<Object, Object> multiValue);
+        public abstract Builder stringListValue(List<String> stringListValue);
         public abstract Builder cacheTTL(long cacheTTL);
         public abstract Builder hasError(boolean hasError);
 

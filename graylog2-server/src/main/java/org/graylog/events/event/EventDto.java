@@ -33,7 +33,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = EventDto.Builder.class)
 public abstract class EventDto {
-    private static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "id";
     public static final String FIELD_EVENT_DEFINITION_TYPE = "event_definition_type";
     public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
     private static final String FIELD_ORIGIN_CONTEXT = "origin_context";
@@ -43,12 +43,12 @@ public abstract class EventDto {
     public static final String FIELD_TIMERANGE_END = "timerange_end";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_SOURCE_STREAMS = "source_streams";
-    private static final String FIELD_MESSAGE = "message";
+    public static final String FIELD_ALERT = "alert";
+    public static final String FIELD_MESSAGE = "message";
     private static final String FIELD_SOURCE = "source";
     private static final String FIELD_KEY_TUPLE = "key_tuple";
     private static final String FIELD_KEY = "key";
     private static final String FIELD_PRIORITY = "priority";
-    private static final String FIELD_ALERT = "alert";
     private static final String FIELD_FIELDS = "fields";
 
     @JsonProperty(FIELD_ID)

@@ -1,7 +1,9 @@
 // @flow strict
 import React, { useEffect } from 'react';
+import type { ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import * as Immutable from 'immutable';
+import styled, { css } from 'styled-components';
 
 import connect from 'stores/connect';
 import SideBar from 'views/components/sidebar/SideBar';
@@ -40,6 +42,23 @@ import style from '!style/useable!css!./ExtendedSearchPage.css';
 import IfInteractive from '../components/dashboard/IfInteractive';
 import InteractiveContext from '../components/contexts/InteractiveContext';
 
+const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
+  ${({ interactive }) => (interactive ? css`
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 50px 250px 1fr;
+    grid-template-areas: "sidebar search";
+  ` : '')}
+`;
+
+const SearchGrid = styled.div`
+  z-index: 1;
+  padding: 15px;
+  grid-area: search;
+  grid-column-start: 2;
+  grid-column-end: 4;
+`;
+
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
   props => Object.assign(
     {},
@@ -71,7 +90,8 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+  const { view } = ViewStore.getInitialState();
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.all();
@@ -87,21 +107,18 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
 const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
-  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
+  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
 
   useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
     FieldTypesActions.all();
-    const { view } = ViewStore.getInitialState();
+
     let storeListenersUnsubscribes = Immutable.List();
-    refreshIfNotUndeclared(view).then(() => {
+    refreshIfNotUndeclared().then(() => {
       storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(() => {
-          const { view: currentView } = ViewStore.getInitialState();
-          refreshIfNotUndeclared(currentView);
-        }))
+        .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
     }, () => { });
@@ -124,13 +141,13 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
       </IfInteractive>
       <InteractiveContext.Consumer>
         {interactive => (
-          <div id="main-row" className={interactive ? 'grid-container' : null}>
+          <GridContainer id="main-row" interactive={interactive}>
             <IfInteractive>
               <ConnectedSideBar>
                 <ConnectedFieldList />
               </ConnectedSideBar>
             </IfInteractive>
-            <div className="search-grid">
+            <SearchGrid>
               <IfInteractive>
                 <HeaderElements />
                 <IfDashboard>
@@ -148,8 +165,8 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
                 <SearchResult />
               </ViewAdditionalContextProvider>
               <Footer />
-            </div>
-          </div>
+            </SearchGrid>
+          </GridContainer>
         )}
       </InteractiveContext.Consumer>
     </CurrentViewTypeProvider>

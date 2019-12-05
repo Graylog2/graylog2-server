@@ -73,6 +73,14 @@ import StreamSearchPage from 'views/pages/StreamSearchPage';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
+import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
+import BarVisualizationConfiguration from './components/aggregationbuilder/BarVisualizationConfiguration';
+import NumberVisualizationConfiguration from './components/aggregationbuilder/NumberVisualizationConfiguration';
+import AreaVisualization from './components/visualizations/area/AreaVisualization';
+import LineVisualizationConfig from './logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import AreaVisualizationConfig from './logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import LineVisualizationConfiguration from './components/aggregationbuilder/LineVisualizationConfiguration';
+import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
@@ -80,6 +88,11 @@ Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 // $FlowFixMe: type is not undefined in this case.
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
+VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
+// $FlowFixMe: type is not undefined in this case.
+VisualizationConfig.registerSubtype(LineVisualization.type, LineVisualizationConfig);
+// $FlowFixMe: type is not undefined in this case.
+VisualizationConfig.registerSubtype(AreaVisualization.type, AreaVisualizationConfig);
 
 ViewSharing.registerSubtype(AllUsersOfInstance.Type, AllUsersOfInstance);
 ViewSharing.registerSubtype(SpecificRoles.Type, SpecificRoles);
@@ -244,6 +257,11 @@ export default {
   ],
   visualizationTypes: [
     {
+      type: AreaVisualization.type,
+      displayName: 'Area Chart',
+      component: AreaVisualization,
+    },
+    {
       type: BarVisualization.type,
       displayName: 'Bar Chart',
       component: BarVisualization,
@@ -284,6 +302,24 @@ export default {
       component: HeatmapVisualization,
     },
   ],
+  visualizationConfigTypes: [
+    {
+      type: AreaVisualization.type,
+      component: AreaVisualizationConfiguration,
+    },
+    {
+      type: BarVisualization.type,
+      component: BarVisualizationConfiguration,
+    },
+    {
+      type: LineVisualization.type,
+      component: LineVisualizationConfiguration,
+    },
+    {
+      type: NumberVisualization.type,
+      component: NumberVisualizationConfiguration,
+    },
+  ],
   creators: [
     {
       type: 'preset',
@@ -297,7 +333,7 @@ export default {
     },
     {
       type: 'generic',
-      title: 'Custom Aggregation',
+      title: 'Aggregation',
       func: CreateCustomAggregation,
     },
   ],

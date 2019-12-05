@@ -1,8 +1,8 @@
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Table as BootstrapTable } from 'react-bootstrap';
-import { colorLevel } from 'theme/GraylogThemeContext';
 
+import { colorLevel } from 'theme/util';
 import teinte from 'theme/teinte';
 
 const variants = {

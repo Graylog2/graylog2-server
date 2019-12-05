@@ -1,32 +1,28 @@
 import theme from 'styled-theming';
 import teinte from 'theme/teinte';
 
-const bsStyles = ['success', 'warning', 'danger', 'info', 'default', 'primary'];
+const variantColors = {
+  danger: teinte.secondary.uno,
+  default: teinte.secondary.due,
+  info: teinte.tertiary.uno,
+  primary: teinte.tertiary.quattro,
+  success: teinte.tertiary.tre,
+  warning: teinte.tertiary.sei,
+};
+const bsStyles = Object.keys(variantColors);
 
-const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}) => {
-  return theme.variants('mode', 'bsStyle', {
-    danger: {
-      teinte: cssBuilder(teinte.secondary.uno),
-    },
-    default: {
-      teinte: cssBuilder(teinte.secondary.due),
-    },
-    info: {
-      teinte: cssBuilder(teinte.tertiary.uno),
-    },
-    primary: {
-      teinte: cssBuilder(teinte.tertiary.quattro),
-    },
-    success: {
-      teinte: cssBuilder(teinte.tertiary.tre),
-    },
-    warning: {
-      teinte: cssBuilder(teinte.tertiary.sei),
-    },
-    ...additionalVariants,
+const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}, includedVariants = bsStyles) => {
+  const variants = includedVariants.map((variant) => {
+    return {
+      [variant]: {
+        teinte: cssBuilder(variantColors[variant], variant),
+      },
+    };
   });
+
+  return theme.variants('mode', 'bsStyle', Object.assign(additionalVariants, ...variants));
 };
 
 
 export default bsStyleThemeVariant;
-export { bsStyles };
+export { bsStyles, variantColors };

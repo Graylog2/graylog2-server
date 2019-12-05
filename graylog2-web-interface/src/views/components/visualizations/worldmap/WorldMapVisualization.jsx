@@ -21,7 +21,10 @@ const _mergeObject = (prev, last) => Object.assign({}, prev, last);
 const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
   const xLabels = getXLabelsFromLeafs(leafs);
-  return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
+  if (!isEmpty(xLabels)) {
+    return { valuesBySeries: { 'No metric defined': xLabels.map(() => null) }, xLabels };
+  }
+  return {};
 };
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   return result => result.map(({ name, x, y }) => {
@@ -50,7 +53,9 @@ const WorldMapVisualization: VisualizationComponent = ({ config, data, editing, 
     _formatSeriesForMap(rowPivots),
   ]);
 
-  const series = pipeline(data);
+  const rows = data.chart || Object.values(data)[0];
+
+  const series = pipeline(rows);
 
   const viewport = get(config, 'visualizationConfig.viewport');
   const _onChange = (newViewport) => {

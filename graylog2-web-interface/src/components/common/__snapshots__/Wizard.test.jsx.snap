@@ -15,7 +15,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
         role="toolbar"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -25,7 +25,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
           />
         </button>
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"
@@ -37,7 +37,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
       </div>
     </div>
     <ul
-      className="Nav-dzawzr-0 zLQl nav nav-pills"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills"
       role={null}
     >
       <li
@@ -106,7 +106,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
         role="toolbar"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -116,7 +116,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
           />
         </button>
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"
@@ -128,7 +128,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
       </div>
     </div>
     <ul
-      className="Nav-dzawzr-0 zLQl nav nav-pills"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills"
       role={null}
     >
       <li
@@ -197,7 +197,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
     className="subnavigation col-md-2"
   >
     <ul
-      className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
       role={null}
     >
       <li
@@ -248,7 +248,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
         className="col-xs-6"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -260,7 +260,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
         className="text-right col-xs-6"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"
@@ -288,7 +288,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
     className="subnavigation col-md-2"
   >
     <ul
-      className="Nav-dzawzr-0 zLQl nav nav-pills nav-stacked"
+      className="Nav-dzawzr-0 dfydXw nav nav-pills nav-stacked"
       role={null}
     >
       <li
@@ -339,7 +339,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
         className="col-xs-6"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
           disabled={true}
           onClick={[Function]}
           type="button"
@@ -351,7 +351,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
         className="text-right col-xs-6"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
           disabled={false}
           onClick={[Function]}
           type="button"

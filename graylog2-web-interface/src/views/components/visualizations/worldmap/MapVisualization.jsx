@@ -141,8 +141,8 @@ class MapVisualization extends React.Component {
     const markers = [];
     data.forEach(({ keys, name, values }, idx) => {
       const y = Object.values(values);
-      const min = y.reduce((prev, next) => Math.min(prev, next));
-      const max = y.reduce((prev, next) => Math.max(prev, next));
+      const min = Math.min(...y);
+      const max = Math.max(...y);
       const color = chromaScale(idx * (1 / noOfKeys));
       Object.entries(values)
         .forEach(([coord, value], valueIdx) => markers

@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -125,7 +124,6 @@ import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
@@ -142,7 +140,6 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -156,7 +153,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -201,13 +197,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         when(streamService.loadAll()).thenReturn(Lists.newArrayList(defaultStream, otherStream));
         when(streamService.loadAllEnabled()).thenReturn(Lists.newArrayList(defaultStream, otherStream));
-        try {
-            when(streamService.load(anyString())).thenThrow(new NotFoundException());
-            when(streamService.load(ArgumentMatchers.eq(Stream.DEFAULT_STREAM_ID))).thenReturn(defaultStream);
-            when(streamService.load(ArgumentMatchers.eq("id2"))).thenReturn(otherStream);
-        } catch (NotFoundException ignored) {
-            // oh well, checked exceptions <3
-        }
         streamCacheService = new StreamCacheService(eventBus, streamService, null);
         streamCacheService.startAsync().awaitRunning();
         final Provider<Stream> defaultStreamProvider = () -> defaultStream;
@@ -966,8 +955,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getStreams()).isNotEmpty();
         assertThat(message.getStreams().size()).isEqualTo(2);
 
-        streamCacheService.updateStreams(ImmutableSet.of("id"));
-
         final Message message2 = evaluateRule(rule);
         assertThat(message2).isNotNull();
         assertThat(message2.getStreams().size()).isEqualTo(2);
@@ -981,8 +968,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message).isNotNull();
         assertThat(message.getStreams()).isNotEmpty();
         assertThat(message.getStreams().size()).isEqualTo(1);
-
-        streamCacheService.updateStreams(ImmutableSet.of(Stream.DEFAULT_STREAM_ID));
 
         final Message message2 = evaluateRule(rule);
         assertThat(message2).isNotNull();
@@ -1023,7 +1008,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         // this can change if either the test message content changes or traffic accounting calculation is changed!
         assertThat(message.getField("accounting_size")).isEqualTo(54L);
     }
-  
+
     @Test
     public void metricCounter() {
         final Rule rule = parser.parseRule(ruleForTest(), true);

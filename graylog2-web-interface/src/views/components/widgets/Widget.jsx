@@ -2,19 +2,28 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
+import { browserHistory } from 'react-router';
 
+import Routes from 'routing/Routes';
 import { MenuItem } from 'components/graylog';
 import connect from 'stores/connect';
+import IfSearch from 'views/components/search/IfSearch';
 
 import { widgetDefinition } from 'views/logic/Widgets';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
-import { ViewMetadataStore } from 'views/stores/ViewMetadataStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import SearchActions from 'views/actions/SearchActions';
+import { ViewManagementActions } from 'views/stores/ViewManagementStore';
+import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
+import View from 'views/logic/views/View';
+import Search from 'views/logic/search/Search';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -30,9 +39,12 @@ import SaveOrCancelButtons from './SaveOrCancelButtons';
 import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
+import CopyToDashboard from './CopyToDashboardForm';
+import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 type Props = {
   id: string,
+  view: ViewStoreState,
   widget: WidgetModel,
   data?: Array<*>,
   editing?: boolean,
@@ -49,11 +61,21 @@ type State = {
   configChanged?: boolean,
   editing: boolean,
   oldConfig?: WidgetConfig,
+  showCopyToDashboard: boolean,
+};
+
+const _visualizationForType = (type) => {
+  return widgetDefinition(type).visualizationComponent;
+};
+
+const _editComponentForType = (type) => {
+  return widgetDefinition(type).editComponent;
 };
 
 class Widget extends React.Component<Props, State> {
   static propTypes = {
     id: PropTypes.string.isRequired,
+    view: PropTypes.object.isRequired,
     widget: PropTypes.shape({
       id: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
@@ -81,18 +103,13 @@ class Widget extends React.Component<Props, State> {
     editing: false,
   };
 
-  static _visualizationForType(type) {
-    return widgetDefinition(type).visualizationComponent;
-  }
-
-  static _editComponentForType(type) {
-    return widgetDefinition(type).editComponent;
-  }
-
   constructor(props) {
     super(props);
     const { editing } = props;
-    this.state = { editing };
+    this.state = {
+      editing,
+      showCopyToDashboard: false,
+    };
     if (editing) {
       this.state = { ...this.state, oldConfig: props.widget.config };
     }
@@ -111,6 +128,40 @@ class Widget extends React.Component<Props, State> {
     WidgetActions.duplicate(widgetId).then((newWidget) => {
       TitlesActions.set(TitleTypes.Widget, newWidget.id, `${title} (copy)`);
     });
+  };
+
+  _onToggleCopyToDashboard = () => {
+    this.setState(({ showCopyToDashboard }) => ({ showCopyToDashboard: !showCopyToDashboard }));
+  };
+
+  _onCopyToDashboard = (widgetId: string, dashboardId: ?string): void => {
+    const { view } = this.props;
+    const { view: activeView } = view;
+
+    if (!dashboardId) {
+      return;
+    }
+
+    const updateDashboardWithNewSearch = (dashboard: View) => ({ search: newSearch }) => {
+      const newDashboard = dashboard.toBuilder().search(newSearch).build();
+      ViewManagementActions.update(newDashboard).then(() => {
+        browserHistory.push(Routes.pluginRoute('DASHBOARDS_VIEWID')(dashboardId));
+      });
+    };
+
+    const addWidgetToDashboard = (dashboard: View) => (searchJson) => {
+      const search = Search.fromJSON(searchJson);
+      const newDashboard = CopyWidgetToDashboard(widgetId, activeView, dashboard.toBuilder().search(search).build());
+      if (newDashboard && newDashboard.search) {
+        SearchActions.create(newDashboard.search).then(updateDashboardWithNewSearch(newDashboard));
+      }
+    };
+
+    ViewManagementActions.get(dashboardId).then((dashboardJson) => {
+      const dashboard = View.fromJSON(dashboardJson);
+      SearchActions.get(dashboardJson.search_id).then(addWidgetToDashboard(dashboard));
+    });
+    this._onToggleCopyToDashboard();
   };
 
   _onToggleEdit = () => {
@@ -155,7 +206,7 @@ class Widget extends React.Component<Props, State> {
       const { editing } = this.state;
       const { id, widget, height, width, fields } = this.props;
       const { config, filter } = widget;
-      const VisComponent = Widget._visualizationForType(widget.type);
+      const VisComponent = _visualizationForType(widget.type);
       return (
         <VisComponent id={id}
                       editing={editing}
@@ -175,11 +226,11 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing } = this.state;
+    const { editing, showCopyToDashboard } = this.state;
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
-      const EditComponent = Widget._editComponentForType(widget.type);
+      const EditComponent = _editComponentForType(widget.type);
       return (
         <WidgetColorContext id={id}>
           <EditWidgetFrame>
@@ -193,7 +244,10 @@ class Widget extends React.Component<Props, State> {
                              editting={editing}
                              id={id}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                {visualization}
+                <WidgetErrorBoundary>
+
+                  {visualization}
+                </WidgetErrorBoundary>
               </EditComponent>
             </MeasureDimensions>
             <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
@@ -220,14 +274,26 @@ class Widget extends React.Component<Props, State> {
                     <WidgetActionDropdown>
                       <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
                       <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                      <IfSearch>
+                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
+                      </IfSearch>
                       <MenuItem divider />
                       <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
                     </WidgetActionDropdown>
+                    {showCopyToDashboard
+                    && (
+                      <CopyToDashboard widgetId={id}
+                                       onSubmit={this._onCopyToDashboard}
+                                       onCancel={this._onToggleCopyToDashboard} />
+                    )}
                   </IfInteractive>
                 </WidgetHeader>
               )}
             </InteractiveContext.Consumer>
-            {visualization}
+            <WidgetErrorBoundary>
+
+              {visualization}
+            </WidgetErrorBoundary>
           </span>
         </WidgetFrame>
       </WidgetColorContext>
@@ -235,4 +301,4 @@ class Widget extends React.Component<Props, State> {
   }
 }
 
-export default connect(Widget, { view: ViewMetadataStore });
+export default connect(Widget, { view: ViewStore });

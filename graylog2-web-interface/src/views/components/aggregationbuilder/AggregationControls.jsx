@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'components/graylog';
 import * as Immutable from 'immutable';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import { defaultCompare } from 'views/logic/DefaultCompare';
@@ -16,7 +17,6 @@ import ColumnPivotSelect from './ColumnPivotSelect';
 import SortDirectionSelect from './SortDirectionSelect';
 import SortSelect from './SortSelect';
 import SeriesSelect from './SeriesSelect';
-import BarVisualizationConfiguration from './BarVisualizationConfiguration';
 import DescriptionBox from './DescriptionBox';
 import SeriesFunctionsSuggester from './SeriesFunctionsSuggester';
 
@@ -30,6 +30,9 @@ type Props = {
 type State = {
   config: AggregationWidgetConfig,
 };
+
+const _visualizationConfigFor = (type: string) => PluginStore.exports('visualizationConfigTypes')
+  .find(visualizationConfigType => visualizationConfigType && visualizationConfigType.type === type);
 
 export default class AggregationControls extends React.Component<Props, State> {
   static propTypes = {
@@ -48,28 +51,23 @@ export default class AggregationControls extends React.Component<Props, State> {
     };
   }
 
-  // eslint-disable-next-line no-undef
   _onColumnPivotChange = (columnPivots: $PropertyType<$PropertyType<Props, 'config'>, 'columnPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().columnPivots(columnPivots).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRowPivotChange = (rowPivots: $PropertyType<$PropertyType<Props, 'config'>, 'rowPivots'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rowPivots(rowPivots).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onSeriesChange = (series: $PropertyType<$PropertyType<Props, 'config'>, 'series'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().series(series).build() }));
     return true;
   };
 
-  // eslint-disable-next-line no-undef
   _onSortChange = (sort: $PropertyType<$PropertyType<Props, 'config'>, 'sort'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().sort(sort).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onSortDirectionChange = (direction: $PropertyType<$PropertyType<Props, 'config'>, 'direction'>) => {
     this._setAndPropagate(state => ({
       config: state.config.toBuilder().sort(state.config.sort
@@ -77,17 +75,14 @@ export default class AggregationControls extends React.Component<Props, State> {
     }));
   };
 
-  // eslint-disable-next-line no-undef
   _onRollupChange = (rollup: $PropertyType<$PropertyType<Props, 'config'>, 'rollup'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().rollup(rollup).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onVisualizationChange = (visualization: $PropertyType<$PropertyType<Props, 'config'>, 'visualization'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualization(visualization).visualizationConfig(undefined).build() }));
   };
 
-  // eslint-disable-next-line no-undef
   _onVisualizationConfigChange = (visualizationConfig: $PropertyType<$PropertyType<Props, 'config'>, 'visualizationConfig'>) => {
     this._setAndPropagate(state => ({ config: state.config.toBuilder().visualizationConfig(visualizationConfig).build() }));
   };
@@ -116,6 +111,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
     const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
+    const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
       <span>
         <Row>
@@ -154,11 +150,10 @@ export default class AggregationControls extends React.Component<Props, State> {
             <DescriptionBox description="Metrics" help="The unit which is tracked for every row and subcolumn.">
               <SeriesSelect onChange={this._onSeriesChange} series={series} suggester={suggester} />
             </DescriptionBox>
-            {visualization === 'bar' && (
+            {VisualizationConfigType && (
               <DescriptionBox description="Visualization config" help="Configuration specifically for the selected visualization type.">
-                <BarVisualizationConfiguration onChange={this._onVisualizationConfigChange}
-                                               // $FlowFixMe: If guard above is true, it is a `BarVisualizationConfig`
-                                               config={visualizationConfig} />
+                <VisualizationConfigType.component onChange={this._onVisualizationConfigChange}
+                                                   config={visualizationConfig} />
               </DescriptionBox>
             )}
           </Col>

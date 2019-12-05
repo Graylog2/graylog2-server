@@ -1,0 +1,391 @@
+{
+  "id": "5d6ce7bd5d1eb45af534399e",
+  "queries": [
+    {
+      "id": "f678e6c5-43b1-4200-b5c3-d33eae164dea",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": "author:\"$author$\" AND project:\"graylog2-server\""
+      },
+      "timerange": {
+        "type": "relative",
+        "range": 0
+      },
+      "filter": {
+        "type": "or",
+        "filters": [
+          {
+            "type": "stream",
+            "filters": null,
+            "id": "5cdab2293d27467fbe9e8a72",
+            "title": null
+          }
+        ]
+      },
+      "search_types": [
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "81e69d89-4160-431f-9b90-95d29ca4cea6",
+          "limit": 150,
+          "offset": 0,
+          "type": "messages",
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "28c87846-a8b6-4b21-9aac-62a8ce886e8e",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [
+            {
+              "type": "pivot",
+              "field": "dayOfTheWeek",
+              "direction": "Ascending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "dayOfTheWeek",
+              "limit": 15
+            },
+            {
+              "type": "values",
+              "field": "weekday",
+              "limit": 15
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "7949e87a-4a82-4e09-b939-f4c803ae12c6",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [
+            {
+              "type": "pivot",
+              "field": "hour",
+              "direction": "Ascending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "hour",
+              "limit": 24
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "8dc4dc5c-1845-4c53-8519-8d02559ad8d7",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "count()",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "project",
+              "limit": 15
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "fd32330f-f487-4bf3-a518-1f1bcef89aec",
+          "series": [
+            {
+              "type": "max",
+              "id": "max(timestamp)",
+              "field": "timestamp"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "3d6c9e26-9090-4aaf-bed8-313e75d9c477",
+          "series": [
+            {
+              "type": "min",
+              "id": "min(timestamp)",
+              "field": "timestamp"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "122d2764-160d-4acc-a2a7-c1ec8fdad28d",
+          "series": [
+            {
+              "type": "count",
+              "id": "Message Count",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "02d6b549-6e56-451e-a2ab-6e4b257605ef",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "field": "timestamp",
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        }
+      ]
+    },
+    {
+      "id": "770a516d-3bfd-4a91-89c8-c21cb192fdf1",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": "author:\"$author$\""
+      },
+      "timerange": {
+        "type": "relative",
+        "range": 2592000
+      },
+      "filter": {
+        "type": "or",
+        "filters": [
+          {
+            "type": "stream",
+            "filters": null,
+            "id": "5cdab2293d27467fbe9e8a72",
+            "title": null
+          }
+        ]
+      },
+      "search_types": [
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "fcea8d22-4794-418c-ae62-bf7786826a34",
+          "limit": 150,
+          "offset": 0,
+          "type": "messages",
+          "filter": null
+        }
+      ]
+    },
+    {
+      "id": "85782551-ec81-42ed-b9f7-020a8de93653",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": "author:\"$author$\""
+      },
+      "timerange": {
+        "type": "relative",
+        "range": 0
+      },
+      "filter": {
+        "type": "or",
+        "filters": [
+          {
+            "type": "stream",
+            "filters": null,
+            "id": "5cdab2293d27467fbe9e8a72",
+            "title": null
+          }
+        ]
+      },
+      "search_types": [
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "52ad4390-16ee-4ad5-b098-5febce6d15d5",
+          "series": [
+            {
+              "type": "percentile",
+              "id": "percentile(files_changed,95)",
+              "field": "files_changed",
+              "percentile": 95
+            },
+            {
+              "type": "avg",
+              "id": "avg(files_changed)",
+              "field": "files_changed"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "field": "timestamp",
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "168311be-eb67-4f33-a255-91a4267eb935",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(lines_add)",
+              "field": "lines_add"
+            },
+            {
+              "type": "sum",
+              "id": "sum(lines_removed)",
+              "field": "lines_removed"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "field": "timestamp",
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        },
+        {
+          "timerange": null,
+          "query": null,
+          "streams": [],
+          "id": "16d5562f-933a-468a-aa34-aaa93f443c88",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(lines_add)",
+              "field": "lines_add"
+            },
+            {
+              "type": "sum",
+              "id": "sum(lines_removed)",
+              "field": "lines_removed"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "field": "project",
+              "limit": 15
+            }
+          ],
+          "column_groups": [],
+          "filter": null
+        }
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "name": "author",
+      "title": "Author",
+      "description": "",
+      "data_type": "string",
+      "default_value": "Dennis Oelkers",
+      "optional": false,
+      "binding": {
+        "type": "value",
+        "value": ""
+      }
+    }
+  ]
+}

@@ -61,8 +61,10 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -201,6 +203,13 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                     if (multiValue instanceof Map) {
                         //noinspection unchecked
                         builder = builder.multiValue((Map<Object, Object>) multiValue);
+                    } else if (multiValue instanceof List) {
+                        //noinspection unchecked
+                        final List<String> stringList = ((List<Object>) multiValue).stream().map(Object::toString).collect(Collectors.toList());
+                        builder = builder.stringListValue(stringList);
+
+                        // for backwards compatibility
+                        builder = builder.multiSingleton(multiValue);
                     } else {
                         builder = builder.multiSingleton(multiValue);
                     }

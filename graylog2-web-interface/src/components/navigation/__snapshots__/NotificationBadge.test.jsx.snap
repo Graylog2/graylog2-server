@@ -18,46 +18,10 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "attrs": Array [],
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
-            "isStatic": true,
-            "lastClassName": "zLQl",
+            "isStatic": false,
+            "lastClassName": "dfydXw",
             "rules": Array [
-              "&.nav{> li{> a{&:hover,&:focus{background-color:",
-              "#F1F2F2",
-              ";}}&.disabled > a{color:",
-              "#DCE1E5",
-              ";&:hover,&:focus{color:",
-              "#DCE1E5",
-              ";}}}.open > a{&,&:hover,&:focus{background-color:",
-              "#F1F2F2",
-              ";border-color:",
-              "#9E1F63",
-              ";}}}&.nav-tabs{border-bottom-color:",
-              "#9E1F63",
-              ";> li{> a{&:hover{border-color:",
-              "#F1F2F2",
-              " ",
-              "#F1F2F2",
-              " ",
-              "#9E1F63",
-              ";}}&.active > a{&,&:hover,&:focus{color:",
-              "#1F1F1F",
-              ";background-color:",
-              "#FFF",
-              ";border-color:",
-              "#9E1F63",
-              ";border-bottom-color:transparent;}}}}&.nav-pills{> li{&.active > a{&,&:hover,&:focus{color:",
-              "#FFF",
-              ";background-color:",
-              "#9E1F63",
-              ";}}}}&.nav-tabs.nav-justified{> .active > a,> .active > a:hover,> .active > a:focus{border-color:",
-              "#9E1F63",
-              ";}@media (min-width:",
-              "768px",
-              "){> li > a{border-bottom-color:",
-              "#9E1F63",
-              ";}> .active > a,> .active > a:hover,> .active > a:focus{border-bottom-color:",
-              "#FFF",
-              ";}}}",
+              [Function],
             ],
           },
           "displayName": "Nav",
@@ -75,7 +39,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 zLQl"
+        className="Nav-dzawzr-0 dfydXw"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -83,7 +47,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 zLQl nav navbar-nav"
+          className="Nav-dzawzr-0 dfydXw nav navbar-nav"
           role={null}
         >
           <LinkContainer
@@ -128,7 +92,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                         bsStyle="danger"
                         id="notification-badge"
                       >
-                        <Badge__StyledBadge
+                        <Badge
                           bsStyle="danger"
                           id="notification-badge"
                         >
@@ -139,17 +103,17 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "$$typeof": Symbol(react.forward_ref),
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                  "componentId": "Badge-sc-4gzqz0-0",
                                   "isStatic": false,
-                                  "lastClassName": "gDhrrS",
+                                  "lastClassName": "iRhcGJ",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Badge__StyledBadge",
+                                "displayName": "Badge",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                "styledComponentId": "Badge-sc-4gzqz0-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -162,19 +126,19 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                              className="Badge-sc-4gzqz0-0 iRhcGJ"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-danger"
+                                className="Badge-sc-4gzqz0-0 iRhcGJ badge badge-danger"
                                 id="notification-badge"
                               >
                                 42
                               </span>
                             </Badge>
                           </StyledComponent>
-                        </Badge__StyledBadge>
+                        </Badge>
                       </ForwardRef>
                     </a>
                   </SafeAnchor>

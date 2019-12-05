@@ -2,10 +2,30 @@
 import * as React from 'react';
 import uuid from 'uuid/v4';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import styled from 'styled-components';
+import { sortBy, isEmpty } from 'lodash';
 
-import { ButtonGroup, Button } from 'components/graylog';
+import { Button } from 'components/graylog';
 import { ViewStore } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
+
+
+const Group = styled.div`
+  margin-bottom: 20px;
+  
+  :last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const GroupHeadline = styled.h4`
+  margin-bottom: 10px;
+`;
+
+const CreateButton = styled(Button)`
+  display: block;
+  margin: 5px 0;
+`;
 
 type Props = {
   onClick: () => void,
@@ -82,29 +102,42 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createMenuItem = (creator: Creator): React.Node => (
-    <Button key={creator.title}
-            onClick={this._createHandlerFor(creator)}
-            disabled={creator.condition ? !creator.condition() : false}>
+    <CreateButton key={creator.title}
+                  onClick={this._createHandlerFor(creator)}
+                  disabled={creator.condition ? !creator.condition() : false}>
       {creator.title}
-    </Button>
+    </CreateButton>
   );
 
+  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.Node => {
+    const typeCreators = creators.filter(c => (c.type === type));
+    const sortedCreators = sortBy(typeCreators, 'title');
+    return sortedCreators.map(this._createMenuItem);
+  }
+
   render() {
-    const creators: Array<Creator> = PluginStore.exports('creators');
-    const presets = creators.filter(c => (c.type === 'preset'))
-      .map(this._createMenuItem);
-    const generic = creators.filter(c => (c.type === 'generic'))
-      .map(this._createMenuItem);
     const { overflowingComponents } = this.state;
+    const creators: Array<Creator> = PluginStore.exports('creators');
+    const presets = this._createGroup(creators, 'preset');
+    const generic = this._createGroup(creators, 'generic');
     // $FlowFixMe: Object.value signature is in the way
     const components: Array<React.Node> = Object.values(overflowingComponents);
     return (
       <React.Fragment>
-        <ButtonGroup vertical block>
-          {presets}
+        <Group>
+          <GroupHeadline>Generic</GroupHeadline>
           {generic}
-        </ButtonGroup>
-        {components}
+        </Group>
+        <Group>
+          <GroupHeadline>Predefined Aggregation</GroupHeadline>
+          {presets}
+        </Group>
+        {!isEmpty(components) && (
+          <Group>
+            <GroupHeadline>Other</GroupHeadline>
+            {components}
+          </Group>
+        )}
       </React.Fragment>
     );
   }

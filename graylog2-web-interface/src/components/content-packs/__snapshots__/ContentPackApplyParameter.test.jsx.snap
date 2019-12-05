@@ -24,7 +24,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="config_key"
               label="Config Key"
               name="config_key"
@@ -73,7 +73,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="parameter"
               label="Parameter"
               name="parameter"
@@ -112,7 +112,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
         className="col-sm-2 col-sm-offset-10"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+          className="Button-c9cbmb-0 GLfOY btn btn-primary"
           disabled={true}
           type="submit"
         >
@@ -164,7 +164,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                     </td>
                     <td>
                       <button
-                        className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+                        className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
                         disabled={false}
                         onClick={[Function]}
                         type="button"
@@ -208,7 +208,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="config_key"
               label="Config Key"
               name="config_key"
@@ -262,7 +262,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="parameter"
               label="Parameter"
               name="parameter"
@@ -293,7 +293,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
         className="col-sm-2 col-sm-offset-10"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+          className="Button-c9cbmb-0 GLfOY btn btn-primary"
           disabled={true}
           type="submit"
         >
@@ -355,7 +355,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="config_key"
               label="Config Key"
               name="config_key"
@@ -404,7 +404,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
           </label>
           <span>
             <select
-              className="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
               id="parameter"
               label="Parameter"
               name="parameter"
@@ -443,7 +443,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
         className="col-sm-2 col-sm-offset-10"
       >
         <button
-          className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+          className="Button-c9cbmb-0 GLfOY btn btn-primary"
           disabled={true}
           type="submit"
         >

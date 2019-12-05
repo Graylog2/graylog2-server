@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Jumbotron, Row } from 'components/graylog';
 import styled, { createGlobalStyle } from 'styled-components';
@@ -18,12 +18,17 @@ const ContainerRow = styled(Row)`
   height: 82vh;
 `;
 
-const StyledJumbotron = color => useCallback(styled(Jumbotron)`
-  && {
-    background-color: ${rgba(color, 0.8)};
-    text-align: center;
-  }
-`, [color]);
+const StyledJumbotron = color => useMemo(
+  () => {
+    return styled(Jumbotron)`
+      && {
+        background-color: ${rgba(color, 0.8)};
+        text-align: center;
+      }
+    `;
+  },
+  [color],
+);
 
 export const H1 = styled.h1`
   font-size: 52px;

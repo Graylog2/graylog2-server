@@ -24,7 +24,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           className="col-sm-4"
         >
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="create-token-input"
             onChange={[Function]}
             placeholder="e.g ServiceName"
@@ -36,7 +36,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           className="col-sm-2"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+            className="Button-c9cbmb-0 GLfOY btn btn-primary"
             disabled={true}
             id="create-token"
             type="submit"
@@ -80,7 +80,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                 className="typeahead-wrapper"
               >
                 <input
-                  className="form-control"
+                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                   id="filter-data-filter"
                   label="Filter"
                   name="filter-data-filter"
@@ -91,7 +91,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               </div>
             </div>
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               style={
                 Object {
@@ -103,7 +103,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
               Filter
             </button>
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={true}
               onClick={[Function]}
               style={
@@ -127,7 +127,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
         className="list-group"
       >
         <span
-          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         >
           <div
             className="headerWrapper"
@@ -136,7 +136,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+          className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         >
           No items to display
         </span>
@@ -186,7 +186,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           className="col-sm-4"
         >
           <input
-            className="form-control"
+            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
             id="create-token-input"
             onChange={[Function]}
             placeholder="e.g ServiceName"
@@ -198,7 +198,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           className="col-sm-2"
         >
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+            className="Button-c9cbmb-0 GLfOY btn btn-primary"
             disabled={true}
             id="create-token"
             type="submit"
@@ -242,7 +242,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                 className="typeahead-wrapper"
               >
                 <input
-                  className="form-control"
+                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
                   id="filter-data-filter"
                   label="Filter"
                   name="filter-data-filter"
@@ -253,7 +253,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               </div>
             </div>
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               style={
                 Object {
@@ -265,7 +265,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               Filter
             </button>
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={true}
               onClick={[Function]}
               style={
@@ -289,7 +289,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
         className="list-group"
       >
         <span
-          className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         >
           <div
             className="headerWrapper"
@@ -298,7 +298,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+          className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         >
           <div
             className="itemWrapper itemWrapperStatic"
@@ -315,7 +315,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   title="Copy to clipboard"
                 />
                 <button
-                  className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
+                  className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
                   disabled={false}
                   onClick={[Function]}
                   type="button"
@@ -333,7 +333,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
           </div>
         </span>
         <span
-          className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+          className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         >
           <div
             className="itemWrapper itemWrapperStatic"
@@ -350,7 +350,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   title="Copy to clipboard"
                 />
                 <button
-                  className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
+                  className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
                   disabled={false}
                   onClick={[Function]}
                   type="button"

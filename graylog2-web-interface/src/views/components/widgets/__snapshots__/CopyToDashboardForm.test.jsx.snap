@@ -1,0 +1,476 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CopyToDashboardForm should render the modal minimal 1`] = `
+<body
+  class="modal-open"
+  style="padding-right: 0px;"
+>
+  <div
+    aria-hidden="true"
+  />
+  <div
+    role="dialog"
+  >
+    <div
+      class="modal-backdrop fade in"
+    />
+    <div
+      class="Modal-nuree8-0 cHlGak fade in modal"
+      role="dialog"
+      style="display: block; padding-right: 0px;"
+      tabindex="-1"
+    >
+      <div
+        class="modal-dialog"
+      >
+        <div
+          class="modal-content"
+          role="document"
+        >
+          <div
+            class="modal-body"
+          >
+            <div
+              class="search"
+              style="margin-top: 15px;"
+            >
+              <form
+                class="form-inline"
+              >
+                <div
+                  class="form-group has-feedback"
+                >
+                  <input
+                    autocomplete="off"
+                    class="query form-control"
+                    id="common-search-form-query-input"
+                    placeholder="Enter search query..."
+                    spellcheck="false"
+                    style="width: auto;"
+                    type="text"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    type="submit"
+                  >
+                    Search
+                  </button>
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    type="reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+            <span>
+              <div
+                class="form-inline page-size"
+                style="float: right;"
+              >
+                <div
+                  class="form-group"
+                >
+                  <label
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                    for="page-size"
+                  >
+                    Show:
+                  </label>
+                  <span>
+                    <select
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
+                      id="page-size"
+                      label="Show:"
+                      name="page-size"
+                      placeholder=""
+                      type="select"
+                    >
+                      <option
+                        value="5"
+                      >
+                        5
+                      </option>
+                      <option
+                        value="10"
+                      >
+                        10
+                      </option>
+                      <option
+                        value="15"
+                      >
+                        15
+                      </option>
+                    </select>
+                    
+                  </span>
+                </div>
+              </div>
+              <span>
+                No dashboards found
+              </span>
+              <div
+                class="text-center"
+              >
+                <ul
+                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+                >
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="First"
+                      >
+                        «
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Previous"
+                      >
+                        ‹
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Next"
+                      >
+                        ›
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Last"
+                      >
+                        »
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div
+            class="modal-footer"
+          >
+            <button
+              class="Button-c9cbmb-0 GLfOY btn btn-primary"
+              disabled=""
+              type="button"
+            >
+              Select
+            </button>
+            <button
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;
+
+exports[`CopyToDashboardForm should render the modal with entries 1`] = `
+<body
+  class="modal-open"
+  style="padding-right: 0px;"
+>
+  <div
+    aria-hidden="true"
+  />
+  <div
+    role="dialog"
+  >
+    <div
+      class="modal-backdrop fade in"
+    />
+    <div
+      class="Modal-nuree8-0 cHlGak fade in modal"
+      role="dialog"
+      style="display: block; padding-right: 0px;"
+      tabindex="-1"
+    >
+      <div
+        class="modal-dialog"
+      >
+        <div
+          class="modal-content"
+          role="document"
+        >
+          <div
+            class="modal-body"
+          >
+            <div
+              class="search"
+              style="margin-top: 15px;"
+            >
+              <form
+                class="form-inline"
+              >
+                <div
+                  class="form-group has-feedback"
+                >
+                  <input
+                    autocomplete="off"
+                    class="query form-control"
+                    id="common-search-form-query-input"
+                    placeholder="Enter search query..."
+                    spellcheck="false"
+                    style="width: auto;"
+                    type="text"
+                    value=""
+                  />
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    type="submit"
+                  >
+                    Search
+                  </button>
+                </div>
+                <div
+                  class="form-group"
+                  style="margin-left: 5px;"
+                >
+                  <button
+                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    type="reset"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </form>
+            </div>
+            <span>
+              <div
+                class="form-inline page-size"
+                style="float: right;"
+              >
+                <div
+                  class="form-group"
+                >
+                  <label
+                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                    for="page-size"
+                  >
+                    Show:
+                  </label>
+                  <span>
+                    <select
+                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
+                      id="page-size"
+                      label="Show:"
+                      name="page-size"
+                      placeholder=""
+                      type="select"
+                    >
+                      <option
+                        value="5"
+                      >
+                        5
+                      </option>
+                      <option
+                        value="10"
+                      >
+                        10
+                      </option>
+                      <option
+                        value="15"
+                      >
+                        15
+                      </option>
+                    </select>
+                    
+                  </span>
+                </div>
+              </div>
+              <div
+                class="list-group"
+              >
+                <button
+                  class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                  type="button"
+                >
+                  <h4
+                    class="list-group-item-heading"
+                  >
+                    view 1
+                  </h4>
+                  <p
+                    class="list-group-item-text"
+                  />
+                </button>
+                <button
+                  class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                  type="button"
+                >
+                  <h4
+                    class="list-group-item-heading"
+                  >
+                    view 2
+                  </h4>
+                  <p
+                    class="list-group-item-text"
+                  />
+                </button>
+              </div>
+              <div
+                class="text-center"
+              >
+                <ul
+                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+                >
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="First"
+                      >
+                        «
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Previous"
+                      >
+                        ‹
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="active"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                    >
+                      1
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Next"
+                      >
+                        ›
+                      </span>
+                    </a>
+                  </li>
+                  <li
+                    class="disabled"
+                  >
+                    <a
+                      href="#"
+                      role="button"
+                      style="pointer-events: none;"
+                      tabindex="-1"
+                    >
+                      <span
+                        aria-label="Last"
+                      >
+                        »
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </span>
+          </div>
+          <div
+            class="modal-footer"
+          >
+            <button
+              class="Button-c9cbmb-0 GLfOY btn btn-primary"
+              disabled=""
+              type="button"
+            >
+              Select
+            </button>
+            <button
+              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

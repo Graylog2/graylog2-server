@@ -24,7 +24,7 @@ describe('WorldMapVisualization', () => {
   it('does not call onChange when not editing', () => {
     const onChange = jest.fn();
     const wrapper = mount(<WorldMapVisualization config={config}
-                                                 data={[]}
+                                                 data={{ chart: [] }}
                                                  editing={false}
                                                  effectiveTimerange={effectiveTimerange}
                                                  fields={Immutable.List()}
@@ -45,7 +45,7 @@ describe('WorldMapVisualization', () => {
   it('does call onChange when editing', () => {
     const onChange = jest.fn();
     const wrapper = mount(<WorldMapVisualization config={config}
-                                                 data={[]}
+                                                 data={{ chart: [] }}
                                                  editing
                                                  effectiveTimerange={effectiveTimerange}
                                                  fields={Immutable.List()}
@@ -68,7 +68,7 @@ describe('WorldMapVisualization', () => {
     const wrapper = mount((
       <RenderCompletionCallback.Provider value={renderCompletionCallback}>
         <WorldMapVisualization config={config}
-                               data={[]}
+                               data={{ chart: [] }}
                                editing
                                effectiveTimerange={effectiveTimerange}
                                fields={Immutable.List()}
@@ -89,10 +89,20 @@ describe('WorldMapVisualization', () => {
     const series = new Series('count()');
     // $FlowFixMe: type is always defined
     const configWithMetric = AggregationWidgetConfig.builder().series([series]).visualization(WorldMapVisualization.type).build();
-    const data = [
-      { key: ['37.751,-97.822'], values: [{ key: ['count()'], value: 25, rollup: true, source: 'row-leaf' }], source: 'leaf' },
-      { key: ['35.69,139.69'], values: [{ key: ['count()'], value: 6, rollup: true, source: 'row-leaf' }], source: 'leaf' },
-    ];
+    const data = {
+      chart: [
+        {
+          key: ['37.751,-97.822'],
+          values: [{ key: ['count()'], value: 25, rollup: true, source: 'row-leaf' }],
+          source: 'leaf',
+        },
+        {
+          key: ['35.69,139.69'],
+          values: [{ key: ['count()'], value: 6, rollup: true, source: 'row-leaf' }],
+          source: 'leaf',
+        },
+      ],
+    };
     const mapData = [{
       keys: [{}, {}],
       name: 'count()',
@@ -116,10 +126,12 @@ describe('WorldMapVisualization', () => {
   it('renders Map component with correct data, when no metric is defined', () => {
     // $FlowFixMe: type is always defined
     const configWithoutMetric = AggregationWidgetConfig.builder().visualization(WorldMapVisualization.type).build();
-    const data = [
-      { key: ['37.751,-97.822'], values: [], source: 'leaf' },
-      { key: ['35.69,139.69'], values: [], source: 'leaf' },
-    ];
+    const data = {
+      chart: [
+        { key: ['37.751,-97.822'], values: [], source: 'leaf' },
+        { key: ['35.69,139.69'], values: [], source: 'leaf' },
+      ],
+    };
     const mapData = [{
       keys: [{}, {}],
       name: 'No metric defined',

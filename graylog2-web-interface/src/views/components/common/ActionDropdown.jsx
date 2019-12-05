@@ -13,7 +13,6 @@ import StopPropagation from './StopPropagation';
 
 type ActionToggleProps = {
   children: React.Node,
-  // eslint-disable-next-line no-undef
   onClick: (SyntheticInputEvent<HTMLButtonElement>) => void,
 };
 
@@ -71,6 +70,8 @@ type ActionDropdownState = {
 };
 
 class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdownState> {
+  target: ?HTMLElement;
+
   static defaultProps = {
     container: undefined,
   };
@@ -82,14 +83,11 @@ class ActionDropdown extends React.Component<ActionDropdownProps, ActionDropdown
     };
   }
 
-  // eslint-disable-next-line no-undef
   _onToggle = (e: SyntheticInputEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     this.setState(({ show }) => ({ show: !show }));
   };
-
-  target: ?HTMLElement;
 
   render() {
     const { children, container, element } = this.props;

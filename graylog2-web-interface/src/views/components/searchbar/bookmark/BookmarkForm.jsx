@@ -7,7 +7,6 @@ import { Button, ControlLabel, FormControl, FormGroup, Popover } from 'component
 import styles from './BookmarkForm.css';
 
 type Props = {
-  // eslint-disable-next-line no-undef
   onChangeTitle: (SyntheticInputEvent<HTMLInputElement>) => void,
   saveSearch: () => void,
   saveAsSearch: () => void,

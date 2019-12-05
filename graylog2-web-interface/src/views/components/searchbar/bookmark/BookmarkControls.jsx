@@ -29,13 +29,11 @@ type State = {
 };
 
 class BookmarkControls extends React.Component<Props, State> {
+  formTarget: any;
+
   static propTypes = {
     viewStoreState: PropTypes.object.isRequired,
   };
-
-  static contextType = ViewLoaderContext;
-
-  formTarget: any;
 
   constructor(props: Props) {
     super(props);
@@ -60,7 +58,6 @@ class BookmarkControls extends React.Component<Props, State> {
     this.setState({ showList: !showList });
   };
 
-  // eslint-disable-next-line no-undef
   onChangeTitle = (e: SyntheticInputEvent<HTMLInputElement>) => {
     this.setState({ newTitle: e.target.value });
   };
@@ -148,6 +145,8 @@ class BookmarkControls extends React.Component<Props, State> {
       },
     });
   };
+
+  static contextType = ViewLoaderContext;
 
   render() {
     const { showForm, showList, newTitle } = this.state;
