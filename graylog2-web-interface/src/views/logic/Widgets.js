@@ -1,3 +1,4 @@
+// @flow strict
 import uuid from 'uuid/v4';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -16,7 +17,7 @@ const widgetsKey = 'enterpriseWidgets';
 const _findWidgetDefinition = type => PluginStore.exports(widgetsKey)
   .find(widget => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 
-export function widgetDefinition(type) {
+export function widgetDefinition(type: string) {
   const typeDefinition = _findWidgetDefinition(type);
   if (typeDefinition) {
     return typeDefinition;
@@ -29,7 +30,7 @@ export function widgetDefinition(type) {
   throw new Error(`Neither a widget of type "${type}" nor a default widget are registered!`);
 }
 
-export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
+export const resultHistogram = (id: string = uuid()) => AggregationWidget.builder()
   .id(id)
   .config(
     AggregationWidgetConfig.builder()
@@ -47,7 +48,7 @@ export const resultHistogram = (id = uuid()) => AggregationWidget.builder()
   )
   .build();
 
-export const allMessagesTable = (id = uuid()) => MessageWidget.builder()
+export const allMessagesTable = (id: string = uuid()) => MessageWidget.builder()
   .id(id)
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)
