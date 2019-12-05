@@ -33,4 +33,7 @@ public interface SearchType {
 
     @JsonProperty
     Set<String> streams();
+
+    @JsonProperty
+    Optional<String> name();
 }

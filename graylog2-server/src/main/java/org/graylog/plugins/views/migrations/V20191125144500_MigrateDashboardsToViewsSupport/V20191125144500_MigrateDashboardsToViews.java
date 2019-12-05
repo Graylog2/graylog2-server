@@ -27,8 +27,10 @@ import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -80,6 +82,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final Consumer<Map<String, Set<String>>> recordMigratedWidgetIds = widgetIdMigrationMapping::putAll;
 
         final Map<View, Search> newViews = this.dashboardsService.streamAll()
+                .sorted(Comparator.comparing(Dashboard::id))
                 .map(dashboard -> migrateDashboard(dashboard, recordMigratedDashboardIds, recordMigratedWidgetIds))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -112,8 +115,10 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
         final BiConsumer<String, String> recordWidgetTitle = newWidgetTitles::put;
 
         final Set<ViewWidget> newViewWidgets = dashboard.widgets().stream()
-                .flatMap(widget -> migrateWidget(widget, recordMigratedWidgetIds, recordWidgetTitle).stream())
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(Widget::id))
+                .flatMap(widget -> migrateWidget(widget, recordMigratedWidgetIds, recordWidgetTitle)
+                        .stream())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         final Map<String, ViewWidgetPosition> newViewWidgetPositions = migrateWidgetPositions(
                 dashboard,
