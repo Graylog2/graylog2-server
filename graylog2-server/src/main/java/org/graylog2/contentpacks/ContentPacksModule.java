@@ -18,6 +18,7 @@ package org.graylog2.contentpacks;
 
 import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.constraints.PluginVersionConstraintChecker;
+import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
@@ -54,6 +55,7 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(PipelineRuleFacade.TYPE_V1, PipelineRuleFacade.class);
         addEntityFacade(RootEntityFacade.TYPE, RootEntityFacade.class);
         addEntityFacade(StreamFacade.TYPE_V1, StreamFacade.class);
+        addEntityFacade(DashboardFacade.TYPE_V2, DashboardFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
         addConstraintChecker(PluginVersionConstraintChecker.class);

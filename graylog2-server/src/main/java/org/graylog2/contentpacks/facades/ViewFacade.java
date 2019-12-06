@@ -39,6 +39,7 @@ import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -46,11 +47,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class ViewFacade implements EntityFacade<ViewDTO> {
+public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     private static final Logger LOG = LoggerFactory.getLogger(ViewFacade.class);
-
-    public static final ModelType TYPE_V1 = ModelTypes.VIEW_V1;
 
     private final ObjectMapper objectMapper;
     private final ViewService viewService;
@@ -64,6 +64,8 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
         this.searchDbService = searchDbService;
         this.viewService = viewService;
     }
+
+    public abstract ModelType getModelType();
 
     private Entity exportNativeEntity(ViewDTO view, EntityDescriptorIds entityDescriptorIds) {
         final Map<String, ViewStateEntity> viewStateMap = new HashMap<>(view.state().size());
@@ -108,8 +110,8 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
 
         final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
         return EntityV1.builder()
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(view.id(), ModelTypes.VIEW_V1))))
-                .type(ModelTypes.VIEW_V1)
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(view.id(), getModelType()))))
+                .type(getModelType())
                 .data(data)
                 .build();
     }
@@ -193,7 +195,7 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
             viewBuilder.owner(viewEntity.owner().get());
         }
         final ViewDTO persistedView = viewService.save(viewBuilder.build());
-        return NativeEntity.create(entityV1.id(), persistedView.id(), TYPE_V1, persistedView.title(), persistedView);
+        return NativeEntity.create(entityV1.id(), persistedView.id(), getModelType(), persistedView.title(), persistedView);
     }
 
     private Search decodeSearch(SearchEntity entity) {
@@ -223,13 +225,15 @@ public class ViewFacade implements EntityFacade<ViewDTO> {
     public EntityExcerpt createExcerpt(ViewDTO nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
-                .type(TYPE_V1)
+                .type(getModelType())
                 .title(nativeEntity.title())
                 .build();
     }
 
+    public abstract Stream<ViewDTO> getNativeViews();
+
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return viewService.streamAll().map(this::createExcerpt).collect(Collectors.toSet());
+        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
     }
 }
