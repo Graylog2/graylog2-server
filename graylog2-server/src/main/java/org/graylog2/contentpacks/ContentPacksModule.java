@@ -20,7 +20,6 @@ import org.graylog2.contentpacks.constraints.GraylogVersionConstraintChecker;
 import org.graylog2.contentpacks.constraints.PluginVersionConstraintChecker;
 import org.graylog2.contentpacks.facades.SidecarCollectorConfigurationFacade;
 import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
-import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.contentpacks.facades.GrokPatternFacade;
 import org.graylog2.contentpacks.facades.InputFacade;
 import org.graylog2.contentpacks.facades.LookupCacheFacade;
@@ -31,7 +30,6 @@ import org.graylog2.contentpacks.facades.PipelineFacade;
 import org.graylog2.contentpacks.facades.PipelineRuleFacade;
 import org.graylog2.contentpacks.facades.RootEntityFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
-import org.graylog2.contentpacks.facades.ViewFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
 import org.graylog2.plugin.PluginModule;
 
@@ -46,7 +44,6 @@ public class ContentPacksModule extends PluginModule {
 
         addEntityFacade(SidecarCollectorConfigurationFacade.TYPE_V1, SidecarCollectorConfigurationFacade.class);
         addEntityFacade(SidecarCollectorFacade.TYPE_V1, SidecarCollectorFacade.class);
-        addEntityFacade(DashboardFacade.TYPE_V1, DashboardFacade.class);
         addEntityFacade(GrokPatternFacade.TYPE_V1, GrokPatternFacade.class);
         addEntityFacade(InputFacade.TYPE_V1, InputFacade.class);
         addEntityFacade(LookupCacheFacade.TYPE_V1, LookupCacheFacade.class);
@@ -57,7 +54,6 @@ public class ContentPacksModule extends PluginModule {
         addEntityFacade(PipelineRuleFacade.TYPE_V1, PipelineRuleFacade.class);
         addEntityFacade(RootEntityFacade.TYPE, RootEntityFacade.class);
         addEntityFacade(StreamFacade.TYPE_V1, StreamFacade.class);
-        addEntityFacade(ViewFacade.TYPE_V1, ViewFacade.class);
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
         addConstraintChecker(PluginVersionConstraintChecker.class);
