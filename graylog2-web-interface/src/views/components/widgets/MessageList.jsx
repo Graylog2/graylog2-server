@@ -114,6 +114,18 @@ class MessageList extends React.Component<Props, State> {
     });
   }
 
+  _getListKey = () => {
+    // When the component receives new messages, we want to reset the scroll position, by defining a new key or the MessageTable.
+    const { data: { messages } } = this.props;
+    const { currentPage } = this.state;
+    const defaultKey = `message-list-${currentPage}`;
+    if (!isEmpty(messages)) {
+      const firstMessageId = messages[0].message._id;
+      return `${defaultKey}-${firstMessageId}`;
+    }
+    return defaultKey;
+  }
+
   static contextType = RenderCompletionCallback;
 
   render() {
@@ -127,6 +139,7 @@ class MessageList extends React.Component<Props, State> {
     } = this.props;
     const { currentPage, errors } = this.state;
     const hasError = !isEmpty(errors);
+    const listKey = this._getListKey();
     return (
       <Wrapper>
         <PaginatedList onChange={this._handlePageChange}
@@ -134,7 +147,7 @@ class MessageList extends React.Component<Props, State> {
                        showPageSizeSelect={false}
                        totalItems={totalMessages}
                        pageSize={pageSize}>
-          {!hasError && <MessageTable messages={messages} fields={fields} config={config} selectedFields={selectedFields} activeQueryId={activeQueryId} key={`message-list-page-${currentPage}`} />}
+          {!hasError && <MessageTable messages={messages} fields={fields} config={config} selectedFields={selectedFields} activeQueryId={activeQueryId} key={listKey} />}
           {hasError && (<ErrorWidget errors={errors} />)}
         </PaginatedList>
       </Wrapper>
