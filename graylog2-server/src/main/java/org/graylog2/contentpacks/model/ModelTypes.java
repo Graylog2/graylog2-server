@@ -32,4 +32,5 @@ public interface ModelTypes {
     ModelType EVENT_DEFINITION_V1 = ModelType.of("event_definition", "1");
     ModelType NOTIFICATION_V1 = ModelType.of("notification", "1");
     ModelType DASHBOARD_V2 = ModelType.of("dashboard", "2");
+    ModelType SEARCH_V1 = ModelType.of("search", "1");
 }

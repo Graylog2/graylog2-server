@@ -10,23 +10,23 @@ import org.graylog2.contentpacks.model.ModelTypes;
 
 import java.util.stream.Stream;
 
-public class DashboardFacade extends ViewFacade {
-    public static final ModelType TYPE_V2 = ModelTypes.DASHBOARD_V2;
+public class SearchFacade extends ViewFacade {
+    public static final ModelType TYPE_V1 = ModelTypes.SEARCH_V1;
     private ViewService viewService;
 
     @Inject
-    public DashboardFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
+    public SearchFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
         this.viewService = viewService;
     }
 
     @Override
     public ModelType getModelType() {
-        return TYPE_V2;
+        return TYPE_V1;
     }
 
     @Override
     public Stream<ViewDTO> getNativeViews() {
-        return viewService.streamAll().filter(v -> v.type().equals(ViewDTO.Type.DASHBOARD));
+        return viewService.streamAll().filter(v -> v.type().equals(ViewDTO.Type.SEARCH));
     }
 }
