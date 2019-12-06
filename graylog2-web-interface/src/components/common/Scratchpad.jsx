@@ -75,7 +75,6 @@ const SavingMessage = styled.span(({ visible }) => `
 
 const Scratchpad = ({ loginName }) => {
   let clipboard;
-  let handleChangeTimeout;
   const localStorageItem = `${LOCALSTORAGE_PREFIX}${loginName}`;
   const scratchpadStore = Store.get(localStorageItem) || {};
   const textareaRef = useRef();
@@ -88,26 +87,27 @@ const Scratchpad = ({ loginName }) => {
   const [recentlySaved, setRecentlySaved] = useState(false);
   const [position, setPosition] = useState(scratchpadStore.position || undefined);
 
-  const writeData = (newData, callback = () => {}) => {
+  const writeData = (newData) => {
     const currentStorage = Store.get(localStorageItem);
     Store.set(localStorageItem, { ...currentStorage, ...newData });
-    callback();
   };
 
   const resetSavingMessage = debounce(() => {
     setRecentlySaved(false);
   }, 1000);
 
+  const handleSaveMessage = () => {
+    setRecentlySaved(true);
+
+    setTimeout(() => {
+      setRecentlySaved(false);
+    }, 1500);
+  };
+
   const handleChange = () => {
     const { value } = textareaRef.current;
     setScratchData(value);
-
-    clearTimeout(handleChangeTimeout);
-    handleChangeTimeout = setTimeout(() => {
-      setRecentlySaved(true);
-      resetSavingMessage.cancel();
-      writeData({ value }, resetSavingMessage);
-    }, 750);
+    writeData({ value });
   };
 
   const handleDrag = (newPosition) => {
@@ -180,7 +180,12 @@ const Scratchpad = ({ loginName }) => {
           </StyledAlert>
         )}
 
-        <Textarea ref={textareaRef} onChange={handleChange} value={scratchData} id={TEXTAREA_ID} copied={copied} />
+        <Textarea ref={textareaRef}
+                  onChange={handleChange}
+                  onBlur={handleSaveMessage}
+                  value={scratchData}
+                  id={TEXTAREA_ID}
+                  copied={copied} />
 
         <Footer>
           <SavingMessage visible={recentlySaved}><Icon name="hdd-o" /> Saved!</SavingMessage>
