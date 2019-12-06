@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,14 +31,20 @@ public class UrlWhitelistTest {
 
     @Test
     public void isWhitelisted() {
-        assertThat(UrlWhitelist.create(ImmutableList.of(new LiteralWhitelistEntry("a", "foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("a", "foo", null)))
                 .isWhitelisted(".foo")).isFalse();
-        assertThat(UrlWhitelist.create(ImmutableList.of(new RegexWhitelistEntry("b", "foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new RegexWhitelistEntry("b", "foo", null)))
                 .isWhitelisted(".foo")).isTrue();
-        assertThat(UrlWhitelist.create(ImmutableList.of(new RegexWhitelistEntry("c", "^foo$", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new RegexWhitelistEntry("c", "^foo$", null)))
                 .isWhitelisted(".foo")).isFalse();
-        assertThat(UrlWhitelist.create(ImmutableList.of(new LiteralWhitelistEntry("d", ".foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("d", ".foo", null)))
                 .isWhitelisted(".foo")).isTrue();
+    }
+
+    @Test
+    public void isDisabled() {
+        assertThat(UrlWhitelist.create(Collections.emptyList(), false).isWhitelisted("test")).isFalse();
+        assertThat(UrlWhitelist.create(Collections.emptyList(), true).isWhitelisted("test")).isTrue();
     }
 
     @Test
@@ -48,7 +55,7 @@ public class UrlWhitelistTest {
         List<WhitelistEntry> entries =
                 ImmutableList.of(new LiteralWhitelistEntry("a", "https://www.graylog.com", null),
                         new RegexWhitelistEntry("b", "https://www\\.graylog\\.com/.*", "regex test title"));
-        UrlWhitelist orig = UrlWhitelist.create(entries);
+        UrlWhitelist orig = UrlWhitelist.createEnabled(entries);
         String json = objectMapper.writeValueAsString(orig);
         UrlWhitelist read = objectMapper.readValue(json, UrlWhitelist.class);
         assertThat(read).isEqualTo(orig);

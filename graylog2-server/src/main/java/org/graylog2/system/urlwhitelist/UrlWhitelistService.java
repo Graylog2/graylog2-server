@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Collections;
-import java.util.UUID;
 
 public class UrlWhitelistService {
 
@@ -35,7 +34,7 @@ public class UrlWhitelistService {
      * Gets the whitelist by reading from the cluster configuration.
      *
      * <p>There should always be a whitelist which is created by an initial migration but if there is none, we return a
-     * whitelist matching all URLs.</p>
+     * disabled one, which will consider all URLs as whitelisted.</p>
      *
      * <p> This is  because we can't easily guarantee that migrations are run before other services are started. On a
      * system that didn't have a whitelist before, we have to add the URLs configured e.g. in lookup table data adapters
@@ -44,7 +43,8 @@ public class UrlWhitelistService {
      * run, these URLs will have been added to whitelist and we are fine.</p>
      */
     public UrlWhitelist get() {
-        return clusterConfigService.getOrDefault(UrlWhitelist.class, createCatchAllDefault());
+        return clusterConfigService.getOrDefault(UrlWhitelist.class,
+                UrlWhitelist.create(Collections.emptyList(), true));
     }
 
     public void save(UrlWhitelist whitelist) {
@@ -55,10 +55,4 @@ public class UrlWhitelistService {
     public boolean isWhitelisted(String url) {
         return get().isWhitelisted(url);
     }
-
-    private UrlWhitelist createCatchAllDefault() {
-        return UrlWhitelist.create(Collections.singletonList(new RegexWhitelistEntry(UUID.randomUUID().toString(), ".*",
-                "Temporary catch-all whitelist")));
-    }
-
 }

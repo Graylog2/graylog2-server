@@ -28,15 +28,33 @@ import java.util.List;
 @AutoValue
 @WithBeanGetter
 public abstract class UrlWhitelist {
+
     @JsonProperty("entries")
     public abstract List<WhitelistEntry> entries();
 
+    @JsonProperty("disabled")
+    public abstract boolean disabled();
+
     @JsonCreator
-    public static UrlWhitelist create(@JsonProperty("entries") List<WhitelistEntry> entries) {
-        return new AutoValue_UrlWhitelist(entries);
+    public static UrlWhitelist create(@JsonProperty("entries") List<WhitelistEntry> entries,
+            @JsonProperty("disabled") boolean disabled) {
+        return new AutoValue_UrlWhitelist(entries, disabled);
     }
 
+    public static UrlWhitelist createEnabled(@JsonProperty("entries") List<WhitelistEntry> entries) {
+        return new AutoValue_UrlWhitelist(entries, false);
+    }
+
+    /**
+     * Checks if a URL is whitelisted by looking for a whitelist entry matching the given url.
+     * @param url The URL to check.
+     * @return {@code false} if the whitelist is enabled and no whitelist entry matches the given url. {@code true}
+     * if there is a whitelist entry matching the given url or if the whitelist is disabled.
+     */
     public boolean isWhitelisted(String url) {
+        if (disabled()) {
+            return true;
+        }
         return entries().stream().anyMatch(e -> e.isWhitelisted(url));
     }
 }

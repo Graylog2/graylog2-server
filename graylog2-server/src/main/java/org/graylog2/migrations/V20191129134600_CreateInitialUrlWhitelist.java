@@ -110,7 +110,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         log.info("Created {} whitelist entries from URLs configured in data adapters and event notifications.",
                 entries.size());
 
-        final UrlWhitelist whitelist = UrlWhitelist.create(new ArrayList<>(entries));
+        final UrlWhitelist whitelist = UrlWhitelist.createEnabled(new ArrayList<>(entries));
         log.debug("Resulting whitelist: {}.", whitelist);
 
         return whitelist;
