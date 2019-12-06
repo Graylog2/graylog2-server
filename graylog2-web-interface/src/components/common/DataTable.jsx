@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { isEqual } from 'lodash';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
@@ -76,25 +75,23 @@ class DataTable extends React.Component {
 
   constructor(props) {
     super(props);
-    const { headers, rows } = this.props;
+    const { rows } = this.props;
     this.state = {
-      headers: headers,
-      rows: rows,
       filteredRows: rows,
     };
   }
 
-  componentDidUpdate(prevProps) {
-    const { rows } = this.props;
-    if (!isEqual(prevProps.rows, rows)) {
+  componentDidUpdate() {
+    const { filterKeys } = this.props;
+    if (filterKeys.length === 0) {
       this._updateState();
     }
   }
 
   getFormattedHeaders = () => {
     let i = 0;
-    const { headers } = this.state;
-    const { headerCellFormatter } = this.props;
+    // const { headers } = this.props;
+    const { headerCellFormatter, headers } = this.props;
     const formattedHeaders = headers.map((header) => {
       const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={headerCellFormatter} />;
       i += 1;
@@ -131,10 +128,8 @@ class DataTable extends React.Component {
   };
 
   _updateState() {
-    const { headers, rows } = this.props;
+    const { rows } = this.props;
     this.setState({
-      headers: headers,
-      rows: rows,
       filteredRows: rows,
     });
   }
@@ -153,8 +148,9 @@ class DataTable extends React.Component {
       className,
       rowClassName,
       useResponsiveTable,
+      rows,
     } = this.props;
-    const { rows, filteredRows } = this.state;
+    const { filteredRows } = this.state;
     if (filterKeys.length !== 0) {
       filter = (
         <div className="row">
