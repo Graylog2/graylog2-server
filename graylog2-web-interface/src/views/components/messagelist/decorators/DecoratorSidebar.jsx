@@ -24,38 +24,9 @@ class DecoratorSidebar extends React.Component {
     maximumHeight: PropTypes.number.isRequired,
   };
 
-  constructor(props: P, context: any) {
-    super(props, context);
-    this.state = {
-      maxDecoratorsHeight: 1000,
-    };
-  }
-
   componentDidMount() {
     DecoratorsActions.available();
-    this._updateHeight();
-    window.addEventListener('scroll', this._updateHeight);
   }
-
-  componentDidUpdate(prevProps) {
-    const { maximumHeight } = this.props;
-
-    if (maximumHeight !== prevProps.maximumHeight) {
-      this._updateHeight();
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this._updateHeight);
-  }
-
-  _updateHeight = () => {
-    const { maximumHeight } = this.props;
-    const decoratorsContainer = ReactDOM.findDOMNode(this.decoratorsContainer);
-    const maxHeight = maximumHeight - decoratorsContainer.getBoundingClientRect().top;
-
-    this.setState({ maxDecoratorsHeight: Math.max(maxHeight, this.MINIMUM_DECORATORS_HEIGHT) });
-  };
 
   _formatDecorator = (decorator) => {
     const { decorators, decoratorTypes, onChange } = this.props;
@@ -74,8 +45,7 @@ class DecoratorSidebar extends React.Component {
   };
 
   _updateOrder = (orderedDecorators) => {
-    const { decorators } = this.state;
-    const { onChange } = this.props;
+    const { decorators, onChange } = this.props;
     orderedDecorators.forEach((item, idx) => {
       const decorator = decorators.find(i => i.id === item.id);
       decorator.order = idx;
@@ -84,10 +54,7 @@ class DecoratorSidebar extends React.Component {
     onChange(decorators);
   };
 
-  static MINIMUM_DECORATORS_HEIGHT = 50;
-
   render() {
-    const { maxDecoratorsHeight } = this.state;
     const { decoratorTypes, onChange, stream, decorators } = this.props;
     if (!decoratorTypes) {
       return <Spinner />;
@@ -122,7 +89,7 @@ class DecoratorSidebar extends React.Component {
             <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
           </OverlayTrigger>
         </div>
-        <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: maxDecoratorsHeight }}>
+        <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer}>
           <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} onChange={onChange} />
         </div>
       </div>
