@@ -44,7 +44,10 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
   const selectedFieldsForSelect = config.fields.map(fieldName => ({ field: fieldName }));
 
-  const onDecoratorsChange = newDecorators => onChange(config.toBuilder().decorators(newDecorators).build());
+  const onDecoratorsChange = newDecorators => {
+    console.log('New Decorators: ', newDecorators);
+    onChange(config.toBuilder().decorators(newDecorators).build());
+  };
 
   return (
     <Row>

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import StoreProvider from 'injection/StoreProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
 import DocsHelper from 'util/DocsHelper';
 import { Button, OverlayTrigger, Popover } from 'components/graylog';
@@ -15,7 +15,7 @@ import DecoratorList from './DecoratorList';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 
-const DecoratorsStore = StoreProvider.getStore('Decorators');
+const { DecoratorsActions, DecoratorsStore } = CombinedProvider.get('Decorators');
 
 class DecoratorSidebar extends React.Component {
   static propTypes = {
@@ -32,6 +32,7 @@ class DecoratorSidebar extends React.Component {
   }
 
   componentDidMount() {
+    DecoratorsActions.available();
     this._updateHeight();
     window.addEventListener('scroll', this._updateHeight);
   }
@@ -88,7 +89,7 @@ class DecoratorSidebar extends React.Component {
   render() {
     const { maxDecoratorsHeight } = this.state;
     const { decoratorTypes, onChange, stream, decorators } = this.props;
-    if (!decorators) {
+    if (!decoratorTypes) {
       return <Spinner />;
     }
     const sortedDecorators = decorators
