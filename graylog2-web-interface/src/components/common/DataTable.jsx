@@ -82,6 +82,7 @@ class DataTable extends React.Component {
   }
 
   componentDidUpdate() {
+    // We update the state with row if the filterKeys is empty other than that typeahead is handling the state
     const { filterKeys } = this.props;
     if (filterKeys.length === 0) {
       this._updateState();
