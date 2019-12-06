@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog2.decorators.Decorator;
+import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
@@ -40,10 +41,12 @@ import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonTypeName(MessageList.NAME)
@@ -155,7 +158,11 @@ public abstract class MessageList implements SearchType {
         @JsonProperty
         public abstract Builder sort(@Nullable List<Sort> sort);
 
-        @JsonProperty
+        @JsonProperty("decorators")
+        public Builder _decorators(List<DecoratorImpl> decorators) {
+            return decorators(new ArrayList<>(decorators));
+        }
+
         public abstract Builder decorators(List<Decorator> decorators);
 
         public abstract MessageList build();
