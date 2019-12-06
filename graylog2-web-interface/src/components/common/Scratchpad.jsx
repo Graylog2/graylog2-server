@@ -84,6 +84,7 @@ const Scratchpad = ({ loginName }) => {
   const [scratchData, setScratchData] = useState(scratchpadStore.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState(scratchpadStore.size || undefined);
   const [copied, setCopied] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [recentlySaved, setRecentlySaved] = useState(false);
   const [position, setPosition] = useState(scratchpadStore.position || undefined);
 
@@ -97,15 +98,20 @@ const Scratchpad = ({ loginName }) => {
   }, 1000);
 
   const handleSaveMessage = () => {
-    setRecentlySaved(true);
+    if (dirty) {
+      setRecentlySaved(true);
 
-    setTimeout(() => {
-      setRecentlySaved(false);
-    }, 1500);
+      setTimeout(() => {
+        setRecentlySaved(false);
+      }, 1500);
+    }
+
+    setDirty(false);
   };
 
   const handleChange = () => {
     const { value } = textareaRef.current;
+    setDirty(true);
     setScratchData(value);
     writeData({ value });
   };
