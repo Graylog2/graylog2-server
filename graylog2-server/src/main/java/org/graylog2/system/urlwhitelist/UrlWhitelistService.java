@@ -20,6 +20,7 @@ import com.google.inject.Inject;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Collections;
+import java.util.UUID;
 
 public class UrlWhitelistService {
 
@@ -56,7 +57,8 @@ public class UrlWhitelistService {
     }
 
     private UrlWhitelist createCatchAllDefault() {
-        return UrlWhitelist.create(Collections.singletonList(new RegexWhitelistEntry(".*")));
+        return UrlWhitelist.create(Collections.singletonList(new RegexWhitelistEntry(UUID.randomUUID().toString(), ".*",
+                "Temporary catch-all whitelist")));
     }
 
 }

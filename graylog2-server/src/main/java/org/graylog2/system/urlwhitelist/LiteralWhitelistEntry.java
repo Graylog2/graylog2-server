@@ -18,9 +18,12 @@ package org.graylog2.system.urlwhitelist;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.annotation.Nullable;
+
 public class LiteralWhitelistEntry extends WhitelistEntry {
-    public LiteralWhitelistEntry(@JsonProperty("value") String value) {
-        super(Type.LITERAL, value);
+    public LiteralWhitelistEntry(@JsonProperty("id") String id, @JsonProperty("value") String value,
+            @JsonProperty("title") @Nullable String title) {
+        super(id, Type.LITERAL, value, title);
     }
 
     @Override

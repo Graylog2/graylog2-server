@@ -18,18 +18,21 @@ package org.graylog2.system.urlwhitelist;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.annotation.Nullable;
 import java.util.regex.Pattern;
 
 public class RegexWhitelistEntry extends WhitelistEntry {
     private final Pattern pattern;
 
-    public RegexWhitelistEntry(@JsonProperty("value") String value) {
-        super(Type.REGEX, value);
+    public RegexWhitelistEntry(@JsonProperty("id") String id, @JsonProperty("value") String value,
+            @JsonProperty("title") @Nullable String title) {
+        super(id, Type.REGEX, value, title);
         this.pattern = Pattern.compile(value, Pattern.DOTALL);
     }
 
     @Override
     public boolean isWhitelisted(String url) {
-        return pattern.matcher(url).find();
+        return pattern.matcher(url)
+                .find();
     }
 }

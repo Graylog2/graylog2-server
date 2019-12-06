@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -122,7 +123,9 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             return Optional.empty();
         }
         final String url = ((HTTPEventNotificationConfig) config).url();
-        return defaultIfNotMatching(new LiteralWhitelistEntry(url), url);
+        return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
+                .toString(), url,
+                "Automatically created entry for \"" + notificationDto.title() + "\" alert notification."), url);
     }
 
     private Optional<WhitelistEntry> extractFromDataAdapter(DataAdapterDto dataAdapterDto) {
@@ -130,7 +133,9 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
 
         if (config instanceof DSVHTTPDataAdapter.Config) {
             final String url = ((DSVHTTPDataAdapter.Config) config).url();
-            return defaultIfNotMatching(new LiteralWhitelistEntry(url), url);
+            return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
+                    .toString(), url,
+                    "Automatically created entry for \"" + dataAdapterDto.title() + "\" DSV HTTP adapter."), url);
         } else if (config instanceof HTTPJSONPathDataAdapter.Config) {
             final String url = StringUtils.strip(((HTTPJSONPathDataAdapter.Config) config).url());
             // Quote all parts around the ${key} template parameter( and replace the ${key} template param with a
@@ -138,7 +143,9 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             String transformedUrl = Arrays.stream(StringUtils.splitByWholeSeparator(url, "${key}"))
                     .map(part -> StringUtils.isBlank(part) ? part : Pattern.quote(part))
                     .collect(Collectors.joining(".*?"));
-            return defaultIfNotMatching(new RegexWhitelistEntry("^" + transformedUrl + "$"), url);
+            return defaultIfNotMatching(new RegexWhitelistEntry(UUID.randomUUID()
+                    .toString(), "^" + transformedUrl + "$",
+                    "Automatically created entry for \"" + dataAdapterDto.title() + "\" HTTP JSONPath adapter."), url);
         }
 
         return Optional.empty();
