@@ -14,26 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.integrations;
+package org.graylog.integrations.ipfix;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.google.auto.value.AutoValue;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.time.ZonedDateTime;
 
-/**
- * Implement the Plugin interface here.
- */
-public class IntegrationsPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new IntegrationsMetaData();
-    }
+@AutoValue
+public abstract class MessageHeader {
+    /**
+     * Known size of an IPFIX message header
+     */
+    public static final int LENGTH = 16;
 
-    @Override
-    public Collection<PluginModule> modules() {
-        return Collections.<PluginModule>singletonList(new IntegrationsModule());
+    public abstract int length();
+
+    public abstract ZonedDateTime exportTime();
+
+    public abstract long sequenceNumber();
+
+    public abstract long observationDomainId();
+
+    public static MessageHeader create(int length, ZonedDateTime exportTime, long sequenceNumber, long observationDomainId) {
+        return new AutoValue_MessageHeader(length, exportTime, sequenceNumber, observationDomainId);
     }
 }

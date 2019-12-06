@@ -28,6 +28,9 @@ import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
+import org.graylog.integrations.ipfix.codecs.IpfixCodec;
+import org.graylog.integrations.ipfix.inputs.IpfixUdpInput;
+import org.graylog.integrations.ipfix.transports.IpfixUdpTransport;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import org.slf4j.Logger;
@@ -81,6 +84,11 @@ public class IntegrationsModule extends PluginModule {
          */
 
         addAuditEventTypes(IntegrationsAuditEventTypes.class);
+
+        // IPFIX
+        addMessageInput(IpfixUdpInput.class);
+        addCodec("ipfix", IpfixCodec.class);
+        addTransport("ipfix-udp", IpfixUdpTransport.class);
 
         // Palo Alto Networks
         LOG.debug("Registering message input: {}", PaloAltoTCPInput.NAME);

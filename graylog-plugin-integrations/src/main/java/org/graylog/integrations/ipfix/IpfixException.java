@@ -14,26 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.integrations;
+package org.graylog.integrations.ipfix;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
-
-import java.util.Collection;
-import java.util.Collections;
-
-/**
- * Implement the Plugin interface here.
- */
-public class IntegrationsPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new IntegrationsMetaData();
+public class IpfixException extends RuntimeException {
+    public IpfixException(String message) {
+        super(message);
     }
 
-    @Override
-    public Collection<PluginModule> modules() {
-        return Collections.<PluginModule>singletonList(new IntegrationsModule());
+    public IpfixException() {
+    }
+
+    public IpfixException(String message, Throwable e) {
+        super(message, e);
     }
 }

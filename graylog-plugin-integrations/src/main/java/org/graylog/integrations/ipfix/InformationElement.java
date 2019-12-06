@@ -14,26 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.integrations;
+package org.graylog.integrations.ipfix;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.google.auto.value.AutoValue;
 
-import java.util.Collection;
-import java.util.Collections;
+@AutoValue
+public abstract class InformationElement {
+    public abstract int id();
 
-/**
- * Implement the Plugin interface here.
- */
-public class IntegrationsPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new IntegrationsMetaData();
-    }
+    public abstract int length();
 
-    @Override
-    public Collection<PluginModule> modules() {
-        return Collections.<PluginModule>singletonList(new IntegrationsModule());
+    public abstract long enterpriseNumber();
+
+    public static InformationElement create(int id, int length, long enterpriseNumber) {
+        return new AutoValue_InformationElement(id, length, enterpriseNumber);
     }
 }

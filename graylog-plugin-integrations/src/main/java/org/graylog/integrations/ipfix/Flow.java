@@ -14,26 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.integrations;
+package org.graylog.integrations.ipfix;
 
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.PluginModule;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 
-import java.util.Collection;
-import java.util.Collections;
+@AutoValue
+public abstract class Flow {
 
-/**
- * Implement the Plugin interface here.
- */
-public class IntegrationsPlugin implements Plugin {
-    @Override
-    public PluginMetaData metadata() {
-        return new IntegrationsMetaData();
+    public abstract ImmutableMap<String, Object> fields();
+
+    public static Flow create(ImmutableMap<String, Object> fields) {
+        return new AutoValue_Flow(fields);
     }
 
-    @Override
-    public Collection<PluginModule> modules() {
-        return Collections.<PluginModule>singletonList(new IntegrationsModule());
-    }
 }
