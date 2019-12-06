@@ -5,6 +5,8 @@ import 'helpers/mocking/react-dom_mock';
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
 import ContentPack from 'logic/content-packs/ContentPack';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 describe('<ContentPackParameters />', () => {
   it('should render with empty parameters', () => {
     const contentPack = {

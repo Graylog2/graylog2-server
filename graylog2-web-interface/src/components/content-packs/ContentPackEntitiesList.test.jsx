@@ -6,6 +6,8 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import Entity from 'logic/content-packs/Entity';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 describe('<ContentPackEntitiesList />', () => {
   const parameter = {
     title: 'A parameter name',

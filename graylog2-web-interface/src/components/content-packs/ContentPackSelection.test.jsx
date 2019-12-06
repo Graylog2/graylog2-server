@@ -6,6 +6,8 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import Entity from 'logic/content-packs/Entity';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
     const contentPack = new ContentPack.builder().build();

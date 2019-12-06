@@ -357,7 +357,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
           "v": "1.0",
         },
       ],
-      "id": "c5175201-66b2-4115-bf64-4dfdee4b0924",
+      "id": "dead-beef",
       "name": "",
       "parameters": Array [
         Object {

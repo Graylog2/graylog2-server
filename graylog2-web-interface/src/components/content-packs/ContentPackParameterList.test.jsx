@@ -6,6 +6,8 @@ import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import ContentPackParameterList from 'components/content-packs/ContentPackParameterList';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 describe('<ContentPackParameterList />', () => {
   it('should render with empty parameters with readOnly', () => {
     const contentPack = ContentPack.builder().build();
