@@ -50,9 +50,8 @@ export default class MessagesWidgetConfig extends WidgetConfig {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   equals(other: any): boolean {
-    return other instanceof MessagesWidgetConfig;
+    return other instanceof MessagesWidgetConfig && other.decorators === this.decorators;
   }
 
   // eslint-disable-next-line no-use-before-define
