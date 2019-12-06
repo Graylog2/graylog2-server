@@ -93,10 +93,6 @@ const Scratchpad = ({ loginName }) => {
     Store.set(localStorageItem, { ...currentStorage, ...newData });
   };
 
-  const resetSavingMessage = debounce(() => {
-    setRecentlySaved(false);
-  }, 1000);
-
   const handleSaveMessage = () => {
     if (dirty) {
       setRecentlySaved(true);
@@ -162,7 +158,6 @@ const Scratchpad = ({ loginName }) => {
 
     return () => {
       clipboard.destroy();
-      resetSavingMessage.cancel();
     };
   }, [isScratchpadVisible]);
 
