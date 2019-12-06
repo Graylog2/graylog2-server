@@ -30,11 +30,13 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.decorators.Decorator;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import javax.annotation.Nullable;
@@ -73,13 +75,17 @@ public abstract class MessageList implements SearchType {
     @Nullable
     public abstract List<Sort> sort();
 
+    @JsonProperty
+    public abstract List<Decorator> decorators();
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_MessageList.Builder()
                 .type(NAME)
                 .limit(150)
                 .offset(0)
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .decorators(Collections.emptyList());
     }
 
     public abstract Builder toBuilder();
@@ -149,6 +155,9 @@ public abstract class MessageList implements SearchType {
         @JsonProperty
         public abstract Builder sort(@Nullable List<Sort> sort);
 
+        @JsonProperty
+        public abstract Builder decorators(List<Decorator> decorators);
+
         public abstract MessageList build();
     }
 
@@ -170,6 +179,9 @@ public abstract class MessageList implements SearchType {
         public abstract List<ResultMessageSummary> messages();
 
         @JsonProperty
+        public abstract Optional<DecorationStats> decorationStats();
+
+        @JsonProperty
         public abstract long totalResults();
 
         public static Builder builder() {
@@ -189,6 +201,8 @@ public abstract class MessageList implements SearchType {
             public abstract Builder messages(List<ResultMessageSummary> messages);
 
             public abstract Builder totalResults(long totalResults);
+
+            public abstract Builder decorationStats(DecorationStats decorationStats);
 
             public abstract Result build();
         }
