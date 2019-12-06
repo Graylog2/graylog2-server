@@ -87,6 +87,7 @@ import LineVisualizationConfiguration from './components/aggregationbuilder/Line
 import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
+import MessageConfigGenerator from './logic/searchtypes/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
@@ -134,7 +135,7 @@ export default {
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
       searchResultTransformer: (data: Array<*>) => data[0],
-      searchTypes: () => [{ type: 'messages' }],
+      searchTypes: MessageConfigGenerator,
       titleGenerator: () => 'Untitled Message Table',
     },
     {
