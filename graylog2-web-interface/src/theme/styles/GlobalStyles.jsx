@@ -1,6 +1,6 @@
 import { css } from 'styled-components';
 
-const globalStyles = theme => css`
+const globalStyles = css(({ theme }) => css`
   body {
     background-color: ${theme.color.global.background};
     color: ${theme.color.global.textDefault};
@@ -73,4 +73,4 @@ const globalStyles = theme => css`
   }
 `);
 
-export default globalStyles;
+export default { globalStyles };

@@ -69,7 +69,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -88,11 +88,11 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                         htmlFor="pattern-input"
                       >
                         Pattern
@@ -269,7 +269,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -288,11 +288,11 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                         htmlFor="pattern-selector"
                       >
                         Filter pattern
@@ -905,7 +905,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -924,11 +924,11 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                         htmlFor="pattern-input"
                       >
                         Pattern
@@ -1105,7 +1105,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -1124,11 +1124,11 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                         htmlFor="pattern-selector"
                       >
                         Filter pattern

@@ -103,7 +103,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ControlLabel-sc-1edmum5-0",
                             "isStatic": false,
-                            "lastClassName": "jmEvcm",
+                            "lastClassName": "brPnzl",
                             "rules": Array [
                               [Function],
                             ],
@@ -122,11 +122,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <ControlLabel
                         bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm"
+                        className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl"
                         srOnly={false}
                       >
                         <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                          className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl control-label"
                           htmlFor="comment"
                         >
                           Comment
@@ -286,7 +286,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ControlLabel-sc-1edmum5-0",
                             "isStatic": false,
-                            "lastClassName": "jmEvcm",
+                            "lastClassName": "brPnzl",
                             "rules": Array [
                               [Function],
                             ],
@@ -305,11 +305,11 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     >
                       <ControlLabel
                         bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm"
+                        className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl"
                         srOnly={false}
                       >
                         <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                          className="col-sm-3 ControlLabel-sc-1edmum5-0 brPnzl control-label"
                           htmlFor="PARAM"
                         >
                           A parameter

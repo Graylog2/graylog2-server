@@ -323,7 +323,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                     "isStatic": false,
-                                    "lastClassName": "jmEvcm",
+                                    "lastClassName": "brPnzl",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -342,11 +342,11 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             >
                               <ControlLabel
                                 bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                className="ControlLabel-sc-1edmum5-0 brPnzl"
                                 srOnly={false}
                               >
                                 <label
-                                  className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   htmlFor="content-packs-filter"
                                 >
                                   Filter
@@ -1093,10 +1093,9 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsClass="badge installed"
-                                            bsStyle="default"
                                             key="installed"
                                           >
-                                            <Badge
+                                            <Badge__StyledBadge
                                               bsClass="badge installed"
                                             >
                                               <StyledComponent
@@ -1106,17 +1105,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     "$$typeof": Symbol(react.forward_ref),
                                                     "attrs": Array [],
                                                     "componentStyle": ComponentStyle {
-                                                      "componentId": "Badge-sc-4gzqz0-0",
+                                                      "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "iRhcGJ",
+                                                      "lastClassName": "gDhrrS",
                                                       "rules": Array [
                                                         [Function],
                                                       ],
                                                     },
-                                                    "displayName": "Badge",
+                                                    "displayName": "Badge__StyledBadge",
                                                     "foldedComponentIds": Array [],
                                                     "render": [Function],
-                                                    "styledComponentId": "Badge-sc-4gzqz0-0",
+                                                    "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                     "target": [Function],
                                                     "toString": [Function],
                                                     "warnTooManyClasses": [Function],
@@ -1127,17 +1126,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               >
                                                 <Badge
                                                   bsClass="badge installed"
-                                                  className="Badge-sc-4gzqz0-0 iRhcGJ"
+                                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
                                                   pullRight={false}
                                                 >
                                                   <span
-                                                    className="Badge-sc-4gzqz0-0 iRhcGJ badge installed"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
                                                   >
                                                     installed
                                                   </span>
                                                 </Badge>
                                               </StyledComponent>
-                                            </Badge>
+                                            </Badge__StyledBadge>
                                           </ForwardRef>
                                         </a>
                                       </Link>
@@ -1916,10 +1915,9 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                         >
                                           <ForwardRef
                                             bsClass="badge installed"
-                                            bsStyle="default"
                                             key="installed"
                                           >
-                                            <Badge
+                                            <Badge__StyledBadge
                                               bsClass="badge installed"
                                             >
                                               <StyledComponent
@@ -1929,17 +1927,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                     "$$typeof": Symbol(react.forward_ref),
                                                     "attrs": Array [],
                                                     "componentStyle": ComponentStyle {
-                                                      "componentId": "Badge-sc-4gzqz0-0",
+                                                      "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                       "isStatic": false,
-                                                      "lastClassName": "iRhcGJ",
+                                                      "lastClassName": "gDhrrS",
                                                       "rules": Array [
                                                         [Function],
                                                       ],
                                                     },
-                                                    "displayName": "Badge",
+                                                    "displayName": "Badge__StyledBadge",
                                                     "foldedComponentIds": Array [],
                                                     "render": [Function],
-                                                    "styledComponentId": "Badge-sc-4gzqz0-0",
+                                                    "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                     "target": [Function],
                                                     "toString": [Function],
                                                     "warnTooManyClasses": [Function],
@@ -1950,17 +1948,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                               >
                                                 <Badge
                                                   bsClass="badge installed"
-                                                  className="Badge-sc-4gzqz0-0 iRhcGJ"
+                                                  className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
                                                   pullRight={false}
                                                 >
                                                   <span
-                                                    className="Badge-sc-4gzqz0-0 iRhcGJ badge installed"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
                                                   >
                                                     installed
                                                   </span>
                                                 </Badge>
                                               </StyledComponent>
-                                            </Badge>
+                                            </Badge__StyledBadge>
                                           </ForwardRef>
                                         </a>
                                       </Link>
@@ -9117,7 +9115,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
                                     "isStatic": false,
-                                    "lastClassName": "jmEvcm",
+                                    "lastClassName": "brPnzl",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -9136,11 +9134,11 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             >
                               <ControlLabel
                                 bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                className="ControlLabel-sc-1edmum5-0 brPnzl"
                                 srOnly={false}
                               >
                                 <label
-                                  className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   htmlFor="content-packs-filter"
                                 >
                                   Filter

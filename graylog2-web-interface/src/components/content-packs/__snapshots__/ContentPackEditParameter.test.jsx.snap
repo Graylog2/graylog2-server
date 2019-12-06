@@ -58,7 +58,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -77,11 +77,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="title"
                     >
                       Title
@@ -248,7 +248,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -267,11 +267,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="name"
                     >
                       Name
@@ -438,7 +438,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -457,11 +457,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="description"
                     >
                       Description
@@ -628,7 +628,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -647,11 +647,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -838,7 +838,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -857,11 +857,11 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="default_value"
                     >
                       Default value
@@ -1065,7 +1065,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -1084,11 +1084,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="title"
                     >
                       Title
@@ -1255,7 +1255,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -1274,11 +1274,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="name"
                     >
                       Name
@@ -1445,7 +1445,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -1464,11 +1464,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="description"
                     >
                       Description
@@ -1635,7 +1635,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -1654,11 +1654,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -1845,7 +1845,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -1864,11 +1864,11 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="default_value"
                     >
                       Default value
@@ -2053,7 +2053,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2072,11 +2072,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="title"
                     >
                       Title
@@ -2243,7 +2243,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2262,11 +2262,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="name"
                     >
                       Name
@@ -2433,7 +2433,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2452,11 +2452,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="description"
                     >
                       Description
@@ -2623,7 +2623,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2642,11 +2642,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="type"
                     >
                       Value Type
@@ -2833,7 +2833,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
                         "isStatic": false,
-                        "lastClassName": "jmEvcm",
+                        "lastClassName": "brPnzl",
                         "rules": Array [
                           [Function],
                         ],
@@ -2852,11 +2852,11 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       htmlFor="default_value"
                     >
                       Default value

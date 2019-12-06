@@ -110,7 +110,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "ControlLabel-sc-1edmum5-0",
                                       "isStatic": false,
-                                      "lastClassName": "jmEvcm",
+                                      "lastClassName": "brPnzl",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -129,11 +129,11 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               >
                                 <ControlLabel
                                   bsClass="control-label"
-                                  className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
                                   srOnly={false}
                                 >
                                   <label
-                                    className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   >
                                     Title
                                   </label>
@@ -479,7 +479,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                                     "componentStyle": ComponentStyle {
                                       "componentId": "ControlLabel-sc-1edmum5-0",
                                       "isStatic": false,
-                                      "lastClassName": "jmEvcm",
+                                      "lastClassName": "brPnzl",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -498,11 +498,11 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               >
                                 <ControlLabel
                                   bsClass="control-label"
-                                  className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
                                   srOnly={false}
                                 >
                                   <label
-                                    className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   >
                                     Title
                                   </label>
@@ -925,7 +925,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                                     "componentStyle": ComponentStyle {
                                       "componentId": "ControlLabel-sc-1edmum5-0",
                                       "isStatic": false,
-                                      "lastClassName": "jmEvcm",
+                                      "lastClassName": "brPnzl",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -944,11 +944,11 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               >
                                 <ControlLabel
                                   bsClass="control-label"
-                                  className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
                                   srOnly={false}
                                 >
                                   <label
-                                    className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   >
                                     Title
                                   </label>

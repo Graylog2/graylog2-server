@@ -50,7 +50,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                 </td>
                 <td>
                   <span
-                    className="failure Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-times"
@@ -70,7 +70,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
                 </td>
                 <td>
                   <span
-                    className="success Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-check"
@@ -137,7 +137,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                 </td>
                 <td>
                   <span
-                    className="success Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-check"
@@ -157,7 +157,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
                 </td>
                 <td>
                   <span
-                    className="success Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="success Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-check"
@@ -224,7 +224,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                 </td>
                 <td>
                   <span
-                    className="failure Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-times"
@@ -244,7 +244,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
                 </td>
                 <td>
                   <span
-                    className="failure Badge-sc-4gzqz0-0 iRhcGJ badge"
+                    className="failure Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge"
                   >
                     <i
                       className="fa fa-times"

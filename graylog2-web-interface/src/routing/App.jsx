@@ -8,6 +8,7 @@ import StoreProvider from 'injection/StoreProvider';
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
+import GlobalThemeStyles from '../theme/GlobalThemeStyles';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
@@ -23,6 +24,7 @@ const App = ({ children, currentUser, location }) => {
 
   return (
     <ScratchpadProvider>
+      <GlobalThemeStyles />
       <Navigation requestPath={location.pathname}
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}

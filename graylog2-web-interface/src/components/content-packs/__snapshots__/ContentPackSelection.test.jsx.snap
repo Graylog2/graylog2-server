@@ -80,7 +80,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -99,11 +99,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="name"
                             >
                               Name
@@ -270,7 +270,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -289,11 +289,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="summary"
                             >
                               Summary
@@ -459,7 +459,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -478,11 +478,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="description"
                             >
                               Description
@@ -645,7 +645,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -664,11 +664,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="vendor"
                             >
                               Vendor
@@ -834,7 +834,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -853,11 +853,11 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="url"
                             >
                               URL
@@ -1390,7 +1390,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1409,11 +1409,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="name"
                             >
                               Name
@@ -1580,7 +1580,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1599,11 +1599,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="summary"
                             >
                               Summary
@@ -1769,7 +1769,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1788,11 +1788,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="description"
                             >
                               Description
@@ -1955,7 +1955,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -1974,11 +1974,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="vendor"
                             >
                               Vendor
@@ -2144,7 +2144,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                               "componentStyle": ComponentStyle {
                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                 "isStatic": false,
-                                "lastClassName": "jmEvcm",
+                                "lastClassName": "brPnzl",
                                 "rules": Array [
                                   [Function],
                                 ],
@@ -2163,11 +2163,11 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         >
                           <ControlLabel
                             bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                             srOnly={false}
                           >
                             <label
-                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                               htmlFor="url"
                             >
                               URL

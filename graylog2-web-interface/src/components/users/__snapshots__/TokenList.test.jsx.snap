@@ -41,7 +41,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -60,11 +60,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       >
                         Token Name
                       </label>
@@ -337,7 +337,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
                                         "isStatic": false,
-                                        "lastClassName": "jmEvcm",
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -356,11 +356,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="filter-data-filter"
                                     >
                                       Filter
@@ -849,7 +849,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "ControlLabel-sc-1edmum5-0",
                           "isStatic": false,
-                          "lastClassName": "jmEvcm",
+                          "lastClassName": "brPnzl",
                           "rules": Array [
                             [Function],
                           ],
@@ -868,11 +868,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <ControlLabel
                       bsClass="control-label"
-                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm"
+                      className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 brPnzl"
                       srOnly={false}
                     >
                       <label
-                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                        className="tokenNewNameLabel ControlLabel-sc-1edmum5-0 brPnzl control-label"
                       >
                         Token Name
                       </label>
@@ -1167,7 +1167,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
                                         "isStatic": false,
-                                        "lastClassName": "jmEvcm",
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
                                           [Function],
                                         ],
@@ -1186,11 +1186,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="filter-data-filter"
                                     >
                                       Filter

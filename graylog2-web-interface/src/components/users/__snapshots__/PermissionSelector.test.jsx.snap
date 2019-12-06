@@ -339,7 +339,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "jmEvcm",
+                                                                "lastClassName": "brPnzl",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -358,11 +358,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         >
                                                           <ControlLabel
                                                             bsClass="control-label"
-                                                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                                                             srOnly={false}
                                                           >
                                                             <label
-                                                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                               htmlFor="filter-streams-data-filter"
                                                             >
                                                               Filter Streams
@@ -1491,7 +1491,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "jmEvcm",
+                                                                "lastClassName": "brPnzl",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -1510,11 +1510,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         >
                                                           <ControlLabel
                                                             bsClass="control-label"
-                                                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                                                             srOnly={false}
                                                           >
                                                             <label
-                                                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                               htmlFor="filter-dashboards-data-filter"
                                                             >
                                                               Filter Dashboards
@@ -2861,7 +2861,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "jmEvcm",
+                                                                "lastClassName": "brPnzl",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -2880,11 +2880,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         >
                                                           <ControlLabel
                                                             bsClass="control-label"
-                                                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                                                             srOnly={false}
                                                           >
                                                             <label
-                                                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                               htmlFor="filter-streams-data-filter"
                                                             >
                                                               Filter Streams
@@ -4013,7 +4013,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                               "componentStyle": ComponentStyle {
                                                                 "componentId": "ControlLabel-sc-1edmum5-0",
                                                                 "isStatic": false,
-                                                                "lastClassName": "jmEvcm",
+                                                                "lastClassName": "brPnzl",
                                                                 "rules": Array [
                                                                   [Function],
                                                                 ],
@@ -4032,11 +4032,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         >
                                                           <ControlLabel
                                                             bsClass="control-label"
-                                                            className="ControlLabel-sc-1edmum5-0 jmEvcm"
+                                                            className="ControlLabel-sc-1edmum5-0 brPnzl"
                                                             srOnly={false}
                                                           >
                                                             <label
-                                                              className="ControlLabel-sc-1edmum5-0 jmEvcm control-label"
+                                                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                               htmlFor="filter-dashboards-data-filter"
                                                             >
                                                               Filter Dashboards
