@@ -2,12 +2,16 @@
 import * as Immutable from 'immutable';
 import WidgetConfig from './WidgetConfig';
 
+type Decorator = any;
+
 type InternalState = {
+  decorators: Array<Decorator>,
   fields: Array<string>,
   showMessageRow: boolean,
 };
 
 export type MessagesWidgetConfigJSON = {
+  decorators: Array<Decorator>,
   fields: Array<string>,
   show_message_row: boolean,
 };
@@ -15,9 +19,13 @@ export type MessagesWidgetConfigJSON = {
 export default class MessagesWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  constructor(fields: Array<string>, showMessageRow: boolean) {
+  constructor(fields: Array<string>, showMessageRow: boolean, decorators: Array<Decorator>) {
     super();
-    this._value = { fields: fields.slice(0), showMessageRow };
+    this._value = { decorators, fields: fields.slice(0), showMessageRow };
+  }
+
+  get decorators() {
+    return this._value.decorators;
   }
 
   get fields() {
@@ -28,30 +36,22 @@ export default class MessagesWidgetConfig extends WidgetConfig {
     return this._value.showMessageRow;
   }
 
-  toObject() {
-    const { fields, showMessageRow } = this._value;
-    const copiedFields: Array<string> = fields.slice(0);
-    return {
-      fields: copiedFields,
-      showMessageRow,
-    };
-  }
-
   toBuilder() {
     // eslint-disable-next-line no-use-before-define
     return new Builder(Immutable.Map(this._value));
   }
 
   toJSON() {
-    const { fields, showMessageRow } = this._value;
+    const { decorators, fields, showMessageRow } = this._value;
     return {
+      decorators,
       fields,
       show_message_row: showMessageRow,
     };
   }
 
   // eslint-disable-next-line class-methods-use-this
-  equals(other: any) : boolean {
+  equals(other: any): boolean {
     return other instanceof MessagesWidgetConfig;
   }
 
@@ -59,14 +59,15 @@ export default class MessagesWidgetConfig extends WidgetConfig {
   static builder(): Builder {
     // eslint-disable-next-line no-use-before-define
     return new Builder()
+      .decorators([])
       .fields([]);
   }
 
   static fromJSON(value: MessagesWidgetConfigJSON) {
     // eslint-disable-next-line camelcase
-    const { show_message_row, fields } = value;
+    const { decorators, show_message_row, fields } = value;
 
-    return new MessagesWidgetConfig(fields, show_message_row);
+    return new MessagesWidgetConfig(fields, show_message_row, decorators);
   }
 }
 
@@ -78,6 +79,10 @@ class Builder {
     this.value = value;
   }
 
+  decorators(value: Array<Decorator>) {
+    return new Builder(this.value.set('decorators', value.slice(0)));
+  }
+
   fields(value: Array<string>) {
     return new Builder(this.value.set('fields', value.slice(0)));
   }
@@ -87,7 +92,7 @@ class Builder {
   }
 
   build() {
-    const { fields, showMessageRow } = this.value.toObject();
-    return new MessagesWidgetConfig(fields, showMessageRow);
+    const { decorators, fields, showMessageRow } = this.value.toObject();
+    return new MessagesWidgetConfig(fields, showMessageRow, decorators);
   }
 }

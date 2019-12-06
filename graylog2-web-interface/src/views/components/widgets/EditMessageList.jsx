@@ -10,6 +10,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
+import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
 import style from './EditMessageList.css';
 
@@ -43,6 +44,8 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
   const selectedFieldsForSelect = config.fields.map(fieldName => ({ field: fieldName }));
 
+  const onDecoratorsChange = newDecorators => onChange(config.toBuilder().decorators(newDecorators).build());
+
   return (
     <Row>
       <Col md={3}>
@@ -55,6 +58,12 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
             Show message in new row
           </Checkbox>
         </DescriptionBox>
+        <DescriptionBox description="Decorators">
+          <DecoratorSidebar stream="000000000000000000000001"
+                            decorators={config.decorators}
+                            maximumHeight={600}
+                            onChange={onDecoratorsChange} />
+        </DescriptionBox>
       </Col>
       <Col md={9}>
         {_renderChildrenWithContainerHeight(children, containerHeight)}
@@ -65,9 +74,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
 
 EditMessageList.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  config: PropTypes.shape({
-    fields: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
+  config: PropTypes.instanceOf(MessagesWidgetConfig).isRequired,
   containerHeight: PropTypes.number.isRequired,
   fields: CustomPropTypes.FieldListType.isRequired,
   onChange: PropTypes.func.isRequired,
