@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
@@ -21,7 +20,6 @@ class DecoratorSidebar extends React.Component {
   static propTypes = {
     decorators: PropTypes.array.isRequired,
     stream: PropTypes.string.isRequired,
-    maximumHeight: PropTypes.number.isRequired,
   };
 
   componentDidMount() {
@@ -32,7 +30,7 @@ class DecoratorSidebar extends React.Component {
     const { decorators, decoratorTypes, onChange } = this.props;
     const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
     const deleteDecorator = decoratorId => onChange(decorators.filter(_decorator => _decorator.id !== decoratorId));
-    const updateDecorator = (id, updatedDecorator) => onChange(decorators.map(_decorator => _decorator.id === id ? updatedDecorator : _decorator));
+    const updateDecorator = (id, updatedDecorator) => onChange(decorators.map(_decorator => (_decorator.id === id ? updatedDecorator : _decorator)));
     return ({
       id: decorator.id,
       title: <Decorator key={`decorator-${decorator.id}`}
