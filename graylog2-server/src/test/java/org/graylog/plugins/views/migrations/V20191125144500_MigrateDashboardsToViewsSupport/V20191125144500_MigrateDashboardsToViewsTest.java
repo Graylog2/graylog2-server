@@ -49,8 +49,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
@@ -63,10 +68,7 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
     @Mock
     private ClusterConfigService clusterConfigService;
 
-    @Mock
     private ViewService viewService;
-
-    @Mock
     private SearchService searchService;
 
     private Migration migration;
@@ -94,6 +96,9 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         final RandomObjectIdProvider randomObjectIdProvider = new StaticRandomObjectIdProvider(new Date(1575020937839L));
         final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
+
+        this.viewService = spy(new ViewService(mongodb.mongoConnection(), mapperProvider));
+        this.searchService = spy(new SearchService(mongodb.mongoConnection(), mapperProvider));
 
         migration = new V20191125144500_MigrateDashboardsToViews(
                 dashboardsService,
@@ -194,6 +199,42 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         JSONAssert.assertEquals(toJSON(newViews), resourceFile("ops_dashboards-expected_views.json"), false);
         JSONAssert.assertEquals(toJSON(newSearches), resourceFile("ops_dashboards-expected_searches.json"), false);
+    }
+
+    @Test
+    @MongoDBFixtures("ops_dashboards.json")
+    public void exceptionWhenSavingViewCausesRollback() throws Exception {
+        doThrow(new RuntimeException("Something bad happened while saving view"))
+                .when(viewService)
+                .save(argThat(view -> view.id().equals("5ddf8ed8b2d44b2e044729d2")));
+
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(migration::upgrade)
+                .withMessage("Something bad happened while saving view");
+
+        verify(viewService, atLeastOnce()).remove(any());
+        verify(searchService, atLeastOnce()).remove(any());
+
+        assertThat(viewService.count()).isZero();
+        assertThat(searchService.count()).isZero();
+    }
+
+    @Test
+    @MongoDBFixtures("ops_dashboards.json")
+    public void exceptionWhenSavingSearchCausesRollback() throws Exception {
+        doThrow(new RuntimeException("Something bad happened while saving view"))
+                .when(searchService)
+                .save(argThat(search -> search.id().equals("5de0e98900002a0017000001")));
+
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(migration::upgrade)
+                .withMessage("Something bad happened while saving view");
+
+        verify(viewService, atLeastOnce()).remove(any());
+        verify(searchService, atLeastOnce()).remove(any());
+
+        assertThat(viewService.count()).isZero();
+        assertThat(searchService.count()).isZero();
     }
 
     private MigrationCompleted captureMigrationCompleted() {

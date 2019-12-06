@@ -37,4 +37,8 @@ class SearchService {
     public ObjectId save(Search search) {
         return db.insert(search).getSavedId();
     }
+
+    public void remove(ObjectId searchID) { db.removeById(searchID); }
+
+    long count() { return db.count(); }
 }
