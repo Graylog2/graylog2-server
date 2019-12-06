@@ -88,7 +88,7 @@ const Scratchpad = ({ loginName }) => {
   const [recentlySaved, setRecentlySaved] = useState(false);
   const [position, setPosition] = useState(scratchpadStore.position || undefined);
 
-  const writeData = (newData, callback) => {
+  const writeData = (newData, callback = () => {}) => {
     const currentStorage = Store.get(localStorageItem);
     Store.set(localStorageItem, { ...currentStorage, ...newData });
     callback();
