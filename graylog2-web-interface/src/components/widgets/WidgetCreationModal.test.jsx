@@ -28,16 +28,16 @@ const CustomModalDynamicConfig = class extends React.Component {
 };
 
 const CustomModalBothConfigs = class extends React.Component {
-  static initialConfiguration = {
-    foo: '3',
-  };
-
   constructor(props) {
     super(props);
     props.setInitialConfiguration({
       foo: '4',
     });
   }
+
+  static initialConfiguration = {
+    foo: '3',
+  };
 
   render() {
     return null;
