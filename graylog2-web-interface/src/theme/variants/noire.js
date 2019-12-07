@@ -1,9 +1,10 @@
 import { darken, lighten, tint, invert } from 'polished';
+import teinte from './teinte';
 
 const brand = {
-  primary: invert('#FF3633'),
-  secondary: invert('#FFF'),
-  tertiary: invert('#1F1F1F'),
+  primary: invert(teinte.brand.primary),
+  secondary: invert(teinte.brand.secondary),
+  tertiary: invert(teinte.brand.tertiary),
 };
 
 const gray = {};
@@ -18,18 +19,18 @@ const global = {
   textDefault: gray[0],
   textAlt: gray[100],
   background: gray[90],
-  contentBackground: invert('#fff'),
-  link: invert('#702785'),
-  linkHover: invert(darken(0.10, '#702785')),
+  contentBackground: invert(teinte.global.contentBackground),
+  link: invert(teinte.global.link),
+  linkHover: invert(darken(0.10, teinte.global.linkHover)),
 };
 
 const variant = {
-  danger: invert('#AD0707'),
-  default: invert('#1F1F1F'),
-  info: invert('#0063BE'),
-  primary: invert('#702785'),
-  success: invert('#00AE42'),
-  warning: invert('#FFD200'),
+  danger: invert(teinte.variant.danger),
+  default: invert(teinte.variant.default),
+  info: invert(teinte.variant.info),
+  primary: invert(teinte.variant.primary),
+  success: invert(teinte.variant.success),
+  warning: invert(teinte.variant.warning),
 };
 
 const variantLight = {};
@@ -40,7 +41,7 @@ Object.keys(variant).forEach((name) => {
   variantDark[name] = darken(0.17, variant[name]);
 });
 
-const teinte = {
+const noire = {
   brand,
   global,
   gray,
@@ -51,4 +52,4 @@ const teinte = {
   },
 };
 
-export default teinte;
+export default noire;
