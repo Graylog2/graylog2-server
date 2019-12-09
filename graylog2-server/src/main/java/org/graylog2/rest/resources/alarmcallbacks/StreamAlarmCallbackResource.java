@@ -67,7 +67,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "Stream/AlarmCallbacks", description = "Manage stream alarm callbacks")
+@Api(value = "Stream/AlarmCallbacks", description = "Manage stream legacy alarm callbacks")
 @Path("/streams/{streamid}/alarmcallbacks")
 public class StreamAlarmCallbackResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlarmCallbackResource.class);
