@@ -83,7 +83,8 @@ const NumberRefExpression = ({
                     onChange={handleAggregationFieldChange}
                     options={formattedFields}
                     value={series.field}
-                    allowCreate />
+                    allowCreate
+                    isClearable />
           </Col>
         </Row>
         {validation.errors.series && (
