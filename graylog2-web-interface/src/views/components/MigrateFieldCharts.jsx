@@ -1,7 +1,6 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { isEmpty } from 'lodash';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -45,10 +44,10 @@ const mapSeries = (legacySeriesName, field) => {
       seriesName = 'sum';
       break;
     case 'mean':
-      seriesName = '';
+      seriesName = 'avg';
       break;
     case 'cardinality':
-      seriesName = '';
+      seriesName = 'card';
       break;
     default:
       seriesName = legacySeriesName;
@@ -71,7 +70,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
   // interpolation: [linear, step-after, basis, bundle, cardinal, monotone]
   // Other fields: createdAt, query, range: {relative: 300}, rangetype: ralative,
 
-  const migrations = Object.values(legacyCharts).map((chart: LegacyFieldChart) => {
+  const newWidgets = Object.values(legacyCharts).map((chart: LegacyFieldChart) => {
     setMigrating(true);
 
     const { field } = chart;
@@ -94,7 +93,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
       .build();
   });
 
-  CurrentViewStateStore.widgets(migrations).then(() => {
+  CurrentViewStateStore.widgets(newWidgets).then(() => {
     SearchActions.execute(SearchExecutionStateStore.getInitialState()).then(() => {
       setMigrating(false);
       Store.set('pinned-field-charts-migrated', true);
@@ -110,12 +109,6 @@ const MigrateFieldCharts = () => {
   const legacyCharts = Object.values(Store.get('pinned-field-charts') || {});
   const chartAmount = legacyCharts.length;
   const [migrating, setMigrating] = useState(false);
-
-  // TODO: display component inside <HeaderElements/>, by adding it to 'views.elements.header'
-  // and run this check (+Store.get('pinned-field-charts')) before adding the component
-  if (isEmpty(legacyCharts)) {
-    return <span />;
-  }
 
   return (
     <Row>

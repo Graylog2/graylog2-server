@@ -1,4 +1,5 @@
 // @flow strict
+import React from 'react';
 import Routes from 'routing/Routes';
 import * as Permissions from 'views/Permissions';
 
@@ -20,6 +21,7 @@ import PieVisualization from 'views/components/visualizations/pie/PieVisualizati
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
+import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
 
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -45,6 +47,7 @@ import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTab
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
+import Store from 'logic/local-storage/Store';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -124,6 +127,8 @@ const searchPages = enableNewSearch
     search: { component: NewSearchPage },
   }
   : {};
+
+const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && Store.get('pinned-field-charts');
 
 export default {
   pages: {
@@ -357,4 +362,7 @@ export default {
   'views.hooks.loadingView': [
     requirementsProvided,
   ],
+  'views.elements.header': [() => hasLegacyFieldCharts() && (
+    <MigrateFieldCharts />
+  )],
 };
