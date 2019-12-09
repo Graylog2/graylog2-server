@@ -97,7 +97,7 @@ const AddDecoratorButton = createReactClass({
                   disabled={disabled}
                   value={typeName} />
         </div>
-        <Button bsStyle="success" disabled={!typeName || disabled} onClick={this._openModal}>Apply</Button>
+        <Button bsStyle="success" disabled={!typeName || disabled} onClick={this._openModal}>Create</Button>
         {typeName && configurationForm}
       </div>
     );
