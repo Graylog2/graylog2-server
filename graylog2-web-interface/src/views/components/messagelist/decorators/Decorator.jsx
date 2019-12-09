@@ -93,13 +93,6 @@ const Decorator = createReactClass({
 
     const decoratorActionsMenu = this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
-    const divComponent = ({ children, onCancel, onSubmitForm }) => (
-      <div>
-        {children}
-        <Button bsStyle="success" onClick={onSubmitForm}>Update</Button>{' '}
-        <Button type="button" onClick={onCancel}>Cancel</Button>
-      </div>
-    );
 
     const content = editing
       ? (
@@ -111,7 +104,7 @@ const Decorator = createReactClass({
                              includeTitleField={false}
                              submitAction={this._handleSubmit}
                              cancelAction={this._closeEditForm}
-                             wrapperComponent={divComponent}
+                             wrapperComponent={InlineForm}
                              values={decorator.config} />
         )
       : (

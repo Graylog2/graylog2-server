@@ -9,6 +9,8 @@ import { Select } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import $ from "jquery";
+import { validate } from '../../../../legacy/validations';
 
 const AddDecoratorButton = createReactClass({
   displayName: 'AddDecoratorButton',
@@ -72,13 +74,6 @@ const AddDecoratorButton = createReactClass({
     const { typeDefinition, typeName } = this.state;
     const { decoratorTypes, disabled } = this.props;
 
-    const divComponent = ({ children, onSubmitForm }) => (
-      <div>
-        {children}
-        <Button bsStyle="success" disabled={!typeName || disabled} onClick={onSubmitForm}>Create</Button>
-      </div>
-    );
-
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
     const configurationForm = (typeName !== this.PLACEHOLDER
       ? (
@@ -88,7 +83,7 @@ const AddDecoratorButton = createReactClass({
                            title={`Create new ${typeDefinition.name}`}
                            typeName={typeName}
                            includeTitleField={false}
-                           wrapperComponent={divComponent}
+                           wrapperComponent={InlineForm}
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel} />
       ) : null);
