@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 
-import { Button, ButtonToolbar, Col, FormGroup } from 'components/graylog';
+import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 
 import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -11,6 +11,7 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
 import NumberRefExpression from './AggregationConditionExpressions/NumberRefExpression';
+import BooleanOperatorSelector from './AggregationConditionExpressions/BooleanOperatorSelector';
 /* eslint-disable import/no-cycle */
 // We render the expression tree recursively, so complex expressions need to refer back to this component
 import BooleanExpression from './AggregationConditionExpressions/BooleanExpression';
@@ -39,16 +40,35 @@ class AggregationConditionExpression extends React.Component {
     renderLabel: true,
   };
 
+  state = {
+    globalGroupOperator: undefined,
+  };
+
+  getEffectiveGlobalGroupOperator = () => {
+    const { globalGroupOperator } = this.state;
+    return globalGroupOperator || '&&';
+  };
+
+  getBooleanOperator = (expression, defaultOperator) => {
+    if (!expression) {
+      return defaultOperator;
+    }
+    const key = expression.expr === 'group' ? 'operator' : 'expr';
+    return lodash.get(expression, key, defaultOperator) === '&&' ? '&&' : '||';
+  };
+
   handleAddExpression = () => {
     const { expression, onChange, parent } = this.props;
-    const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
+    const defaultOperator = this.getEffectiveGlobalGroupOperator();
+    const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression });
     onChange('conditions', nextExpression);
   };
 
   handleAddGroup = () => {
     const { expression, onChange, parent } = this.props;
-    const prevOperator = lodash.get(parent, 'expr', '&&') === '&&' ? '&&' : '||';
+    const defaultOperator = this.getEffectiveGlobalGroupOperator();
+    const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
@@ -87,30 +107,39 @@ class AggregationConditionExpression extends React.Component {
     };
   };
 
+  handleOperatorChange = (nextOperator) => {
+    this.setState({ globalGroupOperator: nextOperator });
+  };
+
   render() {
     const { expression, parent, renderLabel } = this.props;
+    let expressionComponent;
 
     switch (expression.expr) {
       case 'number-ref':
-        return <NumberRefExpression {...this.props} parent={parent} />;
+        expressionComponent = <NumberRefExpression {...this.props} parent={parent} />;
+        break;
       case 'number':
-        return <NumberExpression {...this.props} parent={parent} />;
+        expressionComponent = <NumberExpression {...this.props} parent={parent} />;
+        break;
       case 'group':
-        return <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
+        expressionComponent = <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
+        break;
       case '&&':
       case '||':
-        return (
+        expressionComponent = (
           <BooleanExpression {...this.props}
                              onChildChange={this.handleChildChange}
                              parent={parent} />
         );
+        break;
       case '<':
       case '<=':
       case '>':
       case '>=':
       case '==':
       default:
-        return (
+        expressionComponent = (
           <>
             <ComparisonExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />
             <Col md={2}>
@@ -127,6 +156,19 @@ class AggregationConditionExpression extends React.Component {
           </>
         );
     }
+
+    if (!parent) {
+      return (
+        <>
+          <BooleanOperatorSelector operator={this.getEffectiveGlobalGroupOperator()}
+                                   onOperatorChange={this.handleOperatorChange} />
+          <Clearfix />
+          {expressionComponent}
+        </>
+      );
+    }
+
+    return expressionComponent;
   }
 }
 
