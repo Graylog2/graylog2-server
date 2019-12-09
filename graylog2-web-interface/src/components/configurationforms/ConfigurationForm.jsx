@@ -130,9 +130,7 @@ const ConfigurationForm = createReactClass({
   },
 
   render() {
-    const { typeName } = this.props;
-    const { title } = this.props;
-    const { helpBlock } = this.props;
+    const { typeName, title, helpBlock, wrapperComponent = BootstrapModalForm } = this.props;
 
     let shouldAutoFocus = true;
     let titleElement;
@@ -159,19 +157,21 @@ const ConfigurationForm = createReactClass({
       return configField;
     });
 
+    const WrapperComponent = wrapperComponent
+
     return (
-      <BootstrapModalForm ref={(modal) => { this.modal = modal; }}
-                          title={title}
-                          onCancel={this._closeModal}
-                          onSubmitForm={this._save}
-                          submitButtonText="Save">
+      <WrapperComponent ref={(modal) => { this.modal = modal; }}
+                        title={title}
+                        onCancel={this._closeModal}
+                        onSubmitForm={this._save}
+                        submitButtonText="Save">
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
           {this.props.children}
           {titleElement}
           {configFields}
         </fieldset>
-      </BootstrapModalForm>
+      </WrapperComponent>
     );
   },
 });

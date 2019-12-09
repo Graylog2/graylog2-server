@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Reflux from 'reflux';
 import jQuery from 'jquery';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import { Button } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
@@ -74,6 +72,13 @@ const AddDecoratorButton = createReactClass({
     const { typeDefinition, typeName } = this.state;
     const { decoratorTypes, disabled } = this.props;
 
+    const divComponent = ({ children, onSubmitForm }) => (
+      <div>
+        {children}
+        <Button bsStyle="success" disabled={!typeName || disabled} onClick={onSubmitForm}>Create</Button>
+      </div>
+    );
+
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
     const configurationForm = (typeName !== this.PLACEHOLDER
       ? (
@@ -83,23 +88,26 @@ const AddDecoratorButton = createReactClass({
                            title={`Create new ${typeDefinition.name}`}
                            typeName={typeName}
                            includeTitleField={false}
+                           wrapperComponent={divComponent}
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel} />
       ) : null);
     return (
-      <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
-        <div className={DecoratorStyles.addDecoratorSelect}>
-          <Select ref={(select) => { this.select = select; }}
-                  placeholder="Select decorator"
-                  onChange={this._onTypeChange}
-                  options={decoratorTypeOptions}
-                  matchProp="label"
-                  disabled={disabled}
-                  value={typeName} />
+      <React.Fragment>
+        <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
+          <div className={DecoratorStyles.addDecoratorSelect}>
+            <Select ref={(select) => { this.select = select; }}
+                    placeholder="Select decorator"
+                    onChange={this._onTypeChange}
+                    options={decoratorTypeOptions}
+                    matchProp="label"
+                    isClearable
+                    disabled={disabled}
+                    value={typeName} />
+          </div>
         </div>
-        <Button bsStyle="success" disabled={!typeName || disabled} onClick={this._openModal}>Create</Button>
         {typeName && configurationForm}
-      </div>
+      </React.Fragment>
     );
   },
 });
