@@ -43,6 +43,7 @@ import org.graylog.plugins.views.search.engine.QueryBackend;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
@@ -78,6 +79,7 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.indexer.cluster.jest.JestUtils.deduplicateErrors;
+
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -275,9 +277,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
             final int searchTypeIndex = searchTypeIds.indexOf(searchTypeId);
             final MultiSearchResult.MultiSearchResponse multiSearchResponse = result.getResponses().get(searchTypeIndex);
             if (multiSearchResponse.isError) {
-                queryContext.addError(new SearchTypeError(query, searchTypeId, JestUtils.specificException(() -> "Search type returned error: ", multiSearchResponse.error)));
+                ElasticsearchException e = JestUtils.specificException(() -> "Search type returned error: ", multiSearchResponse.error);
+                queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else if (checkForFailedShards(multiSearchResponse.searchResult).isPresent()) {
-                queryContext.addError(new SearchTypeError(query, searchTypeId, checkForFailedShards(multiSearchResponse.searchResult).get()));
+                ElasticsearchException e = checkForFailedShards(multiSearchResponse.searchResult).get();
+                queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.searchResult, queryContext);
                 if (searchTypeResult != null) {
@@ -293,6 +297,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
     }
+
+
 
     private Optional<ElasticsearchException> checkForFailedShards(SearchResult result) {
         // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets

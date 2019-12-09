@@ -4,8 +4,8 @@ import moment from 'moment';
 import { isEmpty } from 'lodash';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
-import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
 import type { TimeRange } from 'views/logic/queries/Query';
 import type { RefluxActions } from 'stores/StoreTypes';
 import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
@@ -78,7 +78,7 @@ export const GlobalOverrideStore = singletonStore(
             };
             break;
         }
-        const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
+        const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(newTimerange, this.globalOverride.query) : new GlobalOverride(newTimerange);
         const promise = this._propagateNewGlobalOverride(newGlobalOverride);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
@@ -92,7 +92,7 @@ export const GlobalOverrideStore = singletonStore(
         ? { ...this.globalOverride.timerange, [key]: value }
         // $FlowFixMe: Flow is unable to validate that timerange is complete
         : { [key]: value };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, timerange: newTimerange } : { timerange: newTimerange };
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(newTimerange, this.globalOverride.query) : new GlobalOverride(newTimerange);
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.rangeParams.promise(promise);
       return promise;
@@ -107,7 +107,7 @@ export const GlobalOverrideStore = singletonStore(
         type: 'elasticsearch',
         query_string: newQueryString,
       };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? { ...this.globalOverride, query: newQuery } : { query: newQuery };
+      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(this.globalOverride.newTimerange, newQuery) : new GlobalOverride(undefined, newQuery);
       const promise = this._propagateNewGlobalOverride(newGlobalOverride);
       GlobalOverrideActions.query.promise(promise);
       return promise;
