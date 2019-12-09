@@ -3,17 +3,13 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 
-import { DEFAULT_TIMERANGE } from 'views/Constants';
-
+import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
-import { ViewStore } from 'views/stores/ViewStore';
-import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import Store from 'logic/local-storage/Store';
-import View from 'views/logic/views/View';
 
 import SearchActions from 'views/actions/SearchActions';
 
@@ -70,8 +66,6 @@ const mapVisualization = (visualization: string) => {
 };
 
 const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void) => {
-  const { view } = ViewStore.getInitialState();
-
   // TODO: Add widget position on create
   // TODO: Implement interpolation
   // interpolation: [linear, step-after, basis, bundle, cardinal, monotone]
@@ -93,25 +87,18 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
       .rowPivots(rowPivots)
       .build();
 
-    const widget = AggregationWidget.builder()
+    return AggregationWidget.builder()
       .newId()
-      .timerange(view.type === View.Type.Dashboard ? DEFAULT_TIMERANGE : undefined)
+      .timerange(undefined)
       .config(widgetConfig)
       .build();
-
-    return () => WidgetActions.create(widget);
   });
 
-  // Create one widget after the other
-  migrations.reverse().reduce(
-    (p, item) => p.then(item), Promise.resolve(),
-  ).then(() => {
+  CurrentViewStateStore.widgets(migrations).then(() => {
     SearchActions.execute(SearchExecutionStateStore.getInitialState()).then(() => {
       setMigrating(false);
       Store.set('pinned-field-charts-migrated', true);
     });
-  }).catch((error) => {
-    throw new Error(error);
   });
 };
 
@@ -134,7 +121,7 @@ const MigrateFieldCharts = () => {
     <Row>
       <Col>
         <Alert bsStyle="warning">
-          <h2>Migrate your old charts</h2>
+          <h2>Migrate existing search page charts</h2>
           {/* Should we inform the user here about the backend migrations? */}
           <br />
             We found {chartAmount} chart(s), created for an older version of the search.
@@ -148,11 +135,11 @@ const MigrateFieldCharts = () => {
                     onClick={() => onMigrate(legacyCharts, setMigrating)}
                     disabled={migrating}
                     className="save-button-margin">
-                  Migireren {migrating && <Spinner text="" />}
+                  Migrate {migrating && <Spinner text="" />}
             </Button>
             <Button onClick={() => onCancel()}
                     disabled={migrating}>
-                  Verwerfen
+                  Cancel
             </Button>
           </Actions>
         </Alert>
