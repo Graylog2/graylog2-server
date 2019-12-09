@@ -157,7 +157,7 @@ const ConfigurationForm = createReactClass({
       return configField;
     });
 
-    const WrapperComponent = wrapperComponent
+    const WrapperComponent = wrapperComponent;
 
     return (
       <WrapperComponent ref={(modal) => { this.modal = modal; }}

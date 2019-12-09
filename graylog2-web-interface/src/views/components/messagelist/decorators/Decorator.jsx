@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { DropdownButton, MenuItem } from 'components/graylog';
+import { Button, DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
@@ -15,6 +15,12 @@ const Decorator = createReactClass({
     typeDefinition: PropTypes.object.isRequired,
   },
 
+  getInitialState() {
+    return {
+      editing: false,
+    };
+  },
+
   _handleDeleteClick() {
     const { onDelete, decorator } = this.props;
     if (window.confirm('Do you really want to delete this decorator?')) {
@@ -23,7 +29,11 @@ const Decorator = createReactClass({
   },
 
   _handleEditClick() {
-    this.editForm.open();
+    this.setState({ editing: true });
+  },
+
+  _closeEditForm() {
+    this.setState({ editing: false });
   },
 
   _handleSubmit(data) {
@@ -35,6 +45,7 @@ const Decorator = createReactClass({
       order: order,
       stream: stream,
     });
+    this._closeEditForm();
   },
 
   _decoratorTypeNotPresent() {
@@ -76,30 +87,47 @@ const Decorator = createReactClass({
 
   render() {
     const { decorator, decoratorTypes, typeDefinition } = this.props;
+    const { editing } = this.state;
     const config = this._resolveConfigurationIds(decorator.config);
     const decoratorType = decoratorTypes[decorator.type] || this._decoratorTypeNotPresent();
 
     const decoratorActionsMenu = this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
+    const divComponent = ({ children, onCancel, onSubmitForm }) => (
+      <div>
+        {children}
+        <Button bsStyle="success" onClick={onSubmitForm}>Update</Button>{' '}
+        <Button type="button" onClick={onCancel}>Cancel</Button>
+      </div>
+    );
+
+    const content = editing
+      ? (
+          <ConfigurationForm ref={(editForm) => { this.editForm = editForm; }}
+                             key="configuration-form-decorator"
+                             configFields={requestedConfiguration}
+                             title={`Edit ${name}`}
+                             typeName={decorator.type}
+                             includeTitleField={false}
+                             submitAction={this._handleSubmit}
+                             cancelAction={this._closeEditForm}
+                             wrapperComponent={divComponent}
+                             values={decorator.config} />
+        )
+      : (
+        <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
+                           id={decorator.id}
+                           configuration={config}
+                           typeDefinition={typeDefinition} />
+      );
+
     return (
       <span className={DecoratorStyles.fixedWidth}>
         <div className={DecoratorStyles.decoratorBox}>
           <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
           {decoratorActionsMenu}
         </div>
-        <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
-                           id={decorator.id}
-                           configuration={config}
-                           typeDefinition={typeDefinition} />
-        <ConfigurationForm ref={(editForm) => { this.editForm = editForm; }}
-                           key="configuration-form-decorator"
-                           configFields={requestedConfiguration}
-                           title={`Edit ${name}`}
-                           typeName={decorator.type}
-                           includeTitleField={false}
-                           submitAction={this._handleSubmit}
-                           cancelAction={this._handleCancel}
-                           values={decorator.config} />
+        {content}
       </span>
     );
   },

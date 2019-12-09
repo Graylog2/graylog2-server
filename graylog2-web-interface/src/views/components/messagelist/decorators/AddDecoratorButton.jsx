@@ -3,7 +3,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import jQuery from 'jquery';
 
-import { Button } from 'components/graylog';
+import { Button, Modal } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
 
