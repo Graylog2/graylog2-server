@@ -29,6 +29,7 @@ type Shape = {
 
 export type Shapes = Array<Shape>;
 const eventsDisplayName = 'Alerts';
+const defaultColor = '#d3d3d3';
 
 export default {
   convert(events: Array<Event>) {
@@ -80,14 +81,14 @@ export default {
       text: textValues,
       marker: {
         size: 5,
-        color: '#d3d3d3',
+        color: defaultColor,
       },
     };
   },
 
   toShapeData(timestamps: Array<string>, formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): Shapes {
     const { chartColors } = formattingSettings;
-    const shapeColor = chartColors[eventsDisplayName] || '#d3d3d3';
+    const shapeColor = chartColors[eventsDisplayName] || defaultColor;
     return timestamps.map(timestamp => ({
       layer: 'below',
       type: 'line',
