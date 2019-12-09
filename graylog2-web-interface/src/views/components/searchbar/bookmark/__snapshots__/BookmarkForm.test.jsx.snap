@@ -54,7 +54,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
             />
           </div>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+            className="button Button-c9cbmb-0 GLfOY btn btn-info"
             disabled={false}
             onClick={[Function]}
             type="submit"
@@ -62,7 +62,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
             Create new
           </button>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="button Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -130,7 +130,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
             />
           </div>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+            className="button Button-c9cbmb-0 GLfOY btn btn-primary"
             disabled={false}
             onClick={[Function]}
             type="submit"
@@ -138,7 +138,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
             Save
           </button>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+            className="button Button-c9cbmb-0 GLfOY btn btn-info"
             disabled={true}
             onClick={[Function]}
             type="submit"
@@ -146,7 +146,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
             Save as
           </button>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="button Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"
@@ -214,7 +214,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
             />
           </div>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-primary"
+            className="button Button-c9cbmb-0 GLfOY btn btn-primary"
             disabled={false}
             onClick={[Function]}
             type="submit"
@@ -222,7 +222,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
             Save
           </button>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-info"
+            className="button Button-c9cbmb-0 GLfOY btn btn-info"
             disabled={false}
             onClick={[Function]}
             type="submit"
@@ -230,7 +230,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
             Save as
           </button>
           <button
-            className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="button Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={false}
             onClick={[Function]}
             type="button"

@@ -325,7 +325,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                       <ForwardRef
                         bsStyle="default"
                       >
-                        <Button__StyledButton
+                        <Button
                           bsStyle="default"
                         >
                           <StyledComponent
@@ -349,17 +349,17 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button__StyledButton-c9cbmb-0",
+                                  "componentId": "Button-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "kRDLih",
+                                  "lastClassName": "GLfOY",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button__StyledButton",
+                                "displayName": "Button",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
+                                "styledComponentId": "Button-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -373,17 +373,17 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 kRDLih"
+                              className="Button-c9cbmb-0 GLfOY"
                               disabled={false}
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                                className="Button-c9cbmb-0 GLfOY btn btn-default"
                                 disabled={false}
                                 type="button"
                               />
                             </Button>
                           </StyledComponent>
-                        </Button__StyledButton>
+                        </Button>
                       </ForwardRef>
                     </span>
                   </InputGroupButton>

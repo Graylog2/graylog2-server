@@ -41,7 +41,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
               className="pull-right btn-group btn-group-sm"
             >
               <a
-                className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="Button-c9cbmb-0 GLfOY btn btn-default"
                 href="/messages/01/01"
                 onClick={[Function]}
                 onKeyDown={[Function]}
@@ -49,7 +49,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                 Permalink
               </a>
               <button
-                className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="Button-c9cbmb-0 GLfOY btn btn-default"
                 data-clipboard-action="copy"
                 data-clipboard-button={true}
                 data-clipboard-text="01"

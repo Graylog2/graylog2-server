@@ -41,7 +41,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
     }
   >
     <button
-      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
+      className="Button-c9cbmb-0 GLfOY btn btn-success"
       disabled={false}
       onClick={[Function]}
       type="button"

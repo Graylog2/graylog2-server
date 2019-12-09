@@ -3,22 +3,20 @@ import PropTypes from 'prop-types';
 
 import AppGlobalNotifications from './AppGlobalNotifications';
 
-class AppWithGlobalNotifications extends React.Component {
-  static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.element),
-      PropTypes.element,
-    ]).isRequired,
-  };
+const AppWithGlobalNotifications = ({ children }) => {
+  return (
+    <div>
+      <AppGlobalNotifications />
+      {children}
+    </div>
+  );
+};
 
-  render() {
-    return (
-      <div>
-        <AppGlobalNotifications />
-        {this.props.children}
-      </div>
-    );
-  }
-}
+AppWithGlobalNotifications.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element,
+  ]).isRequired,
+};
 
 export default AppWithGlobalNotifications;

@@ -69,7 +69,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
       className="resultList"
     >
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         id="list-item-0"
         onKeyDown={[Function]}
       >
@@ -90,7 +90,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
+              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -101,7 +101,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         </p>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         id="list-item-1"
         onKeyDown={[Function]}
       >
@@ -122,7 +122,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
+              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -133,7 +133,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
         </p>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
         id="list-item-2"
         onKeyDown={[Function]}
       >
@@ -154,7 +154,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             className="addButton"
           >
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-primary"
+              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
               disabled={false}
               onClick={[Function]}
               type="button"

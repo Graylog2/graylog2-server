@@ -14,26 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.contenpacks.responses;
+package org.graylog.plugins.views.search.views.widgets.aggregation;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.Map;
+public enum Interpolation {
+    linear("linear"),
+    stepAfter("step-after"),
+    spline("spline");
 
-@JsonAutoDetect
+    private final String value;
+    @JsonValue
+    public String value() {
+        return this.value;
+    }
 
-@AutoValue
-@WithBeanGetter
-public abstract class ContentPackMetadata {
-    @JsonProperty
-    public abstract int installationCount();
+    public static Interpolation defaultValue() {
+        return linear;
+    }
 
     @JsonCreator
-    public static ContentPackMetadata create(@JsonProperty("installation_count") int installationCount) {
-        return new AutoValue_ContentPackMetadata(installationCount);
+    Interpolation(String value) {
+        this.value = value;
     }
 }

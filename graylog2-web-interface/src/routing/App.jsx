@@ -2,9 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Navigation from 'components/navigation/Navigation';
-import { Icon, Spinner } from 'components/common';
+import { Scratchpad, Icon, Spinner } from 'components/common';
 import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
+import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 
 import AppErrorBoundary from './AppErrorBoundary';
 
@@ -21,7 +22,7 @@ const App = ({ children, currentUser, location }) => {
   }
 
   return (
-    <div>
+    <ScratchpadProvider>
       <Navigation requestPath={location.pathname}
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
@@ -29,10 +30,11 @@ const App = ({ children, currentUser, location }) => {
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
         <Icon name="arrow-up" />
       </div>
+      <Scratchpad loginName={currentUser.username} />
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
-    </div>
+    </ScratchpadProvider>
   );
 };
 

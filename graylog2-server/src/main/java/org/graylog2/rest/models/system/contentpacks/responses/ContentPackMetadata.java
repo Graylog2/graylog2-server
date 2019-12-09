@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.contenpacks.responses;
+package org.graylog2.rest.models.system.contentpacks.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.model.entities.EntityExcerpt;
-
-import java.util.Set;
+import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
+
 @AutoValue
-public abstract class CatalogIndexResponse {
-    @JsonProperty("entities")
-    public abstract Set<EntityExcerpt> entities();
+@WithBeanGetter
+public abstract class ContentPackMetadata {
+    @JsonProperty
+    public abstract int installationCount();
 
     @JsonCreator
-    public static CatalogIndexResponse create(@JsonProperty("entities") Set<EntityExcerpt> entities) {
-        return new AutoValue_CatalogIndexResponse(entities);
+    public static ContentPackMetadata create(@JsonProperty("installation_count") int installationCount) {
+        return new AutoValue_ContentPackMetadata(installationCount);
     }
 }

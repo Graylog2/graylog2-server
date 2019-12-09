@@ -65,8 +65,10 @@ import org.graylog.plugins.views.search.views.sharing.SpecificRolesStrategy;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsers;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsersStrategy;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
@@ -175,6 +177,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(WorldMapVisualizationConfigDTO.class);
         registerJacksonSubtype(BarVisualizationConfigDTO.class);
         registerJacksonSubtype(NumberVisualizationConfigDTO.class);
+        registerJacksonSubtype(LineVisualizationConfigDTO.class);
+        registerJacksonSubtype(AreaVisualizationConfigDTO.class);
     }
 
     private void registerViewSharingSubtypes() {

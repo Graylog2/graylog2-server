@@ -14,35 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.contenpacks.responses;
+package org.graylog2.rest.models.system.contentpacks.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.contentpacks.model.ContentPack;
+import org.graylog2.contentpacks.model.ModelId;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
+
 @AutoValue
 @WithBeanGetter
-public abstract class ContentPackInstallationRequest {
-    @JsonProperty("parameters")
-    public abstract Map<String, ValueReference> parameters();
+public abstract class ContentPackList {
+    @JsonProperty
+    public abstract long total();
 
-    @JsonProperty("comment")
-    @Nullable
-    public abstract String comment();
+    @JsonProperty
+    public abstract Set<ContentPack> contentPacks();
+
+    @JsonProperty
+    public abstract Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata();
 
     @JsonCreator
-    public static ContentPackInstallationRequest create(
-            @JsonProperty("parameters") @Nullable Map<String, ValueReference> parameters,
-            @JsonProperty("comment") @Nullable String comment) {
-        final Map<String, ValueReference> parameterMap = parameters == null ? Collections.emptyMap() : parameters;
-        return new AutoValue_ContentPackInstallationRequest(parameterMap, comment);
+    public static ContentPackList create(@JsonProperty("total") long total,
+                                         @JsonProperty("content_packs")Set<ContentPack> contentPacks,
+                                         @JsonProperty("content_pack_metadata") Map<ModelId, Map<Integer, ContentPackMetadata>> contentPacksMetadata) {
+        return new AutoValue_ContentPackList(total, contentPacks, contentPacksMetadata);
     }
 }

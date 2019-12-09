@@ -24,7 +24,8 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-nav {
-      > li > a {
+      > li > a,
+      > li > .btn-link {
         color: ${teinte.tertiary.uno};
 
         &:hover,
@@ -61,7 +62,8 @@ const Navbar = styled(BootstrapNavbar)`
 
       @media (max-width: ${breakpoint.max.sm}) {
         .open .dropdown-menu {
-          > li > a {
+          > li > a,
+          > li > .btn-link {
             color: ${teinte.tertiary.uno};
             &:hover,
             &:focus {
@@ -146,7 +148,8 @@ const Navbar = styled(BootstrapNavbar)`
     }
 
     .navbar-nav {
-      > li > a {
+      > li > a,
+      > li > .btn-link {
         color: ${teinte.secondary.due};
 
         &:hover,
@@ -189,7 +192,8 @@ const Navbar = styled(BootstrapNavbar)`
           .divider {
             background-color: ${lighten(0.20, teinte.primary.tre)};
           }
-          > li > a {
+          > li > a,
+          > li > .btn-link {
             color: ${teinte.secondary.due};
             &:hover,
             &:focus {
