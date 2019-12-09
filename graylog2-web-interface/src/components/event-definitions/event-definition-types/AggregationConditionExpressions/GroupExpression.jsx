@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { cloneDeep } from 'lodash';
+import styled from 'styled-components';
 
 import { Clearfix } from 'components/graylog';
 
@@ -8,6 +9,10 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 import BooleanOperatorSelector from './BooleanOperatorSelector';
+
+const Group = styled.div`
+  padding-left: 40px;
+`;
 
 const GroupExpression = (props) => {
   const { expression, level, onChange, onChildChange } = props;
@@ -19,7 +24,7 @@ const GroupExpression = (props) => {
   };
 
   return (
-    <>
+    <Group>
       <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
       <Clearfix />
       <AggregationConditionExpression {...props}
@@ -27,7 +32,7 @@ const GroupExpression = (props) => {
                                       parent={expression}
                                       onChange={onChildChange('child')}
                                       level={level + 1} />
-    </>
+    </Group>
   );
 };
 
