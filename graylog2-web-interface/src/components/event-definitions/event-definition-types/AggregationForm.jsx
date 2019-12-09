@@ -12,14 +12,6 @@ import AggregationConditionsForm from './AggregationConditionsForm';
 import commonStyles from '../common/commonStyles.css';
 
 class AggregationForm extends React.Component {
-  static propTypes = {
-    eventDefinition: PropTypes.object.isRequired,
-    validation: PropTypes.object.isRequired,
-    allFieldTypes: PropTypes.array.isRequired,
-    aggregationFunctions: PropTypes.array.isRequired,
-    onChange: PropTypes.func.isRequired,
-  };
-
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
   formatFields = lodash.memoize(
     (fieldTypes) => {
@@ -34,6 +26,14 @@ class AggregationForm extends React.Component {
     },
     fieldTypes => fieldTypes.map(ft => ft.name).join('-'),
   );
+
+  static propTypes = {
+    eventDefinition: PropTypes.object.isRequired,
+    validation: PropTypes.object.isRequired,
+    allFieldTypes: PropTypes.array.isRequired,
+    aggregationFunctions: PropTypes.array.isRequired,
+    onChange: PropTypes.func.isRequired,
+  };
 
   propagateConfigChange = (update) => {
     const { eventDefinition, onChange } = this.props;
