@@ -31,11 +31,15 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
   };
 
   const onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number) => {
-    state[idx][event.target.name] = event.target.value;
+    const stateUpdate = ObjectUtils.clone(state);
+    stateUpdate[idx][event.target.name] = event.target.value;
+    setState([...stateUpdate]);
   };
 
   const onUpdateUrl = (idx, type: string, value: string) => {
-    state[idx] = { ...state[idx], value, type };
+    const stateUpdate = ObjectUtils.clone(state);
+    stateUpdate[idx] = { ...state[idx], value, type };
+    setState([...stateUpdate]);
   };
 
   useEffect(() => {
