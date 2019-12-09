@@ -36,6 +36,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
       return (
         <tr>
           <td>{idx + 1}</td>
+          <td>{urlConfig.title}</td>
           <td>{urlConfig.value}</td>
           <td>{urlConfig.type}</td>
         </tr>
@@ -53,15 +54,14 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
   _saveConfig = () => {
     const { config } = this.state;
-    console.log(config);
     const { updateConfig } = this.props;
     updateConfig(config).then(() => {
       this._closeModal();
     });
   }
 
-  _update = (urls: Array<Url>) => {
-    this.setState({ config: { entries: urls } });
+  _update = (urls: Array<Url>, disabled: boolean) => {
+    this.setState({ config: { entries: urls, disabled } });
   }
 
 
@@ -74,15 +74,16 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
 
   render() {
-    const { config: { entries } } = this.props;
+    const { config: { entries, disabled } } = this.props;
     return (
       <div>
-        <h2>URL Whitelist Configuration</h2>
+        <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>
 
         <Table striped bordered condensed className="top-margin">
           <thead>
             <tr>
               <th>#</th>
+              <th>Title</th>
               <th>URL</th>
               <th>Type</th>
             </tr>
@@ -102,7 +103,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
                             submitButtonText="Save">
 
           <h3>Urls</h3>
-          <UrlWhiteListForm urls={entries} update={this._update} />
+          <UrlWhiteListForm urls={entries} disabled={disabled} update={this._update} />
         </BootstrapModalForm>
       </div>
     );

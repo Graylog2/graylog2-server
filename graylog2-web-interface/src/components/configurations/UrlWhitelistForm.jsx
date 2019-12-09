@@ -1,6 +1,7 @@
 // @flow strict
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import uuid from 'uuid/v4';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
@@ -9,15 +10,17 @@ import type { Url } from 'stores/configurations/ConfigurationsStore';
 
 type Props = {
   urls: Array<Url>,
-  update: (state: Array<Url>) => void
+  disabled: boolean,
+  update: (state: Array<Url>, disabled: boolean) => void
 };
-const UrlWhitelistForm = ({ urls, update }: Props) => {
+const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
   const options = [{ value: 'literal', label: 'Literal' }, { value: 'regex', label: 'Regex' }];
   const inputs = {};
   const [state, setState] = useState(urls);
-  const onAdd = (event) => {
+  const [disabledState, setDisabledState] = useState(disabled);
+  const onAdd = (event: Event) => {
     event.preventDefault();
-    setState([...state, { value: '', type: 'literal' }]);
+    setState([...state, { id: uuid(), title: '', value: '', type: 'literal' }]);
   };
   const onRemove = (event: MouseEvent, idx: number) => {
     event.preventDefault();
@@ -27,24 +30,31 @@ const UrlWhitelistForm = ({ urls, update }: Props) => {
     setState([...stateUpdate]);
   };
 
-  const onInputChange = (event: KeyboardEvent, idx: number) => {
-    state[idx].value = inputs[`ref${idx}`].input.value;
+  const onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number) => {
+    state[idx][event.target.name] = event.target.value;
   };
 
   const onUpdateUrl = (idx, type: string, value: string) => {
-    state[idx] = { value, type };
+    state[idx] = { ...state[idx], value, type };
   };
 
   useEffect(() => {
-    update(state);
-  }, [state]);
+    update(state, disabledState);
+  }, [state, disabledState]);
 
   return (
     <>
+      <Input type="checkbox"
+             id="whitelist-disabled"
+             label="Disabled"
+             checked={disabledState}
+             onChange={() => setDisabledState(!disabled)}
+             help="Disable this white list." />
       <Table striped bordered condense className="top-margin">
         <thead>
           <tr>
             <th>#</th>
+            <th>Title</th>
             <th>Url</th>
             <th>Type</th>
             <th>Actions</th>
@@ -58,7 +68,16 @@ const UrlWhitelistForm = ({ urls, update }: Props) => {
                 <td>{idx + 1}</td>
                 <td>
                   <Input type="text"
-                         ref={(elem) => { inputs[`ref${idx}`] = elem; }}
+                         ref={(elem) => { inputs[`titleRef${idx}`] = elem; }}
+                         name="title"
+                         onChange={event => onInputChange(event, idx)}
+                         defaultValue={url.title}
+                         required />
+                </td>
+                <td>
+                  <Input type="text"
+                         ref={(elem) => { inputs[`urlRref${idx}`] = elem; }}
+                         name="value"
                          onChange={event => onInputChange(event, idx)}
                          defaultValue={url.value}
                          required />

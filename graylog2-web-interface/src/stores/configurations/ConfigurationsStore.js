@@ -10,12 +10,15 @@ const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 const urlPrefix = '/system/cluster_config';
 export type Url = {
+  id: string,
   value: string,
+  title: string,
   type: string,
 };
 
 export type Config = {
-  entries: Array<Url>
+  entries: Array<Url>,
+  disabled: boolean
 };
 const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],
