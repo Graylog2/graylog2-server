@@ -84,23 +84,29 @@ class AggregationConditionExpression extends React.Component {
     return (key, update) => {
       const { expression, onChange } = this.props;
 
-      let nextUpdate = update;
-      if (key === 'conditions') {
-        // A null update indicates that one of the branches got removed
-        if (update === null) {
-          if (branch === 'child') {
-            // If this is the last branch of a group, remove the group altogether
-            nextUpdate = null;
-          } else {
-            // Otherwise replace the current tree with the still existing branch
-            nextUpdate = branch === 'child' ? null : expression[(branch === 'left' ? 'right' : 'left')];
-          }
+      if (key !== 'conditions') {
+        onChange(key, update);
+        return;
+      }
+
+      let nextUpdate;
+      // A null update indicates that one of the branches got removed
+      if (update === null) {
+        if (branch === 'child') {
+          // If this is the last branch of a group, remove the group altogether
+          nextUpdate = null;
         } else {
-          // Propagate the update in the expression tree.
-          const nextExpression = lodash.cloneDeep(expression);
-          nextExpression[branch] = update;
-          nextUpdate = nextExpression;
+          // Otherwise replace the current tree with the still existing branch
+          nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
         }
+      } else if (branch === 'child' && update.expr === 'group') {
+        // Avoid that a group's child is another group. Groups should at least have one expression
+        nextUpdate = update;
+      } else {
+        // Propagate the update in the expression tree.
+        const nextExpression = lodash.cloneDeep(expression);
+        nextExpression[branch] = update;
+        nextUpdate = nextExpression;
       }
 
       onChange(key, nextUpdate);
