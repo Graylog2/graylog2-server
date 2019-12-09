@@ -45,6 +45,7 @@ const LineVisualization: VisualizationComponent = ({ config, data, effectiveTime
 
   return (
     <XYPlot config={config}
+            plotLayout={layout}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             setChartColor={setChartColor}

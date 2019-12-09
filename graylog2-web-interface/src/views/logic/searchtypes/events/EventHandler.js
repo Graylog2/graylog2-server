@@ -40,7 +40,7 @@ export default {
     formattingSettings: WidgetFormattingSettings = WidgetFormattingSettings.create({})): { eventChartData: ChartDefinition, shapes: Shapes } {
     const groupedEvents: GroupedEvents = groupBy(events, e => e.timestamp);
     return {
-      eventChartData: this.toChartData(groupedEvents),
+      eventChartData: this.toChartData(groupedEvents, formattingSettings),
       shapes: this.toShapeData(Object.keys(groupedEvents), formattingSettings),
     };
   },
@@ -60,7 +60,9 @@ export default {
     });
   },
 
-  toChartData(events: GroupedEvents): ChartDefinition {
+  toChartData(events: GroupedEvents, formattingSettings: WidgetFormattingSettings): ChartDefinition {
+    const { chartColors } = formattingSettings;
+    const chartColor = chartColors[eventsDisplayName] || defaultColor;
     const values = this.transformGroupedEvents(events);
     const xValues: Array<string> = values.map(v => v[0]);
     const textValues: Array<string> = values.map((e) => {
@@ -81,7 +83,7 @@ export default {
       text: textValues,
       marker: {
         size: 5,
-        color: defaultColor,
+        color: chartColor,
       },
     };
   },
