@@ -14,33 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.contenpacks.responses;
+package org.graylog2.rest.models.system.contentpacks.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.model.ContentPack;
-import org.graylog2.contentpacks.model.constraints.ConstraintCheckResult;
-
-import java.util.Map;
-import java.util.Set;
 
 @JsonAutoDetect
 
 @AutoValue
 @WithBeanGetter
-public abstract class ContentPackRevisions {
-    @JsonProperty("content_pack_revisions")
-    public abstract Map<Integer, ContentPack> contentPackRevisions();
-
-    @JsonProperty("constraints_result")
-    public abstract Map<Integer, Set<ConstraintCheckResult>> constraints();
+public abstract class ContentPackMetadata {
+    @JsonProperty
+    public abstract int installationCount();
 
     @JsonCreator
-    public static ContentPackRevisions create(@JsonProperty("content_pack_revisions") Map<Integer, ContentPack> contentPackRevisions,
-                                              @JsonProperty("constraints_result")Map<Integer, Set<ConstraintCheckResult>> constraints) {
-        return new AutoValue_ContentPackRevisions(contentPackRevisions, constraints);
+    public static ContentPackMetadata create(@JsonProperty("installation_count") int installationCount) {
+        return new AutoValue_ContentPackMetadata(installationCount);
     }
 }
