@@ -1,20 +1,4 @@
-/**
- * This file is part of Graylog.
- *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
-package org.graylog.plugins.views.search.views;
+package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -31,9 +16,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = WidgetDTO.Builder.class)
+@JsonDeserialize(builder = WidgetEntity.Builder.class)
 @WithBeanGetter
-public abstract class WidgetDTO {
+public abstract class WidgetEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
@@ -66,7 +51,7 @@ public abstract class WidgetDTO {
 
     public static Builder builder() {
         return Builder.builder();
-    };
+    }
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -92,15 +77,15 @@ public abstract class WidgetDTO {
         @JsonTypeInfo(
                 use = JsonTypeInfo.Id.NAME,
                 include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
-                property = WidgetDTO.FIELD_TYPE,
+                property = FIELD_TYPE,
                 visible = true)
         public abstract Builder config(WidgetConfigDTO config);
 
-        public abstract WidgetDTO build();
+        public abstract WidgetEntity build();
 
         @JsonCreator
         static Builder builder() {
-            return new AutoValue_WidgetDTO.Builder().streams(Collections.emptySet());
+            return new AutoValue_WidgetEntity.Builder().streams(Collections.emptySet());
         }
     }
 }

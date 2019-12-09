@@ -41,7 +41,7 @@ public abstract class ViewStateEntity {
     public abstract Titles titles();
 
     @JsonProperty(FIELD_WIDGETS)
-    public abstract Set<WidgetDTO> widgets();
+    public abstract Set<WidgetEntity> widgets();
 
     @JsonProperty(FIELD_WIDGET_MAPPING)
     public abstract Map<String, Set<String>> widgetMapping();
@@ -74,7 +74,7 @@ public abstract class ViewStateEntity {
         public abstract Builder titles(Titles titles);
 
         @JsonProperty(FIELD_WIDGETS)
-        public abstract Builder widgets(Set<WidgetDTO> widgets);
+        public abstract Builder widgets(Set<WidgetEntity> widgets);
 
         @JsonProperty(FIELD_WIDGET_MAPPING)
         public abstract Builder widgetMapping(Map<String, Set<String>> widgetMapping);

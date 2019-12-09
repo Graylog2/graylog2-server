@@ -242,7 +242,7 @@ public class ContentPackTest {
                 .inputs(Collections.emptySet())
                 .streams(Collections.emptySet())
                 .outputs(Collections.emptySet())
-                .dashboards(Collections.emptySet())
+//                .dashboards(Collections.emptySet())
                 .grokPatterns(Collections.singleton(grokPattern))
                 .lookupTables(Collections.emptySet())
                 .lookupCaches(Collections.emptySet())
