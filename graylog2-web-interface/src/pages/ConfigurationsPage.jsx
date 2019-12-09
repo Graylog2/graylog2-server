@@ -15,6 +15,7 @@ import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 
 import {} from 'components/maps/configurations';
+import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
@@ -167,6 +168,9 @@ const ConfigurationsPage = createReactClass({
             </Col>
             <Col md={6}>
               {eventsConfigComponent}
+            </Col>
+            <Col md={6}>
+              <DecoratorsConfig />
             </Col>
           </Row>
 
