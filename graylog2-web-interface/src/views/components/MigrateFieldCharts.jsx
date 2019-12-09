@@ -3,22 +3,23 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 
+import { DEFAULT_TIMERANGE } from 'views/Constants';
+
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { ViewStore } from 'views/stores/ViewStore';
+import { WidgetActions } from 'views/stores/WidgetStore';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
-import { WidgetActions } from 'views/stores/WidgetStore';
-import { Alert, Button, Row, Col } from 'components/graylog';
 import Series from 'views/logic/aggregationbuilder/Series';
-import SearchActions from 'views/actions/SearchActions';
-import Spinner from 'components/common/Spinner';
-
-
-import { DEFAULT_TIMERANGE } from 'views/Constants';
+import Store from 'logic/local-storage/Store';
 import View from 'views/logic/views/View';
 
-import Store from 'logic/local-storage/Store';
-import { ViewStore } from 'views/stores/ViewStore';
+import SearchActions from 'views/actions/SearchActions';
+
+import { Alert, Button, Row, Col } from 'components/graylog';
+import Spinner from 'components/common/Spinner';
+
 
 type LegacyFieldChart = {
   field: string,
