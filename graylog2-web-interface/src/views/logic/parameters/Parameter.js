@@ -64,6 +64,10 @@ class Parameter {
     return this._value.optional;
   }
 
+  get needsBinding(): boolean {
+    return true;
+  }
+
   get binding(): ?ParameterBinding {
     return this._value.binding;
   }

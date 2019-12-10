@@ -43,6 +43,10 @@ export default class LookupTableParameter extends Parameter {
     return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, binding, lookupTable, key }));
   }
 
+  get needsBinding(): boolean {
+    return false;
+  }
+
   get lookupTable(): string {
     return this._value2.lookupTable;
   }

@@ -16,7 +16,7 @@ import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormsUtils from 'util/FormsUtils';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import { SearchMetadataStore } from 'views/stores/SearchMetadataStore';
+import { SearchMetadataActions } from 'views/stores/SearchMetadataStore';
 import PermissionsMixin from 'util/PermissionsMixin';
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -78,7 +78,7 @@ class FilterForm extends React.Component {
       .queries([query])
       .build();
 
-    SearchMetadataStore.parseSearch(search).then((res) => {
+    SearchMetadataActions.parseSearch(search).then((res) => {
       this._syncParamsWithQuery(res.undeclared);
     });
   }, 250);
@@ -199,9 +199,6 @@ class FilterForm extends React.Component {
   renderQueryParameters = () => {
     const { eventDefinition, onChange, lookupTables, validation } = this.props;
     const { query_parameters: queryParameters } = eventDefinition.config;
-    const debug = (key, val) => {
-      onChange(key, val);
-    };
     const parameterButtons = queryParameters.map((queryParam) => {
       return (
         <EditQueryParameterModal key={queryParam.name}
@@ -209,21 +206,23 @@ class FilterForm extends React.Component {
                                  eventDefinition={eventDefinition}
                                  lookupTables={lookupTables.tables || []}
                                  validation={validation}
-                                 onChange={debug} />
+                                 onChange={onChange} />
       );
     });
 
     if (lodash.isEmpty(parameterButtons)) {
       return null;
     }
+    const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
     return (
       <React.Fragment>
-        <ControlLabel>Query Parameters <small className="text-muted">(Optional)</small></ControlLabel>
+        <ControlLabel>Query Parameters</ControlLabel>
         <Well>
           <ButtonToolbar>
             {parameterButtons}
           </ButtonToolbar>
         </Well>
+        { hasEmbryonicParameters && <HelpBlock bsStyle="danger">Please define the missing query parameters by clicking on the buttons above.</HelpBlock> }
       </React.Fragment>
     );
   };
