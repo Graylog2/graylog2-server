@@ -127,7 +127,16 @@ const CollapsibleBody = ({ children }) => {
   );
 };
 
-const Panel = ({ header, footer, children, collapsible, expanded, title, ...props }) => {
+const Panel = ({
+  title,
+  children,
+  collapsible,
+  expanded,
+  footer,
+  header,
+  onToggle,
+  ...props
+}) => {
   /** NOTE: Deprecated & should be removed in 4.0 */
   if (header || footer || title || collapsible || typeof children === 'string') {
     /* eslint-disable-next-line no-console */
@@ -149,7 +158,13 @@ const Panel = ({ header, footer, children, collapsible, expanded, title, ...prop
     );
   }
 
-  return <StyledPanel expanded={expanded} {...props}>{children}</StyledPanel>;
+  return (
+    <StyledPanel expanded={expanded}
+                 onToggle={onToggle}
+                 {...props}>
+      {children}
+    </StyledPanel>
+  );
 };
 
 CollapsibleBody.propTypes = {
@@ -160,8 +175,20 @@ Panel.propTypes = {
   children: PropTypes.any.isRequired,
   /** @deprecated No longer used, replace with `<Panel.Collapse />` &  `expanded`. */
   collapsible: PropTypes.bool,
-  /** Must be used in conjunction with `<Panel.Collapse />` */
+  /**
+   * Controls the collapsed/expanded state ofthe Panel. Requires
+   * a `Panel.Collapse` or `<Panel.Body collapsible>` child component
+   * in order to actually animate out or in.
+   *
+   * @controllable onToggle
+   */
   expanded: PropTypes.bool,
+  /**
+   * A callback fired when the collapse state changes.
+   *
+   * @controllable expanded
+   */
+  onToggle: PropTypes.func,
   /** @deprecated No longer used, replace with `<Panel.Footer />`. */
   footer: PropTypes.string,
   /** @deprecated No longer used, replace with `<Panel.Heading />`. */
@@ -172,9 +199,10 @@ Panel.propTypes = {
 
 Panel.defaultProps = {
   collapsible: false,
-  expanded: null,
+  expanded: false,
   footer: undefined,
   header: undefined,
+  onToggle: () => {},
   title: undefined,
 };
 
