@@ -13,10 +13,10 @@ const borderColor = hex => darken(0.05, adjustHue(-10, hex));
 
 const PanelHeading = styled(BootstrapPanel.Heading)``;
 
-const PanelFooter = styled(BootstrapPanel.Footer)`
-  background-color: ${teinte.secondary.tre};
-  border-top-color: ${teinte.secondary.due};
-`;
+const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
+  background-color: ${theme.color.secondary.tre};
+  border-top-color: ${theme.color.secondary.due};
+`);
 
 const panelVariantStyles = hex => css`
   border-color: ${borderColor(hex)};
@@ -43,26 +43,26 @@ const panelVariantStyles = hex => css`
   }
 `;
 
-const StyledPanel = styled(BootstrapPanel)`
-  background-color: ${teinte.primary.due};
+const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
+  background-color: ${theme.color.primary.due};
 
   .panel-group {
     ${PanelHeading} {
       + .panel-collapse > .panel-body,
       + .panel-collapse > .list-group {
-        border-top-color: ${teinte.secondary.due};
+        border-top-color: ${theme.color.secondary.due};
       }
     }
 
     ${PanelFooter} {
       + .panel-collapse .panel-body {
-        border-bottom-color: ${teinte.secondary.due};
+        border-bottom-color: ${theme.color.secondary.due};
       }
     }
   }
 
   ${bsStyleThemeVariant(panelVariantStyles)};
-`;
+`);
 
 /** NOTE: Deprecated & should be removed in 4.0 */
 const deprecatedVariantStyles = hex => css`

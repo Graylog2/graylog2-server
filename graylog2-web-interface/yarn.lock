@@ -1600,6 +1600,14 @@
     d3-collection "1"
     d3-shape "^1.2.0"
 
+"@react-bootstrap/pagination@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@react-bootstrap/pagination/-/pagination-1.0.0.tgz#7ebab5b23519e030e0f9f98f1d73c8178d58356b"
+  integrity sha1-frq1sjUZ4DDg+fmPHXPIF41YNWs=
+  dependencies:
+    prop-types "^15.5.8"
+    react-prop-types "^0.4.0"
+
 "@sheerun/mutationobserver-shim@^0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@sheerun/mutationobserver-shim/-/mutationobserver-shim-0.3.2.tgz#8013f2af54a2b7d735f71560ff360d3a8176a87b"
