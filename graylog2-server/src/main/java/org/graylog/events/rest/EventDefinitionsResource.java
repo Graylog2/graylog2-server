@@ -123,7 +123,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Create new event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public Response create(EventDefinitionDto dto) {
+    public Response create(@ApiParam(name = "JSON Body") EventDefinitionDto dto) {
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate();
@@ -138,7 +138,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Update existing event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
-                           EventDefinitionDto dto) {
+                           @ApiParam(name = "JSON Body") EventDefinitionDto dto) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         checkEventDefinitionPermissions(dto, "update");
         dbService.get(definitionId)

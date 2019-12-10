@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,6 +27,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 @AutoValue
+@JsonAutoDetect
 @JsonDeserialize(builder = EventsSearchParameters.Builder.class)
 public abstract class EventsSearchParameters {
     private static final String FIELD_PAGE = "page";
