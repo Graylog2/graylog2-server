@@ -12,7 +12,7 @@ const BooleanOperatorSelector = ({ operator, onOperatorChange }) => {
           <FormControl.Static>Messages must meet </FormControl.Static>
         </FormGroup>
         <FormGroup style={{ width: '100px', marginLeft: '1em', marginRight: '1em' }}>
-          <Select id="boolean-operator"
+          <Select className="boolean-operator"
                   matchProp="label"
                   size="small"
                   onChange={onOperatorChange}
