@@ -12,6 +12,7 @@ import Decorator from 'views/components/messagelist/decorators/Decorator';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
+import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
@@ -52,7 +53,10 @@ const DecoratorsConfig = () => {
     return <Spinner />;
   }
 
-  const onSave = (newDecorators) => { console.log('New Decorators: ', newDecorators); };
+  const onSave = newDecorators => DecoratorsUpdater(newDecorators, decorators)
+    .then(DecoratorsActions.list)
+    .then(setDecorators)
+    .then(closeModal);
 
   const decoratorsGroupedByStream = groupBy(decorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
 

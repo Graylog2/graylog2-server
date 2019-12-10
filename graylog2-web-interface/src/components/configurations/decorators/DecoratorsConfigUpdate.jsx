@@ -1,6 +1,5 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
-import { groupBy } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Button, Modal } from 'components/graylog';
@@ -29,7 +28,7 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
   });
 };
 
-type DecoratorType = {
+export type DecoratorType = {
   id: string,
   order: number,
   type: string,
@@ -42,13 +41,16 @@ type Props = {
   types: { [string]: any },
   show: boolean,
   onCancel: () => void,
-  onSave: (Array<DecoratorType>) => void,
+  onSave: (Array<DecoratorType>) => mixed,
 };
 
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
-  const onCreate = useCallback(newDecorator => setModifiedDecorators([...modifiedDecorators, newDecorator]), [modifiedDecorators, setModifiedDecorators]);
+  const onCreate = useCallback(
+    ({ stream, ...rest }) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
+    [modifiedDecorators, setModifiedDecorators],
+  );
 
   const currentDecorators = modifiedDecorators.filter(decorator => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators

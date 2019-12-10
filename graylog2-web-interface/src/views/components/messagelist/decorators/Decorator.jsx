@@ -11,6 +11,8 @@ class Decorator extends React.Component {
   static propTypes = {
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -39,6 +41,7 @@ class Decorator extends React.Component {
     const { stream, id, order } = this.props.decorator;
     const { onUpdate } = this.props;
     onUpdate(id, {
+      id,
       type: data.type,
       config: data.configuration,
       order: order,
