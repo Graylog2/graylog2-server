@@ -38,7 +38,7 @@ const XYPlot = ({
   chartData,
   currentQuery,
   timezone,
-  effectiveTimerange,
+  effectiveTimerange = {},
   getChartColor,
   setChartColor,
   plotLayout = {},
