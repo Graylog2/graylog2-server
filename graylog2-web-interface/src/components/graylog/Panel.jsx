@@ -11,47 +11,36 @@ import bsStyleThemeVariant from './variants/bsStyle';
 const backgroundColor = hex => util.colorLevel(hex, -9);
 const borderColor = hex => darken(0.05, adjustHue(-10, hex));
 
-const panelVariantStyles = hex => css`
-  border-color: ${borderColor(hex)};
-`;
-
-const headingVariantStyles = hex => css`
-  & {
-    color: ${util.colorLevel(backgroundColor(hex), 9)};
-    background-color: ${backgroundColor(hex)};
-    border-color: ${borderColor(hex)};
-
-    + .panel-collapse > .panel-body {
-      border-top-color: ${borderColor};
-    }
-
-    .badge {
-      color: ${backgroundColor};
-      background-color: ${hex};
-    }
-  }
-`;
-
-const footerVariantStyles = hex => css`
-  & {
-    color: ${util.colorLevel(backgroundColor(hex), 9)};
-    background-color: ${backgroundColor(hex)};
-    border-color: ${borderColor(hex)};
-
-    + .panel-collapse > .panel-body {
-      border-bottom-color: ${borderColor};
-    }
-  }
-`;
-
-const PanelHeading = styled(BootstrapPanel.Heading)`
-  ${bsStyleThemeVariant(headingVariantStyles)};
-`;
+const PanelHeading = styled(BootstrapPanel.Heading)``;
 
 const PanelFooter = styled(BootstrapPanel.Footer)`
   background-color: ${teinte.secondary.tre};
   border-top-color: ${teinte.secondary.due};
-  ${bsStyleThemeVariant(footerVariantStyles)};
+`;
+
+const panelVariantStyles = hex => css`
+  border-color: ${borderColor(hex)};
+
+  & > ${PanelHeading} {
+    color: ${colorLevel(backgroundColor(hex), 9)};
+    background-color: ${backgroundColor(hex)};
+    border-color: ${borderColor(hex)};
+
+    + .panel-collapse > .panel-body {
+      border-top-color: ${borderColor(hex)};
+    }
+
+    .badge {
+      color: ${backgroundColor(hex)};
+      background-color: ${hex};
+    }
+  }
+
+  & > ${PanelFooter} {
+    + .panel-collapse > .panel-body {
+      border-bottom-color: ${borderColor(hex)};
+    }
+  }
 `;
 
 const StyledPanel = styled(BootstrapPanel)`
@@ -75,38 +64,89 @@ const StyledPanel = styled(BootstrapPanel)`
   ${bsStyleThemeVariant(panelVariantStyles)};
 `;
 
+/** NOTE: Deprecated & should be removed in 4.0 */
+const deprecatedVariantStyles = hex => css`
+  border-color: ${borderColor(hex)};
+
+  & > .panel-heading {
+    color: ${util.colorLevel(backgroundColor(hex), 9)};
+    background-color: ${backgroundColor(hex)};
+    border-color: ${borderColor(hex)};
+
+    + .panel-collapse > .panel-body {
+      border-top-color: ${borderColor(hex)};
+    }
+    .badge {
+      color: ${backgroundColor(hex)};
+      background-color: ${hex};
+    }
+  }
+
+  & > .panel-footer {
+    + .panel-collapse > .panel-body {
+      border-bottom-color: ${borderColor(hex)};
+    }
+  }
+`;
+
+/** NOTE: Deprecated & should be removed in 4.0 */
+const DeprecatedStyledPanel = styled(BootstrapPanel)`
+  background-color: ${teinte.primary.due};
+
+  .panel-footer {
+    background-color: ${teinte.secondary.tre};
+    border-top-color: ${teinte.secondary.due};
+  }
+  .panel-group {
+    .panel-heading {
+      + .panel-collapse > .panel-body,
+      + .panel-collapse > .list-group {
+        border-top-color: ${teinte.secondary.due};
+      }
+    }
+    .panel-footer {
+      + .panel-collapse .panel-body {
+        border-bottom-color: ${teinte.secondary.due};
+      }
+    }
+  }
+
+  ${bsStyleThemeVariant(deprecatedVariantStyles)}
+`;
+
 const CollapsibleBody = ({ children }) => {
   return (
-    <BootstrapPanel.Collapse>
-      <BootstrapPanel.Body>
+    <DeprecatedStyledPanel.Collapse>
+      <DeprecatedStyledPanel.Body>
         {children}
-      </BootstrapPanel.Body>
-    </BootstrapPanel.Collapse>
+      </DeprecatedStyledPanel.Body>
+    </DeprecatedStyledPanel.Collapse>
   );
 };
 
 const Panel = ({ header, footer, children, collapsible, expanded, title, ...props }) => {
-  if (header || footer || title || collapsible) {
+  /** NOTE: Deprecated & should be removed in 4.0 */
+  if (header || footer || title || collapsible || typeof children === 'string') {
     /* eslint-disable-next-line no-console */
     console.warn('Panel: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest props.');
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
-      <BootstrapPanel {...props} expanded={expanded}>
+      <DeprecatedStyledPanel {...props} expanded={expanded}>
         {header && (
-          <BootstrapPanel.Heading>{header}</BootstrapPanel.Heading>
+          <DeprecatedStyledPanel.Heading>{header}</DeprecatedStyledPanel.Heading>
         )}
         {collapsible
           ? <CollapsibleBody>{children}</CollapsibleBody>
-          : <BootstrapPanel.Body>{children}</BootstrapPanel.Body>}
+          : <DeprecatedStyledPanel.Body>{children}</DeprecatedStyledPanel.Body>}
         {footer && (
-          <BootstrapPanel.Footer>{footer}</BootstrapPanel.Footer>
+          <DeprecatedStyledPanel.Footer>{footer}</DeprecatedStyledPanel.Footer>
         )}
-      </BootstrapPanel>
+      </DeprecatedStyledPanel>
     );
   }
 
-  return <StyledPanel {...props} expanded={expanded}>{children}</StyledPanel>;
+  return <StyledPanel expanded={expanded} {...props}>{children}</StyledPanel>;
 };
 
 CollapsibleBody.propTypes = {
@@ -115,7 +155,7 @@ CollapsibleBody.propTypes = {
 
 Panel.propTypes = {
   children: PropTypes.any.isRequired,
-  /** @deprecated No longer used, replace with `<Panel.Collapse />` &  `expandable`. */
+  /** @deprecated No longer used, replace with `<Panel.Collapse />` &  `expanded`. */
   collapsible: PropTypes.bool,
   /** Must be used in conjunction with `<Panel.Collapse />` */
   expanded: PropTypes.bool,
@@ -129,7 +169,7 @@ Panel.propTypes = {
 
 Panel.defaultProps = {
   collapsible: false,
-  expanded: false,
+  expanded: null,
   footer: undefined,
   header: undefined,
   title: undefined,
