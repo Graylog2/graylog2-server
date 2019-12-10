@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { Button, OverlayTrigger, Popover } from 'components/graylog';
 import DocumentationLink from 'components/support/DocumentationLink';

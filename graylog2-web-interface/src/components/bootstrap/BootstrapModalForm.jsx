@@ -51,7 +51,8 @@ class BootstrapModalForm extends React.Component {
   };
 
   onModalCancel = () => {
-    this.props.onCancel();
+    const { onCancel } = this.props;
+    onCancel();
     this.close();
   };
 
