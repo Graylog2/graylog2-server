@@ -62,6 +62,7 @@
     }
   },
   "dependencies": {
+    "@react-bootstrap/pagination": "^1.0.0",
     "bluebird": "^3.4.0",
     "bootstrap": "^3.3.0",
     "bson-objectid": "^1.2.5",
