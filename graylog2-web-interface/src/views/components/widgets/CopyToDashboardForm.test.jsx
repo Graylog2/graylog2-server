@@ -76,10 +76,12 @@ describe('CopyToDashboardForm', () => {
 
   it('should handle search of dashboards', () => {
     DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
-    const { getByPlaceholderText, getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                                            widgetId="widget-id"
-                                                                            onCancel={() => {}}
-                                                                            onSubmit={() => {}} />);
+    const { getByPlaceholderText, getByText } = render(
+      <CopyToDashboardForm dashboards={dashboardState}
+                           widgetId="widget-id"
+                           onCancel={() => {}}
+                           onSubmit={() => {}} />,
+    );
     const searchInput = getByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
     const searchButton = getByText('Search');

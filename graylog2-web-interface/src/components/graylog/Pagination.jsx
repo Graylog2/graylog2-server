@@ -66,7 +66,15 @@ const Pagination = ({
     /* eslint-disable-next-line no-console */
     console.warn('Panel: ', 'You have used a deprecated `Pagination` prop, please check the documentation to use the latest props.');
 
-    return <DeprecatedPagination {...props} />;
+    return (
+      <DeprecatedPagination activePage={activePage}
+                            first={first}
+                            last={last}
+                            maxButtons={maxButtons}
+                            next={next}
+                            prev={prev}
+                            {...props} />
+    );
   }
 
   return (
