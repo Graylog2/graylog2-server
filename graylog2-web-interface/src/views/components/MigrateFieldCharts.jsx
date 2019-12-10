@@ -1,16 +1,21 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-// import { Map } from 'immutable';
+import { maxBy } from 'lodash';
 
-import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
+import Immutable, { Map } from 'immutable';
+import { widgetDefinition } from 'views/logic/Widgets';
+import ViewState from 'views/logic/views/ViewState';
+import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
+import { ViewStore } from 'views/stores/ViewStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-// import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
+// import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 
 import SearchActions from 'views/actions/SearchActions';
 
@@ -20,6 +25,7 @@ import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
+import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
 
 
 type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
@@ -49,7 +55,6 @@ const mapTime = (oldTimeUnit: string) => {
 };
 
 const mapSeries = (legacySeriesName: LegacySeries, field: string) => {
-  // TODO: How to deal with mean and cardinality?
   let seriesName;
   switch (legacySeriesName) {
     case 'total':
@@ -75,7 +80,6 @@ const mapVisualization = (visualization: LegacyVisualization) => {
       return visualization;
   }
 };
-
 
 const createVisualizationConfig = (interpolation: LegacyInterpolation, visualization: string) => {
   let interpolationName: InterpolationMode;
@@ -105,8 +109,12 @@ const createVisualizationConfig = (interpolation: LegacyInterpolation, visualiza
 };
 
 const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void) => {
-  // TODO: Add widget position on create
-  const newWidgets = legacyCharts.map((chart: LegacyFieldChart) => {
+  const widgetDef = widgetDefinition('AGGREGATION');
+  const currentView = CurrentViewStateStore.getInitialState();
+  const newWidgetPositions = { ...currentView.state.widgetPositions };
+  const lastWidgetPosition = maxBy(Object.values(newWidgetPositions), (position: WidgetPosition): number => position.row);
+
+  const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
     setMigrating(true);
 
     const { field } = chart;
@@ -122,16 +130,23 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
       .series([series])
       .rowPivots(rowPivots)
       .build();
-
-    return AggregationWidget.builder()
+    const newWidget = AggregationWidget.builder()
       .newId()
-      .type('SEARCH')
       .timerange(undefined)
       .config(widgetConfig)
       .build();
+    const widgetRow = lastWidgetPosition.row + lastWidgetPosition.height + index + widgetDef.defaultHeight;
+    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRow, widgetDef.defaultHeight, Infinity);
+    return newWidget;
   });
 
-  CurrentViewStateStore.widgets(newWidgets).then(() => {
+  const newViewState = currentView.state
+    .toBuilder()
+    .widgets(Immutable.List([...currentView.state.widgets, ...newWidgets]))
+    .widgetPositions(newWidgetPositions)
+    .build();
+
+  ViewStatesActions.update(currentView.activeQuery, newViewState).then(() => {
     SearchActions.execute(SearchExecutionStateStore.getInitialState()).then(() => {
       setMigrating(false);
       Store.set('pinned-field-charts-migrated', true);
