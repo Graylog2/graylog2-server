@@ -1,8 +1,6 @@
 ### Basic example
 
 ```js
-// import { Panel } from 'react-bootstrap';
-
 const PanelClickExample = () => {
   function handleClick() {
     alert('You have clicked on me');
@@ -23,8 +21,6 @@ const PanelClickExample = () => {
 ### Panel w/ Header
 
 ```js
-// import { Panel } from 'react-bootstrap';
-
 <Panel>
   <Panel.Heading>Panel heading without a title</Panel.Heading>
   <Panel.Body>Panel content</Panel.Body>
@@ -34,8 +30,6 @@ const PanelClickExample = () => {
 ### Panel w/ Header & Title
 
 ```js
-// import { Panel } from 'react-bootstrap';
-
 <Panel>
   <Panel.Heading>
     <Panel.Title componentClass="h3">Panel heading with a title</Panel.Title>
@@ -47,8 +41,6 @@ const PanelClickExample = () => {
 ### Panel w/ Footer
 
 ```js
-// import { Panel } from 'react-bootstrap';
-
 <Panel>
   <Panel.Body>Panel content</Panel.Body>
   <Panel.Footer>Panel footer</Panel.Footer>
@@ -58,8 +50,6 @@ const PanelClickExample = () => {
 ### Panel w/ Variants
 
 ```js
-// import { Panel } from 'react-bootstrap';
-
 const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Default'];
 
 styles.map((style, i) => {
