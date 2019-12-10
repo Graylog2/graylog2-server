@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import { Button, DropdownButton, MenuItem } from 'components/graylog';
+import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
+import InlineForm from './InlineForm';
 
 const Decorator = createReactClass({
   displayName: 'Decorator',
@@ -86,27 +87,27 @@ const Decorator = createReactClass({
   },
 
   render() {
-    const { decorator, decoratorTypes, typeDefinition } = this.props;
+    const { disableMenu = false, decorator, decoratorTypes, typeDefinition } = this.props;
     const { editing } = this.state;
     const config = this._resolveConfigurationIds(decorator.config);
     const decoratorType = decoratorTypes[decorator.type] || this._decoratorTypeNotPresent();
 
-    const decoratorActionsMenu = this._formatActionsMenu();
+    const decoratorActionsMenu = disableMenu || this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
+    const wrapperComponent = InlineForm('Update');
 
     const content = editing
       ? (
-          <ConfigurationForm ref={(editForm) => { this.editForm = editForm; }}
-                             key="configuration-form-decorator"
-                             configFields={requestedConfiguration}
-                             title={`Edit ${name}`}
-                             typeName={decorator.type}
-                             includeTitleField={false}
-                             submitAction={this._handleSubmit}
-                             cancelAction={this._closeEditForm}
-                             wrapperComponent={InlineForm}
-                             values={decorator.config} />
-        )
+        <ConfigurationForm key="configuration-form-decorator"
+                           configFields={requestedConfiguration}
+                           title={`Edit ${name}`}
+                           typeName={decorator.type}
+                           includeTitleField={false}
+                           submitAction={this._handleSubmit}
+                           cancelAction={this._closeEditForm}
+                           wrapperComponent={wrapperComponent}
+                           values={decorator.config} />
+      )
       : (
         <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
                            id={decorator.id}

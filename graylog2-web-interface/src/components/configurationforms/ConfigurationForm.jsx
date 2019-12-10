@@ -90,11 +90,15 @@ const ConfigurationForm = createReactClass({
     const data = this.getValue();
 
     this.props.submitAction(data);
-    this.modal.close();
+    if (this.modal && this.modal.close) {
+      this.modal.close();
+    }
   },
 
   open() {
-    this.modal.open();
+    if (this.modal && this.modal.open) {
+      this.modal.open();
+    }
   },
 
   _closeModal() {

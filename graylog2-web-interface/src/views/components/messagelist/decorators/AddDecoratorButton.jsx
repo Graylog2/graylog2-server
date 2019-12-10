@@ -2,15 +2,19 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 import jQuery from 'jquery';
+import styled from 'styled-components';
 
-import { Button, Modal } from 'components/graylog';
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
-import $ from "jquery";
-import { validate } from '../../../../legacy/validations';
+import InlineForm from './InlineForm';
+import PopoverHelp from './PopoverHelp';
+
+const ConfigurationFormContainer = styled.div`
+  display: inline-block;
+`;
 
 const AddDecoratorButton = createReactClass({
   displayName: 'AddDecoratorButton',
@@ -75,6 +79,7 @@ const AddDecoratorButton = createReactClass({
     const { decoratorTypes, disabled } = this.props;
 
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
+    const wrapperComponent = InlineForm();
     const configurationForm = (typeName !== this.PLACEHOLDER
       ? (
         <ConfigurationForm ref={(elem) => { this.configurationForm = elem; }}
@@ -83,7 +88,7 @@ const AddDecoratorButton = createReactClass({
                            title={`Create new ${typeDefinition.name}`}
                            typeName={typeName}
                            includeTitleField={false}
-                           wrapperComponent={InlineForm}
+                           wrapperComponent={wrapperComponent}
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel} />
       ) : null);
@@ -101,7 +106,11 @@ const AddDecoratorButton = createReactClass({
                     value={typeName} />
           </div>
         </div>
-        {typeName && configurationForm}
+        <PopoverHelp />
+
+        <ConfigurationFormContainer>
+          {typeName && configurationForm}
+        </ConfigurationFormContainer>
       </React.Fragment>
     );
   },

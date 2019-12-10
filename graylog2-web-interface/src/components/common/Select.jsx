@@ -166,7 +166,7 @@ type Props = {
   value?: string,
   autoFocus?: boolean,
   size?: 'normal' | 'small',
-  optionRenderer: (any) => React.Node,
+  optionRenderer?: (any) => React.Node,
   disabled?: boolean,
   addLabelText?: string,
   allowCreate?: boolean,

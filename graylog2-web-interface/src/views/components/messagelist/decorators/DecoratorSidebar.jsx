@@ -3,10 +3,7 @@ import React from 'react';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import connect from 'stores/connect';
-import DocsHelper from 'util/DocsHelper';
-import { Button, OverlayTrigger, Popover } from 'components/graylog';
 import { Spinner } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 
 import AddDecoratorButton from './AddDecoratorButton';
 import Decorator from './Decorator';
@@ -62,31 +59,12 @@ class DecoratorSidebar extends React.Component {
       .sort((d1, d2) => d1.order - d2.order);
     const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
     const decoratorItems = sortedDecorators.map(this._formatDecorator);
-    const popoverHelp = (
-      <Popover id="decorators-help" className={DecoratorStyles.helpPopover}>
-        <p className="description">
-          Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
-          shown in the search results. Decorator config is stored <strong>per stream</strong>.
-        </p>
-        <p className="description">
-          Use drag and drop to modify the order in which decorators are processed.
-        </p>
-        <p>
-          Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation" />.
-        </p>
-      </Popover>
-    );
 
     const addDecorator = decorator => onChange([...decorators, decorator]);
 
     return (
       <div>
         <AddDecoratorButton decoratorTypes={decoratorTypes} stream={stream} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
-        <div className={DecoratorStyles.helpLinkContainer}>
-          <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
-            <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
-          </OverlayTrigger>
-        </div>
         <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer}>
           <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} onChange={onChange} />
         </div>
