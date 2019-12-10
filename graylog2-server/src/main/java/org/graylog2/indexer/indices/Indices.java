@@ -716,7 +716,7 @@ public class Indices {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg", QueryBuilders.existsQuery(Message.FIELD_TIMESTAMP))
                 .subAggregation(AggregationBuilders.min("ts_min").field(Message.FIELD_TIMESTAMP))
                 .subAggregation(AggregationBuilders.max("ts_max").field(Message.FIELD_TIMESTAMP))
-                .subAggregation(AggregationBuilders.terms("streams").field(Message.FIELD_STREAMS));
+                .subAggregation(AggregationBuilders.terms("streams").size(Integer.MAX_VALUE).field(Message.FIELD_STREAMS));
         final String query = searchSource()
                 .aggregation(builder)
                 .size(0)
