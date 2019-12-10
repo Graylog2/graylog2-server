@@ -66,11 +66,11 @@ public class MessageULIDGenerator {
         final String key = message.getSourceInputId() + messageTimestamp;
         final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
 
-        ULID.Value nextUlid = ulid.nextValue(messageTimestamp);
-        long mostSignificantBits = nextUlid.getMostSignificantBits();
-        long leastSignificantBits = nextUlid.getLeastSignificantBits();
+        final ULID.Value nextUlid = ulid.nextValue(messageTimestamp);
+        final long mostSignificantBits = nextUlid.getMostSignificantBits();
+        final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
-        long msbWithZeroedRandom = mostSignificantBits & ~RANDOM_MSB_MASK;
+        final long msbWithZeroedRandom = mostSignificantBits & ~RANDOM_MSB_MASK;
         long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
         if (messageSequenceNr >= RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number does not fit into ULID ({} >= 65535). Sort order might be wrong.", messageSequenceNr);
