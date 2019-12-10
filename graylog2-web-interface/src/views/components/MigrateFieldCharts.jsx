@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Map } from 'immutable';
+// import { Map } from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -9,7 +9,7 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+// import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 
 import SearchActions from 'views/actions/SearchActions';
@@ -18,22 +18,28 @@ import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 
 
+type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
+type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardinal' | 'monotone';
+type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year'
+type LegacyVisualization = 'bar' | 'area' | 'line' | 'scatterplot'
+
 type LegacyFieldChart = {
   field: string,
-  renderer: string,
-  interpolation: string,
-  valuetype: string,
-  interval: string,
+  renderer: LegacyVisualization,
+  interpolation: LegacyInterpolation,
+  valuetype: LegacySeries,
+  interval: LegacyInterval,
 }
 
 const Actions = styled.div`
   margin-top: 10px;
 `;
 
-const mapTime = (oldTimeUnit) => {
+const mapTime = (oldTimeUnit: string) => {
   switch (oldTimeUnit) {
     case 'quarter':
       return { unit: 'month', value: 3 };
@@ -42,7 +48,7 @@ const mapTime = (oldTimeUnit) => {
   }
 };
 
-const mapSeries = (legacySeriesName, field) => {
+const mapSeries = (legacySeriesName: LegacySeries, field: string) => {
   // TODO: How to deal with mean and cardinality?
   let seriesName;
   switch (legacySeriesName) {
@@ -61,7 +67,7 @@ const mapSeries = (legacySeriesName, field) => {
   return `${seriesName}(${field})`;
 };
 
-const mapVisualization = (visualization: string) => {
+const mapVisualization = (visualization: LegacyVisualization) => {
   switch (visualization) {
     case 'scatterplot':
       return 'scatter';
@@ -70,7 +76,8 @@ const mapVisualization = (visualization: string) => {
   }
 };
 
-const createVisualizationConfig = (interpolation: string, visualization: string) => {
+
+const createVisualizationConfig = (interpolation: LegacyInterpolation, visualization: string) => {
   let interpolationName: InterpolationMode;
   switch (interpolation) {
     case 'basis':
@@ -99,8 +106,6 @@ const createVisualizationConfig = (interpolation: string, visualization: string)
 
 const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void) => {
   // TODO: Add widget position on create
-
-
   const newWidgets = legacyCharts.map((chart: LegacyFieldChart) => {
     setMigrating(true);
 
