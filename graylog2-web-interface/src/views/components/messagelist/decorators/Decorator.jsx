@@ -4,15 +4,22 @@ import React from 'react';
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
 
 class Decorator extends React.Component {
   static propTypes = {
     decorator: PropTypes.object.isRequired,
+    decoratorTypes: PropTypes.object.isRequired,
+    disableMenu: PropTypes.bool,
     typeDefinition: PropTypes.object.isRequired,
     onDelete: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    disableMenu: false,
   };
 
   constructor(props) {
@@ -24,6 +31,7 @@ class Decorator extends React.Component {
 
   _handleDeleteClick = () => {
     const { onDelete, decorator } = this.props;
+    // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to delete this decorator?')) {
       onDelete(decorator.id);
     }
@@ -38,7 +46,8 @@ class Decorator extends React.Component {
   };
 
   _handleSubmit = (data) => {
-    const { stream, id, order } = this.props.decorator;
+    const { decorator } = this.props;
+    const { stream, id, order } = decorator;
     const { onUpdate } = this.props;
     onUpdate(id, {
       id,
@@ -59,7 +68,8 @@ class Decorator extends React.Component {
   // Attempts to resolve ID values in the decorator configuration against the type definition.
   // This allows users to see actual names for entities in drop-downs, instead of their IDs.
   _resolveConfigurationIds = (config) => {
-    const typeConfig = this.props.typeDefinition.requested_configuration;
+    const { typeDefinition } = this.props;
+    const typeConfig = typeDefinition.requested_configuration;
     const resolvedConfig = {};
     const configKeys = Object.keys(config);
 
