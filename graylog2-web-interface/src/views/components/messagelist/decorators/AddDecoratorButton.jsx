@@ -76,7 +76,7 @@ const AddDecoratorButton = createReactClass({
 
   render() {
     const { typeDefinition, typeName } = this.state;
-    const { decoratorTypes, disabled } = this.props;
+    const { decoratorTypes, disabled, showHelp = true } = this.props;
 
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
     const wrapperComponent = InlineForm();
@@ -106,7 +106,7 @@ const AddDecoratorButton = createReactClass({
                     value={typeName} />
           </div>
         </div>
-        <PopoverHelp />
+        {showHelp && <PopoverHelp />}
 
         <ConfigurationFormContainer>
           {typeName && configurationForm}
