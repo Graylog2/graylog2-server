@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
+import { isEqual } from 'lodash';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
@@ -60,6 +60,9 @@ class DataTable extends React.Component {
   };
 
   static defaultProps = {
+    children: undefined,
+    className: '',
+    filterBy: '',
     filterSuggestions: [],
     filterLabel: 'Filter',
     displayKey: 'value',
@@ -71,25 +74,28 @@ class DataTable extends React.Component {
     sortBy: undefined,
   };
 
-  state = {
-    headers: this.props.headers,
-    rows: this.props.rows,
-    filteredRows: this.props.rows,
-  };
+  constructor(props) {
+    super(props);
+    const { rows } = this.props;
+    this.state = {
+      filteredRows: rows,
+    };
+  }
 
-  componentWillReceiveProps(newProps) {
-    this.setState({
-      headers: newProps.headers,
-      rows: newProps.rows,
-      filteredRows: newProps.rows,
-    });
+  componentDidUpdate(previousProps) {
+    // We update the state with row if the filterKeys is empty other than that typeahead is handling the state
+    const { filterKeys, rows } = this.props;
+    if (filterKeys.length === 0 && !isEqual(previousProps.rows, rows)) {
+      this._updateState();
+    }
   }
 
   getFormattedHeaders = () => {
     let i = 0;
-    const formattedHeaders = this.state.headers.map((header) => {
-      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={this.props.headerCellFormatter} />;
-      i++;
+    const { headerCellFormatter, headers } = this.props;
+    const formattedHeaders = headers.map((header) => {
+      const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={headerCellFormatter} />;
+      i += 1;
       return el;
     });
 
@@ -98,19 +104,20 @@ class DataTable extends React.Component {
 
   getFormattedDataRows = () => {
     let i = 0;
-    let sortedDataRows = this.state.filteredRows;
-    if (this.props.sortByKey) {
+    const { sortByKey, sortBy, dataRowFormatter } = this.props;
+    let { filteredRows: sortedDataRows } = this.state;
+    if (sortByKey) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
+        return a[sortByKey].localeCompare(b[sortByKey]);
       });
-    } else if (this.props.sortBy) {
+    } else if (sortBy) {
       sortedDataRows = sortedDataRows.sort((a, b) => {
-        return this.props.sortBy(a).localeCompare(this.props.sortBy(b));
+        return sortBy(a).localeCompare(sortBy(b));
       });
     }
     const formattedDataRows = sortedDataRows.map((row) => {
-      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={this.props.dataRowFormatter} />;
-      i++;
+      const el = <DataTableElement key={`row-${i}`} element={row} index={i} formatter={dataRowFormatter} />;
+      i += 1;
       return el;
     });
 
@@ -121,36 +128,58 @@ class DataTable extends React.Component {
     this.setState({ filteredRows });
   };
 
+  _updateState() {
+    const { rows } = this.props;
+    this.setState({
+      filteredRows: rows,
+    });
+  }
+
   render() {
     let filter;
-    if (this.props.filterKeys.length !== 0) {
+    const {
+      filterKeys,
+      id,
+      filterLabel,
+      filterBy,
+      displayKey,
+      filterSuggestions,
+      children,
+      noDataText,
+      className,
+      rowClassName,
+      useResponsiveTable,
+      rows,
+    } = this.props;
+    const { filteredRows } = this.state;
+    if (filterKeys.length !== 0) {
       filter = (
         <div className="row">
           <div className="col-md-8">
-            <TypeAheadDataFilter id={`${this.props.id}-data-filter`}
-                                 label={this.props.filterLabel}
-                                 data={this.state.rows}
-                                 displayKey={this.props.displayKey}
-                                 filterBy={this.props.filterBy}
-                                 filterSuggestions={this.props.filterSuggestions}
-                                 searchInKeys={this.props.filterKeys}
+            <TypeAheadDataFilter id={`${id}-data-filter`}
+                                 label={filterLabel}
+                                 data={rows}
+                                 displayKey={displayKey}
+                                 filterBy={filterBy}
+                                 filterSuggestions={filterSuggestions}
+                                 searchInKeys={filterKeys}
                                  onDataFiltered={this.filterDataRows} />
           </div>
           <div className="col-md-4">
-            {this.props.children}
+            {children}
           </div>
         </div>
       );
     }
 
     let data;
-    if (this.state.rows.length === 0) {
-      data = <p>{this.props.noDataText}</p>;
-    } else if (this.state.filteredRows.length === 0) {
+    if (rows.length === 0) {
+      data = <p>{noDataText}</p>;
+    } else if (filteredRows.length === 0) {
       data = <p>Filter does not match any data.</p>;
     } else {
       data = (
-        <table className={`table ${this.props.className}`}>
+        <table className={`table ${className}`}>
           <thead>
             {this.getFormattedHeaders()}
           </thead>
@@ -164,9 +193,9 @@ class DataTable extends React.Component {
     return (
       <div>
         {filter}
-        <div className={`row ${this.props.rowClassName}`}>
+        <div className={`row ${rowClassName}`}>
           <div className="col-md-12">
-            <div id={this.props.id} className={`data-table ${this.props.useResponsiveTable ? 'table-responsive' : ''}`}>
+            <div id={id} className={`data-table ${useResponsiveTable ? 'table-responsive' : ''}`}>
               {data}
             </div>
           </div>

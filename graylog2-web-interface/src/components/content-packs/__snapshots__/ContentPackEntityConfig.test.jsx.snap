@@ -14,7 +14,7 @@ exports[`<ContentPackEntityConfig /> should render with a entity 1`] = `
           id="entiy-config-list"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>
