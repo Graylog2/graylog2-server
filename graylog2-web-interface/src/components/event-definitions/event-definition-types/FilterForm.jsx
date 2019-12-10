@@ -215,15 +215,15 @@ class FilterForm extends React.Component {
     }
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
     return (
-      <React.Fragment>
+      <FormGroup validationState={hasEmbryonicParameters && 'error'}>
         <ControlLabel>Query Parameters</ControlLabel>
         <Well>
           <ButtonToolbar>
             {parameterButtons}
           </ButtonToolbar>
         </Well>
-        { hasEmbryonicParameters && <HelpBlock bsStyle="danger">Please define the missing query parameters by clicking on the buttons above.</HelpBlock> }
-      </React.Fragment>
+        { hasEmbryonicParameters && <HelpBlock>Please define the missing query parameters by clicking on the buttons above.</HelpBlock> }
+      </FormGroup>
     );
   };
 
