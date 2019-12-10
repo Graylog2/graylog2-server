@@ -2,6 +2,8 @@
 import React, { useCallback, useState } from 'react';
 import { groupBy } from 'lodash';
 
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { Button, Modal } from 'components/graylog';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import Decorator from 'views/components/messagelist/decorators/Decorator';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
@@ -27,38 +29,56 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
   });
 };
 
-type Props = {
-  streams: Array<{ title: string, id: string }>,
-  decorators: Array<{ id: string, order: number, type: string }>,
-  types: { [string]: any },
+type DecoratorType = {
+  id: string,
+  order: number,
+  type: string,
+  stream: string,
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types }: Props) => {
+type Props = {
+  streams: Array<{ title: string, id: string }>,
+  decorators: Array<DecoratorType>,
+  types: { [string]: any },
+  show: boolean,
+  onCancel: () => void,
+  onSave: (Array<DecoratorType>) => void,
+};
+
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
-  const [updatedDecorators, setUpdatedDecorators] = useState(decorators);
+  const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
+  const onCreate = useCallback(newDecorator => setModifiedDecorators([...modifiedDecorators, newDecorator]), [modifiedDecorators, setModifiedDecorators]);
 
-  const decoratorsGroupedByStream = groupBy(updatedDecorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
-  const currentDecorators = decoratorsGroupedByStream[currentStream] || [];
-  const sortedDecorators = currentDecorators
-    .sort((d1, d2) => d1.order - d2.order);
-  const decoratorItems = sortedDecorators.map(decorator => _formatDecorator(decorator, updatedDecorators, types, setUpdatedDecorators));
+  const currentDecorators = modifiedDecorators.filter(decorator => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
+  const decoratorItems = currentDecorators
+    .sort((d1, d2) => d1.order - d2.order)
+    .map(decorator => _formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
 
-  const nextOrder = sortedDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
-
-  const onCreate = useCallback(newDecorator => setUpdatedDecorators([...updatedDecorators, newDecorator]), [updatedDecorators, setUpdatedDecorators]);
+  const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 
   return (
-    <React.Fragment>
-      <p>Select the stream for which you want to change the set of default decorators.</p>
-      <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
+    <BootstrapModalWrapper showModal={show}
+                           onHide={onCancel}>
+      <Modal.Header closeButton>
+        <Modal.Title>Update Default Decorators Configuration</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>Select the stream for which you want to change the set of default decorators.</p>
+        <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
 
-      <p>Select the type to create a new decorator for this stream:</p>
-      <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
+        <p>Select the type to create a new decorator for this stream:</p>
+        <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
 
-      <p>Use drag and drop to change the execution order of the decorators.</p>
+        <p>Use drag and drop to change the execution order of the decorators.</p>
 
-      <DecoratorList decorators={decoratorItems} />
-    </React.Fragment>
+        <DecoratorList decorators={decoratorItems} />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="button" onClick={onCancel}>Cancel</Button>
+        <Button bsStyle="primary" onClick={() => onSave(modifiedDecorators)}>Save</Button>
+      </Modal.Footer>
+    </BootstrapModalWrapper>
   );
 };
 

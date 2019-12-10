@@ -1,10 +1,9 @@
 // @flow strict
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { groupBy } from 'lodash';
 
 import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
-import { BootstrapModalForm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
@@ -41,18 +40,19 @@ const DecoratorsConfig = () => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState();
   const [types, setTypes] = useState();
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => { StreamsStore.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 
-  const configModal = useRef();
-  const openModal = useCallback(() => configModal.current && configModal.current.open(), [configModal]);
+  const openModal = useCallback(() => setShowModal(true), [setShowModal]);
+  const closeModal = useCallback(() => setShowModal(false), [setShowModal]);
 
   if (!streams || !decorators || !types) {
     return <Spinner />;
   }
 
-  const saveConfig = () => {};
+  const onSave = (newDecorators) => { console.log('New Decorators: ', newDecorators); };
 
   const decoratorsGroupedByStream = groupBy(decorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
 
@@ -73,12 +73,12 @@ const DecoratorsConfig = () => {
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
       </IfPermitted>
-      <BootstrapModalForm ref={configModal}
-                          title="Update Search Configuration"
-                          onSubmitForm={saveConfig}
-                          submitButtonText="Save">
-        <DecoratorsConfigUpdate streams={streams} decorators={decorators} types={types} />
-      </BootstrapModalForm>
+      <DecoratorsConfigUpdate show={showModal}
+                              streams={streams}
+                              decorators={decorators}
+                              onCancel={closeModal}
+                              onSave={onSave}
+                              types={types} />
     </div>
   );
 };
