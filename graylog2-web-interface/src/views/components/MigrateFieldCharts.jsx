@@ -48,9 +48,9 @@ const Actions = styled.div`
 const mapTime = (oldTimeUnit: string) => {
   switch (oldTimeUnit) {
     case 'quarter':
-      return { unit: 'month', value: 3 };
+      return { unit: 'months', value: 3 };
     default:
-      return { unit: oldTimeUnit, value: 1 };
+      return { unit: `${oldTimeUnit}s`, value: 1 };
   }
 };
 
