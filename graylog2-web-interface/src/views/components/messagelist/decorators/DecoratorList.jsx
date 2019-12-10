@@ -14,6 +14,11 @@ class DecoratorList extends React.Component {
     onReorder: PropTypes.func,
   };
 
+  static defaultProps = {
+    disableDragging: false,
+    onReorder: () => {},
+  };
+
   _onReorderWrapper = (...args) => {
     const { onReorder } = this.props;
     if (onReorder) {
