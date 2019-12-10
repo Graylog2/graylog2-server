@@ -24,6 +24,7 @@ import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.bson.types.ObjectId;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -34,10 +35,10 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -55,6 +56,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -95,6 +97,8 @@ public class PipelineFacadeTest {
     private PipelineStreamConnectionsService connectionsService;
     @Mock
     private RuleService ruleService;
+    @Mock
+    private StreamService streamService;
 
     private PipelineFacade facade;
 
@@ -108,7 +112,7 @@ public class PipelineFacadeTest {
         pipelineService = new MongoDbPipelineService(mongoConnection, mapperProvider, clusterEventBus);
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoConnection, mapperProvider, clusterEventBus);
 
-        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService);
+        facade = new PipelineFacade(objectMapper, pipelineService, connectionsService, pipelineRuleParser, ruleService, streamService);
     }
 
     @Test
@@ -160,6 +164,29 @@ public class PipelineFacadeTest {
     }
 
     @Test
+    @UsingDataSet(locations = "/org/graylog2/contentpacks/pipeline_processor_pipelines_default_stream.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void exportNativeEntityWithDefaultStream() {
+        final EntityDescriptor descriptor = EntityDescriptor.create("5a85c4854b900afd5d662be3", ModelTypes.PIPELINE_V1);
+        final EntityDescriptor defaultStreamDescriptor = EntityDescriptor.create(Stream.DEFAULT_STREAM_ID, ModelTypes.STREAM_V1);
+        final EntityDescriptorIds entityDescriptorIds = EntityDescriptorIds.of(descriptor, defaultStreamDescriptor);
+
+        assertThat(entityDescriptorIds.get(defaultStreamDescriptor)).isEqualTo(Optional.of(Stream.DEFAULT_STREAM_ID));
+
+        final Entity entity = facade.exportEntity(descriptor, entityDescriptorIds).orElseThrow(AssertionError::new);
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.id()).isEqualTo(ModelId.of(entityDescriptorIds.get(descriptor).orElse(null)));
+        assertThat(entity.type()).isEqualTo(ModelTypes.PIPELINE_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final PipelineEntity pipelineEntity = objectMapper.convertValue(entityV1.data(), PipelineEntity.class);
+        assertThat(pipelineEntity.title()).isEqualTo(ValueReference.of("Test"));
+        assertThat(pipelineEntity.description()).isEqualTo(ValueReference.of("Description"));
+        assertThat(pipelineEntity.source().asString(Collections.emptyMap())).startsWith("pipeline \"Test\"");
+        assertThat(pipelineEntity.connectedStreams()).containsOnly(ValueReference.of(entityDescriptorIds.get(defaultStreamDescriptor).orElse(null)));
+    }
+
+    @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void createNativeEntity() throws NotFoundException {
         final Entity entity = EntityV1.builder()
@@ -184,6 +211,34 @@ public class PipelineFacadeTest {
         assertThat(nativeEntity.entity().source()).startsWith("pipeline \"Title\"");
 
         assertThat(connectionsService.load("5adf23894b900a0f00000001").pipelineIds())
+                .containsOnly(nativeEntity.entity().id());
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void createNativeEntityWithDefaultStream() throws NotFoundException {
+        final Entity entity = EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.PIPELINE_V1)
+                .data(objectMapper.convertValue(PipelineEntity.create(
+                        ValueReference.of("Title"),
+                        ValueReference.of("Description"),
+                        ValueReference.of("pipeline \"Title\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend"),
+                        Collections.singleton(ValueReference.of(Stream.DEFAULT_STREAM_ID))), JsonNode.class))
+                .build();
+
+        final FakeStream fakeDefaultStream = new FakeStream("All message Fake") {
+            @Override
+            protected ObjectId getObjectId() {
+                return new ObjectId(Stream.DEFAULT_STREAM_ID);
+            }
+        };
+        when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(fakeDefaultStream);
+
+        final Map<EntityDescriptor, Object> nativeEntities = Collections.emptyMap();
+        final NativeEntity<PipelineDao> nativeEntity = facade.createNativeEntity(entity, Collections.emptyMap(), nativeEntities, "username");
+
+        assertThat(connectionsService.load(fakeDefaultStream.getId()).pipelineIds())
                 .containsOnly(nativeEntity.entity().id());
     }
 
