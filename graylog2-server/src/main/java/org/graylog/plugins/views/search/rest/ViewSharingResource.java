@@ -20,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.sharing.UserShortSummary;
@@ -50,7 +49,6 @@ import java.util.stream.Collectors;
 @Path("/views/{id}/share")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(ViewsRestPermissions.VIEW_USE)
 public class ViewSharingResource extends RestResource implements PluginRestResource {
     private final ViewSharingService viewSharingService;
     private final ViewService viewService;

@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
 import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
 import org.graylog.plugins.views.search.views.sharing.IsViewSharedForUser;
@@ -42,7 +41,6 @@ import java.util.stream.Collectors;
 @Path("/views/forValue")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(ViewsRestPermissions.VIEW_USE)
 public class QualifyingViewsResource extends RestResource implements PluginRestResource {
     private final QualifyingViewsService qualifyingViewsService;
     private final ViewSharingService viewSharingService;
