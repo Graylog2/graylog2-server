@@ -239,6 +239,32 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
         assertThat(searchService.count()).isZero();
     }
 
+    @Test
+    @MongoDBFixtures("dashboard_with_no_widgets.json")
+    public void migratesADashboardWithNoWidgets() {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5ddf8ed5b2d44b2e04472992");
+        assertThat(migrationCompleted.widgetMigrationIds()).isEmpty();
+
+        verify(viewService, times(1)).save(any());
+        verify(searchService, times(1)).save(any());
+    }
+
+    @Test
+    @MongoDBFixtures("dashboard_with_no_widget_positions.json")
+    public void migratesADashboardWithNoWidgetPositions() {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5ddf8ed5b2d44b2e04472992");
+        assertThat(migrationCompleted.widgetMigrationIds()).hasSize(16);
+
+        verify(viewService, times(1)).save(any());
+        verify(searchService, times(1)).save(any());
+    }
+
     private MigrationCompleted captureMigrationCompleted() {
         final ArgumentCaptor<MigrationCompleted> migrationCompletedCaptor = ArgumentCaptor.forClass(MigrationCompleted.class);
         verify(clusterConfigService, times(1)).write(migrationCompletedCaptor.capture());

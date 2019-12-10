@@ -23,9 +23,12 @@ import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
 @JsonAutoDetect
@@ -71,9 +74,16 @@ abstract class Dashboard {
             @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
             @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
             @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
-            @JsonProperty(EMBEDDED_POSITIONS) Map<String, WidgetPosition> widgetPositions,
-            @JsonProperty(EMBEDDED_WIDGETS) List<Widget> widgets
+            @JsonProperty(EMBEDDED_POSITIONS) @Nullable Map<String, WidgetPosition> widgetPositions,
+            @JsonProperty(EMBEDDED_WIDGETS) @Nullable List<Widget> widgets
     ) {
-        return new AutoValue_Dashboard(id, title, description, Optional.ofNullable(contentPack), creatorUserId, createdAt, widgetPositions, widgets);
+        return new AutoValue_Dashboard(id,
+                title,
+                description,
+                Optional.ofNullable(contentPack),
+                creatorUserId,
+                createdAt,
+                firstNonNull(widgetPositions, Collections.emptyMap()),
+                firstNonNull(widgets, Collections.emptyList()));
     }
 }
