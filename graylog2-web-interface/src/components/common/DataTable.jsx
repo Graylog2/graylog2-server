@@ -92,7 +92,6 @@ class DataTable extends React.Component {
 
   getFormattedHeaders = () => {
     let i = 0;
-    // const { headers } = this.props;
     const { headerCellFormatter, headers } = this.props;
     const formattedHeaders = headers.map((header) => {
       const el = <DataTableElement key={`header-${i}`} element={header} index={i} formatter={headerCellFormatter} />;
