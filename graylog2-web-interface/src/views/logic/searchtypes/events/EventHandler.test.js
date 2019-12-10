@@ -21,7 +21,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event]));
+    const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder().build());
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -39,7 +39,7 @@ describe('EventHandler convert', () => {
   });
 
   it('should group duplicate events by timestamp and convert events to char data', () => {
-    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]));
+    const result = EventHandler.toChartData(groupByTimestamp([event, event, event]), WidgetFormattingSettings.builder().build());
     expect(result).toEqual({
       hovertemplate: '%{text}',
       marker: {
@@ -53,6 +53,26 @@ describe('EventHandler convert', () => {
       x: ['2019-11-14T08:53:35.000Z'],
       y: [0],
       text: ['3 alerts occurred.'],
+    });
+  });
+
+  it('should keep the color set by the user', () => {
+    const result = EventHandler.toChartData(groupByTimestamp([event]), WidgetFormattingSettings.builder()
+      .chartColors({ Alerts: '#ffffff' })
+      .build());
+    expect(result).toEqual({
+      hovertemplate: '%{text}',
+      marker: {
+        color: '#ffffff',
+        size: 5,
+      },
+      mode: 'markers',
+      opacity: 0.5,
+      name: 'Alerts',
+      type: 'scatter',
+      x: ['2019-11-14T08:53:35.000Z'],
+      y: [0],
+      text: ['This is a emergency. Please stay calm.'],
     });
   });
 
