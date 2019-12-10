@@ -7,6 +7,7 @@ import { Button } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
+import UserNotification from 'util/UserNotification';
 
 import Decorator from 'views/components/messagelist/decorators/Decorator';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
@@ -54,6 +55,10 @@ const DecoratorsConfig = () => {
   }
 
   const onSave = newDecorators => DecoratorsUpdater(newDecorators, decorators)
+    .then(
+      () => UserNotification.success('Updated decorators configuration.', 'Success!'),
+      error => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
+    )
     .then(DecoratorsActions.list)
     .then(setDecorators)
     .then(closeModal);
