@@ -76,28 +76,29 @@ styles.map((style, i) => {
 ### Collapsible Panel
 
 ```js
-// import { Panel } from 'react-bootstrap';
+import { Button } from 'components/graylog';
 
 const PanelCollapseExample = () => {
    const [expanded, setExpanded] = React.useState(false);
 
   return (
-    <Panel onClick={() => setExpanded(!expanded)}
-           id="collapsible-panel-example-1"
-           expanded={expanded}>
-      <Panel.Header>
-        <Panel.Title toggle>Collapsing Panel</Panel.Title>
-      </Panel.Header>
-      <Panel.Collapse>
-        <Panel.Body>
-          Anim pariatur cliche reprehenderit, enim eiusmod high life
-          accusamus terry richardson ad squid. Nihil anim keffiyeh
-          helvetica, craft beer labore wes anderson cred nesciunt sapiente
-          ea proident.
-        </Panel.Body>
-      </Panel.Collapse>
-    </Panel>
-  )
+    <div>
+      <Button onClick={() => setExpanded(!expanded)}>
+        Click to toggle
+      </Button>
+
+      <Panel expanded={expanded}>
+        <Panel.Collapse>
+          <Panel.Body>
+            Anim pariatur cliche reprehenderit, enim eiusmod high life
+            accusamus terry richardson ad squid. Nihil anim keffiyeh
+            helvetica, craft beer labore wes anderson cred nesciunt sapiente
+            ea proident.
+          </Panel.Body>
+        </Panel.Collapse>
+      </Panel>
+    </div>
+  );
 };
 
 <PanelCollapseExample />
@@ -108,7 +109,7 @@ const PanelCollapseExample = () => {
 ### Deprecated Basic example
 
 ```js
-const PanelClickExample = () => {
+const DeprecatedPanelClickExample = () => {
   function handleClick() {
     alert('You have clicked on me');
   }
@@ -118,7 +119,7 @@ const PanelClickExample = () => {
   )
 };
 
-<PanelClickExample />
+<DeprecatedPanelClickExample />
 ```
 
 ### Deprecated Panel w/ Header
@@ -159,13 +160,13 @@ styles.map((style, i) => {
 ```js
 import { Button } from 'components/graylog';
 
-const PanelCollapseExample = () => {
+const DeprecatedPanelCollapseExample = () => {
    const [expanded, setExpanded] = React.useState(false);
 
   return (
     <div>
       <Button onClick={() => setExpanded(!expanded)}>
-        click
+        Click to togle
       </Button>
       <Panel collapsible expanded={expanded}>
         Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid.
@@ -175,5 +176,5 @@ const PanelCollapseExample = () => {
   )
 };
 
-<PanelCollapseExample />
+<DeprecatedPanelCollapseExample />
 ```
