@@ -1,6 +1,5 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 
 import Select from 'components/common/Select';
@@ -33,7 +32,13 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
   });
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types }) => {
+type Props = {
+  streams: Array<{ title: string, id: string }>,
+  decorators: Array<{ id: string, order: number, type: string }>,
+  types: { [string]: any },
+};
+
+const DecoratorsConfigUpdate = ({ streams, decorators, types }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [updatedDecorators, setUpdatedDecorators] = useState(decorators);
 
@@ -49,7 +54,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types }) => {
     .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
     .map(({ title, id }) => ({ label: title, value: id }))];
 
-  const onCreate = useCallback(newDecorator => setUpdatedDecorators([ ...updatedDecorators, newDecorator]), [updatedDecorators, setUpdatedDecorators]);
+  const onCreate = useCallback(newDecorator => setUpdatedDecorators([...updatedDecorators, newDecorator]), [updatedDecorators, setUpdatedDecorators]);
 
   return (
     <React.Fragment>
