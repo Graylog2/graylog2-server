@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 
 import { DropdownButton, MenuItem } from 'components/graylog';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
@@ -8,36 +7,35 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
 
-const Decorator = createReactClass({
-  displayName: 'Decorator',
-
-  propTypes: {
+class Decorator extends React.Component {
+  static propTypes = {
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
-  },
+  };
 
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+    this.state = {
       editing: false,
     };
-  },
+  }
 
-  _handleDeleteClick() {
+  _handleDeleteClick = () => {
     const { onDelete, decorator } = this.props;
     if (window.confirm('Do you really want to delete this decorator?')) {
       onDelete(decorator.id);
     }
-  },
+  };
 
-  _handleEditClick() {
+  _handleEditClick = () => {
     this.setState({ editing: true });
-  },
+  };
 
-  _closeEditForm() {
+  _closeEditForm = () => {
     this.setState({ editing: false });
-  },
+  };
 
-  _handleSubmit(data) {
+  _handleSubmit = (data) => {
     const { stream, id, order } = this.props.decorator;
     const { onUpdate } = this.props;
     onUpdate(id, {
@@ -47,17 +45,17 @@ const Decorator = createReactClass({
       stream: stream,
     });
     this._closeEditForm();
-  },
+  };
 
-  _decoratorTypeNotPresent() {
+  _decoratorTypeNotPresent = () => {
     return {
       name: 'Unknown decorator type',
     };
-  },
+  };
 
   // Attempts to resolve ID values in the decorator configuration against the type definition.
   // This allows users to see actual names for entities in drop-downs, instead of their IDs.
-  _resolveConfigurationIds(config) {
+  _resolveConfigurationIds = (config) => {
     const typeConfig = this.props.typeDefinition.requested_configuration;
     const resolvedConfig = {};
     const configKeys = Object.keys(config);
@@ -73,9 +71,9 @@ const Decorator = createReactClass({
     });
 
     return Object.assign({}, config, resolvedConfig);
-  },
+  };
 
-  _formatActionsMenu() {
+  _formatActionsMenu = () => {
     const { decorator } = this.props;
     return (
       <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
@@ -84,7 +82,7 @@ const Decorator = createReactClass({
         <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
       </DropdownButton>
     );
-  },
+  };
 
   render() {
     const { disableMenu = false, decorator, decoratorTypes, typeDefinition } = this.props;
@@ -124,7 +122,7 @@ const Decorator = createReactClass({
         {content}
       </span>
     );
-  },
-});
+  }
+}
 
 export default Decorator;
