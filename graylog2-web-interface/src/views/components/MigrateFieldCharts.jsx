@@ -5,7 +5,6 @@ import { maxBy } from 'lodash';
 import Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
-import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import Store from 'logic/local-storage/Store';
@@ -141,12 +140,12 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
     .widgetPositions(newWidgetPositions)
     .build();
 
-  ViewStatesActions.update(currentView.activeQuery, newViewState).then(() => {
-    SearchActions.execute(SearchExecutionStateStore.getInitialState()).then(() => {
+  ViewStatesActions.update(currentView.activeQuery, newViewState).then(
+    () => SearchActions.executeWithCurrentState().then(() => {
       setMigrating(false);
       Store.set('pinned-field-charts-migrated', true);
-    });
-  });
+    }),
+  );
 };
 
 const onCancel = () => Store.set('pinned-field-charts-migrated', true);
