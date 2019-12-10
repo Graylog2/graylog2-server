@@ -2,31 +2,26 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { maxBy } from 'lodash';
+import Immutable from 'immutable';
 
-import Immutable, { Map } from 'immutable';
-import { widgetDefinition } from 'views/logic/Widgets';
-import ViewState from 'views/logic/views/ViewState';
-import { CurrentViewStateStore, CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
-import { ViewStore } from 'views/stores/ViewStore';
+import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
+import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+
+import Store from 'logic/local-storage/Store';
+import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import Store from 'logic/local-storage/Store';
-// import { ViewActions, ViewStore } from 'views/stores/ViewStore';
-
 import SearchActions from 'views/actions/SearchActions';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 
 import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
-import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
-import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-
-import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
-import { ViewStatesActions, ViewStatesStore } from 'views/stores/ViewStatesStore';
-
 
 type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
 type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardinal' | 'monotone';
@@ -183,7 +178,7 @@ const MigrateFieldCharts = () => {
             </Button>
             <Button onClick={() => onCancel()}
                     disabled={migrating}>
-                  Cancel
+                  Discard charts
             </Button>
           </Actions>
         </Alert>
