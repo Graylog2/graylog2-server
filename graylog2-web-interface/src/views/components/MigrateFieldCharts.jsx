@@ -1,6 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Map } from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -8,17 +9,22 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
+import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Store from 'logic/local-storage/Store';
 
 import SearchActions from 'views/actions/SearchActions';
 
 import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
+import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
+import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 
 
 type LegacyFieldChart = {
   field: string,
   renderer: string,
+  interpolation: string,
   valuetype: string,
   interval: string,
 }
@@ -64,13 +70,38 @@ const mapVisualization = (visualization: string) => {
   }
 };
 
+const createVisualizationConfig = (interpolation: string, visualization: string) => {
+  let interpolationName: InterpolationMode;
+  switch (interpolation) {
+    case 'basis':
+    case 'bundle':
+    case 'cardinal':
+    case 'monotone':
+      interpolationName = 'spline';
+      break;
+    case 'linear':
+    case 'step-after':
+      interpolationName = interpolation;
+      break;
+    default:
+      interpolationName = 'linear';
+  }
+
+  switch (visualization) {
+    case 'line':
+      return new LineVisualizationConfig(interpolationName);
+    case 'area':
+      return new AreaVisualizationConfig(interpolationName);
+    default:
+      return undefined;
+  }
+};
+
 const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void) => {
   // TODO: Add widget position on create
-  // TODO: Implement interpolation
-  // interpolation: [linear, step-after, basis, bundle, cardinal, monotone]
-  // Other fields: createdAt, query, range: {relative: 300}, rangetype: ralative,
 
-  const newWidgets = Object.values(legacyCharts).map((chart: LegacyFieldChart) => {
+
+  const newWidgets = legacyCharts.map((chart: LegacyFieldChart) => {
     setMigrating(true);
 
     const { field } = chart;
@@ -79,15 +110,17 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
     // Setting series. The old field charts only have one series per chart.
     const rowPivots = [new Pivot('timestamp', 'time', { interval: { type: 'timeunit', ...mapTime(chart.interval) } })];
     const visualization = mapVisualization(chart.renderer);
+    const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
     const widgetConfig = AggregationWidgetConfig.builder()
       .visualization(visualization)
-      .visualizationConfig(undefined)
+      .visualizationConfig(visualizationConfig)
       .series([series])
       .rowPivots(rowPivots)
       .build();
 
     return AggregationWidget.builder()
       .newId()
+      .type('SEARCH')
       .timerange(undefined)
       .config(widgetConfig)
       .build();
@@ -101,12 +134,10 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
   });
 };
 
-const onCancel = () => {
-  Store.set('pinned-field-charts-migrated', true);
-};
+const onCancel = () => Store.set('pinned-field-charts-migrated', true);
 
 const MigrateFieldCharts = () => {
-  const legacyCharts = Object.values(Store.get('pinned-field-charts') || {});
+  const legacyCharts: Array<LegacyFieldChart> = Object.values(Store.get('pinned-field-charts') || {});
   const chartAmount = legacyCharts.length;
   const [migrating, setMigrating] = useState(false);
 
