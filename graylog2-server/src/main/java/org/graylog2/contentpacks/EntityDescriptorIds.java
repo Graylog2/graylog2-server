@@ -47,7 +47,6 @@ public class EntityDescriptorIds {
     public static EntityDescriptorIds of(Collection<EntityDescriptor> entityDescriptors) {
         final ImmutableMap<EntityDescriptor, String> descriptorIds = entityDescriptors.stream()
                 .collect(ImmutableMap.toImmutableMap(Function.identity(), d -> {
-                    // use the hardcoded IDs for default streams
                     if (isDefaultStreamDescriptor(d)) {
                         return d.id().id();
                     } else {
@@ -59,7 +58,7 @@ public class EntityDescriptorIds {
     }
 
     public static boolean isDefaultStreamDescriptor(EntityDescriptor descriptor) {
-        return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isDefaultStream(descriptor.id().id());
+        return ModelTypes.STREAM_V1.equals(descriptor.type()) && Stream.isDefaultStreamId(descriptor.id().id());
     }
 
     private EntityDescriptorIds(ImmutableMap<EntityDescriptor, String> descriptorIds) {
