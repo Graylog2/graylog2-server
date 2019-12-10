@@ -1,0 +1,203 @@
+{
+  "views": [
+    {
+      "_id": {
+        "$oid": "5def958063303ae5f68eccae"
+      },
+      "type" : "SEARCH",
+      "title" : "View with parameter",
+      "summary" : "",
+      "description" : "",
+      "search_id" : "5def956163303ae5f68eccad",
+      "properties" : [],
+      "requires" : {
+        "parameters" : {
+          "name" : "Graylog Enterprise",
+          "version" : "3.1.0",
+          "url" : "https://www.graylog.org/enterprise",
+          "description" : "Graylog Enterprise",
+          "author" : "Graylog, Inc.",
+          "unique_id" : "org.graylog.plugins.enterprise.EnterprisePlugin"
+        }
+      },
+      "state" : {
+        "d5780b28-096c-4285-97a3-a798e91ae464" : {
+          "titles" : {
+            "widget" : {
+              "52dc79c9-9eba-4042-a195-5526649d4bf2" : "Message Count",
+              "6cc51b82-6e31-4dee-aaeb-0105e930bdc4" : "All Messages"
+            }
+          },
+          "widgets" : [
+            {
+              "id" : "52dc79c9-9eba-4042-a195-5526649d4bf2",
+              "type" : "aggregation",
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "config" : {
+                "row_pivots" : [
+                  {
+                    "field" : "timestamp",
+                    "type" : "time",
+                    "config" : {
+                      "interval" : {
+                        "type" : "auto",
+                        "scaling" : null
+                      }
+                    }
+                  }
+                ],
+                "column_pivots" : [],
+                "series" : [
+                  {
+                    "config" : {},
+                    "function" : "count()"
+                  }
+                ],
+                "sort" : [],
+                "visualization" : "bar",
+                "rollup" : true
+              }
+            },
+            {
+              "id" : "6cc51b82-6e31-4dee-aaeb-0105e930bdc4",
+              "type" : "messages",
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "config" : {
+                "fields" : [
+                  "timestamp",
+                  "source"
+                ],
+                "show_message_row" : true
+              }
+            }
+          ],
+          "widget_mapping" : {
+            "52dc79c9-9eba-4042-a195-5526649d4bf2" : [
+              "2c90c5c0-b489-4314-ad22-bea696f1afd7"
+            ],
+            "6cc51b82-6e31-4dee-aaeb-0105e930bdc4" : [
+              "b9170ff1-571c-4a1a-a8f5-27d9698ceeb3"
+            ]
+          },
+          "positions" : {
+            "52dc79c9-9eba-4042-a195-5526649d4bf2" : {
+              "col" : 1,
+              "row" : 1,
+              "height" : 2,
+              "width" : "Infinity"
+            },
+            "6cc51b82-6e31-4dee-aaeb-0105e930bdc4" : {
+              "col" : 1,
+              "row" : 3,
+              "height" : 6,
+              "width" : "Infinity"
+            }
+          },
+          "display_mode_settings" : {
+            "positions" : {}
+          }
+        }
+      },
+      "owner" : "admin",
+      "created_at" : "2019-12-10T12:51:07.999Z"
+    }
+  ],
+  "searches": [
+    {
+      "_id": {
+        "$oid": "5def956163303ae5f68eccad"
+      },
+      "queries" : [
+        {
+          "id" : "d5780b28-096c-4285-97a3-a798e91ae464",
+          "timerange" : {
+            "type" : "relative",
+            "range" : 2592000
+          },
+          "filter" : {
+            "type" : "or",
+            "filters" : [
+              {
+                "type" : "stream",
+                "id" : "5cdab2293d27467fbe9e8a72"
+              }
+            ]
+          },
+          "query" : {
+            "type" : "elasticsearch",
+            "query_string" : "$parameter$ "
+          },
+          "search_types" : [
+            {
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "id" : "2c90c5c0-b489-4314-ad22-bea696f1afd7",
+              "name" : "chart",
+              "series" : [
+                {
+                  "type" : "count",
+                  "id" : "count()"
+                }
+              ],
+              "sort" : [],
+              "rollup" : true,
+              "type" : "pivot",
+              "row_groups" : [
+                {
+                  "type" : "time",
+                  "field" : "timestamp",
+                  "interval" : {
+                    "type" : "auto",
+                    "scaling" : 1.0
+                  }
+                }
+              ],
+              "column_groups" : []
+            },
+            {
+              "timerange" : null,
+              "query" : null,
+              "streams" : [],
+              "id" : "b9170ff1-571c-4a1a-a8f5-27d9698ceeb3",
+              "name" : null,
+              "limit" : 150,
+              "offset" : 0,
+              "type" : "messages"
+            }
+          ]
+        }
+      ],
+      "parameters" : [
+        {
+          "name" : "parameter",
+          "title" : "Parameter",
+          "description" : "parameter",
+          "optional" : false,
+          "binding" : {
+            "type" : "value",
+            "value" : ""
+          },
+          "data_type" : "string",
+          "default_value" : "parameter"
+        }
+      ],
+      "requires" : {
+        "parameters" : {
+          "name" : "Graylog Enterprise",
+          "version" : "3.1.0",
+          "url" : "https://www.graylog.org/enterprise",
+          "description" : "Graylog Enterprise",
+          "author" : "Graylog, Inc.",
+          "unique_id" : "org.graylog.plugins.enterprise.EnterprisePlugin"
+        }
+      },
+      "owner" : "admin",
+      "created_at" : "2019-12-10T12:53:53.592Z"
+    }
+  ]
+}

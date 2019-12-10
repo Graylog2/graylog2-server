@@ -307,7 +307,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
-            return resolveEntityV1(EntityV1 entity, parameters, entities);
+            return resolveEntityV1((EntityV1) entity, parameters, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
