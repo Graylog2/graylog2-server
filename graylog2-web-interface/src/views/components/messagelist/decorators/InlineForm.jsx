@@ -4,7 +4,14 @@ import * as React from 'react';
 import { validate } from 'legacy/validations';
 import { Button } from 'components/graylog/index';
 
-const InlineForm = (submitTitle = 'Create') => ({ children, disabled, onCancel, onSubmitForm }) => {
+type Props = {
+  children: React.Node,
+  disabled: boolean,
+  onCancel: () => void,
+  onSubmitForm: any => void,
+};
+
+const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => ({ children, disabled, onCancel, onSubmitForm }) => {
   const onSubmit = (event) => {
     event.stopPropagation();
     const { target: formDOMNode } = event;

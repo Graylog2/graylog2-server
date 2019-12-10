@@ -52,7 +52,7 @@ const DecoratorsConfig = () => {
   useEffect(() => DecoratorsActions.list().then(setDecorators), [setDecorators]);
 
   const configModal = useRef();
-  const openModal = useCallback(() => configModal.current.open(), [configModal]);
+  const openModal = useCallback(() => configModal.current && configModal.current.open(), [configModal]);
 
   if (!streams || !decorators || !types) {
     return <Spinner />;
