@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { isEqual } from 'lodash';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 import DataTableElement from './DataTableElement';
 
@@ -81,10 +82,10 @@ class DataTable extends React.Component {
     };
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(previousProps) {
     // We update the state with row if the filterKeys is empty other than that typeahead is handling the state
-    const { filterKeys } = this.props;
-    if (filterKeys.length === 0) {
+    const { filterKeys, rows } = this.props;
+    if (filterKeys.length === 0 && !isEqual(previousProps.rows, rows)) {
       this._updateState();
     }
   }
