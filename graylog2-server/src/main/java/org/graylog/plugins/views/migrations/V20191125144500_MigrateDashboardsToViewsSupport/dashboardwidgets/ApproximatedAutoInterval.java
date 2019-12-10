@@ -73,7 +73,7 @@ public class ApproximatedAutoInterval {
             case "day": return Duration.ofDays(1);
             case "week": return Duration.ofDays(7);
             case "month": return Duration.ofDays(30);
-            case "quarter": return Duration.ofDays(120);
+            case "quarter": return Duration.ofDays(90);
             case "year": return Duration.ofDays(365);
         }
         throw new RuntimeException("Unable to parse interval: " + interval);
