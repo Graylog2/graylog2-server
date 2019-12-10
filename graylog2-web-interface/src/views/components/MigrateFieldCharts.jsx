@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { maxBy } from 'lodash';
+import { maxBy, values } from 'lodash';
 import Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
@@ -106,7 +106,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
   const widgetDef = widgetDefinition('AGGREGATION');
   const currentView = CurrentViewStateStore.getInitialState();
   const newWidgetPositions = { ...currentView.state.widgetPositions };
-  const lastWidgetPosition = maxBy(Object.values(newWidgetPositions), (position: WidgetPosition): number => position.row);
+  const lastWidgetPosition = maxBy(values(newWidgetPositions), (position: WidgetPosition): number => position.row);
 
   const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
     setMigrating(true);
@@ -151,7 +151,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
 const onCancel = () => Store.set('pinned-field-charts-migrated', true);
 
 const MigrateFieldCharts = () => {
-  const legacyCharts: Array<LegacyFieldChart> = Object.values(Store.get('pinned-field-charts') || {});
+  const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
   const chartAmount = legacyCharts.length;
   const [migrating, setMigrating] = useState(false);
 
