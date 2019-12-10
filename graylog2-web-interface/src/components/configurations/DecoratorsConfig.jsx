@@ -1,22 +1,18 @@
 // @flow strict
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
 import { groupBy } from 'lodash';
 
 import { IfPermitted } from 'components/common';
 import { Button } from 'components/graylog';
 import { BootstrapModalForm } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
-import Select from 'components/common/Select';
 import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 
 import Decorator from 'views/components/messagelist/decorators/Decorator';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
-import { defaultCompare } from 'views/logic/DefaultCompare';
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
-import SelectContainer from './decorators/SelectContainer';
-import StreamSelect from './decorators/StreamSelect';
+import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 

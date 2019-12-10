@@ -1,14 +1,25 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import SelectContainer from './SelectContainer';
-import Select from '../../common/Select';
-import { defaultCompare } from '../../../views/logic/DefaultCompare';
+import styled from 'styled-components';
+
+import Select from 'components/common/Select';
+import { defaultCompare } from 'views/logic/DefaultCompare';
 
 export const DEFAULT_STREAM_ID = '000000000000000000000001';
 export const DEFAULT_SEARCH_ID = 'DEFAULT_SEARCH';
 
-const StreamSelect = ({ onChange, value, streams }) => {
+const SelectContainer: React.ComponentType<{}> = styled.div`
+  margin-bottom: 10px;
+`;
+
+type Props = {
+  onChange: string => void,
+  value: string,
+  streams: Array<{ id: string, title: string }>,
+};
+
+const StreamSelect = ({ onChange, value, streams }: Props) => {
   const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
     .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
     .map(({ title, id }) => ({ label: title, value: id }))];
@@ -16,7 +27,7 @@ const StreamSelect = ({ onChange, value, streams }) => {
     <SelectContainer>
       <Select inputId="streams-filter"
               onChange={onChange}
-              options={streams}
+              options={options}
               clearable={false}
               style={{ width: '100%' }}
               placeholder="There are no decorators configured for any stream."
@@ -25,6 +36,10 @@ const StreamSelect = ({ onChange, value, streams }) => {
   );
 };
 
-StreamSelect.propTypes = {};
+StreamSelect.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
+  streams: PropTypes.array.isRequired,
+};
 
 export default StreamSelect;
