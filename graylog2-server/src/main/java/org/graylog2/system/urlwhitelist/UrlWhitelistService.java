@@ -16,10 +16,17 @@
  */
 package org.graylog2.system.urlwhitelist;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UrlWhitelistService {
 
@@ -54,5 +61,48 @@ public class UrlWhitelistService {
     // TODO: add some kind of caching so that we don't fetch from db on every whitelist check
     public boolean isWhitelisted(String url) {
         return get().isWhitelisted(url);
+    }
+
+    public Optional<WhitelistEntry> getEntry(String id) {
+        return get().entries()
+                .stream()
+                .filter(entry -> entry.id()
+                        .equals(id))
+                .findFirst();
+    }
+
+    public void addEntry(WhitelistEntry entry) {
+        final UrlWhitelist modified = addEntry(get(), entry);
+        save(modified);
+    }
+
+    public void removeEntry(String id) {
+        UrlWhitelist modified = removeEntry(get(), id);
+        save(modified);
+    }
+
+    @VisibleForTesting
+    UrlWhitelist addEntry(UrlWhitelist whitelist, WhitelistEntry entry) {
+        final LinkedHashMap<String, WhitelistEntry> entriesMap = whitelist.entries()
+                .stream()
+                .collect(Collectors.toMap(WhitelistEntry::id, Function.identity(),
+                        (a, b) -> { throw new IllegalStateException("Duplicate key '" + a + "'."); },
+                        LinkedHashMap::new));
+        entriesMap.put(entry.id(), entry);
+        return whitelist.toBuilder()
+                .entries(ImmutableList.copyOf(entriesMap.values()))
+                .build();
+    }
+
+    @VisibleForTesting
+    UrlWhitelist removeEntry(UrlWhitelist whitelist, String id) {
+        List<WhitelistEntry> entries = whitelist.entries()
+                .stream()
+                .filter(entry -> !entry.id()
+                        .equals(id))
+                .collect(Collectors.toList());
+        return whitelist.toBuilder()
+                .entries(entries)
+                .build();
     }
 }
