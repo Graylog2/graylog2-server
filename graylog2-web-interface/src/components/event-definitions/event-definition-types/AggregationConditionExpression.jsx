@@ -163,7 +163,7 @@ class AggregationConditionExpression extends React.Component {
         );
     }
 
-    if (!parent) {
+    if (!parent && expression.expr !== 'group') {
       return (
         <>
           <BooleanOperatorSelector operator={this.getEffectiveGlobalGroupOperator()}
