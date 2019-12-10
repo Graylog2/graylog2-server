@@ -18,6 +18,11 @@ package org.graylog2.contentpacks.facades;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -27,6 +32,7 @@ import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
+import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
@@ -44,6 +50,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -276,5 +284,47 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
         return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+
+        final ModelId modelId = entityDescriptor.id();
+        final ViewDTO viewDTO = viewService.get(modelId.id()).
+                orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
+        final Search search = searchDbService.get(viewDTO.searchId()).
+                orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewDTO.searchId()));
+        search.queries().stream().flatMap(q -> q.usedStreamIds().stream())
+                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+                .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveEntityV1(EntityV1 entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
+                                          Map<EntityDescriptor, Entity> entities) {
+        final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entity);
+
+        final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
+        viewEntity.search().queries().stream().flatMap(q -> q.usedStreamIds().stream())
+                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+                .map(entities::get)
+                .filter(Objects::nonNull)
+                .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        return ImmutableGraph.copyOf(mutableGraph);
     }
 }
