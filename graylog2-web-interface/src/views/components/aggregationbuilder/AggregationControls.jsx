@@ -116,7 +116,7 @@ export default class AggregationControls extends React.Component<Props, State> {
     const formattedFieldsOptions = formattedFields.map(v => ({ label: v, value: v }));
     const suggester = new SeriesFunctionsSuggester(formattedFields);
 
-    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter'].findIndex(x => x === visualization) >= 0;
+    const showEventConfiguration = config.isTimeline && ['bar', 'line', 'scatter', 'area'].findIndex(x => x === visualization) >= 0;
     const childrenWithCallback = React.Children.map(children, child => React.cloneElement(child, { onVisualizationConfigChange: this._onVisualizationConfigChange }));
     const VisualizationConfigType = _visualizationConfigFor(visualization);
     return (
