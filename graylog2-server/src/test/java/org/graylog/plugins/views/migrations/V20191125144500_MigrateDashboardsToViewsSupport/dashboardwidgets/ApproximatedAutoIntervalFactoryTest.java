@@ -27,12 +27,12 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ApproximatedAutoIntervalTest {
+public class ApproximatedAutoIntervalFactoryTest {
     @Test
     public void returnsParsedIntervalIfKeywordRange() {
         final KeywordRange keywordRange = KeywordRange.create("yesterday");
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", keywordRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", keywordRange);
 
         assertThat(interval).isEqualTo(TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1));
     }
@@ -41,7 +41,7 @@ public class ApproximatedAutoIntervalTest {
     public void approximatesAutoIntervalWithScalingIfRelativeRangeAndBeyondLimits() {
         final RelativeRange relativeRange = RelativeRange.create(7200);
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", relativeRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", relativeRange);
 
         assertThat(interval).isEqualTo(AutoInterval.create(2.0));
     }
@@ -50,7 +50,7 @@ public class ApproximatedAutoIntervalTest {
     public void returnsParsedIntervalIfRelativeRangeButBelowLimit() {
         final RelativeRange relativeRange = RelativeRange.create(450);
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", relativeRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", relativeRange);
 
         assertThat(interval).isEqualTo(TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1));
     }
@@ -59,7 +59,7 @@ public class ApproximatedAutoIntervalTest {
     public void returnsParsedIntervalIfRelativeRangeButAboveLimit() {
         final RelativeRange relativeRange = RelativeRange.create(86400);
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", relativeRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", relativeRange);
 
         assertThat(interval).isEqualTo(TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1));
     }
@@ -70,7 +70,7 @@ public class ApproximatedAutoIntervalTest {
                 DateTime.parse("2019-12-02T14:50:23Z")
         );
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", absoluteRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", absoluteRange);
 
         assertThat(interval).isEqualTo(AutoInterval.create(2.0));
     }
@@ -82,7 +82,7 @@ public class ApproximatedAutoIntervalTest {
                 DateTime.parse("2019-12-02T14:50:23Z")
         );
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", absoluteRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", absoluteRange);
 
         assertThat(interval).isEqualTo(TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1));
     }
@@ -94,7 +94,7 @@ public class ApproximatedAutoIntervalTest {
                 DateTime.parse("2019-12-02T14:50:23Z")
         );
 
-        final Interval interval = ApproximatedAutoInterval.of("minute", absoluteRange);
+        final Interval interval = ApproximatedAutoIntervalFactory.of("minute", absoluteRange);
 
         assertThat(interval).isEqualTo(TimeUnitInterval.create(TimeUnitInterval.IntervalUnit.MINUTES, 1));
     }

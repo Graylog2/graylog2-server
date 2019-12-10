@@ -27,7 +27,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 
 import java.time.Duration;
 
-public class ApproximatedAutoInterval {
+public class ApproximatedAutoIntervalFactory {
     static final ImmutableRangeMap<Duration, Duration> boundaries = ImmutableRangeMap.<Duration, Duration>builder()
             .put(Range.atMost( Duration.ofMillis(20)), Duration.ofMillis(1))
             .put(Range.openClosed(Duration.ofMillis(20), Duration.ofMillis(200)), Duration.ofMillis(5))

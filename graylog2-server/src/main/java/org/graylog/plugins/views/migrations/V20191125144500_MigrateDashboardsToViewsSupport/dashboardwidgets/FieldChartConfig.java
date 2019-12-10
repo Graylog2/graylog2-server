@@ -62,7 +62,7 @@ public abstract class FieldChartConfig extends WidgetConfigBase implements Widge
                 .rowPivots(Collections.singletonList(
                         Pivot.timeBuilder()
                                 .field(TIMESTAMP_FIELD)
-                                .config(TimeHistogramConfig.builder().interval(ApproximatedAutoInterval.of(interval(), timerange())).build())
+                                .config(TimeHistogramConfig.builder().interval(ApproximatedAutoIntervalFactory.of(interval(), timerange())).build())
                                 .build()
                 ))
                 .series(Collections.singletonList(series()))

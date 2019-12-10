@@ -55,7 +55,7 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
                                                 Pivot.timeBuilder()
                                                         .field(TIMESTAMP_FIELD)
                                                         .config(TimeHistogramConfig.builder()
-                                                                .interval(ApproximatedAutoInterval.of(interval(), timerange()))
+                                                                .interval(ApproximatedAutoIntervalFactory.of(interval(), timerange()))
                                                                 .build())
                                                         .build()
                                         ))

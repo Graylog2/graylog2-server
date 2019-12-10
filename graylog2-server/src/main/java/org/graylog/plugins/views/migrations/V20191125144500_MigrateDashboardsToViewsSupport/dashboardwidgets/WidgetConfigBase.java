@@ -41,7 +41,7 @@ abstract class WidgetConfigBase implements WidgetConfig {
     Pivot timestampPivot(String interval) {
         return Pivot.timeBuilder()
                 .field(TIMESTAMP_FIELD)
-                .config(TimeHistogramConfig.builder().interval(ApproximatedAutoInterval.of(interval, timerange())).build())
+                .config(TimeHistogramConfig.builder().interval(ApproximatedAutoIntervalFactory.of(interval, timerange())).build())
                 .build();
     }
 
