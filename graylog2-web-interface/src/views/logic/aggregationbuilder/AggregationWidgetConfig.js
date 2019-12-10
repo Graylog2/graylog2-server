@@ -23,6 +23,7 @@ type InternalState = {
   sort: Array<SortConfig>,
   visualization: string,
   visualizationConfig: ?VisualizationConfig,
+  eventAnnotation: boolean,
 };
 
 type AggregationWidgetConfigJson = {
@@ -34,6 +35,7 @@ type AggregationWidgetConfigJson = {
   sort: Array<SortConfigJson>,
   visualization: string,
   visualization_config: VisualizationConfigJson,
+  event_annotation: boolean,
 };
 
 export default class AggregationWidgetConfig extends WidgetConfig {
@@ -46,9 +48,10 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     visualization: string,
     rollup: boolean,
     visualizationConfig: VisualizationConfig,
-    formattingSettings: WidgetFormattingSettings) {
+    formattingSettings: WidgetFormattingSettings,
+    eventAnnotation: boolean = false) {
     super();
-    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings };
+    this._value = { columnPivots, rowPivots, series, sort, visualization, rollup, visualizationConfig, formattingSettings, eventAnnotation };
   }
 
   get rowPivots() {
@@ -86,6 +89,10 @@ export default class AggregationWidgetConfig extends WidgetConfig {
     return this._value.formattingSettings;
   }
 
+  get eventAnnotation() {
+    return this._value.eventAnnotation;
+  }
+
   get isTimeline() {
     return this.rowPivots && this.rowPivots.length === 1 && this.rowPivots[0].field === TIMESTAMP_FIELD;
   }
@@ -102,6 +109,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .columnPivots([])
       .series([])
       .sort([])
+      .eventAnnotation(false)
       .rollup(true);
   }
 
@@ -120,6 +128,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       sort,
       visualization,
       visualizationConfig,
+      eventAnnotation,
     } = this._value;
     return {
       column_pivots: columnPivots,
@@ -130,13 +139,14 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       sort,
       visualization,
       visualization_config: visualizationConfig,
+      event_annotation: eventAnnotation,
     };
   }
 
   equals(other: any) {
     const { is } = Immutable;
     if (other instanceof AggregationWidgetConfig) {
-      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'visualizationConfig']
+      return ['rowPivots', 'columnPivots', 'series', 'sort', 'rollup', 'eventAnnotation', 'visualizationConfig']
         .every(key => is(Immutable.fromJS(this[key]), Immutable.fromJS(other[key])));
     }
     return false;
@@ -156,6 +166,8 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       visualization,
       // eslint-disable-next-line camelcase
       visualization_config,
+      // eslint-disable-next-line camelcase
+      event_annotation,
     } = value;
 
     // eslint-disable-next-line no-use-before-define
@@ -170,6 +182,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
       .visualizationConfig(visualization_config !== null ? VisualizationConfig.fromJSON(visualization, visualization_config) : null)
       // eslint-disable-next-line camelcase
       .formattingSettings(formatting_settings === null ? undefined : WidgetFormattingSettings.fromJSON(formatting_settings))
+      .eventAnnotation(event_annotation)
       .build();
   }
 }
@@ -214,6 +227,10 @@ class Builder {
     return new Builder(this.value.set('formattingSettings', value));
   }
 
+  eventAnnotation(value: boolean) {
+    return new Builder(this.value.set('eventAnnotation', value));
+  }
+
   build() {
     const {
       rowPivots,
@@ -224,6 +241,7 @@ class Builder {
       rollup,
       visualizationConfig,
       formattingSettings,
+      eventAnnotation,
     } = this.value.toObject();
 
     const availableSorts = [].concat(rowPivots, columnPivots, series);
@@ -239,6 +257,7 @@ class Builder {
       computedRollup,
       visualizationConfig,
       formattingSettings,
+      eventAnnotation,
     );
   }
 }
