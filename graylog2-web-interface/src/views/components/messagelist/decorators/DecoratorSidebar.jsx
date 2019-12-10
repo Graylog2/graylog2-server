@@ -16,6 +16,8 @@ const { DecoratorsActions, DecoratorsStore } = CombinedProvider.get('Decorators'
 class DecoratorSidebar extends React.Component {
   static propTypes = {
     decorators: PropTypes.array.isRequired,
+    decoratorTypes: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
     stream: PropTypes.string.isRequired,
   };
 
