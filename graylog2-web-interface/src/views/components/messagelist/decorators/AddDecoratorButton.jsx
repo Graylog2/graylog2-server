@@ -30,22 +30,21 @@ class AddDecoratorButton extends React.Component {
     showHelp: true,
   };
 
-  getInitialState() {
-    return {
-      typeDefinition: {},
-    };
+  constructor(props) {
+    super(props);
+    this.state = {};
   }
 
   _formatDecoratorType = (typeDefinition, typeName) => {
     return { value: typeName, label: typeDefinition.name };
   };
 
-  _handleCancel() {
+  _handleCancel = () => {
     this.select.clearValue();
     this.setState(this.getInitialState());
-  }
+  };
 
-  _handleSubmit(data) {
+  _handleSubmit = (data) => {
     const { stream, nextOrder, onCreate } = this.props;
 
     const request = {
@@ -56,13 +55,13 @@ class AddDecoratorButton extends React.Component {
     };
     onCreate(request);
     this.setState({ typeName: this.PLACEHOLDER });
-  }
+  };
 
-  _openModal() {
+  _openModal = () => {
     this.configurationForm.open();
-  }
+  };
 
-  _onTypeChange(decoratorType) {
+  _onTypeChange = (decoratorType) => {
     const { decoratorTypes } = this.props;
 
     this.setState({ typeName: decoratorType });
@@ -71,7 +70,7 @@ class AddDecoratorButton extends React.Component {
     } else {
       this.setState({ typeDefinition: {} });
     }
-  }
+  };
 
   render() {
     const { typeDefinition, typeName } = this.state;
