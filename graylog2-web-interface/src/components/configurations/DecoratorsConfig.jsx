@@ -16,6 +16,7 @@ import DecoratorList from 'views/components/messagelist/decorators/DecoratorList
 import { defaultCompare } from 'views/logic/DefaultCompare';
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import SelectContainer from './decorators/SelectContainer';
+import StreamSelect from './decorators/StreamSelect';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
@@ -38,9 +39,6 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
                       typeDefinition={typeDefinition} />,
   });
 };
-
-const DEFAULT_STREAM_ID = '000000000000000000000001';
-const DEFAULT_SEARCH_ID = 'DEFAULT_SEARCH';
 
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState();
@@ -67,27 +65,14 @@ const DecoratorsConfig = () => {
     .sort((d1, d2) => d1.order - d2.order);
   const readOnlyDecoratorItems = sortedDecorators.map(decorator => _formatDecorator(decorator, currentDecorators, types));
 
-  const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
-    .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id))
-    .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
-    .map(({ title, id }) => ({ label: title, value: id }))];
-  const streamSelect = (
-    <SelectContainer>
-      <Select inputId="streams-filter"
-              onChange={setCurrentStream}
-              options={options}
-              clearable={false}
-              style={{ width: '100%' }}
-              placeholder="There are no decorators configured for any stream."
-              value={currentStream} />
-    </SelectContainer>
-  );
+  const streamOptions = streams
+    .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));
 
   return (
     <div>
       <h2>Decorators Configuration</h2>
       <p>Select the stream for which you want to see the set of default decorators.</p>
-      {streamSelect}
+      <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
       <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
