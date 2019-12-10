@@ -38,7 +38,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types }) => {
   const [updatedDecorators, setUpdatedDecorators] = useState(decorators);
 
   const decoratorsGroupedByStream = groupBy(updatedDecorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
-  const currentDecorators = decoratorsGroupedByStream[currentStream];
+  const currentDecorators = decoratorsGroupedByStream[currentStream] || [];
   const sortedDecorators = currentDecorators
     .sort((d1, d2) => d1.order - d2.order);
   const decoratorItems = sortedDecorators.map(decorator => _formatDecorator(decorator, updatedDecorators, types, setUpdatedDecorators));
@@ -46,7 +46,6 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types }) => {
   const nextOrder = sortedDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 
   const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
-    .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id))
     .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
     .map(({ title, id }) => ({ label: title, value: id }))];
 
