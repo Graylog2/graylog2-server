@@ -14,7 +14,7 @@ const StyledSplitButton = memo(styled(BootstrapSplitButton)(({ theme }) => css`
   ~ .btn.dropdown-toggle {
     ${buttonStyles(theme.color)};
 
-    ${menuItemStyles(theme.color, { sibling: true })};
+    ${menuItemStyles({ sibling: true })};
   }
 `));
 

@@ -4,15 +4,15 @@ import PropTypes from 'prop-types';
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { contrastingColor, colorLevel } from 'theme/utils';
+import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
-  const borderColor = colorLevel(hex, -8);
-  const backgroundColor = colorLevel(hex, -10);
-  const textColor = contrastingColor(backgroundColor);
+  const borderColor = util.colorLevel(hex, -8);
+  const backgroundColor = util.colorLevel(hex, -10);
+  const textColor = util.contrastingColor(backgroundColor);
 
   return css`
     background-color: ${backgroundColor};

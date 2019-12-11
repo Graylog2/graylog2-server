@@ -80,7 +80,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               style="float: right;"
             >
               <div
-                class="form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 brPnzl control-label"
@@ -297,7 +297,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               style="float: right;"
             >
               <div
-                class="form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 brPnzl control-label"

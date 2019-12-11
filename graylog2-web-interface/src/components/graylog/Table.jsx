@@ -2,31 +2,31 @@
 import { Table as BootstrapTable } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-import { colorLevel } from 'theme/utils';
+import { util } from 'theme';
 
 const variantRowStyles = css(({ theme }) => {
   let styles = '';
 
   const variants = {
     active: {
-      background: colorLevel(theme.color.gray[80], -10),
-      hover: colorLevel(theme.color.gray[80], -9),
+      background: util.colorLevel(theme.color.gray[80], -10),
+      hover: util.colorLevel(theme.color.gray[80], -9),
     },
     success: {
-      background: colorLevel(theme.color.variant.success, -10),
-      hover: colorLevel(theme.color.variant.success, -9),
+      background: util.colorLevel(theme.color.variant.success, -10),
+      hover: util.colorLevel(theme.color.variant.success, -9),
     },
     info: {
-      background: colorLevel(theme.color.variant.info, -10),
-      hover: colorLevel(theme.color.variant.info, -9),
+      background: util.colorLevel(theme.color.variant.info, -10),
+      hover: util.colorLevel(theme.color.variant.info, -9),
     },
     warning: {
-      background: colorLevel(theme.color.variant.warning, -10),
-      hover: colorLevel(theme.color.variant.warning, -9),
+      background: util.colorLevel(theme.color.variant.warning, -10),
+      hover: util.colorLevel(theme.color.variant.warning, -9),
     },
     danger: {
-      background: colorLevel(theme.color.variant.danger, -10),
-      hover: colorLevel(theme.color.variant.danger, -9),
+      background: util.colorLevel(theme.color.variant.danger, -10),
+      hover: util.colorLevel(theme.color.variant.danger, -9),
     },
   };
   Object.keys(variants).forEach((variant) => {
@@ -84,7 +84,7 @@ const Table = styled(BootstrapTable)(({ theme }) => {
       background-color: ${theme.color.gray[100]};
     }
     &.table-bordered {
-      border-color: ${colorLevel(theme.color.gray[80], -2)};
+      border-color: ${util.colorLevel(theme.color.gray[80], -2)};
     }
     &.table-bordered > thead > tr > th,
     &.table-bordered > tbody > tr > th,
@@ -92,14 +92,14 @@ const Table = styled(BootstrapTable)(({ theme }) => {
     &.table-bordered > thead > tr > td,
     &.table-bordered > tbody > tr > td,
     &.table-bordered > tfoot > tr > td {
-      border-color: ${colorLevel(theme.color.gray[80], -2)};
+      border-color: ${util.colorLevel(theme.color.gray[80], -2)};
     }
 
     &.table-striped > tbody > tr:nth-of-type(odd) {
-      background-color: ${colorLevel(theme.color.gray[80], -10)};
+      background-color: ${util.colorLevel(theme.color.gray[80], -10)};
     }
     &.table-hover > tbody > tr:hover {
-      background-color: ${colorLevel(theme.color.gray[80], -9)};
+      background-color: ${util.colorLevel(theme.color.gray[80], -9)};
     }
 
     ${variantRowStyles};

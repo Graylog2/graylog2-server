@@ -80,7 +80,7 @@ exports[`WidgetQueryControls should do something 1`] = `
         style="margin-left: 50px;"
       >
         <div
-          class="form-group"
+          class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
         >
           
           <span>

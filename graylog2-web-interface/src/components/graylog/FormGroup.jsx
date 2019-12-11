@@ -6,37 +6,17 @@ import styled, { css } from 'styled-components';
 import styledTheme from 'styled-theming';
 import { darken, lighten } from 'polished';
 
-import { teinte, themeModes } from 'theme';
-import colorLevel from 'theme/util/colorLevel';
+import { themeModes, util } from 'theme';
 import FormControl from './FormControl';
 import InputGroup from './InputGroup';
 
 const VALID_STATES = ['error', 'warning', 'success'];
 
-const createCss = (validationState) => {
-  let text;
-  let border;
-  let background;
-
-  switch (validationState) {
-    case 'success':
-      text = colorLevel(teinte.tertiary.tre, 6);
-      border = teinte.tertiary.tre;
-      background = colorLevel(teinte.tertiary.tre, -6);
-      break;
-    case 'warning':
-      text = colorLevel(teinte.tertiary.sei, 6);
-      border = teinte.tertiary.sei;
-      background = colorLevel(teinte.tertiary.sei, -6);
-      break;
-    case 'error':
-      text = colorLevel(teinte.secondary.uno, 6);
-      border = teinte.secondary.uno;
-      background = colorLevel(teinte.secondary.uno, -6);
-      break;
-    default:
-      break;
-  }
+const createCss = validationState => css(({ theme }) => {
+  const variant = validationState === 'error' ? 'danger' : validationState;
+  const text = util.colorLevel(theme.color.variant[variant], 6);
+  const border = theme.color.variant[variant];
+  const background = util.colorLevel(theme.color.variant[variant], -6);
 
   return css`
     &.has-${validationState} {
@@ -63,7 +43,7 @@ const createCss = (validationState) => {
         }
       }
 
-      ${InputGroup} .input-group-addon {
+      ${InputGroup.type} .input-group-addon {
         color: ${text};
         background-color: ${background};
         border-color: ${border};
@@ -74,7 +54,7 @@ const createCss = (validationState) => {
       }
     }
   `;
-};
+});
 
 const validationStates = {};
 VALID_STATES.forEach((validState) => {

@@ -64,125 +64,99 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   value=""
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="name"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="name"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="name"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="name"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="name"
-                            >
-                              Name
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Name"
-                            maxLength={250}
-                            name="name"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Name"
-                              maxLength={250}
-                              name="name"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value=""
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Name"
-                                maxLength={250}
-                                name="name"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value=""
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="name"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="name"
+                                  >
+                                    Name
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Name"
                                   maxLength={250}
                                   name="name"
@@ -191,51 +165,121 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Give a descriptive name for this content pack.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Name"
+                                    maxLength={250}
+                                    name="name"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value=""
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Name"
+                                      maxLength={250}
+                                      name="name"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value=""
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="name"
+                                        label="Name"
+                                        maxLength={250}
+                                        name="name"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value=""
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Give a descriptive name for this content pack.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -254,125 +298,99 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   value=""
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="summary"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="summary"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="summary"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="summary"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="summary"
-                            >
-                              Summary
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Summary"
-                            maxLength={250}
-                            name="summary"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Summary"
-                              maxLength={250}
-                              name="summary"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value=""
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Summary"
-                                maxLength={250}
-                                name="summary"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value=""
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="summary"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="summary"
+                                  >
+                                    Summary
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Summary"
                                   maxLength={250}
                                   name="summary"
@@ -381,51 +399,121 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Give a short summary of the content pack.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Summary"
+                                    maxLength={250}
+                                    name="summary"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value=""
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Summary"
+                                      maxLength={250}
+                                      name="summary"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value=""
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="summary"
+                                        label="Summary"
+                                        maxLength={250}
+                                        name="summary"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value=""
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Give a short summary of the content pack.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -443,122 +531,99 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   value=""
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="description"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="description"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="description"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="description"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="description"
-                            >
-                              Description
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="textarea"
-                            inputRef={[Function]}
-                            label="Description"
-                            name="description"
-                            onChange={[Function]}
-                            placeholder=""
-                            rows={6}
-                            type="textarea"
-                            value=""
-                          >
-                            <StyledComponent
-                              componentClass="textarea"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Description"
-                              name="description"
-                              onChange={[Function]}
-                              placeholder=""
-                              rows={6}
-                              type="textarea"
-                              value=""
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="textarea"
-                                inputRef={[Function]}
-                                label="Description"
-                                name="description"
-                                onChange={[Function]}
-                                placeholder=""
-                                rows={6}
-                                type="textarea"
-                                value=""
+                                forwardedRef={null}
                               >
-                                <textarea
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="description"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="description"
+                                  >
+                                    Description
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="textarea"
+                                  inputRef={[Function]}
                                   label="Description"
                                   name="description"
                                   onChange={[Function]}
@@ -566,51 +631,118 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   rows={6}
                                   type="textarea"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Give a long description of the content pack in markdown.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="textarea"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Description"
+                                    name="description"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    rows={6}
+                                    type="textarea"
+                                    value=""
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="textarea"
+                                      inputRef={[Function]}
+                                      label="Description"
+                                      name="description"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      rows={6}
+                                      type="textarea"
+                                      value=""
+                                    >
+                                      <textarea
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="description"
+                                        label="Description"
+                                        name="description"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        rows={6}
+                                        type="textarea"
+                                        value=""
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Give a long description of the content pack in markdown.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -629,125 +761,99 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   value=""
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="vendor"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="vendor"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="vendor"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="vendor"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="vendor"
-                            >
-                              Vendor
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Vendor"
-                            maxLength={250}
-                            name="vendor"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Vendor"
-                              maxLength={250}
-                              name="vendor"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value=""
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Vendor"
-                                maxLength={250}
-                                name="vendor"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value=""
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="vendor"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="vendor"
+                                  >
+                                    Vendor
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Vendor"
                                   maxLength={250}
                                   name="vendor"
@@ -756,51 +862,121 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Who did this content pack and how can he be reached. e.g Name and eMail
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Vendor"
+                                    maxLength={250}
+                                    name="vendor"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value=""
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Vendor"
+                                      maxLength={250}
+                                      name="vendor"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value=""
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="vendor"
+                                        label="Vendor"
+                                        maxLength={250}
+                                        name="vendor"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value=""
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -818,122 +994,99 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   value=""
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="url"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="url"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="url"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="url"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="url"
-                            >
-                              URL
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="URL"
-                            maxLength={250}
-                            name="url"
-                            onChange={[Function]}
-                            placeholder=""
-                            type="text"
-                            value=""
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="URL"
-                              maxLength={250}
-                              name="url"
-                              onChange={[Function]}
-                              placeholder=""
-                              type="text"
-                              value=""
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="URL"
-                                maxLength={250}
-                                name="url"
-                                onChange={[Function]}
-                                placeholder=""
-                                type="text"
-                                value=""
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="url"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="url"
+                                  >
+                                    URL
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="URL"
                                   maxLength={250}
                                   name="url"
@@ -941,51 +1094,118 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                                   placeholder=""
                                   type="text"
                                   value=""
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Where can I find the content pack. e.g. github url
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="URL"
+                                    maxLength={250}
+                                    name="url"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="URL"
+                                      maxLength={250}
+                                      name="url"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="text"
+                                      value=""
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="url"
+                                        label="URL"
+                                        maxLength={250}
+                                        name="url"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="text"
+                                        value=""
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Where can I find the content pack. e.g. github url
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
               </fieldset>
@@ -1374,125 +1594,99 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   value="name"
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="name"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="name"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="name"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="name"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="name"
-                            >
-                              Name
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Name"
-                            maxLength={250}
-                            name="name"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value="name"
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Name"
-                              maxLength={250}
-                              name="name"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value="name"
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Name"
-                                maxLength={250}
-                                name="name"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value="name"
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="name"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="name"
+                                  >
+                                    Name
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Name"
                                   maxLength={250}
                                   name="name"
@@ -1501,51 +1695,121 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value="name"
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Give a descriptive name for this content pack.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Name"
+                                    maxLength={250}
+                                    name="name"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value="name"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Name"
+                                      maxLength={250}
+                                      name="name"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value="name"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="name"
+                                        label="Name"
+                                        maxLength={250}
+                                        name="name"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value="name"
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Give a descriptive name for this content pack.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -1564,125 +1828,99 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   value="summary"
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="summary"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="summary"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="summary"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="summary"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="summary"
-                            >
-                              Summary
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Summary"
-                            maxLength={250}
-                            name="summary"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value="summary"
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Summary"
-                              maxLength={250}
-                              name="summary"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value="summary"
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Summary"
-                                maxLength={250}
-                                name="summary"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value="summary"
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="summary"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="summary"
+                                  >
+                                    Summary
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Summary"
                                   maxLength={250}
                                   name="summary"
@@ -1691,51 +1929,121 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value="summary"
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Give a short summary of the content pack.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Summary"
+                                    maxLength={250}
+                                    name="summary"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value="summary"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Summary"
+                                      maxLength={250}
+                                      name="summary"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value="summary"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="summary"
+                                        label="Summary"
+                                        maxLength={250}
+                                        name="summary"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value="summary"
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Give a short summary of the content pack.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -1753,122 +2061,99 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   value="description"
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="description"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="description"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="description"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="description"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="description"
-                            >
-                              Description
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="textarea"
-                            inputRef={[Function]}
-                            label="Description"
-                            name="description"
-                            onChange={[Function]}
-                            placeholder=""
-                            rows={6}
-                            type="textarea"
-                            value="description"
-                          >
-                            <StyledComponent
-                              componentClass="textarea"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Description"
-                              name="description"
-                              onChange={[Function]}
-                              placeholder=""
-                              rows={6}
-                              type="textarea"
-                              value="description"
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="textarea"
-                                inputRef={[Function]}
-                                label="Description"
-                                name="description"
-                                onChange={[Function]}
-                                placeholder=""
-                                rows={6}
-                                type="textarea"
-                                value="description"
+                                forwardedRef={null}
                               >
-                                <textarea
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="description"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="description"
+                                  >
+                                    Description
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="textarea"
+                                  inputRef={[Function]}
                                   label="Description"
                                   name="description"
                                   onChange={[Function]}
@@ -1876,51 +2161,118 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   rows={6}
                                   type="textarea"
                                   value="description"
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Give a long description of the content pack in markdown.
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="textarea"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Description"
+                                    name="description"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    rows={6}
+                                    type="textarea"
+                                    value="description"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="textarea"
+                                      inputRef={[Function]}
+                                      label="Description"
+                                      name="description"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      rows={6}
+                                      type="textarea"
+                                      value="description"
+                                    >
+                                      <textarea
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="description"
+                                        label="Description"
+                                        name="description"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        rows={6}
+                                        type="textarea"
+                                        value="description"
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Give a long description of the content pack in markdown.
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -1939,125 +2291,99 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   value="vendor"
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="vendor"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="vendor"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="vendor"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="vendor"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="vendor"
-                            >
-                              Vendor
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Vendor"
-                            maxLength={250}
-                            name="vendor"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value="vendor"
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="Vendor"
-                              maxLength={250}
-                              name="vendor"
-                              onChange={[Function]}
-                              placeholder=""
-                              required={true}
-                              type="text"
-                              value="vendor"
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Vendor"
-                                maxLength={250}
-                                name="vendor"
-                                onChange={[Function]}
-                                placeholder=""
-                                required={true}
-                                type="text"
-                                value="vendor"
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="vendor"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="vendor"
+                                  >
+                                    Vendor
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="Vendor"
                                   maxLength={250}
                                   name="vendor"
@@ -2066,51 +2392,121 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   required={true}
                                   type="text"
                                   value="vendor"
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Required. Who did this content pack and how can he be reached. e.g Name and eMail
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="Vendor"
+                                    maxLength={250}
+                                    name="vendor"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value="vendor"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="Vendor"
+                                      maxLength={250}
+                                      name="vendor"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      required={true}
+                                      type="text"
+                                      value="vendor"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="vendor"
+                                        label="Vendor"
+                                        maxLength={250}
+                                        name="vendor"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        required={true}
+                                        type="text"
+                                        value="vendor"
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Required. Who did this content pack and how can he be reached. e.g Name and eMail
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
                 <Input
@@ -2128,122 +2524,99 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   value="http://example.com"
                 >
                   <FormGroup
-                    bsClass="form-group"
                     controlId="url"
                     validationState={null}
                   >
-                    <div
-                      className="form-group"
+                    <FormGroup__StyledFormGroup
+                      controlId="url"
+                      validationState={null}
                     >
-                      <ControlLabel>
-                        <StyledComponent
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "ControlLabel-sc-1edmum5-0",
-                                "isStatic": false,
-                                "lastClassName": "brPnzl",
-                                "rules": Array [
-                                  [Function],
-                                ],
-                              },
-                              "displayName": "ControlLabel",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
+                      <StyledComponent
+                        controlId="url"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "SIZES": Array [
+                              "large",
+                              "small",
+                            ],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                              "isStatic": false,
+                              "lastClassName": "ekazNr",
+                              "rules": Array [
+                                [Function],
+                                ";",
+                              ],
+                            },
+                            "displayName": "FormGroup__StyledFormGroup",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
                           }
-                          forwardedRef={null}
+                        }
+                        forwardedRef={null}
+                        validationState={null}
+                      >
+                        <FormGroup
+                          bsClass="form-group"
+                          className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                          controlId="url"
+                          validationState={null}
                         >
-                          <ControlLabel
-                            bsClass="control-label"
-                            className="ControlLabel-sc-1edmum5-0 brPnzl"
-                            srOnly={false}
+                          <div
+                            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                           >
-                            <label
-                              className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                              htmlFor="url"
-                            >
-                              URL
-                            </label>
-                          </ControlLabel>
-                        </StyledComponent>
-                      </ControlLabel>
-                      <InputWrapper>
-                        <span>
-                          <FormControl
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="URL"
-                            maxLength={250}
-                            name="url"
-                            onChange={[Function]}
-                            placeholder=""
-                            type="text"
-                            value="http://example.com"
-                          >
-                            <StyledComponent
-                              componentClass="input"
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "Feedback": [Function],
-                                  "SIZES": Array [
-                                    "small",
-                                    "large",
-                                  ],
-                                  "Static": [Function],
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "FormControl-sc-1amoaox-0",
-                                    "isStatic": false,
-                                    "lastClassName": "lpicKK",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "FormControl",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "FormControl-sc-1amoaox-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
+                            <ControlLabel>
+                              <StyledComponent
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "ControlLabel-sc-1edmum5-0",
+                                      "isStatic": false,
+                                      "lastClassName": "brPnzl",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "ControlLabel",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
                                 }
-                              }
-                              forwardedRef={null}
-                              inputRef={[Function]}
-                              label="URL"
-                              maxLength={250}
-                              name="url"
-                              onChange={[Function]}
-                              placeholder=""
-                              type="text"
-                              value="http://example.com"
-                            >
-                              <FormControl
-                                bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="URL"
-                                maxLength={250}
-                                name="url"
-                                onChange={[Function]}
-                                placeholder=""
-                                type="text"
-                                value="http://example.com"
+                                forwardedRef={null}
                               >
-                                <input
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                  id="url"
+                                <ControlLabel
+                                  bsClass="control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                  srOnly={false}
+                                >
+                                  <label
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                    htmlFor="url"
+                                  >
+                                    URL
+                                  </label>
+                                </ControlLabel>
+                              </StyledComponent>
+                            </ControlLabel>
+                            <InputWrapper>
+                              <span>
+                                <FormControl
+                                  componentClass="input"
+                                  inputRef={[Function]}
                                   label="URL"
                                   maxLength={250}
                                   name="url"
@@ -2251,51 +2624,118 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                                   placeholder=""
                                   type="text"
                                   value="http://example.com"
-                                />
-                              </FormControl>
-                            </StyledComponent>
-                          </FormControl>
-                          <HelpBlock>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "HelpBlock-i8is92-0",
-                                    "isStatic": false,
-                                    "lastClassName": "fHJMjA",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "HelpBlock",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "HelpBlock-i8is92-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
-                              }
-                              forwardedRef={null}
-                            >
-                              <HelpBlock
-                                bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
-                              >
-                                <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
                                 >
-                                  Where can I find the content pack. e.g. github url
-                                </span>
-                              </HelpBlock>
-                            </StyledComponent>
-                          </HelpBlock>
-                        </span>
-                      </InputWrapper>
-                    </div>
+                                  <StyledComponent
+                                    componentClass="input"
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "Feedback": [Function],
+                                        "SIZES": Array [
+                                          "small",
+                                          "large",
+                                        ],
+                                        "Static": [Function],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "FormControl-sc-1amoaox-0",
+                                          "isStatic": false,
+                                          "lastClassName": "lpicKK",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "FormControl",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "FormControl-sc-1amoaox-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    inputRef={[Function]}
+                                    label="URL"
+                                    maxLength={250}
+                                    name="url"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value="http://example.com"
+                                  >
+                                    <FormControl
+                                      bsClass="form-control"
+                                      className="FormControl-sc-1amoaox-0 lpicKK"
+                                      componentClass="input"
+                                      inputRef={[Function]}
+                                      label="URL"
+                                      maxLength={250}
+                                      name="url"
+                                      onChange={[Function]}
+                                      placeholder=""
+                                      type="text"
+                                      value="http://example.com"
+                                    >
+                                      <input
+                                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                        id="url"
+                                        label="URL"
+                                        maxLength={250}
+                                        name="url"
+                                        onChange={[Function]}
+                                        placeholder=""
+                                        type="text"
+                                        value="http://example.com"
+                                      />
+                                    </FormControl>
+                                  </StyledComponent>
+                                </FormControl>
+                                <HelpBlock>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "HelpBlock-i8is92-0",
+                                          "isStatic": false,
+                                          "lastClassName": "fHJMjA",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "HelpBlock",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "HelpBlock-i8is92-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                  >
+                                    <HelpBlock
+                                      bsClass="help-block"
+                                      className="HelpBlock-i8is92-0 fHJMjA"
+                                    >
+                                      <span
+                                        className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                      >
+                                        Where can I find the content pack. e.g. github url
+                                      </span>
+                                    </HelpBlock>
+                                  </StyledComponent>
+                                </HelpBlock>
+                              </span>
+                            </InputWrapper>
+                          </div>
+                        </FormGroup>
+                      </StyledComponent>
+                    </FormGroup__StyledFormGroup>
                   </FormGroup>
                 </Input>
               </fieldset>

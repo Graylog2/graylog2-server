@@ -48,11 +48,6 @@ export const globalStyles = css(({ theme }) => css`
     font-weight: bold;
   }
 
-  h4 {
-    font-size: 14px;
-    font-weight: normal;
-  }
-
   a {
     color: ${theme.color.global.link};
 

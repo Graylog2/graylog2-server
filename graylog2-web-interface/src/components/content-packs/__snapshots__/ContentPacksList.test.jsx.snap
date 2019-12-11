@@ -307,128 +307,172 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       wrapperClassName="typeahead-wrapper"
                     >
                       <FormGroup
-                        bsClass="form-group"
                         controlId="content-packs-filter"
                         validationState={null}
                       >
-                        <div
-                          className="form-group"
+                        <FormGroup__StyledFormGroup
+                          controlId="content-packs-filter"
+                          validationState={null}
                         >
-                          <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "brPnzl",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
+                          <StyledComponent
+                            controlId="content-packs-filter"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                  "isStatic": false,
+                                  "lastClassName": "ekazNr",
+                                  "rules": Array [
+                                    [Function],
+                                    ";",
+                                  ],
+                                },
+                                "displayName": "FormGroup__StyledFormGroup",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
                               }
-                              forwardedRef={null}
-                            >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 brPnzl"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                                  htmlFor="content-packs-filter"
-                                >
-                                  Filter
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
-                          </ControlLabel>
-                          <InputWrapper
-                            className="typeahead-wrapper"
+                            }
+                            forwardedRef={null}
+                            validationState={null}
                           >
-                            <div
-                              className="typeahead-wrapper"
+                            <FormGroup
+                              bsClass="form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              controlId="content-packs-filter"
+                              validationState={null}
                             >
-                              <FormControl
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Filter"
-                                name="content-packs-filter"
-                                placeholder=""
-                                type="text"
+                              <div
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                               >
-                                <StyledComponent
-                                  componentClass="input"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "lpicKK",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
+                                <ControlLabel>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "ControlLabel-sc-1edmum5-0",
+                                          "isStatic": false,
+                                          "lastClassName": "brPnzl",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "ControlLabel",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
                                     }
-                                  }
-                                  forwardedRef={null}
-                                  inputRef={[Function]}
-                                  label="Filter"
-                                  name="content-packs-filter"
-                                  placeholder=""
-                                  type="text"
-                                >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 lpicKK"
-                                    componentClass="input"
-                                    inputRef={[Function]}
-                                    label="Filter"
-                                    name="content-packs-filter"
-                                    placeholder=""
-                                    type="text"
+                                    forwardedRef={null}
                                   >
-                                    <input
-                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                      id="content-packs-filter"
+                                    <ControlLabel
+                                      bsClass="control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                      srOnly={false}
+                                    >
+                                      <label
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                        htmlFor="content-packs-filter"
+                                      >
+                                        Filter
+                                      </label>
+                                    </ControlLabel>
+                                  </StyledComponent>
+                                </ControlLabel>
+                                <InputWrapper
+                                  className="typeahead-wrapper"
+                                >
+                                  <div
+                                    className="typeahead-wrapper"
+                                  >
+                                    <FormControl
+                                      componentClass="input"
+                                      inputRef={[Function]}
                                       label="Filter"
                                       name="content-packs-filter"
                                       placeholder=""
                                       type="text"
-                                    />
-                                  </FormControl>
-                                </StyledComponent>
-                              </FormControl>
-                            </div>
-                          </InputWrapper>
-                        </div>
+                                    >
+                                      <StyledComponent
+                                        componentClass="input"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "Feedback": [Function],
+                                            "SIZES": Array [
+                                              "small",
+                                              "large",
+                                            ],
+                                            "Static": [Function],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "FormControl-sc-1amoaox-0",
+                                              "isStatic": false,
+                                              "lastClassName": "lpicKK",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "FormControl",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+                                        inputRef={[Function]}
+                                        label="Filter"
+                                        name="content-packs-filter"
+                                        placeholder=""
+                                        type="text"
+                                      >
+                                        <FormControl
+                                          bsClass="form-control"
+                                          className="FormControl-sc-1amoaox-0 lpicKK"
+                                          componentClass="input"
+                                          inputRef={[Function]}
+                                          label="Filter"
+                                          name="content-packs-filter"
+                                          placeholder=""
+                                          type="text"
+                                        >
+                                          <input
+                                            className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                            id="content-packs-filter"
+                                            label="Filter"
+                                            name="content-packs-filter"
+                                            placeholder=""
+                                            type="text"
+                                          />
+                                        </FormControl>
+                                      </StyledComponent>
+                                    </FormControl>
+                                  </div>
+                                </InputWrapper>
+                              </div>
+                            </FormGroup>
+                          </StyledComponent>
+                        </FormGroup__StyledFormGroup>
                       </FormGroup>
                     </Input>
                   </TypeAheadInput>
@@ -9099,128 +9143,172 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       wrapperClassName="typeahead-wrapper"
                     >
                       <FormGroup
-                        bsClass="form-group"
                         controlId="content-packs-filter"
                         validationState={null}
                       >
-                        <div
-                          className="form-group"
+                        <FormGroup__StyledFormGroup
+                          controlId="content-packs-filter"
+                          validationState={null}
                         >
-                          <ControlLabel>
-                            <StyledComponent
-                              forwardedComponent={
-                                Object {
-                                  "$$typeof": Symbol(react.forward_ref),
-                                  "attrs": Array [],
-                                  "componentStyle": ComponentStyle {
-                                    "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": false,
-                                    "lastClassName": "brPnzl",
-                                    "rules": Array [
-                                      [Function],
-                                    ],
-                                  },
-                                  "displayName": "ControlLabel",
-                                  "foldedComponentIds": Array [],
-                                  "render": [Function],
-                                  "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                                  "target": [Function],
-                                  "toString": [Function],
-                                  "warnTooManyClasses": [Function],
-                                  "withComponent": [Function],
-                                }
+                          <StyledComponent
+                            controlId="content-packs-filter"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "SIZES": Array [
+                                  "large",
+                                  "small",
+                                ],
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                  "isStatic": false,
+                                  "lastClassName": "ekazNr",
+                                  "rules": Array [
+                                    [Function],
+                                    ";",
+                                  ],
+                                },
+                                "displayName": "FormGroup__StyledFormGroup",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
                               }
-                              forwardedRef={null}
-                            >
-                              <ControlLabel
-                                bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 brPnzl"
-                                srOnly={false}
-                              >
-                                <label
-                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
-                                  htmlFor="content-packs-filter"
-                                >
-                                  Filter
-                                </label>
-                              </ControlLabel>
-                            </StyledComponent>
-                          </ControlLabel>
-                          <InputWrapper
-                            className="typeahead-wrapper"
+                            }
+                            forwardedRef={null}
+                            validationState={null}
                           >
-                            <div
-                              className="typeahead-wrapper"
+                            <FormGroup
+                              bsClass="form-group"
+                              className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                              controlId="content-packs-filter"
+                              validationState={null}
                             >
-                              <FormControl
-                                componentClass="input"
-                                inputRef={[Function]}
-                                label="Filter"
-                                name="content-packs-filter"
-                                placeholder=""
-                                type="text"
+                              <div
+                                className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                               >
-                                <StyledComponent
-                                  componentClass="input"
-                                  forwardedComponent={
-                                    Object {
-                                      "$$typeof": Symbol(react.forward_ref),
-                                      "Feedback": [Function],
-                                      "SIZES": Array [
-                                        "small",
-                                        "large",
-                                      ],
-                                      "Static": [Function],
-                                      "attrs": Array [],
-                                      "componentStyle": ComponentStyle {
-                                        "componentId": "FormControl-sc-1amoaox-0",
-                                        "isStatic": false,
-                                        "lastClassName": "lpicKK",
-                                        "rules": Array [
-                                          [Function],
-                                        ],
-                                      },
-                                      "displayName": "FormControl",
-                                      "foldedComponentIds": Array [],
-                                      "render": [Function],
-                                      "styledComponentId": "FormControl-sc-1amoaox-0",
-                                      "target": [Function],
-                                      "toString": [Function],
-                                      "warnTooManyClasses": [Function],
-                                      "withComponent": [Function],
+                                <ControlLabel>
+                                  <StyledComponent
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "ControlLabel-sc-1edmum5-0",
+                                          "isStatic": false,
+                                          "lastClassName": "brPnzl",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "ControlLabel",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
                                     }
-                                  }
-                                  forwardedRef={null}
-                                  inputRef={[Function]}
-                                  label="Filter"
-                                  name="content-packs-filter"
-                                  placeholder=""
-                                  type="text"
-                                >
-                                  <FormControl
-                                    bsClass="form-control"
-                                    className="FormControl-sc-1amoaox-0 lpicKK"
-                                    componentClass="input"
-                                    inputRef={[Function]}
-                                    label="Filter"
-                                    name="content-packs-filter"
-                                    placeholder=""
-                                    type="text"
+                                    forwardedRef={null}
                                   >
-                                    <input
-                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
-                                      id="content-packs-filter"
+                                    <ControlLabel
+                                      bsClass="control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl"
+                                      srOnly={false}
+                                    >
+                                      <label
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
+                                        htmlFor="content-packs-filter"
+                                      >
+                                        Filter
+                                      </label>
+                                    </ControlLabel>
+                                  </StyledComponent>
+                                </ControlLabel>
+                                <InputWrapper
+                                  className="typeahead-wrapper"
+                                >
+                                  <div
+                                    className="typeahead-wrapper"
+                                  >
+                                    <FormControl
+                                      componentClass="input"
+                                      inputRef={[Function]}
                                       label="Filter"
                                       name="content-packs-filter"
                                       placeholder=""
                                       type="text"
-                                    />
-                                  </FormControl>
-                                </StyledComponent>
-                              </FormControl>
-                            </div>
-                          </InputWrapper>
-                        </div>
+                                    >
+                                      <StyledComponent
+                                        componentClass="input"
+                                        forwardedComponent={
+                                          Object {
+                                            "$$typeof": Symbol(react.forward_ref),
+                                            "Feedback": [Function],
+                                            "SIZES": Array [
+                                              "small",
+                                              "large",
+                                            ],
+                                            "Static": [Function],
+                                            "attrs": Array [],
+                                            "componentStyle": ComponentStyle {
+                                              "componentId": "FormControl-sc-1amoaox-0",
+                                              "isStatic": false,
+                                              "lastClassName": "lpicKK",
+                                              "rules": Array [
+                                                [Function],
+                                              ],
+                                            },
+                                            "displayName": "FormControl",
+                                            "foldedComponentIds": Array [],
+                                            "render": [Function],
+                                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                                            "target": [Function],
+                                            "toString": [Function],
+                                            "warnTooManyClasses": [Function],
+                                            "withComponent": [Function],
+                                          }
+                                        }
+                                        forwardedRef={null}
+                                        inputRef={[Function]}
+                                        label="Filter"
+                                        name="content-packs-filter"
+                                        placeholder=""
+                                        type="text"
+                                      >
+                                        <FormControl
+                                          bsClass="form-control"
+                                          className="FormControl-sc-1amoaox-0 lpicKK"
+                                          componentClass="input"
+                                          inputRef={[Function]}
+                                          label="Filter"
+                                          name="content-packs-filter"
+                                          placeholder=""
+                                          type="text"
+                                        >
+                                          <input
+                                            className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                            id="content-packs-filter"
+                                            label="Filter"
+                                            name="content-packs-filter"
+                                            placeholder=""
+                                            type="text"
+                                          />
+                                        </FormControl>
+                                      </StyledComponent>
+                                    </FormControl>
+                                  </div>
+                                </InputWrapper>
+                              </div>
+                            </FormGroup>
+                          </StyledComponent>
+                        </FormGroup__StyledFormGroup>
                       </FormGroup>
                     </Input>
                   </TypeAheadInput>
