@@ -60,7 +60,7 @@ describe('ViewTransformer', () => {
       expect(dashboardView.id).not.toStrictEqual(searchView.id);
     });
 
-    it('should add the timerange to the widget', () => {
+    it('should add the timerange to the widget', async () => {
       const query = Query.builder()
         .id('query-id')
         .timerange({ type: 'relative', range: 365 })
@@ -71,7 +71,7 @@ describe('ViewTransformer', () => {
         .queries([query])
         .build();
 
-      const viewState: ViewState = ViewStateGenerator(View.Type.Search);
+      const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
       const searchView = View.builder()
@@ -85,7 +85,7 @@ describe('ViewTransformer', () => {
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual([]);
     });
 
-    it('should add the query to the widget', () => {
+    it('should add the query to the widget', async () => {
       const query = Query.builder()
         .id('query-id')
         .query({ type: 'elasticsearch', query_string: 'author: "Karl Marx"' })
@@ -96,7 +96,7 @@ describe('ViewTransformer', () => {
         .queries([query])
         .build();
 
-      const viewState: ViewState = ViewStateGenerator(View.Type.Search);
+      const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
       const searchView = View.builder()
@@ -110,7 +110,7 @@ describe('ViewTransformer', () => {
       expect(dashboardView.state.get('query-id').widgets.first().streams).toStrictEqual([]);
     });
 
-    it('should add the streams to the widget', () => {
+    it('should add the streams to the widget', async () => {
       const query = Query.builder()
         .id('query-id')
         .filter({ type: 'or', filters: List.of(Map.of('type', 'stream', 'id', '1234-abcd')) })
@@ -121,7 +121,7 @@ describe('ViewTransformer', () => {
         .queries([query])
         .build();
 
-      const viewState: ViewState = ViewStateGenerator(View.Type.Search);
+      const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map.of('query-id', viewState);
       const searchView = View.builder()

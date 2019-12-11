@@ -48,10 +48,11 @@ export const resultHistogram = (id: string = uuid()) => AggregationWidget.builde
   )
   .build();
 
-export const allMessagesTable = (id: string = uuid()) => MessageWidget.builder()
+export const allMessagesTable = (id: string = uuid(), decorators) => MessageWidget.builder()
   .id(id)
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)
     .showMessageRow(true)
+    .decorators(decorators)
     .build())
   .build();

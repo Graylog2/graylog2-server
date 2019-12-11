@@ -18,7 +18,6 @@ class DecoratorSidebar extends React.Component {
     decorators: PropTypes.array.isRequired,
     decoratorTypes: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
-    stream: PropTypes.string.isRequired,
   };
 
   componentDidMount() {
@@ -52,12 +51,11 @@ class DecoratorSidebar extends React.Component {
   };
 
   render() {
-    const { decoratorTypes, onChange, stream, decorators } = this.props;
+    const { decoratorTypes, onChange, decorators } = this.props;
     if (!decoratorTypes) {
       return <Spinner />;
     }
     const sortedDecorators = decorators
-      .filter(decorator => (stream ? decorator.stream === stream : !decorator.stream))
       .sort((d1, d2) => d1.order - d2.order);
     const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
     const decoratorItems = sortedDecorators.map(this._formatDecorator);
@@ -66,7 +64,7 @@ class DecoratorSidebar extends React.Component {
 
     return (
       <div>
-        <AddDecoratorButton decoratorTypes={decoratorTypes} stream={stream} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
+        <AddDecoratorButton decoratorTypes={decoratorTypes} nextOrder={nextDecoratorOrder} onCreate={addDecorator} />
         <div ref={(decoratorsContainer) => { this.decoratorsContainer = decoratorsContainer; }} className={DecoratorStyles.decoratorListContainer}>
           <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} onChange={onChange} />
         </div>

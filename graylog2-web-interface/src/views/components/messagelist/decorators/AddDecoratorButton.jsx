@@ -19,7 +19,7 @@ class AddDecoratorButton extends React.Component {
   static propTypes = {
     decoratorTypes: PropTypes.object.isRequired,
     nextOrder: PropTypes.number.isRequired,
-    stream: PropTypes.string.isRequired,
+    stream: PropTypes.string,
     disabled: PropTypes.bool,
     onCreate: PropTypes.func.isRequired,
     showHelp: PropTypes.bool,
@@ -28,6 +28,7 @@ class AddDecoratorButton extends React.Component {
   static defaultProps = {
     disabled: false,
     showHelp: true,
+    stream: null,
   };
 
   constructor(props) {
