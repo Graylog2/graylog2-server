@@ -1,5 +1,5 @@
 // @flow strict
-import { difference } from 'lodash';
+import { difference, isEqual } from 'lodash';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import type { DecoratorType } from './DecoratorsConfigUpdate';
@@ -7,9 +7,10 @@ import type { DecoratorType } from './DecoratorsConfigUpdate';
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 const DecoratorsUpdater = (newDecorators: Array<DecoratorType>, oldDecorators: Array<DecoratorType>) => {
+  const oldDecoratorsById = oldDecorators.reduce((prev, cur) => ({ ...prev, [cur.id]: cur }), {});
   const createdDecorators = newDecorators.filter(({ id }) => !id);
   const updatedDecorators = newDecorators.filter(({ id }) => id)
-    .filter(decorator => decorator !== oldDecorators.find(oldDecorator => oldDecorator.id === decorator.id));
+    .filter(decorator => !isEqual(decorator, oldDecoratorsById[decorator.id]));
   const deletedDecoratorIds = difference(oldDecorators.map(({ id }) => id).sort(), newDecorators.map(({ id }) => id).sort());
 
   return [
