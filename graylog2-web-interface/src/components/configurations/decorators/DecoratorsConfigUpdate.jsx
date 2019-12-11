@@ -9,6 +9,7 @@ import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecor
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
+import { IfPermitted } from '../../common/index';
 
 type Props = {
   streams: Array<{ title: string, id: string }>,
@@ -45,8 +46,10 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <p>Select the stream for which you want to change the set of default decorators.</p>
         <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
 
-        <p>Select the type to create a new decorator for this stream:</p>
-        <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
+        <IfPermitted permissions="decorators:create">
+          <p>Select the type to create a new decorator for this stream:</p>
+          <AddDecoratorButton stream={currentStream} nextOrder={nextOrder} decoratorTypes={types} onCreate={onCreate} showHelp={false} />
+        </IfPermitted>
 
         <p>Use drag and drop to change the execution order of the decorators.</p>
 

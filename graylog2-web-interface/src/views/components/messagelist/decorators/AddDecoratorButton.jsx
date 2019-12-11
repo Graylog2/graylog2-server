@@ -12,7 +12,15 @@ import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 
 const ConfigurationFormContainer = styled.div`
+  margin-bottom: 10px;
+  margin-top: 10px;
+  margin-left: 5px;
   display: inline-block;
+  border-style: solid;
+  border-color: lightgray;
+  border-radius: 5px;
+  border-width: 1px;
+  padding: 10px;
 `;
 
 class AddDecoratorButton extends React.Component {
@@ -40,10 +48,7 @@ class AddDecoratorButton extends React.Component {
     return { value: typeName, label: typeDefinition.name };
   };
 
-  _handleCancel = () => {
-    this.select.clearValue();
-    this.setState(this.getInitialState());
-  };
+  _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
 
   _handleSubmit = (data) => {
     const { stream, nextOrder, onCreate } = this.props;
@@ -58,9 +63,7 @@ class AddDecoratorButton extends React.Component {
     this.setState({ typeName: this.PLACEHOLDER });
   };
 
-  _openModal = () => {
-    this.configurationForm.open();
-  };
+  _openModal = () => this.configurationForm.open();
 
   _onTypeChange = (decoratorType) => {
     const { decoratorTypes } = this.props;
@@ -107,9 +110,7 @@ class AddDecoratorButton extends React.Component {
         </div>
         {showHelp && <PopoverHelp />}
 
-        <ConfigurationFormContainer>
-          {typeName && configurationForm}
-        </ConfigurationFormContainer>
+        {typeName && <ConfigurationFormContainer>{configurationForm}</ConfigurationFormContainer>}
       </React.Fragment>
     );
   }

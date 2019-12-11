@@ -106,6 +106,7 @@ class DecoratorSummary extends React.Component {
     const decoratorActionsMenu = disableMenu || this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
     const wrapperComponent = InlineForm('Update');
+    const decoratorId = decorator.id || 'new';
 
     const content = editing
       ? (
@@ -120,8 +121,8 @@ class DecoratorSummary extends React.Component {
                            values={decorator.config} />
       )
       : (
-        <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
-                           id={decorator.id}
+        <ConfigurationWell key={`configuration-well-decorator-${decoratorId}`}
+                           id={decoratorId}
                            configuration={config}
                            typeDefinition={typeDefinition} />
       );

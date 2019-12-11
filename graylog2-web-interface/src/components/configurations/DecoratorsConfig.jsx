@@ -61,7 +61,7 @@ const DecoratorsConfig = () => {
       <p>Select the stream for which you want to see the set of default decorators.</p>
       <StreamSelect streams={streamOptions} onChange={setCurrentStream} value={currentStream} />
       <DecoratorList decorators={readOnlyDecoratorItems} disableDragging />
-      <IfPermitted permissions="clusterconfigentry:edit">
+      <IfPermitted permissions="decorators:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
       </IfPermitted>
       <DecoratorsConfigUpdate ref={configModal}
