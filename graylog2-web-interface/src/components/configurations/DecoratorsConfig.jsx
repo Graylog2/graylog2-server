@@ -14,6 +14,7 @@ import DecoratorList from 'views/components/messagelist/decorators/DecoratorList
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
+import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
@@ -42,7 +43,7 @@ const DecoratorsConfig = () => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState();
   const [types, setTypes] = useState();
-  const configModal = useRef();
+  const configModal = useRef<BootstrapModalWrapper>();
 
   useEffect(() => { StreamsStore.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);

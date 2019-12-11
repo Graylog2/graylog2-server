@@ -18,7 +18,7 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
     : () => {};
   return ({
     id: decorator.id,
-    title: <Decorator key={`decorator-${decorator.id}`}
+    title: <Decorator key={`decorator-${decorator.id || 'new'}`}
                       decorator={decorator}
                       decoratorTypes={decoratorTypes}
                       disableMenu={updateFn === undefined}
@@ -39,12 +39,12 @@ type Props = {
   streams: Array<{ title: string, id: string }>,
   decorators: Array<DecoratorType>,
   types: { [string]: any },
-  show: boolean,
+  show?: boolean,
   onCancel: () => void,
   onSave: (Array<DecoratorType>) => mixed,
 };
 
-const DecoratorsConfigUpdate = React.forwardRef(({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
+const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
@@ -83,8 +83,8 @@ const DecoratorsConfigUpdate = React.forwardRef(({ streams, decorators, types, s
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-});
+};
 
 DecoratorsConfigUpdate.propTypes = {};
 
-export default DecoratorsConfigUpdate;
+export default React.forwardRef<Props, BootstrapModalWrapper>(DecoratorsConfigUpdate);
