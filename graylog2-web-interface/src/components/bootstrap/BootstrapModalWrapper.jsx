@@ -31,12 +31,6 @@ class BootstrapModalWrapper extends React.Component {
     backdrop: 'static',
   };
 
-  static getDerivedStateFromProps({ showModal }) {
-    return {
-      showModal,
-    };
-  }
-
   state = {
     // eslint-disable-next-line react/destructuring-assignment
     showModal: this.props.showModal || false,

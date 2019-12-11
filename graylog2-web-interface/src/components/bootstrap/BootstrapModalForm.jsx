@@ -56,13 +56,9 @@ class BootstrapModalForm extends React.Component {
     this.close();
   };
 
-  open = () => {
-    this.modal.open();
-  };
+  open = () => this.modal.open();
 
-  close = () => {
-    this.modal.close();
-  };
+  close = () => this.modal.close();
 
   submit = (event) => {
     const formDOMNode = this.form;
@@ -89,7 +85,7 @@ class BootstrapModalForm extends React.Component {
   };
 
   render() {
-    const { submitButtonDisabled, formProps, show, bsSize, onModalClose, cancelButtonText, submitButtonText, onModalOpen, title, children } = this.props;
+    const { submitButtonDisabled, formProps, bsSize, onModalClose, cancelButtonText, show, submitButtonText, onModalOpen, title, children } = this.props;
     const body = (
       <div className="container-fluid">
         {children}
