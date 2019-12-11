@@ -53,141 +53,101 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             value=""
           >
             <FormGroup
-              bsClass="form-group"
               controlId="pattern-input"
               validationState={null}
             >
-              <div
-                className="form-group"
+              <FormGroup__StyledFormGroup
+                controlId="pattern-input"
+                validationState={null}
               >
-                <ControlLabel>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
-                          "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
+                <StyledComponent
+                  controlId="pattern-input"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "isStatic": false,
+                        "lastClassName": "ekazNr",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "FormGroup__StyledFormGroup",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    forwardedRef={null}
+                  }
+                  forwardedRef={null}
+                  validationState={null}
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                    controlId="pattern-input"
+                    validationState={null}
                   >
-                    <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                      srOnly={false}
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                        htmlFor="pattern-input"
-                      >
-                        Pattern
-                      </label>
-                    </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-                <InputWrapper>
-                  <span>
-                    <FormControl
-                      componentClass="textarea"
-                      inputRef={[Function]}
-                      label="Pattern"
-                      name="pattern-input"
-                      onChange={[Function]}
-                      placeholder=""
-                      required={true}
-                      rows={9}
-                      type="textarea"
-                      value=""
-                    >
-                      <StyledComponent
-                        componentClass="textarea"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "Feedback": [Function],
-                            "SIZES": Array [
-                              "small",
-                              "large",
-                            ],
-                            "Static": [Function],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "FormControl-sc-1amoaox-0",
-                              "isStatic": true,
-                              "lastClassName": "hdNTyr",
-                              "rules": Array [
-                                "color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&:focus{border-color:",
-                                "#6DC6E7",
-                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                "rgba(109,198,231,0.4)",
-                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                "#b8b8b8",
-                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                "#DCE1E5",
-                                ";}~ .form-control-feedback.glyphicon{display:none;}",
-                              ],
-                            },
-                            "displayName": "FormControl",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "FormControl-sc-1amoaox-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
                           }
-                        }
-                        forwardedRef={null}
-                        inputRef={[Function]}
-                        label="Pattern"
-                        name="pattern-input"
-                        onChange={[Function]}
-                        placeholder=""
-                        required={true}
-                        rows={9}
-                        type="textarea"
-                        value=""
-                      >
-                        <FormControl
-                          bsClass="form-control"
-                          className="FormControl-sc-1amoaox-0 hdNTyr"
-                          componentClass="textarea"
-                          inputRef={[Function]}
-                          label="Pattern"
-                          name="pattern-input"
-                          onChange={[Function]}
-                          placeholder=""
-                          required={true}
-                          rows={9}
-                          type="textarea"
-                          value=""
+                          forwardedRef={null}
                         >
-                          <textarea
-                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                            id="pattern-input"
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="pattern-input"
+                            >
+                              Pattern
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="textarea"
+                            inputRef={[Function]}
                             label="Pattern"
                             name="pattern-input"
                             onChange={[Function]}
@@ -196,53 +156,137 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             rows={9}
                             type="textarea"
                             value=""
-                          />
-                        </FormControl>
-                      </StyledComponent>
-                    </FormControl>
-                    <HelpBlock>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "HelpBlock-i8is92-0",
-                              "isStatic": true,
-                              "lastClassName": "huFHQV",
-                              "rules": Array [
-                                "display:block;margin-top:5px;margin-bottom:10px;color:",
-                                "#9f9f9f",
-                                ";",
-                              ],
-                            },
-                            "displayName": "HelpBlock",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "HelpBlock-i8is92-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
-                      >
-                        <HelpBlock
-                          bsClass="help-block"
-                          className="HelpBlock-i8is92-0 huFHQV"
-                        >
-                          <span
-                            className="HelpBlock-i8is92-0 huFHQV help-block"
                           >
-                            The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
-                          </span>
-                        </HelpBlock>
-                      </StyledComponent>
-                    </HelpBlock>
-                  </span>
-                </InputWrapper>
-              </div>
+                            <StyledComponent
+                              componentClass="textarea"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Pattern"
+                              name="pattern-input"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              rows={9}
+                              type="textarea"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+                                label="Pattern"
+                                name="pattern-input"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                rows={9}
+                                type="textarea"
+                                value=""
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="pattern-input"
+                                  label="Pattern"
+                                  name="pattern-input"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  rows={9}
+                                  type="textarea"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </StyledComponent>
+              </FormGroup__StyledFormGroup>
             </FormGroup>
           </Input>
         </div>
@@ -275,138 +319,101 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
               controlId="pattern-selector"
               validationState={null}
             >
-              <div
-                className="filterFormGroup"
+              <FormGroup__StyledFormGroup
+                bsClass="filterFormGroup"
+                controlId="pattern-selector"
+                validationState={null}
               >
-                <ControlLabel>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
-                          "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
+                <StyledComponent
+                  bsClass="filterFormGroup"
+                  controlId="pattern-selector"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "isStatic": false,
+                        "lastClassName": "ekazNr",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "FormGroup__StyledFormGroup",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    forwardedRef={null}
+                  }
+                  forwardedRef={null}
+                  validationState={null}
+                >
+                  <FormGroup
+                    bsClass="filterFormGroup"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                    controlId="pattern-selector"
+                    validationState={null}
                   >
-                    <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                      srOnly={false}
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                        htmlFor="pattern-selector"
-                      >
-                        Filter pattern
-                      </label>
-                    </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-                <InputWrapper>
-                  <span>
-                    <FormControl
-                      autoComplete="off"
-                      componentClass="input"
-                      inputRef={[Function]}
-                      label="Filter pattern"
-                      name="pattern-selector"
-                      onChange={[Function]}
-                      onKeyDown={[Function]}
-                      placeholder=""
-                      type="text"
-                      value=""
-                    >
-                      <StyledComponent
-                        autoComplete="off"
-                        componentClass="input"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "Feedback": [Function],
-                            "SIZES": Array [
-                              "small",
-                              "large",
-                            ],
-                            "Static": [Function],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "FormControl-sc-1amoaox-0",
-                              "isStatic": true,
-                              "lastClassName": "hdNTyr",
-                              "rules": Array [
-                                "color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&:focus{border-color:",
-                                "#6DC6E7",
-                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                "rgba(109,198,231,0.4)",
-                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                "#b8b8b8",
-                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                "#DCE1E5",
-                                ";}~ .form-control-feedback.glyphicon{display:none;}",
-                              ],
-                            },
-                            "displayName": "FormControl",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "FormControl-sc-1amoaox-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
                           }
-                        }
-                        forwardedRef={null}
-                        inputRef={[Function]}
-                        label="Filter pattern"
-                        name="pattern-selector"
-                        onChange={[Function]}
-                        onKeyDown={[Function]}
-                        placeholder=""
-                        type="text"
-                        value=""
-                      >
-                        <FormControl
-                          autoComplete="off"
-                          bsClass="form-control"
-                          className="FormControl-sc-1amoaox-0 hdNTyr"
-                          componentClass="input"
-                          inputRef={[Function]}
-                          label="Filter pattern"
-                          name="pattern-selector"
-                          onChange={[Function]}
-                          onKeyDown={[Function]}
-                          placeholder=""
-                          type="text"
-                          value=""
+                          forwardedRef={null}
                         >
-                          <input
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="pattern-selector"
+                            >
+                              Filter pattern
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
                             autoComplete="off"
-                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                            id="pattern-selector"
+                            componentClass="input"
+                            inputRef={[Function]}
                             label="Filter pattern"
                             name="pattern-selector"
                             onChange={[Function]}
@@ -414,13 +421,97 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             placeholder=""
                             type="text"
                             value=""
-                          />
-                        </FormControl>
-                      </StyledComponent>
-                    </FormControl>
-                  </span>
-                </InputWrapper>
-              </div>
+                          >
+                            <StyledComponent
+                              autoComplete="off"
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Filter pattern"
+                              name="pattern-selector"
+                              onChange={[Function]}
+                              onKeyDown={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                autoComplete="off"
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Filter pattern"
+                                name="pattern-selector"
+                                onChange={[Function]}
+                                onKeyDown={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  autoComplete="off"
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="pattern-selector"
+                                  label="Filter pattern"
+                                  name="pattern-selector"
+                                  onChange={[Function]}
+                                  onKeyDown={[Function]}
+                                  placeholder=""
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </StyledComponent>
+              </FormGroup__StyledFormGroup>
             </FormGroup>
           </Input>
           <ListGroup
@@ -998,141 +1089,101 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
             value=""
           >
             <FormGroup
-              bsClass="form-group"
               controlId="pattern-input"
               validationState={null}
             >
-              <div
-                className="form-group"
+              <FormGroup__StyledFormGroup
+                controlId="pattern-input"
+                validationState={null}
               >
-                <ControlLabel>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
-                          "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
+                <StyledComponent
+                  controlId="pattern-input"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "isStatic": false,
+                        "lastClassName": "ekazNr",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "FormGroup__StyledFormGroup",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    forwardedRef={null}
+                  }
+                  forwardedRef={null}
+                  validationState={null}
+                >
+                  <FormGroup
+                    bsClass="form-group"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                    controlId="pattern-input"
+                    validationState={null}
                   >
-                    <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                      srOnly={false}
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                        htmlFor="pattern-input"
-                      >
-                        Pattern
-                      </label>
-                    </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-                <InputWrapper>
-                  <span>
-                    <FormControl
-                      componentClass="textarea"
-                      inputRef={[Function]}
-                      label="Pattern"
-                      name="pattern-input"
-                      onChange={[Function]}
-                      placeholder=""
-                      required={true}
-                      rows={9}
-                      type="textarea"
-                      value=""
-                    >
-                      <StyledComponent
-                        componentClass="textarea"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "Feedback": [Function],
-                            "SIZES": Array [
-                              "small",
-                              "large",
-                            ],
-                            "Static": [Function],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "FormControl-sc-1amoaox-0",
-                              "isStatic": true,
-                              "lastClassName": "hdNTyr",
-                              "rules": Array [
-                                "color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&:focus{border-color:",
-                                "#6DC6E7",
-                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                "rgba(109,198,231,0.4)",
-                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                "#b8b8b8",
-                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                "#DCE1E5",
-                                ";}~ .form-control-feedback.glyphicon{display:none;}",
-                              ],
-                            },
-                            "displayName": "FormControl",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "FormControl-sc-1amoaox-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
                           }
-                        }
-                        forwardedRef={null}
-                        inputRef={[Function]}
-                        label="Pattern"
-                        name="pattern-input"
-                        onChange={[Function]}
-                        placeholder=""
-                        required={true}
-                        rows={9}
-                        type="textarea"
-                        value=""
-                      >
-                        <FormControl
-                          bsClass="form-control"
-                          className="FormControl-sc-1amoaox-0 hdNTyr"
-                          componentClass="textarea"
-                          inputRef={[Function]}
-                          label="Pattern"
-                          name="pattern-input"
-                          onChange={[Function]}
-                          placeholder=""
-                          required={true}
-                          rows={9}
-                          type="textarea"
-                          value=""
+                          forwardedRef={null}
                         >
-                          <textarea
-                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                            id="pattern-input"
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="pattern-input"
+                            >
+                              Pattern
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
+                            componentClass="textarea"
+                            inputRef={[Function]}
                             label="Pattern"
                             name="pattern-input"
                             onChange={[Function]}
@@ -1141,53 +1192,137 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                             rows={9}
                             type="textarea"
                             value=""
-                          />
-                        </FormControl>
-                      </StyledComponent>
-                    </FormControl>
-                    <HelpBlock>
-                      <StyledComponent
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "HelpBlock-i8is92-0",
-                              "isStatic": true,
-                              "lastClassName": "huFHQV",
-                              "rules": Array [
-                                "display:block;margin-top:5px;margin-bottom:10px;color:",
-                                "#9f9f9f",
-                                ";",
-                              ],
-                            },
-                            "displayName": "HelpBlock",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "HelpBlock-i8is92-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
-                          }
-                        }
-                        forwardedRef={null}
-                      >
-                        <HelpBlock
-                          bsClass="help-block"
-                          className="HelpBlock-i8is92-0 huFHQV"
-                        >
-                          <span
-                            className="HelpBlock-i8is92-0 huFHQV help-block"
                           >
-                            The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
-                          </span>
-                        </HelpBlock>
-                      </StyledComponent>
-                    </HelpBlock>
-                  </span>
-                </InputWrapper>
-              </div>
+                            <StyledComponent
+                              componentClass="textarea"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Pattern"
+                              name="pattern-input"
+                              onChange={[Function]}
+                              placeholder=""
+                              required={true}
+                              rows={9}
+                              type="textarea"
+                              value=""
+                            >
+                              <FormControl
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="textarea"
+                                inputRef={[Function]}
+                                label="Pattern"
+                                name="pattern-input"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                rows={9}
+                                type="textarea"
+                                value=""
+                              >
+                                <textarea
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="pattern-input"
+                                  label="Pattern"
+                                  name="pattern-input"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  rows={9}
+                                  type="textarea"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                          <HelpBlock>
+                            <StyledComponent
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "HelpBlock-i8is92-0",
+                                    "isStatic": true,
+                                    "lastClassName": "huFHQV",
+                                    "rules": Array [
+                                      "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                      "#9f9f9f",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "HelpBlock",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "HelpBlock-i8is92-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                            >
+                              <HelpBlock
+                                bsClass="help-block"
+                                className="HelpBlock-i8is92-0 huFHQV"
+                              >
+                                <span
+                                  className="HelpBlock-i8is92-0 huFHQV help-block"
+                                >
+                                  The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+                                </span>
+                              </HelpBlock>
+                            </StyledComponent>
+                          </HelpBlock>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </StyledComponent>
+              </FormGroup__StyledFormGroup>
             </FormGroup>
           </Input>
         </div>
@@ -1220,138 +1355,101 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
               controlId="pattern-selector"
               validationState={null}
             >
-              <div
-                className="filterFormGroup"
+              <FormGroup__StyledFormGroup
+                bsClass="filterFormGroup"
+                controlId="pattern-selector"
+                validationState={null}
               >
-                <ControlLabel>
-                  <StyledComponent
-                    forwardedComponent={
-                      Object {
-                        "$$typeof": Symbol(react.forward_ref),
-                        "attrs": Array [],
-                        "componentStyle": ComponentStyle {
-                          "componentId": "ControlLabel-sc-1edmum5-0",
-                          "isStatic": true,
-                          "lastClassName": "iZJNbd",
-                          "rules": Array [
-                            "color:",
-                            "#1F1F1F",
-                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                          ],
-                        },
-                        "displayName": "ControlLabel",
-                        "foldedComponentIds": Array [],
-                        "render": [Function],
-                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                        "target": [Function],
-                        "toString": [Function],
-                        "warnTooManyClasses": [Function],
-                        "withComponent": [Function],
-                      }
+                <StyledComponent
+                  bsClass="filterFormGroup"
+                  controlId="pattern-selector"
+                  forwardedComponent={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "SIZES": Array [
+                        "large",
+                        "small",
+                      ],
+                      "attrs": Array [],
+                      "componentStyle": ComponentStyle {
+                        "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "isStatic": false,
+                        "lastClassName": "ekazNr",
+                        "rules": Array [
+                          [Function],
+                          ";",
+                        ],
+                      },
+                      "displayName": "FormGroup__StyledFormGroup",
+                      "foldedComponentIds": Array [],
+                      "render": [Function],
+                      "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                      "target": [Function],
+                      "toString": [Function],
+                      "warnTooManyClasses": [Function],
+                      "withComponent": [Function],
                     }
-                    forwardedRef={null}
+                  }
+                  forwardedRef={null}
+                  validationState={null}
+                >
+                  <FormGroup
+                    bsClass="filterFormGroup"
+                    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                    controlId="pattern-selector"
+                    validationState={null}
                   >
-                    <ControlLabel
-                      bsClass="control-label"
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
-                      srOnly={false}
+                    <div
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr filterFormGroup"
                     >
-                      <label
-                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                        htmlFor="pattern-selector"
-                      >
-                        Filter pattern
-                      </label>
-                    </ControlLabel>
-                  </StyledComponent>
-                </ControlLabel>
-                <InputWrapper>
-                  <span>
-                    <FormControl
-                      autoComplete="off"
-                      componentClass="input"
-                      inputRef={[Function]}
-                      label="Filter pattern"
-                      name="pattern-selector"
-                      onChange={[Function]}
-                      onKeyDown={[Function]}
-                      placeholder=""
-                      type="text"
-                      value=""
-                    >
-                      <StyledComponent
-                        autoComplete="off"
-                        componentClass="input"
-                        forwardedComponent={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "Feedback": [Function],
-                            "SIZES": Array [
-                              "small",
-                              "large",
-                            ],
-                            "Static": [Function],
-                            "attrs": Array [],
-                            "componentStyle": ComponentStyle {
-                              "componentId": "FormControl-sc-1amoaox-0",
-                              "isStatic": true,
-                              "lastClassName": "hdNTyr",
-                              "rules": Array [
-                                "color:",
-                                "#1F1F1F",
-                                ";background-color:",
-                                "#FFF",
-                                ";border-color:",
-                                "#DCE1E5",
-                                ";&:focus{border-color:",
-                                "#6DC6E7",
-                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                "rgba(109,198,231,0.4)",
-                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                "#b8b8b8",
-                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                "#DCE1E5",
-                                ";}~ .form-control-feedback.glyphicon{display:none;}",
-                              ],
-                            },
-                            "displayName": "FormControl",
-                            "foldedComponentIds": Array [],
-                            "render": [Function],
-                            "styledComponentId": "FormControl-sc-1amoaox-0",
-                            "target": [Function],
-                            "toString": [Function],
-                            "warnTooManyClasses": [Function],
-                            "withComponent": [Function],
+                      <ControlLabel>
+                        <StyledComponent
+                          forwardedComponent={
+                            Object {
+                              "$$typeof": Symbol(react.forward_ref),
+                              "attrs": Array [],
+                              "componentStyle": ComponentStyle {
+                                "componentId": "ControlLabel-sc-1edmum5-0",
+                                "isStatic": true,
+                                "lastClassName": "iZJNbd",
+                                "rules": Array [
+                                  "color:",
+                                  "#1F1F1F",
+                                  ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                ],
+                              },
+                              "displayName": "ControlLabel",
+                              "foldedComponentIds": Array [],
+                              "render": [Function],
+                              "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                              "target": [Function],
+                              "toString": [Function],
+                              "warnTooManyClasses": [Function],
+                              "withComponent": [Function],
+                            }
                           }
-                        }
-                        forwardedRef={null}
-                        inputRef={[Function]}
-                        label="Filter pattern"
-                        name="pattern-selector"
-                        onChange={[Function]}
-                        onKeyDown={[Function]}
-                        placeholder=""
-                        type="text"
-                        value=""
-                      >
-                        <FormControl
-                          autoComplete="off"
-                          bsClass="form-control"
-                          className="FormControl-sc-1amoaox-0 hdNTyr"
-                          componentClass="input"
-                          inputRef={[Function]}
-                          label="Filter pattern"
-                          name="pattern-selector"
-                          onChange={[Function]}
-                          onKeyDown={[Function]}
-                          placeholder=""
-                          type="text"
-                          value=""
+                          forwardedRef={null}
                         >
-                          <input
+                          <ControlLabel
+                            bsClass="control-label"
+                            className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                            srOnly={false}
+                          >
+                            <label
+                              className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                              htmlFor="pattern-selector"
+                            >
+                              Filter pattern
+                            </label>
+                          </ControlLabel>
+                        </StyledComponent>
+                      </ControlLabel>
+                      <InputWrapper>
+                        <span>
+                          <FormControl
                             autoComplete="off"
-                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                            id="pattern-selector"
+                            componentClass="input"
+                            inputRef={[Function]}
                             label="Filter pattern"
                             name="pattern-selector"
                             onChange={[Function]}
@@ -1359,13 +1457,97 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                             placeholder=""
                             type="text"
                             value=""
-                          />
-                        </FormControl>
-                      </StyledComponent>
-                    </FormControl>
-                  </span>
-                </InputWrapper>
-              </div>
+                          >
+                            <StyledComponent
+                              autoComplete="off"
+                              componentClass="input"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "Feedback": [Function],
+                                  "SIZES": Array [
+                                    "small",
+                                    "large",
+                                  ],
+                                  "Static": [Function],
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "FormControl-sc-1amoaox-0",
+                                    "isStatic": true,
+                                    "lastClassName": "hdNTyr",
+                                    "rules": Array [
+                                      "color:",
+                                      "#1F1F1F",
+                                      ";background-color:",
+                                      "#FFF",
+                                      ";border-color:",
+                                      "#DCE1E5",
+                                      ";&:focus{border-color:",
+                                      "#6DC6E7",
+                                      ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                      "rgba(109,198,231,0.4)",
+                                      ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                      "#b8b8b8",
+                                      ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                      "#DCE1E5",
+                                      ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                    ],
+                                  },
+                                  "displayName": "FormControl",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "FormControl-sc-1amoaox-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              inputRef={[Function]}
+                              label="Filter pattern"
+                              name="pattern-selector"
+                              onChange={[Function]}
+                              onKeyDown={[Function]}
+                              placeholder=""
+                              type="text"
+                              value=""
+                            >
+                              <FormControl
+                                autoComplete="off"
+                                bsClass="form-control"
+                                className="FormControl-sc-1amoaox-0 hdNTyr"
+                                componentClass="input"
+                                inputRef={[Function]}
+                                label="Filter pattern"
+                                name="pattern-selector"
+                                onChange={[Function]}
+                                onKeyDown={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              >
+                                <input
+                                  autoComplete="off"
+                                  className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                  id="pattern-selector"
+                                  label="Filter pattern"
+                                  name="pattern-selector"
+                                  onChange={[Function]}
+                                  onKeyDown={[Function]}
+                                  placeholder=""
+                                  type="text"
+                                  value=""
+                                />
+                              </FormControl>
+                            </StyledComponent>
+                          </FormControl>
+                        </span>
+                      </InputWrapper>
+                    </div>
+                  </FormGroup>
+                </StyledComponent>
+              </FormGroup__StyledFormGroup>
             </FormGroup>
           </Input>
           <ListGroup
