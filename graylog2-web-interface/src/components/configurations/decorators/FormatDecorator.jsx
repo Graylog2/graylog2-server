@@ -31,4 +31,3 @@ const formatDecorator = (
 };
 
 export default formatDecorator;
-
