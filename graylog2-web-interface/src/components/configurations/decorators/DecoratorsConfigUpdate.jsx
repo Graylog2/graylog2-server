@@ -29,10 +29,10 @@ const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
 };
 
 export type DecoratorType = {
-  id: string,
+  id?: string,
   order: number,
   type: string,
-  stream: string,
+  stream: ?string,
 };
 
 type Props = {
