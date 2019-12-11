@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { groupBy } from 'lodash';
 
 import { IfPermitted } from 'components/common';
@@ -42,13 +42,14 @@ const DecoratorsConfig = () => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [decorators, setDecorators] = useState();
   const [types, setTypes] = useState();
-  const [showModal, setShowModal] = useState(false);
+  const configModal = useRef();
+
   useEffect(() => { StreamsStore.listStreams().then(setStreams); }, [setStreams]);
   useEffect(() => { DecoratorsActions.available().then(setTypes); }, [setTypes]);
   useEffect(() => { DecoratorsActions.list().then(setDecorators); }, [setDecorators]);
 
-  const openModal = useCallback(() => setShowModal(true), [setShowModal]);
-  const closeModal = useCallback(() => setShowModal(false), [setShowModal]);
+  const openModal = useCallback(() => configModal.current && configModal.current.open(), [configModal]);
+  const closeModal = useCallback(() => configModal.current && configModal.current.close(), [configModal]);
 
   if (!streams || !decorators || !types) {
     return <Spinner />;
@@ -82,7 +83,7 @@ const DecoratorsConfig = () => {
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>Update</Button>
       </IfPermitted>
-      <DecoratorsConfigUpdate show={showModal}
+      <DecoratorsConfigUpdate ref={configModal}
                               streams={streams}
                               decorators={decorators}
                               onCancel={closeModal}

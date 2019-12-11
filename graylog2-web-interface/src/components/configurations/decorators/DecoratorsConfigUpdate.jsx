@@ -44,7 +44,7 @@ type Props = {
   onSave: (Array<DecoratorType>) => mixed,
 };
 
-const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
+const DecoratorsConfigUpdate = React.forwardRef(({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const onCreate = useCallback(
@@ -60,7 +60,8 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 
   return (
-    <BootstrapModalWrapper showModal={show}
+    <BootstrapModalWrapper ref={modalRef}
+                           showModal={show}
                            onHide={onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>Update Default Decorators Configuration</Modal.Title>
@@ -82,7 +83,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
       </Modal.Footer>
     </BootstrapModalWrapper>
   );
-};
+});
 
 DecoratorsConfigUpdate.propTypes = {};
 
