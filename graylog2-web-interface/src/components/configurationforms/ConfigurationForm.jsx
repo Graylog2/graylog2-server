@@ -111,7 +111,7 @@ class ConfigurationForm extends React.Component {
 
   _closeModal = () => {
     const { cancelAction, titleValue } = this.props;
-    this.setState($.extend(this.getInitialState(), { titleValue: titleValue }));
+    this.setState($.extend(this._copyStateFromProps(this.props), { titleValue: titleValue }));
     if (cancelAction) {
       cancelAction();
     }
