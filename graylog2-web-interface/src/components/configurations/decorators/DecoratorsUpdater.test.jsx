@@ -18,7 +18,7 @@ jest.mock('injection/CombinedProvider', () => ({
 }));
 
 const decorator = (id, type = 'dummy') => ({ id, type, order: 0, stream: 'dummystream' });
-const newDecorator = type => ({ type, order: 0, stream: 'anotherdummystream' });
+const newDecorator = type => ({ type, order: 0, stream: 'dummystream' });
 
 describe('DecoratorsUpdater', () => {
   beforeEach(() => {
@@ -31,7 +31,7 @@ describe('DecoratorsUpdater', () => {
       expect(mockRemove).not.toHaveBeenCalled();
     }));
   it('finds a created decorator', () => DecoratorsUpdater(
-    [decorator('decorator1'), newDecorator('a new decorator'), decorator('decorator3')],
+    [decorator('decorator1'), decorator('new1', 'a new decorator'), decorator('decorator3')],
     [decorator('decorator1'), decorator('decorator3')],
   )
     .then(() => {
@@ -59,7 +59,7 @@ describe('DecoratorsUpdater', () => {
     }));
 
   it('finds a combination of created, updated & removed decorators', () => DecoratorsUpdater(
-    [decorator('decorator2'), newDecorator('new type'), decorator('decorator3', 'bar!'), newDecorator('other new type'), decorator('decorator4', 'something else')],
+    [decorator('decorator2'), decorator('new1', 'new type'), decorator('decorator3', 'bar!'), decorator('new2', 'other new type'), decorator('decorator4', 'something else')],
     [decorator('decorator1'), decorator('decorator2'), decorator('decorator4', 'something'), decorator('decorator3', 'foo!')],
   )
     .then(() => {

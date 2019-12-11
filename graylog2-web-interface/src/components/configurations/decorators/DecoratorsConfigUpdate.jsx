@@ -1,15 +1,16 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
+import { cloneDeep } from 'lodash';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Button, Modal } from 'components/graylog';
+import { IfPermitted } from 'components/common';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
 import formatDecorator from './FormatDecorator';
-import { IfPermitted } from '../../common/index';
 
 type Props = {
   streams: Array<{ title: string, id: string }>,
@@ -20,6 +21,19 @@ type Props = {
   onSave: (Array<Decorator>) => mixed,
 };
 
+const _updateOrder = (orderedDecorators, decorators, onChange) => {
+  const newDecorators = cloneDeep(decorators);
+  orderedDecorators.forEach((item, idx) => {
+    const decorator = newDecorators.find(i => i.id === item.id);
+    if (decorator) {
+      decorator.order = idx;
+    }
+  });
+
+  onChange(newDecorators);
+};
+
+
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
@@ -27,6 +41,11 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     ({ stream, ...rest }) => setModifiedDecorators([...modifiedDecorators, { ...rest, stream: stream === DEFAULT_SEARCH_ID ? null : stream }]),
     [modifiedDecorators, setModifiedDecorators],
   );
+  const onReorder = useCallback(
+    orderedDecorators => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    [modifiedDecorators, setModifiedDecorators],
+  );
+  const onSubmit = useCallback(() => onSave(modifiedDecorators), [onSave, modifiedDecorators]);
 
   const currentDecorators = modifiedDecorators.filter(decorator => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators
@@ -53,11 +72,11 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
 
         <p>Use drag and drop to change the execution order of the decorators.</p>
 
-        <DecoratorList decorators={decoratorItems} />
+        <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={() => onSave(modifiedDecorators)}>Save</Button>
+        <Button bsStyle="primary" onClick={onSubmit}>Save</Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

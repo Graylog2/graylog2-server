@@ -1,6 +1,6 @@
 // @flow strict
 export type Decorator = {
-  id?: string,
+  id: string,
   order: number,
   type: string,
   stream: ?string,

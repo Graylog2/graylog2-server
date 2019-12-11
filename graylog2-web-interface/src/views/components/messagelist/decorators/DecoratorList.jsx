@@ -21,9 +21,7 @@ class DecoratorList extends React.Component {
 
   _onReorderWrapper = (...args) => {
     const { onReorder } = this.props;
-    if (onReorder) {
-      onReorder(...args);
-    }
+    onReorder(...args);
   };
 
   render() {

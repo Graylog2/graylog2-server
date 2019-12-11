@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import jQuery from 'jquery';
 import styled from 'styled-components';
+import ObjectID from 'bson-objectid';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select } from 'components/common';
@@ -54,6 +55,7 @@ class AddDecoratorButton extends React.Component {
     const { stream, nextOrder, onCreate } = this.props;
 
     const request = {
+      id: ObjectID().toString(),
       stream,
       type: data.type,
       config: data.configuration,

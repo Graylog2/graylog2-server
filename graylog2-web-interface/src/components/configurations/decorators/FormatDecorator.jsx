@@ -16,9 +16,11 @@ const formatDecorator = (
   const onDelete = updateFn
     ? deletedDecoratorId => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
     : () => {};
+  const { id, order } = decorator;
   return ({
-    id: decorator.id,
-    title: <DecoratorSummary key={`decorator-${decorator.id || 'new'}`}
+    id,
+    order,
+    title: <DecoratorSummary key={`decorator-${id || 'new'}`}
                              decorator={decorator}
                              decoratorTypes={decoratorTypes}
                              disableMenu={updateFn === undefined}
