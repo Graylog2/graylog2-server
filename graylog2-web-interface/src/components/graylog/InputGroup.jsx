@@ -14,4 +14,7 @@ const InputGroup = memo(styled(BootstrapInputGroup)`
   }
 `);
 
+InputGroup.Addon = memo(BootstrapInputGroup.Addon);
+InputGroup.Button = memo(BootstrapInputGroup.Button);
+
 export default InputGroup;
