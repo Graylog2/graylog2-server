@@ -25,17 +25,14 @@ const _onShowMessageRowChanged = (config, onChange) => {
   return onChange(newConfig);
 };
 
-const _renderChildrenWithContainerHeight = (children, containerHeight) => React.Children.map(children, child => React.cloneElement(child, { containerHeight }));
-
 type Props = {
   children: React.Node,
   config: MessagesWidgetConfig,
-  containerHeight: number,
   fields: Immutable.Set<FieldTypeMapping>,
   onChange: (MessagesWidgetConfig) => void,
 };
 
-const EditMessageList = ({ children, config, containerHeight, fields, onChange }: Props) => {
+const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const fieldsForSelect = fields
     .map(fieldType => fieldType.name)
     .map(fieldName => ({ label: fieldName, value: fieldName }))
@@ -66,7 +63,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
         </DescriptionBox>
       </Col>
       <Col md={9}>
-        {_renderChildrenWithContainerHeight(children, containerHeight)}
+        {children}
       </Col>
     </Row>
   );
@@ -74,8 +71,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
 
 EditMessageList.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  config: PropTypes.instanceOf(MessagesWidgetConfig).isRequired,
-  containerHeight: PropTypes.number.isRequired,
+  config: PropTypes.object.isRequired,
   fields: CustomPropTypes.FieldListType.isRequired,
   onChange: PropTypes.func.isRequired,
 };
