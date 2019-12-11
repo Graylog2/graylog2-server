@@ -1,6 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import Reflux from 'reflux';
 import PropTypes from 'prop-types';
 

@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import SearchError from 'views/logic/SearchError';
 import ErrorWidget from './ErrorWidget';

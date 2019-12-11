@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import MapVisualization from '../MapVisualization';
 import * as fixtures from './MapVisualization.fixtures';

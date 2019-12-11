@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import MeasureDimensions from './MeasureDimensions';
 

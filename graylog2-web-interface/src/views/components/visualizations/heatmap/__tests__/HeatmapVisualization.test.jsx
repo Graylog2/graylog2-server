@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import * as Immutable from 'immutable';
 
 import Pivot from 'views/logic/aggregationbuilder/Pivot';

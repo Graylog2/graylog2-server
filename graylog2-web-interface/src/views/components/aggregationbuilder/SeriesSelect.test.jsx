@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesParameterOptions from 'views/components/aggregationbuilder/SeriesParameterOptions';

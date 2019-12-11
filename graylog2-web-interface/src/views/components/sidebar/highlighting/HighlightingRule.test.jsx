@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import mockAction from 'helpers/mocking/MockAction';
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';

@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ExpandableList from 'components/common/ExpandableList';
