@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonDeserialize(builder = ValueType.Builder.class)
+@JsonDeserialize(builder = AutoValue_ValueType.Builder.class)
 public abstract class ValueType implements Parent {
     static final String VERSION = "1";
     private static final String FIELD_FOOBAR = "foobar";

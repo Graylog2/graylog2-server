@@ -59,7 +59,7 @@ public class AutoValueSubtypeResolverTest {
     }
 
     @AutoValue
-    @JsonDeserialize(builder = NestedValueType.Builder.class)
+    @JsonDeserialize(builder = AutoValue_AutoValueSubtypeResolverTest_NestedValueType.Builder.class)
     public static abstract class NestedValueType implements Parent {
         static final String VERSION = "2";
         private static final String FIELD_BAZ = "baz";

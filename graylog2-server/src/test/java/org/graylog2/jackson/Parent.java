@@ -36,6 +36,7 @@ public interface Parent {
     @JsonProperty(FIELD_TEXT)
     String text();
 
+    @AutoValue.Builder
     interface ParentBuilder<SELF> {
         @JsonProperty(FIELD_VERSION)
         SELF version(String version);
