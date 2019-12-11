@@ -59,7 +59,7 @@ const Title = styled.h3(({ theme }) => css`
 `);
 
 const DragBars = styled(Icon)(({ theme }) => css`
-  color: ${theme.color.gray[90]};
+  color: ${theme.color.gray[70]};
 `);
 
 /**

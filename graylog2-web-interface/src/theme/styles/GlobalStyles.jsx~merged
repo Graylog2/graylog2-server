@@ -1,6 +1,10 @@
 import { css } from 'styled-components';
 
+<<<<<<< HEAD
 export const globalStyles = css(({ theme }) => css`
+=======
+const globalStyles = theme => css`
+>>>>>>> 8a855cb93... Updated tests and snapshots
   body {
     background-color: ${theme.color.global.background};
     color: ${theme.color.global.textDefault};
@@ -71,6 +75,12 @@ export const globalStyles = css(({ theme }) => css`
     outline: none;
     outline-offset: 0;
   }
+<<<<<<< HEAD
 `);
 
+export default { globalStyles };
+=======
+`;
+
 export default globalStyles;
+>>>>>>> 8a855cb93... Updated tests and snapshots

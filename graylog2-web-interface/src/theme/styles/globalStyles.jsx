@@ -73,4 +73,4 @@ export const globalStyles = css(({ theme }) => css`
   }
 `);
 
-export default { globalStyles };
+export default globalStyles;
