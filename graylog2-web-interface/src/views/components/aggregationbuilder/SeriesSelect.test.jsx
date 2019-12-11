@@ -91,6 +91,7 @@ describe('SeriesSelect', () => {
   });
 
   it('shows parameter suggestions when parameter is needed', () => {
+    // eslint-disable-next-line import/no-named-as-default-member
     SeriesParameterOptions.parameterOptionsForType = jest.fn(() => [1, 2, 3]);
 
     suggester.defaults = [
@@ -109,7 +110,11 @@ describe('SeriesSelect', () => {
     const select = wrapper.find('Select').at(0);
     select.prop('onChange')([{ label: 'func1', value: 'func1', incomplete: true, parameterNeeded: true }]);
 
+
+    // eslint-disable-next-line import/no-named-as-default-member
     expect(SeriesParameterOptions.parameterOptionsForType).toHaveBeenCalledTimes(1);
+
+    // eslint-disable-next-line import/no-named-as-default-member
     expect(SeriesParameterOptions.parameterOptionsForType).toHaveBeenCalledWith('func1');
     expect(onChange).not.toHaveBeenCalled();
   });

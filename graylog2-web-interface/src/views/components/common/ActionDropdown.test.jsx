@@ -22,11 +22,11 @@ describe('ActionDropdown', () => {
   it('stops event when trigger element is clicked', () => {
     const onClick = jest.fn();
     const wrapper = mount((
-      <div onClick={onClick}>
+      <button type="button" onClick={onClick}>
         <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
           <MenuItem>Foo</MenuItem>
         </ActionDropdown>
-      </div>
+      </button>
     ));
     const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');
@@ -53,11 +53,11 @@ describe('ActionDropdown', () => {
     const onClick = jest.fn();
     const onSelect = jest.fn();
     const wrapper = mount((
-      <div onClick={onClick}>
+      <button type="button" onClick={onClick}>
         <ActionDropdown element={<div>Trigger!</div>}>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </ActionDropdown>
-      </div>
+      </button>
     ));
     const trigger = wrapper.find('ActionToggle');
     trigger.simulate('click');

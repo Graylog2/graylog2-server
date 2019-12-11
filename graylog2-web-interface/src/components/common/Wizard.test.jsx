@@ -111,6 +111,7 @@ describe('<Wizard />', () => {
     });
 
     it('should show a warning when activeStep is not a key in steps', () => {
+      /* eslint-disable no-console */
       const consoleWarn = console.warn;
       console.warn = jest.fn();
       const wrapper = mount(<Wizard steps={steps} activeStep={0} />);
@@ -124,6 +125,7 @@ describe('<Wizard />', () => {
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
       expect(console.warn.mock.calls.length).toBe(2);
       console.warn = consoleWarn;
+      /* eslint-enable no-console */
     });
   });
 

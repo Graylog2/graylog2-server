@@ -1,31 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import createReactClass from 'create-react-class';
 import { mount } from 'wrappedEnzyme';
 
 import MeasureDimensions from './MeasureDimensions';
 
 describe('<MeasureDimensions />', () => {
   it('should pass the height of the container to its children', () => {
-    const ChildComp = createReactClass({
-      propTypes: {
+    class ChildComp extends React.Component {
+      static propTypes = {
         containerHeight: PropTypes.number,
-      },
+      };
 
-      getDefaultProps() {
-        return {
-          containerHeight: undefined,
-        };
-      },
+      static defaultProps = {
+        containerHeight: undefined,
+      }
 
       getContainerHeight() {
-        return this.props.containerHeight;
-      },
+        const { containerHeight } = this.props;
+
+        return containerHeight;
+      }
 
       render() {
         return (<div />);
-      },
-    });
+      }
+    }
     let childRef = null;
     mount(<MeasureDimensions><ChildComp ref={(node) => { childRef = node; }} /></MeasureDimensions>);
 

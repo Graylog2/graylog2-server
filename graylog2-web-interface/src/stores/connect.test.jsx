@@ -31,7 +31,9 @@ const SimpleComponentWithDummyStore = ({ simpleStore }) => {
 };
 
 SimpleComponentWithDummyStore.propTypes = {
-  simpleStore: PropTypes.shape({ foo: PropTypes.number }),
+  simpleStore: PropTypes.shape({
+    value: PropTypes.number,
+  }),
 };
 
 SimpleComponentWithDummyStore.defaultProps = {
