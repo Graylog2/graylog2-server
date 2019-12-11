@@ -63,6 +63,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -259,7 +260,7 @@ public class ViewFacadeTest {
                 .queries(ImmutableSet.of(query))
                 .parameters(ImmutableSet.of())
                 .requires(ImmutableMap.of())
-                .createdAt(DateTime.now())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         final ViewStateEntity viewStateEntity = ViewStateEntity.builder()
                 .fields(ImmutableSet.of())
@@ -279,7 +280,7 @@ public class ViewFacadeTest {
                 .properties(ImmutableSet.of())
                 .requires(ImmutableMap.of())
                 .state(ImmutableMap.of(newViewId, viewStateEntity))
-                .createdAt(DateTime.now())
+                .createdAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         return EntityV1.builder()
                 .id(ModelId.of("1"))
