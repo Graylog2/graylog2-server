@@ -416,7 +416,7 @@ public class ContentPackService {
 
         if (!fulfilledConstraints.equals(requiredConstraints)) {
             final Set<Constraint> failedConstraints = Sets.difference(requiredConstraints, fulfilledConstraints);
-//            throw new FailedConstraintsException(failedConstraints);
+            throw new FailedConstraintsException(failedConstraints);
         }
     }
 
