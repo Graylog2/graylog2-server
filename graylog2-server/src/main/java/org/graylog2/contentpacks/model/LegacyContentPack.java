@@ -114,7 +114,6 @@ public abstract class LegacyContentPack implements ContentPack {
         private Collection<Entity> inputs = Collections.emptySet();
         private Collection<Entity> streams = Collections.emptySet();
         private Collection<Entity> outputs = Collections.emptySet();
-        private Collection<Entity> dashboards = Collections.emptySet();
         private Collection<Entity> grokPatterns = Collections.emptySet();
         private Collection<Entity> lookupTables = Collections.emptySet();
         private Collection<Entity> lookupCaches = Collections.emptySet();
@@ -178,12 +177,12 @@ public abstract class LegacyContentPack implements ContentPack {
             return this;
         }
 
-//        @JsonProperty("dashboards")
-//        Builder dashboards(Collection<JsonNode> dashboards) {
-//            this.dashboards = convertDashboards(dashboards);
-//            return this;
-//        }
-//
+        @JsonProperty("dashboards")
+        Builder dashboards(Collection<JsonNode> dashboards) {
+            // Todo: implement support for new Dashboards
+            return this;
+        }
+
         @JsonProperty("grok_patterns")
         Builder grokPatterns(Collection<JsonNode> grokPatterns) {
             this.grokPatterns = convertGrokPatterns(grokPatterns);
@@ -216,7 +215,6 @@ public abstract class LegacyContentPack implements ContentPack {
                     .addAll(inputs)
                     .addAll(streams)
                     .addAll(outputs)
-//                    .addAll(dashboards)
                     .addAll(grokPatterns)
                     .addAll(lookupTables)
                     .addAll(lookupCaches)
@@ -292,25 +290,6 @@ public abstract class LegacyContentPack implements ContentPack {
                     .build();
         }
 
-//        private Collection<Entity> convertDashboards(Collection<JsonNode> dashboards) {
-//            if (dashboards == null || dashboards.isEmpty()) {
-//                return Collections.emptySet();
-//            }
-//
-//            return dashboards.stream()
-//                    .map(this::convertDashboard)
-//                    .collect(Collectors.toSet());
-//        }
-//
-//        private Entity convertDashboard(JsonNode json) {
-//            return EntityV1.builder()
-//                    .id(ModelId.of(UUID.randomUUID().toString()))
-//                    .type(ModelTypes.DASHBOARD_V1)
-//                    .version(ModelVersion.of("1"))
-//                    .data(json)
-//                    .build();
-//        }
-//
         private Collection<Entity> convertGrokPatterns(Collection<JsonNode> grokPatterns) {
             if (grokPatterns == null || grokPatterns.isEmpty()) {
                 return Collections.emptySet();
