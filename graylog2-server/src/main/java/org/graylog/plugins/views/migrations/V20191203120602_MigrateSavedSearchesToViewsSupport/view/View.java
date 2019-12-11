@@ -39,7 +39,6 @@ public abstract class View {
     private static final String FIELD_SUMMARY = "summary";
     private static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_SEARCH_ID = "search_id";
-    public static final String FIELD_CONTENT_PACK = "content_pack";
     private static final String FIELD_PROPERTIES = "properties";
     private static final String FIELD_REQUIRES = "requires";
     private static final String FIELD_STATE = "state";
@@ -69,12 +68,7 @@ public abstract class View {
 
     @JsonProperty(FIELD_SEARCH_ID)
     abstract String searchId();
-
-    @JsonProperty(FIELD_CONTENT_PACK)
-    Optional<String> contentPack() {
-        return Optional.empty();
-    }
-
+    
     @JsonProperty(FIELD_PROPERTIES)
     Set<String> properties() {
         return Collections.emptySet();
