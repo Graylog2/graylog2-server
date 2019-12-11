@@ -28,6 +28,8 @@ class FieldType {
 
   static Unknown = new FieldType('unknown', [], []);
 
+  static Decorated = new FieldType('decorated field', [], []);
+
   get type(): string {
     return this.value.get('type');
   }

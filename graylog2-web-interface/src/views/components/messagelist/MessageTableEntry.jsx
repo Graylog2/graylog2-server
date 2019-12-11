@@ -19,6 +19,7 @@ import DecoratedValue from './decoration/DecoratedValue';
 import CustomHighlighting from './CustomHighlighting';
 
 import style from './MessageTableEntry.css';
+import type { Message } from './Types';
 
 const { NodesStore } = CombinedProvider.get('Nodes');
 const { InputsStore } = CombinedProvider.get('Inputs');
@@ -46,12 +47,6 @@ const ConnectedMessageDetail = connect(
     });
   },
 );
-
-type Message = {|
-  id: string,
-  index: string,
-  fields: { [string]: any },
-|};
 
 type Props = {
   disableSurroundingSearch?: boolean,
