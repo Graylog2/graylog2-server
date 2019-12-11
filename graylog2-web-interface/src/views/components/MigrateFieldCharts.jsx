@@ -113,8 +113,10 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
 
     const { field } = chart;
     // The old field charts only have one series per chart.
+    // The series allways relates to the selected field.
+    // Because all field charts show the results for the defined timerange,
+    // the new row pivot always contains the timestamp field.
     const series = new Series(mapSeries(chart.valuetype, field));
-    // Setting series. The old field charts only have one series per chart.
     const rowPivots = [new Pivot('timestamp', 'time', { interval: { type: 'timeunit', ...mapTime(chart.interval) } })];
     const visualization = mapVisualization(chart.renderer);
     const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
@@ -160,7 +162,7 @@ const MigrateFieldCharts = () => {
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
   const chartAmount = legacyCharts.length;
 
-  if (migrationFinished) {
+  if (migrationFinished || !empty(legacyCharts)) {
     return null;
   }
 
