@@ -32,7 +32,7 @@ describe('ViewStateGenerator', () => {
 
     expect(mockList).toHaveBeenCalledWith();
     const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
-    expect(messageTableWidget.config.decorators).toEqual([{ id: 'decorator1', stream: 'foobar', order: 0, type: 'something'}]);
+    expect(messageTableWidget.config.decorators).toEqual([{ id: 'decorator1', stream: 'foobar', order: 0, type: 'something' }]);
   });
   it('adds decorators for default search to message table if stream id is `null`', async () => {
     mockList.mockReturnValue([
@@ -43,7 +43,7 @@ describe('ViewStateGenerator', () => {
 
     expect(mockList).toHaveBeenCalledWith();
     const messageTableWidget = result.widgets.find(widget => widget.type === MessagesWidget.type);
-    expect(messageTableWidget.config.decorators).toEqual([{ id: 'decorator2', stream: null, order: 0, type: 'something'}]);
+    expect(messageTableWidget.config.decorators).toEqual([{ id: 'decorator2', stream: null, order: 0, type: 'something' }]);
   });
   it('does not add decorators for current stream to message table if none exist for this stream', async () => {
     mockList.mockReturnValue([
