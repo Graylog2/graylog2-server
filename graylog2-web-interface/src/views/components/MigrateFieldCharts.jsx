@@ -102,7 +102,7 @@ const createVisualizationConfig = (interpolation: LegacyInterpolation, visualiza
   }
 };
 
-const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void) => {
+const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
   const widgetDef = widgetDefinition('AGGREGATION');
   const currentView = CurrentViewStateStore.getInitialState();
   const newWidgetPositions = { ...currentView.state.widgetPositions };
@@ -144,15 +144,19 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
     () => SearchActions.executeWithCurrentState().then(() => {
       Store.set('pinned-field-charts-migrated', true);
       setMigrating(false);
+      setMigrationFinished(true);
     }),
   );
 };
 
-const onCancel = () => Store.set('pinned-field-charts-migrated', true);
+const onCancel = (setMigrationFinished) => {
+  Store.set('pinned-field-charts-migrated', true);
+  setMigrationFinished(true);
+};
 
 const MigrateFieldCharts = () => {
-  const migrationFinished: boolean = !!Store.get('pinned-field-charts-migrated');
   const [migrating, setMigrating] = useState(false);
+  const [migrationFinished, setMigrationFinished] = useState(!!Store.get('pinned-field-charts-migrated'));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
   const chartAmount = legacyCharts.length;
 
@@ -175,12 +179,12 @@ const MigrateFieldCharts = () => {
           <br />
           <Actions>
             <Button bsStyle="primary"
-                    onClick={() => onMigrate(legacyCharts, setMigrating)}
+                    onClick={() => onMigrate(legacyCharts, setMigrating, setMigrationFinished)}
                     disabled={migrating}
                     className="save-button-margin">
                   Migrate {migrating && <Spinner text="" />}
             </Button>
-            <Button onClick={() => onCancel()}
+            <Button onClick={() => onCancel(setMigrationFinished)}
                     disabled={migrating}>
                   Discard charts
             </Button>
