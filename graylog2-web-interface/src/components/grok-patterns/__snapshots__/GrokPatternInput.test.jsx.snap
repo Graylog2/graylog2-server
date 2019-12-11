@@ -52,7 +52,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             type="textarea"
             value=""
           >
-            <FormGroup
+            <Component
               controlId="pattern-input"
               validationState={null}
             >
@@ -269,7 +269,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   </FormGroup>
                 </StyledComponent>
               </FormGroup__StyledFormGroup>
-            </FormGroup>
+            </Component>
           </Input>
         </div>
       </Col>
@@ -296,7 +296,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
             type="text"
             value=""
           >
-            <FormGroup
+            <Component
               bsClass="filterFormGroup"
               controlId="pattern-selector"
               validationState={null}
@@ -478,7 +478,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   </FormGroup>
                 </StyledComponent>
               </FormGroup__StyledFormGroup>
-            </FormGroup>
+            </Component>
           </Input>
           <ListGroup
             bsClass="resultList"
@@ -979,7 +979,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
             type="textarea"
             value=""
           >
-            <FormGroup
+            <Component
               controlId="pattern-input"
               validationState={null}
             >
@@ -1196,7 +1196,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                   </FormGroup>
                 </StyledComponent>
               </FormGroup__StyledFormGroup>
-            </FormGroup>
+            </Component>
           </Input>
         </div>
       </Col>
@@ -1223,7 +1223,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
             type="text"
             value=""
           >
-            <FormGroup
+            <Component
               bsClass="filterFormGroup"
               controlId="pattern-selector"
               validationState={null}
@@ -1405,7 +1405,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                   </FormGroup>
                 </StyledComponent>
               </FormGroup__StyledFormGroup>
-            </FormGroup>
+            </Component>
           </Input>
           <ListGroup
             bsClass="resultList"

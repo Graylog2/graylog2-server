@@ -306,7 +306,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                       type="text"
                       wrapperClassName="typeahead-wrapper"
                     >
-                      <FormGroup
+                      <Component
                         controlId="content-packs-filter"
                         validationState={null}
                       >
@@ -473,7 +473,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                             </FormGroup>
                           </StyledComponent>
                         </FormGroup__StyledFormGroup>
-                      </FormGroup>
+                      </Component>
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef
@@ -9142,7 +9142,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                       type="text"
                       wrapperClassName="typeahead-wrapper"
                     >
-                      <FormGroup
+                      <Component
                         controlId="content-packs-filter"
                         validationState={null}
                       >
@@ -9309,7 +9309,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                             </FormGroup>
                           </StyledComponent>
                         </FormGroup__StyledFormGroup>
-                      </FormGroup>
+                      </Component>
                     </Input>
                   </TypeAheadInput>
                   <ForwardRef

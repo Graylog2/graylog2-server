@@ -322,7 +322,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                   type="text"
                                                   wrapperClassName="typeahead-wrapper"
                                                 >
-                                                  <FormGroup
+                                                  <Component
                                                     controlId="filter-streams-data-filter"
                                                     validationState={null}
                                                   >
@@ -489,7 +489,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         </FormGroup>
                                                       </StyledComponent>
                                                     </FormGroup__StyledFormGroup>
-                                                  </FormGroup>
+                                                  </Component>
                                                 </Input>
                                               </TypeAheadInput>
                                               <ForwardRef
@@ -766,7 +766,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     type="checkbox"
                                                     wrapperClassName="form-group-inline"
                                                   >
-                                                    <FormGroup
+                                                    <Component
                                                       controlId="select-all-checkbox"
                                                       validationState={null}
                                                     >
@@ -859,7 +859,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </FormGroup>
                                                         </StyledComponent>
                                                       </FormGroup__StyledFormGroup>
-                                                    </FormGroup>
+                                                    </Component>
                                                   </Input>
                                                 </span>
                                               </ListGroupItem>
@@ -1087,7 +1087,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -1179,7 +1179,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -1413,7 +1413,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -1505,7 +1505,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -1650,7 +1650,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                   type="text"
                                                   wrapperClassName="typeahead-wrapper"
                                                 >
-                                                  <FormGroup
+                                                  <Component
                                                     controlId="filter-dashboards-data-filter"
                                                     validationState={null}
                                                   >
@@ -1817,7 +1817,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         </FormGroup>
                                                       </StyledComponent>
                                                     </FormGroup__StyledFormGroup>
-                                                  </FormGroup>
+                                                  </Component>
                                                 </Input>
                                               </TypeAheadInput>
                                               <ForwardRef
@@ -2094,7 +2094,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                     type="checkbox"
                                                     wrapperClassName="form-group-inline"
                                                   >
-                                                    <FormGroup
+                                                    <Component
                                                       controlId="select-all-checkbox"
                                                       validationState={null}
                                                     >
@@ -2187,7 +2187,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                           </FormGroup>
                                                         </StyledComponent>
                                                       </FormGroup__StyledFormGroup>
-                                                    </FormGroup>
+                                                    </Component>
                                                   </Input>
                                                 </span>
                                               </ListGroupItem>
@@ -2415,7 +2415,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -2507,7 +2507,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -2741,7 +2741,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -2833,7 +2833,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -3196,7 +3196,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                   type="text"
                                                   wrapperClassName="typeahead-wrapper"
                                                 >
-                                                  <FormGroup
+                                                  <Component
                                                     controlId="filter-streams-data-filter"
                                                     validationState={null}
                                                   >
@@ -3363,7 +3363,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         </FormGroup>
                                                       </StyledComponent>
                                                     </FormGroup__StyledFormGroup>
-                                                  </FormGroup>
+                                                  </Component>
                                                 </Input>
                                               </TypeAheadInput>
                                               <ForwardRef
@@ -3640,7 +3640,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     type="checkbox"
                                                     wrapperClassName="form-group-inline"
                                                   >
-                                                    <FormGroup
+                                                    <Component
                                                       controlId="select-all-checkbox"
                                                       validationState={null}
                                                     >
@@ -3733,7 +3733,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </FormGroup>
                                                         </StyledComponent>
                                                       </FormGroup__StyledFormGroup>
-                                                    </FormGroup>
+                                                    </Component>
                                                   </Input>
                                                 </span>
                                               </ListGroupItem>
@@ -3961,7 +3961,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -4053,7 +4053,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -4287,7 +4287,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -4379,7 +4379,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -4524,7 +4524,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                   type="text"
                                                   wrapperClassName="typeahead-wrapper"
                                                 >
-                                                  <FormGroup
+                                                  <Component
                                                     controlId="filter-dashboards-data-filter"
                                                     validationState={null}
                                                   >
@@ -4691,7 +4691,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         </FormGroup>
                                                       </StyledComponent>
                                                     </FormGroup__StyledFormGroup>
-                                                  </FormGroup>
+                                                  </Component>
                                                 </Input>
                                               </TypeAheadInput>
                                               <ForwardRef
@@ -4968,7 +4968,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                     type="checkbox"
                                                     wrapperClassName="form-group-inline"
                                                   >
-                                                    <FormGroup
+                                                    <Component
                                                       controlId="select-all-checkbox"
                                                       validationState={null}
                                                     >
@@ -5061,7 +5061,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                           </FormGroup>
                                                         </StyledComponent>
                                                       </FormGroup__StyledFormGroup>
-                                                    </FormGroup>
+                                                    </Component>
                                                   </Input>
                                                 </span>
                                               </ListGroupItem>
@@ -5289,7 +5289,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -5381,7 +5381,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"
@@ -5615,7 +5615,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       type="checkbox"
                                                       wrapperClassName="form-group-inline"
                                                     >
-                                                      <FormGroup
+                                                      <Component
                                                         controlId="id-checkbox"
                                                         validationState={null}
                                                       >
@@ -5707,7 +5707,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                             </FormGroup>
                                                           </StyledComponent>
                                                         </FormGroup__StyledFormGroup>
-                                                      </FormGroup>
+                                                      </Component>
                                                     </Input>
                                                     <span
                                                       className="description"

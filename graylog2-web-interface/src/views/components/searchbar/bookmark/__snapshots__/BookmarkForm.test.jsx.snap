@@ -95,7 +95,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                       className="popover-content"
                     >
                       <form>
-                        <FormGroup
+                        <Component
                           validationState={null}
                         >
                           <FormGroup__StyledFormGroup
@@ -243,7 +243,7 @@ exports[`BookmarkForm render the BookmarkForm should render create new 1`] = `
                               </FormGroup>
                             </StyledComponent>
                           </FormGroup__StyledFormGroup>
-                        </FormGroup>
+                        </Component>
                         <ForwardRef
                           bsStyle="info"
                           className="button"
@@ -506,7 +506,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                       className="popover-content"
                     >
                       <form>
-                        <FormGroup
+                        <Component
                           validationState={null}
                         >
                           <FormGroup__StyledFormGroup
@@ -654,7 +654,7 @@ exports[`BookmarkForm render the BookmarkForm should render disabled create new 
                               </FormGroup>
                             </StyledComponent>
                           </FormGroup__StyledFormGroup>
-                        </FormGroup>
+                        </Component>
                         <ForwardRef
                           bsStyle="primary"
                           className="button"
@@ -994,7 +994,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                       className="popover-content"
                     >
                       <form>
-                        <FormGroup
+                        <Component
                           validationState={null}
                         >
                           <FormGroup__StyledFormGroup
@@ -1142,7 +1142,7 @@ exports[`BookmarkForm render the BookmarkForm should render save 1`] = `
                               </FormGroup>
                             </StyledComponent>
                           </FormGroup__StyledFormGroup>
-                        </FormGroup>
+                        </Component>
                         <ForwardRef
                           bsStyle="primary"
                           className="button"

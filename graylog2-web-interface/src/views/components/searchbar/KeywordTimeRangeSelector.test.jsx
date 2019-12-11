@@ -57,7 +57,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     const wrapper = mount(<KeywordTimeRangeSelector value={value} onChange={() => {}} />);
 
-    expect(wrapper.find('FormGroup').at(1)).toHaveProp('validationState', 'error');
+    expect(wrapper.find('FormGroup').at(0)).toHaveProp('validationState', 'error');
   });
 
   it('sets validation state to error if parsing fails initially', (done) => {
@@ -68,7 +68,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('FormGroup').at(1)).toHaveProp('validationState', 'error');
+      expect(wrapper.find('FormGroup').at(0)).toHaveProp('validationState', 'error');
       done();
     });
   });
@@ -86,7 +86,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('FormGroup').at(1)).toHaveProp('validationState', 'error');
+      expect(wrapper.find('FormGroup').at(0)).toHaveProp('validationState', 'error');
       expect(onChange).not.toHaveBeenCalled();
       done();
     });
@@ -104,7 +104,7 @@ describe('KeywordTimeRangeSelector', () => {
 
     setImmediate(() => {
       wrapper.update();
-      expect(wrapper.find('FormGroup').at(1)).toHaveProp('validationState', null);
+      expect(wrapper.find('FormGroup').at(0)).toHaveProp('validationState', null);
       expect(onChange).toHaveBeenLastCalledWith('keyword', 'last hour');
       done();
     });

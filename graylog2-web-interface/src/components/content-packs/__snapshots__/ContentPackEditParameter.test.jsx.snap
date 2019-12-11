@@ -41,7 +41,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="title"
             validationState={null}
           >
@@ -258,7 +258,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -275,7 +275,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="name"
             validationState={null}
           >
@@ -492,7 +492,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -509,7 +509,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="description"
             validationState={null}
           >
@@ -726,7 +726,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -743,7 +743,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
           type="select"
           value="string"
         >
-          <FormGroup
+          <Component
             controlId="type"
             validationState={null}
           >
@@ -981,7 +981,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -997,7 +997,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="default_value"
             validationState={null}
           >
@@ -1210,7 +1210,7 @@ exports[`<ContentPackEditParameters /> should render a form for creation 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
       </fieldset>
     </form>
@@ -1268,7 +1268,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
           type="text"
           value="A parameter title"
         >
-          <FormGroup
+          <Component
             controlId="title"
             validationState={null}
           >
@@ -1485,7 +1485,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -1502,7 +1502,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
           type="text"
           value="A parameter name"
         >
-          <FormGroup
+          <Component
             controlId="name"
             validationState={null}
           >
@@ -1719,7 +1719,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -1736,7 +1736,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
           type="text"
           value="A parameter descriptions"
         >
-          <FormGroup
+          <Component
             controlId="description"
             validationState={null}
           >
@@ -1953,7 +1953,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -1970,7 +1970,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
           type="select"
           value="string"
         >
-          <FormGroup
+          <Component
             controlId="type"
             validationState={null}
           >
@@ -2208,7 +2208,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -2224,7 +2224,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
           type="text"
           value="test"
         >
-          <FormGroup
+          <Component
             controlId="default_value"
             validationState={null}
           >
@@ -2437,7 +2437,7 @@ exports[`<ContentPackEditParameters /> should render a form for edition 1`] = `
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
       </fieldset>
     </form>
@@ -2476,7 +2476,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="title"
             validationState={null}
           >
@@ -2693,7 +2693,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -2710,7 +2710,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="name"
             validationState={null}
           >
@@ -2927,7 +2927,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -2944,7 +2944,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="description"
             validationState={null}
           >
@@ -3161,7 +3161,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -3178,7 +3178,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           type="select"
           value="string"
         >
-          <FormGroup
+          <Component
             controlId="type"
             validationState={null}
           >
@@ -3416,7 +3416,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
         <Input
           addonAfter={null}
@@ -3432,7 +3432,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
           type="text"
           value=""
         >
-          <FormGroup
+          <Component
             controlId="default_value"
             validationState={null}
           >
@@ -3645,7 +3645,7 @@ exports[`<ContentPackEditParameters /> should render with empty parameters 1`] =
                 </FormGroup>
               </StyledComponent>
             </FormGroup__StyledFormGroup>
-          </FormGroup>
+          </Component>
         </Input>
       </fieldset>
     </form>

@@ -88,7 +88,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="config_key"
                   validationState={null}
                 >
@@ -288,7 +288,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>
@@ -314,7 +314,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="parameter"
                   validationState={null}
                 >
@@ -505,7 +505,7 @@ exports[`<ContentPackApplyParameter /> should render with full props 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>
@@ -892,7 +892,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="config_key"
                   validationState={null}
                 >
@@ -1098,7 +1098,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>
@@ -1124,7 +1124,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="parameter"
                   validationState={null}
                 >
@@ -1306,7 +1306,7 @@ exports[`<ContentPackApplyParameter /> should render with minimal props 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>
@@ -1568,7 +1568,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="config_key"
                   validationState={null}
                 >
@@ -1768,7 +1768,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>
@@ -1794,7 +1794,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                 type="select"
                 value=""
               >
-                <FormGroup
+                <Component
                   controlId="parameter"
                   validationState={null}
                 >
@@ -1985,7 +1985,7 @@ exports[`<ContentPackApplyParameter /> should render with readOnly 1`] = `
                       </FormGroup>
                     </StyledComponent>
                   </FormGroup__StyledFormGroup>
-                </FormGroup>
+                </Component>
               </Input>
             </div>
           </Col>

@@ -63,7 +63,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   type="text"
                   value=""
                 >
-                  <FormGroup
+                  <Component
                     controlId="name"
                     validationState={null}
                   >
@@ -280,7 +280,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -297,7 +297,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   type="text"
                   value=""
                 >
-                  <FormGroup
+                  <Component
                     controlId="summary"
                     validationState={null}
                   >
@@ -514,7 +514,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -530,7 +530,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   type="textarea"
                   value=""
                 >
-                  <FormGroup
+                  <Component
                     controlId="description"
                     validationState={null}
                   >
@@ -743,7 +743,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -760,7 +760,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   type="text"
                   value=""
                 >
-                  <FormGroup
+                  <Component
                     controlId="vendor"
                     validationState={null}
                   >
@@ -977,7 +977,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -993,7 +993,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                   type="text"
                   value=""
                 >
-                  <FormGroup
+                  <Component
                     controlId="url"
                     validationState={null}
                   >
@@ -1206,7 +1206,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
               </fieldset>
             </form>
@@ -1593,7 +1593,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   type="text"
                   value="name"
                 >
-                  <FormGroup
+                  <Component
                     controlId="name"
                     validationState={null}
                   >
@@ -1810,7 +1810,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -1827,7 +1827,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   type="text"
                   value="summary"
                 >
-                  <FormGroup
+                  <Component
                     controlId="summary"
                     validationState={null}
                   >
@@ -2044,7 +2044,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -2060,7 +2060,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   type="textarea"
                   value="description"
                 >
-                  <FormGroup
+                  <Component
                     controlId="description"
                     validationState={null}
                   >
@@ -2273,7 +2273,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -2290,7 +2290,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   type="text"
                   value="vendor"
                 >
-                  <FormGroup
+                  <Component
                     controlId="vendor"
                     validationState={null}
                   >
@@ -2507,7 +2507,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
                 <Input
                   addonAfter={null}
@@ -2523,7 +2523,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                   type="text"
                   value="http://example.com"
                 >
-                  <FormGroup
+                  <Component
                     controlId="url"
                     validationState={null}
                   >
@@ -2736,7 +2736,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
                         </FormGroup>
                       </StyledComponent>
                     </FormGroup__StyledFormGroup>
-                  </FormGroup>
+                  </Component>
                 </Input>
               </fieldset>
             </form>

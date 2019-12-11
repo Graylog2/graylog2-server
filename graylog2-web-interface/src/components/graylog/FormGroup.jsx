@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
@@ -43,6 +43,7 @@ const createCss = validationState => css(({ theme }) => {
         }
       }
 
+      /** NOTE: InputGroup is memoized so reference it with .type */
       ${InputGroup.type} .input-group-addon {
         color: ${text};
         background-color: ${background};
@@ -73,13 +74,13 @@ const StyledFormGroup = styled(BootstrapFormGroup)`
   ${validationStyleVariants};
 `;
 
-const FormGroup = ({ children, validationState, ...props }) => {
+const FormGroup = memo(({ children, validationState, ...props }) => {
   return (
     <StyledFormGroup validationState={validationState} {...props}>
       {children}
     </StyledFormGroup>
   );
-};
+});
 
 FormGroup.propTypes = {
   children: PropTypes.node.isRequired,

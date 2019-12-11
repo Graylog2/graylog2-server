@@ -320,7 +320,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           type="text"
                           wrapperClassName="typeahead-wrapper"
                         >
-                          <FormGroup
+                          <Component
                             controlId="filter-data-filter"
                             validationState={null}
                           >
@@ -487,7 +487,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 </FormGroup>
                               </StyledComponent>
                             </FormGroup__StyledFormGroup>
-                          </FormGroup>
+                          </Component>
                         </Input>
                       </TypeAheadInput>
                       <ForwardRef
@@ -1194,7 +1194,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           type="text"
                           wrapperClassName="typeahead-wrapper"
                         >
-                          <FormGroup
+                          <Component
                             controlId="filter-data-filter"
                             validationState={null}
                           >
@@ -1361,7 +1361,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 </FormGroup>
                               </StyledComponent>
                             </FormGroup__StyledFormGroup>
-                          </FormGroup>
+                          </Component>
                         </Input>
                       </TypeAheadInput>
                       <ForwardRef
