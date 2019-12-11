@@ -22,6 +22,7 @@ const ConfigurationFormContainer = styled.div`
   border-radius: 5px;
   border-width: 1px;
   padding: 10px;
+  background: white;
 `;
 
 class AddDecoratorButton extends React.Component {
