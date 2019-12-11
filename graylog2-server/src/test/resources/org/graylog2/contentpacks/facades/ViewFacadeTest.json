@@ -199,5 +199,21 @@
       "owner" : "admin",
       "created_at" : "2019-12-10T12:53:53.592Z"
     }
+  ],
+  "streams": [
+    {
+      "_id": {
+        "$oid": "5cdab2293d27467fbe9e8a72"
+      },
+      "creator_user_id" : "admin",
+      "index_set_id" : "5cdab2083d27467fbe9e8a47",
+      "matching_type" : "OR",
+      "remove_matches_from_default_stream" : true,
+      "description" : "git log stream",
+      "created_at" : "2019-05-14T12:18:49.410Z",
+      "disabled" : false,
+      "title" : "Graylog Git",
+      "content_pack" : null
+    }
   ]
 }

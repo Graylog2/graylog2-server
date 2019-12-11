@@ -162,8 +162,7 @@ public abstract class ViewDTO {
         public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
 
         @JsonProperty(FIELD_OWNER)
-        @Nullable
-        public abstract Builder owner(String owner);
+        public abstract Builder owner(@Nullable String owner);
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);

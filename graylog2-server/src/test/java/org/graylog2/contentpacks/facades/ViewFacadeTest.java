@@ -1,15 +1,25 @@
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.Graph;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.views.DisplayModeSettings;
+import org.graylog.plugins.views.search.views.FormattingSettings;
+import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -20,18 +30,23 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
+import org.graylog2.contentpacks.model.entities.ViewStateEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -39,8 +54,10 @@ import org.junit.Test;
 
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,6 +91,11 @@ public class ViewFacadeTest {
     private ViewFacade facade;
     private TestViewService viewService;
     private TestSearchDBService searchDbService;
+    private final String viewId = "5def958063303ae5f68eccae"; /* stored in database */
+    private final String newViewId = "5def958063303ae5f68edead";
+    private final String newStreamId = "5def958063303ae5f68ebeaf";
+    private final String streamId = "5cdab2293d27467fbe9e8a72"; /* stored in database */
+
 
     @Before
     public void setUp() {
@@ -91,11 +113,9 @@ public class ViewFacadeTest {
         facade = new SearchFacade(objectMapper, searchDbService, viewService);
     }
 
-    final String viewId = "5def958063303ae5f68eccae";
-
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void exportNativeEntity() {
+    public void exportEntity() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         final EntityDescriptor descriptor = EntityDescriptor.create(viewDTO.id(), ModelTypes.SEARCH_V1);
@@ -143,5 +163,112 @@ public class ViewFacadeTest {
         assertThat(entityExcerpts)
                 .hasSize(1)
                 .contains(entityExcerpt);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void delete() {
+        final ViewDTO viewDTO = viewService.get(viewId)
+                .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
+        assertThat(facade.listEntityExcerpts()).hasSize(1);
+        facade.delete(viewDTO);
+        assertThat(facade.listEntityExcerpts()).hasSize(0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void createNativeEntity() throws Exception {
+        final Entity viewEntity = createViewEntity();
+        final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
+                Collections.emptyMap(), Collections.emptyMap(), "admin");
+
+        assertThat(nativeEntity.descriptor().title()).isEqualTo("title");
+        assertThat(nativeEntity.descriptor().type()).isEqualTo(ModelTypes.SEARCH_V1);
+
+        assertThat(viewService.get(nativeEntity.descriptor().id().id())).isPresent();
+        assertThat(searchDbService.streamAll().collect(Collectors.toSet())).hasSize(2);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveDependencyForInstallation() throws Exception {
+        Entity streamEntity = createStreamEntity();
+        Entity entity = createViewEntity();
+
+        final EntityDescriptor depDescriptor = streamEntity.toEntityDescriptor();
+        final Map<EntityDescriptor, Entity> entityDescriptorEntityMap = ImmutableMap.of(depDescriptor, streamEntity);
+        Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entityDescriptorEntityMap);
+
+        assertThat(graph.nodes().toArray()).contains(streamEntity);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void resolveDependencyForCreation() {
+        final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
+        final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);
+        Graph graph = facade.resolveNativeEntity(viewEntityDescriptor);
+
+        assertThat(graph.nodes().toArray()).contains(streamEntityDescriptor);
+    }
+
+    private EntityV1 createStreamEntity() {
+        final StreamEntity streamEntity = StreamEntity.create(
+                ValueReference.of("title"),
+                ValueReference.of("description"),
+                ValueReference.of(false),
+                ValueReference.of("matching-type"),
+                ImmutableList.of(),
+                ImmutableList.of(),
+                ImmutableList.of(),
+                ImmutableSet.of(),
+                ValueReference.of(false),
+                ValueReference.of(true)
+        );
+        return EntityV1.builder()
+                .id(ModelId.of(newStreamId))
+                .type(ModelTypes.STREAM_V1)
+                .data(objectMapper.convertValue(streamEntity, JsonNode.class))
+                .build();
+    }
+
+    private EntityV1 createViewEntity() throws Exception {
+        final Query query = Query.builder()
+                .id("dead-beef")
+                .timerange(KeywordRange.create("last 5 minutes"))
+                .filter(OrFilter.or(StreamFilter.ofId(newStreamId)))
+                .query(ElasticsearchQueryString.builder().queryString("author: Mara Jade").build())
+                .build();
+        final SearchEntity searchEntity = SearchEntity.builder()
+                .queries(ImmutableSet.of(query))
+                .parameters(ImmutableSet.of())
+                .requires(ImmutableMap.of())
+                .createdAt(DateTime.now())
+                .build();
+        final ViewStateEntity viewStateEntity = ViewStateEntity.builder()
+                .fields(ImmutableSet.of())
+                .titles(Titles.empty())
+                .widgets(ImmutableSet.of())
+                .widgetMapping(ImmutableMap.of())
+                .widgetPositions(ImmutableMap.of())
+                .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
+                .displayModeSettings(DisplayModeSettings.empty())
+                .build();
+        final ViewEntity entity = ViewEntity.builder()
+                .type(ViewEntity.Type.SEARCH)
+                .summary(ValueReference.of("summary"))
+                .title(ValueReference.of("title"))
+                .description(ValueReference.of("description"))
+                .search(searchEntity)
+                .properties(ImmutableSet.of())
+                .requires(ImmutableMap.of())
+                .state(ImmutableMap.of(newViewId, viewStateEntity))
+                .createdAt(DateTime.now())
+                .build();
+        return EntityV1.builder()
+                .id(ModelId.of("1"))
+                .type(ModelTypes.SEARCH_V1)
+                .data(objectMapper.convertValue(entity, JsonNode.class))
+                .build();
     }
 }

@@ -13,6 +13,7 @@ import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,7 @@ public abstract class SearchEntity {
         public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
 
         @JsonProperty(FIELD_OWNER)
-        public abstract Builder owner(String owner);
+        public abstract Builder owner(@Nullable String owner);
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);

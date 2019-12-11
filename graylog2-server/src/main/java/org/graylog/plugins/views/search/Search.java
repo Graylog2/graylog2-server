@@ -174,7 +174,7 @@ public abstract class Search {
         public abstract Builder requires(Map<String, PluginMetadataSummary> requirements);
 
         @JsonProperty(FIELD_OWNER)
-        public abstract Builder owner(String owner);
+        public abstract Builder owner(@Nullable String owner);
 
         @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder createdAt(DateTime createdAt);
