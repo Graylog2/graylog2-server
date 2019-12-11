@@ -6,53 +6,52 @@ import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
 import ObjectUtils from 'util/ObjectUtils';
-import type { Url } from 'stores/configurations/ConfigurationsStore';
+import type { Url, Config } from 'stores/configurations/ConfigurationsStore';
 
 type Props = {
   urls: Array<Url>,
   disabled: boolean,
-  update: (state: Array<Url>, disabled: boolean) => void
+  update: (config: Config) => void
 };
 const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
   const options = [{ value: 'literal', label: 'Literal' }, { value: 'regex', label: 'Regex' }];
   const inputs = {};
-  const [state, setState] = useState(urls);
-  const [disabledState, setDisabledState] = useState(disabled);
+  const [state, setState] = useState<Config>({ entries: urls, disabled });
   const onAdd = (event: Event) => {
     event.preventDefault();
-    setState([...state, { id: uuid(), title: '', value: '', type: 'literal' }]);
+    setState({ ...state, entries: [...state.entries, { id: uuid(), title: '', value: '', type: 'literal' }] });
   };
   const onRemove = (event: MouseEvent, idx: number) => {
     event.preventDefault();
     // eslint-disable-next-line prefer-const
     let stateUpdate = ObjectUtils.clone(state);
-    stateUpdate.splice(idx, 1);
-    setState([...stateUpdate]);
+    stateUpdate.entries.splice(idx, 1);
+    setState(stateUpdate);
   };
 
   const onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number) => {
     const stateUpdate = ObjectUtils.clone(state);
-    stateUpdate[idx][event.target.name] = event.target.value;
-    setState([...stateUpdate]);
+    stateUpdate.entries[idx][event.target.name] = event.target.value;
+    setState(stateUpdate);
   };
 
   const onUpdateUrl = (idx, type: string, value: string) => {
     const stateUpdate = ObjectUtils.clone(state);
-    stateUpdate[idx] = { ...state[idx], value, type };
-    setState([...stateUpdate]);
+    stateUpdate.entries[idx] = { ...state.entries[idx], value, type };
+    setState(stateUpdate);
   };
 
   useEffect(() => {
-    update(state, disabledState);
-  }, [state, disabledState]);
+    update(state);
+  }, [state]);
 
   return (
     <>
       <Input type="checkbox"
              id="whitelist-disabled"
              label="Disabled"
-             checked={disabledState}
-             onChange={() => setDisabledState(!disabled)}
+             checked={state.disabled}
+             onChange={() => setState({ ...state, disabled: !state.disabled })}
              help="Disable this white list." />
       <Table striped bordered condense className="top-margin">
         <thead>
@@ -65,7 +64,7 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {state.map((url, idx) => {
+          {state.entries.map((url, idx) => {
             return (
             // eslint-disable-next-line react/no-array-index-key
               <tr key={idx + 1}>

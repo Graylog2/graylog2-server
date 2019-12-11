@@ -6,7 +6,7 @@ import { Button, Table } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import type { Config, Url } from 'stores/configurations/ConfigurationsStore';
+import type { Config } from 'stores/configurations/ConfigurationsStore';
 
 
 type State = {
@@ -60,8 +60,8 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     });
   }
 
-  _update = (urls: Array<Url>, disabled: boolean) => {
-    this.setState({ config: { entries: urls, disabled } });
+  _update = (config: Config) => {
+    this.setState({ config });
   }
 
 
