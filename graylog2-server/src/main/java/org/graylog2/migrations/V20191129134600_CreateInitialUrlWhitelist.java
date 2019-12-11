@@ -90,7 +90,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         }
 
         UrlWhitelist whitelist = createWhitelist();
-        whitelistService.save(whitelist);
+        whitelistService.saveWhitelist(whitelist);
         configService.write(MigrationCompleted.create(whitelist.toString()));
     }
 

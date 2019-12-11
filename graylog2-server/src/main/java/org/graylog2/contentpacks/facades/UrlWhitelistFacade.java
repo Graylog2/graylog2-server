@@ -111,7 +111,7 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return urlWhitelistService.get()
+        return urlWhitelistService.getWhitelist()
                 .entries()
                 .stream()
                 .map(this::createExcerpt)

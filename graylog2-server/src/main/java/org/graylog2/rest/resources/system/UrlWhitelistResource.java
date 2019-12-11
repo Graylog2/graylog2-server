@@ -60,7 +60,7 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Get url whitelist.")
     public UrlWhitelist get() {
         checkPermission(RestPermissions.URL_WHITELIST_READ);
-        return urlWhitelistService.get();
+        return urlWhitelistService.getWhitelist();
     }
 
     @PUT
@@ -70,7 +70,7 @@ public class UrlWhitelistResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response put(@ApiParam(name = "whitelist", required = true) final UrlWhitelist whitelist) {
         checkPermission(RestPermissions.URL_WHITELIST_WRITE);
-        urlWhitelistService.save(whitelist);
+        urlWhitelistService.saveWhitelist(whitelist);
         return Response.noContent().build();
     }
 

@@ -30,7 +30,7 @@ public class LookupModule extends Graylog2Module {
 
     @Override
     protected void configure() {
-        binder().bind(UrlWhitelistService.class).in(Scopes.SINGLETON);
+        serviceBinder().addBinding().to(UrlWhitelistService.class).in(Scopes.SINGLETON);
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,
