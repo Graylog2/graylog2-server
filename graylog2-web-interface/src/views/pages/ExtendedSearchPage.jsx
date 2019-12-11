@@ -9,7 +9,6 @@ import connect from 'stores/connect';
 import SideBar from 'views/components/sidebar/SideBar';
 import WithSearchStatus from 'views/components/WithSearchStatus';
 import SearchResult from 'views/components/SearchResult';
-import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
 import type {
   SearchRefreshCondition,
   SearchRefreshConditionArguments,
@@ -158,9 +157,6 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
               <SearchGrid>
                 <IfInteractive>
                   <HeaderElements />
-                  <IfSearch>
-                    <MigrateFieldCharts />
-                  </IfSearch>
                   <IfDashboard>
                     <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
                     <QueryBar />

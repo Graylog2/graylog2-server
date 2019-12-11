@@ -128,7 +128,7 @@ const searchPages = enableNewSearch
   }
   : {};
 
-const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && Store.get('pinned-field-charts');
+const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && !!Store.get('pinned-field-charts');
 
 export default {
   pages: {
