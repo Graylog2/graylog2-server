@@ -5,44 +5,18 @@ import PropTypes from 'prop-types';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Button, Modal } from 'components/graylog';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
-import Decorator from 'views/components/messagelist/decorators/Decorator';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
+import type { Decorator } from 'views/components/messagelist/decorators/Types';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSelect';
-
-const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
-  const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-  const onUpdate = updateFn
-    ? (id, updatedDecorator) => updateFn(decorators.map(curDecorator => (curDecorator.id === id ? updatedDecorator : curDecorator)))
-    : () => {};
-  const onDelete = updateFn
-    ? deletedDecoratorId => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
-    : () => {};
-  return ({
-    id: decorator.id,
-    title: <Decorator key={`decorator-${decorator.id || 'new'}`}
-                      decorator={decorator}
-                      decoratorTypes={decoratorTypes}
-                      disableMenu={updateFn === undefined}
-                      onUpdate={onUpdate}
-                      onDelete={onDelete}
-                      typeDefinition={typeDefinition} />,
-  });
-};
-
-export type DecoratorType = {
-  id?: string,
-  order: number,
-  type: string,
-  stream: ?string,
-};
+import formatDecorator from './FormatDecorator';
 
 type Props = {
   streams: Array<{ title: string, id: string }>,
-  decorators: Array<DecoratorType>,
+  decorators: Array<Decorator>,
   types: { [string]: any },
   show?: boolean,
   onCancel: () => void,
-  onSave: (Array<DecoratorType>) => mixed,
+  onSave: (Array<Decorator>) => mixed,
 };
 
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props, modalRef) => {
@@ -56,7 +30,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const currentDecorators = modifiedDecorators.filter(decorator => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
   const decoratorItems = currentDecorators
     .sort((d1, d2) => d1.order - d2.order)
-    .map(decorator => _formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
+    .map(decorator => formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
 
   const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 

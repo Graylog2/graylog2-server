@@ -6,7 +6,7 @@ import connect from 'stores/connect';
 import { Spinner } from 'components/common';
 
 import AddDecoratorButton from './AddDecoratorButton';
-import Decorator from './Decorator';
+import DecoratorSummary from './DecoratorSummary';
 import DecoratorList from './DecoratorList';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
@@ -31,12 +31,12 @@ class DecoratorSidebar extends React.Component {
     const updateDecorator = (id, updatedDecorator) => onChange(decorators.map(_decorator => (_decorator.id === id ? updatedDecorator : _decorator)));
     return ({
       id: decorator.id,
-      title: <Decorator key={`decorator-${decorator.id}`}
-                        decorator={decorator}
-                        decoratorTypes={decoratorTypes}
-                        onDelete={deleteDecorator}
-                        onUpdate={updateDecorator}
-                        typeDefinition={typeDefinition} />,
+      title: <DecoratorSummary key={`decorator-${decorator.id}`}
+                               decorator={decorator}
+                               decoratorTypes={decoratorTypes}
+                               onDelete={deleteDecorator}
+                               onUpdate={updateDecorator}
+                               typeDefinition={typeDefinition} />,
     });
   };
 

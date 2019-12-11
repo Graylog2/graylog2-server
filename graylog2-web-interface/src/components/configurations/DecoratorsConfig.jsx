@@ -9,34 +9,14 @@ import CombinedProvider from 'injection/CombinedProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import UserNotification from 'util/UserNotification';
 
-import Decorator from 'views/components/messagelist/decorators/Decorator';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import DecoratorsConfigUpdate from './decorators/DecoratorsConfigUpdate';
 import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './decorators/StreamSelect';
 import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import BootstrapModalWrapper from '../bootstrap/BootstrapModalWrapper';
+import formatDecorator from './decorators/FormatDecorator';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
-
-const _formatDecorator = (decorator, decorators, decoratorTypes, updateFn) => {
-  const typeDefinition = decoratorTypes[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-  const onUpdate = updateFn
-    ? (id, updatedDecorator) => updateFn(decorators.map(curDecorator => (curDecorator.id === id ? updatedDecorator : curDecorator)))
-    : () => {};
-  const onDelete = updateFn
-    ? deletedDecoratorId => updateFn(decorators.filter(({ id }) => (id !== deletedDecoratorId)))
-    : () => {};
-  return ({
-    id: decorator.id,
-    title: <Decorator key={`decorator-${decorator.id}`}
-                      decorator={decorator}
-                      decoratorTypes={decoratorTypes}
-                      disableMenu={updateFn === undefined}
-                      onUpdate={onUpdate}
-                      onDelete={onDelete}
-                      typeDefinition={typeDefinition} />,
-  });
-};
 
 const DecoratorsConfig = () => {
   const [streams, setStreams] = useState();
@@ -70,7 +50,7 @@ const DecoratorsConfig = () => {
   const currentDecorators = decoratorsGroupedByStream[currentStream];
   const sortedDecorators = currentDecorators
     .sort((d1, d2) => d1.order - d2.order);
-  const readOnlyDecoratorItems = sortedDecorators.map(decorator => _formatDecorator(decorator, currentDecorators, types));
+  const readOnlyDecoratorItems = sortedDecorators.map(decorator => formatDecorator(decorator, currentDecorators, types));
 
   const streamOptions = streams
     .filter(({ id }) => Object.keys(decoratorsGroupedByStream).includes(id));

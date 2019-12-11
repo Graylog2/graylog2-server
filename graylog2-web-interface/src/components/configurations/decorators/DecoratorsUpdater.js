@@ -2,11 +2,11 @@
 import { difference, isEqual } from 'lodash';
 
 import CombinedProvider from 'injection/CombinedProvider';
-import type { DecoratorType } from './DecoratorsConfigUpdate';
+import type { Decorator } from 'views/components/messagelist/decorators/Types';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
-const DecoratorsUpdater = (newDecorators: Array<DecoratorType>, oldDecorators: Array<DecoratorType>) => {
+const DecoratorsUpdater = (newDecorators: Array<Decorator>, oldDecorators: Array<Decorator>) => {
   const oldDecoratorsById = oldDecorators
     .reduce((prev, cur) => (cur.id ? { ...prev, [cur.id]: cur } : prev), {});
   const createdDecorators = newDecorators.filter(({ id }) => !id);

@@ -8,7 +8,7 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
 import InlineForm from './InlineForm';
 
-class Decorator extends React.Component {
+class DecoratorSummary extends React.Component {
   static propTypes = {
     decorator: PropTypes.object.isRequired,
     decoratorTypes: PropTypes.object.isRequired,
@@ -138,4 +138,4 @@ class Decorator extends React.Component {
   }
 }
 
-export default Decorator;
+export default DecoratorSummary;
