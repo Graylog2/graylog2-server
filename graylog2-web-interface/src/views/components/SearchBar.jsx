@@ -57,7 +57,7 @@ const SearchBar = ({ availableStreams, config, currentQuery, disableSearch = fal
 
   return (
     <ScrollToHint value={query.query_string}>
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Row className="content">
         <Col md={12}>
           <Row className="no-bm">
             <Col md={12}>
