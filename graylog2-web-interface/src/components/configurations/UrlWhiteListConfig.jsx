@@ -10,7 +10,8 @@ import type { Config } from 'stores/configurations/ConfigurationsStore';
 
 
 type State = {
-  config: Config
+  config: Config,
+  valid: boolean
 };
 
 type Props = {
@@ -27,6 +28,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     const { config } = this.props;
     this.state = {
       config,
+      valid: false,
     };
   }
 
@@ -53,23 +55,25 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   }
 
   _saveConfig = () => {
-    const { config } = this.state;
+    const { config, valid } = this.state;
     const { updateConfig } = this.props;
-    updateConfig(config).then(() => {
-      this._closeModal();
-    });
+    if (valid) {
+      updateConfig(config).then(() => {
+        this._closeModal();
+      });
+    }
   }
 
-  _update = (config: Config) => {
-    this.setState({ config });
+  _update = (config: Config, valid: boolean) => {
+    const updatedState = { config, valid };
+    this.setState(updatedState);
   }
 
 
   _resetConfig = () => {
     const { config } = this.props;
-    this.setState({
-      config,
-    });
+    const updatedState = { ...this.state, config };
+    this.setState(updatedState);
   }
 
 
