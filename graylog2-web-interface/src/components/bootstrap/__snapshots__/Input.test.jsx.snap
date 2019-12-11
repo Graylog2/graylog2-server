@@ -11,7 +11,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
   placeholder=""
   type="text"
 >
-  <FormGroup
+  <Component
     controlId="inputWithAddon"
     validationState={null}
   >
@@ -187,9 +187,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
                             </FormControl>
                           </StyledComponent>
                         </FormControl>
-                        <InputGroupAddon
-                          bsClass="input-group-addon"
-                        >
+                        <InputGroupAddon>
                           <span
                             className="input-group-addon"
                           >
@@ -206,7 +204,7 @@ exports[`Input renders a addon after the input if addonAfter is passed 1`] = `
         </FormGroup>
       </StyledComponent>
     </FormGroup__StyledFormGroup>
-  </FormGroup>
+  </Component>
 </Input>
 `;
 
@@ -225,7 +223,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
   placeholder=""
   type="text"
 >
-  <FormGroup
+  <Component
     controlId="inputWithButton"
     validationState={null}
   >
@@ -401,9 +399,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
                             </FormControl>
                           </StyledComponent>
                         </FormControl>
-                        <InputGroupButton
-                          bsClass="input-group-btn"
-                        >
+                        <InputGroupButton>
                           <span
                             className="input-group-btn"
                           >
@@ -482,7 +478,7 @@ exports[`Input renders a button after the input if buttonAfter is passed 1`] = `
         </FormGroup>
       </StyledComponent>
     </FormGroup__StyledFormGroup>
-  </FormGroup>
+  </Component>
 </Input>
 `;
 
@@ -503,7 +499,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
   placeholder=""
   type="text"
 >
-  <FormGroup
+  <Component
     controlId="inputWithCheckboxAddon"
     validationState={null}
   >
@@ -679,9 +675,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
                             </FormControl>
                           </StyledComponent>
                         </FormControl>
-                        <InputGroupAddon
-                          bsClass="input-group-addon"
-                        >
+                        <InputGroupAddon>
                           <span
                             className="input-group-addon"
                           >
@@ -702,7 +696,7 @@ exports[`Input renders a checkbox addon after the input if addonAfter is passed 
         </FormGroup>
       </StyledComponent>
     </FormGroup__StyledFormGroup>
-  </FormGroup>
+  </Component>
 </Input>
 `;
 
@@ -718,7 +712,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
   placeholder=""
   type="text"
 >
-  <FormGroup
+  <Component
     controlId="inputWithoutNameProp"
     validationState={null}
   >
@@ -855,7 +849,7 @@ exports[`Input renders input w/ \`name\` attribute w/ setting prop 1`] = `
         </FormGroup>
       </StyledComponent>
     </FormGroup__StyledFormGroup>
-  </FormGroup>
+  </Component>
 </Input>
 `;
 
@@ -870,7 +864,7 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
   placeholder=""
   type="text"
 >
-  <FormGroup
+  <Component
     controlId="inputWithoutNameProp"
     validationState={null}
   >
@@ -1007,6 +1001,6 @@ exports[`Input renders input w/ \`name\` attribute w/o setting prop 1`] = `
         </FormGroup>
       </StyledComponent>
     </FormGroup__StyledFormGroup>
-  </FormGroup>
+  </Component>
 </Input>
 `;
