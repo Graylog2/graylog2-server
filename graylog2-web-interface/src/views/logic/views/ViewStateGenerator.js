@@ -12,14 +12,10 @@ const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 const _defaultWidgets = {
   [View.Type.Search]: async (streamId: ?string) => {
-    console.log('Generating new search for stream: ', streamId);
-    const decorators = await DecoratorsActions.list() || [];
-    console.log('Got decorators: ', decorators);
-    const streamDecorators = decorators.filter(decorator => decorator.stream === streamId);
-    console.log('Got stream decorators: ', streamDecorators);
+    const decorators = await DecoratorsActions.list();
+    const streamDecorators = decorators ? decorators.filter(decorator => decorator.stream === streamId) : [];
     const histogram = resultHistogram();
     const messageTable = allMessagesTable(undefined, streamDecorators);
-    console.log('Got message widget: ', messageTable);
     const widgets = [
       histogram,
       messageTable,
