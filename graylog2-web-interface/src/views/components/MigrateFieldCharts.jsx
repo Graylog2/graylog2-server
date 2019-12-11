@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { maxBy, values } from 'lodash';
+import { maxBy, values, isEmpty } from 'lodash';
 import Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
@@ -162,7 +162,7 @@ const MigrateFieldCharts = () => {
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
   const chartAmount = legacyCharts.length;
 
-  if (migrationFinished || !empty(legacyCharts)) {
+  if (migrationFinished || isEmpty(legacyCharts)) {
     return null;
   }
 
