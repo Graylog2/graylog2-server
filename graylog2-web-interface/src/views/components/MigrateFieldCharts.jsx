@@ -142,8 +142,8 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
 
   ViewStatesActions.update(currentView.activeQuery, newViewState).then(
     () => SearchActions.executeWithCurrentState().then(() => {
-      setMigrating(false);
       Store.set('pinned-field-charts-migrated', true);
+      setMigrating(false);
     }),
   );
 };
@@ -151,9 +151,14 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
 const onCancel = () => Store.set('pinned-field-charts-migrated', true);
 
 const MigrateFieldCharts = () => {
+  const migrationFinished: boolean = !!Store.get('pinned-field-charts-migrated');
+  const [migrating, setMigrating] = useState(false);
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
   const chartAmount = legacyCharts.length;
-  const [migrating, setMigrating] = useState(false);
+
+  if (migrationFinished) {
+    return null;
+  }
 
   return (
     <Row>
