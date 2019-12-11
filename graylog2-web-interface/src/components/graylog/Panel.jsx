@@ -141,7 +141,7 @@ const Panel = ({
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
-      <DeprecatedStyledPanel {...props} expanded={expanded}>
+      <DeprecatedStyledPanel {...props} expanded={expanded} onToggle={onToggle}>
         {header && (
           <DeprecatedStyledPanel.Heading>{header}</DeprecatedStyledPanel.Heading>
         )}
