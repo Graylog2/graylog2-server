@@ -1,5 +1,6 @@
 // @flow strict
 import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Button, Modal } from 'components/graylog';
@@ -85,6 +86,17 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   );
 };
 
-DecoratorsConfigUpdate.propTypes = {};
+DecoratorsConfigUpdate.propTypes = {
+  streams: PropTypes.array.isRequired,
+  decorators: PropTypes.array.isRequired,
+  types: PropTypes.object.isRequired,
+  show: PropTypes.bool,
+  onCancel: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+};
+
+DecoratorsConfigUpdate.defaultProps = {
+  show: false,
+};
 
 export default React.forwardRef<Props, BootstrapModalWrapper>(DecoratorsConfigUpdate);
