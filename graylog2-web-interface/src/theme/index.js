@@ -10,9 +10,12 @@ const theme = {
   },
 };
 
+const themeModes = ['teinte', 'noire'];
+
 export default theme;
 
 export {
   breakpoints as breakpoint,
   teinte,
+  themeModes,
 };
