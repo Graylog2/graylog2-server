@@ -174,9 +174,7 @@ class ConfigurationForm extends React.Component {
     });
 
     return (
-      <WrapperComponent ref={(modal) => {
-        this.modal = modal;
-      }}
+      <WrapperComponent ref={(modal) => { this.modal = modal; }}
                         title={title}
                         onCancel={this._closeModal}
                         onSubmitForm={this._save}
