@@ -12,10 +12,13 @@ const theme = {
   },
 };
 
+const themeModes = Object.keys(colors);
+
 export default theme;
 
 export {
   breakpoints as breakpoint,
   colors as color,
   utils as util,
+  themeModes,
 };

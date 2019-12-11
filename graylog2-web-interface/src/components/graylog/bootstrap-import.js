@@ -9,7 +9,6 @@ export {
   Collapse,
   Dropdown,
   Form,
-  FormGroup,
   Grid,
   ListGroup,
   MenuItem,
