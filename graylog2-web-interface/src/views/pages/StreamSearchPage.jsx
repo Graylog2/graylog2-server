@@ -5,7 +5,7 @@ import { ViewActions } from 'views/stores/ViewStore';
 import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import View from 'views/logic/views/View';
 import Spinner from 'components/common/Spinner';
-import ExtendedSearchPage from './ExtendedSearchPage';
+import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
   params: {
