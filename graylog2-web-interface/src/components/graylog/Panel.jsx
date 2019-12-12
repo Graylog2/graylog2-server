@@ -140,7 +140,7 @@ const Panel = ({
   /** NOTE: Deprecated & should be removed in 4.0 */
   if (header || footer || title || collapsible || typeof children === 'string') {
     /* eslint-disable-next-line no-console */
-    console.warn('Panel: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest props.');
+    console.warn('Graylog Panel: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest props.');
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */

@@ -64,7 +64,7 @@ const Pagination = ({
 }) => {
   if (activePage || maxButtons || prev || next || first || last) {
     /* eslint-disable-next-line no-console */
-    console.warn('Panel: ', 'You have used a deprecated `Pagination` prop, please check the documentation to use the latest props.');
+    console.warn('Graylog Pagination: ', 'You have used a deprecated `Pagination` prop, please check the documentation to use the latest props.');
 
     return (
       <DeprecatedPagination activePage={activePage}
