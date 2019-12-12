@@ -64,6 +64,8 @@ class Parameter {
     return this._value.optional;
   }
 
+  // screw you eslint, using param.constructor.needsBinding() is ugly
+  // eslint-disable-next-line class-methods-use-this
   get needsBinding(): boolean {
     return true;
   }

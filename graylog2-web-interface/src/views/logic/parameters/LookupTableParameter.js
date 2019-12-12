@@ -43,6 +43,8 @@ export default class LookupTableParameter extends Parameter {
     return new Builder(Immutable.Map({ type, name, title, description, dataType, defaultValue, optional, binding, lookupTable, key }));
   }
 
+  // screw you eslint, using param.constructor.needsBinding() is ugly
+  // eslint-disable-next-line class-methods-use-this
   get needsBinding(): boolean {
     return false;
   }
