@@ -1,3 +1,4 @@
+### Default
 ```js
 import { Pager } from 'components/graylog';
 
@@ -7,6 +8,7 @@ import { Pager } from 'components/graylog';
 </Pager>
 ```
 
+### Aligned
 ```js
 import { Pager } from 'components/graylog';
 
@@ -20,6 +22,7 @@ import { Pager } from 'components/graylog';
 </Pager>
 ```
 
+### Disabled
 ```js
 import { Pager } from 'components/graylog';
 
@@ -33,6 +36,7 @@ import { Pager } from 'components/graylog';
 </Pager>
 ```
 
+### Pagination
 ```js
 const ExamplePagination = ({}) => {
   const [active, setActive] = React.useState(7);
@@ -68,7 +72,7 @@ const ExamplePagination = ({}) => {
 
 <ExamplePagination />
 ```
-
+### Pagination w/ Options
 ```js
 <Pagination>
   <Pagination.First />
@@ -89,6 +93,7 @@ const ExamplePagination = ({}) => {
 </Pagination>
 ```
 
+### Deprecated Pagination
 ```js
 <div>
   <div>
