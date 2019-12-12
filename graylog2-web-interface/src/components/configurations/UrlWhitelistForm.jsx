@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
+import URI from 'urijs';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
@@ -34,10 +35,15 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
     stateUpdate.entries.splice(idx, 1);
     setState(stateUpdate);
   };
-  const validURL = (str: string): boolean => {
-    const expression = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
-    const regexp = new RegExp(expression);
-    return regexp.test(str);
+  const validURL = (str: string) => {
+    let isValid = true;
+    try {
+      // eslint-disable-next-line no-unused-vars
+      const test = new URL(str);
+    } catch (e) {
+      isValid = false;
+    }
+    return isValid;
   };
   const validRegex = (str: string) => {
     let isValid = true;
@@ -58,7 +64,7 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
         if (type === literal) {
           return validURL(value);
         }
-        return validURL(value) && validRegex(value);
+        return validRegex(value);
       default:
         return true;
     }
