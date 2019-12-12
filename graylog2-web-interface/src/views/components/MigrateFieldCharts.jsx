@@ -177,7 +177,7 @@ const MigrateFieldCharts = () => {
             Do you want to migrate these chart(s) for the current search?
           <br />
             When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard.
-            Otherwise the charts would get lost, when leaving the search page.
+            Otherwise the charts will get lost, when leaving the search page.
           <br />
           <Actions>
             <Button bsStyle="primary"
