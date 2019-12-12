@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 public abstract class Time {
     public static final String NAME = "time";
 
+    @JsonProperty
     public String type() { return NAME; }
 
     @JsonProperty
