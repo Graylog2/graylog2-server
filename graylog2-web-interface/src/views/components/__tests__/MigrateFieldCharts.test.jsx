@@ -65,7 +65,6 @@ jest.mock('views/logic/Widgets', () => ({
 const getNewWidget = (actionMock) => {
   const viewState = actionMock.mock.calls[0][1];
   const widgetsTotal = viewState.widgets.size;
-  // console.log('the widget', viewState.widgets.get(widgetsTotal - 1).config);
   return viewState.widgets.get(widgetsTotal - 1);
 };
 
