@@ -14,6 +14,7 @@ import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 import HeaderElements from '../HeaderElements';
 import QueryBarElements from '../QueryBarElements';
+import WidgetOverrideElements from '../WidgetOverrideElements';
 
 
 type DialogProps = {
@@ -73,7 +74,9 @@ export default class EditWidgetFrame extends React.Component<Props> {
         </IfDashboard>
         <Modal.Body className={styles.Visualization}>
           <div role="presentation" style={{ height: '100%' }}>
-            {children[0]}
+            <WidgetOverrideElements>
+              {children[0]}
+            </WidgetOverrideElements>
           </div>
         </Modal.Body>
         <Modal.Footer className={styles.Footer}>
