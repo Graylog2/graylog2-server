@@ -31,6 +31,7 @@ public interface ModelTypes {
     ModelType STREAM_V1 = ModelType.of("stream", "1");
     ModelType EVENT_DEFINITION_V1 = ModelType.of("event_definition", "1");
     ModelType NOTIFICATION_V1 = ModelType.of("notification", "1");
+    ModelType DASHBOARD_V1 = ModelType.of("dashboard", "1");
     ModelType DASHBOARD_V2 = ModelType.of("dashboard", "2");
     ModelType SEARCH_V1 = ModelType.of("search", "1");
     ModelType URL_WHITELIST_ENTRY_V1 = ModelType.of("url_whitelist_entry", "1");

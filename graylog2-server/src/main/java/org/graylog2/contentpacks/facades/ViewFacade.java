@@ -113,7 +113,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         }
     }
 
-    private NativeEntity<ViewDTO> decode(EntityV1 entityV1,
+    protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                          Map<String, ValueReference> parameters,
                                          Map<EntityDescriptor, Object> nativeEntities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
