@@ -36,7 +36,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     const { config: { entries } } = this.props;
     return entries.map((urlConfig, idx) => {
       return (
-        <tr>
+        <tr key={urlConfig.id}>
           <td>{idx + 1}</td>
           <td>{urlConfig.title}</td>
           <td>{urlConfig.value}</td>
