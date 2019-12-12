@@ -28,6 +28,10 @@
     z-index: 2;
 }
 
+:local(.steps).nav > li:hover::after {
+    background-color: #f4f5f5;
+}
+
 :local(.steps).nav > li.active > a {
     border-radius: 0;
 }
@@ -41,5 +45,5 @@
 }
 
 :local(.steps).nav > li.active:after {
-    background-color: #9E1F63;
+    background-color: #90d3ec;
 }

@@ -3,7 +3,7 @@
 exports[`<ContentPackUploadControls /> should render 1`] = `
 <span>
   <button
-    className="button Button__StyledButton-c9cbmb-0 kRDLih btn btn-success"
+    className="button Button-c9cbmb-0 GLfOY btn btn-success"
     disabled={false}
     id="upload-content-pack-button"
     onClick={[Function]}

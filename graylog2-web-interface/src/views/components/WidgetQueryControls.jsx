@@ -17,7 +17,7 @@ import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import type { TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
-import type { GlobalOverride } from 'views/logic/search/SearchExecutionState';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';

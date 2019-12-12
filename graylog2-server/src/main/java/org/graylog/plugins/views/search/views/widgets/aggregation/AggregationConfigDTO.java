@@ -41,6 +41,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     static final String FIELD_VISUALIZATION_CONFIG = "visualization_config";
     static final String FIELD_ROLLUP = "rollup";
     static final String FIELD_FORMATTING_SETTINGS = "formatting_settings";
+    static final String FIELD_EVENT_ANNOTATION = "event_annotation";
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
@@ -67,6 +68,9 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_ROLLUP)
     public abstract boolean rollup();
+
+    @JsonProperty(FIELD_EVENT_ANNOTATION)
+    public abstract boolean eventAnnotation();
 
     @AutoValue.Builder
     public static abstract class Builder {
@@ -101,11 +105,15 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_ROLLUP)
         public abstract Builder rollup(boolean roolup);
 
+        @JsonProperty(FIELD_EVENT_ANNOTATION)
+        public abstract Builder eventAnnotation(boolean eventAnnotation);
+
         public abstract AggregationConfigDTO build();
 
         @JsonCreator
         static Builder builder() {
             return new AutoValue_AggregationConfigDTO.Builder()
+                    .eventAnnotation(false)
                     .rollup(true);
         }
     }

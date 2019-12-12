@@ -222,7 +222,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             }
           >
             <button
-              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               type="submit"
             >
@@ -238,7 +238,7 @@ exports[`<ContentPackSelection /> should render with empty content pack 1`] = `
             }
           >
             <button
-              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               onClick={[Function]}
               type="reset"
@@ -499,7 +499,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             }
           >
             <button
-              className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               type="submit"
             >
@@ -515,7 +515,7 @@ exports[`<ContentPackSelection /> should render with filled content pack 1`] = `
             }
           >
             <button
-              className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+              className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
               disabled={false}
               onClick={[Function]}
               type="reset"

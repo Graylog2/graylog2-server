@@ -1,7 +1,0 @@
-:local(.messageListTableHeader) table.messages thead th, :local(.messageListTableHeader) table.messages thead {
-    background-color: #eee;
-    color: #333;
-}
-:local(.messageListPaginator) #message-table-paginator-top {
-    margin-bottom: 12px;
-}

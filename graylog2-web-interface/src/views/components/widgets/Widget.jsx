@@ -40,6 +40,7 @@ import WidgetColorContext from './WidgetColorContext';
 import IfInteractive from '../dashboard/IfInteractive';
 import InteractiveContext from '../contexts/InteractiveContext';
 import CopyToDashboard from './CopyToDashboardForm';
+import WidgetErrorBoundary from './WidgetErrorBoundary';
 
 type Props = {
   id: string,
@@ -59,6 +60,7 @@ type Props = {
 type State = {
   configChanged?: boolean,
   editing: boolean,
+  loading: boolean;
   oldConfig?: WidgetConfig,
   showCopyToDashboard: boolean,
 };
@@ -107,6 +109,7 @@ class Widget extends React.Component<Props, State> {
     const { editing } = props;
     this.state = {
       editing,
+      loading: false,
       showCopyToDashboard: false,
     };
     if (editing) {
@@ -196,6 +199,10 @@ class Widget extends React.Component<Props, State> {
     WidgetActions.updateConfig(widgetId, config);
   };
 
+  _setLoadingState = (loading: boolean) => {
+    this.setState({ loading });
+  }
+
   visualize = () => {
     const { data, errors, title } = this.props;
     if (errors && errors.length > 0) {
@@ -216,6 +223,7 @@ class Widget extends React.Component<Props, State> {
                       height={height}
                       width={width}
                       filter={filter}
+                      setLoadingState={this._setLoadingState}
                       toggleEdit={this._onToggleEdit} />
       );
     }
@@ -225,7 +233,7 @@ class Widget extends React.Component<Props, State> {
   // TODO: Clean up different code paths for normal/edit modes
   render() {
     const { id, widget, fields, onSizeChange, title, position, onPositionsChange } = this.props;
-    const { editing, showCopyToDashboard } = this.state;
+    const { editing, loading, showCopyToDashboard } = this.state;
     const { config } = widget;
     const visualization = this.visualize();
     if (editing) {
@@ -236,6 +244,7 @@ class Widget extends React.Component<Props, State> {
             <MeasureDimensions>
               <WidgetHeader title={title}
                             hideDragHandle
+                            loading={loading}
                             onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
                             editing={editing} />
               <EditComponent config={config}
@@ -243,7 +252,10 @@ class Widget extends React.Component<Props, State> {
                              editting={editing}
                              id={id}
                              onChange={newWidgetConfig => this._onWidgetConfigChange(id, newWidgetConfig)}>
-                {visualization}
+                <WidgetErrorBoundary>
+
+                  {visualization}
+                </WidgetErrorBoundary>
               </EditComponent>
             </MeasureDimensions>
             <SaveOrCancelButtons onFinish={this._onToggleEdit} onCancel={this._onCancelEdit} />
@@ -254,40 +266,42 @@ class Widget extends React.Component<Props, State> {
     return (
       <WidgetColorContext id={id}>
         <WidgetFrame widgetId={id} onSizeChange={onSizeChange}>
-          <span>
-            <InteractiveContext.Consumer>
-              {interactive => (
-                <WidgetHeader title={title}
-                              hideDragHandle={!interactive}
-                              onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
-                              editing={editing}>
-                  <IfInteractive>
-                    <WidgetHorizontalStretch widgetId={widget.id}
-                                             widgetType={widget.type}
-                                             onStretch={onPositionsChange}
-                                             position={position} />
-                    {' '}
-                    <WidgetActionDropdown>
-                      <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
-                      <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
-                      <IfSearch>
-                        <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
-                      </IfSearch>
-                      <MenuItem divider />
-                      <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
-                    </WidgetActionDropdown>
-                    {showCopyToDashboard
+          <InteractiveContext.Consumer>
+            {interactive => (
+              <WidgetHeader title={title}
+                            hideDragHandle={!interactive}
+                            loading={loading}
+                            onRename={newTitle => TitlesActions.set('widget', id, newTitle)}
+                            editing={editing}>
+                <IfInteractive>
+                  <WidgetHorizontalStretch widgetId={widget.id}
+                                           widgetType={widget.type}
+                                           onStretch={onPositionsChange}
+                                           position={position} />
+                  {' '}
+                  <WidgetActionDropdown>
+                    <MenuItem onSelect={this._onToggleEdit}>Edit</MenuItem>
+                    <MenuItem onSelect={() => this._onDuplicate(id)}>Duplicate</MenuItem>
+                    <IfSearch>
+                      <MenuItem onSelect={this._onToggleCopyToDashboard}>Copy to Dashboard</MenuItem>
+                    </IfSearch>
+                    <MenuItem divider />
+                    <MenuItem onSelect={() => this._onDelete(widget)}>Delete</MenuItem>
+                  </WidgetActionDropdown>
+                  {showCopyToDashboard
                     && (
                       <CopyToDashboard widgetId={id}
                                        onSubmit={this._onCopyToDashboard}
                                        onCancel={this._onToggleCopyToDashboard} />
                     )}
-                  </IfInteractive>
-                </WidgetHeader>
-              )}
-            </InteractiveContext.Consumer>
+                </IfInteractive>
+              </WidgetHeader>
+            )}
+          </InteractiveContext.Consumer>
+          <WidgetErrorBoundary>
+
             {visualization}
-          </span>
+          </WidgetErrorBoundary>
         </WidgetFrame>
       </WidgetColorContext>
     );

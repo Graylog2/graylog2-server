@@ -16,6 +16,7 @@
  */
 package org.graylog.events.search;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class EventsSearchResult {
     @JsonProperty("events")
     public abstract List<Event> events();

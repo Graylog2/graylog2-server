@@ -15,6 +15,7 @@ import type {
 } from 'views/logic/hooks/SearchRefreshCondition';
 import Footer from 'components/layout/Footer';
 
+import { Grid } from 'components/graylog';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -51,12 +52,17 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ` : '')}
 `;
 
-const SearchGrid = styled.div`
-  z-index: 1;
-  padding: 15px;
+const SearchArea = styled.div`
   grid-area: search;
   grid-column-start: 2;
   grid-column-end: 4;
+  padding: 15px;
+
+  z-index: 1;
+`;
+
+const SearchGrid = styled(Grid)`
+  width: 100%;
 `;
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
@@ -90,7 +96,8 @@ const _searchRefreshConditionChain = (searchRefreshHooks, state: SearchRefreshCo
   return searchRefreshHooks.every((condition: SearchRefreshCondition) => condition(state));
 };
 
-const _refreshIfNotUndeclared = (searchRefreshHooks, executionState, view) => {
+const _refreshIfNotUndeclared = (searchRefreshHooks, executionState) => {
+  const { view } = ViewStore.getInitialState();
   return SearchMetadataActions.parseSearch(view.search).then((searchMetadata) => {
     if (_searchRefreshConditionChain(searchRefreshHooks, { view, searchMetadata, executionState })) {
       FieldTypesActions.all();
@@ -106,21 +113,18 @@ const DashboardSearchBarWithStatus = WithSearchStatus(DashboardSearchBar);
 const ViewAdditionalContextProvider = connect(AdditionalContext.Provider, { view: ViewStore }, ({ view }) => ({ value: { view: view.view } }));
 
 const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
-  const refreshIfNotUndeclared = view => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState(), view);
+  const refreshIfNotUndeclared = () => _refreshIfNotUndeclared(searchRefreshHooks, SearchExecutionStateStore.getInitialState());
 
   useEffect(() => {
     style.use();
 
     SearchConfigActions.refresh();
     FieldTypesActions.all();
-    const { view } = ViewStore.getInitialState();
+
     let storeListenersUnsubscribes = Immutable.List();
-    refreshIfNotUndeclared(view).then(() => {
+    refreshIfNotUndeclared().then(() => {
       storeListenersUnsubscribes = storeListenersUnsubscribes
-        .push(SearchActions.refresh.listen(() => {
-          const { view: currentView } = ViewStore.getInitialState();
-          refreshIfNotUndeclared(currentView);
-        }))
+        .push(SearchActions.refresh.listen(refreshIfNotUndeclared))
         .push(ViewActions.search.completed.listen(refreshIfNotUndeclared));
       return null;
     }, () => { });
@@ -149,25 +153,27 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
                 <ConnectedFieldList />
               </ConnectedSideBar>
             </IfInteractive>
-            <SearchGrid>
-              <IfInteractive>
-                <HeaderElements />
-                <IfDashboard>
-                  <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  <QueryBar />
-                </IfDashboard>
-                <IfSearch>
-                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                </IfSearch>
+            <SearchArea>
+              <SearchGrid>
+                <IfInteractive>
+                  <HeaderElements />
+                  <IfDashboard>
+                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    <QueryBar />
+                  </IfDashboard>
+                  <IfSearch>
+                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfSearch>
 
-                <QueryBarElements />
-              </IfInteractive>
+                  <QueryBarElements />
+                </IfInteractive>
 
-              <ViewAdditionalContextProvider>
-                <SearchResult />
-              </ViewAdditionalContextProvider>
-              <Footer />
-            </SearchGrid>
+                <ViewAdditionalContextProvider>
+                  <SearchResult />
+                </ViewAdditionalContextProvider>
+                <Footer />
+              </SearchGrid>
+            </SearchArea>
           </GridContainer>
         )}
       </InteractiveContext.Consumer>

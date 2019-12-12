@@ -1,10 +1,13 @@
+// @flow strict
+import type { NodeMetric } from 'stores/metrics/MetricsStore';
+
 const MetricsExtractor = {
   /*
    * Returns an object containing a short name and the metric value for it.
    * Short names are the keys of the metricNames object, which should look like:
    * { shortName: "metricFullName" }
    */
-  getValuesForNode(nodeMetrics, metricNames) {
+  getValuesForNode(nodeMetrics: NodeMetric, metricNames: { [string]: string }): { [string]: ?number } {
     if (nodeMetrics === null || nodeMetrics === undefined || Object.keys(nodeMetrics).length === 0) {
       return {};
     }

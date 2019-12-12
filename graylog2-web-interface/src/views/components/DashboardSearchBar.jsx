@@ -15,8 +15,6 @@ import TimeRangeOverrideTypeSelector from 'views/components/searchbar/TimeRangeO
 import TimeRangeOverrideInput from 'views/components/searchbar/TimeRangeOverrideInput';
 import SearchButton from 'views/components/searchbar/SearchButton';
 import QueryInput from 'views/components/searchbar/AsyncQueryInput';
-import View from 'views/logic/views/View';
-import { ViewStore } from 'views/stores/ViewStore';
 import { GlobalOverrideActions, GlobalOverrideStore } from '../stores/GlobalOverrideStore';
 
 type Props = {
@@ -29,19 +27,13 @@ type Props = {
     },
   },
   disableSearch: boolean,
-  onExecute: (View) => void,
+  onExecute: () => void,
 };
 
-const _performSearch = (onExecute) => {
-  const { view } = ViewStore.getInitialState();
-  onExecute(view);
-};
-
-const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute }: Props) => {
+const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExecute: performSearch }: Props) => {
   if (!config) {
     return <Spinner />;
   }
-  const performSearch = () => _performSearch(onExecute);
   const submitForm = (event) => {
     event.preventDefault();
     performSearch();
@@ -53,7 +45,7 @@ const DashboardSearchBar = ({ config, currentQuery, disableSearch = false, onExe
 
   return (
     <ScrollToHint value={query.query_string || ''}>
-      <Row className="content" style={{ marginRight: 0, marginLeft: 0 }}>
+      <Row className="content">
         <Col md={12}>
           <form method="GET" onSubmit={submitForm}>
             <Row className="no-bm">

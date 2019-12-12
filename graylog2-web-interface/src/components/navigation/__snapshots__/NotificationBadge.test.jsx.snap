@@ -92,7 +92,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                         bsStyle="danger"
                         id="notification-badge"
                       >
-                        <Badge__StyledBadge
+                        <Badge
                           bsStyle="danger"
                           id="notification-badge"
                         >
@@ -103,17 +103,17 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "$$typeof": Symbol(react.forward_ref),
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                  "componentId": "Badge-sc-4gzqz0-0",
                                   "isStatic": false,
-                                  "lastClassName": "gDhrrS",
+                                  "lastClassName": "iRhcGJ",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Badge__StyledBadge",
+                                "displayName": "Badge",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
+                                "styledComponentId": "Badge-sc-4gzqz0-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -126,19 +126,19 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
+                              className="Badge-sc-4gzqz0-0 iRhcGJ"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge badge-danger"
+                                className="Badge-sc-4gzqz0-0 iRhcGJ badge badge-danger"
                                 id="notification-badge"
                               >
                                 42
                               </span>
                             </Badge>
                           </StyledComponent>
-                        </Badge__StyledBadge>
+                        </Badge>
                       </ForwardRef>
                     </a>
                   </SafeAnchor>

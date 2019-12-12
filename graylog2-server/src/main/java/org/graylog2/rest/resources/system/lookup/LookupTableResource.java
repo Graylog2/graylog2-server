@@ -90,6 +90,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
@@ -143,6 +144,7 @@ public class LookupTableResource extends RestResource {
     private final DBCacheService dbCacheService;
     private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
+    private final Map<String, LookupDataAdapter.Factory2> dataAdapterTypes2;
     private final SearchQueryParser lutSearchQueryParser;
     private final SearchQueryParser adapterSearchQueryParser;
     private final SearchQueryParser cacheSearchQueryParser;
@@ -153,6 +155,7 @@ public class LookupTableResource extends RestResource {
     public LookupTableResource(DBLookupTableService dbTableService, DBDataAdapterService dbDataAdapterService,
                                DBCacheService dbCacheService, Map<String, LookupCache.Factory> cacheTypes,
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
+                               Map<String, LookupDataAdapter.Factory2> dataAdapterTypes2,
                                LookupTableService lookupTableService,
                                LookupDataAdapterValidationContext lookupDataAdapterValidationContext) {
         this.dbTableService = dbTableService;
@@ -160,6 +163,7 @@ public class LookupTableResource extends RestResource {
         this.dbCacheService = dbCacheService;
         this.cacheTypes = cacheTypes;
         this.dataAdapterTypes = dataAdapterTypes;
+        this.dataAdapterTypes2 = dataAdapterTypes2;
         this.lookupTableService = lookupTableService;
         this.lookupDataAdapterValidationContext = lookupDataAdapterValidationContext;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
@@ -463,8 +467,9 @@ public class LookupTableResource extends RestResource {
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, LookupDataAdapter.Descriptor> availableAdapterTypes() {
 
-        return dataAdapterTypes.values().stream()
-                .map(LookupDataAdapter.Factory::getDescriptor)
+        final Stream<LookupDataAdapter.Descriptor> stream1 = dataAdapterTypes.values().stream().map(LookupDataAdapter.Factory::getDescriptor);
+        final Stream<LookupDataAdapter.Descriptor> stream2 = dataAdapterTypes2.values().stream().map(LookupDataAdapter.Factory2::getDescriptor);
+        return Stream.concat(stream1, stream2)
                 .collect(Collectors.toMap(LookupDataAdapter.Descriptor::getType, Function.identity()));
 
     }

@@ -1,5 +1,5 @@
 // @flow strict
-import React from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment-timezone';
 import { get, merge } from 'lodash';
@@ -48,7 +48,8 @@ const XYPlot = ({
 
   const layout = merge({}, { yaxis }, plotLayout);
 
-  const _onZoom = config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true;
+  const _onZoom = useCallback(config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true, [config.isTimeline, onZoom]);
+
   if (config.isTimeline) {
     const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();

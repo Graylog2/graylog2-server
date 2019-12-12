@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EventHandler convert should convert events to chart data and shapes 1`] = `
+Object {
+  "eventChartData": Object {
+    "hovertemplate": "%{text}",
+    "marker": Object {
+      "color": "#d3d3d3",
+      "size": 5,
+    },
+    "mode": "markers",
+    "name": "Alerts",
+    "opacity": 0.5,
+    "text": Array [
+      "This is a emergency. Please stay calm.",
+    ],
+    "type": "scatter",
+    "x": Array [
+      "2019-11-14T08:53:35.000Z",
+    ],
+    "y": Array [
+      0,
+    ],
+  },
+  "shapes": Array [
+    Object {
+      "layer": "below",
+      "line": Object {
+        "color": "#d3d3d3",
+      },
+      "opacity": 0.5,
+      "type": "line",
+      "x0": "2019-11-14T08:53:35.000Z",
+      "x1": "2019-11-14T08:53:35.000Z",
+      "y0": 0,
+      "y1": 1,
+      "yref": "paper",
+    },
+  ],
+}
+`;

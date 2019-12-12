@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { AggregationType } from 'views/components/aggregationbuilder/AggregationBuilderPropTypes';
 import type { VisualizationComponent, VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 
+import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import { chartData } from '../ChartData';
 import XYPlot from '../XYPlot';
 
@@ -42,10 +43,16 @@ const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimer
   const _seriesGenerator = (type, name, labels, values): ChartDefinition => ({ type, name, x: labels, y: values, opacity });
 
   const rows = data.chart || Object.values(data)[0];
+  const chartDataResult = chartData(config, rows, 'bar', _seriesGenerator);
+  if (config.eventAnnotation && data.events) {
+    const { eventChartData, shapes } = EventHandler.toVisualizationData(data.events, config.formattingSettings);
+    chartDataResult.push(eventChartData);
+    layout.shapes = shapes;
+  }
 
   return (
     <XYPlot config={config}
-            chartData={chartData(config, rows, 'bar', _seriesGenerator)}
+            chartData={chartDataResult}
             effectiveTimerange={effectiveTimerange}
             getChartColor={getChartColor}
             setChartColor={setChartColor}

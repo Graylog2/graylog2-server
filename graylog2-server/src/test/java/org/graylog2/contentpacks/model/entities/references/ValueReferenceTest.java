@@ -19,8 +19,10 @@ package org.graylog2.contentpacks.model.entities.references;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.json.JSONException;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -30,6 +32,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ValueReferenceTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
+    public void assertJsonEqualsNonStrict(String json1, String json2) {
+        try {
+            JSONAssert.assertEquals(json1, json2, false);
+        } catch (JSONException jse) {
+            throw new IllegalArgumentException(jse.getMessage());
+        }
+    }
 
     @Test
     public void asBoolean() {
@@ -107,8 +117,8 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeBoolean() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(true))).isEqualTo("{\"@type\":\"boolean\",\"@value\":true}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(false))).isEqualTo("{\"@type\":\"boolean\",\"@value\":false}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(true)), "{\"@type\":\"boolean\",\"@value\":true}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(false)), "{\"@type\":\"boolean\",\"@value\":false}");
     }
 
     @Test
@@ -119,8 +129,8 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeEnum() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.A))).isEqualTo("{\"@type\":\"string\",\"@value\":\"A\"}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(TestEnum.B))).isEqualTo("{\"@type\":\"string\",\"@value\":\"B\"}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(TestEnum.A)), "{\"@type\":\"string\",\"@value\":\"A\"}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(TestEnum.B)), "{\"@type\":\"string\",\"@value\":\"B\"}");
     }
 
     @Test
@@ -131,8 +141,8 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeFloat() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(1.0f))).isEqualTo("{\"@type\":\"float\",\"@value\":1.0}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(42.4f))).isEqualTo("{\"@type\":\"float\",\"@value\":42.4}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(1.0f)), "{\"@type\":\"float\",\"@value\":1.0}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(42.4f)), "{\"@type\":\"float\",\"@value\":42.4}");
     }
 
     @Test
@@ -144,8 +154,8 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeInteger() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(1))).isEqualTo("{\"@type\":\"integer\",\"@value\":1}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(42))).isEqualTo("{\"@type\":\"integer\",\"@value\":42}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(1)), "{\"@type\":\"integer\",\"@value\":1}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of(42)), "{\"@type\":\"integer\",\"@value\":42}");
     }
 
     @Test
@@ -156,8 +166,8 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeString() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.of(""))).isEqualTo("{\"@type\":\"string\",\"@value\":\"\"}");
-        assertThat(objectMapper.writeValueAsString(ValueReference.of("Test"))).isEqualTo("{\"@type\":\"string\",\"@value\":\"Test\"}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of("")), "{\"@type\":\"string\",\"@value\":\"\"}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.of("Test")), "{\"@type\":\"string\",\"@value\":\"Test\"}");
     }
 
     @Test
@@ -178,7 +188,7 @@ public class ValueReferenceTest {
 
     @Test
     public void serializeParameter() throws IOException {
-        assertThat(objectMapper.writeValueAsString(ValueReference.createParameter("Test"))).isEqualTo("{\"@type\":\"parameter\",\"@value\":\"Test\"}");
+        assertJsonEqualsNonStrict(objectMapper.writeValueAsString(ValueReference.createParameter("Test")), "{\"@type\":\"parameter\",\"@value\":\"Test\"}");
     }
 
     @Test

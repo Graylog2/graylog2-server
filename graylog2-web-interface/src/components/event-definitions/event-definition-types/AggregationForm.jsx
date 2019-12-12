@@ -181,7 +181,8 @@ class AggregationForm extends React.Component {
                           onChange={this.handleAggregationFieldChange}
                           options={formattedFields}
                           value={series.field}
-                          allowCreate />
+                          allowCreate
+                          isClearable />
                 </Col>
               </Row>
               {validation.errors.series && (

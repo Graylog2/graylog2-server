@@ -1,3 +1,4 @@
+import { memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled from 'styled-components';
@@ -5,7 +6,7 @@ import { lighten, transparentize } from 'polished';
 
 import teinte from 'theme/teinte';
 
-const FormControl = styled(BootstrapFormControl)`
+const FormControl = memo(styled(BootstrapFormControl)`
   color: ${teinte.primary.tre};
   background-color: ${teinte.primary.due};
   border-color: ${teinte.secondary.tre};
@@ -28,6 +29,9 @@ const FormControl = styled(BootstrapFormControl)`
   }
 
   ~ .form-control-feedback.glyphicon { display: none; }
-`;
+`);
+
+FormControl.Static = BootstrapFormControl.Static;
+FormControl.Feedback = BootstrapFormControl.Feedback;
 
 export default FormControl;

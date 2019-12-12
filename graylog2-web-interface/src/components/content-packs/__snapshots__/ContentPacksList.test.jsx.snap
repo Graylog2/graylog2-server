@@ -44,7 +44,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             </div>
           </div>
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={false}
             style={
               Object {
@@ -56,7 +56,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             Filter
           </button>
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={true}
             onClick={[Function]}
             style={
@@ -212,7 +212,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
       className="list-group"
     >
       <span
-        className="listGroupHeader ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="headerWrapper"
@@ -221,7 +221,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -245,7 +245,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
+                      className="Badge-sc-4gzqz0-0 iRhcGJ badge installed badge installed-default"
                     >
                       installed
                     </span>
@@ -261,7 +261,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -275,7 +275,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-1"
                 onClick={[Function]}
@@ -373,7 +373,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -397,7 +397,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                     style={Object {}}
                   >
                     <span
-                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed badge installed-default"
+                      className="Badge-sc-4gzqz0-0 iRhcGJ badge installed badge installed-default"
                     >
                       installed
                     </span>
@@ -413,7 +413,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -427,7 +427,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-2"
                 onClick={[Function]}
@@ -525,7 +525,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -554,7 +554,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -568,7 +568,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-3"
                 onClick={[Function]}
@@ -666,7 +666,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -695,7 +695,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -709,7 +709,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-4"
                 onClick={[Function]}
@@ -807,7 +807,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -836,7 +836,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -850,7 +850,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-5"
                 onClick={[Function]}
@@ -948,7 +948,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -977,7 +977,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -991,7 +991,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-6"
                 onClick={[Function]}
@@ -1089,7 +1089,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -1118,7 +1118,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1132,7 +1132,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-7"
                 onClick={[Function]}
@@ -1230,7 +1230,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -1259,7 +1259,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1273,7 +1273,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-8"
                 onClick={[Function]}
@@ -1371,7 +1371,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -1400,7 +1400,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1414,7 +1414,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-9"
                 onClick={[Function]}
@@ -1512,7 +1512,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
         </div>
       </span>
       <span
-        className="ListGroupItem__StyledListGroupItem-sc-1ky0joo-0 THrbj list-group-item"
+        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
       >
         <div
           className="row-sm row"
@@ -1541,7 +1541,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
             
              
             <button
-              className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
               disabled={false}
               onClick={[Function]}
               type="button"
@@ -1555,7 +1555,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
               <button
                 aria-expanded={false}
                 aria-haspopup={true}
-                className="DropdownButton-sc-1343dcx-0 kgGfWL dropdown-toggle btn btn-sm btn-default"
+                className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
                 disabled={false}
                 id="more-actions-10"
                 onClick={[Function]}
@@ -1840,7 +1840,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             </div>
           </div>
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={false}
             style={
               Object {
@@ -1852,7 +1852,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
             Filter
           </button>
           <button
-            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
             disabled={true}
             onClick={[Function]}
             style={
