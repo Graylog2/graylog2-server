@@ -103,19 +103,19 @@ const createVisualizationConfig = (interpolation: LegacyInterpolation, visualiza
 };
 
 const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
+  setMigrating(true);
   const widgetDef = widgetDefinition('AGGREGATION');
   const currentView = CurrentViewStateStore.getInitialState();
   const newWidgetPositions = { ...currentView.state.widgetPositions };
   const lastWidgetPosition = maxBy(values(newWidgetPositions), (position: WidgetPosition): number => position.row);
+  const existingRowOffset = lastWidgetPosition.row + lastWidgetPosition.height;
 
   const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
-    setMigrating(true);
-
-    const { field } = chart;
     // The old field charts only have one series per chart.
     // The series allways relates to the selected field.
     // Because all field charts show the results for the defined timerange,
     // the new row pivot always contains the timestamp field.
+    const { field } = chart;
     const series = new Series(mapSeries(chart.valuetype, field));
     const rowPivots = [new Pivot('timestamp', 'time', { interval: { type: 'timeunit', ...mapTime(chart.interval) } })];
     const visualization = mapVisualization(chart.renderer);
@@ -131,8 +131,8 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
       .timerange(undefined)
       .config(widgetConfig)
       .build();
-    const widgetRow = lastWidgetPosition.row + lastWidgetPosition.height + index + widgetDef.defaultHeight;
-    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRow, widgetDef.defaultHeight, Infinity);
+    const widgetRowPos = existingRowOffset + (widgetDef.defaultHeight * index);
+    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, widgetDef.defaultHeight, Infinity);
     return newWidget;
   });
 
