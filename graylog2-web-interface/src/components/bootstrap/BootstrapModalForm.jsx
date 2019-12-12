@@ -13,6 +13,7 @@ import { validate } from 'legacy/validations.js';
  */
 class BootstrapModalForm extends React.Component {
   static defaultProps = {
+    backdrop: undefined,
     formProps: {},
     cancelButtonText: 'Cancel',
     submitButtonText: 'Submit',
@@ -26,6 +27,7 @@ class BootstrapModalForm extends React.Component {
   };
 
   static propTypes = {
+    backdrop: PropTypes.oneOf([true, false, 'static']),
     bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
     /* Modal title */
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
@@ -97,6 +99,7 @@ class BootstrapModalForm extends React.Component {
                              onClose={this.props.onModalClose}
                              bsSize={this.props.bsSize}
                              showModal={this.props.show}
+                             backdrop={this.props.backdrop}
                              onHide={this.onModalCancel}>
         <Modal.Header closeButton>
           <Modal.Title>{this.props.title}</Modal.Title>
