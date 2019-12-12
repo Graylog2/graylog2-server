@@ -60,4 +60,10 @@ public class UrlWhitelistTest {
         UrlWhitelist read = objectMapper.readValue(json, UrlWhitelist.class);
         assertThat(read).isEqualTo(orig);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void duplicateIds() {
+        UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("a", "a", "a"),
+                new RegexWhitelistEntry("a", "b", "b")));
+    }
 }

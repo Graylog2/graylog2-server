@@ -11,13 +11,12 @@ import {
   FormControl,
   FormGroup,
   HelpBlock,
-  Icon,
   InputGroup,
   OverlayTrigger,
   Row,
 } from 'components/graylog';
 import { Input } from 'components/bootstrap';
-import { Select } from 'components/common';
+import { Icon, Select } from 'components/common';
 import EventKeyHelpPopover from 'components/event-definitions/common/EventKeyHelpPopover';
 
 import FormsUtils from 'util/FormsUtils';

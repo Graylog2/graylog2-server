@@ -1,15 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import { Icon } from 'components/common';
+import { Spinner, Icon } from 'components/common';
 import EditableTitle from 'views/components/common/EditableTitle';
 import styles from './WidgetHeader.css';
 import CustomPropTypes from '../CustomPropTypes';
 
-const WidgetHeader = ({ children, onRename, hideDragHandle, title }) => (
+const LoadingSpinner = styled(Spinner)`
+  margin-left: 10px;
+`;
+
+const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }) => (
   <div className={styles.widgetHeader}>
     {hideDragHandle || <Icon name="bars" className={`widget-drag-handle ${styles.widgetDragHandle}`} />}{' '}
     <EditableTitle disabled={!onRename} value={title} onChange={onRename} />
+    {loading && <LoadingSpinner text="" />}
     <span className={`pull-right ${styles.widgetActionDropdown}`}>
       {children}
     </span>
@@ -21,12 +27,14 @@ WidgetHeader.propTypes = {
   onRename: PropTypes.func,
   hideDragHandle: PropTypes.bool,
   title: PropTypes.node.isRequired,
+  loading: PropTypes.bool,
 };
 
 WidgetHeader.defaultProps = {
   children: null,
   onRename: undefined,
   hideDragHandle: false,
+  loading: false,
 };
 
 export default WidgetHeader;

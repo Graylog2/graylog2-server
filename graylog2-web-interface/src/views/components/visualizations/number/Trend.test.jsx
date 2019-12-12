@@ -3,18 +3,13 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import 'jest-styled-components';
 
-import teinte from 'theme/teinte';
-import Trend from './Trend';
+import Trend, { TREND_BAD, TREND_GOOD, TREND_NEUTRAL } from './Trend';
 
 const renderTrend = ({
   current = 42,
   previous = 42,
   trendPreference = 'NEUTRAL',
 } = {}) => mount(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
-
-const goodBackgroundColor = teinte.tertiary.tre;
-const badBackgroundColor = teinte.tertiary.quattro;
-const neutralBackgroundColor = undefined;
 
 describe('Trend', () => {
   it('shows absolute delta', () => {
@@ -44,31 +39,38 @@ describe('Trend', () => {
   describe('renders background according to values and trend preference', () => {
     it('shows neutral background if values are equal', () => {
       const wrapper = renderTrend();
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', neutralBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
     });
     it('shows good background if current value and preference are higher', () => {
       const wrapper = renderTrend({ current: 43, trendPreference: 'HIGHER' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', goodBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_GOOD);
     });
     it('shows good background if current value and preference are lower', () => {
       const wrapper = renderTrend({ current: 41, trendPreference: 'LOWER' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', goodBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_GOOD);
     });
     it('shows bad background if current value is lower but preference is higher', () => {
       const wrapper = renderTrend({ current: 41, trendPreference: 'HIGHER' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', badBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_BAD);
     });
     it('shows bad background if current value is higher but preference is lower', () => {
       const wrapper = renderTrend({ current: 43, trendPreference: 'LOWER' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', badBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_BAD);
     });
     it('shows neutral background if current value is higher but preference is neutral', () => {
       const wrapper = renderTrend({ current: 43, trendPreference: 'NEUTRAL' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', neutralBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
     });
     it('shows neutral background if current value is lower but preference is neutral', () => {
       const wrapper = renderTrend({ current: 41, trendPreference: 'NEUTRAL' });
-      expect(wrapper.find('div')).toHaveStyleRule('background-color', neutralBackgroundColor);
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toExist();
+      expect(wrapper.find("[data-test-id='trend-background']").at(0)).toHaveProp('trend', TREND_NEUTRAL);
     });
   });
   describe('renders icon indicating trend direction', () => {

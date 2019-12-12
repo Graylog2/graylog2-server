@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -33,6 +34,7 @@ import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
@@ -137,6 +139,15 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "user_password_bcrypt_salt_size", validator = PositiveIntegerValidator.class)
     private int userPasswordBCryptSaltSize = 10;
+
+    @Parameter(value = "content_packs_loader_enabled")
+    private boolean contentPacksLoaderEnabled = false;
+
+    @Parameter(value = "content_packs_dir")
+    private Path contentPacksDir = getDataDir().resolve("contentpacks");
+
+    @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
+    private Set<String> contentPacksAutoInstall = Collections.emptySet();
 
     @Parameter(value = "index_ranges_cleanup_interval", validator = PositiveDurationValidator.class)
     private Duration indexRangesCleanupInterval = Duration.hours(1L);
@@ -272,6 +283,18 @@ public class Configuration extends BaseConfiguration {
 
     public int getUserPasswordBCryptSaltSize() {
         return userPasswordBCryptSaltSize;
+    }
+
+    public boolean isContentPacksLoaderEnabled() {
+        return contentPacksLoaderEnabled;
+    }
+
+    public Path getContentPacksDir() {
+        return contentPacksDir;
+    }
+
+    public Set<String> getContentPacksAutoInstall() {
+        return contentPacksAutoInstall;
     }
 
     public Duration getIndexRangesCleanupInterval() {

@@ -31,7 +31,7 @@ export default class BarVisualizationConfig extends VisualizationConfig {
     return new Builder(Immutable.Map({ barmode }));
   }
 
-  static create(barmode : BarMode) {
+  static create(barmode: BarMode) {
     return new BarVisualizationConfig(barmode);
   }
 
@@ -52,11 +52,11 @@ export default class BarVisualizationConfig extends VisualizationConfig {
 class Builder {
   value: Immutable.Map<BarVisualizationConfigType>;
 
-  constructor(value : BarVisualizationConfigType = Immutable.Map()) {
+  constructor(value: BarVisualizationConfigType = Immutable.Map()) {
     this.value = value;
   }
 
-  barmode(value : BarMode) {
+  barmode(value: BarMode) {
     return new Builder(this.value.set('barmode', value));
   }
 

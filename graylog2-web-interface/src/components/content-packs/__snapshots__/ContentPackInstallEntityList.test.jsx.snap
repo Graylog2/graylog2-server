@@ -43,7 +43,7 @@ exports[`<ContentPackInstallEntityList /> should render with entities 1`] = `
           id="installed-entities"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>
@@ -106,7 +106,7 @@ exports[`<ContentPackInstallEntityList /> should render with uninstall and entit
           id="installed-entities"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>

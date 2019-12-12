@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -46,35 +46,40 @@ const listGroupItemStyles = (hex) => {
 
 const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
   const { colors } = useTheme();
-  const StyledListGroupItem = useCallback(styled(BootstrapListGroupItem)`
-    &.list-group-item-action {
-      color: ${colors.primary.tre};
+  const StyledListGroupItem = useMemo(
+    () => {
+      return styled(BootstrapListGroupItem)`
+        &.list-group-item-action {
+          color: ${colors.primary.tre};
 
-      &:hover,
-      &:focus {
-        color: ${colors.primary.tre};
-        background-color: ${colors.secondary.due};
-      }
+          &:hover,
+          &:focus {
+            color: ${colors.primary.tre};
+            background-color: ${colors.secondary.due};
+          }
 
-      &:active {
-        color: ${contrastingColor(colors.secondary.tre)};
-        background-color: ${colors.secondary.tre};
-      }
-    }
+          &:active {
+            color: ${contrastingColor(colors.secondary.tre)};
+            background-color: ${colors.secondary.tre};
+          }
+        }
 
-    &.list-group-item {
-      background-color: ${colors.primary.due};
-      border-color: ${colors.secondary.tre};
+        &.list-group-item {
+          background-color: ${colors.primary.due};
+          border-color: ${colors.secondary.tre};
 
-      &.disabled,
-      &:disabled {
-        color: ${colors.primary.tre};
-        background-color: ${colors.primary.due};
-      }
-    }
+          &.disabled,
+          &:disabled {
+            color: ${colors.primary.tre};
+            background-color: ${colors.primary.due};
+          }
+        }
 
-    ${bsStyleThemeVariant(listGroupItemStyles)}
-  `, [bsStyle, colors]);
+        ${bsStyleThemeVariant(listGroupItemStyles)}
+      `;
+    },
+    [bsStyle, colors],
+  );
 
   return (
     <StyledListGroupItem bsStyle={bsStyle} ref={ref} {...props} />

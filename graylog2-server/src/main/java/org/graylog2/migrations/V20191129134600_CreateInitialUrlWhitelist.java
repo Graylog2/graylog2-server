@@ -90,7 +90,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         }
 
         UrlWhitelist whitelist = createWhitelist();
-        whitelistService.save(whitelist);
+        whitelistService.saveWhitelist(whitelist);
         configService.write(MigrationCompleted.create(whitelist.toString()));
     }
 
@@ -125,7 +125,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         final String url = ((HTTPEventNotificationConfig) config).url();
         return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
                 .toString(), url,
-                "Automatically created entry for \"" + notificationDto.title() + "\" alert notification."), url);
+                "\"" + notificationDto.title() + "\" alert notification"), url);
     }
 
     private Optional<WhitelistEntry> extractFromDataAdapter(DataAdapterDto dataAdapterDto) {
@@ -135,7 +135,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             final String url = ((DSVHTTPDataAdapter.Config) config).url();
             return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
                     .toString(), url,
-                    "Automatically created entry for \"" + dataAdapterDto.title() + "\" DSV HTTP adapter."), url);
+                    "\"" + dataAdapterDto.title() + "\" data adapter"), url);
         } else if (config instanceof HTTPJSONPathDataAdapter.Config) {
             final String url = StringUtils.strip(((HTTPJSONPathDataAdapter.Config) config).url());
             // Quote all parts around the ${key} template parameter( and replace the ${key} template param with a
@@ -145,7 +145,7 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
                     .collect(Collectors.joining(".*?"));
             return defaultIfNotMatching(new RegexWhitelistEntry(UUID.randomUUID()
                     .toString(), "^" + transformedUrl + "$",
-                    "Automatically created entry for \"" + dataAdapterDto.title() + "\" HTTP JSONPath adapter."), url);
+                    "\"" + dataAdapterDto.title() + "\" data adapter"), url);
         }
 
         return Optional.empty();

@@ -32,7 +32,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
         className="widget-info"
       >
         <button
-          className="btn-text Button__StyledButton-c9cbmb-0 kRDLih btn btn-link"
+          className="btn-text Button-c9cbmb-0 GLfOY btn btn-link"
           disabled={false}
           onClick={[Function]}
           title="Show widget configuration"
@@ -80,7 +80,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
         className="widget-replay"
       >
         <a
-          className="btn-text Button__StyledButton-c9cbmb-0 kRDLih btn btn-link"
+          className="btn-text Button-c9cbmb-0 GLfOY btn btn-link"
           href="http://example.org"
           onClick={[Function]}
           onKeyDown={[Function]}
@@ -95,7 +95,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
         className="widget-info"
       >
         <button
-          className="btn-text Button__StyledButton-c9cbmb-0 kRDLih btn btn-link"
+          className="btn-text Button-c9cbmb-0 GLfOY btn btn-link"
           disabled={false}
           onClick={[Function]}
           title="Show widget configuration"
@@ -143,7 +143,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
         className="widget-delete"
       >
         <button
-          className="btn-text Button__StyledButton-c9cbmb-0 kRDLih btn btn-link"
+          className="btn-text Button-c9cbmb-0 GLfOY btn btn-link"
           disabled={false}
           onClick={[Function]}
           title="Delete widget"
@@ -158,7 +158,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
         className="widget-edit"
       >
         <button
-          className="btn-text Button__StyledButton-c9cbmb-0 kRDLih btn btn-link"
+          className="btn-text Button-c9cbmb-0 GLfOY btn btn-link"
           disabled={false}
           onClick={[Function]}
           title="Edit widget"

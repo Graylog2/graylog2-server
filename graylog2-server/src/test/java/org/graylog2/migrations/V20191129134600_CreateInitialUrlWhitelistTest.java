@@ -66,7 +66,7 @@ public class V20191129134600_CreateInitialUrlWhitelistTest {
         migration.upgrade();
 
         final ArgumentCaptor<UrlWhitelist> captor = ArgumentCaptor.forClass(UrlWhitelist.class);
-        verify(whitelistService).save(captor.capture());
+        verify(whitelistService).saveWhitelist(captor.capture());
 
         final UrlWhitelist whitelist = captor.getValue();
 

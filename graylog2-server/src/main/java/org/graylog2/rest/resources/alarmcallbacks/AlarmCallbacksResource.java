@@ -65,7 +65,7 @@ import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 
 @RequiresAuthentication
-@Api(value = "AlarmCallbacks", description = "Manage alarm callbacks (aka alert notifications)")
+@Api(value = "AlarmCallbacks", description = "Manage legacy alarm callbacks (aka alert notifications)")
 @Path("/alerts/callbacks")
 @Produces(MediaType.APPLICATION_JSON)
 public class AlarmCallbacksResource extends RestResource {

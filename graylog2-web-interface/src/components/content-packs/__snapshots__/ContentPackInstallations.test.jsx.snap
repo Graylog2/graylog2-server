@@ -13,7 +13,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
         id="content-packs-versions"
       >
         <table
-          className="table undefined"
+          className="table "
         >
           <thead>
             <tr>
@@ -47,7 +47,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                     role="toolbar"
                   >
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-primary"
+                      className="Button-c9cbmb-0 GLfOY btn btn-sm btn-primary"
                       disabled={false}
                       onClick={[Function]}
                       type="button"
@@ -55,7 +55,7 @@ exports[`<ContentPackInstallations /> should render with a installation 1`] = `
                       Uninstall
                     </button>
                     <button
-                      className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-sm btn-info"
+                      className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
                       disabled={false}
                       onClick={[Function]}
                       type="button"

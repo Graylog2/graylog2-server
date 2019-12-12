@@ -24,6 +24,7 @@ import org.graylog.plugins.views.migrations.V20180817120900_AddViewsUsers;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
 import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardStateFromViews;
+import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
@@ -65,8 +66,10 @@ import org.graylog.plugins.views.search.views.sharing.SpecificRolesStrategy;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsers;
 import org.graylog.plugins.views.search.views.sharing.SpecificUsersStrategy;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
@@ -136,6 +139,7 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20181220133700_AddViewsAdminRole.class);
         addMigration(V20190304102700_MigrateMessageListStructure.class);
         addMigration(V20190805115800_RemoveDashboardStateFromViews.class);
+        addMigration(V20191204000000_RemoveLegacyViewsPermissions.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 
@@ -175,6 +179,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(WorldMapVisualizationConfigDTO.class);
         registerJacksonSubtype(BarVisualizationConfigDTO.class);
         registerJacksonSubtype(NumberVisualizationConfigDTO.class);
+        registerJacksonSubtype(LineVisualizationConfigDTO.class);
+        registerJacksonSubtype(AreaVisualizationConfigDTO.class);
     }
 
     private void registerViewSharingSubtypes() {

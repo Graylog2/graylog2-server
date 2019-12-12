@@ -132,7 +132,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               }
             >
               <button
-                className="submit-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 type="submit"
               >
@@ -148,7 +148,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               }
             >
               <button
-                className="reset-button Button__StyledButton-c9cbmb-0 kRDLih btn btn-default"
+                className="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
                 disabled={false}
                 onClick={[Function]}
                 type="reset"
@@ -209,7 +209,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                           role="toolbar"
                         >
                           <button
-                            className="Button__StyledButton-c9cbmb-0 kRDLih btn btn-xs btn-info"
+                            className="Button-c9cbmb-0 GLfOY btn btn-xs btn-info"
                             disabled={false}
                             onClick={[Function]}
                             type="button"

@@ -27,6 +27,7 @@ import NavigationLink from './NavigationLink';
 import SystemMenu from './SystemMenu';
 import styles from './Navigation.css';
 import InactiveNavItem from './InactiveNavItem';
+import ScratchpadToggle from './ScratchpadToggle';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const { isPermitted } = PermissionsMixin;
@@ -135,6 +136,7 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
           <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
             <GlobalThroughput />
           </LinkContainer>
+          <ScratchpadToggle />
           <HelpMenu active={_isActive(location.pathname, Routes.GETTING_STARTED)} />
           <UserMenu fullName={fullName} loginName={loginName} />
         </Nav>

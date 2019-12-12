@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -9,9 +9,10 @@ import badgeStyles from './styles/badge';
 
 const Badge = forwardRef((props, ref) => {
   const { bsStyle } = props;
-  const StyledBadge = useCallback(styled(BootstrapBadge)`
-    ${badgeStyles(props)}
-  `, [bsStyle]);
+  const StyledBadge = useMemo(
+    () => styled(BootstrapBadge)`${badgeStyles(props)}`,
+    [bsStyle],
+  );
 
   return (
     <StyledBadge ref={ref} {...props} />

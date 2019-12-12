@@ -16,17 +16,33 @@
  */
 package org.graylog2.system.urlwhitelist;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
+import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+import javax.inject.Singleton;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class UrlWhitelistService {
+@Singleton
+public class UrlWhitelistService extends AbstractIdleService {
+    private volatile UrlWhitelist cachedWhitelist = null;
 
+    private final EventBus eventBus;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public UrlWhitelistService(ClusterConfigService clusterConfigService) {
+    public UrlWhitelistService(EventBus eventBus, ClusterConfigService clusterConfigService) {
+        this.eventBus = eventBus;
         this.clusterConfigService = clusterConfigService;
     }
 
@@ -42,17 +58,80 @@ public class UrlWhitelistService {
      * have to pass the whitelist though, otherwise the services won't be able to run properly. Once the migration has
      * run, these URLs will have been added to whitelist and we are fine.</p>
      */
-    public UrlWhitelist get() {
-        return clusterConfigService.getOrDefault(UrlWhitelist.class,
-                UrlWhitelist.create(Collections.emptyList(), true));
+    public UrlWhitelist getWhitelist() {
+        UrlWhitelist whitelist = cachedWhitelist;
+        if (whitelist == null) {
+            cachedWhitelist = whitelist = clusterConfigService.getOrDefault(UrlWhitelist.class,
+                    UrlWhitelist.create(Collections.emptyList(), true));
+        }
+        return whitelist;
     }
 
-    public void save(UrlWhitelist whitelist) {
+    public void saveWhitelist(UrlWhitelist whitelist) {
         clusterConfigService.write(whitelist);
     }
 
-    // TODO: add some kind of caching so that we don't fetch from db on every whitelist check
     public boolean isWhitelisted(String url) {
-        return get().isWhitelisted(url);
+        return getWhitelist().isWhitelisted(url);
+    }
+
+    public Optional<WhitelistEntry> getEntry(String id) {
+        return getWhitelist().entries()
+                .stream()
+                .filter(entry -> entry.id()
+                        .equals(id))
+                .findFirst();
+    }
+
+    public void addEntry(WhitelistEntry entry) {
+        final UrlWhitelist modified = addEntry(getWhitelist(), entry);
+        saveWhitelist(modified);
+    }
+
+    public void removeEntry(String id) {
+        UrlWhitelist modified = removeEntry(getWhitelist(), id);
+        saveWhitelist(modified);
+    }
+
+    @Subscribe
+    public void handleWhitelistUpdated(ClusterConfigChangedEvent event) {
+        if (UrlWhitelist.class.getCanonicalName().equals(event.type())) {
+            cachedWhitelist = null;
+        }
+    }
+
+    @Override
+    protected void startUp() {
+        eventBus.register(this);
+    }
+
+    @Override
+    protected void shutDown() {
+        eventBus.unregister(this);
+    }
+
+    @VisibleForTesting
+    UrlWhitelist addEntry(UrlWhitelist whitelist, WhitelistEntry entry) {
+        final LinkedHashMap<String, WhitelistEntry> entriesMap = whitelist.entries()
+                .stream()
+                .collect(Collectors.toMap(WhitelistEntry::id, Function.identity(),
+                        (a, b) -> { throw new IllegalStateException("Duplicate key '" + a + "'."); },
+                        LinkedHashMap::new));
+        entriesMap.put(entry.id(), entry);
+        return whitelist.toBuilder()
+                .entries(ImmutableList.copyOf(entriesMap.values()))
+                .build();
+    }
+
+    @VisibleForTesting
+    UrlWhitelist removeEntry(UrlWhitelist whitelist, String id) {
+        List<WhitelistEntry> entries = whitelist.entries()
+                .stream()
+                .filter(entry -> !entry.id()
+                        .equals(id))
+                .collect(Collectors.toList());
+        return whitelist.toBuilder()
+                .entries(entries)
+                .build();
     }
 }
