@@ -1,12 +1,13 @@
 // @flow strict
 import React from 'react';
-import { render, fireEvent, wait, waitForElementToBeRemoved, cleanup } from '@testing-library/react';
+import { render, fireEvent, wait, cleanup } from '@testing-library/react';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
+import asMock from 'helpers/mocking/AsMock';
 
 import Store from 'logic/local-storage/Store';
 import SearchActions from 'views/actions/SearchActions';
@@ -63,7 +64,7 @@ jest.mock('views/logic/Widgets', () => ({
 }));
 
 const getNewWidget = (actionMock) => {
-  const viewState = actionMock.mock.calls[0][1];
+  const viewState = asMock(actionMock).mock.calls[0][1];
   const widgetsTotal = viewState.widgets.size;
   return viewState.widgets.get(widgetsTotal - 1);
 };
@@ -73,8 +74,8 @@ const getNewWidgetConfig = (actionMock) => {
 };
 
 const renderAndMigrate = () => {
-  const { queryByText } = render(<MigrateFieldCharts />);
-  const migrateButton = queryByText('Migrate');
+  const { queryByText, getByText } = render(<MigrateFieldCharts />);
+  const migrateButton = getByText('Migrate');
   fireEvent.click(migrateButton);
   return { queryByText };
 };
@@ -108,7 +109,7 @@ describe('MigrateFieldCharts', () => {
     it('hide alert, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
       const { queryByText } = renderAndMigrate();
-      await waitForElementToBeRemoved(() => queryByText('Migrate existing search page charts'));
+      await wait(() => expect(queryByText('Migrate existing search page charts')).toBeNull());
       expect(Store.set).toHaveBeenCalledWith('pinned-field-charts-migrated', true);
     });
 
@@ -120,8 +121,9 @@ describe('MigrateFieldCharts', () => {
       const expWidgetPos = new WidgetPosition(1, 9, 4, Infinity);
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
-      await wait(() => expect(ViewStatesActions.update.mock.calls[0][1].widgets.size).toEqual(3));
-      expect(getNewWidgetPos(ViewStatesActions.update)).toEqual(expWidgetPos);
+      const actionMock = asMock(ViewStatesActions.update);
+      await wait(() => expect(actionMock.mock.calls[0][1].widgets.size).toEqual(3));
+      expect(getNewWidgetPos(actionMock)).toEqual(expWidgetPos);
     });
 
     it('create row pivot with interval unit months, if field chart interval is quarter', async () => {
