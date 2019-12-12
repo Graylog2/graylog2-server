@@ -70,6 +70,7 @@ class ConfigurationsPage extends React.Component {
   _pluginConfigs = () => {
     return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
       return React.createElement(systemConfig.component, {
+        // eslint-disable-next-line react/no-array-index-key
         key: `system-configuration-${idx}`,
         config: this._getConfig(systemConfig.configType) || undefined,
         updateConfig: this._onUpdate(systemConfig.configType),

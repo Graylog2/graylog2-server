@@ -35,15 +35,15 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
     setState(stateUpdate);
   };
   const validURL = (str: string): boolean => {
-    const expression = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    const expression = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/;
     const regexp = new RegExp(expression);
     return regexp.test(str);
   };
   const validRegex = (str: string) => {
     let isValid = true;
     try {
-      const expression = new RegExp(str);
-      console.log(expression);
+      // eslint-disable-next-line no-unused-vars
+      const expr = new RegExp(str);
     } catch (e) {
       isValid = false;
     }
@@ -60,7 +60,7 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
         }
         return validURL(value) && validRegex(value);
       default:
-        break;
+        return true;
     }
   };
   const validate = (input: string, value: string, type: string) => {
@@ -96,7 +96,6 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
     stateUpdate.entries[idx] = { ...state.entries[idx], value };
     setState(stateUpdate);
   };
-
 
   useEffect(() => {
     const valid = validateForm();
