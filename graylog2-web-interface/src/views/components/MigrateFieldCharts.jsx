@@ -108,7 +108,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
   const currentView = CurrentViewStateStore.getInitialState();
   const newWidgetPositions = { ...currentView.state.widgetPositions };
   const lastWidgetPosition = maxBy(values(newWidgetPositions), (position: WidgetPosition): number => position.row);
-  const existingRowOffset = lastWidgetPosition.row + lastWidgetPosition.height;
+  const existingRowOffset = lastWidgetPosition ? (lastWidgetPosition.row + lastWidgetPosition.height) : 0;
 
   const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
     // The old field charts only have one series per chart.
@@ -132,7 +132,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
       .config(widgetConfig)
       .build();
     const widgetRowPos = existingRowOffset + (widgetDef.defaultHeight * index);
-    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, widgetDef.defaultHeight, Infinity);
+    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, widgetDef.defaultHeight, Infinity);
     return newWidget;
   });
 
