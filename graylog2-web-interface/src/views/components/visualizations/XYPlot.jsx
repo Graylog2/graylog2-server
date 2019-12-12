@@ -38,7 +38,7 @@ const XYPlot = ({
   chartData,
   currentQuery,
   timezone,
-  effectiveTimerange = {},
+  effectiveTimerange,
   getChartColor,
   setChartColor,
   plotLayout = {},
@@ -50,7 +50,7 @@ const XYPlot = ({
 
   const _onZoom = useCallback(config.isTimeline ? (from, to) => onZoom(currentQuery, from, to) : () => true, [config.isTimeline, onZoom]);
 
-  if (config.isTimeline) {
+  if (config.isTimeline && effectiveTimerange) {
     const normalizedFrom = moment.tz(effectiveTimerange.from, timezone).format();
     const normalizedTo = moment.tz(effectiveTimerange.to, timezone).format();
     layout.xaxis = {
@@ -82,15 +82,18 @@ XYPlot.propTypes = {
   effectiveTimerange: PropTypes.shape({
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
-  }).isRequired,
+  }),
   plotLayout: PropTypes.object,
-  getChartColor: PropTypes.func.isRequired,
-  setChartColor: PropTypes.func.isRequired,
+  getChartColor: PropTypes.func,
+  setChartColor: PropTypes.func,
   onZoom: PropTypes.func,
 };
 
 XYPlot.defaultProps = {
   plotLayout: {},
+  getChartColor: undefined,
+  setChartColor: undefined,
+  effectiveTimerange: undefined,
   onZoom: OnZoom,
 };
 
