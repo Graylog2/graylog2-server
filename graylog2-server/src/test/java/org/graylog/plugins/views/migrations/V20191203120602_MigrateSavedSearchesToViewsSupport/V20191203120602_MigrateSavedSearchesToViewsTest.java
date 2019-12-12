@@ -18,7 +18,6 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.V20191203120602_MigrateSavedSearchesToViews.MigrationCompleted;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch.SavedSearchService;
@@ -50,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -122,33 +122,78 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
     }
 
     @Test
-    @MongoDBFixtures("sample_saved_searches.json")
-    public void migrateSampleSavedSearches() throws Exception {
+    @MongoDBFixtures("sample_saved_search_relative.json")
+    public void migrateSavedSearchWithRelativeTimerange() throws Exception {
         this.migration.upgrade();
 
         final MigrationCompleted migrationCompleted = captureMigrationCompleted();
-        assertThat(migrationCompleted.savedSearchIds()).containsAllEntriesOf(
-                ImmutableMap.of(
-                        "5c7e5499f38ed7e1d8d6a613", "5de0e98900002a0017000002",
-                        "5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000004",
-                        "5de660c6b2d44b5813c1d806", "5de0e98900002a0017000006"
-                )
-        );
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5c7e5499f38ed7e1d8d6a613", "5de0e98900002a0017000002"));
 
         final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
         final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
 
-        verify(viewService, times(3)).save(newViewsCaptor.capture());
-        verify(searchService, times(3)).save(newSearchesCaptor.capture());
+        verify(viewService, times(1)).save(newViewsCaptor.capture());
+        verify(searchService, times(1)).save(newSearchesCaptor.capture());
 
         final List<View> newViews = newViewsCaptor.getAllValues();
         final List<Search> newSearches = newSearchesCaptor.getAllValues();
 
-        assertThat(newViews).hasSize(3);
-        assertThat(newSearches).hasSize(3);
+        assertThat(newViews).hasSize(1);
+        assertThat(newSearches).hasSize(1);
 
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_searches-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_searches-expected_searches.json"), false);
+        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_relative-expected_views.json"), false);
+        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_relative-expected_searches.json"), false);
+    }
+
+    @Test
+    @MongoDBFixtures("sample_saved_search_absolute.json")
+    public void migrateSavedSearchWithAbsoluteTimerange() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000002"));
+
+        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
+        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
+
+        verify(viewService, times(1)).save(newViewsCaptor.capture());
+        verify(searchService, times(1)).save(newSearchesCaptor.capture());
+
+        final List<View> newViews = newViewsCaptor.getAllValues();
+        final List<Search> newSearches = newSearchesCaptor.getAllValues();
+
+        assertThat(newViews).hasSize(1);
+        assertThat(newSearches).hasSize(1);
+
+        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_absolute-expected_views.json"), false);
+        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_absolute-expected_searches.json"), false);
+    }
+
+    @Test
+    @MongoDBFixtures("sample_saved_search_keyword.json")
+    public void migrateSavedSearchWithKeywordTimerange() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5de660c6b2d44b5813c1d806", "5de0e98900002a0017000002"));
+
+        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
+        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
+
+        verify(viewService, times(1)).save(newViewsCaptor.capture());
+        verify(searchService, times(1)).save(newSearchesCaptor.capture());
+
+        final List<View> newViews = newViewsCaptor.getAllValues();
+        final List<Search> newSearches = newSearchesCaptor.getAllValues();
+
+        assertThat(newViews).hasSize(1);
+        assertThat(newSearches).hasSize(1);
+
+        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_keyword-expected_views.json"), false);
+        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_keyword-expected_searches.json"), false);
     }
 
     private MigrationCompleted captureMigrationCompleted() {
