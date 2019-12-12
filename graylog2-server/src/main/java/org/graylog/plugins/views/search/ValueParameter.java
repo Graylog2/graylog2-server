@@ -17,14 +17,11 @@
 package org.graylog.plugins.views.search;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-
-import javax.annotation.Nullable;
 
 /**
  * Parameters describe variable inputs to queries.
@@ -40,34 +37,6 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = ValueParameter.Builder.class)
 public abstract class ValueParameter implements Parameter {
     public static final String TYPE_NAME = "value-parameter-v1";
-
-    @Override
-    public abstract String type();
-
-    @JsonProperty
-    public abstract String name();
-
-    @Nullable
-    @JsonProperty
-    public abstract String title();
-
-    @Nullable
-    @JsonProperty
-    public abstract String description();
-
-    @JsonProperty("data_type")
-    public abstract String dataType();
-
-    @Nullable
-    @JsonProperty("default_value")
-    public abstract Object defaultValue();
-
-    @JsonProperty
-    public abstract boolean optional();
-
-    @Nullable
-    @JsonProperty
-    public abstract Binding binding();
 
     public static Builder builder() {
         return new AutoValue_ValueParameter.Builder().type(TYPE_NAME).optional(false);
@@ -93,26 +62,6 @@ public abstract class ValueParameter implements Parameter {
 
     @AutoValue.Builder
     public abstract static class Builder implements Parameter.Builder<Builder> {
-        @JsonProperty
-        public abstract Builder name(String name);
-
-        @JsonProperty
-        public abstract Builder title(String title);
-
-        @JsonProperty
-        public abstract Builder description(String description);
-
-        @JsonProperty
-        public abstract Builder dataType(String dataType);
-
-        @JsonProperty("default_value")
-        public abstract Builder defaultValue(Object defaultValue);
-
-        @JsonProperty
-        public abstract Builder optional(boolean optional);
-
-        @JsonProperty
-        public abstract Builder binding(Binding binding);
 
         public abstract ValueParameter build();
 

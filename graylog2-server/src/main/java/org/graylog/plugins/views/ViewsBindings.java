@@ -200,7 +200,8 @@ public class ViewsBindings extends ViewsModule {
         registerSharingStrategy(SpecificRoles.TYPE, SpecificRolesStrategy.class);
         registerSharingStrategy(SpecificUsers.TYPE, SpecificUsersStrategy.class);
     }
-private void registerExceptionMappers() {
+
+    private void registerExceptionMappers() {
         addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
     }

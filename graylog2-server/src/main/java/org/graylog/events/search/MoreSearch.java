@@ -319,7 +319,13 @@ public class MoreSearch extends Searches {
         return streams;
     }
 
+    /**
+     * Substitute query string parameters using ESQueryDecorators.
+     */
     private String decorateQuery(Set<Parameter> queryParameters, TimeRange timeRange, String queryString) {
+        // TODO
+        // We need to create a dummy SearchJob and a Query to use the decorator API.
+        // Maybe the decorate call could be refactored to make this easier.
         org.graylog.plugins.views.search.Search search = org.graylog.plugins.views.search.Search.builder()
                 .parameters(ImmutableSet.copyOf(queryParameters))
                 .build();

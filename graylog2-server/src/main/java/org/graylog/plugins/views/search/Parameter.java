@@ -60,22 +60,46 @@ public interface Parameter {
     @JsonProperty
     String description();
 
+    @JsonProperty("data_type")
+    String dataType();
+
     @Nullable
-    @JsonProperty
-    Binding binding();
+    @JsonProperty("default_value")
+    Object defaultValue();
 
     @JsonProperty
     boolean optional();
 
     @Nullable
-    @JsonProperty("default_value")
-    Object defaultValue();
+    @JsonProperty
+    Binding binding();
 
     Parameter applyExecutionState(ObjectMapper objectMapper, JsonNode jsonNode);
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
         SELF type(String type);
+
+        @JsonProperty
+        SELF name(String name);
+
+        @JsonProperty
+        SELF title(String title);
+
+        @JsonProperty
+        SELF description(String description);
+
+        @JsonProperty("data_type")
+        SELF dataType(String dataType);
+
+        @JsonProperty("default_value")
+        SELF defaultValue(Object defaultValue);
+
+        @JsonProperty
+        SELF optional(boolean optional);
+
+        @JsonProperty
+        SELF binding(Binding binding);
     }
     interface Factory<TYPE extends Parameter> {
         TYPE create(Parameter parameter);
