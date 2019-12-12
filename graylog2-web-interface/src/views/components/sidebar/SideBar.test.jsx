@@ -45,8 +45,7 @@ describe('<Sidebar />', () => {
       title: 'Query Title',
     };
 
-    // eslint-disable-next-line camelcase
-    const effective_timerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' };
+    const effectiveTimerange = { type: 'absolute', from: '2018-08-28T14:34:26.192Z', to: '2018-08-28T14:39:26.192Z' };
     const duration = 64;
     const timestamp = '2018-08-28T14:39:26.127Z';
     query = {
@@ -56,10 +55,9 @@ describe('<Sidebar />', () => {
       search_types: [],
       timerange: { type: 'relative', range: 300 },
     };
-    const error = [];
-    // eslint-disable-next-line camelcase
-    const execution_stats = { effective_timerange, duration, timestamp };
-    queryResult = new QueryResult({ execution_stats, query, error });
+    const errors = [];
+    const executionStats = { effective_timerange: effectiveTimerange, duration, timestamp };
+    queryResult = new QueryResult({ execution_stats: executionStats, query, errors });
 
     const currentUser = { timezone: 'UTC' };
     const CurrentUserStore = StoreMock('listen', ['get', () => currentUser], ['getInitialState', () => ({ currentUser })]);
