@@ -29,3 +29,18 @@ export const emptyGroupExpressionConfig = ({ operator = '&&', child = emptyCompa
     child: child,
   };
 };
+
+/**
+ * Replaces all boolean expressions inside the current tree, without affecting any internal groups.
+ */
+export const replaceBooleanExpressionOperatorInGroup = (nextOperator, expression) => {
+  const nextExpression = Object.assign({}, expression);
+
+  if (expression.expr === '&&' || expression.expr === '||') {
+    nextExpression.expr = nextOperator;
+    nextExpression.left = replaceBooleanExpressionOperatorInGroup(nextOperator, nextExpression.left);
+    nextExpression.right = replaceBooleanExpressionOperatorInGroup(nextOperator, nextExpression.right);
+  }
+
+  return nextExpression;
+};

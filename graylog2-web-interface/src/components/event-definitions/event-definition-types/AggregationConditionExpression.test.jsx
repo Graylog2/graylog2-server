@@ -312,5 +312,67 @@ describe('AggregationConditionExpression', () => {
       deleteConditionButton.last().simulate('click');
       expect(onChange.mock.calls.length).toBe(1);
     });
+
+    it('should update boolean expressions when group operator changes', () => {
+      const comparisonExpression = getComparisonExpression('<', 12);
+      const secondBooleanExpression = getBooleanExpression('||', comparisonExpression, comparisonExpression);
+      const firstBooleanExpression = getBooleanExpression('||', comparisonExpression, secondBooleanExpression);
+      const groupExpression = getGroupExpression('||', firstBooleanExpression);
+      const expression = getBooleanExpression('&&', comparisonExpression, groupExpression);
+
+      const onChange = jest.fn((key, update) => {
+        expect(key).toBe('conditions');
+        expect(update.expr).toBe('&&');
+        const nextGroup = update.right;
+        expect(nextGroup.expr).toBe('group');
+        expect(nextGroup.operator).toBe('&&');
+        const nextBoolean = nextGroup.child;
+        expect(nextBoolean.expr).toBe('&&');
+        expect(nextBoolean.right.expr).toBe('&&');
+      });
+      const wrapper = mount(
+        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
+                                        validation={{ errors: {} }}
+                                        formattedFields={[]}
+                                        aggregationFunctions={[]}
+                                        onChange={onChange}
+                                        expression={expression} />,
+      );
+
+      const select = wrapper.find('Select Select.boolean-operator').at(1);
+      select.prop('onChange')({ value: '&&' });
+      expect(onChange.mock.calls.length).toBe(1);
+    });
+
+    it('should update boolean expressions when global group operator changes', () => {
+      const comparisonExpression = getComparisonExpression('<', 12);
+      const groupBooleanExpression = getBooleanExpression('||', comparisonExpression, comparisonExpression);
+      const groupExpression = getGroupExpression('||', groupBooleanExpression);
+      const booleanExpression = getBooleanExpression('&&', comparisonExpression, groupExpression);
+      const expression = getBooleanExpression('&&', comparisonExpression, booleanExpression);
+
+      const onChange = jest.fn((key, update) => {
+        expect(key).toBe('conditions');
+        expect(update.expr).toBe('||');
+        const nextBoolean = update.right;
+        expect(nextBoolean.expr).toBe('||');
+        const nextGroup = nextBoolean.right;
+        expect(nextGroup.operator).toBe('||');
+        const nextGroupBoolean = nextGroup.child;
+        expect(nextGroupBoolean.expr).toBe('||');
+      });
+      const wrapper = mount(
+        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
+                                        validation={{ errors: {} }}
+                                        formattedFields={[]}
+                                        aggregationFunctions={[]}
+                                        onChange={onChange}
+                                        expression={expression} />,
+      );
+
+      const select = wrapper.find('Select Select.boolean-operator').at(0);
+      select.prop('onChange')({ value: '||' });
+      expect(onChange.mock.calls.length).toBe(1);
+    });
   });
 });

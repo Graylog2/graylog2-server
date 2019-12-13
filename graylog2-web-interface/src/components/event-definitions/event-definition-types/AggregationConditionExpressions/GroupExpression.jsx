@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Clearfix } from 'components/graylog';
 
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
+import { replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 // eslint-disable-next-line import/no-cycle
 import AggregationConditionExpression from '../AggregationConditionExpression';
 import BooleanOperatorSelector from './BooleanOperatorSelector';
@@ -20,6 +21,7 @@ const GroupExpression = (props) => {
   const handleOperatorChange = (nextOperator) => {
     const nextExpression = cloneDeep(expression);
     nextExpression.operator = nextOperator;
+    nextExpression.child = replaceBooleanExpressionOperatorInGroup(nextOperator, nextExpression.child);
     onChange('conditions', nextExpression);
   };
 

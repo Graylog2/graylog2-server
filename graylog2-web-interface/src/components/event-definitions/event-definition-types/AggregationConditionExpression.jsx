@@ -5,7 +5,7 @@ import lodash from 'lodash';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/graylog';
 import { Icon } from 'components/common';
 
-import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
+import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
 
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
@@ -20,6 +20,7 @@ import GroupExpression from './AggregationConditionExpressions/GroupExpression';
 /* eslint-enable import/no-cycle */
 
 import styles from './AggregationConditionExpression.css';
+
 
 class AggregationConditionExpression extends React.Component {
   static propTypes = {
@@ -114,7 +115,10 @@ class AggregationConditionExpression extends React.Component {
   };
 
   handleOperatorChange = (nextOperator) => {
+    const { expression, onChange } = this.props;
     this.setState({ globalGroupOperator: nextOperator });
+    const nextExpression = replaceBooleanExpressionOperatorInGroup(nextOperator, expression);
+    onChange('conditions', nextExpression);
   };
 
   render() {
