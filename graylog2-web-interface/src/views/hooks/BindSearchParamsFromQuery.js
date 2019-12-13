@@ -15,24 +15,28 @@ const _getTimerange = (query = {}) => {
   let timerange;
   const rangeType = query.rangetype || DEFAULT_RANGE_TYPE;
 
-  if (query.relative || query.absolute || query.keyword) {
-    switch (rangeType) {
-      case 'relative':
+  switch (rangeType) {
+    case 'relative':
+      if (query.relative) {
         timerange = { type: rangeType, range: query.relative };
-        break;
-      case 'absolute':
+      }
+      break;
+    case 'absolute':
+      if (query.from || query.to) {
         timerange = {
           type: rangeType,
           from: query.from,
           to: query.to,
         };
-        break;
-      case 'keyword':
-        timerange = { type: rangeType, keyword: query.relative };
-        break;
-      default:
-        throw new Error(`Unsupported range type ${rangeType}`);
-    }
+      }
+      break;
+    case 'keyword':
+      if (query.keyword) {
+        timerange = { type: rangeType, keyword: query.keyword };
+      }
+      break;
+    default:
+      throw new Error(`Unsupported range type ${rangeType}`);
   }
 
   return timerange;
