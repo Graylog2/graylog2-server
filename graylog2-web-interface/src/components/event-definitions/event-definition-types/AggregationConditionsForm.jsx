@@ -17,6 +17,9 @@ const extractSeriesReferences = (expression, acc = []) => {
   if (expression.left && expression.right) {
     return extractSeriesReferences(expression.left).concat(extractSeriesReferences(expression.right));
   }
+  if (expression.child) {
+    return extractSeriesReferences(expression.child);
+  }
   return acc;
 };
 
