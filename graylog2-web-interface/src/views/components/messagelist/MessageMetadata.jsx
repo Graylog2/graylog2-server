@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 type Props = {
   timestamp: string,
   receivedBy: React.Node,
   index: string,
-  streams: Array<React.Node>,
+  streams: Immutable.Set<React.Node>,
 };
 
 const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
