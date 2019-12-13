@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
@@ -140,8 +140,10 @@ const Panel = ({
 
   if (header || footer || title || collapsible || typeof children === 'string') {
     /** NOTE: Deprecated & should be removed in 4.0 */
-    /* eslint-disable-next-line no-console */
-    console.warn('Graylog Notice: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+    useEffect(() => {
+      /* eslint-disable-next-line no-console */
+      console.warn('Graylog Notice: ', 'You have used a deprecated `Panel` prop, please check the documentation to use the latest `Panel`.');
+    }, []);
 
     return (
       /* NOTE: this exists as a deprecated render for older Panel instances */
