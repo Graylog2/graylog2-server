@@ -151,7 +151,7 @@
     "connect-history-api-fallback": "^1.4.0",
     "copy-webpack-plugin": "^4.5.1",
     "cors": "^2.8.5",
-    "css-loader": "^0.28.10",
+    "css-loader": "^3.3.2",
     "enzyme": "3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "eslint-config-graylog": "file:packages/eslint-config-graylog",
