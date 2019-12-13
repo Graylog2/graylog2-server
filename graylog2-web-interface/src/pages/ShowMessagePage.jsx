@@ -24,6 +24,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
   const [message, setMessage] = useState();
   const [inputs, setInputs] = useState(Immutable.Map);
   const [streams, setStreams] = useState();
+  const [allStreams, setAllStreams] = useState();
   useEffect(() => { NodesActions.list(); }, []);
   useEffect(() => {
     MessagesActions.loadMessage(index, messageId)
@@ -43,10 +44,14 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
       if (newStreams) {
         const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
         setStreams(Immutable.Map(streamsMap));
+        setAllStreams(newStreams);
       }
     });
-  }, [setStreams]);
-  const isLoaded = useMemo(() => (message !== undefined && streams !== undefined && inputs !== undefined), [message, streams, inputs]);
+  }, [setStreams, setAllStreams]);
+  const isLoaded = useMemo(() => (message !== undefined
+    && streams !== undefined
+    && inputs !== undefined
+    && allStreams !== undefined), [message, streams, inputs, allStreams]);
 
   if (isLoaded) {
     return (
@@ -56,7 +61,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
             <InteractiveContext.Provider value={false}>
               <ConnectedMessageDetail fields={Immutable.Map()}
                                       streams={streams}
-                                      allStreams={streams.valueSeq().toJS()}
+                                      allStreams={allStreams}
                                       disableSurroundingSearch
                                       disableFieldActions
                                       inputs={inputs}
