@@ -21,6 +21,8 @@ const AggregationConditionSummary = ({ conditions, series }) => {
             {renderExpression(expression.right)}
           </>
         );
+      case 'group':
+        return <span>[{renderExpression(expression.child)}]</span>;
       case '<':
       case '<=':
       case '>':
