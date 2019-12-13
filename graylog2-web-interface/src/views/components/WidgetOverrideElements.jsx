@@ -8,7 +8,7 @@ type Props = {
   widgetOverrideElements: Array<React.ComponentType<{}>>,
 };
 
-export type OverrideComponentType = React.ComponentType<{ resetOverride: () => mixed }> | Error;
+export type OverrideComponentType = React.ComponentType<{ retry: () => mixed }> | Error;
 
 type State = {
   thrownComponent: ?OverrideComponentType,
@@ -31,8 +31,8 @@ class WidgetOverrideElements extends React.Component<Props, State> {
       if (OverrideComponent instanceof Error) {
         throw OverrideComponent;
       }
-      const resetOverride = () => this.setState({ thrownComponent: undefined });
-      return <OverrideComponent resetOverride={resetOverride} />;
+      const retry = () => this.setState({ thrownComponent: undefined });
+      return <OverrideComponent retry={retry} />;
     }
 
     const { children, widgetOverrideElements } = this.props;
