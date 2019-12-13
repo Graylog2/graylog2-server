@@ -4,6 +4,8 @@ import { dirname } from 'path';
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import copyWidgetToDashboard from './CopyWidgetToDashboard';
+import ValueParameter from '../parameters/ValueParameter';
+import Parameter from '../parameters/Parameter';
 
 jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
@@ -21,12 +23,17 @@ const cwd = dirname(__filename);
 const readFixture = filename => JSON.parse(readFileSync(`${cwd}/${filename}`).toString());
 
 describe('copyWidgetToDashboard', () => {
+  beforeEach(() => {
+    Parameter.registerSubtype(ValueParameter.type, ValueParameter);
+  });
+
   it('should copy a Widget to a dashboard', () => {
     const searchViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Search-View.fixture.json'));
     const searchSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Search-Search.fixture.json'));
     const searchView = searchViewFixture.toBuilder()
       .search(searchSearchFixture)
       .build();
+
 
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
     const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));

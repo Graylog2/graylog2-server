@@ -19,7 +19,7 @@ exports[`<ContentPackConstraints /> should render with created constraints 1`] =
           id="content-packs-constraints"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>
@@ -106,7 +106,7 @@ exports[`<ContentPackConstraints /> should render with new constraints with forc
           id="content-packs-constraints"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>
@@ -193,7 +193,7 @@ exports[`<ContentPackConstraints /> should render with new constraints without f
           id="content-packs-constraints"
         >
           <table
-            className="table undefined"
+            className="table "
           >
             <thead>
               <tr>

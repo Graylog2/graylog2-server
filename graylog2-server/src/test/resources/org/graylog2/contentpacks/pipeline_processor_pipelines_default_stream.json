@@ -1,0 +1,29 @@
+{
+  "pipeline_processor_pipelines": [
+    {
+      "_id": {
+        "$oid": "5a85c4854b900afd5d662be3"
+      },
+      "title": "Test",
+      "description": "Description",
+      "source": "pipeline \"Test\"\nstage 0 match either\nrule \"debug\"\nrule \"no-op\"\nend",
+      "created_at": {
+        "$date": "2018-02-15T17:33:57.125Z"
+      },
+      "modified_at": {
+        "$date": "2018-04-24T12:37:31.592Z"
+      }
+    }
+  ],
+  "pipeline_processor_pipelines_streams": [
+    {
+      "_id": {
+        "$oid": "5adf28464b900a0fdb4e56f2"
+      },
+      "stream_id": "000000000000000000000001",
+      "pipeline_ids": [
+        "5a85c4854b900afd5d662be3"
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import PropTypes from 'prop-types';
 
-import { Tab, Tabs } from 'components/graylog';
+import { Tab, Tabs, Col, Row } from 'components/graylog';
 import ViewActionsMenu from 'views/components/ViewActionsMenu';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
@@ -27,6 +27,8 @@ type Props = {
 }
 
 class QueryTabs extends React.Component<Props> {
+  queryTitleEditModal: ?QueryTitleEditModal
+
   static propTypes = {
     children: PropTypes.node,
     onRemove: PropTypes.func.isRequired,
@@ -42,8 +44,6 @@ class QueryTabs extends React.Component<Props> {
   static defaultProps = {
     children: null,
   }
-
-  queryTitleEditModal: ?QueryTitleEditModal
 
   openTitleEditModal = (activeQueryTitle: string) => {
     if (this.queryTitleEditModal) {
@@ -87,24 +87,26 @@ class QueryTabs extends React.Component<Props> {
     const tabs = [queryTabs, newTab];
 
     return (
-      <span>
-        <span className="pull-right">
-          <ViewActionsMenu onSaveView={onSaveView} onSaveAsView={onSaveAsView} />
-        </span>
-        <Tabs activeKey={selectedQueryId}
-              animation={false}
-              id="QueryTabs"
-              onSelect={onSelect}>
-          {tabs}
-        </Tabs>
-        {/*
+      <Row style={{ marginBottom: 0 }}>
+        <Col>
+          <span className="pull-right">
+            <ViewActionsMenu onSaveView={onSaveView} onSaveAsView={onSaveAsView} />
+          </span>
+          <Tabs activeKey={selectedQueryId}
+                animation={false}
+                id="QueryTabs"
+                onSelect={onSelect}>
+            {tabs}
+          </Tabs>
+          {/*
           The title edit modal can't be part of the QueryTitle component,
           due to the react bootstrap tabs keybindings.
           The input would always lose the focus when using the arrow keys.
         */}
-        <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
-                             ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} />
-      </span>
+          <QueryTitleEditModal onTitleChange={(newTitle: string) => onTitleChange(selectedQueryId, newTitle)}
+                               ref={(queryTitleEditModal) => { this.queryTitleEditModal = queryTitleEditModal; }} />
+        </Col>
+      </Row>
     );
   }
 }

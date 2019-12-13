@@ -1,12 +1,7 @@
 // @flow strict
 import * as Immutable from 'immutable';
+import GlobalOverride from './GlobalOverride';
 import ParameterBinding from '../parameters/ParameterBinding';
-import type { QueryString, TimeRange } from '../queries/Query';
-
-export type GlobalOverride = {
-  timerange?: TimeRange,
-  query?: QueryString,
-};
 
 export type ParameterBindings = Immutable.Map<string, ParameterBinding>;
 

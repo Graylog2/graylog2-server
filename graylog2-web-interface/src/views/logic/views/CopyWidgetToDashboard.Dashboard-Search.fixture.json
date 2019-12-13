@@ -56,6 +56,7 @@
   ],
   "parameters": [
     {
+      "type": "value-parameter-v1",
       "name": "project",
       "title": "Project",
       "description": "",

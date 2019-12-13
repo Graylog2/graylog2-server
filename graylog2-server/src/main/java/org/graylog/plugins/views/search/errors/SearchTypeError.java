@@ -18,7 +18,6 @@ package org.graylog.plugins.views.search.errors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Query;
 
 import javax.annotation.Nonnull;
 
@@ -28,11 +27,13 @@ public class SearchTypeError extends QueryError {
 
     public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, Throwable throwable) {
         super(query, throwable);
+
         this.searchTypeId = searchTypeId;
     }
 
     public SearchTypeError(@Nonnull Query query, @Nonnull String searchTypeId, String description) {
         super(query, description);
+
         this.searchTypeId = searchTypeId;
     }
 

@@ -75,125 +75,123 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </div>
               </form>
             </div>
+            <div
+              class="form-inline page-size"
+              style="float: right;"
+            >
+              <div
+                class="form-group"
+              >
+                <label
+                  class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                  for="page-size"
+                >
+                  Show:
+                </label>
+                <span>
+                  <select
+                    class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
+                    id="page-size"
+                    label="Show:"
+                    name="page-size"
+                    placeholder=""
+                    type="select"
+                  >
+                    <option
+                      value="5"
+                    >
+                      5
+                    </option>
+                    <option
+                      value="10"
+                    >
+                      10
+                    </option>
+                    <option
+                      value="15"
+                    >
+                      15
+                    </option>
+                  </select>
+                  
+                </span>
+              </div>
+            </div>
             <span>
-              <div
-                class="form-inline page-size"
-                style="float: right;"
-              >
-                <div
-                  class="form-group"
-                >
-                  <label
-                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                    for="page-size"
-                  >
-                    Show:
-                  </label>
-                  <span>
-                    <select
-                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
-                      id="page-size"
-                      label="Show:"
-                      name="page-size"
-                      placeholder=""
-                      type="select"
-                    >
-                      <option
-                        value="5"
-                      >
-                        5
-                      </option>
-                      <option
-                        value="10"
-                      >
-                        10
-                      </option>
-                      <option
-                        value="15"
-                      >
-                        15
-                      </option>
-                    </select>
-                    
-                  </span>
-                </div>
-              </div>
-              <span>
-                No dashboards found
-              </span>
-              <div
-                class="text-center"
-              >
-                <ul
-                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
-                >
-                  <li
-                    class="disabled"
-                  >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
-                    >
-                      <span
-                        aria-label="First"
-                      >
-                        «
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
-                  >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
-                    >
-                      <span
-                        aria-label="Previous"
-                      >
-                        ‹
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
-                  >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
-                    >
-                      <span
-                        aria-label="Next"
-                      >
-                        ›
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
-                  >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
-                    >
-                      <span
-                        aria-label="Last"
-                      >
-                        »
-                      </span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              No dashboards found
             </span>
+            <div
+              class="text-center"
+            >
+              <ul
+                class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+              >
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
+                  >
+                    <span
+                      aria-label="First"
+                    >
+                      «
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
+                  >
+                    <span
+                      aria-label="Previous"
+                    >
+                      ‹
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
+                  >
+                    <span
+                      aria-label="Next"
+                    >
+                      ›
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
+                  >
+                    <span
+                      aria-label="Last"
+                    >
+                      »
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
           <div
             class="modal-footer"
@@ -294,162 +292,160 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </div>
               </form>
             </div>
-            <span>
+            <div
+              class="form-inline page-size"
+              style="float: right;"
+            >
               <div
-                class="form-inline page-size"
-                style="float: right;"
+                class="form-group"
               >
-                <div
-                  class="form-group"
+                <label
+                  class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                  for="page-size"
                 >
-                  <label
-                    class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                    for="page-size"
+                  Show:
+                </label>
+                <span>
+                  <select
+                    class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
+                    id="page-size"
+                    label="Show:"
+                    name="page-size"
+                    placeholder=""
+                    type="select"
                   >
-                    Show:
-                  </label>
-                  <span>
-                    <select
-                      class="FormControl-sc-1amoaox-0 hdNTyr form-control input-sm"
-                      id="page-size"
-                      label="Show:"
-                      name="page-size"
-                      placeholder=""
-                      type="select"
+                    <option
+                      value="5"
                     >
-                      <option
-                        value="5"
-                      >
-                        5
-                      </option>
-                      <option
-                        value="10"
-                      >
-                        10
-                      </option>
-                      <option
-                        value="15"
-                      >
-                        15
-                      </option>
-                    </select>
-                    
-                  </span>
-                </div>
+                      5
+                    </option>
+                    <option
+                      value="10"
+                    >
+                      10
+                    </option>
+                    <option
+                      value="15"
+                    >
+                      15
+                    </option>
+                  </select>
+                  
+                </span>
               </div>
-              <div
-                class="list-group"
+            </div>
+            <div
+              class="list-group"
+            >
+              <button
+                class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                type="button"
               >
-                <button
-                  class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-                  type="button"
+                <h4
+                  class="list-group-item-heading"
                 >
-                  <h4
-                    class="list-group-item-heading"
-                  >
-                    view 1
-                  </h4>
-                  <p
-                    class="list-group-item-text"
-                  />
-                </button>
-                <button
-                  class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-                  type="button"
-                >
-                  <h4
-                    class="list-group-item-heading"
-                  >
-                    view 2
-                  </h4>
-                  <p
-                    class="list-group-item-text"
-                  />
-                </button>
-              </div>
-              <div
-                class="text-center"
+                  view 1
+                </h4>
+                <p
+                  class="list-group-item-text"
+                />
+              </button>
+              <button
+                class="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                type="button"
               >
-                <ul
-                  class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+                <h4
+                  class="list-group-item-heading"
                 >
-                  <li
-                    class="disabled"
+                  view 2
+                </h4>
+                <p
+                  class="list-group-item-text"
+                />
+              </button>
+            </div>
+            <div
+              class="text-center"
+            >
+              <ul
+                class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+              >
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
                   >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
+                    <span
+                      aria-label="First"
                     >
-                      <span
-                        aria-label="First"
-                      >
-                        «
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
+                      «
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
                   >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
+                    <span
+                      aria-label="Previous"
                     >
-                      <span
-                        aria-label="Previous"
-                      >
-                        ‹
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="active"
+                      ‹
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="active"
+                >
+                  <a
+                    href="#"
+                    role="button"
                   >
-                    <a
-                      href="#"
-                      role="button"
-                    >
-                      1
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
+                    1
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
                   >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
+                    <span
+                      aria-label="Next"
                     >
-                      <span
-                        aria-label="Next"
-                      >
-                        ›
-                      </span>
-                    </a>
-                  </li>
-                  <li
-                    class="disabled"
+                      ›
+                    </span>
+                  </a>
+                </li>
+                <li
+                  class="disabled"
+                >
+                  <a
+                    href="#"
+                    role="button"
+                    style="pointer-events: none;"
+                    tabindex="-1"
                   >
-                    <a
-                      href="#"
-                      role="button"
-                      style="pointer-events: none;"
-                      tabindex="-1"
+                    <span
+                      aria-label="Last"
                     >
-                      <span
-                        aria-label="Last"
-                      >
-                        »
-                      </span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </span>
+                      »
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
           <div
             class="modal-footer"

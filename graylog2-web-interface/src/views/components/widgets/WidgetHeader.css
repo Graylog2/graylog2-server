@@ -1,6 +1,5 @@
 :local(.widgetHeader) {
     font-size: 18px;
-    height: 25px;
     text-overflow: ellipsis;
     margin-bottom: 5px;
 }

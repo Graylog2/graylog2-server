@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import one.util.streamex.StreamEx;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
@@ -77,7 +76,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_USE)
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
@@ -117,7 +115,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
-    @RequiresPermissions(ViewsRestPermissions.EXTENDEDSEARCH_CREATE)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
         final String username = username();

@@ -117,7 +117,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Create new notification definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
-    public Response create(NotificationDto dto) {
+    public Response create(@ApiParam(name = "JSON Body") NotificationDto dto) {
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
@@ -130,7 +130,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
     public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
-                                  NotificationDto dto) {
+                                  @ApiParam(name = "JSON Body") NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         dbNotificationService.get(notificationId)
                 .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
@@ -186,7 +186,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             @ApiResponse(code = 500, message = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
-    public Response test(NotificationDto dto) {
+    public Response test(@ApiParam(name = "JSON Body") NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {

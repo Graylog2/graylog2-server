@@ -1,35 +1,43 @@
 // @flow strict
 
 import * as Immutable from 'immutable';
-import ParameterBinding from './ParameterBinding';
+import ParameterBinding from 'views/logic/parameters/ParameterBinding';
+import type { ParameterBindingJsonRepresentation } from './ParameterBinding';
+import { singleton } from '../singleton';
 
 type InternalState = {
+  type: string,
   name: string,
   title: string,
   description: string,
   dataType: string,
   defaultValue: any,
   optional: boolean,
-  binding: ParameterBinding,
+  binding: ?ParameterBinding
 };
 
-type InternalBuilderState = Immutable.Map<string, any>;
-
 export type ParameterJson = {
+  type: string,
   name: string,
   title: string,
   description: string,
   data_type: string,
   default_value: any,
   optional: boolean,
-  binding: ParameterBinding,
+  binding: ?ParameterBindingJsonRepresentation,
 };
 
-export default class Parameter {
+class Parameter {
   _value: InternalState;
 
-  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ParameterBinding) {
-    this._value = { name, title, description, dataType, defaultValue, optional, binding };
+  static __registrations: { [string]: typeof Parameter } = {};
+
+  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ?ParameterBinding) {
+    this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
+  }
+
+  get type(): string {
+    return this._value.type;
   }
 
   get name(): string {
@@ -56,90 +64,30 @@ export default class Parameter {
     return this._value.optional;
   }
 
-  get binding(): ParameterBinding {
+  // screw you eslint, using param.constructor.needsBinding() is ugly
+  // eslint-disable-next-line class-methods-use-this
+  get needsBinding(): boolean {
+    return true;
+  }
+
+  get binding(): ?ParameterBinding {
     return this._value.binding;
   }
 
-  // eslint-disable-next-line no-use-before-define
-  toBuilder(): Builder {
-    const { name, title, description, dataType, defaultValue, optional, binding } = this._value;
-    // eslint-disable-next-line no-use-before-define
-    return new Builder(Immutable.Map({ name, title, description, dataType, defaultValue, optional, binding }));
-  }
-
-  static create(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding: ParameterBinding): Parameter {
-    return new Parameter(name, title, description, dataType, defaultValue, optional, binding);
-  }
-
-  toJSON(): ParameterJson {
-    const { name, title, description, dataType, defaultValue, optional, binding } = this._value;
-
-    return {
-      name,
-      title,
-      description,
-      data_type: dataType,
-      default_value: defaultValue,
-      optional,
-      binding,
-    };
-  }
-
   static fromJSON(value: ParameterJson): Parameter {
-    // eslint-disable-next-line camelcase
-    const { name, title, description, data_type, default_value, optional, binding } = value;
-    return Parameter.create(name, title, description, data_type, default_value, optional, binding);
+    const { type = 'value-parameter-v1' } = value; // default to ValueParameter in case type is empty
+    const implementingClass = Parameter.__registrations[type.toLocaleLowerCase()];
+
+    if (implementingClass) {
+      return implementingClass.fromJSON(value);
+    }
+    throw new Error(`No class found for type <${type}>`);
   }
 
-  // eslint-disable-next-line no-use-before-define
-  static builder(): Builder {
-    // eslint-disable-next-line no-use-before-define
-    return new Builder()
-      .optional(false)
-      .dataType('any')
-      .binding(ParameterBinding.empty());
-  }
-}
-
-class Builder {
-  value: InternalBuilderState;
-
-  constructor(value: Immutable.Map = Immutable.Map()) {
-    this.value = value;
-  }
-
-  name(value: string): Builder {
-    return new Builder(this.value.set('name', value));
-  }
-
-  title(value: string): Builder {
-    return new Builder(this.value.set('title', value));
-  }
-
-  description(value: string): Builder {
-    return new Builder(this.value.set('description', value));
-  }
-
-  dataType(value: string): Builder {
-    return new Builder(this.value.set('dataType', value));
-  }
-
-  defaultValue(value: any): Builder {
-    return new Builder(this.value.set('defaultValue', value));
-  }
-
-  optional(value: boolean): Builder {
-    return new Builder(this.value.set('optional', value));
-  }
-
-  binding(value: ParameterBinding): Builder {
-    return new Builder(this.value.set('binding', value));
-  }
-
-  build(): Parameter {
-    const { name, title, description, dataType, defaultValue, optional, binding } = this.value.toObject();
-    return new Parameter(name, title, description, dataType, defaultValue, optional, binding);
+  static registerSubtype(type: string, implementingClass: typeof Parameter) {
+    this.__registrations[type.toLocaleLowerCase()] = implementingClass;
   }
 }
+export default singleton('views.logic.parameters.Parameter', () => Parameter);
 
 export type ParameterMap = Immutable.Map<string, Parameter>;

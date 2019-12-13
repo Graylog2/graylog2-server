@@ -18,13 +18,9 @@ package org.graylog.plugins.views.search.views;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.views.QualifyingViewsService;
-import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog.plugins.views.search.views.ViewParameterSummaryDTO;
-import org.graylog.plugins.views.search.views.ViewService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -93,7 +89,7 @@ public class QualifyingViewsServiceTest {
         when(view1.summary()).thenReturn("My Summary");
         when(view1.description()).thenReturn("My Description");
         when(search.id()).thenReturn(searchId);
-        when(search.parameters()).thenReturn(ImmutableSet.of(Parameter.any("foobar")));
+        when(search.parameters()).thenReturn(ImmutableSet.of(ValueParameter.any("foobar")));
         when(viewService.streamAll()).then(invocation -> Stream.of(view1));
         when(searchDbService.findByIds(any())).thenReturn(ImmutableList.of(search));
 
@@ -121,7 +117,7 @@ public class QualifyingViewsServiceTest {
         when(view1.summary()).thenReturn("My Summary");
         when(view1.description()).thenReturn("My Description");
         when(search1.id()).thenReturn(search1Id);
-        when(search1.parameters()).thenReturn(ImmutableSet.of(Parameter.any("foobar")));
+        when(search1.parameters()).thenReturn(ImmutableSet.of(ValueParameter.any("foobar")));
         when(search2.parameters()).thenReturn(ImmutableSet.of());
         when(viewService.streamAll()).then(invocation -> Stream.of(view1, view2));
         when(searchDbService.findByIds(any())).thenReturn(ImmutableList.of(search1, search2));

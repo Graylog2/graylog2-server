@@ -15,6 +15,7 @@ const conditionTypes = {
 
 const initialFilterConfig = {
   query: '',
+  query_parameters: [],
   streams: [],
   search_within_ms: 60 * 1000,
   execute_every_ms: 60 * 1000,
@@ -34,11 +35,7 @@ class FilterAggregationForm extends React.Component {
     entityTypes: PropTypes.object.isRequired,
     streams: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
-  };
-
-  static defaultConfig = {
-    ...initialFilterConfig,
-    ...initialAggregationConfig,
+    currentUser: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -95,9 +92,14 @@ class FilterAggregationForm extends React.Component {
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
   };
 
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
+  };
+
   render() {
     const { conditionType } = this.state;
-    const { allFieldTypes, entityTypes, eventDefinition, streams, validation } = this.props;
+    const { allFieldTypes, entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
 
     return (
       <React.Fragment>
@@ -106,6 +108,7 @@ class FilterAggregationForm extends React.Component {
             <FilterForm eventDefinition={eventDefinition}
                         validation={validation}
                         streams={streams}
+                        currentUser={currentUser}
                         onChange={this.propagateChange} />
 
             <FormGroup>
