@@ -56,8 +56,8 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
             <InteractiveContext.Provider value={false}>
               <ConnectedMessageDetail fields={Immutable.Map()}
                                       streams={streams}
+                                      allStreams={streams.valueSeq().toJS()}
                                       disableSurroundingSearch
-                                      disableMessageActions
                                       disableFieldActions
                                       inputs={inputs}
                                       message={message} />
