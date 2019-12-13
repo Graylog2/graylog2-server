@@ -10,6 +10,7 @@ import View from 'views/logic/views/View';
 import type { SearchJson } from 'views/logic/search/Search';
 import { singletonActions } from 'views/logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
+import type { TimeRange } from 'views/logic/queries/Query';
 
 export type CreateSearchResponse = {
   search: Search,
@@ -25,6 +26,7 @@ export type SearchExecutionResult = {
 type SearchActionsType = RefluxActions<{
   create: (Search) => Promise<CreateSearchResponse>,
   execute: (SearchExecutionState) => Promise<SearchExecutionResult>,
+  reexecuteSearchTypes: (searchTypes: {[searchTypeId: string]: { limit: number, offset: number }}, effectiveTimeRange?: TimeRange) => Promise<SearchExecutionResult>,
   executeWithCurrentState: () => Promise<SearchExecutionResult>,
   refresh: () => Promise<void>,
   get: (SearchId) => Promise<SearchJson>,
@@ -41,6 +43,9 @@ const SearchActions: SearchActionsType = singletonActions(
       asyncResult: true,
     },
     execute: {
+      asyncResult: true,
+    },
+    reexecuteSearchTypes: {
       asyncResult: true,
     },
     executeWithCurrentState: {

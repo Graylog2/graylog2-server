@@ -39,7 +39,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @RequiresAuthentication
-@Api(value = "AlarmCallbackHistories", description = "Manage stream alarm callback histories")
+@Api(value = "AlarmCallbackHistories", description = "Manage stream legacy alarm callback histories")
 @Path("/streams/{streamid}/alerts/{alertId}/history")
 public class AlarmCallbackHistoryResource extends RestResource {
     private final AlarmCallbackHistoryService alarmCallbackHistoryService;

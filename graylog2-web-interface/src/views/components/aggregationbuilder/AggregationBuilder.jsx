@@ -6,6 +6,7 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type { Events } from 'views/logic/searchtypes/events/EventHandler';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
@@ -15,15 +16,22 @@ const defaultVisualizationType = 'table';
 
 type OnVisualizationConfigChange = (VisualizationConfig) => void;
 
-type Result = {
+type RowResult = {
+  type: 'pivot',
   total: number,
   rows: Rows,
   effective_timerange: TimeRange,
 };
 
+type EventResult = {
+  events: Events,
+  type: 'events',
+  name: 'events',
+};
+
 type Props = {
   config: AggregationWidgetConfig,
-  data: { [string]: Result },
+  data: { [string]: RowResult },
   editing?: boolean,
   toggleEdit: () => void,
   fields: FieldTypeMappingsList,
@@ -32,7 +40,7 @@ type Props = {
 
 export type VisualizationComponentProps = {|
   config: AggregationWidgetConfig,
-  data: { [string]: Rows },
+  data: { [string]: Rows, events?: Events },
   editing?: boolean,
   effectiveTimerange: TimeRange,
   fields: FieldTypeMappingsList,
@@ -55,6 +63,13 @@ const _visualizationForType = (type: string): VisualizationComponent => {
   return visualization.component;
 };
 
+const getResult = (value: RowResult | EventResult): Rows | Events => {
+  if (value.type === 'events') {
+    return value.events;
+  }
+  return value.rows;
+};
+
 const AggregationBuilder = ({ config, data, editing = false, fields, onVisualizationConfigChange = () => {}, toggleEdit }: Props) => {
   if (!config || config.isEmpty) {
     return <EmptyAggregationContent toggleEdit={toggleEdit} editing={editing} />;
@@ -64,10 +79,10 @@ const AggregationBuilder = ({ config, data, editing = false, fields, onVisualiza
   const { effective_timerange: effectiveTimerange } = data.chart || Object.values(data)[0] || {};
   const rows = Object.entries(data)
     .map(
-      // $FlowFixMe: map claims it's `mixed`, we know it's `Result`
-      ([key, value]: [string, Result]) => [
+      // $FlowFixMe: map claims it's `mixed`, we know it's `RowResult`
+      ([key, value]: [string, RowResult] | ['events', EventResult]) => [
         key,
-        value.rows,
+        getResult(value),
       ],
     )
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});

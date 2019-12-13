@@ -15,6 +15,7 @@ import type {
 } from 'views/logic/hooks/SearchRefreshCondition';
 import Footer from 'components/layout/Footer';
 
+import { Grid } from 'components/graylog';
 import { FieldTypesStore, FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchStore, SearchActions } from 'views/stores/SearchStore';
 import { SearchExecutionStateStore } from 'views/stores/SearchExecutionStateStore';
@@ -51,12 +52,17 @@ const GridContainer: ComponentType<{ interactive: boolean }> = styled.div`
   ` : '')}
 `;
 
-const SearchGrid = styled.div`
-  z-index: 1;
-  padding: 15px;
+const SearchArea = styled.div`
   grid-area: search;
   grid-column-start: 2;
   grid-column-end: 4;
+  padding: 15px;
+
+  z-index: 1;
+`;
+
+const SearchGrid = styled(Grid)`
+  width: 100%;
 `;
 
 const ConnectedSideBar = connect(SideBar, { viewMetadata: ViewMetadataStore, searches: SearchStore },
@@ -147,25 +153,27 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
                 <ConnectedFieldList />
               </ConnectedSideBar>
             </IfInteractive>
-            <SearchGrid>
-              <IfInteractive>
-                <HeaderElements />
-                <IfDashboard>
-                  <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                  <QueryBar />
-                </IfDashboard>
-                <IfSearch>
-                  <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                </IfSearch>
+            <SearchArea>
+              <SearchGrid>
+                <IfInteractive>
+                  <HeaderElements />
+                  <IfDashboard>
+                    <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                    <QueryBar />
+                  </IfDashboard>
+                  <IfSearch>
+                    <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
+                  </IfSearch>
 
-                <QueryBarElements />
-              </IfInteractive>
+                  <QueryBarElements />
+                </IfInteractive>
 
-              <ViewAdditionalContextProvider>
-                <SearchResult />
-              </ViewAdditionalContextProvider>
-              <Footer />
-            </SearchGrid>
+                <ViewAdditionalContextProvider>
+                  <SearchResult />
+                </ViewAdditionalContextProvider>
+                <Footer />
+              </SearchGrid>
+            </SearchArea>
           </GridContainer>
         )}
       </InteractiveContext.Consumer>

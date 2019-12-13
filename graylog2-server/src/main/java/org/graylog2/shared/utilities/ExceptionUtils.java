@@ -50,7 +50,7 @@ public class ExceptionUtils {
             causeMessage.append(message);
         }
 
-        if (message != null && !message.endsWith(".")) {
+        if (message != null && !message.endsWith(".") && !message.endsWith("!")) {
             causeMessage.append(".");
         }
 

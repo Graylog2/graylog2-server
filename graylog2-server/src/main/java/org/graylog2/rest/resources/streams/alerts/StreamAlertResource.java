@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 @RequiresAuthentication
-@Api(value = "Stream/Alerts", description = "Manage stream alerts for a given stream")
+@Api(value = "Stream/Alerts", description = "Manage stream legacy alerts for a given stream")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertResource extends RestResource {
     private static final int REST_CHECK_CACHE_SECONDS = 30;
