@@ -94,4 +94,9 @@ public class BooleanNumberConditionsVisitor implements ExpressionVisitor {
 
         return value;
     }
+
+    @Override
+    public boolean visit(Expr.Group group) {
+        return accept(group.child());
+    }
 }

@@ -26,6 +26,8 @@ public class Expr {
     private static final String RIGHT = "right";
     private static final String VALUE = "value";
     private static final String REF = "ref";
+    private static final String CHILD = "child";
+    private static final String OPERATOR = "operator";
 
     @AutoValue
     public static abstract class True implements Expression<Boolean> {
@@ -311,6 +313,34 @@ public class Expr {
         @JsonIgnore
         @Override
         public Double accept(ExpressionVisitor visitor) {
+            return visitor.visit(this);
+        }
+    }
+
+    @AutoValue
+    public static abstract class Group implements Expression<Boolean> {
+        static final String EXPR = "group";
+
+        @JsonProperty(CHILD)
+        public abstract Expression<Boolean> child();
+
+        @JsonProperty(OPERATOR)
+        public abstract String operator();
+
+        @JsonCreator
+        public static Group create(@JsonProperty(Expression.FIELD_EXPR) String expr,
+                                   @JsonProperty(CHILD) Expression<Boolean> child,
+                                   @JsonProperty(OPERATOR) String operator) {
+            return new AutoValue_Expr_Group(expr, child, operator);
+        }
+
+        public static Group create(Expression<Boolean> child, String operator) {
+            return create(EXPR, child, operator);
+        }
+
+        @JsonIgnore
+        @Override
+        public Boolean accept(ExpressionVisitor visitor) {
             return visitor.visit(this);
         }
     }
