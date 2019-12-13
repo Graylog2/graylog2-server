@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class MessageInput implements Stoppable {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
@@ -64,7 +63,7 @@ public abstract class MessageInput implements Stoppable {
     @SuppressWarnings("StaticNonFinalField")
     private static int defaultRecvBufferSize = 1024 * 1024;
 
-    private final AtomicInteger sequenceNr;
+    private final MessageInputSequencer sequenceNr;
     private final MetricRegistry metricRegistry;
     private final Transport transport;
     private final MetricRegistry localRegistry;
@@ -121,7 +120,7 @@ public abstract class MessageInput implements Stoppable {
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
         emptyMessages = localRegistry.counter("emptyMessages");
-        sequenceNr = new AtomicInteger(0);
+        sequenceNr = new MessageInputSequencer();
     }
 
     public static int getDefaultRecvBufferSize() {
@@ -348,7 +347,7 @@ public abstract class MessageInput implements Stoppable {
         rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
         rawMessage.addSourceNode(getId(), serverStatus.getNodeId());
-        rawMessage.setSequenceNr(sequenceNr.incrementAndGet());
+        rawMessage.setSequenceNr(sequenceNr.next(rawMessage.getTimestamp().getMillis()));
 
         inputBuffer.insert(rawMessage);
 

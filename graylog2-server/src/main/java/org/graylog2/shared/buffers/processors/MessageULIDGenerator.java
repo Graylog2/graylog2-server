@@ -60,18 +60,12 @@ public class MessageULIDGenerator {
         // This means that the first recorded sequence number can be higher than the one of later messages.
         // To account for this, we simply add a constant (OFFSET_GAP) to prevent negative messageSequenceNrs.
 
-        final long messageTimestamp = message.getTimestamp().getMillis();
-        final int sequenceNr = message.getSequenceNr();
-
-        final String key = message.getSourceInputId() + messageTimestamp;
-        final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
-
-        final ULID.Value nextUlid = ulid.nextValue(messageTimestamp);
+        final ULID.Value nextUlid = ulid.nextValue(message.getTimestamp().getMillis());
         final long mostSignificantBits = nextUlid.getMostSignificantBits();
         final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
         final long msbWithZeroedRandom = mostSignificantBits & ~RANDOM_MSB_MASK;
-        long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
+        int messageSequenceNr = message.getSequenceNr();
         if (messageSequenceNr >= RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number does not fit into ULID ({} >= 65535). Sort order might be wrong.", messageSequenceNr);
             messageSequenceNr %= RANDOM_MSB_MASK;
