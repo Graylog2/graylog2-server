@@ -8,7 +8,7 @@ import { ViewActions } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
-import ViewLoader from 'views/logic/views/ViewLoader';
+import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
 
 import { ExtendedSearchPage } from 'views/pages';
@@ -44,7 +44,12 @@ class NewSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    ViewActions.create(View.Type.Search).then(() => this.setState({ loaded: true }));
+    const { location, loadingViewHooks, executingViewHooks } = this.props;
+    const { query } = location;
+    processHooks(
+      ViewActions.create(View.Type.Search)
+        .then(({ view }) => view), loadingViewHooks, executingViewHooks, query,
+    ).then(() => this.setState({ loaded: true }));
   }
 
   loadView = (viewId: string): Promise<?View> => {
