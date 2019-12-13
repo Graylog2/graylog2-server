@@ -33,9 +33,8 @@ import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,16 +60,17 @@ public class HTTPEventNotification implements EventNotification {
     private final ObjectMapper objectMapper;
     private final OkHttpClient httpClient;
     private final UrlWhitelistService whitelistService;
-    private final NotificationService notificationService;
+    private final UrlWhitelistNotificationService urlWhitelistNotificationService;
 
     @Inject
-    public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper, final OkHttpClient httpClient, UrlWhitelistService whitelistService,
-            NotificationService notificationService) {
+    public HTTPEventNotification(EventNotificationService notificationCallbackService, ObjectMapper objectMapper,
+            final OkHttpClient httpClient, UrlWhitelistService whitelistService,
+            UrlWhitelistNotificationService urlWhitelistNotificationService) {
         this.notificationCallbackService = notificationCallbackService;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
         this.whitelistService = whitelistService;
-        this.notificationService = notificationService;
+        this.urlWhitelistNotificationService = urlWhitelistNotificationService;
     }
 
     @Override
@@ -133,18 +133,9 @@ public class HTTPEventNotification implements EventNotification {
     }
 
     private void publishSystemNotificationForWhitelistFailure(String url, String eventNotificationTitle) {
-        // This method is synchronized to reduce the chance of emitting multiple notifications at the same time
-        synchronized (HTTPEventNotification.class) {
-            final String title = "URL not whitelisted.";
-            final String description = "The alert notification \"" + eventNotificationTitle +
-                    "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
-                    url + "\"]";
-            final Notification notification = notificationService.buildNow()
-                    .addType(Notification.Type.GENERIC)
-                    .addSeverity(Notification.Severity.NORMAL)
-                    .addDetail("title", title)
-                    .addDetail("description", description);
-            notificationService.publishIfFirst(notification);
-        }
+        final String description = "The alert notification \"" + eventNotificationTitle +
+                "\" is trying to access a URL which is not whitelisted. Please check your configuration. [url: \"" +
+                url + "\"]";
+        urlWhitelistNotificationService.publishWhitelistFailure(description);
     }
 }
