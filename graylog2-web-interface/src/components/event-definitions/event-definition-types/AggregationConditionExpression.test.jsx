@@ -388,7 +388,7 @@ describe('AggregationConditionExpression', () => {
       );
 
       expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('&&');
-      wrapper.setState({ globalGroupOperator: '||'});
+      wrapper.setState({ globalGroupOperator: '||' });
       wrapper.update();
       expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('||');
     });
