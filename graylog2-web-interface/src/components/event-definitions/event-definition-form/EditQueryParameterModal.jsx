@@ -164,11 +164,32 @@ class EditQueryParameterModal extends React.Component {
                  spellCheck={false}
                  onChange={this.handleChange} />
           <Panel header="How to use" style={{ marginTop: 20 }}>
-            After declaring it, the parameter {' '}
-            <span style={{ whiteSpace: 'nowrap' }}>
-              <code>{parameterSyntax}</code>
-            </span>{' '}
-            in your query, will be replaced with the results from the lookup table.
+            <p>
+              <h5>General Usage</h5>
+              After declaring it, the parameter {' '}
+              <span style={{ whiteSpace: 'nowrap' }}>
+                <code>{parameterSyntax}</code>
+              </span>{' '}
+              in your query, will be replaced with the list of results from the lookup table.
+              The list of results will be presented in the form of a Lucene BooleanQuery. E.g.:
+              <span style={{ whiteSpace: 'nowrap' }}>
+                <code>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</code>
+              </span>
+            </p>
+            <p>
+              <h5>Behaviour on empty lookup result list</h5>
+              The event definition query is only executed if a value for the parameter is present.
+              If the lookup result is empty, the execution will be skipped and treated as if the <i>Search Query</i> found
+              no messages. If an execution is desired a <i>Default Value</i> that yields the desired search result needs to be provided.
+              For example, (depending on the use case) a wildcard like <span style={{ whiteSpace: 'nowrap' }}><code>*</code></span>
+              can be a meaningful Default Value.
+            </p>
+            <p>
+              <h5>Limitations</h5>
+              Please note that maximum number of supported results is 1024. If the lookup table returns
+              more results, the event definition is not executed.
+            </p>
+
           </Panel>
         </BootstrapModalForm>
       </React.Fragment>
