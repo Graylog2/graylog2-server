@@ -64,6 +64,7 @@ import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandle
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
+import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import {
   dashboardsPath, dashboardsTvPath,
   extendedSearchPath,
@@ -361,6 +362,7 @@ export default {
   ],
   'views.hooks.loadingView': [
     requirementsProvided,
+    bindSearchParamsFromQuery,
   ],
   'views.elements.header': [() => hasLegacyFieldCharts() && (
     <MigrateFieldCharts />
