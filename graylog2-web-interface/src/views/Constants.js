@@ -7,7 +7,8 @@ export const Messages = {
   DEFAULT_LIMIT: 150,
 };
 
-export const DEFAULT_TIMERANGE = { type: 'relative', range: 300 };
+export const DEFAULT_RANGE_TYPE = 'relative';
+export const DEFAULT_TIMERANGE = { type: DEFAULT_RANGE_TYPE, range: 300 };
 
 export const DEFAULT_HIGHLIGHT_COLOR = '#ffec3d';
 export const DEFAULT_CUSTOM_HIGHLIGHT_RANGE = chroma.scale(['lightyellow', 'lightgreen', 'lightblue', 'red']).mode('lch').colors(40);
