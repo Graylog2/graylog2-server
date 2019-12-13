@@ -20,9 +20,9 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 const ConnectedMessageDetail = connect(MessageDetail, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
 
-const ShowMessagePage = ({ params: { index, messageId }, params, searchConfig, nodes }) => {
+const ShowMessagePage = ({ params: { index, messageId }, params }) => {
   const [message, setMessage] = useState();
-  const [inputs, setInputs] = useState();
+  const [inputs, setInputs] = useState(Immutable.Map);
   const [streams, setStreams] = useState();
   useEffect(() => { NodesActions.list(); }, []);
   useEffect(() => {
@@ -37,7 +37,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params, searchConfig, n
           setInputs(newInputs);
         }
       });
-  }, [index, messageId]);
+  }, [index, messageId, setMessage, setInputs]);
   useEffect(() => {
     StreamsStore.listStreams().then((newStreams) => {
       if (newStreams) {
@@ -45,8 +45,8 @@ const ShowMessagePage = ({ params: { index, messageId }, params, searchConfig, n
         setStreams(Immutable.Map(streamsMap));
       }
     });
-  }, []);
-  const isLoaded = useMemo(() => (message && streams && inputs), [message, streams, inputs]);
+  }, [setStreams]);
+  const isLoaded = useMemo(() => (message !== undefined && streams !== undefined && inputs !== undefined), [message, streams, inputs]);
 
   if (isLoaded) {
     return (
@@ -60,15 +60,14 @@ const ShowMessagePage = ({ params: { index, messageId }, params, searchConfig, n
                                       disableMessageActions
                                       disableFieldActions
                                       inputs={inputs}
-                                      message={message}
-                                      searchConfig={searchConfig} />
+                                      message={message} />
             </InteractiveContext.Provider>
           </Col>
         </Row>
       </DocumentTitle>
     );
   }
-  return <Spinner />;
+  return <Spinner data-testid="spinner" />;
 };
 
 ShowMessagePage.propTypes = {
@@ -76,7 +75,6 @@ ShowMessagePage.propTypes = {
     index: PropTypes.string.isRequired,
     messageId: PropTypes.string.isRequired,
   }).isRequired,
-    searchConfig: PropTypes.object.isRequired,
 };
 
 export default connect(ShowMessagePage, { nodes: NodesStore });
