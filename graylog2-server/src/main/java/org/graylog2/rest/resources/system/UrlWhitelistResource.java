@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -33,6 +34,7 @@ import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,6 +60,7 @@ public class UrlWhitelistResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get url whitelist.")
+    @RequiresPermissions(RestPermissions.URL_WHITELIST_READ)
     public UrlWhitelist get() {
         checkPermission(RestPermissions.URL_WHITELIST_READ);
         return urlWhitelistService.getWhitelist();
@@ -68,8 +71,8 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Update url whitelist.")
     @AuditEvent(type = AuditEventTypes.URL_WHITELIST_UPDATE)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response put(@ApiParam(name = "whitelist", required = true) final UrlWhitelist whitelist) {
-        checkPermission(RestPermissions.URL_WHITELIST_WRITE);
+    @RequiresPermissions(RestPermissions.URL_WHITELIST_WRITE)
+    public Response put(@ApiParam(name = "whitelist", required = true) @NotNull final UrlWhitelist whitelist) {
         urlWhitelistService.saveWhitelist(whitelist);
         return Response.noContent().build();
     }
@@ -80,9 +83,9 @@ public class UrlWhitelistResource extends RestResource {
     @ApiOperation(value = "Check if a url is whitelisted.")
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.URL_WHITELIST_READ)
     public WhitelistCheckResponse check(@ApiParam(name = "url", required = true)
-                             @Valid /*@NotNull*/ final WhitelistCheckRequest checkRequest) {
-        checkPermission(RestPermissions.URL_WHITELIST_READ);
+                             @Valid @NotNull final WhitelistCheckRequest checkRequest) {
         final boolean isWhitelisted = urlWhitelistService.isWhitelisted(checkRequest.url());
         return WhitelistCheckResponse.create(checkRequest.url(), isWhitelisted);
     }

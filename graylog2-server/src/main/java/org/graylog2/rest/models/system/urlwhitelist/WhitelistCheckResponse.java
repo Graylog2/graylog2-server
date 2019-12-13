@@ -22,13 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.core.MediaType;
-
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-@Consumes(MediaType.APPLICATION_JSON)
 public abstract class WhitelistCheckResponse {
     @JsonProperty("url")
     public abstract String url();

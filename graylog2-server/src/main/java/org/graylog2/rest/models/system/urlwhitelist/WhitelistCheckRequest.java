@@ -23,13 +23,10 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import javax.validation.constraints.NotEmpty;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.core.MediaType;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
-@Consumes(MediaType.APPLICATION_JSON)
 public abstract class WhitelistCheckRequest {
     @NotEmpty
     @JsonProperty("url")
