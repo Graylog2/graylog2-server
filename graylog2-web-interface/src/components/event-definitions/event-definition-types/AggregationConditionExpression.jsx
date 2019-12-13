@@ -47,7 +47,12 @@ class AggregationConditionExpression extends React.Component {
 
   getEffectiveGlobalGroupOperator = () => {
     const { globalGroupOperator } = this.state;
-    return globalGroupOperator || '&&';
+    if (globalGroupOperator) {
+      return globalGroupOperator;
+    }
+
+    const { expression } = this.props;
+    return (expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&');
   };
 
   getBooleanOperator = (expression, defaultOperator) => {

@@ -374,5 +374,41 @@ describe('AggregationConditionExpression', () => {
       select.prop('onChange')({ value: '||' });
       expect(onChange.mock.calls.length).toBe(1);
     });
+
+    it('should display the right default initial global group operator', () => {
+      const expression = getComparisonExpression('<', 12);
+
+      const wrapper = mount(
+        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
+                                        validation={{ errors: {} }}
+                                        formattedFields={[]}
+                                        aggregationFunctions={[]}
+                                        onChange={() => {}}
+                                        expression={expression} />,
+      );
+
+      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('&&');
+      wrapper.setState({ globalGroupOperator: '||'});
+      wrapper.update();
+      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('||');
+    });
+
+    it('should display the right default initial global group operator from props', () => {
+      const expression = getBooleanExpression('||');
+
+      const wrapper = mount(
+        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
+                                        validation={{ errors: {} }}
+                                        formattedFields={[]}
+                                        aggregationFunctions={[]}
+                                        onChange={() => { }}
+                                        expression={expression} />,
+      );
+
+      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('||');
+      wrapper.setState({ globalGroupOperator: '&&' });
+      wrapper.update();
+      expect(wrapper.find('BooleanOperatorSelector').at(0).prop('operator')).toBe('&&');
+    });
   });
 });
