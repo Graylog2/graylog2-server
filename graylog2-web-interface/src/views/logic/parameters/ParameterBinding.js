@@ -8,7 +8,7 @@ type InternalState = {
 
 type InternalStateBuilder = Immutable.Map<string, any>;
 
-type JsonRepresentation = {
+export type ParameterBindingJsonRepresentation = {
   type: string,
   value: any,
 };
@@ -47,7 +47,7 @@ export default class ParameterBinding {
     return ParameterBinding.create('value', '');
   }
 
-  toJSON(): JsonRepresentation {
+  toJSON(): ParameterBindingJsonRepresentation {
     const { type, value } = this._value;
 
     return {
@@ -56,7 +56,10 @@ export default class ParameterBinding {
     };
   }
 
-  static fromJSON(json: JsonRepresentation): ParameterBinding {
+  static fromJSON(json: ?ParameterBindingJsonRepresentation): ?ParameterBinding {
+    if (json == null) {
+      return null;
+    }
     const { type, value } = json;
     return ParameterBinding.create(type, value);
   }

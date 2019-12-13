@@ -28,6 +28,7 @@ import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPer
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.V20191203120602_MigrateSavedSearchesToViews;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.InMemorySearchJobService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.db.SearchesCleanUpJob;
@@ -148,6 +149,7 @@ public class ViewsBindings extends ViewsModule {
         registerViewSharingSubtypes();
         registerSharingStrategies();
         registerSortConfigSubclasses();
+        registerParameterSubtypes();
 
         install(new FactoryModuleBuilder().build(ViewRequirements.Factory.class));
         install(new FactoryModuleBuilder().build(SearchRequirements.Factory.class));
@@ -189,6 +191,10 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(AllUsersOfInstance.class);
         registerJacksonSubtype(SpecificRoles.class);
         registerJacksonSubtype(SpecificUsers.class);
+    }
+
+    private void registerParameterSubtypes() {
+        registerJacksonSubtype(ValueParameter.class);
     }
 
     private void registerSharingStrategies() {
