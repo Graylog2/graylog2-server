@@ -1,15 +1,17 @@
+// @flow strict
 import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
-import Immutable from 'immutable';
-import MessageShow from 'components/search/MessageShow';
-import DocumentTitle from 'components/common/DocumentTitle';
-import Spinner from 'components/common/Spinner';
+import * as Immutable from 'immutable';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
 import StoreProvider from 'injection/StoreProvider';
+import DocumentTitle from 'components/common/DocumentTitle';
+import Spinner from 'components/common/Spinner';
 import connect from 'stores/connect';
+import { Col, Row } from 'components/graylog';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import MessageDetail from 'views/components/messagelist/MessageDetail';
 
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
@@ -17,7 +19,7 @@ const MessagesActions = ActionsProvider.getActions('Messages');
 const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const ConnectedMessageShow = connect(MessageShow, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
+const ConnectedMessageDetail = connect(MessageDetail, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
 
 const ShowMessagePage = createReactClass({
   displayName: 'ShowMessagePage',
@@ -76,11 +78,20 @@ const ShowMessagePage = createReactClass({
       const { streams, inputs, message } = this.state;
       return (
         <DocumentTitle title={`Message ${params.messageId} on ${params.index}`}>
-          <ConnectedMessageShow message={message}
-                                inputs={inputs}
-                                streams={streams}
-                                allStreamsLoaded
-                                searchConfig={searchConfig} />
+          <Row className="content">
+            <Col md={12}>
+              <InteractiveContext.Provider value={false}>
+                <ConnectedMessageDetail fields={Immutable.Map()}
+                                        streams={streams}
+                                        disableSurroundingSearch
+                                        disableMessageActions
+                                        disableFieldActions
+                                        inputs={inputs}
+                                        message={message}
+                                        searchConfig={searchConfig} />
+              </InteractiveContext.Provider>
+            </Col>
+          </Row>
         </DocumentTitle>
       );
     }
