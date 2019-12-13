@@ -3,7 +3,6 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
 
-import mockComponent from 'helpers/mocking/MockComponent';
 import 'helpers/mocking/react-dom_mock';
 import UrlWhiteListConfig from './UrlWhiteListConfig';
 

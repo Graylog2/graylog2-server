@@ -110,7 +110,6 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
 
   useEffect(() => {
     const valid = isFormValid();
-    console.log({ valid });
     update(state, valid);
   }, [state]);
 
