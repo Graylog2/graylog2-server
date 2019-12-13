@@ -13,8 +13,8 @@ exports[`ShowMessagePage renders for generic event 1`] = `
   "nodes": {},
   "fields": {},
   "streams": {},
+  "allStreams": [],
   "disableSurroundingSearch": true,
-  "disableMessageActions": true,
   "disableFieldActions": true,
   "inputs": {},
   "message": {
@@ -96,8 +96,8 @@ exports[`ShowMessagePage renders for generic message 1`] = `
   "nodes": {},
   "fields": {},
   "streams": {},
+  "allStreams": [],
   "disableSurroundingSearch": true,
-  "disableMessageActions": true,
   "disableFieldActions": true,
   "inputs": {
     "5c26a37b3885e50480aa12a2": {
