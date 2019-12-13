@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
-import URI from 'urijs';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
 import ObjectUtils from 'util/ObjectUtils';
-import { get } from 'lodash';
 import FormUtils from 'util/FormsUtils';
 import type { Url, Config } from 'stores/configurations/ConfigurationsStore';
 import StoreProvider from 'injection/StoreProvider';
@@ -52,52 +50,67 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
     }
     return isValid;
   };
-
-  const validate = (name: string, idx: number, type: string, value: string) => {
+  const isFormValid = (): boolean => {
+    let isValid = true;
+    if (validationState.errors.length > 0
+      && validationState.errors.find((el => (el && el.title && el.title.valid) === false
+      || (el && el.value && el.value.valid === false)))) {
+      isValid = false;
+    }
+    return isValid;
+  };
+  const updateState = (idx: number, name: string, value: string) => {
+    const stateUpdate = ObjectUtils.clone(state);
+    stateUpdate.entries[idx][name] = value;
+    setState(stateUpdate);
+  };
+  const updateValidationError = (idx: number, name: string, result: Object, value: string) => {
     const validationUpdate = ObjectUtils.clone(validationState);
+    validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
+    setValidationState(validationUpdate);
+    updateState(idx, name, value);
+  };
+  const validate = (name: string, idx: number, type: string, value: string): void => {
     switch (name) {
-      case 'title':
-        validationUpdate.errors[idx].name = value.trim().length <= 0 ? { valid: false } : { valid: true };
+      case 'title': {
+        const result = value.trim().length <= 0 ? { valid: false } : { valid: true };
+        updateValidationError(idx, name, result, value);
+      }
         break;
       case 'value':
         if (type === literal) {
-          validationUpdate.errors[idx].value = validURL(value) ? { valid: true } : { valid: false };
-        } else {
+          const result = validURL(value) ? { valid: true } : { valid: false };
+          updateValidationError(idx, name, result, value);
+        } else if (value.trim().length > 0) {
           const promise = ToolsStore.testRegexValidity(value);
           promise.then((result) => {
-            validationUpdate.errors[idx].value = result.is_valid ? { valid: true } : { valid: true };
+            const res = result.is_valid ? { valid: true } : { valid: false };
+            updateValidationError(idx, name, res, value);
           });
+        } else {
+          const res = { valid: false };
+          updateValidationError(idx, name, res, value);
         }
         break;
       default:
         break;
     }
-    setValidationState(validationUpdate);
-    console.log(validationState);
-  };
-  const isFormValid = () => {
-    let isValid = true;
-    if (validationState.errors.find((el => el.title.valid === false || el.value.valid === false))) {
-      isValid = false;
-    }
-    return isValid;
-  };
-  const onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
-    console.log(inputs[event.target.name + idx]);
-    validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
-    // const stateUpdate = ObjectUtils.clone(state);
-    // stateUpdate.entries[idx][event.target.name] = FormUtils.getValueFromInput(event.target);
-    // setState(stateUpdate);
   };
 
-  const onUpdateType = (idx: number, value: string) => {
+  const onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
+    validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
+  };
+
+  const onUpdateType = (idx: number, type: string) => {
     const stateUpdate = ObjectUtils.clone(state);
-    stateUpdate.entries[idx] = { ...state.entries[idx], value };
+    stateUpdate.entries[idx] = { ...state.entries[idx], type };
     setState(stateUpdate);
+    validate('value', idx, type, stateUpdate.entries[idx].value);
   };
 
   useEffect(() => {
-    const valid = true;
+    const valid = isFormValid();
+    console.log({ valid });
     update(state, valid);
   }, [state]);
 
@@ -127,7 +140,9 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
                 <td>{idx + 1}</td>
                 <td>
                   <Input type="text"
+                         id={`title-input${idx}`}
                          ref={(elem) => { inputs[`title${idx}`] = elem; }}
+                         help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'required' : null}
                          name="title"
                          bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
                          onChange={event => onInputChange(event, idx, url.type)}
@@ -136,7 +151,9 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
                 </td>
                 <td>
                   <Input type="text"
+                         id={`value-input${idx}`}
                          ref={(elem) => { inputs[`value${idx}`] = elem; }}
+                         help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'Not valid' : null}
                          name="value"
                          bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
                          onChange={event => onInputChange(event, idx, url.type)}
