@@ -22,7 +22,7 @@ const App = ({ children, currentUser, location }) => {
   }
 
   return (
-    <ScratchpadProvider>
+    <ScratchpadProvider loginName={currentUser.username}>
       <Navigation requestPath={location.pathname}
                   fullName={currentUser.full_name}
                   loginName={currentUser.username}
@@ -30,7 +30,7 @@ const App = ({ children, currentUser, location }) => {
       <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
         <Icon name="arrow-up" />
       </div>
-      <Scratchpad loginName={currentUser.username} />
+      <Scratchpad />
       <AppErrorBoundary>
         {children}
       </AppErrorBoundary>
