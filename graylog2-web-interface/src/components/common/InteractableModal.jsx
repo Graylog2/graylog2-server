@@ -7,8 +7,9 @@ import { lighten } from 'polished';
 import { Button } from 'components/graylog';
 import Icon from 'components/common/Icon';
 import teinte from 'theme/teinte';
+import { debounce } from 'lodash';
 
-const DEFAULT_SIZE = { width: 450, height: 300 };
+const DEFAULT_SIZE = { width: 450, height: 400 };
 const halfWidth = Math.ceil((document.body.offsetWidth / 2) - (DEFAULT_SIZE.width / 2));
 const halfHeight = Math.ceil((document.body.offsetHeight / 2) - (DEFAULT_SIZE.height / 2));
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
@@ -61,6 +62,7 @@ const Title = styled.h3`
 
 const DragBars = styled(Icon)`
   color: ${teinte.secondary.tre};
+  margin-right: 9px;
 `;
 
 /**
@@ -87,10 +89,6 @@ const InteractableModal = ({
   const [dragPosition, setDragPosition] = useState(position);
   const [resizeSize, setResizeSize] = useState(size);
 
-  useEffect(() => {
-    setDragHandleClassName(dragHandleRef.current.classList[0]);
-  }, []);
-
   const handleDragStop = (event, newPosition) => {
     const { x, y, node } = newPosition;
     const width = parseFloat(node.style.width);
@@ -115,12 +113,25 @@ const InteractableModal = ({
     const newY = tooFarUp ? 0 : newDown;
 
     const setPosition = {
-      x: newX,
-      y: newY,
+      x: newX < 0 ? 0 : newX,
+      y: newY < 0 ? 0 : newY,
     };
     setDragPosition(setPosition);
     onDrag(setPosition);
   };
+
+  const handleBrowserResize = debounce((event) => {
+    handleDragStop(event, { node: { style: { ...resizeSize } }, ...dragPosition });
+  }, 150);
+
+  useEffect(() => {
+    setDragHandleClassName(dragHandleRef.current.classList[0]);
+    window.addEventListener('resize', handleBrowserResize, false);
+
+    return () => {
+      window.removeEventListener('resize', handleBrowserResize);
+    };
+  }, []);
 
   return (
     <InteractableModalWrapper className={wrapperClassName}>
@@ -143,7 +154,7 @@ const InteractableModal = ({
                  size={resizeSize}
                  className={className}>
         <Header ref={dragHandleRef}>
-          <Title><DragBars name="bars" />{' '}{title}</Title>
+          <Title><DragBars name="bars" />{title}</Title>
 
           <Button bsStyle="default" onClick={onClose} bsSize="sm">
             <Icon name="times" size="lg" />
