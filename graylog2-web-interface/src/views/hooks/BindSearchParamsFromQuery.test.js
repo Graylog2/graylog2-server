@@ -1,7 +1,11 @@
+// @flow strict
+import View from 'views/logic/views/View';
 import MockQuery from 'views/logic/queries/Query';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
+
+const MOCK_VIEW_QUERY_ID = 'query-id';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
@@ -11,41 +15,79 @@ jest.mock('views/stores/QueriesStore', () => ({
 }));
 
 jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().id('query-id').build()], 'listen'),
+  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().id(MOCK_VIEW_QUERY_ID).build()], 'listen'),
 }));
 
 describe('BindSearchParamsFromQuery should', () => {
+  const defaultInput = {
+    query: {},
+    view: new View.create().toBuilder().type('SEARCH').build(),
+    retry: () => Promise.resolve(),
+  };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('not update query when provided view is not a search', async () => {
-    await bindSearchParamsFromQuery({ query: undefined, view: { type: 'DASHBOARD' } });
+    const input = {
+      ...defaultInput,
+      view: new View.create().toBuilder().type('DASHBOARD').build(),
+    };
+    await bindSearchParamsFromQuery(input);
     expect(QueriesActions.query).not.toHaveBeenCalled();
   });
 
   it('update query string with provided query param', async () => {
-    await bindSearchParamsFromQuery({ query: { q: 'gl2_source_input:source-input-id' }, view: { type: 'SEARCH' } });
-    expect(QueriesActions.query).toHaveBeenCalledWith('query-id', 'gl2_source_input:source-input-id');
+    const input = {
+      ...defaultInput,
+      query: { q: 'gl2_source_input:source-input-id' },
+    };
+    await bindSearchParamsFromQuery(input);
+    expect(QueriesActions.query).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, input.query.q);
   });
 
   it('not update query string when no query param is provided', async () => {
-    await bindSearchParamsFromQuery({ query: undefined, view: { type: 'SEARCH' } });
+    await bindSearchParamsFromQuery(defaultInput);
     expect(QueriesActions.query).not.toHaveBeenCalled();
   });
 
   it('update query timerange when relative range value param is povided', async () => {
-    await bindSearchParamsFromQuery({ query: { relative: '0' }, view: { type: 'SEARCH' } });
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('query-id', { type: 'relative', range: '0' });
+    const input = {
+      ...defaultInput,
+      query: { relative: '0' },
+    };
+    const expectedTimerange = {
+      type: 'relative',
+      range: input.query.relative,
+    };
+    await bindSearchParamsFromQuery(input);
+    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
   });
 
   it('update query timerange when provided query range param is absolute', async () => {
-    await bindSearchParamsFromQuery({ query: { rangetype: 'absolute', from: '2010-01-00 00:00:00', to: '2010-10-00 00:00:00' }, view: { type: 'SEARCH' } });
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('query-id', { type: 'absolute', from: '2010-01-00 00:00:00', to: '2010-10-00 00:00:00' });
+    const input = {
+      ...defaultInput,
+      query: { rangetype: 'absolute', from: '2010-01-00 00:00:00', to: '2010-10-00 00:00:00' },
+    };
+    const expectedTimerange = {
+      type: input.query.rangetype,
+      from: input.query.from,
+      to: input.query.to,
+    };
+    await bindSearchParamsFromQuery(input);
+    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
   });
 
   it('update query timerange when provided query range is keyword', async () => {
-    await bindSearchParamsFromQuery({ query: { rangetype: 'keyword', keyword: 'Last five days' }, view: { type: 'SEARCH' } });
-    expect(QueriesActions.timerange).toHaveBeenCalledWith('query-id', { type: 'keyword', keyword: 'Last five days' });
+    const input = {
+      ...defaultInput,
+      query: { rangetype: 'keyword', keyword: 'Last five days' },
+    };
+    const expectedTimerange = {
+      type: input.query.rangetype, keyword: input.query.keyword,
+    };
+    await bindSearchParamsFromQuery(input);
+    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
   });
 });
