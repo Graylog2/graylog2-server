@@ -6,6 +6,7 @@ import Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
+import SearchActions from 'views/actions/SearchActions';
 
 import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -14,7 +15,6 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import SearchActions from 'views/actions/SearchActions';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
@@ -26,7 +26,6 @@ type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
 type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardinal' | 'monotone';
 type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year'
 type LegacyVisualization = 'bar' | 'area' | 'line' | 'scatterplot'
-
 type LegacyFieldChart = {
   field: string,
   renderer: LegacyVisualization,
@@ -39,18 +38,9 @@ const Actions = styled.div`
   margin-top: 10px;
 `;
 
-const mapTime = (oldTimeUnit: string) => {
-  switch (oldTimeUnit) {
-    case 'quarter':
-      return { unit: 'months', value: 3 };
-    default:
-      return { unit: `${oldTimeUnit}s`, value: 1 };
-  }
-};
-
-const mapSeries = (legacySeriesName: LegacySeries, field: string) => {
+const mapSeries = (legacySeries: LegacySeries, field: string) => {
   let seriesName;
-  switch (legacySeriesName) {
+  switch (legacySeries) {
     case 'total':
       seriesName = 'sum';
       break;
@@ -61,78 +51,95 @@ const mapSeries = (legacySeriesName: LegacySeries, field: string) => {
       seriesName = 'card';
       break;
     default:
-      seriesName = legacySeriesName;
+      seriesName = legacySeries;
   }
   return `${seriesName}(${field})`;
 };
 
-const mapVisualization = (visualization: LegacyVisualization) => {
-  switch (visualization) {
+const mapVisualization = (legacyVisualization: LegacyVisualization) => {
+  switch (legacyVisualization) {
     case 'scatterplot':
       return 'scatter';
     default:
-      return visualization;
+      return legacyVisualization;
   }
 };
 
-const createVisualizationConfig = (interpolation: LegacyInterpolation, visualization: string) => {
-  let interpolationName: InterpolationMode;
-  switch (interpolation) {
+const mapTime = (legacyTime: string) => {
+  switch (legacyTime) {
+    case 'quarter':
+      return { unit: 'months', value: 3 };
+    default:
+      return { unit: `${legacyTime}s`, value: 1 };
+  }
+};
+
+const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, visualization: string) => {
+  let interpolation: InterpolationMode;
+  switch (legacyInterpolation) {
     case 'basis':
     case 'bundle':
     case 'cardinal':
     case 'monotone':
-      interpolationName = 'spline';
+      interpolation = 'spline';
       break;
     case 'linear':
     case 'step-after':
-      interpolationName = interpolation;
+      interpolation = legacyInterpolation;
       break;
     default:
-      interpolationName = 'linear';
+      interpolation = 'linear';
   }
 
   switch (visualization) {
     case 'line':
-      return new LineVisualizationConfig(interpolationName);
+      return new LineVisualizationConfig(interpolation);
     case 'area':
-      return new AreaVisualizationConfig(interpolationName);
+      return new AreaVisualizationConfig(interpolation);
     default:
       return undefined;
   }
 };
 
-const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
+const _initialRowOffset = (widgetPositions) => {
+  const lastWidgetPosition = maxBy(values(widgetPositions), (position: WidgetPosition): number => position.row);
+  return lastWidgetPosition ? (lastWidgetPosition.row + lastWidgetPosition.height) : 0;
+};
+
+const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
   setMigrating(true);
-  const widgetDef = widgetDefinition('AGGREGATION');
+  const { defaultHeight } = widgetDefinition('AGGREGATION');
   const currentView = CurrentViewStateStore.getInitialState();
   const newWidgetPositions = { ...currentView.state.widgetPositions };
-  const lastWidgetPosition = maxBy(values(newWidgetPositions), (position: WidgetPosition): number => position.row);
-  const existingRowOffset = lastWidgetPosition ? (lastWidgetPosition.row + lastWidgetPosition.height) : 0;
+  const initialRowOffset = _initialRowOffset(newWidgetPositions);
 
   const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
+    const { field } = chart;
     // The old field charts only have one series per chart.
-    // The series allways relates to the selected field.
+    // The series always relates to the selected field.
+    const series = new Series(mapSeries(chart.valuetype, field));
     // Because all field charts show the results for the defined timerange,
     // the new row pivot always contains the timestamp field.
-    const { field } = chart;
-    const series = new Series(mapSeries(chart.valuetype, field));
-    const rowPivots = [new Pivot('timestamp', 'time', { interval: { type: 'timeunit', ...mapTime(chart.interval) } })];
+    const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } };
+    const rowPivot = new Pivot('timestamp', 'time', rowPivotConfig);
     const visualization = mapVisualization(chart.renderer);
     const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
+    // create widget with migrated data
     const widgetConfig = AggregationWidgetConfig.builder()
       .visualization(visualization)
       .visualizationConfig(visualizationConfig)
       .series([series])
-      .rowPivots(rowPivots)
+      .rowPivots([rowPivot])
       .build();
     const newWidget = AggregationWidget.builder()
       .newId()
       .timerange(undefined)
       .config(widgetConfig)
       .build();
-    const widgetRowPos = existingRowOffset + (widgetDef.defaultHeight * index);
-    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, widgetDef.defaultHeight, Infinity);
+    // create widget position for new widget
+    const migratedWidgetsOffset = defaultHeight * index;
+    const widgetRowPos = initialRowOffset + migratedWidgetsOffset;
+    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, defaultHeight, Infinity);
     return newWidget;
   });
 
@@ -151,7 +158,7 @@ const onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean 
   );
 };
 
-const onCancel = (setMigrationFinished) => {
+const _onCancel = (setMigrationFinished) => {
   Store.set('pinned-field-charts-migrated', true);
   setMigrationFinished(true);
 };
@@ -181,12 +188,12 @@ const MigrateFieldCharts = () => {
           <br />
           <Actions>
             <Button bsStyle="primary"
-                    onClick={() => onMigrate(legacyCharts, setMigrating, setMigrationFinished)}
+                    onClick={() => _onMigrate(legacyCharts, setMigrating, setMigrationFinished)}
                     disabled={migrating}
                     className="save-button-margin">
                   Migrate {migrating && <Spinner text="" />}
             </Button>
-            <Button onClick={() => onCancel(setMigrationFinished)}
+            <Button onClick={() => _onCancel(setMigrationFinished)}
                     disabled={migrating}>
                   Discard charts
             </Button>
