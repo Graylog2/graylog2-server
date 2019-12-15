@@ -13,7 +13,6 @@ import styles from '!style?insertAt=bottom!css!./EditWidgetFrame.css';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import globalStyles from '!style/useable!css!./EditWidgetFrame.global.css';
 import HeaderElements from '../HeaderElements';
-import QueryBarElements from '../QueryBarElements';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 
 
