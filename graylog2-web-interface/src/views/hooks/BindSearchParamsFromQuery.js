@@ -1,69 +1,58 @@
 // @flow strict
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 
-import View from 'views/logic/views/View';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 
-type Arguments = {
-  query: { [string]: any },
-  view: View,
-};
-
 const _getTimerange = (query = {}) => {
-  let timerange;
-  const rangeType = query.rangetype || DEFAULT_RANGE_TYPE;
+  let range;
+  const type = query.rangetype || DEFAULT_RANGE_TYPE;
+  const _setRange = (condition, newRange) => { if (condition); range = newRange; };
 
-  switch (rangeType) {
+  switch (type) {
     case 'relative':
-      if (query.relative) {
-        timerange = { type: rangeType, range: query.relative };
-      }
+      _setRange(query.relative, { type, range: query.relative });
       break;
     case 'absolute':
-      if (query.from || query.to) {
-        timerange = {
-          type: rangeType,
-          from: query.from,
-          to: query.to,
-        };
-      }
+      _setRange((query.from || query.to), {
+        type: type,
+        from: query.from,
+        to: query.to,
+      });
       break;
     case 'keyword':
-      if (query.keyword) {
-        timerange = { type: rangeType, keyword: query.keyword };
-      }
+      _setRange(query.keyword, { type, keyword: query.keyword });
       break;
     default:
-      throw new Error(`Unsupported range type ${rangeType}`);
+      throw new Error(`Unsupported range type ${type}`);
   }
 
-  return timerange;
+  return range;
 };
 
-const setQueryString = (queryId, queryParam) => {
-  if (!queryParam) {
+const _setQueryString = (queryId, query) => {
+  const queryString = query.q;
+  if (!queryString) {
     return Promise.resolve();
   }
-  return QueriesActions.query(queryId, queryParam);
+  return QueriesActions.query(queryId, queryString);
 };
 
-const setTimerange = (queryId, timeRangeParam) => {
-  if (!timeRangeParam) {
+const setQueryTimerange = (queryId, query) => {
+  const timerange = _getTimerange(query);
+  if (!timerange) {
     return Promise.resolve();
   }
-  return QueriesActions.timerange(queryId, timeRangeParam);
+  return QueriesActions.timerange(queryId, timerange);
 };
 
-const bindSearchParamsFromQuery: ViewHook = ({ query, view }: Arguments) => {
+const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (view.type !== 'SEARCH') {
     return Promise.resolve(true);
   }
   const { id: queryId } = CurrentQueryStore.getInitialState();
-  const queryParam = query ? query.q : undefined;
-  const timerangeParam = _getTimerange(query);
-  return setQueryString(queryId, queryParam).then(() => setTimerange(queryId, timerangeParam)).then(() => true);
+  return _setQueryString(queryId, query).then(() => setQueryTimerange(queryId, query)).then(() => true);
 };
 
 export default bindSearchParamsFromQuery;
