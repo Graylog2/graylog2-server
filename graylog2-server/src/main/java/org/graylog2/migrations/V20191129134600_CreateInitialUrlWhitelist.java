@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.notifications.NotificationDto;
@@ -45,6 +46,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -119,13 +121,21 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
     private Optional<WhitelistEntry> extractFromNotification(NotificationDto notificationDto) {
         final EventNotificationConfig config = notificationDto.config();
 
-        if (!(config instanceof HTTPEventNotificationConfig)) {
+        String url = "";
+        if (config instanceof HTTPEventNotificationConfig) {
+            url = ((HTTPEventNotificationConfig) config).url();
+        } else if (config instanceof LegacyAlarmCallbackEventNotificationConfig) {
+            url = Objects.toString(((LegacyAlarmCallbackEventNotificationConfig) config).configuration()
+                    .get("url"), "");
+
+        }
+
+        if (StringUtils.isNotBlank(url)) {
+            return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
+                    .toString(), url, "\"" + notificationDto.title() + "\" alert notification"), url);
+        } else {
             return Optional.empty();
         }
-        final String url = ((HTTPEventNotificationConfig) config).url();
-        return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
-                .toString(), url,
-                "\"" + notificationDto.title() + "\" alert notification"), url);
     }
 
     private Optional<WhitelistEntry> extractFromDataAdapter(DataAdapterDto dataAdapterDto) {
