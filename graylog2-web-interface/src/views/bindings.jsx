@@ -76,7 +76,6 @@ import {
 import NewDashboardPage from 'views/pages/NewDashboardPage';
 import StreamSearchPage from 'views/pages/StreamSearchPage';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
-import AppConfig from 'util/AppConfig';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
