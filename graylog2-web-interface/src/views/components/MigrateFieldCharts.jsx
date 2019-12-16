@@ -111,56 +111,65 @@ const _initialRowOffset = (widgetPositions) => {
   return lastWidgetPosition ? (lastWidgetPosition.row + lastWidgetPosition.height) : 0;
 };
 
+const _migrateWidgets = (legacyCharts) => {
+  return new Promise((resolve) => {
+    const { defaultHeight } = widgetDefinition('AGGREGATION');
+    const currentView = CurrentViewStateStore.getInitialState();
+    const newWidgetPositions = { ...currentView.state.widgetPositions };
+    const initialRowOffset = _initialRowOffset(newWidgetPositions);
+
+    const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
+      const { field } = chart;
+      // The old field charts only have one series per chart.
+      // The series always relates to the selected field.
+      const series = new Series(mapSeries(chart.valuetype, field));
+      // Because all field charts show the results for the defined timerange,
+      // the new row pivot always contains the timestamp field.
+      const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } };
+      const rowPivot = new Pivot('timestamp', 'time', rowPivotConfig);
+      const visualization = mapVisualization(chart.renderer);
+      const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
+      // create widget with migrated data
+      const widgetConfig = AggregationWidgetConfig.builder()
+        .visualization(visualization)
+        .visualizationConfig(visualizationConfig)
+        .series([series])
+        .rowPivots([rowPivot])
+        .build();
+      const newWidget = AggregationWidget.builder()
+        .newId()
+        .timerange(undefined)
+        .config(widgetConfig)
+        .build();
+      // create widget position for new widget
+      const migratedWidgetsOffset = defaultHeight * index;
+      const widgetRowPos = initialRowOffset + migratedWidgetsOffset;
+      newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, defaultHeight, Infinity);
+      return newWidget;
+    });
+
+    const newViewState = currentView.state
+      .toBuilder()
+      .widgets(Immutable.List([...currentView.state.widgets, ...newWidgets]))
+      .widgetPositions(newWidgetPositions)
+      .build();
+
+    return resolve({ newViewState, currentQueryId: currentView.activeQuery });
+  });
+};
+
 const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean => void, setMigrationFinished: boolean => void) => {
   setMigrating(true);
-  const { defaultHeight } = widgetDefinition('AGGREGATION');
-  const currentView = CurrentViewStateStore.getInitialState();
-  const newWidgetPositions = { ...currentView.state.widgetPositions };
-  const initialRowOffset = _initialRowOffset(newWidgetPositions);
 
-  const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
-    const { field } = chart;
-    // The old field charts only have one series per chart.
-    // The series always relates to the selected field.
-    const series = new Series(mapSeries(chart.valuetype, field));
-    // Because all field charts show the results for the defined timerange,
-    // the new row pivot always contains the timestamp field.
-    const rowPivotConfig = { interval: { type: 'timeunit', ...mapTime(chart.interval) } };
-    const rowPivot = new Pivot('timestamp', 'time', rowPivotConfig);
-    const visualization = mapVisualization(chart.renderer);
-    const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
-    // create widget with migrated data
-    const widgetConfig = AggregationWidgetConfig.builder()
-      .visualization(visualization)
-      .visualizationConfig(visualizationConfig)
-      .series([series])
-      .rowPivots([rowPivot])
-      .build();
-    const newWidget = AggregationWidget.builder()
-      .newId()
-      .timerange(undefined)
-      .config(widgetConfig)
-      .build();
-    // create widget position for new widget
-    const migratedWidgetsOffset = defaultHeight * index;
-    const widgetRowPos = initialRowOffset + migratedWidgetsOffset;
-    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, defaultHeight, Infinity);
-    return newWidget;
+  _migrateWidgets(legacyCharts).then(({ newViewState, currentQueryId }) => {
+    ViewStatesActions.update(currentQueryId, newViewState).then(
+      () => SearchActions.executeWithCurrentState().then(() => {
+        Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
+        setMigrating(false);
+        setMigrationFinished(true);
+      }),
+    );
   });
-
-  const newViewState = currentView.state
-    .toBuilder()
-    .widgets(Immutable.List([...currentView.state.widgets, ...newWidgets]))
-    .widgetPositions(newWidgetPositions)
-    .build();
-
-  ViewStatesActions.update(currentView.activeQuery, newViewState).then(
-    () => SearchActions.executeWithCurrentState().then(() => {
-      Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
-      setMigrating(false);
-      setMigrationFinished(true);
-    }),
-  );
 };
 
 const _onCancel = (setMigrationFinished) => {
