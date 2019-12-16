@@ -14,6 +14,19 @@ import type { OnVisualizationConfigChange, WidgetProps } from '../widgets/Widget
 
 const defaultVisualizationType = 'table';
 
+type RowResult = {
+  type: 'pivot',
+  total: number,
+  rows: Rows,
+  effective_timerange: TimeRange,
+};
+
+type EventResult = {
+  events: Events,
+  type: 'events',
+  name: 'events',
+};
+
 export type VisualizationComponentProps = {|
   config: AggregationWidgetConfig,
   data: { [string]: Rows, events?: Events },
