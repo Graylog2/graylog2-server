@@ -24,17 +24,21 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetEntity.Builder.class)
 @WithBeanGetter
-public abstract class WidgetEntity {
+public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
@@ -103,5 +107,22 @@ public abstract class WidgetEntity {
         static Builder builder() {
             return new AutoValue_WidgetEntity.Builder().streams(Collections.emptySet());
         }
+    }
+
+    @Override
+    public WidgetDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
+                .config(this.config())
+                .filter(this.filter())
+                .id(this.id())
+                .streams(this.streams())
+                .type(this.type());
+        if (this.query().isPresent()) {
+            widgetBuilder.query(this.query().get());
+        }
+        if (this.timerange().isPresent()) {
+            widgetBuilder.timerange(this.timerange().get());
+        }
+        return widgetBuilder.build();
     }
 }

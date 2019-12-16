@@ -28,12 +28,10 @@ import java.util.stream.Stream;
 
 public class DashboardFacade extends ViewFacade {
     public static final ModelType TYPE_V2 = ModelTypes.DASHBOARD_V2;
-    private ViewService viewService;
 
     @Inject
     public DashboardFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
-        this.viewService = viewService;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class DashboardFacade extends ViewFacade {
     }
 
     @Override
-    public Stream<ViewDTO> getNativeViews() {
-        return viewService.streamAll().filter(v -> v.type().equals(ViewDTO.Type.DASHBOARD));
+    public ViewDTO.Type getDTOType() {
+        return ViewDTO.Type.DASHBOARD;
     }
 }

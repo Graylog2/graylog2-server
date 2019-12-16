@@ -21,16 +21,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ViewStateDTO.Builder.class)
 @WithBeanGetter
-public abstract class ViewStateDTO {
+public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
     static final String FIELD_TITLES = "titles";
@@ -107,5 +111,24 @@ public abstract class ViewStateDTO {
                     .titles(Titles.empty())
                     .displayModeSettings(DisplayModeSettings.empty());
         }
+    }
+
+    @Override
+    public ViewStateEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final ViewStateEntity.Builder viewStateBuilder = ViewStateEntity.builder()
+                .titles(this.titles())
+                .displayModeSettings(this.displayModeSettings())
+                .formatting(this.formatting())
+                .widgets(this.widgets().stream().map(widgetDTO -> widgetDTO.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toSet()))
+                .widgetPositions(this.widgetPositions())
+                .widgetMapping(this.widgetMapping());
+        if (this.fields() != null && this.fields().isPresent()) {
+            viewStateBuilder.fields(this.fields().get());
+        }
+        if (this.staticMessageListId() != null && this.staticMessageListId().isPresent()) {
+            viewStateBuilder.staticMessageListId(this.staticMessageListId().get());
+        }
+        return viewStateBuilder.build();
     }
 }

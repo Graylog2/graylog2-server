@@ -25,7 +25,10 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -39,7 +42,7 @@ import static com.google.common.collect.ImmutableSet.of;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = SearchEntity.Builder.class)
-public abstract class SearchEntity {
+public abstract class SearchEntity implements NativeEntityConverter<Search> {
     public static final String FIELD_REQUIRES = "requires";
     private static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_OWNER = "owner";
@@ -93,5 +96,18 @@ public abstract class SearchEntity {
                     .parameters(of());
         }
 
+    }
+
+    @Override
+    public Search toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final Search.Builder searchBuilder = Search.builder()
+                .queries(this.queries())
+                .parameters(this.parameters())
+                .requires(this.requires())
+                .createdAt(this.createdAt());
+        if (this.owner().isPresent()) {
+            searchBuilder.owner(this.owner().get());
+        }
+        return searchBuilder.build();
     }
 }

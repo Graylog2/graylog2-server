@@ -18,10 +18,21 @@ package org.graylog.plugins.views.search.views;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.plugins.views.search.Search;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.SearchEntity;
+import org.graylog2.contentpacks.model.entities.ViewEntity;
+import org.graylog2.contentpacks.model.entities.ViewStateEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
@@ -31,6 +42,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -39,7 +51,7 @@ import java.util.stream.Collectors;
 @AutoValue
 @JsonDeserialize(builder = ViewDTO.Builder.class)
 @WithBeanGetter
-public abstract class ViewDTO {
+public abstract class ViewDTO implements ContentPackable<ViewEntity.Builder> {
     public enum Type {
         SEARCH,
         DASHBOARD
@@ -182,5 +194,31 @@ public abstract class ViewDTO {
         }
 
         public abstract ViewDTO build();
+    }
+
+    @Override
+    public ViewEntity.Builder toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final Map<String, ViewStateEntity> viewStateMap = new HashMap<>(this.state().size());
+        for (Map.Entry<String, ViewStateDTO> entry : this.state().entrySet()) {
+            final ViewStateDTO viewStateDTO = entry.getValue();
+            final ViewStateEntity viewStateEntity = viewStateDTO.toContentPackEntity(entityDescriptorIds);
+            viewStateMap.put(entry.getKey(), viewStateEntity);
+        }
+
+        final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
+                .type(this.type())
+                .title(ValueReference.of(this.title()))
+                .summary(ValueReference.of(this.summary()))
+                .description(ValueReference.of(this.description()))
+                .state(viewStateMap)
+                .requires(this.requires())
+                .properties(this.properties())
+                .createdAt(this.createdAt());
+
+        if (this.owner().isPresent()) {
+            viewEntityBuilder.owner(this.owner().get());
+        }
+
+        return viewEntityBuilder;
     }
 }

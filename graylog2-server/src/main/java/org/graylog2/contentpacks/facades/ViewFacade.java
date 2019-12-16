@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
-import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelType;
@@ -41,7 +40,6 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
-import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,95 +70,6 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         this.viewService = viewService;
     }
 
-    public abstract ModelType getModelType();
-
-    private Entity exportNativeEntity(ViewDTO view, EntityDescriptorIds entityDescriptorIds) {
-        final Map<String, ViewStateEntity> viewStateMap = new HashMap<>(view.state().size());
-        for (Map.Entry<String, ViewStateDTO> entry : view.state().entrySet()) {
-           final ViewStateDTO viewStateDTO = entry.getValue();
-           final ViewStateEntity viewStateEntity = exportViewStateEntity(viewStateDTO);
-           viewStateMap.put(entry.getKey(), viewStateEntity);
-        }
-
-        SearchEntity searchEntity = exportSearch(view.searchId()).orElseThrow(
-                () -> new IllegalArgumentException("View has no valid search")
-        );
-
-        final ViewEntity.Builder viewEntityBuilder = ViewEntity.builder()
-                .type(view.type())
-                .title(ValueReference.of(view.title()))
-                .summary(ValueReference.of(view.summary()))
-                .description(ValueReference.of(view.description()))
-                .state(viewStateMap)
-                .search(searchEntity)
-                .requires(view.requires())
-                .properties(view.properties())
-                .createdAt(view.createdAt());
-
-        if (view.owner().isPresent()) {
-            viewEntityBuilder.owner(view.owner().get());
-        }
-
-        final ViewEntity viewEntity = viewEntityBuilder.build();
-
-        final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
-        return EntityV1.builder()
-                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(view.id(), getModelType()))))
-                .type(getModelType())
-                .data(data)
-                .build();
-    }
-
-    private Optional<SearchEntity> exportSearch(String searchId) {
-        final Optional<Search> optionalSearch = searchDbService.get(searchId);
-        if (!optionalSearch.isPresent()) {
-            return Optional.empty();
-        }
-        final Search search = optionalSearch.get();
-        final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
-                .queries(search.queries())
-                .parameters(search.parameters())
-                .requires(search.requires())
-                .createdAt(search.createdAt());
-        if (search.owner().isPresent()) {
-            searchEntityBuilder.owner(search.owner().get());
-        }
-        return Optional.of(searchEntityBuilder.build());
-    }
-
-    private WidgetEntity exportWidgetEntity(WidgetDTO widgetDTO) {
-        final WidgetEntity.Builder builder = WidgetEntity.builder()
-                .id(widgetDTO.id())
-                .config(widgetDTO.config())
-                .filter(widgetDTO.filter())
-                .streams(widgetDTO.streams())
-                .type(widgetDTO.type());
-        if (widgetDTO.query().isPresent()) {
-            builder.query(widgetDTO.query().get());
-        }
-        if (widgetDTO.timerange().isPresent()) {
-            builder.timerange(widgetDTO.timerange().get());
-        }
-        return builder.build();
-    }
-
-    private ViewStateEntity exportViewStateEntity(ViewStateDTO viewStateDTO) {
-        final ViewStateEntity.Builder viewStateBuilder = ViewStateEntity.builder()
-                .titles(viewStateDTO.titles())
-                .displayModeSettings(viewStateDTO.displayModeSettings())
-                .formatting(viewStateDTO.formatting())
-                .widgets(viewStateDTO.widgets().stream().map(this::exportWidgetEntity).collect(Collectors.toSet()))
-                .widgetPositions(viewStateDTO.widgetPositions())
-                .widgetMapping(viewStateDTO.widgetMapping());
-        if (viewStateDTO.fields() != null && viewStateDTO.fields().isPresent()) {
-            viewStateBuilder.fields(viewStateDTO.fields().get());
-        }
-        if (viewStateDTO.staticMessageListId() != null && viewStateDTO.staticMessageListId().isPresent()) {
-            viewStateBuilder.staticMessageListId(viewStateDTO.staticMessageListId().get());
-        }
-        return viewStateBuilder.build();
-    }
-
     @Override
     public Optional<Entity> exportEntity(EntityDescriptor entityDescriptor,
                                          EntityDescriptorIds entityDescriptorIds) {
@@ -173,89 +82,54 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return Optional.empty();
     }
 
+    private Entity exportNativeEntity(ViewDTO view, EntityDescriptorIds entityDescriptorIds) {
+        final ViewEntity.Builder viewEntityBuilder = view.toContentPackEntity(entityDescriptorIds);
+
+        final Optional<Search> optionalSearch = searchDbService.get(view.searchId());
+        final Search search = optionalSearch.orElseThrow(() ->
+                new IllegalArgumentException("Search is missing in view " + view.searchId()));
+        SearchEntity searchEntity = search.toContentPackEntity(entityDescriptorIds);
+        final ViewEntity viewEntity = viewEntityBuilder.search(searchEntity).build();
+
+        final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
+        return EntityV1.builder()
+                .id(ModelId.of(entityDescriptorIds.getOrThrow(EntityDescriptor.create(view.id(), getModelType()))))
+                .type(getModelType())
+                .data(data)
+                .build();
+    }
+
+    public abstract ModelType getModelType();
+
     @Override
     public NativeEntity<ViewDTO> createNativeEntity(Entity entity,
                                                     Map<String, ValueReference> parameters,
                                                     Map<EntityDescriptor, Object> nativeEntities,
                                                     String username) {
         if (entity instanceof EntityV1) {
-            return decode((EntityV1) entity, parameters);
+            return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
     private NativeEntity<ViewDTO> decode(EntityV1 entityV1,
-                                         Map<String, ValueReference> parameters) {
+                                         Map<String, ValueReference> parameters,
+                                         Map<EntityDescriptor, Object> nativeEntities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new HashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {
             final ViewStateEntity entity = entry.getValue();
-            final ViewStateDTO viewStateDTO = decodeViewStateEntity(entity);
-            viewStateMap.put(entry.getKey(), viewStateDTO);
+            viewStateMap.put(entry.getKey(), entity.toNativeEntity(parameters, nativeEntities));
         }
+        final ViewDTO.Builder viewBuilder = viewEntity.toNativeEntity(parameters, nativeEntities);
+        viewBuilder.state(viewStateMap);
+        final Search search = viewEntity.search().toNativeEntity(parameters, nativeEntities);
+        final Search persistedSearch = searchDbService.save(search);
 
-        final Search search = decodeSearch(viewEntity.search());
-        final ViewDTO.Builder viewBuilder = ViewDTO.builder()
-                .title(viewEntity.title().asString(parameters))
-                .searchId(search.id())
-                .summary(viewEntity.summary().asString(parameters))
-                .description(viewEntity.description().asString(parameters))
-                .type(viewEntity.dtoType())
-                .properties(viewEntity.properties())
-                .createdAt(viewEntity.createdAt())
-                .state(viewStateMap)
-                .requires(viewEntity.requires());
-        if (viewEntity.owner().isPresent()) {
-            viewBuilder.owner(viewEntity.owner().get());
-        }
-        final ViewDTO persistedView = viewService.save(viewBuilder.build());
+        final ViewDTO persistedView = viewService.save(viewBuilder.searchId(persistedSearch.id()).build());
+
         return NativeEntity.create(entityV1.id(), persistedView.id(), getModelType(), persistedView.title(), persistedView);
-    }
-
-    private ViewStateDTO decodeViewStateEntity(ViewStateEntity viewStateEntity) {
-        final ViewStateDTO.Builder viewStateBuilder = ViewStateDTO.builder()
-                .displayModeSettings(viewStateEntity.displayModeSettings())
-                .widgets(viewStateEntity.widgets().stream().map(this::decodeWidgetEntity).collect(Collectors.toSet()))
-                .widgetMapping(viewStateEntity.widgetMapping())
-                .widgetPositions(viewStateEntity.widgetPositions())
-                .formatting(viewStateEntity.formatting())
-                .titles(viewStateEntity.titles());
-        if (viewStateEntity.fields() != null && viewStateEntity.fields().isPresent()) {
-            viewStateBuilder.fields(viewStateEntity.fields().get());
-        }
-        if (viewStateEntity.staticMessageListId() != null && viewStateEntity.staticMessageListId().isPresent()) {
-            viewStateBuilder.staticMessageListId(viewStateEntity.staticMessageListId().get());
-        }
-        return viewStateBuilder.build();
-    }
-
-    private WidgetDTO decodeWidgetEntity(WidgetEntity widgetEntity) {
-        final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
-                .config(widgetEntity.config())
-                .filter(widgetEntity.filter())
-                .id(widgetEntity.id())
-                .streams(widgetEntity.streams())
-                .type(widgetEntity.type());
-        if (widgetEntity.query().isPresent()) {
-            widgetBuilder.query(widgetEntity.query().get());
-        }
-        if (widgetEntity.timerange().isPresent()) {
-            widgetBuilder.timerange(widgetEntity.timerange().get());
-        }
-        return widgetBuilder.build();
-    }
-
-    private Search decodeSearch(SearchEntity entity) {
-        final Search.Builder searchBuilder = Search.builder()
-                .queries(entity.queries())
-                .parameters(entity.parameters())
-                .requires(entity.requires())
-                .createdAt(entity.createdAt());
-        if (entity.owner().isPresent()) {
-            searchBuilder.owner(entity.owner().get());
-        }
-        return searchDbService.save(searchBuilder.build());
     }
 
     @Override
@@ -270,6 +144,15 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     }
 
     @Override
+    public Set<EntityExcerpt> listEntityExcerpts() {
+        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
+    }
+
+public Stream<ViewDTO> getNativeViews() {
+        return viewService.streamAll().filter(v -> v.type().equals(this.getDTOType()));
+    }
+
+        @Override
     public EntityExcerpt createExcerpt(ViewDTO nativeEntity) {
         return EntityExcerpt.builder()
                 .id(ModelId.of(nativeEntity.id()))
@@ -278,13 +161,9 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
                 .build();
     }
 
-    public abstract Stream<ViewDTO> getNativeViews();
+    public abstract ViewDTO.Type getDTOType();
 
-    @Override
-    public Set<EntityExcerpt> listEntityExcerpts() {
-        return getNativeViews().map(this::createExcerpt).collect(Collectors.toSet());
-    }
-
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
         final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
@@ -301,19 +180,20 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public Graph<Entity> resolveForInstallation(Entity entity,
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
         if (entity instanceof EntityV1) {
-            return resolveEntityV1((EntityV1) entity, parameters, entities);
+            return resolveEntityV1((EntityV1) entity, entities);
         } else {
             throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
         }
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private Graph<Entity> resolveEntityV1(EntityV1 entity,
-                                          Map<String, ValueReference> parameters,
                                           Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);

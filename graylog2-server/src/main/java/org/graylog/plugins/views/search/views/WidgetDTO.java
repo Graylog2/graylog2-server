@@ -23,6 +23,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -33,7 +36,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
 @WithBeanGetter
-public abstract class WidgetDTO {
+public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_FILTER = "filter";
@@ -102,5 +105,22 @@ public abstract class WidgetDTO {
         static Builder builder() {
             return new AutoValue_WidgetDTO.Builder().streams(Collections.emptySet());
         }
+    }
+
+    @Override
+    public WidgetEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        final WidgetEntity.Builder builder = WidgetEntity.builder()
+                .id(this.id())
+                .config(this.config())
+                .filter(this.filter())
+                .streams(this.streams())
+                .type(this.type());
+        if (this.query().isPresent()) {
+            builder.query(this.query().get());
+        }
+        if (this.timerange().isPresent()) {
+            builder.timerange(this.timerange().get());
+        }
+        return builder.build();
     }
 }

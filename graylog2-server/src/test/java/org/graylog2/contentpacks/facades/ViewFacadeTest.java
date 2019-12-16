@@ -80,8 +80,6 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoR
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ViewFacadeTest {
-
-
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     @Rule
@@ -132,7 +130,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void exportEntity() {
+    public void itShouldCreateAViewEntity() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         final EntityDescriptor descriptor = EntityDescriptor.create(viewDTO.id(), ModelTypes.SEARCH_V1);
@@ -154,7 +152,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void createExcerpt() {
+    public void itShouldCreateAEntityExcerpt() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         final EntityExcerpt entityExcerpt = facade.createExcerpt(viewDTO);
@@ -167,7 +165,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void listEntityExcerpts() {
+    public void itShouldListEntityExcerptsForAllViewsInDB() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         final EntityExcerpt entityExcerpt = EntityExcerpt.builder()
@@ -184,7 +182,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void delete() {
+    public void itShouldRemoveAViewByDTO() {
         final ViewDTO viewDTO = viewService.get(viewId)
                 .orElseThrow(() -> new NotFoundException("Missing view with id: " + viewId));
         assertThat(facade.listEntityExcerpts()).hasSize(1);
@@ -194,7 +192,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void createNativeEntity() throws Exception {
+    public void itShouldCreateADTOFromAnEntity() throws Exception {
         final Entity viewEntity = createViewEntity();
         final NativeEntity<ViewDTO> nativeEntity = facade.createNativeEntity(viewEntity,
                 Collections.emptyMap(), Collections.emptyMap(), "admin");
@@ -208,7 +206,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void resolveDependencyForInstallation() throws Exception {
+    public void itShouldResolveDependencyForInstallation() throws Exception {
         Entity streamEntity = createStreamEntity();
         Entity entity = createViewEntity();
 
@@ -221,7 +219,7 @@ public class ViewFacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void resolveDependencyForCreation() {
+    public void itShouldResolveDependencyForCreation() {
         final EntityDescriptor streamEntityDescriptor = EntityDescriptor.create(streamId, ModelTypes.STREAM_V1);
         final EntityDescriptor viewEntityDescriptor = EntityDescriptor.create(viewId, ModelTypes.SEARCH_V1);
         Graph graph = facade.resolveNativeEntity(viewEntityDescriptor);

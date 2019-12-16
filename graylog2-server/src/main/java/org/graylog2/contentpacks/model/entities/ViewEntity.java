@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.search.views.ViewDTO;
+import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -38,7 +39,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = ViewEntity.Builder.class)
 @WithBeanGetter
-public abstract class ViewEntity {
+public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builder> {
     public enum Type {
         SEARCH,
         DASHBOARD
@@ -165,5 +166,21 @@ public abstract class ViewEntity {
         }
 
         public abstract ViewEntity build();
+    }
+
+    @Override
+    public ViewDTO.Builder toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final ViewDTO.Builder viewBuilder = ViewDTO.builder()
+                .title(this.title().asString(parameters))
+                .summary(this.summary().asString(parameters))
+                .description(this.description().asString(parameters))
+                .type(this.dtoType())
+                .properties(this.properties())
+                .createdAt(this.createdAt())
+                .requires(this.requires());
+        if (this.owner().isPresent()) {
+            viewBuilder.owner(this.owner().get());
+        }
+        return viewBuilder;
     }
 }

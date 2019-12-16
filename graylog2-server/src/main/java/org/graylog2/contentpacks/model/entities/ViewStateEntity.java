@@ -24,18 +24,22 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.DisplayModeSettings;
 import org.graylog.plugins.views.search.views.FormattingSettings;
 import org.graylog.plugins.views.search.views.Titles;
+import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 @JsonDeserialize(builder = ViewStateEntity.Builder.class)
 @WithBeanGetter
-public abstract class ViewStateEntity {
+public abstract class ViewStateEntity implements NativeEntityConverter<ViewStateDTO> {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
     static final String FIELD_TITLES = "titles";
@@ -112,5 +116,24 @@ public abstract class ViewStateEntity {
                     .titles(Titles.empty())
                     .displayModeSettings(DisplayModeSettings.empty());
         }
+    }
+
+    @Override
+    public ViewStateDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final ViewStateDTO.Builder viewStateBuilder = ViewStateDTO.builder()
+                .displayModeSettings(this.displayModeSettings())
+                .widgets(this.widgets().stream().map(w -> w.toNativeEntity(parameters, nativeEntities))
+                        .collect(Collectors.toSet()))
+                .widgetMapping(this.widgetMapping())
+                .widgetPositions(this.widgetPositions())
+                .formatting(this.formatting())
+                .titles(this.titles());
+        if (this.fields() != null && this.fields().isPresent()) {
+            viewStateBuilder.fields(this.fields().get());
+        }
+        if (this.staticMessageListId() != null && this.staticMessageListId().isPresent()) {
+            viewStateBuilder.staticMessageListId(this.staticMessageListId().get());
+        }
+        return viewStateBuilder.build();
     }
 }
