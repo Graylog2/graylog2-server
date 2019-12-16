@@ -40,6 +40,7 @@ import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
+import software.amazon.awssdk.services.kinesis.model.LimitExceededException;
 import software.amazon.awssdk.services.kinesis.model.ListShardsRequest;
 import software.amazon.awssdk.services.kinesis.model.ListShardsResponse;
 import software.amazon.awssdk.services.kinesis.model.ListStreamsRequest;
@@ -71,7 +72,14 @@ public class KinesisService {
 
     private static final int EIGHT_BITS = 8;
     private static final int KINESIS_LIST_STREAMS_MAX_ATTEMPTS = 1000;
-    private static final int KINESIS_LIST_STREAMS_LIMIT = 30;
+
+    // This number is intentionally high to avoid unneeded paging. The ListStreams request is different than other AWS
+    // requests in the way it pages (also seems to be sensitive to rate limiting and exact limits are not published).
+    // The ListStreams request is also fairly light, so there is no harm in the high page size.
+    // Usually the number of streams in an entire AWS account is limited to 1000, but exceptions can be made for very
+    // large accounts. 400 is high enough to not require unnecessary paging for many accounts, and also small enough
+    // that paging occurs in the case of a huge number of streams.
+    private static final int KINESIS_LIST_STREAMS_LIMIT = 400;
     private static final int RECORDS_SAMPLE_SIZE = 10;
     private static final int SHARD_COUNT = 1;
     private static final String ROLE_NAME_FORMAT = "graylog-cloudwatch-role-%s";
@@ -188,12 +196,17 @@ public class KinesisService {
         // Create retryer to keep checking if more streams exist.
         final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
                 .retryIfResult(b -> Objects.equals(b, Boolean.TRUE))
+                // Rate limiting is very likely to occur if multiple requests are executed in succession.
+                // Retrying on occurrence of LimitExceededException allows requests to repeat until successful.
+                // Usually the 3rd or 4th attempt is successful.
+                .retryIfExceptionOfType(LimitExceededException.class)
                 .withStopStrategy(StopStrategies.stopAfterAttempt(KINESIS_LIST_STREAMS_MAX_ATTEMPTS))
                 .build();
 
         if (listStreamsResponse.hasMoreStreams()) {
             try {
                 retryer.call(() -> {
+                    LOG.debug("Requesting streams...");
                     final String lastStreamName = streamNames.get(streamNames.size() - 1);
                     final ListStreamsRequest moreStreamsRequest = ListStreamsRequest.builder()
                                                                                     .exclusiveStartStreamName(lastStreamName)
