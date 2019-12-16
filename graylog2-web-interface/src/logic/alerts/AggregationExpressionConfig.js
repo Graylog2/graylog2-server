@@ -1,11 +1,9 @@
-import uuid from 'uuid/v4';
-
 export const emptyComparisonExpressionConfig = () => {
   return {
     expr: undefined,
     left: {
       expr: 'number-ref',
-      ref: uuid(),
+      ref: undefined,
     },
     right: {
       expr: 'number',

@@ -35,30 +35,44 @@ const NumberRefExpression = ({
     return getSeries(seriesId) || createSeries();
   };
 
-  const handleAggregationFunctionChange = (nextFunction) => {
+  const getSeriesId = (currentSeries, func, field) => {
+    return `${lodash.defaultTo(func, currentSeries.function)}-${lodash.defaultTo(field, currentSeries.field || '')}`;
+  };
+
+  const handleFieldChange = ({ nextFunction, nextField }) => {
     const series = lodash.cloneDeep(eventDefinition.config.series);
     const nextSeries = lodash.cloneDeep(getOrCreateSeries(expression.ref));
-    nextSeries.function = nextFunction;
+    const nextSeriesId = getSeriesId(nextSeries, nextFunction, nextField);
+    if (nextFunction !== undefined) {
+      nextSeries.function = nextFunction;
+    }
+    if (nextField !== undefined) {
+      nextSeries.field = nextField;
+    }
+    nextSeries.id = nextSeriesId;
+
     const seriesIndex = series.findIndex(s => s.id === nextSeries.id);
     if (seriesIndex >= 0) {
       series[seriesIndex] = nextSeries;
     } else {
       series.push(nextSeries);
     }
-    onChange('series', series);
+
+    const nextExpression = lodash.cloneDeep(expression);
+    nextExpression.ref = nextSeriesId;
+
+    onChange({
+      series: series,
+      conditions: nextExpression,
+    });
+  };
+
+  const handleAggregationFunctionChange = (nextFunction) => {
+    handleFieldChange({ nextFunction });
   };
 
   const handleAggregationFieldChange = (nextField) => {
-    const series = lodash.cloneDeep(eventDefinition.config.series);
-    const nextSeries = lodash.cloneDeep((getOrCreateSeries(expression.ref)));
-    nextSeries.field = nextField;
-    const seriesIndex = series.findIndex(s => s.id === nextSeries.id);
-    if (seriesIndex >= 0) {
-      series[seriesIndex] = nextSeries;
-    } else {
-      series.push(nextSeries);
-    }
-    onChange('series', series);
+    handleFieldChange({ nextField });
   };
 
   const series = getSeries(expression.ref) || {};

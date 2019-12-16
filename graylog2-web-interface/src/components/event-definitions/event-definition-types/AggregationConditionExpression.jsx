@@ -87,14 +87,16 @@ class AggregationConditionExpression extends React.Component {
   };
 
   handleChildChange = (branch) => {
-    return (key, update) => {
+    return (...args) => {
       const { expression, onChange } = this.props;
+      const changes = lodash.isObject(...args) ? args[0] : Object.fromEntries([args]);
 
-      if (key !== 'conditions') {
-        onChange(key, update);
+      if (!Object.keys(changes).includes('conditions')) {
+        onChange(changes);
         return;
       }
 
+      const update = changes.conditions;
       let nextUpdate;
       // A null update indicates that one of the branches got removed
       if (update === null) {
@@ -115,7 +117,7 @@ class AggregationConditionExpression extends React.Component {
         nextUpdate = nextExpression;
       }
 
-      onChange(key, nextUpdate);
+      onChange(Object.assign({}, changes, { conditions: nextUpdate }));
     };
   };
 

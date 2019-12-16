@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isObject } from 'lodash';
 
 import { Row } from 'components/graylog';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -32,24 +33,27 @@ class AggregationConditionsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  handleChange = (key, update) => {
+  handleChange = (...args) => {
     const { eventDefinition, onChange } = this.props;
-    if (key === 'conditions') {
-      // Propagate empty comparison expression, if the last expression was removed
-      const nextConditions = update || emptyComparisonExpressionConfig();
 
-      // Keep series up-to-date with changes in conditions
-      const seriesReferences = extractSeriesReferences(nextConditions);
-      const nextSeries = eventDefinition.config.series.filter(s => seriesReferences.includes(s.id));
+    const changes = isObject(...args) ? args[0] : Object.fromEntries([args]);
 
-      onChange({
-        conditions: { expression: nextConditions },
-        series: nextSeries,
-      });
+    if (!Object.keys(changes).includes('conditions')) {
+      onChange(changes);
       return;
     }
 
-    onChange({ [key]: update });
+    // Propagate empty comparison expression, if the last expression was removed
+    const nextConditions = changes.conditions || emptyComparisonExpressionConfig();
+
+    // Keep series up-to-date with changes in conditions
+    const seriesReferences = extractSeriesReferences(nextConditions);
+    const nextSeries = (changes.series || eventDefinition.config.series).filter(s => seriesReferences.includes(s.id));
+
+    onChange(Object.assign({}, changes, {
+      conditions: { expression: nextConditions },
+      series: nextSeries,
+    }));
   };
 
   render() {
