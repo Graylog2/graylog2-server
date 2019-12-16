@@ -1,21 +1,11 @@
+// @flow strict
 import React from 'react';
 import { mount } from 'enzyme';
 
+import suppressConsole from 'helpers/suppressConsole';
 import AppErrorBoundary from './AppErrorBoundary';
 
 jest.mock('react-router', () => ({ withRouter: x => x }));
-
-const suppressConsole = (fn) => {
-  /* eslint-disable no-console */
-  const originalConsoleError = console.error;
-  console.error = () => {
-  };
-
-  fn();
-
-  console.error = originalConsoleError;
-  /* eslint-enable no-console */
-};
 
 const ErroneusComponent = () => {
   // eslint-disable-next-line no-throw-literal

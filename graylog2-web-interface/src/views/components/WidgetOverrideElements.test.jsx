@@ -2,21 +2,10 @@
 import * as React from 'react';
 import { cleanup, render, waitForElement } from '@testing-library/react';
 
+import suppressConsole from 'helpers/suppressConsole';
 import WidgetOverrideElements from './WidgetOverrideElements';
 
 jest.mock('views/logic/withPluginEntities', () => x => x);
-
-const suppressConsole = async (fn) => {
-  /* eslint-disable no-console */
-  const originalConsoleError = console.error;
-  console.error = () => {
-  };
-
-  await fn();
-
-  console.error = originalConsoleError;
-  /* eslint-enable no-console */
-};
 
 describe('WidgetOverrideElements', () => {
   afterEach(cleanup);
