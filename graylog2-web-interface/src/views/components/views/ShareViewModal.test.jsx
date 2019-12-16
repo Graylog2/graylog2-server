@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import { ViewSharingActions } from 'views/stores/ViewSharingStore';
 import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
@@ -21,8 +21,9 @@ jest.mock('injection/StoreProvider', () => ({
         };
       case 'CurrentUser':
         return {};
+      default:
+        return null;
     }
-    return null;
   },
 }));
 jest.mock('views/stores/ViewSharingStore', () => ({

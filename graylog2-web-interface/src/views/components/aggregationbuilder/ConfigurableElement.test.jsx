@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import { mount, shallow } from 'enzyme';
+import { mount, shallow } from 'wrappedEnzyme';
 
 import ConfigurableElement from './ConfigurableElement';
 

@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
@@ -13,8 +12,8 @@ describe('SeriesConfiguration', () => {
   };
 
   it('renders the configuration dialog', () => {
-    const wrapper = renderer.create(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SeriesConfiguration series={createNewSeries()} onClose={() => {}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders an input to change the series name', () => {

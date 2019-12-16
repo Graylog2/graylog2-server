@@ -85,6 +85,7 @@ class Wizard extends React.Component {
       return;
     }
     if (!this._isValidActiveStep(activeStep, steps)) {
+      // eslint-disable-next-line no-console
       console.warn(`activeStep ${activeStep} is not a key in any element of the 'steps' prop!`);
     }
   };

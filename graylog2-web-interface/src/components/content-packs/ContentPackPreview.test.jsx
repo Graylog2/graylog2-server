@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -9,8 +8,8 @@ import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 describe('<ContentPackPreview />', () => {
   it('should render with empty content pack', () => {
     const contentPack = ContentPack.builder().id('dead-beef').build();
-    const wrapper = renderer.create(<ContentPackPreview contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with filled content pack', () => {
@@ -23,8 +22,8 @@ describe('<ContentPackPreview />', () => {
       .url('http://example.com')
       .build();
 
-    const wrapper = renderer.create(<ContentPackPreview contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackPreview contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should call onSave when creating a content pack', () => {

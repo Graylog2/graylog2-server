@@ -1,117 +1,574 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackInstallations /> should render with a installation 1`] = `
-<div>
-  <div
-    className="row "
+<ContentPackInstallations
+  installations={
+    Array [
+      Object {
+        "_id": "5b55b8b73d274645e49f7eec",
+        "comment": "The fake input",
+        "content_pack_id": "82d59d98-7440-ab74-9857-36b2f1b7ab8a",
+        "content_pack_revision": 1,
+        "created_at": "2018-07-23T11:15:03.871Z",
+        "created_by": "kmerz",
+        "entities": Array [
+          Object {
+            "content_pack_entity_id": "5b6d973d3d274645572a4318",
+            "id": "5ba38df33d274660f0b94118",
+            "title": "hulud.net",
+            "type": Object {
+              "name": "input",
+              "version": "1",
+            },
+          },
+        ],
+        "parameters": Object {
+          "SOURCE": Object {
+            "name": "string",
+            "value": "hulud.com.uk",
+          },
+        },
+      },
+    ]
+  }
+  onUninstall={[Function]}
+>
+  <DataTable
+    className=""
+    dataRowFormatter={[Function]}
+    displayKey="value"
+    filterBy=""
+    filterKeys={Array []}
+    filterLabel="Filter"
+    filterSuggestions={Array []}
+    headerCellFormatter={[Function]}
+    headers={
+      Array [
+        "Comment",
+        "Version",
+        "Action",
+      ]
+    }
+    id="content-packs-versions"
+    noDataText="No data available."
+    rowClassName=""
+    rows={
+      Array [
+        Object {
+          "_id": "5b55b8b73d274645e49f7eec",
+          "comment": "The fake input",
+          "content_pack_id": "82d59d98-7440-ab74-9857-36b2f1b7ab8a",
+          "content_pack_revision": 1,
+          "created_at": "2018-07-23T11:15:03.871Z",
+          "created_by": "kmerz",
+          "entities": Array [
+            Object {
+              "content_pack_entity_id": "5b6d973d3d274645572a4318",
+              "id": "5ba38df33d274660f0b94118",
+              "title": "hulud.net",
+              "type": Object {
+                "name": "input",
+                "version": "1",
+              },
+            },
+          ],
+          "parameters": Object {
+            "SOURCE": Object {
+              "name": "string",
+              "value": "hulud.com.uk",
+            },
+          },
+        },
+      ]
+    }
+    sortByKey="comment"
+    useResponsiveTable={true}
   >
-    <div
-      className="col-md-12"
-    >
+    <div>
       <div
-        className="data-table table-responsive"
-        id="content-packs-versions"
+        className="row "
       >
-        <table
-          className="table "
+        <div
+          className="col-md-12"
         >
-          <thead>
-            <tr>
-              <th>
-                Comment
-              </th>
-              <th>
-                Version
-              </th>
-              <th
-                className="text-right"
-              >
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                The fake input
-              </td>
-              <td>
-                1
-              </td>
-              <td>
-                <div
-                  className="pull-right"
-                >
-                  <div
-                    className="btn-toolbar"
-                    role="toolbar"
+          <div
+            className="data-table table-responsive"
+            id="content-packs-versions"
+          >
+            <table
+              className="table "
+            >
+              <thead>
+                <tr>
+                  <DataTableElement
+                    element="Comment"
+                    formatter={[Function]}
+                    index={0}
+                    key="header-0"
                   >
-                    <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-sm btn-primary"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
+                    <th>
+                      Comment
+                    </th>
+                  </DataTableElement>
+                  <DataTableElement
+                    element="Version"
+                    formatter={[Function]}
+                    index={1}
+                    key="header-1"
+                  >
+                    <th>
+                      Version
+                    </th>
+                  </DataTableElement>
+                  <DataTableElement
+                    element="Action"
+                    formatter={[Function]}
+                    index={2}
+                    key="header-2"
+                  >
+                    <th
+                      className="text-right"
                     >
-                      Uninstall
-                    </button>
-                    <button
-                      className="Button-c9cbmb-0 GLfOY btn btn-sm btn-info"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
-                    >
-                      View
-                    </button>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                      Action
+                    </th>
+                  </DataTableElement>
+                </tr>
+              </thead>
+              <tbody>
+                <DataTableElement
+                  element={
+                    Object {
+                      "_id": "5b55b8b73d274645e49f7eec",
+                      "comment": "The fake input",
+                      "content_pack_id": "82d59d98-7440-ab74-9857-36b2f1b7ab8a",
+                      "content_pack_revision": 1,
+                      "created_at": "2018-07-23T11:15:03.871Z",
+                      "created_by": "kmerz",
+                      "entities": Array [
+                        Object {
+                          "content_pack_entity_id": "5b6d973d3d274645572a4318",
+                          "id": "5ba38df33d274660f0b94118",
+                          "title": "hulud.net",
+                          "type": Object {
+                            "name": "input",
+                            "version": "1",
+                          },
+                        },
+                      ],
+                      "parameters": Object {
+                        "SOURCE": Object {
+                          "name": "string",
+                          "value": "hulud.com.uk",
+                        },
+                      },
+                    }
+                  }
+                  formatter={[Function]}
+                  index={0}
+                  key="row-0"
+                >
+                  <tr
+                    key="[object Object]"
+                  >
+                    <td>
+                      The fake input
+                    </td>
+                    <td>
+                      1
+                    </td>
+                    <td>
+                      <div
+                        className="pull-right"
+                      >
+                        <ButtonToolbar
+                          bsClass="btn-toolbar"
+                        >
+                          <div
+                            className="btn-toolbar"
+                            role="toolbar"
+                          >
+                            <ForwardRef
+                              bsSize="small"
+                              bsStyle="primary"
+                              onClick={[Function]}
+                            >
+                              <Button
+                                bsSize="small"
+                                bsStyle="primary"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="small"
+                                  bsStyle="primary"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "ghlLDE",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="small"
+                                    bsStyle="primary"
+                                    className="Button-c9cbmb-0 ghlLDE"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button-c9cbmb-0 ghlLDE btn btn-sm btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Uninstall
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button>
+                            </ForwardRef>
+                            <ForwardRef
+                              bsSize="small"
+                              bsStyle="info"
+                              onClick={[Function]}
+                            >
+                              <Button
+                                bsSize="small"
+                                bsStyle="info"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="small"
+                                  bsStyle="info"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "gZfKUo",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="small"
+                                    bsStyle="info"
+                                    className="Button-c9cbmb-0 gZfKUo"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button-c9cbmb-0 gZfKUo btn btn-sm btn-info"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      View
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button>
+                            </ForwardRef>
+                            <BootstrapModalWrapper
+                              backdrop="static"
+                              bsSize="large"
+                              onClose={[Function]}
+                              onHide={[Function]}
+                              onOpen={[Function]}
+                              showModal={false}
+                            >
+                              <Modal
+                                backdrop="static"
+                                bsSize="large"
+                                onHide={[Function]}
+                                show={false}
+                              >
+                                <StyledComponent
+                                  backdrop="static"
+                                  bsSize="large"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "BACKDROP_TRANSITION_DURATION": 150,
+                                      "Body": [Function],
+                                      "Dialog": [Function],
+                                      "Footer": [Function],
+                                      "Header": [Function],
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                      ],
+                                      "TRANSITION_DURATION": 300,
+                                      "Title": [Function],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Modal-nuree8-0",
+                                        "isStatic": true,
+                                        "lastClassName": "cHlGak",
+                                        "rules": Array [
+                                          ".modal-content{background-color:",
+                                          "#FFF",
+                                          ";border-color:",
+                                          "rgba(31,31,31,0.2)",
+                                          ";.modal-header{border-bottom-color:",
+                                          "#DCE1E5",
+                                          ";}.modal-footer{border-top-color:",
+                                          "#DCE1E5",
+                                          ";}}",
+                                        ],
+                                      },
+                                      "displayName": "Modal",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Modal-nuree8-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onHide={[Function]}
+                                  show={false}
+                                >
+                                  <Modal
+                                    animation={true}
+                                    autoFocus={true}
+                                    backdrop="static"
+                                    bsClass="modal"
+                                    bsSize="large"
+                                    className="Modal-nuree8-0 cHlGak"
+                                    dialogComponentClass={[Function]}
+                                    enforceFocus={true}
+                                    keyboard={true}
+                                    manager={
+                                      ModalManager {
+                                        "add": [Function],
+                                        "containers": Array [],
+                                        "data": Array [],
+                                        "handleContainerOverflow": true,
+                                        "hideSiblingNodes": true,
+                                        "isTopModal": [Function],
+                                        "modals": Array [],
+                                        "remove": [Function],
+                                      }
+                                    }
+                                    onHide={[Function]}
+                                    renderBackdrop={[Function]}
+                                    restoreFocus={true}
+                                    show={false}
+                                  >
+                                    <Modal
+                                      autoFocus={true}
+                                      backdrop="static"
+                                      backdropClassName="modal-backdrop"
+                                      backdropTransitionTimeout={150}
+                                      containerClassName="modal-open"
+                                      dialogTransitionTimeout={300}
+                                      enforceFocus={true}
+                                      keyboard={true}
+                                      manager={
+                                        ModalManager {
+                                          "add": [Function],
+                                          "containers": Array [],
+                                          "data": Array [],
+                                          "handleContainerOverflow": true,
+                                          "hideSiblingNodes": true,
+                                          "isTopModal": [Function],
+                                          "modals": Array [],
+                                          "remove": [Function],
+                                        }
+                                      }
+                                      onEntering={[Function]}
+                                      onExited={[Function]}
+                                      onHide={[Function]}
+                                      renderBackdrop={[Function]}
+                                      restoreFocus={true}
+                                      show={false}
+                                      transition={[Function]}
+                                    />
+                                  </Modal>
+                                </StyledComponent>
+                              </Modal>
+                            </BootstrapModalWrapper>
+                          </div>
+                        </ButtonToolbar>
+                      </div>
+                    </td>
+                  </tr>
+                </DataTableElement>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </DataTable>
+</ContentPackInstallations>
 `;
 
 exports[`<ContentPackInstallations /> should render with empty installations 1`] = `
-<div>
-  <div
-    className="row "
+<ContentPackInstallations
+  installations={Array []}
+  onUninstall={[Function]}
+>
+  <DataTable
+    className=""
+    dataRowFormatter={[Function]}
+    displayKey="value"
+    filterBy=""
+    filterKeys={Array []}
+    filterLabel="Filter"
+    filterSuggestions={Array []}
+    headerCellFormatter={[Function]}
+    headers={
+      Array [
+        "Comment",
+        "Version",
+        "Action",
+      ]
+    }
+    id="content-packs-versions"
+    noDataText="No data available."
+    rowClassName=""
+    rows={Array []}
+    sortByKey="comment"
+    useResponsiveTable={true}
   >
-    <div
-      className="col-md-12"
-    >
+    <div>
       <div
-        className="data-table table-responsive"
-        id="content-packs-versions"
+        className="row "
       >
-        <p>
-          No data available.
-        </p>
+        <div
+          className="col-md-12"
+        >
+          <div
+            className="data-table table-responsive"
+            id="content-packs-versions"
+          >
+            <p>
+              No data available.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </DataTable>
+</ContentPackInstallations>
 `;
 
 exports[`<ContentPackInstallations /> should render without installations 1`] = `
-<div>
-  <div
-    className="row "
+<ContentPackInstallations
+  installations={Array []}
+  onUninstall={[Function]}
+>
+  <DataTable
+    className=""
+    dataRowFormatter={[Function]}
+    displayKey="value"
+    filterBy=""
+    filterKeys={Array []}
+    filterLabel="Filter"
+    filterSuggestions={Array []}
+    headerCellFormatter={[Function]}
+    headers={
+      Array [
+        "Comment",
+        "Version",
+        "Action",
+      ]
+    }
+    id="content-packs-versions"
+    noDataText="No data available."
+    rowClassName=""
+    rows={Array []}
+    sortByKey="comment"
+    useResponsiveTable={true}
   >
-    <div
-      className="col-md-12"
-    >
+    <div>
       <div
-        className="data-table table-responsive"
-        id="content-packs-versions"
+        className="row "
       >
-        <p>
-          No data available.
-        </p>
+        <div
+          className="col-md-12"
+        >
+          <div
+            className="data-table table-responsive"
+            id="content-packs-versions"
+          >
+            <p>
+              No data available.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
+  </DataTable>
+</ContentPackInstallations>
 `;

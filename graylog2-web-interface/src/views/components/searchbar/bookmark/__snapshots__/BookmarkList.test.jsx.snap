@@ -56,7 +56,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    class="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
                     type="submit"
                   >
                     Search
@@ -67,7 +67,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    class="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -197,21 +197,21 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-primary"
+              class="Button-c9cbmb-0 ghlLDE btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              class="Button-c9cbmb-0 iKWoaE btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              class="Button-c9cbmb-0 iKWoaE btn btn-default"
               type="button"
             >
               Cancel
@@ -280,7 +280,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    class="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
                     type="submit"
                   >
                     Search
@@ -291,7 +291,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button-c9cbmb-0 GLfOY btn btn-default"
+                    class="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -445,21 +445,21 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
             class="modal-footer"
           >
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-primary"
+              class="Button-c9cbmb-0 ghlLDE btn btn-primary"
               disabled=""
               type="button"
             >
               Load
             </button>
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              class="Button-c9cbmb-0 iKWoaE btn btn-default"
               disabled=""
               type="button"
             >
               Delete
             </button>
             <button
-              class="Button-c9cbmb-0 GLfOY btn btn-default"
+              class="Button-c9cbmb-0 iKWoaE btn btn-default"
               type="button"
             >
               Cancel

@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -15,8 +15,8 @@ describe('<ContentPackDetails />', () => {
       .vendor('graylog.com')
       .url('www.graylog.com')
       .build();
-    const wrapper = renderer.create(<ContentPackDetails contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with content pack without a description', () => {
@@ -31,7 +31,7 @@ describe('<ContentPackDetails />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = renderer.create(<ContentPackDetails contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackDetails contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import Highlight from './Highlight';

@@ -1,593 +1,2089 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] = `
-<tbody
-  className="message-group message-group-toggled"
->
-  <tr
-    className="fields-row"
-    onClick={[Function]}
-  >
-    <td>
-      <strong>
-        <time
-          dateTime="2018-01-22T15:36:02.189Z"
-          title="2018-01-22T15:36:02.189Z"
-        >
-          2018-01-22 16:36:02.189
-        </time>
-      </strong>
-    </td>
-  </tr>
-  <tr
-    className="message-detail-row"
-    style={
-      Object {
-        "display": "table-row",
+<table>
+  <MessageTableEntry
+    allStreams={
+      Immutable.List [
+        Object {
+          "description": "stream1",
+          "id": "01",
+        },
+        Object {
+          "description": "stream2",
+          "id": "02",
+        },
+      ]
+    }
+    allStreamsLoaded={true}
+    disableSurroundingSearch={true}
+    expandAllRenderAsync={false}
+    expanded={true}
+    highlight={false}
+    inputs={
+      Immutable.Map {
+        "00001": Object {
+          "id": "00001",
+          "name": "syslog",
+          "title": "syslog",
+        },
       }
     }
+    message={
+      Object {
+        "fields": Object {
+          "message": "2018-01-22T15:36:02.189Z foo",
+          "timestamp": "2018-01-22T15:36:02.189Z",
+        },
+        "formatted_fields": Object {
+          "message": "2018-01-22T15:36:02.189Z foo",
+          "timestamp": "2018-01-22T15:36:02.189Z",
+        },
+        "highlight_ranges": Object {},
+        "id": "01",
+        "index": "01",
+      }
+    }
+    nodes={Immutable.Map {}}
+    searchConfig={Object {}}
+    selectedFields={Immutable.OrderedSet []}
+    showMessageRow={false}
+    streams={
+      Immutable.Map {
+        "01": Object {
+          "description": "stream1",
+          "id": "01",
+        },
+      }
+    }
+    toggleDetail={[Function]}
   >
-    <td
-      colSpan={1}
+    <tbody
+      className="message-group message-group-toggled"
     >
-      <div>
-        <div
-          className="row-sm row"
+      <tr
+        className="fields-row"
+        onClick={[Function]}
+      >
+        <td>
+          <strong>
+            <Timestamp
+              dateTime="2018-01-22T15:36:02.189Z"
+              format="YYYY-MM-DD HH:mm:ss.SSS"
+              relative={false}
+            >
+              <time
+                dateTime="2018-01-22T15:36:02.189Z"
+                key="time-2018-01-22T15:36:02.189Z"
+                title="2018-01-22T15:36:02.189Z"
+              >
+                2018-01-22 16:36:02.189
+              </time>
+            </Timestamp>
+          </strong>
+        </td>
+      </tr>
+      <tr
+        className="message-detail-row"
+        style={
+          Object {
+            "display": "table-row",
+          }
+        }
+      >
+        <td
+          colSpan={1}
         >
-          <div
-            className="col-md-12"
-          >
-            <div
-              className="pull-right btn-group btn-group-sm"
-            >
-              <a
-                className="Button-c9cbmb-0 GLfOY btn btn-default"
-                href="/messages/01/01"
-                onClick={[Function]}
-                onKeyDown={[Function]}
-              >
-                Permalink
-              </a>
-              <button
-                className="Button-c9cbmb-0 GLfOY btn btn-default"
-                data-clipboard-action="copy"
-                data-clipboard-button={true}
-                data-clipboard-text="01"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
-              >
-                Copy ID
-              </button>
-              <div
-                className="dropdown btn-group btn-group-sm"
-              >
-                <button
-                  aria-expanded={false}
-                  aria-haspopup={true}
-                  className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
-                  disabled={false}
-                  id="select-stream-dropdown"
-                  onClick={[Function]}
-                  onKeyDown={[Function]}
-                  role="button"
-                  type="button"
-                >
-                  Test against stream
-                   
-                  <span
-                    className="caret"
-                  />
-                </button>
-                <ul
-                  aria-labelledby="select-stream-dropdown"
-                  className="dropdown-menu dropdown-menu-right"
-                  role="menu"
-                >
-                  <li
-                    className=""
-                    role="presentation"
-                  >
-                    <a
-                      action="push"
-                      href="#"
-                      onClick={[Function]}
-                      onKeyDown={[Function]}
-                      role="menuitem"
-                      tabIndex="-1"
-                    />
-                  </li>
-                  <li
-                    className=""
-                    role="presentation"
-                  >
-                    <a
-                      action="push"
-                      href="#"
-                      onClick={[Function]}
-                      onKeyDown={[Function]}
-                      role="menuitem"
-                      tabIndex="-1"
-                    />
-                  </li>
-                </ul>
-              </div>
-            </div>
-            <h3
-              className="message-details-title"
-            >
-              <i
-                className="fa fa-envelope"
-              />
-               
-              <a
-                onClick={[Function]}
-                style={Object {}}
-              >
-                01
-              </a>
-            </h3>
-          </div>
-        </div>
-        <div
-          className="row"
-        >
-          <div
-            className="col-md-3"
-          >
-            <dl
-              className="message-details"
-            >
-              <dt>
-                Stored in index
-              </dt>
-              <dd>
-                01
-              </dd>
-            </dl>
-          </div>
-          <div
-            className="col-md-9"
+          <MessageDetail
+            allStreams={
+              Immutable.List [
+                Object {
+                  "description": "stream1",
+                  "id": "01",
+                },
+                Object {
+                  "description": "stream2",
+                  "id": "02",
+                },
+              ]
+            }
+            allStreamsLoaded={true}
+            disableSurroundingSearch={true}
+            expandAllRenderAsync={false}
+            inputs={
+              Immutable.Map {
+                "00001": Object {
+                  "id": "00001",
+                  "name": "syslog",
+                  "title": "syslog",
+                },
+              }
+            }
+            message={
+              Object {
+                "fields": Object {
+                  "message": "2018-01-22T15:36:02.189Z foo",
+                  "timestamp": "2018-01-22T15:36:02.189Z",
+                },
+                "formatted_fields": Object {
+                  "message": "2018-01-22T15:36:02.189Z foo",
+                  "timestamp": "2018-01-22T15:36:02.189Z",
+                },
+                "highlight_ranges": Object {},
+                "id": "01",
+                "index": "01",
+              }
+            }
+            nodes={Immutable.Map {}}
+            renderForDisplay={[Function]}
+            searchConfig={Object {}}
+            streams={
+              Immutable.Map {
+                "01": Object {
+                  "description": "stream1",
+                  "id": "01",
+                },
+              }
+            }
           >
             <div>
-              <dl
-                className="message-details message-details-fields"
+              <Row
+                bsClass="row"
+                className="row-sm"
+                componentClass="div"
               >
-                <span>
-                  <dt>
-                    message
-                  </dt>
-                  <dd
-                    className="message-field"
+                <div
+                  className="row-sm row"
+                >
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    md={12}
                   >
                     <div
-                      className="message-field-actions pull-right"
+                      className="col-md-12"
                     >
-                      <div
-                        className="dropdown btn-group btn-group-xs"
+                      <ButtonGroup
+                        block={false}
+                        bsClass="btn-group"
+                        bsSize="small"
+                        className="pull-right"
+                        justified={false}
+                        vertical={false}
                       >
-                        <button
-                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
+                        <div
+                          className="pull-right btn-group btn-group-sm"
+                        >
+                          <ForwardRef
+                            bsStyle="default"
+                            href="/messages/01/01"
+                          >
+                            <Button
+                              bsStyle="default"
+                              href="/messages/01/01"
+                            >
+                              <StyledComponent
+                                bsStyle="default"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "SIZES": Array [
+                                      "large",
+                                      "small",
+                                      "xsmall",
+                                    ],
+                                    "STYLES": Array [
+                                      "success",
+                                      "warning",
+                                      "danger",
+                                      "info",
+                                      "default",
+                                      "primary",
+                                      "link",
+                                    ],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "Button-c9cbmb-0",
+                                      "isStatic": false,
+                                      "lastClassName": "iKWoaE",
+                                      "rules": Array [
+                                        [Function],
+                                      ],
+                                    },
+                                    "displayName": "Button",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                href="/messages/01/01"
+                              >
+                                <Button
+                                  active={false}
+                                  block={false}
+                                  bsClass="btn"
+                                  bsStyle="default"
+                                  className="Button-c9cbmb-0 iKWoaE"
+                                  disabled={false}
+                                  href="/messages/01/01"
+                                >
+                                  <SafeAnchor
+                                    className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                    componentClass="a"
+                                    disabled={false}
+                                    href="/messages/01/01"
+                                  >
+                                    <a
+                                      className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                      href="/messages/01/01"
+                                      onClick={[Function]}
+                                      onKeyDown={[Function]}
+                                    >
+                                      Permalink
+                                    </a>
+                                  </SafeAnchor>
+                                </Button>
+                              </StyledComponent>
+                            </Button>
+                          </ForwardRef>
+                          <ClipboardButton
+                            action="copy"
+                            disabled={false}
+                            onSuccess={[Function]}
+                            text="01"
+                            title="Copy ID"
+                          >
+                            <OverlayTrigger
+                              defaultOverlayShown={false}
+                              overlay={
+                                <ForwardRef(Tooltip)
+                                  id="copy-button-tooltip"
+                                >
+                                  
+                                </ForwardRef(Tooltip)>
+                              }
+                              placement="top"
+                              rootClose={true}
+                              trigger="click"
+                            >
+                              <ForwardRef
+                                bsStyle="default"
+                                data-clipboard-action="copy"
+                                data-clipboard-button={true}
+                                data-clipboard-text="01"
+                                disabled={false}
+                                onClick={[Function]}
+                              >
+                                <Button
+                                  bsStyle="default"
+                                  data-clipboard-action="copy"
+                                  data-clipboard-button={true}
+                                  data-clipboard-text="01"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                >
+                                  <StyledComponent
+                                    bsStyle="default"
+                                    data-clipboard-action="copy"
+                                    data-clipboard-button={true}
+                                    data-clipboard-text="01"
+                                    disabled={false}
+                                    forwardedComponent={
+                                      Object {
+                                        "$$typeof": Symbol(react.forward_ref),
+                                        "SIZES": Array [
+                                          "large",
+                                          "small",
+                                          "xsmall",
+                                        ],
+                                        "STYLES": Array [
+                                          "success",
+                                          "warning",
+                                          "danger",
+                                          "info",
+                                          "default",
+                                          "primary",
+                                          "link",
+                                        ],
+                                        "attrs": Array [],
+                                        "componentStyle": ComponentStyle {
+                                          "componentId": "Button-c9cbmb-0",
+                                          "isStatic": false,
+                                          "lastClassName": "iKWoaE",
+                                          "rules": Array [
+                                            [Function],
+                                          ],
+                                        },
+                                        "displayName": "Button",
+                                        "foldedComponentIds": Array [],
+                                        "render": [Function],
+                                        "styledComponentId": "Button-c9cbmb-0",
+                                        "target": [Function],
+                                        "toString": [Function],
+                                        "warnTooManyClasses": [Function],
+                                        "withComponent": [Function],
+                                      }
+                                    }
+                                    forwardedRef={null}
+                                    onClick={[Function]}
+                                  >
+                                    <Button
+                                      active={false}
+                                      block={false}
+                                      bsClass="btn"
+                                      bsStyle="default"
+                                      className="Button-c9cbmb-0 iKWoaE"
+                                      data-clipboard-action="copy"
+                                      data-clipboard-button={true}
+                                      data-clipboard-text="01"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                    >
+                                      <button
+                                        className="Button-c9cbmb-0 iKWoaE btn btn-default"
+                                        data-clipboard-action="copy"
+                                        data-clipboard-button={true}
+                                        data-clipboard-text="01"
+                                        disabled={false}
+                                        onClick={[Function]}
+                                        type="button"
+                                      >
+                                        Copy ID
+                                      </button>
+                                    </Button>
+                                  </StyledComponent>
+                                </Button>
+                              </ForwardRef>
+                            </OverlayTrigger>
+                          </ClipboardButton>
+                          <DropdownButton
+                            bsSize="small"
+                            id="select-stream-dropdown"
+                            pullRight={true}
+                            title="Test against stream"
+                          >
+                            <StyledComponent
+                              bsSize="small"
+                              forwardedComponent={
+                                Object {
+                                  "$$typeof": Symbol(react.forward_ref),
+                                  "attrs": Array [],
+                                  "componentStyle": ComponentStyle {
+                                    "componentId": "DropdownButton-sc-1343dcx-0",
+                                    "isStatic": false,
+                                    "lastClassName": "jgZJTb",
+                                    "rules": Array [
+                                      [Function],
+                                      ";",
+                                      "& ~",
+                                      " .dropdown-menu{> li > a{color:",
+                                      "#1F1F1F",
+                                      ";:hover,:focus{color:",
+                                      "#484848",
+                                      ";background-color:",
+                                      "#F1F2F2",
+                                      ";}}> .active > a{background-color:",
+                                      "#6DC6E7",
+                                      ";color:",
+                                      "#f7fcfd",
+                                      ";:hover,:focus{background-color:",
+                                      "#16ACE3",
+                                      ";color:",
+                                      "#f3fafd",
+                                      ";}}> .disabled > a{color:",
+                                      "#8f8f8f",
+                                      ";:hover,:focus{background-color:",
+                                      "#F1F2F2",
+                                      ";color:",
+                                      "#b0b0b0",
+                                      ";}}}",
+                                      ";",
+                                    ],
+                                  },
+                                  "displayName": "DropdownButton",
+                                  "foldedComponentIds": Array [],
+                                  "render": [Function],
+                                  "styledComponentId": "DropdownButton-sc-1343dcx-0",
+                                  "target": [Function],
+                                  "toString": [Function],
+                                  "warnTooManyClasses": [Function],
+                                  "withComponent": [Function],
+                                }
+                              }
+                              forwardedRef={null}
+                              id="select-stream-dropdown"
+                              pullRight={true}
+                              title="Test against stream"
+                            >
+                              <DropdownButton
+                                bsSize="small"
+                                className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                id="select-stream-dropdown"
+                                pullRight={true}
+                                title="Test against stream"
+                              >
+                                <Uncontrolled(Dropdown)
+                                  bsSize="small"
+                                  id="select-stream-dropdown"
+                                  pullRight={true}
+                                >
+                                  <Dropdown
+                                    bsClass="dropdown"
+                                    bsSize="small"
+                                    componentClass={[Function]}
+                                    id="select-stream-dropdown"
+                                    onToggle={[Function]}
+                                    pullRight={true}
+                                  >
+                                    <ButtonGroup
+                                      block={false}
+                                      bsClass="btn-group"
+                                      bsSize="small"
+                                      className="dropdown"
+                                      justified={false}
+                                      vertical={false}
+                                    >
+                                      <div
+                                        className="dropdown btn-group btn-group-sm"
+                                      >
+                                        <DropdownToggle
+                                          bsClass="dropdown-toggle"
+                                          bsRole="toggle"
+                                          bsSize="small"
+                                          className="DropdownButton-sc-1343dcx-0 jgZJTb"
+                                          id="select-stream-dropdown"
+                                          key=".0"
+                                          onClick={[Function]}
+                                          onKeyDown={[Function]}
+                                          open={false}
+                                          useAnchor={false}
+                                        >
+                                          <Button
+                                            active={false}
+                                            aria-expanded={false}
+                                            aria-haspopup={true}
+                                            block={false}
+                                            bsClass="btn"
+                                            bsSize="small"
+                                            bsStyle="default"
+                                            className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle"
+                                            disabled={false}
+                                            id="select-stream-dropdown"
+                                            onClick={[Function]}
+                                            onKeyDown={[Function]}
+                                            role="button"
+                                          >
+                                            <button
+                                              aria-expanded={false}
+                                              aria-haspopup={true}
+                                              className="DropdownButton-sc-1343dcx-0 jgZJTb dropdown-toggle btn btn-sm btn-default"
+                                              disabled={false}
+                                              id="select-stream-dropdown"
+                                              onClick={[Function]}
+                                              onKeyDown={[Function]}
+                                              role="button"
+                                              type="button"
+                                            >
+                                              Test against stream
+                                               
+                                              <span
+                                                className="caret"
+                                              />
+                                            </button>
+                                          </Button>
+                                        </DropdownToggle>
+                                        <DropdownMenu
+                                          bsClass="dropdown-menu"
+                                          bsRole="menu"
+                                          key=".1"
+                                          labelledBy="select-stream-dropdown"
+                                          onClose={[Function]}
+                                          onSelect={[Function]}
+                                          pullRight={true}
+                                        >
+                                          <RootCloseWrapper
+                                            disabled={true}
+                                            event="click"
+                                            onRootClose={[Function]}
+                                          >
+                                            <ul
+                                              aria-labelledby="select-stream-dropdown"
+                                              className="dropdown-menu dropdown-menu-right"
+                                              role="menu"
+                                            >
+                                              <LinkContainer
+                                                action="push"
+                                                key=".0:$01"
+                                                onKeyDown={[Function]}
+                                                onSelect={[Function]}
+                                                onlyActiveOnIndex={false}
+                                                to="/streams/01/edit?index=01&message_id=01"
+                                              >
+                                                <MenuItem
+                                                  action="push"
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      action="push"
+                                                      componentClass="a"
+                                                      onClick={[Function]}
+                                                      onKeyDown={[Function]}
+                                                      role="menuitem"
+                                                      tabIndex="-1"
+                                                    >
+                                                      <a
+                                                        action="push"
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      />
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                              </LinkContainer>
+                                              <LinkContainer
+                                                action="push"
+                                                key=".0:$02"
+                                                onKeyDown={[Function]}
+                                                onSelect={[Function]}
+                                                onlyActiveOnIndex={false}
+                                                to="/streams/02/edit?index=01&message_id=01"
+                                              >
+                                                <MenuItem
+                                                  action="push"
+                                                  bsClass="dropdown"
+                                                  disabled={false}
+                                                  divider={false}
+                                                  header={false}
+                                                  onClick={[Function]}
+                                                  onKeyDown={[Function]}
+                                                  onSelect={[Function]}
+                                                >
+                                                  <li
+                                                    className=""
+                                                    role="presentation"
+                                                  >
+                                                    <SafeAnchor
+                                                      action="push"
+                                                      componentClass="a"
+                                                      onClick={[Function]}
+                                                      onKeyDown={[Function]}
+                                                      role="menuitem"
+                                                      tabIndex="-1"
+                                                    >
+                                                      <a
+                                                        action="push"
+                                                        href="#"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        role="menuitem"
+                                                        tabIndex="-1"
+                                                      />
+                                                    </SafeAnchor>
+                                                  </li>
+                                                </MenuItem>
+                                              </LinkContainer>
+                                            </ul>
+                                          </RootCloseWrapper>
+                                        </DropdownMenu>
+                                      </div>
+                                    </ButtonGroup>
+                                  </Dropdown>
+                                </Uncontrolled(Dropdown)>
+                              </DropdownButton>
+                            </StyledComponent>
+                          </DropdownButton>
+                        </div>
+                      </ButtonGroup>
+                      <h3
+                        className="message-details-title"
+                      >
+                        <ForwardRef
+                          fixedWidth={false}
+                          inverse={false}
+                          name="envelope"
+                          pulse={false}
+                          spin={false}
                         >
                           <i
-                            className="fa fa-search-plus"
+                            className="fa fa-envelope"
                           />
-                        </button>
-                        <button
-                          aria-expanded={false}
-                          aria-haspopup={true}
-                          aria-label={
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
-                              name="search-plus"
-                              pulse={false}
-                              spin={false}
-                            />
-                          }
-                          className="dropdown-toggle btn btn-xs btn-default"
-                          disabled={false}
-                          id="more-actions-dropdown-field-message"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          type="button"
+                        </ForwardRef>
+                         
+                        <Link
+                          onlyActiveOnIndex={false}
+                          style={Object {}}
+                          to="/messages/01/01"
                         >
-                           
-                          <span
-                            className="caret"
-                          />
-                        </button>
-                        <ul
-                          aria-labelledby="more-actions-dropdown-field-message"
-                          className="dropdown-menu dropdown-menu-right"
-                          role="menu"
-                        >
-                          <li
-                            className="dropdown-submenu left-submenu"
-                            onKeyDown={[Function]}
-                            onSelect={[Function]}
+                          <a
+                            onClick={[Function]}
+                            style={Object {}}
                           >
-                            <a
-                              href="#"
-                            >
-                              Create extractor for field 
-                              message
-                            </a>
-                            <ul
-                              className="dropdown-menu"
-                            >
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Copy input
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Grok pattern
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  JSON
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Regular expression
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Replace with regular expression
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Split & Index
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Substring
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=message&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Lookup Table
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                          <li
-                            className=""
-                            role="presentation"
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="menuitem"
-                              tabIndex="-1"
-                            >
-                              Show terms of 
-                              <em>
-                                message
-                              </em>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
+                            01
+                          </a>
+                        </Link>
+                      </h3>
                     </div>
-                    <div
-                      className="field-value"
-                    >
-                      2018-01-22T15:36:02.189Z foo
-                    </div>
-                  </dd>
-                </span>
-                <span>
-                  <dt>
-                    timestamp
-                  </dt>
-                  <dd
-                    className=""
+                  </Col>
+                </div>
+              </Row>
+              <Row
+                bsClass="row"
+                componentClass="div"
+              >
+                <div
+                  className="row"
+                >
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    md={3}
                   >
                     <div
-                      className="message-field-actions pull-right"
+                      className="col-md-3"
                     >
-                      <div
-                        className="dropdown btn-group btn-group-xs"
+                      <dl
+                        className="message-details"
                       >
-                        <button
-                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
-                          disabled={false}
-                          onClick={[Function]}
-                          type="button"
-                        >
-                          <i
-                            className="fa fa-search-plus"
-                          />
-                        </button>
-                        <button
-                          aria-expanded={false}
-                          aria-haspopup={true}
-                          aria-label={
-                            <ForwardRef
-                              fixedWidth={false}
-                              inverse={false}
-                              name="search-plus"
-                              pulse={false}
-                              spin={false}
-                            />
+                        <dt>
+                          Stored in index
+                        </dt>
+                        <dd>
+                          01
+                        </dd>
+                      </dl>
+                    </div>
+                  </Col>
+                  <Col
+                    bsClass="col"
+                    componentClass="div"
+                    md={9}
+                  >
+                    <div
+                      className="col-md-9"
+                    >
+                      <div>
+                        <MessageFields
+                          message={
+                            Object {
+                              "fields": Object {
+                                "message": "2018-01-22T15:36:02.189Z foo",
+                                "timestamp": "2018-01-22T15:36:02.189Z",
+                              },
+                              "formatted_fields": Object {
+                                "message": "2018-01-22T15:36:02.189Z foo",
+                                "timestamp": "2018-01-22T15:36:02.189Z",
+                              },
+                              "highlight_ranges": Object {},
+                              "id": "01",
+                              "index": "01",
+                            }
                           }
-                          className="dropdown-toggle btn btn-xs btn-default"
-                          disabled={false}
-                          id="more-actions-dropdown-field-timestamp"
-                          onClick={[Function]}
-                          onKeyDown={[Function]}
-                          role="button"
-                          type="button"
+                          renderForDisplay={[Function]}
+                          showDecoration={false}
                         >
-                           
-                          <span
-                            className="caret"
-                          />
-                        </button>
-                        <ul
-                          aria-labelledby="more-actions-dropdown-field-timestamp"
-                          className="dropdown-menu dropdown-menu-right"
-                          role="menu"
-                        >
-                          <li
-                            className="dropdown-submenu left-submenu"
-                            onKeyDown={[Function]}
-                            onSelect={[Function]}
+                          <dl
+                            className="message-details message-details-fields"
                           >
-                            <a
-                              href="#"
+                            <MessageField
+                              disableFieldActions={false}
+                              fieldName="message"
+                              key="message"
+                              message={
+                                Object {
+                                  "fields": Object {
+                                    "message": "2018-01-22T15:36:02.189Z foo",
+                                    "timestamp": "2018-01-22T15:36:02.189Z",
+                                  },
+                                  "formatted_fields": Object {
+                                    "message": "2018-01-22T15:36:02.189Z foo",
+                                    "timestamp": "2018-01-22T15:36:02.189Z",
+                                  },
+                                  "highlight_ranges": Object {},
+                                  "id": "01",
+                                  "index": "01",
+                                }
+                              }
+                              renderForDisplay={[Function]}
+                              showDecoration={false}
+                              value="2018-01-22T15:36:02.189Z foo"
                             >
-                              Create extractor for field 
-                              timestamp
-                            </a>
-                            <ul
-                              className="dropdown-menu"
+                              <span>
+                                <dt
+                                  key="messageTitle"
+                                >
+                                  message
+                                </dt>
+                                <MessageFieldDescription
+                                  disableFieldActions={false}
+                                  fieldName="message"
+                                  fieldValue="2018-01-22T15:36:02.189Z foo"
+                                  key="messageDescription"
+                                  message={
+                                    Object {
+                                      "fields": Object {
+                                        "message": "2018-01-22T15:36:02.189Z foo",
+                                        "timestamp": "2018-01-22T15:36:02.189Z",
+                                      },
+                                      "formatted_fields": Object {
+                                        "message": "2018-01-22T15:36:02.189Z foo",
+                                        "timestamp": "2018-01-22T15:36:02.189Z",
+                                      },
+                                      "highlight_ranges": Object {},
+                                      "id": "01",
+                                      "index": "01",
+                                    }
+                                  }
+                                  renderForDisplay={[Function]}
+                                >
+                                  <dd
+                                    className="message-field"
+                                    key="messagedd"
+                                  >
+                                    <MessageFieldSearchActions
+                                      fieldName="message"
+                                      message={
+                                        Object {
+                                          "fields": Object {
+                                            "message": "2018-01-22T15:36:02.189Z foo",
+                                            "timestamp": "2018-01-22T15:36:02.189Z",
+                                          },
+                                          "formatted_fields": Object {
+                                            "message": "2018-01-22T15:36:02.189Z foo",
+                                            "timestamp": "2018-01-22T15:36:02.189Z",
+                                          },
+                                          "highlight_ranges": Object {},
+                                          "id": "01",
+                                          "index": "01",
+                                        }
+                                      }
+                                      onAddFieldToSearchBar={[Function]}
+                                      onLoadTerms={[Function]}
+                                    >
+                                      <div
+                                        className="message-field-actions pull-right"
+                                      >
+                                        <SplitButton
+                                          bsSize="xsmall"
+                                          id="more-actions-dropdown-field-message"
+                                          key="1"
+                                          onClick={[Function]}
+                                          pullRight={true}
+                                          title={
+                                            <ForwardRef
+                                              fixedWidth={false}
+                                              inverse={false}
+                                              name="search-plus"
+                                              pulse={false}
+                                              spin={false}
+                                            />
+                                          }
+                                        >
+                                          <StyledComponent
+                                            bsSize="xsmall"
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "Toggle": [Function],
+                                                "attrs": Array [],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "SplitButton-sc-72s76o-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "cIryF",
+                                                  "rules": Array [
+                                                    [Function],
+                                                    ";~ .btn.dropdown-toggle{",
+                                                    [Function],
+                                                    ";",
+                                                    "& ~",
+                                                    " .dropdown-menu{> li > a{color:",
+                                                    "#1F1F1F",
+                                                    ";:hover,:focus{color:",
+                                                    "#484848",
+                                                    ";background-color:",
+                                                    "#F1F2F2",
+                                                    ";}}> .active > a{background-color:",
+                                                    "#6DC6E7",
+                                                    ";color:",
+                                                    "#f7fcfd",
+                                                    ";:hover,:focus{background-color:",
+                                                    "#16ACE3",
+                                                    ";color:",
+                                                    "#f3fafd",
+                                                    ";}}> .disabled > a{color:",
+                                                    "#8f8f8f",
+                                                    ";:hover,:focus{background-color:",
+                                                    "#F1F2F2",
+                                                    ";color:",
+                                                    "#b0b0b0",
+                                                    ";}}}",
+                                                    ";}",
+                                                  ],
+                                                },
+                                                "displayName": "SplitButton",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "SplitButton-sc-72s76o-0",
+                                                "target": [Function],
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                            id="more-actions-dropdown-field-message"
+                                            onClick={[Function]}
+                                            pullRight={true}
+                                            title={
+                                              <ForwardRef
+                                                fixedWidth={false}
+                                                inverse={false}
+                                                name="search-plus"
+                                                pulse={false}
+                                                spin={false}
+                                              />
+                                            }
+                                          >
+                                            <SplitButton
+                                              bsSize="xsmall"
+                                              className="SplitButton-sc-72s76o-0 cIryF"
+                                              id="more-actions-dropdown-field-message"
+                                              onClick={[Function]}
+                                              pullRight={true}
+                                              title={
+                                                <ForwardRef
+                                                  fixedWidth={false}
+                                                  inverse={false}
+                                                  name="search-plus"
+                                                  pulse={false}
+                                                  spin={false}
+                                                />
+                                              }
+                                            >
+                                              <Uncontrolled(Dropdown)
+                                                bsSize="xsmall"
+                                                id="more-actions-dropdown-field-message"
+                                                pullRight={true}
+                                              >
+                                                <Dropdown
+                                                  bsClass="dropdown"
+                                                  bsSize="xsmall"
+                                                  componentClass={[Function]}
+                                                  id="more-actions-dropdown-field-message"
+                                                  onToggle={[Function]}
+                                                  pullRight={true}
+                                                >
+                                                  <ButtonGroup
+                                                    block={false}
+                                                    bsClass="btn-group"
+                                                    bsSize="xsmall"
+                                                    className="dropdown"
+                                                    justified={false}
+                                                    vertical={false}
+                                                  >
+                                                    <div
+                                                      className="dropdown btn-group btn-group-xs"
+                                                    >
+                                                      <Button
+                                                        active={false}
+                                                        block={false}
+                                                        bsClass="btn"
+                                                        bsSize="xsmall"
+                                                        bsStyle="default"
+                                                        className="SplitButton-sc-72s76o-0 cIryF"
+                                                        disabled={false}
+                                                        key=".0"
+                                                        onClick={[Function]}
+                                                      >
+                                                        <button
+                                                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
+                                                          disabled={false}
+                                                          onClick={[Function]}
+                                                          type="button"
+                                                        >
+                                                          <ForwardRef
+                                                            fixedWidth={false}
+                                                            inverse={false}
+                                                            name="search-plus"
+                                                            pulse={false}
+                                                            spin={false}
+                                                          >
+                                                            <i
+                                                              className="fa fa-search-plus"
+                                                            />
+                                                          </ForwardRef>
+                                                        </button>
+                                                      </Button>
+                                                      <SplitToggle
+                                                        aria-label={
+                                                          <ForwardRef
+                                                            fixedWidth={false}
+                                                            inverse={false}
+                                                            name="search-plus"
+                                                            pulse={false}
+                                                            spin={false}
+                                                          />
+                                                        }
+                                                        bsClass="dropdown-toggle"
+                                                        bsRole="toggle"
+                                                        bsSize="xsmall"
+                                                        id="more-actions-dropdown-field-message"
+                                                        key=".1"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        open={false}
+                                                        useAnchor={false}
+                                                      >
+                                                        <DropdownToggle
+                                                          aria-label={
+                                                            <ForwardRef
+                                                              fixedWidth={false}
+                                                              inverse={false}
+                                                              name="search-plus"
+                                                              pulse={false}
+                                                              spin={false}
+                                                            />
+                                                          }
+                                                          bsClass="dropdown-toggle"
+                                                          bsRole="toggle"
+                                                          bsSize="xsmall"
+                                                          id="more-actions-dropdown-field-message"
+                                                          noCaret={false}
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          open={false}
+                                                          useAnchor={false}
+                                                        >
+                                                          <Button
+                                                            active={false}
+                                                            aria-expanded={false}
+                                                            aria-haspopup={true}
+                                                            aria-label={
+                                                              <ForwardRef
+                                                                fixedWidth={false}
+                                                                inverse={false}
+                                                                name="search-plus"
+                                                                pulse={false}
+                                                                spin={false}
+                                                              />
+                                                            }
+                                                            block={false}
+                                                            bsClass="btn"
+                                                            bsSize="xsmall"
+                                                            bsStyle="default"
+                                                            className="dropdown-toggle"
+                                                            disabled={false}
+                                                            id="more-actions-dropdown-field-message"
+                                                            onClick={[Function]}
+                                                            onKeyDown={[Function]}
+                                                            role="button"
+                                                          >
+                                                            <button
+                                                              aria-expanded={false}
+                                                              aria-haspopup={true}
+                                                              aria-label={
+                                                                <ForwardRef
+                                                                  fixedWidth={false}
+                                                                  inverse={false}
+                                                                  name="search-plus"
+                                                                  pulse={false}
+                                                                  spin={false}
+                                                                />
+                                                              }
+                                                              className="dropdown-toggle btn btn-xs btn-default"
+                                                              disabled={false}
+                                                              id="more-actions-dropdown-field-message"
+                                                              onClick={[Function]}
+                                                              onKeyDown={[Function]}
+                                                              role="button"
+                                                              type="button"
+                                                            >
+                                                               
+                                                              <span
+                                                                className="caret"
+                                                              />
+                                                            </button>
+                                                          </Button>
+                                                        </DropdownToggle>
+                                                      </SplitToggle>
+                                                      <DropdownMenu
+                                                        bsClass="dropdown-menu"
+                                                        bsRole="menu"
+                                                        key=".2"
+                                                        labelledBy="more-actions-dropdown-field-message"
+                                                        onClose={[Function]}
+                                                        onSelect={[Function]}
+                                                        pullRight={true}
+                                                      >
+                                                        <RootCloseWrapper
+                                                          disabled={true}
+                                                          event="click"
+                                                          onRootClose={[Function]}
+                                                        >
+                                                          <ul
+                                                            aria-labelledby="more-actions-dropdown-field-message"
+                                                            className="dropdown-menu dropdown-menu-right"
+                                                            role="menu"
+                                                          >
+                                                            <li
+                                                              className="dropdown-submenu left-submenu"
+                                                              key=".0"
+                                                              onKeyDown={[Function]}
+                                                              onSelect={[Function]}
+                                                            >
+                                                              <a
+                                                                href="#"
+                                                              >
+                                                                Create extractor for field 
+                                                                message
+                                                              </a>
+                                                              <ul
+                                                                className="dropdown-menu"
+                                                              >
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-copy_input"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Copy input
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-grok"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Grok pattern
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-json"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        JSON
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-regex"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Regular expression
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-regex_replace"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Replace with regular expression
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-split_and_index"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Split & Index
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-substring"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Substring
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=message&example_index=01&example_id=01"
+                                                                  key="menu-item-lookup_table"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=message&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=message&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Lookup Table
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                              </ul>
+                                                            </li>
+                                                            <MenuItem
+                                                              bsClass="dropdown"
+                                                              disabled={false}
+                                                              divider={false}
+                                                              header={false}
+                                                              key=".1"
+                                                              onKeyDown={[Function]}
+                                                              onSelect={[Function]}
+                                                            >
+                                                              <li
+                                                                className=""
+                                                                role="presentation"
+                                                              >
+                                                                <SafeAnchor
+                                                                  componentClass="a"
+                                                                  onClick={[Function]}
+                                                                  onKeyDown={[Function]}
+                                                                  role="menuitem"
+                                                                  tabIndex="-1"
+                                                                >
+                                                                  <a
+                                                                    href="#"
+                                                                    onClick={[Function]}
+                                                                    onKeyDown={[Function]}
+                                                                    role="menuitem"
+                                                                    tabIndex="-1"
+                                                                  >
+                                                                    Show terms of 
+                                                                    <em>
+                                                                      message
+                                                                    </em>
+                                                                  </a>
+                                                                </SafeAnchor>
+                                                              </li>
+                                                            </MenuItem>
+                                                          </ul>
+                                                        </RootCloseWrapper>
+                                                      </DropdownMenu>
+                                                    </div>
+                                                  </ButtonGroup>
+                                                </Dropdown>
+                                              </Uncontrolled(Dropdown)>
+                                            </SplitButton>
+                                          </StyledComponent>
+                                        </SplitButton>
+                                      </div>
+                                    </MessageFieldSearchActions>
+                                    <div
+                                      className="field-value"
+                                    >
+                                      2018-01-22T15:36:02.189Z foo
+                                    </div>
+                                  </dd>
+                                </MessageFieldDescription>
+                              </span>
+                            </MessageField>
+                            <MessageField
+                              disableFieldActions={false}
+                              fieldName="timestamp"
+                              key="timestamp"
+                              message={
+                                Object {
+                                  "fields": Object {
+                                    "message": "2018-01-22T15:36:02.189Z foo",
+                                    "timestamp": "2018-01-22T15:36:02.189Z",
+                                  },
+                                  "formatted_fields": Object {
+                                    "message": "2018-01-22T15:36:02.189Z foo",
+                                    "timestamp": "2018-01-22T15:36:02.189Z",
+                                  },
+                                  "highlight_ranges": Object {},
+                                  "id": "01",
+                                  "index": "01",
+                                }
+                              }
+                              renderForDisplay={[Function]}
+                              showDecoration={false}
+                              value="2018-01-22T15:36:02.189Z"
                             >
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
+                              <span>
+                                <dt
+                                  key="timestampTitle"
                                 >
-                                  Copy input
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
+                                  timestamp
+                                </dt>
+                                <MessageFieldDescription
+                                  disableFieldActions={false}
+                                  fieldName="timestamp"
+                                  fieldValue="2018-01-22T15:36:02.189Z"
+                                  key="timestampDescription"
+                                  message={
+                                    Object {
+                                      "fields": Object {
+                                        "message": "2018-01-22T15:36:02.189Z foo",
+                                        "timestamp": "2018-01-22T15:36:02.189Z",
+                                      },
+                                      "formatted_fields": Object {
+                                        "message": "2018-01-22T15:36:02.189Z foo",
+                                        "timestamp": "2018-01-22T15:36:02.189Z",
+                                      },
+                                      "highlight_ranges": Object {},
+                                      "id": "01",
+                                      "index": "01",
+                                    }
+                                  }
+                                  renderForDisplay={[Function]}
                                 >
-                                  Grok pattern
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  JSON
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Regular expression
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Replace with regular expression
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Split & Index
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Substring
-                                </a>
-                              </li>
-                              <li
-                                className=""
-                                role="presentation"
-                              >
-                                <a
-                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=timestamp&example_index=01&example_id=01"
-                                  onClick={[Function]}
-                                  onKeyDown={[Function]}
-                                  role="menuitem"
-                                  tabIndex="-1"
-                                >
-                                  Lookup Table
-                                </a>
-                              </li>
-                            </ul>
-                          </li>
-                          <li
-                            className=""
-                            role="presentation"
-                          >
-                            <a
-                              href="#"
-                              onClick={[Function]}
-                              onKeyDown={[Function]}
-                              role="menuitem"
-                              tabIndex="-1"
-                            >
-                              Show terms of 
-                              <em>
-                                timestamp
-                              </em>
-                            </a>
-                          </li>
-                        </ul>
+                                  <dd
+                                    className=""
+                                    key="timestampdd"
+                                  >
+                                    <MessageFieldSearchActions
+                                      fieldName="timestamp"
+                                      message={
+                                        Object {
+                                          "fields": Object {
+                                            "message": "2018-01-22T15:36:02.189Z foo",
+                                            "timestamp": "2018-01-22T15:36:02.189Z",
+                                          },
+                                          "formatted_fields": Object {
+                                            "message": "2018-01-22T15:36:02.189Z foo",
+                                            "timestamp": "2018-01-22T15:36:02.189Z",
+                                          },
+                                          "highlight_ranges": Object {},
+                                          "id": "01",
+                                          "index": "01",
+                                        }
+                                      }
+                                      onAddFieldToSearchBar={[Function]}
+                                      onLoadTerms={[Function]}
+                                    >
+                                      <div
+                                        className="message-field-actions pull-right"
+                                      >
+                                        <SplitButton
+                                          bsSize="xsmall"
+                                          id="more-actions-dropdown-field-timestamp"
+                                          key="1"
+                                          onClick={[Function]}
+                                          pullRight={true}
+                                          title={
+                                            <ForwardRef
+                                              fixedWidth={false}
+                                              inverse={false}
+                                              name="search-plus"
+                                              pulse={false}
+                                              spin={false}
+                                            />
+                                          }
+                                        >
+                                          <StyledComponent
+                                            bsSize="xsmall"
+                                            forwardedComponent={
+                                              Object {
+                                                "$$typeof": Symbol(react.forward_ref),
+                                                "Toggle": [Function],
+                                                "attrs": Array [],
+                                                "componentStyle": ComponentStyle {
+                                                  "componentId": "SplitButton-sc-72s76o-0",
+                                                  "isStatic": false,
+                                                  "lastClassName": "cIryF",
+                                                  "rules": Array [
+                                                    [Function],
+                                                    ";~ .btn.dropdown-toggle{",
+                                                    [Function],
+                                                    ";",
+                                                    "& ~",
+                                                    " .dropdown-menu{> li > a{color:",
+                                                    "#1F1F1F",
+                                                    ";:hover,:focus{color:",
+                                                    "#484848",
+                                                    ";background-color:",
+                                                    "#F1F2F2",
+                                                    ";}}> .active > a{background-color:",
+                                                    "#6DC6E7",
+                                                    ";color:",
+                                                    "#f7fcfd",
+                                                    ";:hover,:focus{background-color:",
+                                                    "#16ACE3",
+                                                    ";color:",
+                                                    "#f3fafd",
+                                                    ";}}> .disabled > a{color:",
+                                                    "#8f8f8f",
+                                                    ";:hover,:focus{background-color:",
+                                                    "#F1F2F2",
+                                                    ";color:",
+                                                    "#b0b0b0",
+                                                    ";}}}",
+                                                    ";}",
+                                                  ],
+                                                },
+                                                "displayName": "SplitButton",
+                                                "foldedComponentIds": Array [],
+                                                "render": [Function],
+                                                "styledComponentId": "SplitButton-sc-72s76o-0",
+                                                "target": [Function],
+                                                "toString": [Function],
+                                                "warnTooManyClasses": [Function],
+                                                "withComponent": [Function],
+                                              }
+                                            }
+                                            forwardedRef={null}
+                                            id="more-actions-dropdown-field-timestamp"
+                                            onClick={[Function]}
+                                            pullRight={true}
+                                            title={
+                                              <ForwardRef
+                                                fixedWidth={false}
+                                                inverse={false}
+                                                name="search-plus"
+                                                pulse={false}
+                                                spin={false}
+                                              />
+                                            }
+                                          >
+                                            <SplitButton
+                                              bsSize="xsmall"
+                                              className="SplitButton-sc-72s76o-0 cIryF"
+                                              id="more-actions-dropdown-field-timestamp"
+                                              onClick={[Function]}
+                                              pullRight={true}
+                                              title={
+                                                <ForwardRef
+                                                  fixedWidth={false}
+                                                  inverse={false}
+                                                  name="search-plus"
+                                                  pulse={false}
+                                                  spin={false}
+                                                />
+                                              }
+                                            >
+                                              <Uncontrolled(Dropdown)
+                                                bsSize="xsmall"
+                                                id="more-actions-dropdown-field-timestamp"
+                                                pullRight={true}
+                                              >
+                                                <Dropdown
+                                                  bsClass="dropdown"
+                                                  bsSize="xsmall"
+                                                  componentClass={[Function]}
+                                                  id="more-actions-dropdown-field-timestamp"
+                                                  onToggle={[Function]}
+                                                  pullRight={true}
+                                                >
+                                                  <ButtonGroup
+                                                    block={false}
+                                                    bsClass="btn-group"
+                                                    bsSize="xsmall"
+                                                    className="dropdown"
+                                                    justified={false}
+                                                    vertical={false}
+                                                  >
+                                                    <div
+                                                      className="dropdown btn-group btn-group-xs"
+                                                    >
+                                                      <Button
+                                                        active={false}
+                                                        block={false}
+                                                        bsClass="btn"
+                                                        bsSize="xsmall"
+                                                        bsStyle="default"
+                                                        className="SplitButton-sc-72s76o-0 cIryF"
+                                                        disabled={false}
+                                                        key=".0"
+                                                        onClick={[Function]}
+                                                      >
+                                                        <button
+                                                          className="SplitButton-sc-72s76o-0 cIryF btn btn-xs btn-default"
+                                                          disabled={false}
+                                                          onClick={[Function]}
+                                                          type="button"
+                                                        >
+                                                          <ForwardRef
+                                                            fixedWidth={false}
+                                                            inverse={false}
+                                                            name="search-plus"
+                                                            pulse={false}
+                                                            spin={false}
+                                                          >
+                                                            <i
+                                                              className="fa fa-search-plus"
+                                                            />
+                                                          </ForwardRef>
+                                                        </button>
+                                                      </Button>
+                                                      <SplitToggle
+                                                        aria-label={
+                                                          <ForwardRef
+                                                            fixedWidth={false}
+                                                            inverse={false}
+                                                            name="search-plus"
+                                                            pulse={false}
+                                                            spin={false}
+                                                          />
+                                                        }
+                                                        bsClass="dropdown-toggle"
+                                                        bsRole="toggle"
+                                                        bsSize="xsmall"
+                                                        id="more-actions-dropdown-field-timestamp"
+                                                        key=".1"
+                                                        onClick={[Function]}
+                                                        onKeyDown={[Function]}
+                                                        open={false}
+                                                        useAnchor={false}
+                                                      >
+                                                        <DropdownToggle
+                                                          aria-label={
+                                                            <ForwardRef
+                                                              fixedWidth={false}
+                                                              inverse={false}
+                                                              name="search-plus"
+                                                              pulse={false}
+                                                              spin={false}
+                                                            />
+                                                          }
+                                                          bsClass="dropdown-toggle"
+                                                          bsRole="toggle"
+                                                          bsSize="xsmall"
+                                                          id="more-actions-dropdown-field-timestamp"
+                                                          noCaret={false}
+                                                          onClick={[Function]}
+                                                          onKeyDown={[Function]}
+                                                          open={false}
+                                                          useAnchor={false}
+                                                        >
+                                                          <Button
+                                                            active={false}
+                                                            aria-expanded={false}
+                                                            aria-haspopup={true}
+                                                            aria-label={
+                                                              <ForwardRef
+                                                                fixedWidth={false}
+                                                                inverse={false}
+                                                                name="search-plus"
+                                                                pulse={false}
+                                                                spin={false}
+                                                              />
+                                                            }
+                                                            block={false}
+                                                            bsClass="btn"
+                                                            bsSize="xsmall"
+                                                            bsStyle="default"
+                                                            className="dropdown-toggle"
+                                                            disabled={false}
+                                                            id="more-actions-dropdown-field-timestamp"
+                                                            onClick={[Function]}
+                                                            onKeyDown={[Function]}
+                                                            role="button"
+                                                          >
+                                                            <button
+                                                              aria-expanded={false}
+                                                              aria-haspopup={true}
+                                                              aria-label={
+                                                                <ForwardRef
+                                                                  fixedWidth={false}
+                                                                  inverse={false}
+                                                                  name="search-plus"
+                                                                  pulse={false}
+                                                                  spin={false}
+                                                                />
+                                                              }
+                                                              className="dropdown-toggle btn btn-xs btn-default"
+                                                              disabled={false}
+                                                              id="more-actions-dropdown-field-timestamp"
+                                                              onClick={[Function]}
+                                                              onKeyDown={[Function]}
+                                                              role="button"
+                                                              type="button"
+                                                            >
+                                                               
+                                                              <span
+                                                                className="caret"
+                                                              />
+                                                            </button>
+                                                          </Button>
+                                                        </DropdownToggle>
+                                                      </SplitToggle>
+                                                      <DropdownMenu
+                                                        bsClass="dropdown-menu"
+                                                        bsRole="menu"
+                                                        key=".2"
+                                                        labelledBy="more-actions-dropdown-field-timestamp"
+                                                        onClose={[Function]}
+                                                        onSelect={[Function]}
+                                                        pullRight={true}
+                                                      >
+                                                        <RootCloseWrapper
+                                                          disabled={true}
+                                                          event="click"
+                                                          onRootClose={[Function]}
+                                                        >
+                                                          <ul
+                                                            aria-labelledby="more-actions-dropdown-field-timestamp"
+                                                            className="dropdown-menu dropdown-menu-right"
+                                                            role="menu"
+                                                          >
+                                                            <li
+                                                              className="dropdown-submenu left-submenu"
+                                                              key=".0"
+                                                              onKeyDown={[Function]}
+                                                              onSelect={[Function]}
+                                                            >
+                                                              <a
+                                                                href="#"
+                                                              >
+                                                                Create extractor for field 
+                                                                timestamp
+                                                              </a>
+                                                              <ul
+                                                                className="dropdown-menu"
+                                                              >
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-copy_input"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=copy_input&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Copy input
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-grok"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=grok&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Grok pattern
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-json"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=json&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        JSON
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-regex"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Regular expression
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-regex_replace"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=regex_replace&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Replace with regular expression
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-split_and_index"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=split_and_index&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Split & Index
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-substring"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=substring&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Substring
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                  bsClass="dropdown"
+                                                                  disabled={false}
+                                                                  divider={false}
+                                                                  header={false}
+                                                                  href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=timestamp&example_index=01&example_id=01"
+                                                                  key="menu-item-lookup_table"
+                                                                >
+                                                                  <li
+                                                                    className=""
+                                                                    role="presentation"
+                                                                  >
+                                                                    <SafeAnchor
+                                                                      componentClass="a"
+                                                                      href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=timestamp&example_index=01&example_id=01"
+                                                                      onClick={[Function]}
+                                                                      role="menuitem"
+                                                                      tabIndex="-1"
+                                                                    >
+                                                                      <a
+                                                                        href="/system/inputs/undefined/undefined/extractors/new?extractor_type=lookup_table&field=timestamp&example_index=01&example_id=01"
+                                                                        onClick={[Function]}
+                                                                        onKeyDown={[Function]}
+                                                                        role="menuitem"
+                                                                        tabIndex="-1"
+                                                                      >
+                                                                        Lookup Table
+                                                                      </a>
+                                                                    </SafeAnchor>
+                                                                  </li>
+                                                                </MenuItem>
+                                                              </ul>
+                                                            </li>
+                                                            <MenuItem
+                                                              bsClass="dropdown"
+                                                              disabled={false}
+                                                              divider={false}
+                                                              header={false}
+                                                              key=".1"
+                                                              onKeyDown={[Function]}
+                                                              onSelect={[Function]}
+                                                            >
+                                                              <li
+                                                                className=""
+                                                                role="presentation"
+                                                              >
+                                                                <SafeAnchor
+                                                                  componentClass="a"
+                                                                  onClick={[Function]}
+                                                                  onKeyDown={[Function]}
+                                                                  role="menuitem"
+                                                                  tabIndex="-1"
+                                                                >
+                                                                  <a
+                                                                    href="#"
+                                                                    onClick={[Function]}
+                                                                    onKeyDown={[Function]}
+                                                                    role="menuitem"
+                                                                    tabIndex="-1"
+                                                                  >
+                                                                    Show terms of 
+                                                                    <em>
+                                                                      timestamp
+                                                                    </em>
+                                                                  </a>
+                                                                </SafeAnchor>
+                                                              </li>
+                                                            </MenuItem>
+                                                          </ul>
+                                                        </RootCloseWrapper>
+                                                      </DropdownMenu>
+                                                    </div>
+                                                  </ButtonGroup>
+                                                </Dropdown>
+                                              </Uncontrolled(Dropdown)>
+                                            </SplitButton>
+                                          </StyledComponent>
+                                        </SplitButton>
+                                      </div>
+                                    </MessageFieldSearchActions>
+                                    <div
+                                      className="field-value"
+                                    >
+                                      <span>
+                                        <Timestamp
+                                          dateTime="2018-01-22T15:36:02.189Z"
+                                          format="YYYY-MM-DD HH:mm:ss.SSS Z"
+                                          relative={false}
+                                        >
+                                          <time
+                                            dateTime="2018-01-22T15:36:02.189Z"
+                                            key="time-2018-01-22T15:36:02.189Z"
+                                            title="2018-01-22T15:36:02.189Z"
+                                          >
+                                            2018-01-22 16:36:02.189 +01:00
+                                          </time>
+                                        </Timestamp>
+                                        <OverlayTrigger
+                                          defaultOverlayShown={false}
+                                          overlay={
+                                            <ForwardRef(Popover)
+                                              id="popover-trigger-hover-focus"
+                                            >
+                                              This timestamp is rendered in your timezone.
+                                            </ForwardRef(Popover)>
+                                          }
+                                          trigger={
+                                            Array [
+                                              "hover",
+                                            ]
+                                          }
+                                        >
+                                          <ForwardRef
+                                            className="timezoneInfo"
+                                            fixedWidth={true}
+                                            inverse={false}
+                                            name="info"
+                                            onClick={null}
+                                            onMouseOut={[Function]}
+                                            onMouseOver={[Function]}
+                                            pulse={false}
+                                            spin={false}
+                                          >
+                                            <i
+                                              className="fa fa-info timezoneInfo fa-fw"
+                                              onClick={null}
+                                              onMouseOut={[Function]}
+                                              onMouseOver={[Function]}
+                                            />
+                                          </ForwardRef>
+                                        </OverlayTrigger>
+                                      </span>
+                                    </div>
+                                  </dd>
+                                </MessageFieldDescription>
+                              </span>
+                            </MessageField>
+                          </dl>
+                        </MessageFields>
                       </div>
                     </div>
-                    <div
-                      className="field-value"
-                    >
-                      <span>
-                        <time
-                          dateTime="2018-01-22T15:36:02.189Z"
-                          title="2018-01-22T15:36:02.189Z"
-                        >
-                          2018-01-22 16:36:02.189 +01:00
-                        </time>
-                        <i
-                          className="fa fa-info timezoneInfo fa-fw"
-                          onClick={null}
-                          onMouseOut={[Function]}
-                          onMouseOver={[Function]}
-                        />
-                      </span>
-                    </div>
-                  </dd>
-                </span>
-              </dl>
+                  </Col>
+                </div>
+              </Row>
             </div>
-          </div>
-        </div>
-      </div>
-    </td>
-  </tr>
-</tbody>
+          </MessageDetail>
+        </td>
+      </tr>
+    </tbody>
+  </MessageTableEntry>
+</table>
 `;
