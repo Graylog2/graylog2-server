@@ -59,37 +59,38 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
     }
     return isValid;
   };
-  const updateState = (idx: number, name: string, value: string) => {
+  const updateState = (idx: number, type: string, name: string, value: string) => {
     const stateUpdate = ObjectUtils.clone(state);
     stateUpdate.entries[idx][name] = value;
+    stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
     setState(stateUpdate);
   };
-  const updateValidationError = (idx: number, name: string, result: Object, value: string) => {
+  const updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
     const validationUpdate = ObjectUtils.clone(validationState);
     validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
     setValidationState(validationUpdate);
-    updateState(idx, name, value);
+    updateState(idx, type, name, value);
   };
   const validate = (name: string, idx: number, type: string, value: string): void => {
     switch (name) {
       case 'title': {
         const result = value.trim().length <= 0 ? { valid: false } : { valid: true };
-        updateValidationError(idx, name, result, value);
+        updateValidationError(idx, type, name, result, value);
       }
         break;
       case 'value':
         if (type === literal) {
           const result = validURL(value) ? { valid: true } : { valid: false };
-          updateValidationError(idx, name, result, value);
-        } else if (value.trim().length > 0) {
+          updateValidationError(idx, type, name, result, value);
+        } else if (type === regex && value.trim().length > 0) {
           const promise = ToolsStore.testRegexValidity(value);
           promise.then((result) => {
             const res = result.is_valid ? { valid: true } : { valid: false };
-            updateValidationError(idx, name, res, value);
+            updateValidationError(idx, type, name, res, value);
           });
         } else {
           const res = { valid: false };
-          updateValidationError(idx, name, res, value);
+          updateValidationError(idx, type, name, res, value);
         }
         break;
       default:
@@ -103,8 +104,6 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
 
   const onUpdateType = (idx: number, type: string) => {
     const stateUpdate = ObjectUtils.clone(state);
-    stateUpdate.entries[idx] = { ...state.entries[idx], type };
-    setState(stateUpdate);
     validate('value', idx, type, stateUpdate.entries[idx].value);
   };
 
