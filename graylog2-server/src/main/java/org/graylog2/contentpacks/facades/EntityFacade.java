@@ -27,6 +27,7 @@ import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -58,7 +59,7 @@ public interface EntityFacade<T> {
     NativeEntity<T> createNativeEntity(Entity entity,
                                        Map<String, ValueReference> parameters,
                                        Map<EntityDescriptor, Object> nativeEntities,
-                                       String username);
+                                       String username) throws InvalidRangeParametersException;
 
     /**
      * Find an existing instance of the native entity described by the entity model.

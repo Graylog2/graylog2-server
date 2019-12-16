@@ -40,6 +40,10 @@ public abstract class PivotDTO {
     @JsonProperty(FIELD_CONFIG)
     public abstract PivotConfigDTO config();
 
+    public static Builder builder() {
+        return new AutoValue_PivotDTO.Builder();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_FIELD_NAME)

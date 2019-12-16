@@ -41,6 +41,7 @@ import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
     public NativeEntity<ViewDTO> createNativeEntity(Entity entity,
                                                     Map<String, ValueReference> parameters,
                                                     Map<EntityDescriptor, Object> nativeEntities,
-                                                    String username) {
+                                                    String username) throws InvalidRangeParametersException {
         if (entity instanceof EntityV1) {
             return decode((EntityV1) entity, parameters, nativeEntities);
         } else {
@@ -115,7 +116,7 @@ public abstract class ViewFacade implements EntityFacade<ViewDTO> {
 
     protected NativeEntity<ViewDTO> decode(EntityV1 entityV1,
                                          Map<String, ValueReference> parameters,
-                                         Map<EntityDescriptor, Object> nativeEntities) {
+                                         Map<EntityDescriptor, Object> nativeEntities) throws InvalidRangeParametersException {
         final ViewEntity viewEntity = objectMapper.convertValue(entityV1.data(), ViewEntity.class);
         final Map<String, ViewStateDTO> viewStateMap = new HashMap<>(viewEntity.state().size());
         for (Map.Entry<String, ViewStateEntity> entry : viewEntity.state().entrySet()) {

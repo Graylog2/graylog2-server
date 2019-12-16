@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @AutoValue
 public abstract class Titles {
-    private static final String KEY_WIDGETS = "widget";
+    public static final String KEY_WIDGETS = "widget";
 
     @JsonValue
     public abstract Map<String, Map<String, String>> titles();

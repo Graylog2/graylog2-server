@@ -1,0 +1,459 @@
+{
+  "v": 1,
+  "id": "3c01787d-877f-4345-9bee-20fb7fc21b2e",
+  "rev": 1,
+  "name": "Old Dashboard",
+  "summary": "Old Dashboard Content Pack",
+  "description": "Dashboard of version 1",
+  "vendor": "my, myself and I",
+  "url": "",
+  "parameters": [],
+  "entities": [
+    {
+      "v": "1",
+      "type": {
+        "name": "dashboard",
+        "version": "1"
+      },
+      "id": "89cbd7e1-31fd-4282-854d-cabf12537a77",
+      "data": {
+        "title": {
+          "@type": "string",
+          "@value": "ContentPack Dashboard"
+        },
+        "description": {
+          "@type": "string",
+          "@value": "A dashboard for content packs"
+        },
+        "widgets": [
+          {
+            "id": {
+              "@type": "string",
+              "@value": "38b5d8e9-2961-47f6-8bd0-484b0af57687"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Field graph line"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "FIELD_CHART"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "configuration": {
+              "renderer": {
+                "@type": "string",
+                "@value": "line"
+              },
+              "interpolation": {
+                "@type": "string",
+                "@value": "linear"
+              },
+              "interval": {
+                "@type": "string",
+                "@value": "week"
+              },
+              "query": {
+                "@type": "string",
+                "@value": "project:\"graylog2-server\""
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "valuetype": {
+                "@type": "string",
+                "@value": "cardinality"
+              },
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "absolute"
+                }
+              },
+              "rangeType": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "field": {
+                "@type": "string",
+                "@value": "author"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "position": null
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "eacdcd9f-2db5-430c-9caa-934e0cba3290"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Histogram"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "SEARCH_RESULT_CHART"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "relative"
+              },
+              "range": {
+                "@type": "integer",
+                "@value": 2592000
+              }
+            },
+            "configuration": {
+              "interval": {
+                "@type": "string",
+                "@value": "week"
+              },
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "relative"
+                },
+                "range": {
+                  "@type": "integer",
+                  "@value": 2592000
+                }
+              },
+              "query": {
+                "@type": "string",
+                "@value": "author: \"Konrad Merz\""
+              }
+            },
+            "position": null
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "eb7876a9-9d42-4e41-9505-cda150bc31a0"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Field graph"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "FIELD_CHART"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "configuration": {
+              "renderer": {
+                "@type": "string",
+                "@value": "bar"
+              },
+              "interpolation": {
+                "@type": "string",
+                "@value": "step-after"
+              },
+              "interval": {
+                "@type": "string",
+                "@value": "day"
+              },
+              "query": {
+                "@type": "string",
+                "@value": "project:\"graylog2-server\""
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "valuetype": {
+                "@type": "string",
+                "@value": "mean"
+              },
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "absolute"
+                }
+              },
+              "rangeType": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "field": {
+                "@type": "string",
+                "@value": "dayOfYear"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "position": null
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "13a02966-0318-4b52-bdc6-f17d676b77ec"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Field graph"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "STACKED_CHART"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "configuration": {
+              "interval": {
+                "@type": "string",
+                "@value": "month"
+              },
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "absolute"
+                }
+              },
+              "renderer": {
+                "@type": "string",
+                "@value": "bar"
+              },
+              "interpolation": {
+                "@type": "string",
+                "@value": "linear"
+              },
+              "series": [
+                {
+                  "query": {
+                    "@type": "string",
+                    "@value": "project:\"graylog2-server\""
+                  },
+                  "field": {
+                    "@type": "string",
+                    "@value": "lines_add"
+                  },
+                  "statistical_function": {
+                    "@type": "string",
+                    "@value": "count"
+                  }
+                },
+                {
+                  "query": {
+                    "@type": "string",
+                    "@value": "project:\"graylog2-server\""
+                  },
+                  "field": {
+                    "@type": "string",
+                    "@value": "lines_removed"
+                  },
+                  "statistical_function": {
+                    "@type": "string",
+                    "@value": "count"
+                  }
+                }
+              ]
+            },
+            "position": null
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "9bec70c3-fbdd-4d8c-bd19-103528827e42"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Statistical value"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "STATS_COUNT"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "configuration": {
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "absolute"
+                }
+              },
+              "field": {
+                "@type": "string",
+                "@value": "files_changed"
+              },
+              "trend": {
+                "@type": "boolean",
+                "@value": true
+              },
+              "query": {
+                "@type": "string",
+                "@value": "project:\"graylog2-server\""
+              },
+              "stats_function": {
+                "@type": "string",
+                "@value": "mean"
+              },
+              "lower_is_better": {
+                "@type": "boolean",
+                "@value": true
+              }
+            },
+            "position": null
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "499fd850-3a8a-4e4d-85d0-50301034c611"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Quick values"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "QUICKVALUES"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "absolute"
+              },
+              "from": {
+                "@type": "string",
+                "@value": "2018-12-13T09:46:36.000Z"
+              },
+              "to": {
+                "@type": "string",
+                "@value": "2019-12-13T09:46:37.000Z"
+              }
+            },
+            "configuration": {
+              "query": {
+                "@type": "string",
+                "@value": "project:\"graylog2-server\""
+              },
+              "show_pie_chart": {
+                "@type": "boolean",
+                "@value": true
+              },
+              "sort_order": {
+                "@type": "string",
+                "@value": "desc"
+              },
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "absolute"
+                }
+              },
+              "stacked_fields": {
+                "@type": "string",
+                "@value": ""
+              },
+              "data_table_limit": {
+                "@type": "integer",
+                "@value": 50
+              },
+              "field": {
+                "@type": "string",
+                "@value": "author"
+              },
+              "show_data_table": {
+                "@type": "boolean",
+                "@value": true
+              },
+              "limit": {
+                "@type": "integer",
+                "@value": 5
+              }
+            },
+            "position": null
+          }
+        ]
+      },
+      "constraints": [
+        {
+          "type": "server-version",
+          "version": ">=3.1.4"
+        }
+      ]
+    }
+  ]
+}

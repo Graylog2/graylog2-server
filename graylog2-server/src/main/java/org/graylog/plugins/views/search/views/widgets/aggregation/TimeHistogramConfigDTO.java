@@ -32,6 +32,10 @@ public abstract class TimeHistogramConfigDTO implements PivotConfigDTO {
     @JsonProperty(FIELD_INTERVAL)
     public abstract IntervalDTO interval();
 
+    public static Builder builder() {
+        return new AutoValue_TimeHistogramConfigDTO.Builder();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERVAL)

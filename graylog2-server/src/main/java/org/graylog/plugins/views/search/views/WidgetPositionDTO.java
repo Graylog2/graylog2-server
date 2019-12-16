@@ -38,6 +38,10 @@ public abstract class WidgetPositionDTO {
     @JsonProperty("width")
     public abstract Position width();
 
+    public static Builder builder() {
+        return new AutoValue_WidgetPositionDTO.Builder();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty("col")
