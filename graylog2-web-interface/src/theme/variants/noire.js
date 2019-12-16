@@ -11,7 +11,7 @@ const gray = {};
 const darkestGray = brand.tertiary;
 let i = 0;
 while (i <= 100) {
-  gray[i] = tint(Math.ceil(i / 100), darkestGray);
+  gray[i] = tint((i / 100), darkestGray);
   i += 10;
 }
 
