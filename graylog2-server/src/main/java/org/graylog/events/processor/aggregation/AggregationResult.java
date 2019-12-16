@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import java.util.List;
@@ -28,6 +30,13 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = AggregationResult.Builder.class)
 public abstract class AggregationResult {
+    private static final AggregationResult EMPTY_AGGREGATION_RESULT = builder()
+            .keyResults(ImmutableList.of())
+            .effectiveTimerange(AbsoluteRange.create(Tools.nowUTC(), Tools.nowUTC()))
+            .totalAggregatedMessages(0)
+            .sourceStreams(ImmutableSet.of())
+            .build();
+
     public abstract ImmutableList<AggregationKeyResult> keyResults();
 
     public abstract AbsoluteRange effectiveTimerange();
@@ -58,5 +67,9 @@ public abstract class AggregationResult {
         public abstract Builder sourceStreams(Set<String> sourceStreams);
 
         public abstract AggregationResult build();
+    }
+
+    public static AggregationResult empty() {
+        return EMPTY_AGGREGATION_RESULT;
     }
 }

@@ -17,14 +17,10 @@
 package org.graylog.plugins.views.search.views;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
+import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchDbService;
-import org.graylog.plugins.views.search.views.EnterpriseMetadataSummary;
-import org.graylog.plugins.views.search.views.PluginMetadataSummary;
-import org.graylog.plugins.views.search.views.RequiresParameterSupport;
-import org.graylog.plugins.views.search.views.ViewDTO;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -94,7 +90,7 @@ public class RequiresParameterSupportTest {
     @Test
     public void returnsParameterCapabilityIfViewDoesHaveParameters() {
         final Search search = Search.builder().parameters(ImmutableSet.of(
-                Parameter.builder()
+                ValueParameter.builder()
                         .name("foo")
                         .dataType("any")
                         .build()
