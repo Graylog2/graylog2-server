@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import UserNotification from 'util/UserNotification';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
@@ -47,9 +48,15 @@ class NewSearchPage extends React.Component<Props, State> {
     const { location, loadingViewHooks, executingViewHooks } = this.props;
     const { query } = location;
     processHooks(
-      ViewActions.create(View.Type.Search)
-        .then(({ view }) => view), loadingViewHooks, executingViewHooks, query,
-    ).then(() => this.setState({ loaded: true }));
+      ViewActions.create(View.Type.Search).then(({ view }) => view),
+      loadingViewHooks,
+      executingViewHooks,
+      query,
+    ).then(
+      () => this.setState({ loaded: true }),
+    ).catch(
+      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+    );
   }
 
   loadView = (viewId: string): Promise<?View> => {
