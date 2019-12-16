@@ -128,7 +128,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "kphWbh",
+                  "lastClassName": "gVCAoS",
                   "rules": Array [
                     [Function],
                   ],
@@ -152,7 +152,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               autoFocus={true}
               backdrop="static"
               bsClass="modal"
-              className="Modal-nuree8-0 kphWbh"
+              className="Modal-nuree8-0 gVCAoS"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

@@ -15,7 +15,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="Modal-nuree8-0 kphWbh fade in modal"
+      class="Modal-nuree8-0 gVCAoS fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -56,7 +56,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                    class="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="submit"
                   >
                     Search
@@ -67,7 +67,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                    class="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -90,7 +90,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 lpicKK form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 jJEiYy form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -124,7 +124,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               class="text-center"
             >
               <ul
-                class="Pagination-sc-1u3exqe-0 hpouZO pagination pagination-sm"
+                class="Pagination-sc-1u3exqe-0 eBWAYe pagination pagination-sm"
               >
                 <li
                   class="disabled"
@@ -204,7 +204,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
               type="button"
             >
               Cancel
@@ -232,7 +232,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
       class="modal-backdrop fade in"
     />
     <div
-      class="Modal-nuree8-0 kphWbh fade in modal"
+      class="Modal-nuree8-0 gVCAoS fade in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -273,7 +273,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                    class="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="submit"
                   >
                     Search
@@ -284,7 +284,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                   style="margin-left: 5px;"
                 >
                   <button
-                    class="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                    class="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                     type="reset"
                   >
                     Reset
@@ -307,7 +307,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 </label>
                 <span>
                   <select
-                    class="FormControl-sc-1amoaox-0 lpicKK form-control input-sm"
+                    class="FormControl-sc-1amoaox-0 jJEiYy form-control input-sm"
                     id="page-size"
                     label="Show:"
                     name="page-size"
@@ -338,7 +338,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                class="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                 type="button"
               >
                 <h4
@@ -351,7 +351,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 />
               </button>
               <button
-                class="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                class="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                 type="button"
               >
                 <h4
@@ -368,7 +368,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="text-center"
             >
               <ul
-                class="Pagination-sc-1u3exqe-0 hpouZO pagination pagination-sm"
+                class="Pagination-sc-1u3exqe-0 eBWAYe pagination pagination-sm"
               >
                 <li
                   class="disabled"
@@ -458,7 +458,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               Select
             </button>
             <button
-              class="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+              class="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
               type="button"
             >
               Cancel

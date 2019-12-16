@@ -148,7 +148,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "iGXdCA",
+                        "lastClassName": "hnlYRE",
                         "rules": Array [
                           [Function],
                         ],
@@ -172,7 +172,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 iGXdCA"
+                    className="Nav-dzawzr-0 hnlYRE"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -180,7 +180,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 iGXdCA nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 hnlYRE nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -336,7 +336,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -424,7 +424,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -658,7 +658,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -686,7 +686,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -699,7 +699,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -722,7 +722,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -741,10 +741,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -892,7 +892,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -920,7 +920,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -933,7 +933,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -956,7 +956,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -975,10 +975,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -1124,7 +1124,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1151,7 +1151,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -1163,7 +1163,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -1185,7 +1185,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1204,10 +1204,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -1355,7 +1355,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1383,7 +1383,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -1396,7 +1396,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -1419,7 +1419,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1438,10 +1438,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                                                     </span>
@@ -1587,7 +1587,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1614,7 +1614,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -1626,7 +1626,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                     value=""
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -1648,7 +1648,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -1667,10 +1667,10 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -1825,7 +1825,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "hYkHdk",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1848,12 +1848,12 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                          className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -1908,7 +1908,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "hYkHdk",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -1932,13 +1932,13 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                          className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -2470,7 +2470,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Nav-dzawzr-0",
                         "isStatic": false,
-                        "lastClassName": "iGXdCA",
+                        "lastClassName": "hnlYRE",
                         "rules": Array [
                           [Function],
                         ],
@@ -2494,7 +2494,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     activeKey="selection"
                     bsClass="nav"
                     bsStyle="pills"
-                    className="Nav-dzawzr-0 iGXdCA"
+                    className="Nav-dzawzr-0 hnlYRE"
                     justified={false}
                     onSelect={[Function]}
                     pullLeft={false}
@@ -2502,7 +2502,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                     stacked={true}
                   >
                     <ul
-                      className="Nav-dzawzr-0 iGXdCA nav nav-pills nav-stacked"
+                      className="Nav-dzawzr-0 hnlYRE nav nav-pills nav-stacked"
                       role={null}
                     >
                       <NavItem
@@ -2652,7 +2652,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -2740,7 +2740,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -3015,7 +3015,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3043,7 +3043,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Name"
@@ -3056,7 +3056,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Content Pack the movie"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="name"
                                                       label="Name"
                                                       maxLength={250}
@@ -3079,7 +3079,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3098,10 +3098,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a descriptive name for this content pack.
                                                     </span>
@@ -3249,7 +3249,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3277,7 +3277,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Summary"
@@ -3290,7 +3290,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="A old content pack"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="summary"
                                                       label="Summary"
                                                       maxLength={250}
@@ -3313,7 +3313,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3332,10 +3332,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Give a short summary of the content pack.
                                                     </span>
@@ -3481,7 +3481,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3508,7 +3508,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="textarea"
                                                     inputRef={[Function]}
                                                     label="Description"
@@ -3520,7 +3520,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="## No one dares"
                                                   >
                                                     <textarea
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="description"
                                                       label="Description"
                                                       name="description"
@@ -3542,7 +3542,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3561,10 +3561,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Give a long description of the content pack in markdown.
                                                     </span>
@@ -3712,7 +3712,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3740,7 +3740,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Vendor"
@@ -3753,7 +3753,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="Beinstein"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="vendor"
                                                       label="Vendor"
                                                       maxLength={250}
@@ -3776,7 +3776,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3795,10 +3795,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Required. Who did this content pack and how can he be reached. e.g Name and eMail
                                                     </span>
@@ -3944,7 +3944,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "lpicKK",
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -3971,7 +3971,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 lpicKK"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="URL"
@@ -3983,7 +3983,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                     value="http://beinstein.com"
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="url"
                                                       label="URL"
                                                       maxLength={250}
@@ -4005,7 +4005,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "HelpBlock-i8is92-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "fHJMjA",
+                                                        "lastClassName": "hCBNCb",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
@@ -4024,10 +4024,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                                 >
                                                   <HelpBlock
                                                     bsClass="help-block"
-                                                    className="HelpBlock-i8is92-0 fHJMjA"
+                                                    className="HelpBlock-i8is92-0 hCBNCb"
                                                   >
                                                     <span
-                                                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                                                     >
                                                       Where can I find the content pack. e.g. github url
                                                     </span>
@@ -4182,7 +4182,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "hYkHdk",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4205,12 +4205,12 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                          className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           type="submit"
                                         >
                                           <button
-                                            className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                            className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             type="submit"
                                           >
@@ -4265,7 +4265,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "Button__StyledButton-c9cbmb-0",
                                               "isStatic": false,
-                                              "lastClassName": "hYkHdk",
+                                              "lastClassName": "kojzoH",
                                               "rules": Array [
                                                 [Function],
                                               ],
@@ -4289,13 +4289,13 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           block={false}
                                           bsClass="btn"
                                           bsStyle="default"
-                                          className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                          className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="reset"
                                         >
                                           <button
-                                            className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                            className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                             disabled={false}
                                             onClick={[Function]}
                                             type="reset"
@@ -4610,7 +4610,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                           "componentStyle": ComponentStyle {
                                             "componentId": "Well-sc-19gs1oc-0",
                                             "isStatic": false,
-                                            "lastClassName": "dWfXTA",
+                                            "lastClassName": "hnzchw",
                                             "rules": Array [
                                               [Function],
                                             ],
@@ -4629,10 +4629,10 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                     >
                                       <Well
                                         bsClass="well"
-                                        className="Well-sc-19gs1oc-0 dWfXTA"
+                                        className="Well-sc-19gs1oc-0 hnzchw"
                                       >
                                         <div
-                                          className="Well-sc-19gs1oc-0 dWfXTA well"
+                                          className="Well-sc-19gs1oc-0 hnzchw well"
                                         >
                                           <div
                                             dangerouslySetInnerHTML={

@@ -18,7 +18,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 hzVhhK dropdown-toggle btn btn-info"
+            class="DropdownButton__StyledDropdownButton-sc-1343dcx-0 dmQzht dropdown-toggle btn btn-info"
             id="dropdown-timerange-selector"
             role="button"
             type="button"
@@ -85,7 +85,7 @@ exports[`WidgetQueryControls should do something 1`] = `
           
           <span>
             <select
-              class="relative FormControl-sc-1amoaox-0 lpicKK form-control"
+              class="relative FormControl-sc-1amoaox-0 jJEiYy form-control"
               id="relative-timerange-selector"
               label=""
               name="relative"

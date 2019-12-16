@@ -170,7 +170,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "lpicKK",
+                                    "lastClassName": "jJEiYy",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -198,7 +198,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
+                                className="FormControl-sc-1amoaox-0 jJEiYy"
                                 componentClass="textarea"
                                 inputRef={[Function]}
                                 label="Pattern"
@@ -211,7 +211,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                 value=""
                               >
                                 <textarea
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                  className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                   id="pattern-input"
                                   label="Pattern"
                                   name="pattern-input"
@@ -234,7 +234,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   "componentStyle": ComponentStyle {
                                     "componentId": "HelpBlock-i8is92-0",
                                     "isStatic": false,
-                                    "lastClassName": "fHJMjA",
+                                    "lastClassName": "hCBNCb",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -253,10 +253,10 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             >
                               <HelpBlock
                                 bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
+                                className="HelpBlock-i8is92-0 hCBNCb"
                               >
                                 <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                  className="HelpBlock-i8is92-0 hCBNCb help-block"
                                 >
                                   The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
                                 </span>
@@ -418,7 +418,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "lpicKK",
+                                    "lastClassName": "jJEiYy",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -446,7 +446,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
+                                className="FormControl-sc-1amoaox-0 jJEiYy"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="Filter pattern"
@@ -459,7 +459,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                  className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                   id="pattern-selector"
                                   label="Filter pattern"
                                   name="pattern-selector"
@@ -506,7 +506,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                       "componentStyle": ComponentStyle {
                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                         "isStatic": false,
-                        "lastClassName": "kQFEvB",
+                        "lastClassName": "egnaMQ",
                         "rules": Array [
                           [Function],
                         ],
@@ -528,14 +528,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                 >
                   <ListGroupItem
                     bsClass="list-group-item"
-                    className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                    className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                     header="COMMONMAC"
                     id="list-item-0"
                     listItem={false}
                     onKeyDown={[Function]}
                   >
                     <span
-                      className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                       id="list-item-0"
                       onKeyDown={[Function]}
                     >
@@ -655,7 +655,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                       "componentStyle": ComponentStyle {
                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                         "isStatic": false,
-                        "lastClassName": "kQFEvB",
+                        "lastClassName": "egnaMQ",
                         "rules": Array [
                           [Function],
                         ],
@@ -677,14 +677,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                 >
                   <ListGroupItem
                     bsClass="list-group-item"
-                    className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                    className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                     header="DATA"
                     id="list-item-1"
                     listItem={false}
                     onKeyDown={[Function]}
                   >
                     <span
-                      className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                       id="list-item-1"
                       onKeyDown={[Function]}
                     >
@@ -804,7 +804,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                       "componentStyle": ComponentStyle {
                         "componentId": "ListGroupItem-sc-1ky0joo-0",
                         "isStatic": false,
-                        "lastClassName": "kQFEvB",
+                        "lastClassName": "egnaMQ",
                         "rules": Array [
                           [Function],
                         ],
@@ -826,14 +826,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                 >
                   <ListGroupItem
                     bsClass="list-group-item"
-                    className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                    className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                     header="DATE"
                     id="list-item-2"
                     listItem={false}
                     onKeyDown={[Function]}
                   >
                     <span
-                      className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                       id="list-item-2"
                       onKeyDown={[Function]}
                     >
@@ -1097,7 +1097,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "lpicKK",
+                                    "lastClassName": "jJEiYy",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1125,7 +1125,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                             >
                               <FormControl
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
+                                className="FormControl-sc-1amoaox-0 jJEiYy"
                                 componentClass="textarea"
                                 inputRef={[Function]}
                                 label="Pattern"
@@ -1138,7 +1138,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                 value=""
                               >
                                 <textarea
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                  className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                   id="pattern-input"
                                   label="Pattern"
                                   name="pattern-input"
@@ -1161,7 +1161,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "HelpBlock-i8is92-0",
                                     "isStatic": false,
-                                    "lastClassName": "fHJMjA",
+                                    "lastClassName": "hCBNCb",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1180,10 +1180,10 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                             >
                               <HelpBlock
                                 bsClass="help-block"
-                                className="HelpBlock-i8is92-0 fHJMjA"
+                                className="HelpBlock-i8is92-0 hCBNCb"
                               >
                                 <span
-                                  className="HelpBlock-i8is92-0 fHJMjA help-block"
+                                  className="HelpBlock-i8is92-0 hCBNCb help-block"
                                 >
                                   The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
                                 </span>
@@ -1345,7 +1345,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                                   "componentStyle": ComponentStyle {
                                     "componentId": "FormControl-sc-1amoaox-0",
                                     "isStatic": false,
-                                    "lastClassName": "lpicKK",
+                                    "lastClassName": "jJEiYy",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1373,7 +1373,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               <FormControl
                                 autoComplete="off"
                                 bsClass="form-control"
-                                className="FormControl-sc-1amoaox-0 lpicKK"
+                                className="FormControl-sc-1amoaox-0 jJEiYy"
                                 componentClass="input"
                                 inputRef={[Function]}
                                 label="Filter pattern"
@@ -1386,7 +1386,7 @@ exports[`<GrokPatternInput /> should render grok pattern input without patterns 
                               >
                                 <input
                                   autoComplete="off"
-                                  className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                  className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                   id="pattern-selector"
                                   label="Filter pattern"
                                   name="pattern-selector"

@@ -116,7 +116,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
                         "isStatic": false,
-                        "lastClassName": "lpicKK",
+                        "lastClassName": "jJEiYy",
                         "rules": Array [
                           [Function],
                         ],
@@ -138,14 +138,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 lpicKK"
+                    className="FormControl-sc-1amoaox-0 jJEiYy"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
@@ -162,7 +162,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "HelpBlock-i8is92-0",
                         "isStatic": false,
-                        "lastClassName": "fHJMjA",
+                        "lastClassName": "hCBNCb",
                         "rules": Array [
                           [Function],
                         ],
@@ -181,10 +181,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <HelpBlock
                     bsClass="help-block"
-                    className="HelpBlock-i8is92-0 fHJMjA"
+                    className="HelpBlock-i8is92-0 hCBNCb"
                   >
                     <span
-                      className="HelpBlock-i8is92-0 fHJMjA help-block"
+                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                     >
                       The name of the series as it appears in the chart.
                     </span>

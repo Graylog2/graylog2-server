@@ -102,7 +102,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "lpicKK",
+                          "lastClassName": "jJEiYy",
                           "rules": Array [
                             [Function],
                           ],
@@ -126,7 +126,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 lpicKK"
+                      className="FormControl-sc-1amoaox-0 jJEiYy"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -135,7 +135,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                        className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -191,7 +191,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "Button__StyledButton-c9cbmb-0",
                             "isStatic": false,
-                            "lastClassName": "hYkHdk",
+                            "lastClassName": "kojzoH",
                             "rules": Array [
                               [Function],
                             ],
@@ -438,7 +438,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "lpicKK",
+                                                  "lastClassName": "jJEiYy",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -462,7 +462,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 lpicKK"
+                                              className="FormControl-sc-1amoaox-0 jJEiYy"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -471,7 +471,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -531,7 +531,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -559,7 +559,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               style={
                                 Object {
@@ -569,7 +569,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -630,7 +630,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "hYkHdk",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -659,7 +659,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -670,7 +670,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -725,7 +725,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "kQFEvB",
+                            "lastClassName": "egnaMQ",
                             "rules": Array [
                               [Function],
                             ],
@@ -744,11 +744,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 egnaMQ"
                         listItem={false}
                       >
                         <span
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                         >
                           <div
                             className="headerWrapper"
@@ -774,7 +774,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "kQFEvB",
+                            "lastClassName": "egnaMQ",
                             "rules": Array [
                               [Function],
                             ],
@@ -793,11 +793,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                          className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                         >
                           No items to display
                         </span>
@@ -954,7 +954,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                         "componentStyle": ComponentStyle {
                           "componentId": "FormControl-sc-1amoaox-0",
                           "isStatic": false,
-                          "lastClassName": "lpicKK",
+                          "lastClassName": "jJEiYy",
                           "rules": Array [
                             [Function],
                           ],
@@ -978,7 +978,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                   >
                     <FormControl
                       bsClass="form-control"
-                      className="FormControl-sc-1amoaox-0 lpicKK"
+                      className="FormControl-sc-1amoaox-0 jJEiYy"
                       componentClass="input"
                       id="create-token-input"
                       onChange={[Function]}
@@ -987,7 +987,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       value=""
                     >
                       <input
-                        className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                        className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                         id="create-token-input"
                         onChange={[Function]}
                         placeholder="e.g ServiceName"
@@ -1312,7 +1312,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
                                                   "isStatic": false,
-                                                  "lastClassName": "lpicKK",
+                                                  "lastClassName": "jJEiYy",
                                                   "rules": Array [
                                                     [Function],
                                                   ],
@@ -1336,7 +1336,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 lpicKK"
+                                              className="FormControl-sc-1amoaox-0 jJEiYy"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Filter"
@@ -1345,7 +1345,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                               type="text"
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 lpicKK form-control"
+                                                className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                 id="filter-data-filter"
                                                 label="Filter"
                                                 name="filter-data-filter"
@@ -1433,7 +1433,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               style={
                                 Object {
@@ -1443,7 +1443,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="submit"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                 disabled={false}
                                 style={
                                   Object {
@@ -1533,7 +1533,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               block={false}
                               bsClass="btn"
                               bsStyle="default"
-                              className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={true}
                               onClick={[Function]}
                               style={
@@ -1544,7 +1544,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               type="button"
                             >
                               <button
-                                className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                 disabled={true}
                                 onClick={[Function]}
                                 style={
@@ -1599,7 +1599,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "kQFEvB",
+                            "lastClassName": "egnaMQ",
                             "rules": Array [
                               [Function],
                             ],
@@ -1618,11 +1618,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        className="listGroupHeader ListGroupItem-sc-1ky0joo-0 egnaMQ"
                         listItem={false}
                       >
                         <span
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                         >
                           <div
                             className="headerWrapper"
@@ -1650,7 +1650,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "kQFEvB",
+                            "lastClassName": "egnaMQ",
                             "rules": Array [
                               [Function],
                             ],
@@ -1669,11 +1669,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                          className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                         >
                           <div
                             className="itemWrapper itemWrapperStatic"
@@ -1805,7 +1805,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                           "componentStyle": ComponentStyle {
                             "componentId": "ListGroupItem-sc-1ky0joo-0",
                             "isStatic": false,
-                            "lastClassName": "kQFEvB",
+                            "lastClassName": "egnaMQ",
                             "rules": Array [
                               [Function],
                             ],
@@ -1824,11 +1824,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                     >
                       <ListGroupItem
                         bsClass="list-group-item"
-                        className="ListGroupItem-sc-1ky0joo-0 kQFEvB"
+                        className="ListGroupItem-sc-1ky0joo-0 egnaMQ"
                         listItem={false}
                       >
                         <span
-                          className="ListGroupItem-sc-1ky0joo-0 kQFEvB list-group-item"
+                          className="ListGroupItem-sc-1ky0joo-0 egnaMQ list-group-item"
                         >
                           <div
                             className="itemWrapper itemWrapperStatic"

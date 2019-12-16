@@ -205,7 +205,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                     "componentStyle": ComponentStyle {
                                       "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "hYkHdk",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -228,18 +228,18 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                   block={false}
                                   bsClass="btn"
                                   bsStyle="default"
-                                  className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   href="/messages/01/01"
                                 >
                                   <SafeAnchor
-                                    className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                     componentClass="a"
                                     disabled={false}
                                     href="/messages/01/01"
                                   >
                                     <a
-                                      className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                      className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                       href="/messages/01/01"
                                       onClick={[Function]}
                                       onKeyDown={[Function]}
@@ -314,7 +314,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                         "componentStyle": ComponentStyle {
                                           "componentId": "Button__StyledButton-c9cbmb-0",
                                           "isStatic": false,
-                                          "lastClassName": "hYkHdk",
+                                          "lastClassName": "kojzoH",
                                           "rules": Array [
                                             [Function],
                                           ],
@@ -337,7 +337,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                       block={false}
                                       bsClass="btn"
                                       bsStyle="default"
-                                      className="Button__StyledButton-c9cbmb-0 hYkHdk"
+                                      className="Button__StyledButton-c9cbmb-0 kojzoH"
                                       data-clipboard-action="copy"
                                       data-clipboard-button={true}
                                       data-clipboard-text="01"
@@ -345,7 +345,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                       onClick={[Function]}
                                     >
                                       <button
-                                        className="Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                        className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                         data-clipboard-action="copy"
                                         data-clipboard-button={true}
                                         data-clipboard-text="01"
@@ -385,7 +385,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                     "componentStyle": ComponentStyle {
                                       "componentId": "DropdownButton__StyledDropdownButton-sc-1343dcx-0",
                                       "isStatic": false,
-                                      "lastClassName": "kTBiPl",
+                                      "lastClassName": "dVScaT",
                                       "rules": Array [
                                         [Function],
                                       ],
@@ -408,7 +408,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                 <DropdownButton
                                   bsSize="small"
                                   bsStyle="default"
-                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 kTBiPl"
+                                  className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 dVScaT"
                                   id="select-stream-dropdown"
                                   pullRight={true}
                                   title="Test against stream"
@@ -445,7 +445,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                             bsRole="toggle"
                                             bsSize="small"
                                             bsStyle="default"
-                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 kTBiPl"
+                                            className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 dVScaT"
                                             id="select-stream-dropdown"
                                             key=".0"
                                             onClick={[Function]}
@@ -461,7 +461,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                               bsClass="btn"
                                               bsSize="small"
                                               bsStyle="default"
-                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 kTBiPl dropdown-toggle"
+                                              className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 dVScaT dropdown-toggle"
                                               disabled={false}
                                               id="select-stream-dropdown"
                                               onClick={[Function]}
@@ -471,7 +471,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                               <button
                                                 aria-expanded={false}
                                                 aria-haspopup={true}
-                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 kTBiPl dropdown-toggle btn btn-sm btn-default"
+                                                className="DropdownButton__StyledDropdownButton-sc-1343dcx-0 dVScaT dropdown-toggle btn btn-sm btn-default"
                                                 disabled={false}
                                                 id="select-stream-dropdown"
                                                 onClick={[Function]}
@@ -815,7 +815,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "SplitButton__StyledSplitButton-sc-72s76o-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "jZDPul",
+                                                    "lastClassName": "jefkPu",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -847,7 +847,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                               <SplitButton
                                                 bsSize="xsmall"
                                                 bsStyle="default"
-                                                className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul"
+                                                className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu"
                                                 id="more-actions-dropdown-field-message"
                                                 onClick={[Function]}
                                                 pullRight={true}
@@ -894,13 +894,13 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                                           bsClass="btn"
                                                           bsSize="xsmall"
                                                           bsStyle="default"
-                                                          className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul"
+                                                          className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu"
                                                           disabled={false}
                                                           key=".0"
                                                           onClick={[Function]}
                                                         >
                                                           <button
-                                                            className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul btn btn-xs btn-default"
+                                                            className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu btn btn-xs btn-default"
                                                             disabled={false}
                                                             onClick={[Function]}
                                                             type="button"
@@ -1475,7 +1475,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "SplitButton__StyledSplitButton-sc-72s76o-0",
                                                     "isStatic": false,
-                                                    "lastClassName": "jZDPul",
+                                                    "lastClassName": "jefkPu",
                                                     "rules": Array [
                                                       [Function],
                                                     ],
@@ -1507,7 +1507,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                               <SplitButton
                                                 bsSize="xsmall"
                                                 bsStyle="default"
-                                                className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul"
+                                                className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu"
                                                 id="more-actions-dropdown-field-timestamp"
                                                 onClick={[Function]}
                                                 pullRight={true}
@@ -1554,13 +1554,13 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                                                           bsClass="btn"
                                                           bsSize="xsmall"
                                                           bsStyle="default"
-                                                          className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul"
+                                                          className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu"
                                                           disabled={false}
                                                           key=".0"
                                                           onClick={[Function]}
                                                         >
                                                           <button
-                                                            className="SplitButton__StyledSplitButton-sc-72s76o-0 jZDPul btn btn-xs btn-default"
+                                                            className="SplitButton__StyledSplitButton-sc-72s76o-0 jefkPu btn btn-xs btn-default"
                                                             disabled={false}
                                                             onClick={[Function]}
                                                             type="button"

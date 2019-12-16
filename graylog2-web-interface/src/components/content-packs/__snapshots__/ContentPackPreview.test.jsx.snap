@@ -366,12 +366,12 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -450,13 +450,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -658,12 +658,12 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -742,13 +742,13 @@ exports[`<ContentPackPreview /> should render with empty content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1166,7 +1166,7 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                   "componentStyle": ComponentStyle {
                                     "componentId": "Well-sc-19gs1oc-0",
                                     "isStatic": false,
-                                    "lastClassName": "dWfXTA",
+                                    "lastClassName": "hnzchw",
                                     "rules": Array [
                                       [Function],
                                     ],
@@ -1185,10 +1185,10 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                             >
                               <Well
                                 bsClass="well"
-                                className="Well-sc-19gs1oc-0 dWfXTA"
+                                className="Well-sc-19gs1oc-0 hnzchw"
                               >
                                 <div
-                                  className="Well-sc-19gs1oc-0 dWfXTA well"
+                                  className="Well-sc-19gs1oc-0 hnzchw well"
                                 >
                                   <div
                                     dangerouslySetInnerHTML={
@@ -1418,12 +1418,12 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1502,13 +1502,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"
@@ -1710,12 +1710,12 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 type="submit"
                               >
                                 <button
-                                  className="submit-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   type="submit"
                                 >
@@ -1794,13 +1794,13 @@ exports[`<ContentPackPreview /> should render with filled content pack 1`] = `
                                 block={false}
                                 bsClass="btn"
                                 bsStyle="default"
-                                className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk"
+                                className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="reset"
                               >
                                 <button
-                                  className="reset-button Button__StyledButton-c9cbmb-0 hYkHdk btn btn-default"
+                                  className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                                   disabled={false}
                                   onClick={[Function]}
                                   type="reset"

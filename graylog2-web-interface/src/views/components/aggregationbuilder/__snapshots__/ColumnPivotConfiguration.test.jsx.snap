@@ -115,7 +115,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "HelpBlock-i8is92-0",
                               "isStatic": false,
-                              "lastClassName": "fHJMjA",
+                              "lastClassName": "hCBNCb",
                               "rules": Array [
                                 [Function],
                               ],
@@ -134,10 +134,10 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                       >
                         <HelpBlock
                           bsClass="help-block"
-                          className="HelpBlock-i8is92-0 fHJMjA"
+                          className="HelpBlock-i8is92-0 hCBNCb"
                         >
                           <span
-                            className="HelpBlock-i8is92-0 fHJMjA help-block"
+                            className="HelpBlock-i8is92-0 hCBNCb help-block"
                           >
                             When rollup is enabled, an additional trace totalling individual subtraces will be included.
                           </span>
