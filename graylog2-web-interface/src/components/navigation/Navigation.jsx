@@ -61,8 +61,6 @@ const formatPluginRoute = (pluginRoute, permissions, location) => {
   return formatSinglePluginRoute(pluginRoute);
 };
 
-const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
-
 const Navigation = ({ permissions, fullName, location, loginName }) => {
   const pluginNavigations = PluginStore.exports('navigation')
     .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
@@ -90,13 +88,6 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
               <NavItem to="search">Search</NavItem>
             </LinkContainer>
           </IfPermitted>
-
-          {!enableNewSearch && (
-          <NavDropdown title="Views" id="views-dropdown">
-            <NavigationLink path={Routes.EXTENDEDSEARCH} description="Create new" />
-            <NavigationLink path={Routes.VIEWS.LIST} description="Load existing" />
-          </NavDropdown>
-          )}
 
           <LinkContainer to={Routes.STREAMS}>
             <NavItem>Streams</NavItem>
