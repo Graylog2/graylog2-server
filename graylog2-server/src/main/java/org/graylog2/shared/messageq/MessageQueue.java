@@ -1,6 +1,7 @@
 package org.graylog2.shared.messageq;
 
 import com.google.common.util.concurrent.Service;
+import org.apache.pulsar.client.api.MessageId;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -17,6 +18,9 @@ public interface MessageQueue extends Service {
     Entry createEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp);
 
     interface Entry {
+        @Nullable
+        MessageId messageId();
+
         /**
          * The journal entry ID.
          * @return the ID value
@@ -50,6 +54,7 @@ public interface MessageQueue extends Service {
 
         void commitAll() throws MessageQueueException;
 
+        // TODO: Do we need a negative ack?
         void commit(Entry entry) throws MessageQueueException;
     }
 }

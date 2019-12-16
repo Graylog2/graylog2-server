@@ -4,13 +4,16 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
 import org.apache.pulsar.client.api.ConsumerInterceptor;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
 import org.apache.pulsar.client.api.PulsarClient;
+import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.Schema;
+import org.graylog2.shared.messageq.MessageQueue;
 import org.graylog2.shared.messageq.MessageQueueException;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.slf4j.Logger;
@@ -18,9 +21,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -92,13 +97,78 @@ public class PulsarMessageQueueReader extends AbstractIdleService implements Mes
     }
 
     @Override
-    public List<Entry> read(long entries) throws MessageQueueException {
-        return null;
+    public MessageQueue.Envelope read(long entries) throws MessageQueueException {
+        final ImmutableList.Builder<MessageQueue.Entry> builder = ImmutableList.builder();
+
+        for (int consumed = 0; consumed < entries; consumed++) {
+            try {
+                final Message<byte[]> message = consumer.receive(5, TimeUnit.SECONDS);
+                if (message == null) {
+                    throw new MessageQueueException("Timeout waiting for messages");
+                }
+                builder.add(PulsarMessageQueueEntry.fromMessage(message));
+            } catch (PulsarClientException e) {
+                throw new MessageQueueException("Error consuming messages", e);
+            }
+        }
+
+        return new Envelope(builder.build());
     }
 
     @Override
-    public void subscribe(Consumer<Envelope> consumer) throws MessageQueueException {
+    public void subscribe(Consumer<MessageQueue.Envelope> envelopeConsumer) throws MessageQueueException {
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            LOG.info("Got interrupted", e);
+            Thread.currentThread().interrupt();
+            return;
+        }
+        while (isRunning()) {
+            try {
+                final Message<byte[]> message = consumer.receive(5, TimeUnit.SECONDS);
 
+                if (message != null) {
+                    envelopeConsumer.accept(new Envelope(ImmutableList.of(PulsarMessageQueueEntry.fromMessage(message))));
+                }
+            } catch (PulsarClientException e) {
+                throw new MessageQueueException("Error consuming messages", e);
+            }
+        }
+    }
+
+    private class Envelope implements MessageQueueReader.Envelope {
+        private final ImmutableList<Entry> entries;
+
+        public Envelope(ImmutableList<Entry> entries) {
+            this.entries = entries;
+        }
+
+        @Override
+        public List<Entry> entries() {
+            return entries;
+        }
+
+        @Override
+        public void commitAll() throws MessageQueueException {
+            for (final Entry entry : entries) {
+                commit(entry);
+            }
+        }
+
+        @Override
+        public void commit(Entry entry) throws MessageQueueException {
+            try {
+                consumer.acknowledge(entry.messageId());
+            } catch (PulsarClientException e) {
+                throw new MessageQueueException("Couldn't acknowledge message", e);
+            }
+        }
+
+        @Override
+        public Iterator<Entry> iterator() {
+            return entries.iterator();
+        }
     }
 
     private class MessageInterceptor implements ConsumerInterceptor<byte[]> {
