@@ -126,7 +126,6 @@ const AppRouter = () => {
             <IndexRoute component={StartPage} />
             {pluginRoutesWithParent}
             <Route component={AppWithSearchBar}>
-              <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
               <Route path={Routes.SOURCES} component={SourcesPage} />
               {enableNewSearch || <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
               {enableNewSearch || <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />}
@@ -135,6 +134,7 @@ const AppRouter = () => {
               {enableNewSearch && <Route path={Routes.SEARCH} component={DelegatedSearchPage} />}
             </Route>
             <Route component={AppWithoutSearchBar}>
+              <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
               <Redirect from={Routes.legacy_stream_search(':streamId')} to={Routes.stream_search(':streamId')} />
               <Route path={Routes.GETTING_STARTED} component={GettingStartedPage} />
               <Route path={Routes.STREAMS} component={StreamsPage} />
