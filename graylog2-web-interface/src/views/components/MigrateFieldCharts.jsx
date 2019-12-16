@@ -22,6 +22,10 @@ import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualiza
 import { Alert, Button, Row, Col } from 'components/graylog';
 import Spinner from 'components/common/Spinner';
 
+// localStorage keys
+const FIELD_CHARTS_KEY = 'pinned-field-charts';
+const FIELD_CHARTS_MIGRATED_KEY = 'pinned-field-charts-migrated';
+
 type LegacySeries = 'mean' | 'max' | 'min' | 'total' | 'count' | 'cardinality';
 type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardinal' | 'monotone';
 type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year'
@@ -152,7 +156,7 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean
 
   ViewStatesActions.update(currentView.activeQuery, newViewState).then(
     () => SearchActions.executeWithCurrentState().then(() => {
-      Store.set('pinned-field-charts-migrated', true);
+      Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
       setMigrating(false);
       setMigrationFinished(true);
     }),
@@ -160,14 +164,14 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean
 };
 
 const _onCancel = (setMigrationFinished) => {
-  Store.set('pinned-field-charts-migrated', true);
+  Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
   setMigrationFinished(true);
 };
 
 const MigrateFieldCharts = () => {
   const [migrating, setMigrating] = useState(false);
-  const [migrationFinished, setMigrationFinished] = useState(!!Store.get('pinned-field-charts-migrated'));
-  const legacyCharts: Array<LegacyFieldChart> = values(Store.get('pinned-field-charts'));
+  const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
+  const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
 
   if (migrationFinished || isEmpty(legacyCharts)) {
