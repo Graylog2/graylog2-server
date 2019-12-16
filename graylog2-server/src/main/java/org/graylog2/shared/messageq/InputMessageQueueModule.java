@@ -9,6 +9,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 public class InputMessageQueueModule extends MessageQueueModule {
+    private static final String QUEUE_NAME = "input";
+
     @Override
     protected void configure() {
         serviceBinder().addBinding().toProvider(InputMessageQueueWriterServiceProvider.class);
@@ -19,14 +21,14 @@ public class InputMessageQueueModule extends MessageQueueModule {
     @InputMessageQueue
     public MessageQueueWriter provideWriter(@Named(INPUT_MESSAGE_QUEUE_TYPE) String messageQueueType,
                                             MessageQueueInstanceCache cache) {
-        return cache.getWriter(messageQueueType, "input");
+        return cache.getWriter(messageQueueType, QUEUE_NAME);
     }
 
     @Provides
     @InputMessageQueue
     public MessageQueueReader provideReader(@Named(INPUT_MESSAGE_QUEUE_TYPE) String messageQueueType,
                                             MessageQueueInstanceCache cache) {
-        return cache.getReader(messageQueueType, "input");
+        return cache.getReader(messageQueueType, QUEUE_NAME);
     }
 
     private static class InputMessageQueueWriterServiceProvider implements Provider<Service> {
