@@ -44,7 +44,7 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
       if (newStreams) {
         const streamsMap = newStreams.reduce((prev, stream) => ({ ...prev, [stream.id]: stream }), {});
         setStreams(Immutable.Map(streamsMap));
-        setAllStreams(newStreams);
+        setAllStreams(Immutable.List(newStreams));
       }
     });
   }, [setStreams, setAllStreams]);
