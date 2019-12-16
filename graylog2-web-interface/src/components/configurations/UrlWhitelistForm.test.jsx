@@ -64,7 +64,7 @@ describe('UrlWhitelistForm', () => {
       const title = wrapper.find('input#title-input0').at(0);
       title.instance().value = 'world';
       title.simulate('change');
-      expect(setState).toHaveBeenCalled();
+      expect(onUpdate).toHaveBeenCalled();
     });
   });
 });
