@@ -13,7 +13,7 @@ type Props = {|
   field: string,
   value: *,
   render?: ValueRenderer,
-  queryId: string,
+  queryId: ?string,
   type: FieldType,
 |};
 

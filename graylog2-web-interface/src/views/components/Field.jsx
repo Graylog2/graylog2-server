@@ -39,7 +39,7 @@ Field.propTypes = {
   disabled: PropTypes.bool,
   name: PropTypes.string.isRequired,
   menuContainer: PropTypes.object,
-  queryId: PropTypes.string.isRequired,
+  queryId: PropTypes.string,
   type: CustomPropTypes.FieldType.isRequired,
 };
 
@@ -47,6 +47,7 @@ Field.defaultProps = {
   children: null,
   disabled: false,
   menuContainer: document.body,
+  queryId: undefined,
 };
 
 export default Field;
