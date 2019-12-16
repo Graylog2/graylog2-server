@@ -37,11 +37,6 @@ class FilterAggregationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  static defaultConfig = {
-    ...initialFilterConfig,
-    ...initialAggregationConfig,
-  };
-
   constructor(props) {
     super(props);
 
@@ -95,6 +90,11 @@ class FilterAggregationForm extends React.Component {
   handleChange = (event) => {
     const { name } = event.target;
     this.propagateChange(name, FormsUtils.getValueFromInput(event.target));
+  };
+
+  static defaultConfig = {
+    ...initialFilterConfig,
+    ...initialAggregationConfig,
   };
 
   render() {
