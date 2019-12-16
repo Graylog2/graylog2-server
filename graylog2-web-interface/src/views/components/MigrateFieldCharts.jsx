@@ -38,22 +38,22 @@ const Actions = styled.div`
   margin-top: 10px;
 `;
 
-const mapSeries = (legacySeries: LegacySeries, field: string) => {
-  let seriesName;
+const mapSeriesFunction = (legacySeries: LegacySeries) => {
   switch (legacySeries) {
     case 'total':
-      seriesName = 'sum';
-      break;
+      return 'sum';
     case 'mean':
-      seriesName = 'avg';
-      break;
+      return 'avg';
     case 'cardinality':
-      seriesName = 'card';
-      break;
+      return 'card';
     default:
-      seriesName = legacySeries;
+      return legacySeries;
   }
-  return `${seriesName}(${field})`;
+};
+
+const mapSeries = (legacySeries: LegacySeries, field: string) => {
+  const seriesFunction = mapSeriesFunction(legacySeries);
+  return `${seriesFunction}(${field})`;
 };
 
 const mapVisualization = (legacyVisualization: LegacyVisualization) => {
@@ -74,22 +74,23 @@ const mapTime = (legacyTime: string) => {
   }
 };
 
-const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, visualization: string) => {
-  let interpolation: InterpolationMode;
+const mapInterpolation = (legacyInterpolation: LegacyInterpolation): InterpolationMode => {
   switch (legacyInterpolation) {
     case 'basis':
     case 'bundle':
     case 'cardinal':
     case 'monotone':
-      interpolation = 'spline';
-      break;
+      return 'spline';
     case 'linear':
     case 'step-after':
-      interpolation = legacyInterpolation;
-      break;
+      return legacyInterpolation;
     default:
-      interpolation = 'linear';
+      throw new Error(`Unsupported interpolation ${legacyInterpolation}`);
   }
+};
+
+const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, visualization: string) => {
+  const interpolation = mapInterpolation(legacyInterpolation);
 
   switch (visualization) {
     case 'line':
