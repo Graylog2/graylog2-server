@@ -38,11 +38,9 @@ jest.mock('views/stores/ViewStatesStore', () => ({
   },
 }));
 
-
 jest.mock('views/actions/SearchActions', () => ({
   executeWithCurrentState: jest.fn(() => Promise.resolve()),
 }));
-
 
 jest.mock('views/stores/CurrentViewStateStore', () => ({
   CurrentViewStateStore: MockStore(
