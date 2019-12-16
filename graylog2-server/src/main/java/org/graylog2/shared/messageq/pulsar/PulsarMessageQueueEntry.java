@@ -16,19 +16,20 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
     private final byte[] key;
     private final byte[] value;
     private final long timestamp;
-    private final MessageId messageId;
+    private final MessageId commitId;
 
     PulsarMessageQueueEntry(Message<byte[]> message) {
-        this.messageId = requireNonNull(message.getMessageId(), "messageId cannot be null");
-        this.id = messageId.toByteArray();
+        this.commitId = requireNonNull(message.getMessageId(), "messageId cannot be null");
+        this.id = commitId.toByteArray();
         this.key = message.getKey().getBytes(UTF_8);
         this.value = requireNonNull(message.getData(), "value cannot be null");
         this.timestamp = message.getEventTime();
     }
 
     PulsarMessageQueueEntry(byte[] id, @Nullable byte[] key, byte[] value, long timestamp) {
-        this.messageId = null;
-        this.id = requireNonNull(id, "id cannot be null");
+        this.commitId = null;
+        this.id = requireNonNull(id, "id cannot be null"); // TODO: This is different to the constructor above. Should be the same!
+                                                                    //       Can we store the actual ID?
         this.key = key;
         this.value = requireNonNull(value, "value cannot be null");
         this.timestamp = timestamp;
@@ -40,8 +41,8 @@ public class PulsarMessageQueueEntry implements MessageQueue.Entry {
 
     @Nullable
     @Override
-    public MessageId messageId() {
-        return messageId;
+    public MessageId commitId() {
+        return commitId;
     }
 
     @Override

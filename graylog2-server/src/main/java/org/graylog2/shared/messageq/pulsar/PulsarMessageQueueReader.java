@@ -159,7 +159,7 @@ public class PulsarMessageQueueReader extends AbstractIdleService implements Mes
         @Override
         public void commit(Entry entry) throws MessageQueueException {
             try {
-                consumer.acknowledge(entry.messageId());
+                consumer.acknowledge(entry.commitId());
             } catch (PulsarClientException e) {
                 throw new MessageQueueException("Couldn't acknowledge message", e);
             }

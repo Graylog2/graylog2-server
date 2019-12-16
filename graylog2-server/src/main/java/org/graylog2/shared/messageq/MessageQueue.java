@@ -19,7 +19,7 @@ public interface MessageQueue extends Service {
 
     interface Entry {
         @Nullable
-        MessageId messageId();
+        MessageId commitId();
 
         /**
          * The journal entry ID.
