@@ -31,13 +31,14 @@ public class UrlWhitelistTest {
 
     @Test
     public void isWhitelisted() {
-        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("a", "foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(LiteralWhitelistEntry.create("a", "title", "foo")))
                 .isWhitelisted(".foo")).isFalse();
-        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new RegexWhitelistEntry("b", "foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(RegexWhitelistEntry.create("b", "title", "foo")))
                 .isWhitelisted(".foo")).isTrue();
-        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new RegexWhitelistEntry("c", "^foo$", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(RegexWhitelistEntry.create("c", "title", "^foo$")))
                 .isWhitelisted(".foo")).isFalse();
-        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("d", ".foo", null)))
+        assertThat(UrlWhitelist.createEnabled(ImmutableList.of(LiteralWhitelistEntry.create("d", "title", ".foo"
+                )))
                 .isWhitelisted(".foo")).isTrue();
     }
 
@@ -53,8 +54,8 @@ public class UrlWhitelistTest {
         objectMapper.registerModule(new Jdk8Module());
 
         List<WhitelistEntry> entries =
-                ImmutableList.of(new LiteralWhitelistEntry("a", "https://www.graylog.com", null),
-                        new RegexWhitelistEntry("b", "https://www\\.graylog\\.com/.*", "regex test title"));
+                ImmutableList.of(LiteralWhitelistEntry.create("a", "title", "https://www.graylog.com"),
+                        RegexWhitelistEntry.create("b", "regex test title", "https://www\\.graylog\\.com/.*"));
         UrlWhitelist orig = UrlWhitelist.createEnabled(entries);
         String json = objectMapper.writeValueAsString(orig);
         UrlWhitelist read = objectMapper.readValue(json, UrlWhitelist.class);
@@ -63,7 +64,7 @@ public class UrlWhitelistTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void duplicateIds() {
-        UrlWhitelist.createEnabled(ImmutableList.of(new LiteralWhitelistEntry("a", "a", "a"),
-                new RegexWhitelistEntry("a", "b", "b")));
+        UrlWhitelist.createEnabled(ImmutableList.of(LiteralWhitelistEntry.create("a", "a", "a"),
+                RegexWhitelistEntry.create("a", "b", "b")));
     }
 }

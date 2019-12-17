@@ -131,8 +131,8 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
         }
 
         if (StringUtils.isNotBlank(url)) {
-            return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
-                    .toString(), url, "\"" + notificationDto.title() + "\" alert notification"), url);
+            return defaultIfNotMatching(LiteralWhitelistEntry.create(UUID.randomUUID().toString(),
+                    "\"" + notificationDto.title() + "\" alert notification", url), url);
         } else {
             return Optional.empty();
         }
@@ -143,9 +143,8 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
 
         if (config instanceof DSVHTTPDataAdapter.Config) {
             final String url = ((DSVHTTPDataAdapter.Config) config).url();
-            return defaultIfNotMatching(new LiteralWhitelistEntry(UUID.randomUUID()
-                    .toString(), url,
-                    "\"" + dataAdapterDto.title() + "\" data adapter"), url);
+            return defaultIfNotMatching(LiteralWhitelistEntry.create(UUID.randomUUID().toString(),
+                    "\"" + dataAdapterDto.title() + "\" data adapter", url), url);
         } else if (config instanceof HTTPJSONPathDataAdapter.Config) {
             final String url = StringUtils.strip(((HTTPJSONPathDataAdapter.Config) config).url());
             // Quote all parts around the ${key} template parameter( and replace the ${key} template param with a
@@ -153,9 +152,8 @@ public class V20191129134600_CreateInitialUrlWhitelist extends Migration {
             String transformedUrl = Arrays.stream(StringUtils.splitByWholeSeparator(url, "${key}"))
                     .map(part -> StringUtils.isBlank(part) ? part : Pattern.quote(part))
                     .collect(Collectors.joining(".*?"));
-            return defaultIfNotMatching(new RegexWhitelistEntry(UUID.randomUUID()
-                    .toString(), "^" + transformedUrl + "$",
-                    "\"" + dataAdapterDto.title() + "\" data adapter"), url);
+            return defaultIfNotMatching(RegexWhitelistEntry.create(UUID.randomUUID().toString(),
+                    "\"" + dataAdapterDto.title() + "\" data adapter", "^" + transformedUrl + "$"), url);
         }
 
         return Optional.empty();

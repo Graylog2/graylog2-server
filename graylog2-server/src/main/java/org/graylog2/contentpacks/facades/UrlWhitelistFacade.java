@@ -119,8 +119,6 @@ public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
     }
 
     private String createTitle(WhitelistEntry entry) {
-        return entry.title()
-                .map(t -> t + " [" + entry.value() + "]")
-                .orElse(entry.value());
+        return entry.title() + " [" + entry.value() + "]";
     }
 }
