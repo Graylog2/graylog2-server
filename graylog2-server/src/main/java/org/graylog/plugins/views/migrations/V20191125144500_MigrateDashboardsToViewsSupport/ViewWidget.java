@@ -109,8 +109,7 @@ public abstract class ViewWidget {
         public abstract Builder type(String type);
 
         @JsonProperty(FIELD_FILTER)
-        @Nullable
-        public abstract Builder filter(String filter);
+        public abstract Builder filter(@Nullable String filter);
 
         @JsonProperty(FIELD_TIMERANGE)
         public abstract Builder timerange(@Nullable TimeRange timerange);
