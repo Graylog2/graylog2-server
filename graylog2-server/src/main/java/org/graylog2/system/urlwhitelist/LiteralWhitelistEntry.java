@@ -16,14 +16,20 @@
  */
 package org.graylog2.system.urlwhitelist;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
-import javax.annotation.Nullable;
-
-public class LiteralWhitelistEntry extends WhitelistEntry {
-    public LiteralWhitelistEntry(@JsonProperty("id") String id, @JsonProperty("value") String value,
-            @JsonProperty("title") @Nullable String title) {
-        super(id, Type.LITERAL, value, title);
+@AutoValue
+@WithBeanGetter
+@JsonAutoDetect
+public abstract class LiteralWhitelistEntry implements WhitelistEntry {
+    @JsonCreator
+    public static LiteralWhitelistEntry create(@JsonProperty("id") String id, @JsonProperty("title") String title,
+            @JsonProperty("value") String value) {
+        return new AutoValue_LiteralWhitelistEntry(id, Type.LITERAL, title, value);
     }
 
     @Override

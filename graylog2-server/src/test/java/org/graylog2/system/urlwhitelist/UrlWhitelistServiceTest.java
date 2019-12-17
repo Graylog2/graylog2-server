@@ -42,15 +42,15 @@ public class UrlWhitelistServiceTest {
 
     @Test
     public void addEntry() {
-        final WhitelistEntry existingEntry = new LiteralWhitelistEntry("a", "a", "a");
+        final WhitelistEntry existingEntry = LiteralWhitelistEntry.create("a", "a", "a");
         final UrlWhitelist existingWhitelist = UrlWhitelist.createEnabled(Collections.singletonList(existingEntry));
-        final WhitelistEntry newEntry = new LiteralWhitelistEntry("b", "b", "b");
+        final WhitelistEntry newEntry = LiteralWhitelistEntry.create("b", "b", "b");
 
         final UrlWhitelist whitelistWithEntryAdded = urlWhitelistService.addEntry(existingWhitelist, newEntry);
         assertThat(whitelistWithEntryAdded).isEqualTo(
                 UrlWhitelist.createEnabled(ImmutableList.of(existingEntry, newEntry)));
 
-        final WhitelistEntry replacedEntry = new LiteralWhitelistEntry("a", "c", "c");
+        final WhitelistEntry replacedEntry = LiteralWhitelistEntry.create("a", "c", "c");
 
         final UrlWhitelist whitelistWithEntryReplaced =
                 urlWhitelistService.addEntry(whitelistWithEntryAdded, replacedEntry);
@@ -61,7 +61,7 @@ public class UrlWhitelistServiceTest {
 
     @Test
     public void removeEntry() {
-        final WhitelistEntry entry = new LiteralWhitelistEntry("a", "a", "a");
+        final WhitelistEntry entry = LiteralWhitelistEntry.create("a", "a", "a");
         final UrlWhitelist whitelist = UrlWhitelist.createEnabled(Collections.singletonList(entry));
         assertThat(urlWhitelistService.removeEntry(whitelist, null)).isEqualTo(whitelist);
         assertThat(urlWhitelistService.removeEntry(whitelist, "b")).isEqualTo(whitelist);
