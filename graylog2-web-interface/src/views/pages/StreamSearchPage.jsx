@@ -3,15 +3,16 @@ import React, { useEffect, useState } from 'react';
 
 import UserNotification from 'util/UserNotification';
 
-import { processHooks } from 'views/logic/views/ViewLoader';
+import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import { QueryFiltersActions } from 'views/stores/QueryFiltersStore';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
-
+import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import Spinner from 'components/common/Spinner';
 import { ExtendedSearchPage } from 'views/pages';
+import { SearchActions } from 'views/stores/SearchStore';
 
 
 type Props = {
@@ -29,6 +30,8 @@ type Props = {
 const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, executingViewHooks, location }: Props) => {
   const [loaded, setLoaded] = useState(false);
   const { query } = location;
+  const [hookComponent, setHookComponent] = useState(undefined);
+
   useEffect(() => {
     processHooks(
       ViewActions.create(View.Type.Search)
@@ -45,7 +48,41 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
     );
   }, []);
 
-  return loaded ? <ExtendedSearchPage route={route} /> : <Spinner />;
+  const loadView = (viewId: string): Promise<?View> => {
+    return ViewLoader(
+      viewId,
+      loadingViewHooks,
+      executingViewHooks,
+      query,
+      () => {
+        setHookComponent(undefined);
+      },
+      (e) => {
+        if (e instanceof Error) {
+          throw e;
+        }
+        setHookComponent(e);
+      },
+    ).then((view) => {
+      setLoaded(true);
+      return view;
+    }).then(() => {
+      SearchActions.executeWithCurrentState();
+    }).catch(e => e);
+  };
+
+  if (hookComponent) {
+    return (<>{hookComponent}</>);
+  }
+
+  if (loaded) {
+    return (
+      <ViewLoaderContext.Provider value={loadView}>
+        <ExtendedSearchPage route={route} />
+      </ViewLoaderContext.Provider>
+    );
+  }
+  return <Spinner />;
 };
 
 const mapping = {
