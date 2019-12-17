@@ -38,7 +38,7 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
+import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
@@ -74,8 +74,6 @@ import {
   showSearchPath,
   viewsPath,
 } from 'views/Constants';
-import NewDashboardPage from 'views/pages/NewDashboardPage';
-import StreamSearchPage from 'views/pages/StreamSearchPage';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';

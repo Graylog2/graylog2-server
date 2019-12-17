@@ -1,7 +1,6 @@
 // @flow strict
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 
-import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
