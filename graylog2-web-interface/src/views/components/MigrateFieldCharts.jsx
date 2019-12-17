@@ -168,7 +168,7 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean
   _migrateWidgets(legacyCharts).then(({ newViewState, currentQueryId }) => {
     ViewStatesActions.update(currentQueryId, newViewState).then(
       () => SearchActions.executeWithCurrentState().then(() => {
-        Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
+        Store.set(FIELD_CHARTS_MIGRATED_KEY, 'finished');
         setMigrating(false);
         setMigrationFinished(true);
       }),
@@ -177,7 +177,7 @@ const _onMigrate = (legacyCharts: Array<LegacyFieldChart>, setMigrating: boolean
 };
 
 const _onCancel = (setMigrationFinished) => {
-  Store.set(FIELD_CHARTS_MIGRATED_KEY, true);
+  Store.set(FIELD_CHARTS_MIGRATED_KEY, 'discarded');
   setMigrationFinished(true);
 };
 
