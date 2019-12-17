@@ -14,11 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog.plugins.views.search.views;
 
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.auto.value.AutoValue;
 
-public interface ViewWidget {
-    String id();
-    Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider);
+import java.util.Map;
+
+@AutoValue
+@JsonAutoDetect
+public abstract class UnknownWidgetConfigDTO implements WidgetConfigDTO {
+    @JsonValue
+    public abstract Map<String, Object> config();
+
+    @JsonCreator
+    public static UnknownWidgetConfigDTO create(Map<String, Object> config) {
+        return new AutoValue_UnknownWidgetConfigDTO(config);
+    }
 }

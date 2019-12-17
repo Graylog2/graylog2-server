@@ -26,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AutoInterval;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.BarVisualizationConfig;
@@ -82,9 +83,9 @@ public abstract class QuickValuesHistogramConfig extends WidgetConfigBase implem
     }
 
     @Override
-    public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
+    public Set<ViewWidget> toViewWidgets(Widget widget, RandomUUIDProvider randomUUIDProvider) {
         return Collections.singleton(
-                createViewWidget(randomUUIDProvider.get())
+                createAggregationWidget(randomUUIDProvider.get())
                         .config(
                                 AggregationConfig.builder()
                                         .rowPivots(Collections.singletonList(

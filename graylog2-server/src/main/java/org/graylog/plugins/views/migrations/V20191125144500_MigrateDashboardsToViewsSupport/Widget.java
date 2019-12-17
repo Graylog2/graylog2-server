@@ -30,6 +30,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultCountConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StackedChartConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StatsCountConfig;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.UnknownWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
 
@@ -46,15 +47,15 @@ public abstract class Widget {
     private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     private static final String FIELD_CONFIG = "config";
 
-    abstract String id();
-    abstract String type();
-    abstract String description();
-    abstract int cacheTime();
-    abstract String creatorUserId();
-    abstract WidgetConfig config();
+    public abstract String id();
+    public abstract String type();
+    public abstract String description();
+    public abstract int cacheTime();
+    public abstract String creatorUserId();
+    public abstract WidgetConfig config();
 
     Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
-        return config().toViewWidgets(randomUUIDProvider);
+        return config().toViewWidgets(this, randomUUIDProvider);
     }
 
     @AutoValue.Builder
@@ -70,7 +71,7 @@ public abstract class Widget {
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
         @JsonProperty(FIELD_CONFIG)
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
+        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type", defaultImpl = UnknownWidget.class)
         @JsonSubTypes({
                 @JsonSubTypes.Type(value = FieldChartConfig.class, name = "FIELD_CHART"),
                 @JsonSubTypes.Type(value = SearchResultChartConfig.class, name = "SEARCH_RESULT_CHART"),

@@ -28,7 +28,7 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 
 import java.util.Optional;
 
-abstract class WidgetConfigBase implements WidgetConfig {
+abstract class WidgetConfigBase implements WidgetConfigWithTimeRange {
     static String TIMESTAMP_FIELD = "timestamp";
 
     Pivot valuesPivotForField(String field, int limit) {

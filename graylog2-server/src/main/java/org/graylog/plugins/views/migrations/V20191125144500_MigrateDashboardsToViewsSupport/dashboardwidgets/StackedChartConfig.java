@@ -20,10 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.AggregationWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidgetPosition;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.WidgetPosition;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
@@ -32,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
     public abstract Optional<String> streamId();
 
     @Override
-    public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
+    public Set<ViewWidget> toViewWidgets(Widget widget, RandomUUIDProvider randomUUIDProvider) {
         final Map<String, List<StackedSeries>> seriesByQuery = series().stream()
                 .collect(Collectors.groupingBy(StackedSeries::query));
         final AggregationConfig.Builder configBuilderTemplate = AggregationConfig.builder()
@@ -74,7 +75,7 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
 
                     final AggregationConfig.Builder configBuilder = configBuilderTemplate.series(series);
 
-                    final ViewWidget.Builder viewWidgetBuilder = ViewWidget.builder()
+                    final AggregationWidget.Builder viewWidgetBuilder = AggregationWidget.builder()
                             .id(randomUUIDProvider.get())
                             .timerange(timerange())
                             .query(query)
@@ -89,8 +90,11 @@ public abstract class StackedChartConfig extends WidgetConfigBase implements Wid
             return super.toViewWidgetPositions(viewWidgets, widgetPosition);
         }
 
-        final List<ViewWidget> widgetList = new ArrayList<>(viewWidgets);
-        final ViewWidget first = widgetList.get(0);
+        final List<AggregationWidget> widgetList = viewWidgets.stream()
+                .filter(viewWidget -> viewWidget instanceof AggregationWidget)
+                .map(viewWidget -> (AggregationWidget)viewWidget)
+                .collect(Collectors.toList());
+        final AggregationWidget first = widgetList.get(0);
 
         final ViewWidgetPosition firstPosition = ViewWidgetPosition.builder()
                 .col(widgetPosition.col())

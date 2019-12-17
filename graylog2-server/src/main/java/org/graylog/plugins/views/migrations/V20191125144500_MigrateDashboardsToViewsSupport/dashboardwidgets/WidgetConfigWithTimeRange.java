@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
+package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets;
 
-import java.util.Set;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 
-public interface ViewWidget {
-    String id();
-    Set<SearchType> toSearchTypes(RandomUUIDProvider randomUUIDProvider);
+public interface WidgetConfigWithTimeRange extends WidgetConfig {
+    TimeRange timerange();
 }

@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
+import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Series;
@@ -49,8 +50,8 @@ public abstract class WorldMapConfig extends WidgetConfigBase implements WidgetC
     }
 
     @Override
-    public Set<ViewWidget> toViewWidgets(RandomUUIDProvider randomUUIDProvider) {
-        return Collections.singleton(createViewWidget(randomUUIDProvider.get())
+    public Set<ViewWidget> toViewWidgets(Widget widget, RandomUUIDProvider randomUUIDProvider) {
+        return Collections.singleton(createAggregationWidget(randomUUIDProvider.get())
                 .config(AggregationConfig.builder()
                         .rowPivots(Collections.singletonList(fieldPivot()))
                         .series(Collections.singletonList(series()))

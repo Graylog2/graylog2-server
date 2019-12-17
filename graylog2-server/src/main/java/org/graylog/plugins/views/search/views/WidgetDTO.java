@@ -96,7 +96,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity> {
                 use = JsonTypeInfo.Id.NAME,
                 include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
                 property = WidgetDTO.FIELD_TYPE,
-                visible = true)
+                visible = true,
+                defaultImpl = UnknownWidgetConfigDTO.class)
         public abstract Builder config(WidgetConfigDTO config);
 
         public abstract WidgetDTO build();

@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { render, wait, fireEvent, cleanup } from 'wrappedTestingLibrary';
+import { render, wait, fireEvent, cleanup, waitForElement } from 'wrappedTestingLibrary';
 import { browserHistory } from 'react-router';
 import { Map } from 'immutable';
 import Routes from 'routing/Routes';
@@ -56,6 +56,11 @@ jest.mock('graylog-web-plugin/plugin', () => ({
           return <button onClick={() => onChange({ foo: 23 })}>Click me</button>;
         },
       },
+      {
+        type: 'default',
+        visualizationComponent: () => <span>Unknown widget</span>,
+        editComponent: () => <span>Unknown widget in edit mode</span>,
+      },
     ]),
   },
 }));
@@ -110,7 +115,6 @@ describe('<Widget />', () => {
     },
   };
 
-
   const DummyWidget = props => (
     <Widget widget={widget}
             id="widgetId"
@@ -153,6 +157,39 @@ describe('<Widget />', () => {
     const { queryAllByTestId, queryAllByTitle } = render(<DummyWidget data={[]} />);
     expect(queryAllByTestId('loading-widget')).toHaveLength(0);
     expect(queryAllByTitle('Widget Title')).toHaveLength(2);
+  });
+  it('renders placeholder if widget type is unknown', async () => {
+    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const UnknownWidget = props => (
+      <Widget widget={unknownWidget}
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+
+    );
+    const { getByText } = render(<UnknownWidget data={[]} />);
+    await waitForElement(() => getByText('Unknown widget'));
+  });
+  it('renders placeholder in edit mode if widget type is unknown', async () => {
+    const unknownWidget = { config: {}, id: 'widgetId', type: 'i-dont-know-this-widget-type' };
+    const UnknownWidget = props => (
+      <Widget widget={unknownWidget}
+              editing
+              id="widgetId"
+              fields={[]}
+              onPositionsChange={() => {}}
+              onSizeChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props} />
+
+    );
+    const { getByText } = render(<UnknownWidget data={[]} />);
+    await waitForElement(() => getByText('Unknown widget in edit mode'));
   });
 
   it('copies title when duplicating widget', (done) => {
