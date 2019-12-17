@@ -10,7 +10,7 @@ import viewTransformer from 'views/logic/views/ViewTransformer';
 import { ViewActions } from 'views/stores/ViewStore';
 import View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
-import ExtendedSearchPage from './ExtendedSearchPage';
+import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
   route: {},

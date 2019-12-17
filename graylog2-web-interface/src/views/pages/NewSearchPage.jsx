@@ -11,7 +11,7 @@ import View from 'views/logic/views/View';
 import ViewLoader from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
 
-import ExtendedSearchPage from './ExtendedSearchPage';
+import { ExtendedSearchPage } from 'views/pages';
 
 type Props = {
   route: {},
