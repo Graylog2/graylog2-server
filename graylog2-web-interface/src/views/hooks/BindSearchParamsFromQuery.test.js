@@ -1,7 +1,7 @@
 // @flow strict
 import View from 'views/logic/views/View';
-import MockQuery from 'views/logic/queries/Query';
-import { StoreMock as MockStore } from 'helpers/mocking';
+import Query from 'views/logic/queries/Query';
+import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import bindSearchParamsFromQuery from './BindSearchParamsFromQuery';
 
@@ -14,14 +14,20 @@ jest.mock('views/stores/QueriesStore', () => ({
   },
 }));
 
-jest.mock('views/stores/CurrentQueryStore', () => ({
-  CurrentQueryStore: MockStore(['getInitialState', () => MockQuery.builder().id(MOCK_VIEW_QUERY_ID).build()], 'listen'),
-}));
-
 describe('BindSearchParamsFromQuery should', () => {
+  const query = Query.builder().id(MOCK_VIEW_QUERY_ID).build();
+  const search = Search.create()
+    .toBuilder()
+    .queries([query])
+    .build();
+  const view = View.create()
+    .toBuilder()
+    .type(View.Type.Search)
+    .search(search)
+    .build();
   const defaultInput = {
     query: {},
-    view: new View.create().toBuilder().type('SEARCH').build(),
+    view,
     retry: () => Promise.resolve(),
   };
 
@@ -32,7 +38,7 @@ describe('BindSearchParamsFromQuery should', () => {
   it('not update query when provided view is not a search', async () => {
     const input = {
       ...defaultInput,
-      view: new View.create().toBuilder().type('DASHBOARD').build(),
+      view: view.toBuilder().type(View.Type.Dashboard).build(),
     };
     await bindSearchParamsFromQuery(input);
     expect(QueriesActions.query).not.toHaveBeenCalled();
