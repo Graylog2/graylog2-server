@@ -47,11 +47,15 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   }
 
   _openModal = () => {
-    this.configModal.open();
+    if (this.configModal) {
+      this.configModal.open();
+    }
   }
 
   _closeModal = () => {
-    this.configModal.close();
+    if (this.configModal) {
+      this.configModal.close();
+    }
   }
 
   _saveConfig = () => {
