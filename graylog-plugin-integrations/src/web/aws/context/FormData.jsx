@@ -6,16 +6,27 @@ export const FormDataContext = createContext();
 export const FormDataProvider = ({ initialFormData, children }) => {
   const [formData, updateState] = useState(initialFormData);
 
-  const setFormData = (id, fieldData) => updateState({
-    ...formData,
-    [id]: {
-      ...formData[id],
-      ...fieldData,
-    },
-  });
+  const setFormData = (id, fieldData) => {
+    updateState({
+      ...formData,
+      [id]: {
+        ...formData[id],
+        ...fieldData,
+        dirty: true,
+      },
+    });
+  };
+
+  const clearField = (id) => {
+    if (Object.keys(formData).find(field => field === id)) {
+      delete formData[id];
+      updateState(formData);
+    }
+  };
+
 
   return (
-    <FormDataContext.Provider value={{ formData, setFormData }}>
+    <FormDataContext.Provider value={{ formData, setFormData, clearField }}>
       {children}
     </FormDataContext.Provider>
   );

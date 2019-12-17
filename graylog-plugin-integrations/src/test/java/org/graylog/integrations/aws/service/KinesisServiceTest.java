@@ -4,6 +4,7 @@ import org.assertj.core.api.AssertionsForClassTypes;
 import org.graylog.integrations.aws.AWSLogMessage;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSTestingUtils;
+import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
 import org.graylog.integrations.aws.resources.responses.KinesisHealthCheckResponse;
@@ -14,7 +15,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -28,6 +28,8 @@ import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamResponse;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
@@ -38,6 +40,8 @@ import software.amazon.awssdk.services.kinesis.model.ListStreamsRequest;
 import software.amazon.awssdk.services.kinesis.model.ListStreamsResponse;
 import software.amazon.awssdk.services.kinesis.model.Record;
 import software.amazon.awssdk.services.kinesis.model.Shard;
+import software.amazon.awssdk.services.kinesis.model.StreamDescription;
+import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -174,22 +178,12 @@ public class KinesisServiceTest {
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(10000L).build())
                 .thenReturn(GetRecordsResponse.builder().records(record).millisBehindLatest(0L).build());
 
-        KinesisHealthCheckRequest request = KinesisHealthCheckRequest.create(Region.EU_WEST_1.id(),
-                                                                             "key", "secret", TEST_STREAM_1);
+        KinesisHealthCheckRequest request = KinesisHealthCheckRequest.builder()
+                                                                     .region(Region.EU_WEST_1.id())
+                                                                     .awsAccessKeyId("a-key")
+                                                                     .awsSecretAccessKey("a-secret")
+                                                                     .streamName(TEST_STREAM_1).build();
         return kinesisService.healthCheck(request);
-    }
-
-    @Test
-    public void testGetStreamsCredentials() {
-        AssertionsForClassTypes.assertThatThrownBy(() -> kinesisService.getKinesisStreamNames(TEST_REGION, "", ""))
-                               .isExactlyInstanceOf(IllegalArgumentException.class)
-                               .hasMessageContaining("An AWS access key is required");
-        AssertionsForClassTypes.assertThatThrownBy(() -> kinesisService.getKinesisStreamNames(TEST_REGION, "dsfadsdf", ""))
-                               .isExactlyInstanceOf(IllegalArgumentException.class)
-                               .hasMessageContaining("An AWS secret key is required");
-        AssertionsForClassTypes.assertThatThrownBy(() -> kinesisService.getKinesisStreamNames(TEST_REGION, "", "dsfadsdf"))
-                               .isExactlyInstanceOf(IllegalArgumentException.class)
-                               .hasMessageContaining("An AWS access key is required");
     }
 
     @Test
@@ -206,7 +200,10 @@ public class KinesisServiceTest {
                                                .hasMoreStreams(false).build());
 
 
-        StreamsResponse streamsResponse = kinesisService.getKinesisStreamNames(TEST_REGION, "accessKey", "secretKey");
+        StreamsResponse streamsResponse = kinesisService.getKinesisStreamNames(AWSRequestImpl.builder()
+                                                                                             .region(TEST_REGION)
+                                                                                             .awsAccessKeyId("a-key")
+                                                                                             .awsSecretAccessKey("a-secret").build());
         assertEquals(2, streamsResponse.total());
         assertEquals(2, streamsResponse.streams().size());
 
@@ -226,7 +223,10 @@ public class KinesisServiceTest {
                                                .streamNames(TWO_TEST_STREAMS)
                                                .hasMoreStreams(false).build()); // Indicate no more streams.
 
-        streamsResponse = kinesisService.getKinesisStreamNames(TEST_REGION, "accessKey", "secretKey");
+        streamsResponse = kinesisService.getKinesisStreamNames(AWSRequestImpl.builder()
+                                                                             .region(TEST_REGION)
+                                                                             .awsAccessKeyId("a-key")
+                                                                             .awsSecretAccessKey("a-secret").build());
 
         // There should be 4 total streams (two from each page).
         assertEquals(4, streamsResponse.total());
@@ -285,7 +285,6 @@ public class KinesisServiceTest {
         assertEquals(fakeRecordsList.size(), 10);
     }
 
-    @Ignore ("Test ignored as this method is still being implemented.")
     @Test
     public void testCreateNewKinesisStream() {
 
@@ -296,22 +295,24 @@ public class KinesisServiceTest {
 
         // Mock out specific KinesisNewStreamRequest to return a response.
         when(kinesisClient.createStream(isA(CreateStreamRequest.class))).thenReturn(CreateStreamResponse.builder().build());
+        when(kinesisClient.describeStream(isA(DescribeStreamRequest.class)))
+                .thenReturn(DescribeStreamResponse.builder().streamDescription(StreamDescription.builder()
+                                                                                                .streamName(TEST_STREAM_1)
+                                                                                                .streamStatus(StreamStatus.ACTIVE)
+                                                                                                .streamARN(STREAM_ARN)
+                                                                                                .build()).build());
 
-        final KinesisNewStreamRequest kinesisNewStreamRequest = KinesisNewStreamRequest.create(TEST_REGION,
-                                                                                               "accessKey", "secretKey",
-                                                                                               TEST_STREAM_1);
+        final KinesisNewStreamRequest kinesisNewStreamRequest = KinesisNewStreamRequest.builder()
+                                                                                       .region(Region.EU_WEST_1.id())
+                                                                                       .awsAccessKeyId("a-key")
+                                                                                       .awsSecretAccessKey("a-secret")
+                                                                                       .streamName(TEST_STREAM_1).build();
         // TODO debug the error
         final KinesisNewStreamResponse response = kinesisService.createNewKinesisStream(kinesisNewStreamRequest);
 
         // Check the values are whats expected.
-        final String expectedResponse = "Success. The new stream [" + TEST_STREAM_1 + "] was created with ["
-                                        + SHARD_COUNT + "] shards with the following stream ARN [" + STREAM_ARN + "].";
-        assertEquals(response.result(), expectedResponse);
+        final String expectedResponse = "Success. The new stream [" + TEST_STREAM_1 + "/" + STREAM_ARN + "] was created with [1] shard.";
+        assertEquals(expectedResponse, response.result());
         assertEquals(SHARD_COUNT, 1);
-    }
-
-    @Test
-    public void uniqueRoleName() {
-        assertEquals(1,1);
     }
 }

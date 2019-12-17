@@ -47,12 +47,15 @@ public class AWSInput extends MessageInput {
     public static final String NAME = "AWS Kinesis/CloudWatch";
     public static final String TYPE = "org.graylog.integrations.aws.inputs.AWSInput";
 
-    public static final String CK_TITLE = "title";
     public static final String CK_GLOBAL = "global";
     public static final String CK_AWS_REGION = "aws_region";
     public static final String CK_ACCESS_KEY = "aws_access_key";
     public static final String CK_SECRET_KEY = "aws_secret_key";
     public static final String CK_ASSUME_ROLE_ARN = "aws_assume_role_arn";
+    public static final String CK_CLOUDWATCH_ENDPOINT = "cloudwatch_endpoint";
+    public static final String CK_DYNAMODB_ENDPOINT = "dynamodb_endpoint";
+    public static final String CK_IAM_ENDPOINT = "iam_endpoint";
+    public static final String CK_KINESIS_ENDPOINT = "kinesis_endpoint";
 
     @Inject
     public AWSInput(@Assisted Configuration configuration,
@@ -104,6 +107,8 @@ public class AWSInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
 
+        private static final String AWS_SDK_ENDPOINT_DESCRIPTION = "Only specify this if you want to override the endpoint, which the AWS SDK communicates with.";
+
         @Inject
         public Config(AWSTransport.Factory transport, AWSCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
@@ -143,6 +148,34 @@ public class AWSInput extends MessageInput {
                     "AWS assume role ARN",
                     "",
                     "Role ARN with required permissions (cross account access)",
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
+                    CK_CLOUDWATCH_ENDPOINT,
+                    "AWS CloudWatch Override Endpoint",
+                    "",
+                    AWS_SDK_ENDPOINT_DESCRIPTION,
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
+                    CK_DYNAMODB_ENDPOINT,
+                    "AWS DynamoDB Override Endpoint",
+                    "",
+                    AWS_SDK_ENDPOINT_DESCRIPTION,
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
+                    CK_IAM_ENDPOINT,
+                    "AWS IAM Override Endpoint",
+                    "",
+                    AWS_SDK_ENDPOINT_DESCRIPTION,
+                    ConfigurationField.Optional.OPTIONAL));
+
+            request.addField(new TextField(
+                    CK_KINESIS_ENDPOINT,
+                    "AWS Kinesis Override Endpoint",
+                    "",
+                    AWS_SDK_ENDPOINT_DESCRIPTION,
                     ConfigurationField.Optional.OPTIONAL));
 
             request.addField(new TextField(

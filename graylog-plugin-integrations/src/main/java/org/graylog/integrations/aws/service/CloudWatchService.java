@@ -7,13 +7,14 @@ import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.CreateLogSubscriptionRequest;
 import org.graylog.integrations.aws.resources.responses.CreateLogSubscriptionResponse;
 import org.graylog.integrations.aws.resources.responses.LogGroupsResponse;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClient;
 import software.amazon.awssdk.services.cloudwatchlogs.CloudWatchLogsClientBuilder;
 import software.amazon.awssdk.services.cloudwatchlogs.model.DescribeLogGroupsRequest;
@@ -42,24 +43,9 @@ public class CloudWatchService {
         this.logsClientBuilder = logsClientBuilder;
     }
 
-    private CloudWatchLogsClient createClient(String regionName, String accessKeyId, String secretAccessKey) {
+    public LogGroupsResponse getLogGroupNames(AWSRequest request) {
 
-        return logsClientBuilder.region(Region.of(regionName))
-                                .credentialsProvider(AWSService.buildCredentialProvider(accessKeyId, secretAccessKey))
-                                .build();
-    }
-
-    /**
-     * Returns a list of log groups that exist in CloudWatch.
-     *
-     * @param region             The AWS region
-     * @param awsAccessKeyId     The AWS accessKey
-     * @param awsSecretAccessKey The AWS secretKey
-     * @return A list of log groups in alphabetical order.
-     */
-    public LogGroupsResponse getLogGroupNames(String region, String awsAccessKeyId, String awsSecretAccessKey) {
-
-        final CloudWatchLogsClient cloudWatchLogsClient = createClient(region, awsAccessKeyId, awsSecretAccessKey);
+        final CloudWatchLogsClient cloudWatchLogsClient = AWSClientBuilderUtil.buildClient(logsClientBuilder, request);
         final DescribeLogGroupsRequest describeLogGroupsRequest = DescribeLogGroupsRequest.builder().build();
         final DescribeLogGroupsIterable responses = cloudWatchLogsClient.describeLogGroupsPaginator(describeLogGroupsRequest);
 
@@ -72,23 +58,21 @@ public class CloudWatchService {
         LOG.debug("Log groups queried: [{}]", groupNameList);
 
         if (groupNameList.isEmpty()) {
-            throw new BadRequestException(String.format("No CloudWatch log groups were found in the [%s] region.", region));
+            throw new BadRequestException(String.format("No CloudWatch log groups were found in the [%s] region.", request.region()));
         }
 
         return LogGroupsResponse.create(groupNameList, groupNameList.size());
     }
 
     public CreateLogSubscriptionResponse addSubscriptionFilter(CreateLogSubscriptionRequest request) {
-        CloudWatchLogsClient cloudWatch = createClient(request.region(),
-                                                       request.awsAccessKeyId(),
-                                                       request.awsSecretAccessKey());
+        CloudWatchLogsClient cloudWatch = AWSClientBuilderUtil.buildClient(logsClientBuilder, request);
         final PutSubscriptionFilterRequest putSubscriptionFilterRequest =
                 PutSubscriptionFilterRequest.builder()
                                             .logGroupName(request.logGroupName())
                                             .filterName(request.filterName())
                                             .filterPattern(request.filterPattern())
                                             .destinationArn(request.destinationStreamArn())
-                                            .roleArn(request.getRoleArn())
+                                            .roleArn(request.roleArn())
                                             .distribution(Distribution.BY_LOG_STREAM)
                                             .build();
         try {

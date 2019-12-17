@@ -32,6 +32,7 @@ import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamResponse;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.DescribeStreamResponse;
 import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
@@ -101,7 +102,7 @@ public class KinesisSetupResourceTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
         // Set up services.
         cloudWatchService = new CloudWatchService(logsClientBuilder);
@@ -126,12 +127,12 @@ public class KinesisSetupResourceTest {
         // Stream AWS request mocks
         when(kinesisClient.createStream(isA(CreateStreamRequest.class)))
                 .thenReturn(CreateStreamResponse.builder().build());
-        when(kinesisClient.describeStream(isA(Consumer.class)))
-                .thenReturn(DescribeStreamResponse.builder()
-                                                  .streamDescription(StreamDescription.builder()
-                                                                                      .streamARN(STREAM_ARN)
-                                                                                      .streamStatus(StreamStatus.ACTIVE)
-                                                                                      .build()).build());
+        when(kinesisClient.describeStream(isA(DescribeStreamRequest.class)))
+                .thenReturn(DescribeStreamResponse.builder().streamDescription(StreamDescription.builder()
+                                                                                                .streamName(STREAM_NAME)
+                                                                                                .streamStatus(StreamStatus.ACTIVE)
+                                                                                                .streamARN(STREAM_ARN)
+                                                                                                .build()).build());
 
         // Policy AWS request mocks
         when(iamClient.createRole(isA(Consumer.class)))
@@ -151,22 +152,37 @@ public class KinesisSetupResourceTest {
 
         // Stream
         final KinesisNewStreamRequest request =
-                KinesisNewStreamRequest.create(REGION, KEY, SECRET, STREAM_NAME);
+                KinesisNewStreamRequest.builder()
+                                       .region(Region.EU_WEST_1.id())
+                                       .awsAccessKeyId(KEY)
+                                       .awsSecretAccessKey(SECRET)
+                                       .streamName(STREAM_NAME).build();
         final KinesisNewStreamResponse streamResponse = setupResource.createNewKinesisStream(request);
         assertEquals(STREAM_NAME, streamResponse.streamName());
         assertEquals(STREAM_ARN, streamResponse.streamArn());
 
         // Policy
         final CreateRolePermissionRequest policyRequest =
-                CreateRolePermissionRequest.create(REGION, KEY, SECRET, streamResponse.streamName(),
-                                                   streamResponse.streamArn());
+                CreateRolePermissionRequest.builder()
+                                           .region(REGION)
+                                           .awsAccessKeyId(KEY)
+                                           .awsSecretAccessKey(SECRET)
+                                           .streamName(streamResponse.streamName())
+                                           .streamArn(streamResponse.streamArn()).build();
         final CreateRolePermissionResponse policyResponse = setupResource.autoKinesisPermissions(policyRequest);
         assertEquals(ROLE_ARN, policyResponse.roleArn());
 
         // Subscription
         final CreateLogSubscriptionRequest subscriptionRequest =
-                CreateLogSubscriptionRequest.create(REGION, KEY, SECRET, "log-group-name", "filter-name",
-                                                    "filter-pattern", streamResponse.streamArn(), policyResponse.roleArn());
+                CreateLogSubscriptionRequest.builder()
+                                            .region(REGION)
+                                            .awsAccessKeyId(KEY)
+                                            .awsSecretAccessKey(SECRET)
+                                            .logGroupName("log-group-name")
+                                            .filterName("filter-name")
+                                            .filterPattern("filter-pattern")
+                                            .destinationStreamArn(streamResponse.streamArn())
+                                            .roleArn(policyResponse.roleArn()).build();
         final CreateLogSubscriptionResponse subscriptionResponse = setupResource.createSubscription(subscriptionRequest);
         subscriptionResponse.result();
         assertEquals("Success. The subscription filter [filter-name] was added for the CloudWatch log group [log-group-name].",

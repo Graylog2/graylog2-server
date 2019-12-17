@@ -1,23 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
 import styled from 'styled-components';
+
+import { Icon } from 'components/common';
 
 import ValidatedInput from './ValidatedInput';
 
-const MaskedInput = ({ label, ...props }) => {
+const MaskedInput = ({ className, label, ...props }) => {
   const [masked, setMasked] = useState(true);
   const toggleLabel = (
     <LabelWrapper>
       {label}
       <ToggleMask onClick={() => setMasked(!masked)} ariaDescription={`Toggle ${label} field input`}>
-        <i className={`fa fa-${masked ? 'eye-slash' : 'eye'}`} />
+        <Icon name={masked ? 'eye-slash' : 'eye'} />
       </ToggleMask>
     </LabelWrapper>
   );
 
   return (
-    <ValidatedInput {...props} type={masked ? 'password' : 'text'} label={toggleLabel} />
+    <ValidatedInput {...props} type={masked ? 'password' : 'text'} label={toggleLabel} formGroupClassName={className} />
   );
 };
 
@@ -26,6 +27,11 @@ MaskedInput.propTypes = {
     PropTypes.string,
     PropTypes.node,
   ]).isRequired,
+  className: PropTypes.string,
+};
+
+MaskedInput.defaultProps = {
+  className: undefined,
 };
 
 const LabelWrapper = styled.span`

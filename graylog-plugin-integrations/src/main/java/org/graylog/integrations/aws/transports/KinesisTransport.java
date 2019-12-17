@@ -2,14 +2,15 @@ package org.graylog.integrations.aws.transports;
 
 import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.inputs.AWSInput;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
+import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
 import org.graylog.integrations.aws.service.AWSService;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -29,12 +30,10 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sts.StsClient;
-import software.amazon.awssdk.services.sts.auth.StsAssumeRoleCredentialsProvider;
 
 import javax.inject.Inject;
+import java.net.URL;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -93,35 +92,61 @@ public class KinesisTransport extends ThrottleableTransport {
     public void doLaunch(MessageInput input) throws MisfireException {
 
         final Region region = Region.of(Objects.requireNonNull(configuration.getString(CK_AWS_REGION)));
-        final String assumeRoleArn = configuration.getString(AWSInput.CK_ASSUME_ROLE_ARN);
         final String key = configuration.getString(CK_ACCESS_KEY);
         final String secret = configuration.getString(CK_SECRET_KEY);
-        Preconditions.checkArgument(StringUtils.isNotBlank(key), "An AWS key is required.");
-        AwsCredentialsProvider awsCredentialsProvider = AWSService.buildCredentialProvider(key, secret);
-        Preconditions.checkArgument(StringUtils.isNotBlank(secret), "An AWS secret is required.");
+        final String assumeRoleArn = configuration.getString(AWSInput.CK_ASSUME_ROLE_ARN);
 
-        // Assume role ARN functionality only applies to the Kinesis runtime (not to the setup flows).
-        if (StringUtils.isNotBlank(assumeRoleArn)) {
-            StsClient stsClient = StsClient.builder()
-                                           .region(region)
-                                           .credentialsProvider(awsCredentialsProvider).build();
-            String roleSessionName = String.format("API_KEY_%s@ACCOUNT_%s",
-                                                   key,
-                                                   stsClient.getCallerIdentity().account());
-            awsCredentialsProvider = StsAssumeRoleCredentialsProvider.builder()
-                                                                     .stsClient(stsClient)
-                                                                     .refreshRequest(r -> r.roleArn(assumeRoleArn)
-                                                                                           .roleSessionName(roleSessionName)).build();
-        }
-        this.kinesisConsumer = new KinesisConsumer(
-                nodeId, this, objectMapper, kinesisCallback(input), configuration.getString(CK_KINESIS_STREAM_NAME),
-                AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE)), region,
-                awsCredentialsProvider,
-                configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE)
-        );
+        final String dynamodbEndpoint = configuration.getString(AWSInput.CK_DYNAMODB_ENDPOINT);
+        final String cloudwatchEndpoint = configuration.getString(AWSInput.CK_CLOUDWATCH_ENDPOINT);
+        final String iamEndpoint = configuration.getString(AWSInput.CK_IAM_ENDPOINT);
+        final String kinesisEndpoint = configuration.getString(AWSInput.CK_KINESIS_ENDPOINT);
+
+        // Validate the endpoints, because the Kinesis client will silently fail if an endpoint is invalid.
+        validateEndpoint(dynamodbEndpoint, "DynamoDB");
+        validateEndpoint(cloudwatchEndpoint, "CloudWatch");
+        validateEndpoint(iamEndpoint, "IAM");
+        validateEndpoint(iamEndpoint, "Kinesis");
+
+        // Creating and passing an AWSRequest here is not ideal (since it's a web request object), but at least the
+        // builder can be used for all of the required request fields. Perhaps this can be improved later.
+        final AWSRequest awsRequest = AWSRequestImpl.builder()
+                                                    .region(region.id())
+                                                    .awsAccessKeyId(key)
+                                                    .awsSecretAccessKey(secret)
+                                                    .assumeRoleArn(assumeRoleArn)
+                                                    .cloudwatchEndpoint(cloudwatchEndpoint)
+                                                    .dynamodbEndpoint(dynamodbEndpoint)
+                                                    .iamEndpoint(iamEndpoint)
+                                                    .kinesisEndpoint(kinesisEndpoint).build();
+
+        final int batchSize = configuration.getInt(CK_KINESIS_RECORD_BATCH_SIZE, DEFAULT_BATCH_SIZE);
+        final String streamName = configuration.getString(CK_KINESIS_STREAM_NAME);
+        final AWSMessageType awsMessageType = AWSMessageType.valueOf(configuration.getString(AWSCodec.CK_AWS_MESSAGE_TYPE));
+
+        this.kinesisConsumer = new KinesisConsumer(nodeId, this, objectMapper, kinesisCallback(input),
+                                                   streamName, awsMessageType, batchSize, awsRequest);
 
         LOG.debug("Starting Kinesis reader thread for input [{}/{}]", input.getName(), input.getId());
         executor.submit(this.kinesisConsumer);
+    }
+
+    /**
+     * If specified, verify that the specified endpoint is a valid URI.
+     *
+     * @param endpoint     The endpoint URI.
+     * @param endpointName The name of the endpoint. This will be included in the exception message.
+     * @throws MisfireException A {@link MisfireException} will be thrown if the URI is invalid.
+     */
+    static void validateEndpoint(String endpoint, String endpointName) throws MisfireException {
+        if (StringUtils.isNotEmpty(endpoint)) {
+            try {
+                new URL(endpoint).toURI();
+            } catch (Exception e) {
+                // Re-throw the exception to fail the input start attempt
+                throw new MisfireException(String.format("The specified [%s] Override Endpoint [%s] is invalid.",
+                                                         endpointName, endpoint), e);
+            }
+        }
     }
 
     private Consumer<byte[]> kinesisCallback(final MessageInput input) {

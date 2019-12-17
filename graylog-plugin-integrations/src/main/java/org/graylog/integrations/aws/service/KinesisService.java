@@ -8,11 +8,13 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSLogMessage;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogEvent;
 import org.graylog.integrations.aws.cloudwatch.CloudWatchLogSubscriptionData;
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.CreateRolePermissionRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisHealthCheckRequest;
 import org.graylog.integrations.aws.resources.requests.KinesisNewStreamRequest;
@@ -31,12 +33,12 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.iam.IamClient;
 import software.amazon.awssdk.services.iam.IamClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisClient;
 import software.amazon.awssdk.services.kinesis.KinesisClientBuilder;
 import software.amazon.awssdk.services.kinesis.model.CreateStreamRequest;
+import software.amazon.awssdk.services.kinesis.model.DescribeStreamRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsRequest;
 import software.amazon.awssdk.services.kinesis.model.GetRecordsResponse;
 import software.amazon.awssdk.services.kinesis.model.GetShardIteratorRequest;
@@ -103,22 +105,6 @@ public class KinesisService {
         this.availableCodecs = availableCodecs;
     }
 
-    private KinesisClient createClient(String regionName, String accessKeyId, String secretAccessKey) {
-
-        return kinesisClientBuilder.region(Region.of(regionName))
-                                   .credentialsProvider(AWSService.buildCredentialProvider(accessKeyId, secretAccessKey))
-                                   .build();
-    }
-
-
-    private IamClient createIamClient(String accessKeyId, String secretAccessKey) {
-
-        // IAM Always uses the Global region.
-        return iamClientBuilder.region(Region.AWS_GLOBAL)
-                               .credentialsProvider(AWSService.buildCredentialProvider(accessKeyId, secretAccessKey))
-                               .build();
-    }
-
     /**
      * The Health Check performs the following actions:
      * <p>
@@ -138,9 +124,7 @@ public class KinesisService {
         LOG.debug("Executing healthCheck");
         LOG.debug("Requesting a list of streams to find out if the indicated stream exists.");
         // Get all the Kinesis streams that exist for a user and region
-        StreamsResponse kinesisStreamNames = getKinesisStreamNames(request.region(),
-                                                                   request.awsAccessKeyId(),
-                                                                   request.awsSecretAccessKey());
+        StreamsResponse kinesisStreamNames = getKinesisStreamNames(request);
 
         // Check if Kinesis stream exists
         final boolean streamExists = kinesisStreamNames.streams().stream()
@@ -151,8 +135,7 @@ public class KinesisService {
 
         LOG.debug("The stream [{}] exists", request.streamName());
 
-        KinesisClient kinesisClient =
-                createClient(request.region(), request.awsAccessKeyId(), request.awsSecretAccessKey());
+        KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         // Retrieve one records from the Kinesis stream
         final List<Record> records = retrieveRecords(request.streamName(), kinesisClient);
@@ -176,18 +159,17 @@ public class KinesisService {
     /**
      * Get a list of Kinesis stream names. All available streams will be returned.
      *
-     * @param regionName The AWS region to query Kinesis stream names from.
+     * @param request The full AWS request object.
      * @return A list of all available Kinesis streams in the supplied region.
      */
-    public StreamsResponse getKinesisStreamNames(String regionName, String accessKeyId, String secretAccessKey) throws ExecutionException {
+    public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
 
-        LOG.debug("List Kinesis streams for region [{}]", regionName);
+        LOG.debug("List Kinesis streams for region [{}]", request.region());
 
         // KinesisClient.listStreams() is paginated. Use a retryer to loop and stream names (while ListStreamsResponse.hasMoreStreams() is true).
         // The stopAfterAttempt retryer option is an emergency brake to prevent infinite loops
         // if AWS API always returns true for hasMoreStreamNames.
-
-        final KinesisClient kinesisClient = createClient(regionName, accessKeyId, secretAccessKey);
+        final KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
         ListStreamsRequest streamsRequest = ListStreamsRequest.builder().limit(KINESIS_LIST_STREAMS_LIMIT).build();
         final ListStreamsResponse listStreamsResponse = kinesisClient.listStreams(streamsRequest);
@@ -227,7 +209,7 @@ public class KinesisService {
         LOG.debug("Kinesis streams queried: [{}]", streamNames);
 
         if (streamNames.isEmpty()) {
-            throw new BadRequestException(String.format("No Kinesis streams were found in the [%s] region.", regionName));
+            throw new BadRequestException(String.format("No Kinesis streams were found in the [%s] region.", request.region()));
         }
 
         return StreamsResponse.create(streamNames, streamNames.size());
@@ -432,22 +414,20 @@ public class KinesisService {
     /**
      * Creates a new Kinesis stream.
      *
-     * @param kinesisNewStreamRequest request which contains region, access, secret, region, streamName and shardCount
+     * @param request request which contains region, access, secret, region, streamName and shardCount
      * @return the status response
      */
-    public KinesisNewStreamResponse createNewKinesisStream(KinesisNewStreamRequest kinesisNewStreamRequest) {
+    public KinesisNewStreamResponse createNewKinesisStream(KinesisNewStreamRequest request) {
         LOG.debug("Creating Kinesis client with the provided credentials.");
-        final KinesisClient kinesisClient = createClient(kinesisNewStreamRequest.region(),
-                                                         kinesisNewStreamRequest.awsAccessKeyId(),
-                                                         kinesisNewStreamRequest.awsSecretAccessKey());
+        final KinesisClient kinesisClient = AWSClientBuilderUtil.buildClient(kinesisClientBuilder, request);
 
-        LOG.debug("Creating new Kinesis stream request [{}].", kinesisNewStreamRequest.streamName());
+        LOG.debug("Creating new Kinesis stream request [{}].", request.streamName());
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.builder()
-                                                                           .streamName(kinesisNewStreamRequest.streamName())
+                                                                           .streamName(request.streamName())
                                                                            .shardCount(SHARD_COUNT)
                                                                            .build();
         LOG.debug("Sending request to create new Kinesis stream [{}] with [{}] shards.",
-                  kinesisNewStreamRequest.streamName(), SHARD_COUNT);
+                  request.streamName(), SHARD_COUNT);
 
         StreamDescription streamDescription;
         try {
@@ -461,30 +441,29 @@ public class KinesisService {
                     return null; // Give up on request.
                 }
                 streamDescription = kinesisClient
-                        .describeStream(r -> r.streamName(kinesisNewStreamRequest.streamName()))
+                        .describeStream(DescribeStreamRequest.builder().streamName(request.streamName()).build())
                         .streamDescription();
                 if (seconds > 300) {
                     final String responseMessage = String.format("Fail. Stream [%s] has failed to become active " +
-                                                                 "within 60 seconds.", kinesisNewStreamRequest.streamName());
+                                                                 "within 60 seconds.", request.streamName());
                     throw new BadRequestException(responseMessage);
                 }
                 seconds++;
             } while (streamDescription.streamStatus() != StreamStatus.ACTIVE);
             String streamArn = streamDescription.streamARN();
             final String responseMessage = String.format("Success. The new stream [%s/%s] was created with [%d] shard.",
-                                                         kinesisNewStreamRequest.streamName(), streamArn, SHARD_COUNT);
+                                                         request.streamName(), streamArn, SHARD_COUNT);
 
             return KinesisNewStreamResponse.create(createStreamRequest.streamName(),
                                                    streamArn,
                                                    responseMessage);
         } catch (Exception e) {
-
             final String specificError = ExceptionUtils.formatMessageCause(e);
             final String responseMessage = String.format("Attempt to create [%s] new Kinesis stream " +
                                                          "with [%d] shards failed due to the following exception: [%s]",
-                                                         kinesisNewStreamRequest.streamName(), SHARD_COUNT,
+                                                         request.streamName(), SHARD_COUNT,
                                                          specificError);
-            LOG.error(responseMessage);
+            LOG.error(responseMessage, e);
             throw new BadRequestException(responseMessage, e);
         }
     }
@@ -492,19 +471,14 @@ public class KinesisService {
     /**
      * Creates and sets the new role and permissions for Kinesis to talk to Cloudwatch.
      *
-     * @param request
+     * @param request The create permission request.
      * @return role Arn associated with the associated kinesis stream
      */
     public CreateRolePermissionResponse autoKinesisPermissions(CreateRolePermissionRequest request) {
 
-        LOG.debug("Creating the role that will allow CloudWatch to talk to Kinesis");
-        KinesisClient kinesisClient = createClient(request.region(),
-                                                   request.awsAccessKeyId(),
-                                                   request.awsSecretAccessKey());
-
         String roleName = String.format(ROLE_NAME_FORMAT, DateTime.now().toString(UNIQUE_ROLE_DATE_FORMAT));
         try {
-            final IamClient iamClient = createIamClient(request.awsAccessKeyId(), request.awsSecretAccessKey());
+            final IamClient iamClient = AWSClientBuilderUtil.buildClient(iamClientBuilder, request);
             String createRoleResponse = createRoleForKinesisAutoSetup(iamClient, request.region(), roleName);
             LOG.debug(createRoleResponse);
             setPermissionsForKinesisAutoSetupRole(iamClient, roleName, request.streamArn());

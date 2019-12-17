@@ -76,16 +76,17 @@ public class AWSServiceTest {
         when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class))).thenReturn(messageInput);
 
         AWSInputCreateRequest request =
-                AWSInputCreateRequest.create("AWS Input",
-                                             AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString(),
-                                             "a-key", "a-secret",
-                                             "a-stream",
-                                             Region.US_EAST_1.id(),
-                                             10000,
-                                             "",
-                                             false,
-                                             true,
-                                             true);
+                AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
+                                     .awsAccessKeyId("a-key")
+                                     .awsSecretAccessKey("a-secret")
+                                     .name("AWS Input")
+                                     .awsMessageType(AWSMessageType.KINESIS_CLOUDWATCH_FLOW_LOGS.toString())
+                                     .streamName("a-stream")
+                                     .batchSize(10000)
+                                     .global(false)
+                                     .addFlowLogPrefix(true)
+                                     .throttlingAllowed(true)
+                                     .build();
         awsService.saveInput(request, user);
 
         // Verify that inputService received a valid input to save.
@@ -104,7 +105,6 @@ public class AWSServiceTest {
         assertEquals("a-key", input.configuration().get(AWSInput.CK_ACCESS_KEY));
         assertEquals("a-secret", input.configuration().get(AWSInput.CK_SECRET_KEY));
         assertEquals("us-east-1", input.configuration().get(AWSInput.CK_AWS_REGION));
-        assertEquals("AWS Input", input.configuration().get(MessageInput.FIELD_TITLE));
         assertEquals("a-stream", input.configuration().get(KinesisTransport.CK_KINESIS_STREAM_NAME));
         assertEquals(10000, input.configuration().get(KinesisTransport.CK_KINESIS_RECORD_BATCH_SIZE));
     }

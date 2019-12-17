@@ -7,6 +7,7 @@ import { SidebarProvider } from 'aws/context/Sidebar';
 import { FormDataProvider } from 'aws/context/FormData';
 import { StepsProvider } from 'aws/context/Steps';
 import { ApiProvider } from 'aws/context/Api';
+import { AdvancedOptionsProvider } from 'aws/context/AdvancedOptions';
 
 import CloudWatch from './CloudWatch';
 import INITIAL_FORMDATA from './_initialFormData';
@@ -17,11 +18,13 @@ const CloudWatchApp = ({ params: { step }, route }) => {
       <StepsProvider>
         <FormDataProvider initialFormData={INITIAL_FORMDATA}>
           <SidebarProvider>
-            <PageHeader title="AWS Integrations">
-              <span>This feature retrieves log messages from various AWS sources.</span>
-            </PageHeader>
+            <AdvancedOptionsProvider>
+              <PageHeader title="AWS Integrations">
+                <span>This feature retrieves log messages from various AWS sources.</span>
+              </PageHeader>
 
-            <CloudWatch wizardStep={step} route={route} />
+              <CloudWatch wizardStep={step} route={route} />
+            </AdvancedOptionsProvider>
           </SidebarProvider>
         </FormDataProvider>
       </StepsProvider>

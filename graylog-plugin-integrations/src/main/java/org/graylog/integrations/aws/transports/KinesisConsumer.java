@@ -4,14 +4,19 @@ package org.graylog.integrations.aws.transports;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.integrations.aws.AWSAuthProvider;
+import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.AWSMessageType;
+import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClientBuilder;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClient;
 import software.amazon.awssdk.services.kinesis.KinesisAsyncClientBuilder;
 import software.amazon.kinesis.common.ConfigsBuilder;
@@ -39,14 +44,13 @@ public class KinesisConsumer implements Runnable {
     private static final TimeUnit GRACEFUL_SHUTDOWN_TIMEOUT_UNIT = TimeUnit.SECONDS;
 
     private final String kinesisStreamName;
-    private final Region region;
     private final NodeId nodeId;
     private final KinesisTransport transport;
     private final Integer recordBatchSize;
     private final ObjectMapper objectMapper;
     private final AWSMessageType awsMessageType;
-    private final AwsCredentialsProvider credentialsProvider;
     private final Consumer<byte[]> handleMessageCallback;
+    private final AWSRequest request;
     private Scheduler kinesisScheduler;
 
     KinesisConsumer(NodeId nodeId,
@@ -55,39 +59,39 @@ public class KinesisConsumer implements Runnable {
                     Consumer<byte[]> handleMessageCallback,
                     String kinesisStreamName,
                     AWSMessageType awsMessageType,
-                    Region region,
-                    AwsCredentialsProvider credentialsProvider,
-                    int recordBatchSize) {
+                    int recordBatchSize, AWSRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(kinesisStreamName), "A Kinesis stream name is required.");
-        Preconditions.checkNotNull(region, "A Region is required.");
         Preconditions.checkNotNull(awsMessageType, "A AWSMessageType is required.");
 
         this.nodeId = requireNonNull(nodeId, "nodeId");
         this.transport = transport;
         this.handleMessageCallback = handleMessageCallback;
         this.kinesisStreamName = requireNonNull(kinesisStreamName, "kinesisStream");
-        this.region = requireNonNull(region, "region");
         this.objectMapper = objectMapper;
         this.awsMessageType = awsMessageType;
-        this.credentialsProvider = credentialsProvider;
         this.recordBatchSize = recordBatchSize;
+        this.request = request;
     }
 
     public void run() {
 
         LOG.debug("Starting the Kinesis Consumer.");
-        // Create the clients needed for the Kinesis consumer.
-        final DynamoDbAsyncClient dynamoClient = DynamoDbAsyncClient.builder()
-                                                                    .region(region)
-                                                                    .credentialsProvider(credentialsProvider)
-                                                                    .build();
-        final CloudWatchAsyncClient cloudWatchClient = CloudWatchAsyncClient.builder()
-                                                                            .region(region)
-                                                                            .credentialsProvider(credentialsProvider)
-                                                                            .build();
-        final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder()
-                                                                                      .region(this.region)
-                                                                                      .credentialsProvider(credentialsProvider);
+        AwsCredentialsProvider credentialsProvider = new AWSAuthProvider(request.region(), request.awsAccessKeyId(),
+                                                                         request.awsSecretAccessKey(), request.assumeRoleArn());
+
+        final Region region = Region.of(request.region());
+
+        // Create all clients needed for the Kinesis consumer.
+        final DynamoDbAsyncClientBuilder dynamoDbClientBuilder = DynamoDbAsyncClient.builder();
+        AWSClientBuilderUtil.initializeBuilder(dynamoDbClientBuilder, request.dynamodbEndpoint(), region, credentialsProvider);
+        final DynamoDbAsyncClient dynamoClient = dynamoDbClientBuilder.build();
+
+        final CloudWatchAsyncClientBuilder cloudwatchClientBuilder = CloudWatchAsyncClient.builder();
+        AWSClientBuilderUtil.initializeBuilder(cloudwatchClientBuilder, request.cloudwatchEndpoint(), region, credentialsProvider);
+        final CloudWatchAsyncClient cloudWatchClient = cloudwatchClientBuilder.build();
+
+        final KinesisAsyncClientBuilder kinesisAsyncClientBuilder = KinesisAsyncClient.builder();
+        AWSClientBuilderUtil.initializeBuilder(kinesisAsyncClientBuilder, request.kinesisEndpoint(), region, credentialsProvider);
         final KinesisAsyncClient kinesisAsyncClient = KinesisClientUtil.createKinesisAsyncClient(kinesisAsyncClientBuilder);
 
         final String workerId = String.format(Locale.ENGLISH, "graylog-node-%s", nodeId.anonymize());
@@ -99,8 +103,7 @@ public class KinesisConsumer implements Runnable {
         LOG.debug("Using Kinesis applicationName [{}].", applicationName);
 
         // The KinesisShardProcessorFactory contains the message processing logic.
-        final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType
-        );
+        final KinesisShardProcessorFactory kinesisShardProcessorFactory = new KinesisShardProcessorFactory(objectMapper, transport, handleMessageCallback, kinesisStreamName, awsMessageType);
 
         ConfigsBuilder configsBuilder = new ConfigsBuilder(kinesisStreamName, applicationName,
                                                            kinesisAsyncClient, dynamoClient, cloudWatchClient,

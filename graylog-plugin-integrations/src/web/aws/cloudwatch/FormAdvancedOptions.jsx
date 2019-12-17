@@ -15,7 +15,6 @@ const FormAdvancedOptions = ({ onChange }) => {
 
   const {
     awsCloudWatchGlobalInput,
-    awsCloudWatchAssumeARN,
     awsCloudWatchBatchSize,
     awsCloudWatchThrottleEnabled,
     awsCloudWatchAddFlowLogPrefix,
@@ -50,13 +49,6 @@ const FormAdvancedOptions = ({ onChange }) => {
              onChange={onChange}
              label="Add Flow Log field name prefix"
              help='Add field with the Flow Log prefix e. g. "src_addr" -> "flow_log_src_addr".' />
-
-      <Input id="awsCloudWatchAssumeARN"
-             type="text"
-             value={awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : ''}
-             onChange={onChange}
-             label="AWS assume role ARN"
-             help="Role ARN with required permissions (cross account access)" />
 
       <Input id="awsCloudWatchBatchSize"
              type="number"

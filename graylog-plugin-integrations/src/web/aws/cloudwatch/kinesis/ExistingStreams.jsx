@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { Modal, Panel } from 'components/graylog';
+import { Button, Modal, Panel } from 'components/graylog';
 
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
@@ -47,14 +47,13 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
           </p>
         </AutoSetupContent>
 
-        <button onClick={() => {
+        <Button onClick={() => {
           clearSidebar();
           toggleSetup();
         }}
-                type="button"
-                className="btn btn-default">
+                type="button">
           Setup Kinesis Automatically
-        </button>
+        </Button>
       </Panel>,
     );
   }, []);

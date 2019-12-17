@@ -132,7 +132,7 @@ public class KinesisShardProcessorFactory implements ShardRecordProcessorFactory
             checkpoint(shutdownRequestedInput.checkpointer(), null);
         }
 
-        private void checkpoint(RecordProcessorCheckpointer checkpointer, String lastSequence ) {
+        private void checkpoint(RecordProcessorCheckpointer checkpointer, String lastSequence) {
             LOG.debug("Checkpointing stream [{}]", kinesisStreamName);
             final Retryer<Void> retryer = RetryerBuilder.<Void>newBuilder()
                     .retryIfExceptionOfType(ThrottlingException.class)

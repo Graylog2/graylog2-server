@@ -5,6 +5,7 @@ import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
 import { FormDataContext } from 'aws/context/FormData';
 import { ApiContext } from 'aws/context/Api';
@@ -14,13 +15,9 @@ import FormWrap from 'aws/common/FormWrap';
 import { ApiRoutes } from 'aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'aws/common/constants';
 
-const Default = ({ value }) => {
-  return (
-    <React.Fragment>
-      {value} <small>(default)</small>
-    </React.Fragment>
-  );
-};
+const Default = ({ value }) => (
+  <>{value} <small>(default)</small></>
+);
 
 Default.propTypes = {
   value: PropTypes.string.isRequired,
@@ -31,21 +28,26 @@ const StepReview = ({ onSubmit, onEditClick }) => {
   const { formData } = useContext(FormDataContext);
   const { logData } = useContext(ApiContext);
   const {
-    awsCloudWatchName,
-    awsCloudWatchAwsKey,
+    awsAuthenticationType,
+    awsCloudWatchAddFlowLogPrefix = { value: undefined },
+    awsCloudWatchAssumeARN = { value: undefined },
+    awsCloudWatchAwsKey = { value: undefined },
     awsCloudWatchAwsRegion,
-    awsCloudWatchKinesisStream,
-    awsCloudWatchGlobalInput,
-    awsCloudWatchAssumeARN,
     awsCloudWatchBatchSize,
-    awsCloudWatchThrottleEnabled,
-    awsCloudWatchAddFlowLogPrefix,
-    awsCloudWatchKinesisInputType,
+    awsEndpointCloudWatch = { value: undefined },
+    awsCloudWatchGlobalInput = { value: undefined },
+    awsCloudWatchKinesisInputType = { value: DEFAULT_KINESIS_LOG_TYPE },
+    awsCloudWatchKinesisStream,
+    awsCloudWatchName,
+    awsCloudWatchThrottleEnabled = { value: undefined },
+    awsEndpointDynamoDB = { value: undefined },
+    awsEndpointIAM = { value: undefined },
+    awsEndpointKinesis = { value: undefined },
   } = formData;
 
-  const globalInputEnabled = awsCloudWatchGlobalInput && awsCloudWatchGlobalInput.value;
-  const throttleEnabled = awsCloudWatchThrottleEnabled && awsCloudWatchThrottleEnabled.value;
-  const addPrefix = awsCloudWatchAddFlowLogPrefix && awsCloudWatchAddFlowLogPrefix.value;
+  const globalInputEnabled = !!awsCloudWatchGlobalInput.value;
+  const throttleEnabled = !!awsCloudWatchThrottleEnabled.value;
+  const addPrefix = !!awsCloudWatchAddFlowLogPrefix.value;
 
   const [fetchSubmitStatus, setSubmitFetch] = useFetch(
     null,
@@ -56,10 +58,9 @@ const StepReview = ({ onSubmit, onEditClick }) => {
     {
       name: awsCloudWatchName.value,
       region: awsCloudWatchAwsRegion.value,
-      aws_input_type: awsCloudWatchKinesisInputType ? awsCloudWatchKinesisInputType.value : DEFAULT_KINESIS_LOG_TYPE,
+      aws_input_type: awsCloudWatchKinesisInputType.value,
       stream_name: awsCloudWatchKinesisStream.value,
       batch_size: Number(awsCloudWatchBatchSize.value || awsCloudWatchBatchSize.defaultValue),
-      assume_role_arn: awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : '',
       global: globalInputEnabled,
       enable_throttling: throttleEnabled,
       add_flow_log_prefix: addPrefix,
@@ -94,10 +95,54 @@ const StepReview = ({ onSubmit, onEditClick }) => {
             <strong>Name</strong>
             <span>{awsCloudWatchName.value}</span>
           </li>
+
           <li>
-            <strong>AWS Key</strong>
-            <span>{awsCloudWatchAwsKey.value}</span>
+            <strong>Authorization Type</strong>
+            <span>{awsAuthenticationType.value}</span>
           </li>
+
+          {awsCloudWatchAwsKey.value && (
+            <li>
+              <strong>AWS Key</strong>
+              <span>{awsCloudWatchAwsKey.value}</span>
+            </li>
+          )}
+
+          {awsCloudWatchAssumeARN.value && (
+            <li>
+              <strong>AWS Assumed ARN Role</strong>
+              <span>{awsCloudWatchAssumeARN.value}</span>
+            </li>
+          )}
+
+          {awsEndpointCloudWatch.value && (
+            <li>
+              <strong>CloudWatch VPC Endpoint</strong>
+              <span>{awsEndpointCloudWatch.value}</span>
+            </li>
+          )}
+
+          {awsEndpointDynamoDB.value && (
+            <li>
+              <strong>DynamoDB VPC Endpoint</strong>
+              <span>{awsEndpointDynamoDB.value}</span>
+            </li>
+          )}
+
+          {awsEndpointIAM.value && (
+            <li>
+              <strong>IAM VPC Endpoint</strong>
+              <span>{awsEndpointIAM.value}</span>
+            </li>
+          )}
+
+          {awsEndpointKinesis.value && (
+            <li>
+              <strong>Kinesis VPC Endpoint</strong>
+              <span>{awsEndpointKinesis.value}</span>
+            </li>
+          )}
+
           <li>
             <strong>AWS Region</strong>
             <span>{awsCloudWatchAwsRegion.value}</span>
@@ -112,29 +157,25 @@ const StepReview = ({ onSubmit, onEditClick }) => {
           </li>
           <li>
             <strong>Global Input</strong>
-            <span>{<i className={`fa fa-${globalInputEnabled ? 'check' : 'times'}`} />}</span>
-          </li>
-          <li>
-            <strong>AWS Assumed ARN Role</strong>
-            <span>{awsCloudWatchAssumeARN ? awsCloudWatchAssumeARN.value : 'None'}</span>
+            <span><Icon name={globalInputEnabled ? 'check' : 'times'} /></span>
           </li>
           <li>
             <strong>Record Batch Size</strong>
             <span>
               {
-                    awsCloudWatchBatchSize.value
-                      ? awsCloudWatchBatchSize.value
-                      : <Default value={awsCloudWatchBatchSize.defaultValue} />
-                  }
+                awsCloudWatchBatchSize.value
+                  ? awsCloudWatchBatchSize.value
+                  : <Default value={awsCloudWatchBatchSize.defaultValue} />
+              }
             </span>
           </li>
           <li>
             <strong>Enable Throttling</strong>
-            <span>{<i className={`fa fa-${throttleEnabled ? 'check' : 'times'}`} />}</span>
+            <span><Icon name={throttleEnabled ? 'check' : 'times'} /></span>
           </li>
           <li>
             <strong>Add Flow Log prefix to field names</strong>
-            <span>{<i className={`fa fa-${addPrefix ? 'check' : 'times'}`} />}</span>
+            <span><Icon name={addPrefix ? 'check' : 'times'} /></span>
           </li>
         </ReviewItems>
 

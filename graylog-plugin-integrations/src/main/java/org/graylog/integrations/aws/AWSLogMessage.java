@@ -14,8 +14,8 @@ public class AWSLogMessage {
     /**
      * Detects the type of log message.
      *
-     * @return A {@code Type} indicating the which kind of log message has been detected.
      * @param compressed Indicates if the payload is compressed and probably from CloudWatch.
+     * @return A {@code Type} indicating the which kind of log message has been detected.
      */
     public AWSMessageType detectLogMessageType(boolean compressed) {
 

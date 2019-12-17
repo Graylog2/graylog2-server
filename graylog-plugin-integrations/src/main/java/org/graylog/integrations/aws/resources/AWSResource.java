@@ -100,35 +100,26 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
         return awsService.getPermissions();
     }
 
-    /**
-     * Get all available AWS CloudWatch log groups names for the specified region.
-     */
     @POST
     @Timed
     @Path("/cloudwatch/log_groups")
     @ApiOperation(value = "Get all available AWS CloudWatch log groups names for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public LogGroupsResponse getLogGroupNames(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl awsRequest) {
-        return cloudWatchService.getLogGroupNames(awsRequest.region(), awsRequest.awsAccessKeyId(), awsRequest.awsSecretAccessKey());
+    public LogGroupsResponse getLogGroupNames(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) {
+        return cloudWatchService.getLogGroupNames(request);
     }
 
-    /**
-     * Get all available Kinesis streams for the specified region.
-     */
     @POST
     @Timed
     @Path("/kinesis/streams")
     @ApiOperation(value = "Get all available Kinesis streams for the specified region.")
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
-    public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl awsRequest) throws ExecutionException {
-        return kinesisService.getKinesisStreamNames(awsRequest.region(), awsRequest.awsAccessKeyId(), awsRequest.awsSecretAccessKey());
+    public StreamsResponse getKinesisStreams(@ApiParam(name = "JSON body", required = true) @Valid @NotNull AWSRequestImpl request) throws ExecutionException {
+        return kinesisService.getKinesisStreamNames(request);
     }
 
-    /**
-     * Perform an AWS HealthCheck
-     */
     @POST
     @Timed
     @Path("/kinesis/health_check")
@@ -144,9 +135,6 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
         return Response.accepted().entity(response).build();
     }
 
-    /**
-     * Create a new AWS input.
-     */
     @POST
     @Timed
     @Path("/inputs")

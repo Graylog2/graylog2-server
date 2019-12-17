@@ -2,10 +2,8 @@ package org.graylog.integrations.aws.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import org.apache.commons.lang.StringUtils;
 import org.graylog.integrations.aws.AWSMessageType;
 import org.graylog.integrations.aws.AWSPolicy;
 import org.graylog.integrations.aws.AWSPolicyStatement;
@@ -31,8 +29,6 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.RegionMetadata;
 
@@ -47,9 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Service for all AWS CloudWatch business logic and SDK usages.
- */
 public class AWSService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AWSService.class);
@@ -123,18 +116,6 @@ public class AWSService {
     }
 
     /**
-     * Checks that the supplied accessKey and secretKey are not null or blank
-     *
-     * @return A credential provider
-     */
-    public static StaticCredentialsProvider buildCredentialProvider(String accessKeyId, String secretAccessKey) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(accessKeyId), "An AWS access key is required.");
-        Preconditions.checkArgument(StringUtils.isNotBlank(secretAccessKey), "An AWS secret key is required.");
-
-        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKeyId, secretAccessKey));
-    }
-
-    /**
      * @return A list of available AWS services supported by the AWS Graylog AWS integration.
      */
     public AvailableServiceResponse getAvailableServices() {
@@ -176,6 +157,7 @@ public class AWSService {
 
     /**
      * Convert the {@link AWSPolicy} object into a JSON string.
+     *
      * @return A JSON policy string.
      */
     private String policyAsJsonString(AWSPolicy setupPolicy) {
@@ -253,14 +235,17 @@ public class AWSService {
         // Transpose the SaveAWSInputRequest to the needed InputCreateRequest
         final HashMap<String, Object> configuration = new HashMap<>();
         configuration.put(AWSCodec.CK_AWS_MESSAGE_TYPE, request.awsMessageType());
-        configuration.put(AWSInput.CK_TITLE, request.name()); // TODO: Should name and title be the same?
         configuration.put(AWSInput.CK_GLOBAL, request.global());
         configuration.put(ThrottleableTransport.CK_THROTTLING_ALLOWED, request.throttlingAllowed());
         configuration.put(AWSCodec.CK_FLOW_LOG_PREFIX, request.addFlowLogPrefix());
         configuration.put(AWSInput.CK_AWS_REGION, request.region());
         configuration.put(AWSInput.CK_ACCESS_KEY, request.awsAccessKeyId());
         configuration.put(AWSInput.CK_SECRET_KEY, request.awsSecretAccessKey());
-        configuration.put(AWSInput.CK_ASSUME_ROLE_ARN, request.assumeRoleARN());
+        configuration.put(AWSInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
+        configuration.put(AWSInput.CK_CLOUDWATCH_ENDPOINT, request.cloudwatchEndpoint());
+        configuration.put(AWSInput.CK_DYNAMODB_ENDPOINT, request.dynamodbEndpoint());
+        configuration.put(AWSInput.CK_IAM_ENDPOINT, request.iamEndpoint());
+        configuration.put(AWSInput.CK_KINESIS_ENDPOINT, request.kinesisEndpoint());
 
         AWSMessageType inputType = AWSMessageType.valueOf(request.awsMessageType());
         if (inputType.isKinesis()) {
