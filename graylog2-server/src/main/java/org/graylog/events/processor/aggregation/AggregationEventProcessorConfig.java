@@ -28,6 +28,7 @@ import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorSchedulerConfig;
+import org.graylog.plugins.views.search.Parameter;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
@@ -56,6 +57,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";
+    private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
     private static final String FIELD_SERIES = "series";
@@ -65,6 +67,9 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     @JsonProperty(FIELD_QUERY)
     public abstract String query();
+
+    @JsonProperty(FIELD_QUERY_PARAMETERS)
+    public abstract ImmutableSet<Parameter> queryParameters();
 
     @JsonProperty(FIELD_STREAMS)
     public abstract ImmutableSet<String> streams();
@@ -130,11 +135,15 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         @JsonCreator
         public static Builder create() {
             return new AutoValue_AggregationEventProcessorConfig.Builder()
+                    .queryParameters(ImmutableSet.of())
                     .type(TYPE_NAME);
         }
 
         @JsonProperty(FIELD_QUERY)
         public abstract Builder query(String query);
+
+        @JsonProperty(FIELD_QUERY_PARAMETERS)
+        public abstract Builder queryParameters(Set<Parameter> queryParameters);
 
         @JsonProperty(FIELD_STREAMS)
         public abstract Builder streams(Set<String> streams);

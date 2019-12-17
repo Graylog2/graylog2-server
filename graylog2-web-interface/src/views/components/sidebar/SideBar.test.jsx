@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import PropTypes from 'prop-types';
 
 import ViewTypeContext from 'views/components/contexts/ViewTypeContext';

@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, waitForElement, cleanup, fireEvent } from '@testing-library/react';
+import { render, waitForElement, cleanup, fireEvent } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import '@testing-library/jest-dom/extend-expect';
 

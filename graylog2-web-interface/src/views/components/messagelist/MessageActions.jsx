@@ -2,13 +2,9 @@
 import * as React from 'react';
 // $FlowFixMe: imports from core need to be fixed in flow
 import { LinkContainer } from 'react-router-bootstrap';
-// $FlowFixMe: imports from core need to be fixed in flow
 import Routes from 'routing/Routes';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { ClipboardButton } from 'components/common';
-// $FlowFixMe: imports from core need to be fixed in flow
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/graylog';
-// $FlowFixMe: imports from core need to be fixed in flow
 import SurroundingSearchButton from 'components/search/SurroundingSearchButton';
 
 type Props = {

@@ -52,7 +52,7 @@ const _trendIcon = (delta) => {
     return <Icon name="arrow-circle-right" />;
   }
 
-  return delta > 0 ? <Icon name="arrow-circle-up" /> : <Icon name="arrow-circle-down" />;
+  return <Icon name={delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down'} />;
 };
 
 const Trend = React.forwardRef<Props, any>(({ current, previous, trendPreference }: Props, ref) => {

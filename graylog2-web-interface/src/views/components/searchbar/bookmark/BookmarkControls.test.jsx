@@ -1,6 +1,6 @@
 // @flow strict
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import { browserHistory } from 'react-router';
 
 import View from 'views/logic/views/View';

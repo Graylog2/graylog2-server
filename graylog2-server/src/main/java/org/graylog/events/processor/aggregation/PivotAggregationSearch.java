@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.filter.OrFilter;
@@ -115,17 +116,26 @@ public class PivotAggregationSearch implements AggregationSearch {
         if (!aggregationErrors.isEmpty() || !streamErrors.isEmpty()) {
             final Set<SearchError> errors = aggregationErrors.isEmpty() ? streamErrors : aggregationErrors;
 
-            LOG.error("Aggregation search resulted in {} errors", errors.size());
             errors.forEach(error -> {
                 if (error instanceof QueryError) {
                     final QueryError queryError = (QueryError) error;
-                    LOG.error("Aggregation search query <{}> returned an error: {}\n{}",
-                            queryError.queryId(), queryError.description(), queryError.backtrace());
+                    final String backtrace = queryError.backtrace() != null ? queryError.backtrace() : "";
+                    if (error instanceof EmptyParameterError) {
+                        LOG.debug("Aggregation search query <{}> with empty Parameter: {}\n{}",
+                                queryError.queryId(), queryError.description(), backtrace);
+                    } else {
+                        LOG.error("Aggregation search query <{}> returned an error: {}\n{}",
+                                queryError.queryId(), queryError.description(), backtrace);
+                    }
                 } else {
                     LOG.error("Aggregation search returned an error: {}", error);
                 }
             });
 
+            // If we have only EmptyParameterErrors, just return an empty Result
+            if (! (errors.stream().filter(e -> !(e instanceof EmptyParameterError)).count() > 1)) {
+                return AggregationResult.empty();
+            }
             if (errors.size() > 1) {
                 throw new EventProcessorException("Pivot search failed with multiple errors.", false, eventDefinition);
             } else {
@@ -291,6 +301,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username) throws EventProcessorException {
         final Search search = Search.builder()
                 .queries(ImmutableSet.of(getAggregationQuery(parameters), getSourceStreamsQuery(parameters)))
+                .parameters(config.queryParameters())
                 .build();
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
         try {

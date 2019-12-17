@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -38,8 +37,8 @@ describe('<ContentPackInstall />', () => {
     .build();
 
   it('should render a install', () => {
-    const wrapper = renderer.create(<ContentPackInstall contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackInstall contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should call install when called', () => {

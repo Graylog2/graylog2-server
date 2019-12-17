@@ -1,7 +1,7 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import Widget from 'views/components/widgets/Widget';

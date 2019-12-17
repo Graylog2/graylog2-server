@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import each from 'jest-each';
 
 import mockComponent from 'helpers/mocking/MockComponent';
