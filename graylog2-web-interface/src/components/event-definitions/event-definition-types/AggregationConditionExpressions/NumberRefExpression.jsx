@@ -83,7 +83,7 @@ const NumberRefExpression = ({
         {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
           <Col md={6}>
-            <Select id="aggregation-function"
+            <Select className="aggregation-function"
                     matchProp="label"
                     placeholder="Select Function"
                     onChange={handleAggregationFunctionChange}
@@ -91,7 +91,7 @@ const NumberRefExpression = ({
                     value={series.function} />
           </Col>
           <Col md={6}>
-            <Select id="aggregation-function-field"
+            <Select className="aggregation-function-field"
                     matchProp="label"
                     placeholder="Select Field (Optional)"
                     onChange={handleAggregationFieldChange}
