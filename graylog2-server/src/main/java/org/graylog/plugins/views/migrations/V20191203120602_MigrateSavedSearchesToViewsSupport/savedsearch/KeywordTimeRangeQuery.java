@@ -23,6 +23,9 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.KeywordRange;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class KeywordTimeRangeQuery implements Query {
@@ -44,8 +47,9 @@ public abstract class KeywordTimeRangeQuery implements Query {
             @JsonProperty("rangeType") String rangeType,
             @JsonProperty("fields") String fields,
             @JsonProperty("query") String query,
-            @JsonProperty("keyword") String keyword
+            @JsonProperty("keyword") String keyword,
+            @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_KeywordTimeRangeQuery(rangeType, fields, query, keyword);
+        return new AutoValue_KeywordTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, keyword);
     }
 }
