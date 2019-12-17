@@ -14,16 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.views.search.views;
+package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.contentpacks.ContentPackable;
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.entities.ViewStateEntity;
+import org.graylog.plugins.views.search.views.DisplayModeSettings;
+import org.graylog.plugins.views.search.views.FormattingSettings;
+import org.graylog.plugins.views.search.views.Titles;
+import org.graylog.plugins.views.search.views.ViewStateDTO;
+import org.graylog.plugins.views.search.views.WidgetDTO;
+import org.graylog.plugins.views.search.views.WidgetPositionDTO;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -32,9 +37,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @AutoValue
-@JsonDeserialize(builder = ViewStateDTO.Builder.class)
+@JsonDeserialize(builder = ViewStateEntity.Builder.class)
 @WithBeanGetter
-public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
+public abstract class ViewStateEntity implements NativeEntityConverter<ViewStateDTO> {
     static final String FIELD_SELECTED_FIELDS = "selected_fields";
     static final String FIELD_STATIC_MESSAGE_LIST_ID = "static_message_list_id";
     static final String FIELD_TITLES = "titles";
@@ -56,7 +61,7 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
     public abstract Titles titles();
 
     @JsonProperty(FIELD_WIDGETS)
-    public abstract Set<WidgetDTO> widgets();
+    public abstract Set<WidgetEntity> widgets();
 
     @JsonProperty(FIELD_WIDGET_MAPPING)
     public abstract Map<String, Set<String>> widgetMapping();
@@ -89,7 +94,7 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
         public abstract Builder titles(Titles titles);
 
         @JsonProperty(FIELD_WIDGETS)
-        public abstract Builder widgets(Set<WidgetDTO> widgets);
+        public abstract Builder widgets(Set<WidgetEntity> widgets);
 
         @JsonProperty(FIELD_WIDGET_MAPPING)
         public abstract Builder widgetMapping(Map<String, Set<String>> widgetMapping);
@@ -103,26 +108,26 @@ public abstract class ViewStateDTO implements ContentPackable<ViewStateEntity> {
         @JsonProperty(FIELD_DISPLAY_MODE_SETTINGS)
         public abstract Builder displayModeSettings(DisplayModeSettings displayModeSettings);
 
-        public abstract ViewStateDTO build();
+        public abstract ViewStateEntity build();
 
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_ViewStateDTO.Builder()
+            return new AutoValue_ViewStateEntity.Builder()
                     .titles(Titles.empty())
                     .displayModeSettings(DisplayModeSettings.empty());
         }
     }
 
     @Override
-    public ViewStateEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        final ViewStateEntity.Builder viewStateBuilder = ViewStateEntity.builder()
-                .titles(this.titles())
+    public ViewStateDTO toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+        final ViewStateDTO.Builder viewStateBuilder = ViewStateDTO.builder()
                 .displayModeSettings(this.displayModeSettings())
-                .formatting(this.formatting())
-                .widgets(this.widgets().stream().map(widgetDTO -> widgetDTO.toContentPackEntity(entityDescriptorIds))
+                .widgets(this.widgets().stream().map(w -> w.toNativeEntity(parameters, nativeEntities))
                         .collect(Collectors.toSet()))
+                .widgetMapping(this.widgetMapping())
                 .widgetPositions(this.widgetPositions())
-                .widgetMapping(this.widgetMapping());
+                .formatting(this.formatting())
+                .titles(this.titles());
         if (this.fields() != null && this.fields().isPresent()) {
             viewStateBuilder.fields(this.fields().get());
         }

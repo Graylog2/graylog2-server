@@ -24,23 +24,22 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 
-import java.util.stream.Stream;
-
-public class DashboardFacade extends ViewFacade {
-    public static final ModelType TYPE_V2 = ModelTypes.DASHBOARD_V2;
+public class SearchFacade extends ViewFacade {
+    public static final ModelType TYPE_V1 = ModelTypes.SEARCH_V1;
 
     @Inject
-    public DashboardFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
+    public SearchFacade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
     }
 
     @Override
     public ModelType getModelType() {
-        return TYPE_V2;
+        return TYPE_V1;
     }
+
 
     @Override
     public ViewDTO.Type getDTOType() {
-        return ViewDTO.Type.DASHBOARD;
+        return ViewDTO.Type.SEARCH;
     }
 }
