@@ -64,8 +64,12 @@ const mapVisualization = (legacyVisualization: LegacyVisualization) => {
   switch (legacyVisualization) {
     case 'scatterplot':
       return 'scatter';
-    default:
+    case 'line':
+    case 'area':
+    case 'bar':
       return legacyVisualization;
+    default:
+      throw new Error(`Unsupported visualization ${legacyVisualization}`);
   }
 };
 
