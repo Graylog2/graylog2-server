@@ -1,0 +1,760 @@
+[ {
+  "id" : "5c7fc3f9f38ed741ac154697",
+  "type" : "DASHBOARD",
+  "title" : "Sample Dashboard",
+  "summary" : "This dashboard was migrated automatically.",
+  "description" : "Hey!",
+  "search_id" : "5de0e98900002a0017000001",
+  "state" : {
+    "0000016e-b690-4291-0000-016eb690426f" : {
+      "titles" : {
+        "widget" : {
+          "0000016e-b690-427c-0000-016eb690426f" : "Some Statistical values",
+          "0000016e-b690-4270-0000-016eb690426f" : "Statistical value",
+          "0000016e-b690-4277-0000-016eb690426f" : "World Map Example",
+          "0000016e-b690-426f-0000-016eb690426f" : "Search result count",
+          "0000016e-b690-4279-0000-016eb690426f" : "Field Chart with absolute time range",
+          "0000016e-b690-4273-0000-016eb690426f" : "Quick values Histogram",
+          "0000016e-b690-4276-0000-016eb690426f" : "Quick values",
+          "0000016e-b690-4275-0000-016eb690426f" : "Quick values",
+          "0000016e-b690-427a-0000-016eb690426f" : "KPI",
+          "0000016e-b690-4271-0000-016eb690426f" : "Search result graph",
+          "0000016e-b690-4278-0000-016eb690426f" : "Field chart with keyword time range",
+          "0000016e-b690-427e-0000-016eb690426f" : "Stacked Field graph",
+          "0000016e-b690-4274-0000-016eb690426f" : "Important!",
+          "0000016e-b690-427b-0000-016eb690426f" : "Stacked graph with custom timerange & query",
+          "0000016e-b690-427d-0000-016eb690426f" : "Search result graph",
+          "0000016e-b690-4272-0000-016eb690426f" : "Field graph"
+        },
+        "tab" : {
+          "title" : "Sample Dashboard"
+        }
+      },
+      "widgets" : [ {
+        "id" : "0000016e-b690-426f-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "LOWER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4270-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "card(nf_src_address_geolocation)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : false,
+            "trend_preference" : "HIGHER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4271-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : "Messages"
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4272-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "sum(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "line",
+          "visualization_config" : {
+            "interpolation" : "linear"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4273-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "hours"
+              }
+            }
+          } ],
+          "column_pivots" : [ {
+            "field" : "facility",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "facility",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "bar",
+          "visualization_config" : {
+            "barmode" : "stack"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4274-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 28800
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "sum(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "line",
+          "visualization_config" : {
+            "interpolation" : "linear"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4275-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "facility",
+            "type" : "values",
+            "config" : {
+              "limit" : 5
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "facility",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "pie",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4276-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "facility",
+            "type" : "values",
+            "config" : {
+              "limit" : 50
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ {
+            "type" : "series",
+            "field" : "facility",
+            "direction" : "Descending"
+          } ],
+          "visualization" : "table",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4277-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5c2e07eeba33a9681ad6070a" ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "nf_dst_address_geolocation",
+            "type" : "values",
+            "config" : {
+              "limit" : 15
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "map",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4278-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "keyword",
+          "keyword" : "yesterday"
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-4279-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "absolute",
+          "from" : "2019-11-25T00:00:00.000Z",
+          "to" : "2019-11-26T00:00:00.000Z"
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427a-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "sum(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "line",
+          "visualization_config" : {
+            "interpolation" : "linear"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427b-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 7200
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "*"
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "auto",
+                "scaling" : 2.0
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(dns_client)"
+          }, {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427c-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ "5c2e07eeba33a9681ad6070a" ],
+        "config" : {
+          "row_pivots" : [ ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "card(nf_proto)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "numeric",
+          "visualization_config" : {
+            "trend" : true,
+            "trend_preference" : "LOWER"
+          },
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427d-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 28800
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : ""
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : "Messages"
+            },
+            "function" : "count()"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      }, {
+        "id" : "0000016e-b690-427e-0000-016eb690426f",
+        "type" : "aggregation",
+        "filter" : null,
+        "timerange" : {
+          "type" : "relative",
+          "range" : 300
+        },
+        "query" : {
+          "type" : "elasticsearch",
+          "query_string" : "*"
+        },
+        "streams" : [ ],
+        "config" : {
+          "row_pivots" : [ {
+            "field" : "timestamp",
+            "type" : "time",
+            "config" : {
+              "interval" : {
+                "type" : "timeunit",
+                "value" : 1,
+                "unit" : "minutes"
+              }
+            }
+          } ],
+          "column_pivots" : [ ],
+          "series" : [ {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(dns_client)"
+          }, {
+            "config" : {
+              "name" : null
+            },
+            "function" : "count(nf_bytes)"
+          } ],
+          "sort" : [ ],
+          "visualization" : "bar",
+          "visualization_config" : null,
+          "rollup" : true,
+          "formatting_settings" : null
+        }
+      } ],
+      "widget_mapping" : {
+        "0000016e-b690-427c-0000-016eb690426f" : [ "0000016e-b690-428d-0000-016eb690426f", "0000016e-b690-428e-0000-016eb690426f" ],
+        "0000016e-b690-4277-0000-016eb690426f" : [ "0000016e-b690-4288-0000-016eb690426f" ],
+        "0000016e-b690-4270-0000-016eb690426f" : [ "0000016e-b690-4281-0000-016eb690426f" ],
+        "0000016e-b690-426f-0000-016eb690426f" : [ "0000016e-b690-427f-0000-016eb690426f", "0000016e-b690-4280-0000-016eb690426f" ],
+        "0000016e-b690-4279-0000-016eb690426f" : [ "0000016e-b690-428a-0000-016eb690426f" ],
+        "0000016e-b690-4276-0000-016eb690426f" : [ "0000016e-b690-4287-0000-016eb690426f" ],
+        "0000016e-b690-4273-0000-016eb690426f" : [ "0000016e-b690-4284-0000-016eb690426f" ],
+        "0000016e-b690-4275-0000-016eb690426f" : [ "0000016e-b690-4286-0000-016eb690426f" ],
+        "0000016e-b690-427a-0000-016eb690426f" : [ "0000016e-b690-428b-0000-016eb690426f" ],
+        "0000016e-b690-427e-0000-016eb690426f" : [ "0000016e-b690-4290-0000-016eb690426f" ],
+        "0000016e-b690-4278-0000-016eb690426f" : [ "0000016e-b690-4289-0000-016eb690426f" ],
+        "0000016e-b690-4271-0000-016eb690426f" : [ "0000016e-b690-4282-0000-016eb690426f" ],
+        "0000016e-b690-427b-0000-016eb690426f" : [ "0000016e-b690-428c-0000-016eb690426f" ],
+        "0000016e-b690-4274-0000-016eb690426f" : [ "0000016e-b690-4285-0000-016eb690426f" ],
+        "0000016e-b690-427d-0000-016eb690426f" : [ "0000016e-b690-428f-0000-016eb690426f" ],
+        "0000016e-b690-4272-0000-016eb690426f" : [ "0000016e-b690-4283-0000-016eb690426f" ]
+      },
+      "positions" : {
+        "0000016e-b690-427c-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 5,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-4270-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 3,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-4277-0000-016eb690426f" : {
+          "col" : 4,
+          "row" : 7,
+          "height" : 5,
+          "width" : 3
+        },
+        "0000016e-b690-426f-0000-016eb690426f" : {
+          "col" : 5,
+          "row" : 1,
+          "height" : 2,
+          "width" : 2
+        },
+        "0000016e-b690-4279-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 14,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4273-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 5,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4276-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 10,
+          "height" : 2,
+          "width" : 3
+        },
+        "0000016e-b690-4275-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 7,
+          "height" : 3,
+          "width" : 3
+        },
+        "0000016e-b690-427a-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 7,
+          "height" : 5,
+          "width" : 6
+        },
+        "0000016e-b690-4271-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 1,
+          "height" : 3,
+          "width" : 6
+        },
+        "0000016e-b690-4278-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 12,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4274-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 1,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-427d-0000-016eb690426f" : {
+          "col" : 1,
+          "row" : 3,
+          "height" : 2,
+          "width" : 4
+        },
+        "0000016e-b690-4272-0000-016eb690426f" : {
+          "col" : 7,
+          "row" : 4,
+          "height" : 3,
+          "width" : 6
+        }
+      },
+      "selected_fields" : null,
+      "static_message_list_id" : null,
+      "display_mode_settings" : {
+        "positions" : { }
+      }
+    }
+  },
+  "owner" : "admin",
+  "created_at" : "2019-03-06T12:58:33.610Z",
+  "requires" : { },
+  "properties" : [ ]
+} ]
