@@ -110,17 +110,20 @@ const createVisualizationConfig = (legacyInterpolation: LegacyInterpolation, vis
   }
 };
 
-const _initialRowOffset = (widgetPositions) => {
-  const lastWidgetPosition = maxBy(values(widgetPositions), (position: WidgetPosition): number => position.row);
-  return lastWidgetPosition ? (lastWidgetPosition.row + lastWidgetPosition.height) : 0;
+const _updateExistingWidgetPos = (existingPositions, rowOffset) => {
+  const updatedWidgetPos = { ...existingPositions };
+  Object.keys(updatedWidgetPos).forEach((widgetId) => {
+    const widgetPos = updatedWidgetPos[widgetId];
+    updatedWidgetPos[widgetId] = widgetPos.toBuilder().row(widgetPos.row + rowOffset).build();
+  });
+  return updatedWidgetPos;
 };
 
 const _migrateWidgets = (legacyCharts) => {
   return new Promise((resolve) => {
     const { defaultHeight } = widgetDefinition('AGGREGATION');
     const currentView = CurrentViewStateStore.getInitialState();
-    const newWidgetPositions = { ...currentView.state.widgetPositions };
-    const initialRowOffset = _initialRowOffset(newWidgetPositions);
+    const newWidgetPositions = {};
 
     const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
       const { field } = chart;
@@ -146,16 +149,17 @@ const _migrateWidgets = (legacyCharts) => {
         .config(widgetConfig)
         .build();
       // create widget position for new widget
-      const migratedWidgetsOffset = defaultHeight * index;
-      const widgetRowPos = initialRowOffset + migratedWidgetsOffset;
-      newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos || 1, defaultHeight, Infinity);
+      const widgetRowPos = (defaultHeight * index) + 1;
+      newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, defaultHeight, Infinity);
       return newWidget;
     });
 
+    const newWidgetsRowOffset = legacyCharts.length * defaultHeight;
+    const existingWidgetPos = _updateExistingWidgetPos(currentView.state.widgetPositions, newWidgetsRowOffset);
     const newViewState = currentView.state
       .toBuilder()
       .widgets(Immutable.List([...currentView.state.widgets, ...newWidgets]))
-      .widgetPositions(newWidgetPositions)
+      .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
       .build();
 
     return resolve({ newViewState, currentQueryId: currentView.activeQuery });

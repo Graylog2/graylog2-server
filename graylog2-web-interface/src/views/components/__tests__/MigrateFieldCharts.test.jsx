@@ -108,7 +108,7 @@ describe('MigrateFieldCharts', () => {
       Store.get.mockImplementation(mockStoreGet());
       const { queryByText } = renderAndMigrate();
       await wait(() => expect(queryByText('Migrate existing search page charts')).toBeNull());
-      expect(Store.set).toHaveBeenCalledWith('pinned-field-charts-migrated', true);
+      expect(Store.set).toHaveBeenCalledWith('pinned-field-charts-migrated', 'finished');
     });
 
     it('append new field chart widgets to existing widgets', async () => {
@@ -116,7 +116,7 @@ describe('MigrateFieldCharts', () => {
         const widget = getNewWidget(actionMock);
         return actionMock.mock.calls[0][1].widgetPositions[widget.id];
       };
-      const expWidgetPos = new WidgetPosition(1, 9, 4, Infinity);
+      const expWidgetPos = new WidgetPosition(1, 1, 4, Infinity);
       Store.get.mockImplementation(mockStoreGet());
       renderAndMigrate();
       const actionMock = asMock(ViewStatesActions.update);
