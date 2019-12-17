@@ -26,29 +26,29 @@ describe('WidgetOverrideElements', () => {
     await waitForElement(() => getByText('Hello world!'));
   });
   it('propagates thrown errors', async () => {
-    const throwElement = () => {
-      throw new Error('The dungeon collapses, you die!');
-    };
-    expect(() => render((
-      <WidgetOverrideElements widgetOverrideElements={[throwElement]}>
-        <span>Hello world!</span>
-      </WidgetOverrideElements>
-    ))).toThrowError('The dungeon collapses, you die!');
-  });
-  it('renders thrown component if element throws one', async () => {
     suppressConsole(async () => {
-      const Component = () => <span>I was thrown!</span>;
-      const OverridingElement = ({ override }) => {
-        useEffect(() => override(Component), []);
-        return null;
+      const throwElement = () => {
+        throw new Error('The dungeon collapses, you die!');
       };
-      const { getByText, queryByText } = render((
-        <WidgetOverrideElements widgetOverrideElements={[OverridingElement]}>
+      expect(() => render((
+        <WidgetOverrideElements widgetOverrideElements={[throwElement]}>
           <span>Hello world!</span>
         </WidgetOverrideElements>
-      ));
-      await waitForElement(() => getByText('I was thrown!'));
-      expect(queryByText('Hello world!')).toBeNull();
+      ))).toThrowError('The dungeon collapses, you die!');
     });
+  });
+  it('renders thrown component if element throws one', async () => {
+    const Component = () => <span>I was thrown!</span>;
+    const OverridingElement = ({ override }) => {
+      useEffect(() => override(Component), []);
+      return null;
+    };
+    const { getByText, queryByText } = render((
+      <WidgetOverrideElements widgetOverrideElements={[OverridingElement]}>
+        <span>Hello world!</span>
+      </WidgetOverrideElements>
+    ));
+    await waitForElement(() => getByText('I was thrown!'));
+    expect(queryByText('Hello world!')).toBeNull()
   });
 });
