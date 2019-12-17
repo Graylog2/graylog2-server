@@ -22,7 +22,7 @@ const GroupExpression = (props) => {
     const nextExpression = cloneDeep(expression);
     nextExpression.operator = nextOperator;
     nextExpression.child = replaceBooleanExpressionOperatorInGroup(nextOperator, nextExpression.child);
-    onChange('conditions', nextExpression);
+    onChange({ conditions: nextExpression });
   };
 
   return (

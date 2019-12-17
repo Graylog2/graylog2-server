@@ -16,7 +16,7 @@ const ComparisonExpression = (props) => {
   const handleExpressionOperatorChange = (nextOperator) => {
     const nextExpression = lodash.cloneDeep(expression);
     nextExpression.expr = nextOperator;
-    onChange('conditions', nextExpression);
+    onChange({ conditions: nextExpression });
   };
 
   return (

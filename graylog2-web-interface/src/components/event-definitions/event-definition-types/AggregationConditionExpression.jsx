@@ -68,7 +68,7 @@ class AggregationConditionExpression extends React.Component {
     const defaultOperator = this.getEffectiveGlobalGroupOperator();
     const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression });
-    onChange('conditions', nextExpression);
+    onChange({ conditions: nextExpression });
   };
 
   handleAddGroup = () => {
@@ -78,18 +78,17 @@ class AggregationConditionExpression extends React.Component {
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
     const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
-    onChange('conditions', nextExpression);
+    onChange({ conditions: nextExpression });
   };
 
   handleDeleteExpression = () => {
     const { onChange } = this.props;
-    onChange('conditions', null);
+    onChange({ conditions: null });
   };
 
   handleChildChange = (branch) => {
-    return (...args) => {
+    return (changes) => {
       const { expression, onChange } = this.props;
-      const changes = lodash.isObject(...args) ? args[0] : Object.fromEntries([args]);
 
       if (!Object.keys(changes).includes('conditions')) {
         onChange(changes);
@@ -125,7 +124,7 @@ class AggregationConditionExpression extends React.Component {
     const { expression, onChange } = this.props;
     this.setState({ globalGroupOperator: nextOperator });
     const nextExpression = replaceBooleanExpressionOperatorInGroup(nextOperator, expression);
-    onChange('conditions', nextExpression);
+    onChange({ conditions: nextExpression });
   };
 
   render() {

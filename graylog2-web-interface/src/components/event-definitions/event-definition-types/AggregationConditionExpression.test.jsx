@@ -125,10 +125,10 @@ describe('AggregationConditionExpression', () => {
   describe('managing conditions', () => {
     it('should generate right expression when adding conditions', () => {
       const expression = getComparisonExpression('<', 12);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('&&');
-        expect(update.left).toBe(expression);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('&&');
+        expect(conditions.left).toBe(expression);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -146,10 +146,10 @@ describe('AggregationConditionExpression', () => {
 
     it('should generate right expression when adding conditions with different operator', () => {
       const expression = getComparisonExpression('<', 12);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('||');
-        expect(update.left).toBe(expression);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('||');
+        expect(conditions.left).toBe(expression);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -170,9 +170,9 @@ describe('AggregationConditionExpression', () => {
     it('should generate right expression when deleting conditions', () => {
       const remainingExpression = getComparisonExpression('>', 42);
       const expression = getBooleanExpression('&&', getComparisonExpression('<', 12), remainingExpression);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update).toBe(remainingExpression);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions).toBe(remainingExpression);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -190,9 +190,9 @@ describe('AggregationConditionExpression', () => {
 
     it('should propagate null update when deleting last condition', () => {
       const expression = getComparisonExpression('<', 12);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update).toBe(null);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions).toBe(null);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -212,12 +212,12 @@ describe('AggregationConditionExpression', () => {
   describe('managing groups', () => {
     it('should generate right expression when adding groups', () => {
       const expression = getComparisonExpression('<', 12);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('&&');
-        expect(update.left).toBe(expression);
-        expect(update.right.expr).toBe('group');
-        expect(update.right.operator).toBe('||');
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('&&');
+        expect(conditions.left).toBe(expression);
+        expect(conditions.right.expr).toBe('group');
+        expect(conditions.right.operator).toBe('||');
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -237,9 +237,9 @@ describe('AggregationConditionExpression', () => {
     it('should generate right expression when deleting groups', () => {
       const leftExpression = getComparisonExpression();
       const expression = getBooleanExpression('&&', leftExpression, getGroupExpression('&&'));
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update).toBe(leftExpression);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions).toBe(leftExpression);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -261,13 +261,13 @@ describe('AggregationConditionExpression', () => {
       const booleanExpression = getBooleanExpression('||');
       const groupExpression = getGroupExpression('||', booleanExpression);
       const expression = getBooleanExpression('&&', leftExpression, groupExpression);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('&&');
-        expect(update.left).toStrictEqual(leftExpression);
-        expect(update.right.expr).toBe('group');
-        expect(update.right.operator).toBe('||');
-        const nextBooleanExpression = update.right.child;
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('&&');
+        expect(conditions.left).toStrictEqual(leftExpression);
+        expect(conditions.right.expr).toBe('group');
+        expect(conditions.right.operator).toBe('||');
+        const nextBooleanExpression = conditions.right.child;
         expect(nextBooleanExpression.expr).toBe('||');
         expect(nextBooleanExpression.left).toStrictEqual(booleanExpression.left);
         expect(nextBooleanExpression.right.expr).toBe('||');
@@ -293,10 +293,10 @@ describe('AggregationConditionExpression', () => {
       const leftExpression = getComparisonExpression('<', 12);
       const booleanExpression = getBooleanExpression('&&', leftExpression);
       const expression = getGroupExpression('&&', booleanExpression);
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('group');
-        expect(update.child).toBe(leftExpression);
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('group');
+        expect(conditions.child).toBe(leftExpression);
       });
       const wrapper = mount(
         <AggregationConditionExpression eventDefinition={defaultEventDefinition}
@@ -320,10 +320,10 @@ describe('AggregationConditionExpression', () => {
       const groupExpression = getGroupExpression('||', firstBooleanExpression);
       const expression = getBooleanExpression('&&', comparisonExpression, groupExpression);
 
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('&&');
-        const nextGroup = update.right;
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('&&');
+        const nextGroup = conditions.right;
         expect(nextGroup.expr).toBe('group');
         expect(nextGroup.operator).toBe('&&');
         const nextBoolean = nextGroup.child;
@@ -351,10 +351,10 @@ describe('AggregationConditionExpression', () => {
       const booleanExpression = getBooleanExpression('&&', comparisonExpression, groupExpression);
       const expression = getBooleanExpression('&&', comparisonExpression, booleanExpression);
 
-      const onChange = jest.fn((key, update) => {
-        expect(key).toBe('conditions');
-        expect(update.expr).toBe('||');
-        const nextBoolean = update.right;
+      const onChange = jest.fn(({ conditions }) => {
+        expect(conditions).toBeDefined();
+        expect(conditions.expr).toBe('||');
+        const nextBoolean = conditions.right;
         expect(nextBoolean.expr).toBe('||');
         const nextGroup = nextBoolean.right;
         expect(nextGroup.operator).toBe('||');

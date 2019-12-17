@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { isObject } from 'lodash';
 
 import { Row } from 'components/graylog';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -33,10 +32,8 @@ class AggregationConditionsForm extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  handleChange = (...args) => {
+  handleChange = (changes) => {
     const { eventDefinition, onChange } = this.props;
-
-    const changes = isObject(...args) ? args[0] : Object.fromEntries([args]);
 
     if (!Object.keys(changes).includes('conditions')) {
       onChange(changes);
