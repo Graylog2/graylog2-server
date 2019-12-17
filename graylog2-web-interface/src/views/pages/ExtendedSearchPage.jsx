@@ -159,13 +159,16 @@ const ExtendedSearchPage = ({ route, searchRefreshHooks }: Props) => {
                   <HeaderElements />
                   <IfDashboard>
                     <DashboardSearchBarWithStatus onExecute={refreshIfNotUndeclared} />
-                    <QueryBar />
                   </IfDashboard>
                   <IfSearch>
                     <SearchBarWithStatus onExecute={refreshIfNotUndeclared} />
                   </IfSearch>
 
                   <QueryBarElements />
+
+                  <IfDashboard>
+                    <QueryBar />
+                  </IfDashboard>
                 </IfInteractive>
 
                 <ViewAdditionalContextProvider>
