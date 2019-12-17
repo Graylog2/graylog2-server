@@ -69,6 +69,7 @@ public class UrlWhitelistService extends AbstractIdleService {
 
     public void saveWhitelist(UrlWhitelist whitelist) {
         clusterConfigService.write(whitelist);
+        cachedWhitelist = null;
     }
 
     public boolean isWhitelisted(String url) {
