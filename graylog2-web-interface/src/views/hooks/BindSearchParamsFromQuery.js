@@ -4,6 +4,7 @@ import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import { CurrentQueryStore } from 'views/stores/CurrentQueryStore';
 import { QueriesActions } from 'views/stores/QueriesStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import View from 'views/logic/views/View';
 
 const _getTimerange = (query = {}) => {
   let range;
@@ -48,7 +49,7 @@ const setQueryTimerange = (queryId, query) => {
 };
 
 const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
-  if (view.type !== 'SEARCH') {
+  if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }
   const { id: queryId } = CurrentQueryStore.getInitialState();
