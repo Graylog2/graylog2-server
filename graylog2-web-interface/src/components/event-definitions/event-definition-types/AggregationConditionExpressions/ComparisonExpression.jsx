@@ -63,6 +63,7 @@ ComparisonExpression.propTypes = {
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
+  renderLabel: PropTypes.bool.isRequired,
   validation: PropTypes.object.isRequired,
 };
 
