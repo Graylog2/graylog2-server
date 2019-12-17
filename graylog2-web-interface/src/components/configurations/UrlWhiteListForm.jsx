@@ -18,7 +18,7 @@ type Props = {
   disabled: boolean,
   update: (config: Config, valid: boolean) => void
 };
-const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
+const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Literal' }, { value: regex, label: 'Regex' }];
@@ -189,16 +189,16 @@ const UrlWhitelistForm = ({ urls, update, disabled }: Props) => {
   );
 };
 
-UrlWhitelistForm.propTypes = {
+UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
   update: PropTypes.func,
 };
 
-UrlWhitelistForm.defaultProps = {
+UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
   update: () => {},
 };
 
-export default UrlWhitelistForm;
+export default UrlWhiteListForm;
