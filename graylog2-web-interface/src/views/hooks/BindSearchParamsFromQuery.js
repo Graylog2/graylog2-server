@@ -31,6 +31,17 @@ const _getTimerange = (query = {}) => {
   }
 };
 
+const _getQueryIdFromView = (view: View) => {
+  if (!view.search || !view.search.queries) {
+    throw new Error('Unable to extract queries from search!');
+  }
+  const { queries } = view.search;
+  if (queries.size !== 1) {
+    throw new Error('Searches must only have a single query!');
+  }
+  return queries.map(({ id }) => id).first();
+};
+
 const _setQueryString = (queryId, query) => {
   const queryString = query.q;
   if (!queryString) {
@@ -39,7 +50,7 @@ const _setQueryString = (queryId, query) => {
   return QueriesActions.query(queryId, queryString);
 };
 
-const setQueryTimerange = (queryId, query) => {
+const _setQueryTimerange = (queryId, query) => {
   const timerange = _getTimerange(query);
   if (!timerange) {
     return Promise.resolve();
@@ -51,8 +62,8 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (view.type !== View.Type.Search) {
     return Promise.resolve(true);
   }
-  const { id: queryId } = CurrentQueryStore.getInitialState();
-  return _setQueryString(queryId, query).then(() => setQueryTimerange(queryId, query)).then(() => true);
+  const queryId = _getQueryIdFromView(view);
+  return _setQueryString(queryId, query).then(() => _setQueryTimerange(queryId, query)).then(() => true);
 };
 
 export default bindSearchParamsFromQuery;
