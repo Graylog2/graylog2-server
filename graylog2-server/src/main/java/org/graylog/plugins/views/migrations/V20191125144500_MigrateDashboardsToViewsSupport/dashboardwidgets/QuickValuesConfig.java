@@ -29,7 +29,6 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidgetPosition;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.WidgetPosition;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.AggregationConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.viewwidgets.Pivot;
@@ -122,9 +121,9 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
     }
 
     @Override
-    public Map<String, ViewWidgetPosition> toViewWidgetPositions(Set<ViewWidget> viewWidgets, Widget oldWidget, WidgetPosition widgetPosition) {
+    public Map<String, ViewWidgetPosition> toViewWidgetPositions(Set<ViewWidget> viewWidgets, WidgetPosition widgetPosition) {
         if (viewWidgets.size() == 1) {
-            return super.toViewWidgetPositions(viewWidgets, oldWidget, widgetPosition);
+            return super.toViewWidgetPositions(viewWidgets, widgetPosition);
         }
 
         final ViewWidget pieWidget = viewWidgets.stream()

@@ -20,7 +20,6 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidgetPosition;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.WidgetPosition;
 
 import java.util.Map;
@@ -34,7 +33,7 @@ public interface WidgetConfig {
         throw new RuntimeException("Missing strategy to transform dashboard widget to view widget in class " + this.getClass().getSimpleName());
     }
 
-    default Map<String, ViewWidgetPosition> toViewWidgetPositions(Set<ViewWidget> viewWidgets, Widget oldWidget, WidgetPosition widgetPosition) {
+    default Map<String, ViewWidgetPosition> toViewWidgetPositions(Set<ViewWidget> viewWidgets, WidgetPosition widgetPosition) {
         final ViewWidgetPosition newPosition = ViewWidgetPosition.builder()
                 .col(widgetPosition.col())
                 .row(widgetPosition.row())

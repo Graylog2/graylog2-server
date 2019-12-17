@@ -217,7 +217,7 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                             .filter(widget -> widget.id().equals(entry.getKey()))
                             .findFirst()
                             .orElseThrow(() -> new RuntimeException("Unable to find widget with id <" + entry.getKey()));
-                    return dashboardWidget.config().toViewWidgetPositions(newViewWidgets, dashboardWidget, widgetPosition)
+                    return dashboardWidget.config().toViewWidgetPositions(newViewWidgets, widgetPosition)
                             .entrySet()
                             .stream();
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
