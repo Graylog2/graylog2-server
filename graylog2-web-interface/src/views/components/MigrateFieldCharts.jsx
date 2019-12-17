@@ -1,7 +1,7 @@
 // @flow strict
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { maxBy, values, isEmpty } from 'lodash';
+import { values, isEmpty } from 'lodash';
 import Immutable from 'immutable';
 
 import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
