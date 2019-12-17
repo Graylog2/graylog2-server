@@ -1,19 +1,19 @@
+// @flow strict
 import { escape, addToQuery } from 'views/logic/queries/QueryHelper';
-import { QueriesActions } from 'views/stores/QueriesStore';
+import type { ActionHandler } from 'views/components/actions/ActionHandler';
 import QueryManipulationHandler from './QueryManipulationHandler';
-import type { ActionHandler } from '../../components/actions/ActionHandler';
 
 export default class ExcludeFromQueryHandler extends QueryManipulationHandler {
-  formatNewQuery = (oldQuery, field, value) => {
+  formatNewQuery = (oldQuery: string, field: string, value: any) => {
     const fieldPredicate = `NOT ${field}:${escape(value)}`;
 
     return addToQuery(oldQuery, fieldPredicate);
   };
 
   handle: ActionHandler = ({ queryId, field, value }) => {
-    const query = this.queries.get(queryId);
-    const oldQuery = query.query.query_string;
+    const oldQuery = this.currentQueryString(queryId);
     const newQuery = this.formatNewQuery(oldQuery, field, value);
-    QueriesActions.query(queryId, newQuery);
+
+    return this.updateQueryString(queryId, newQuery);
   };
 }
