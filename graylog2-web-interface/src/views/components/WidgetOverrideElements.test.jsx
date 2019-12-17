@@ -1,5 +1,5 @@
 // @flow strict
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { cleanup, render, waitForElement } from '@testing-library/react';
 
 import suppressConsole from 'helpers/suppressConsole';
@@ -38,15 +38,17 @@ describe('WidgetOverrideElements', () => {
   it('renders thrown component if element throws one', async () => {
     suppressConsole(async () => {
       const Component = () => <span>I was thrown!</span>;
-      const ThrowElement = () => {
-        throw Component;
+      const OverridingElement = ({ override }) => {
+        useEffect(() => override(Component), []);
+        return null;
       };
-      const { getByText } = render((
-        <WidgetOverrideElements widgetOverrideElements={[() => <ThrowElement />]}>
+      const { getByText, queryByText } = render((
+        <WidgetOverrideElements widgetOverrideElements={[OverridingElement]}>
           <span>Hello world!</span>
         </WidgetOverrideElements>
       ));
       await waitForElement(() => getByText('I was thrown!'));
+      expect(queryByText('Hello world!')).toBeNull()
     });
   });
 });

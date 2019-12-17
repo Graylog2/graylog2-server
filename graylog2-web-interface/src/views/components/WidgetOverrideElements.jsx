@@ -10,6 +10,10 @@ type Props = {
 
 export type OverrideComponentType = React.ComponentType<{ retry: () => mixed }> | Error;
 
+export type OverrideProps = {
+  override: (OverrideComponentType) => void,
+};
+
 type State = {
   thrownComponent: ?OverrideComponentType,
 };
@@ -18,11 +22,6 @@ class WidgetOverrideElements extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = { thrownComponent: undefined };
-  }
-
-  static getDerivedStateFromError(thrownComponent) {
-    // Update state so the next render will show the fallback UI.
-    return { thrownComponent };
   }
 
   render() {
@@ -35,10 +34,12 @@ class WidgetOverrideElements extends React.Component<Props, State> {
       return <OverrideComponent retry={retry} />;
     }
 
+    const override = thrownComponent => this.setState({ thrownComponent });
+
     const { children, widgetOverrideElements } = this.props;
     const widgetOverrideChecks = widgetOverrideElements
       // eslint-disable-next-line react/no-array-index-key
-      .map((Component, idx) => <Component key={idx} />);
+      .map((Component, idx) => <Component key={idx} override={override} />);
 
     return (
       <React.Fragment>
@@ -50,7 +51,7 @@ class WidgetOverrideElements extends React.Component<Props, State> {
 }
 
 const mapping = {
-  widgetOverrideElements: 'views.elements.widgetOverrides',
+  widgetOverrideElements: 'views.overrides.widgetEdit',
 };
 
 export default withPluginEntities<Props, typeof mapping>(WidgetOverrideElements, mapping);
