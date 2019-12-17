@@ -101,6 +101,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         </IfPermitted>
 
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
+                            bsSize="lg"
                             title="Update White List Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}

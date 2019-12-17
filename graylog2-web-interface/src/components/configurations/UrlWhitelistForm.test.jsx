@@ -66,5 +66,25 @@ describe('UrlWhitelistForm', () => {
       title.simulate('change');
       expect(onUpdate).toHaveBeenCalled();
     });
+
+    it('should add a new row to the form', () => {
+      wrapper = mount(<UrlWhitelistForm urls={config.entries}
+                                        disabled={config.disabled}
+                                        update={onUpdate} />);
+      const button = wrapper.find('button').at(0);
+      button.simulate('click');
+      const listItems = wrapper.find('tbody>tr');
+      expect(listItems.length).toBe(config.entries.length + 1);
+    });
+
+    it('should delete a row', () => {
+      wrapper = mount(<UrlWhitelistForm urls={config.entries}
+                                        disabled={config.disabled}
+                                        update={onUpdate} />);
+      const deleteButton = wrapper.find('i.fa-trash').at(0);
+      deleteButton.simulate('click');
+      const listItems = wrapper.find('tbody>tr');
+      expect(listItems.length).toBe(config.entries.length - 1);
+    });
   });
 });
