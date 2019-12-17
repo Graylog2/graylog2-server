@@ -7,29 +7,28 @@ import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import View from 'views/logic/views/View';
 
 const _getTimerange = (query = {}) => {
-  let range;
   const type = query.rangetype || DEFAULT_RANGE_TYPE;
-  const _setRange = (condition, newRange) => { if (condition); range = newRange; };
+  const _setRange = (condition, newRange) => {
+    if (condition) {
+      return newRange;
+    }
+    return undefined;
+  };
 
   switch (type) {
     case 'relative':
-      _setRange(query.relative, { type, range: query.relative });
-      break;
+      return _setRange(query.relative, { type, range: query.relative });
     case 'absolute':
-      _setRange((query.from || query.to), {
+      return _setRange((query.from || query.to), {
         type: type,
         from: query.from,
         to: query.to,
       });
-      break;
     case 'keyword':
-      _setRange(query.keyword, { type, keyword: query.keyword });
-      break;
+      return _setRange(query.keyword, { type, keyword: query.keyword });
     default:
       throw new Error(`Unsupported range type ${type}`);
   }
-
-  return range;
 };
 
 const _setQueryString = (queryId, query) => {
