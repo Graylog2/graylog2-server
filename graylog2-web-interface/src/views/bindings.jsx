@@ -75,7 +75,6 @@ import {
   viewsPath,
 } from 'views/Constants';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
-import AppConfig from 'util/AppConfig';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import type { ActionHandlerArguments, ActionHandlerCondition } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -109,33 +108,19 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
-const enableNewSearch = AppConfig.isFeatureEnabled('search_3_2');
+const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && !!Store.get('pinned-field-charts');
 
-const searchRoutes = enableNewSearch
-  ? [
+export default {
+  pages: {
+    search: { component: NewSearchPage },
+  },
+  routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: AppWithExtendedSearchBar },
     { path: showSearchPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath, component: ShowViewPage },
-  ]
-  : [];
-
-const searchPages = enableNewSearch
-  ? {
-    search: { component: NewSearchPage },
-  }
-  : {};
-
-const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && !!Store.get('pinned-field-charts');
-
-export default {
-  pages: {
-    ...searchPages,
-  },
-  routes: [
-    ...searchRoutes,
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
