@@ -7,7 +7,7 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { TimeRange } from 'views/logic/queries/Query';
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import { SearchExecutionStateStore, SearchExecutionStateActions } from './SearchExecutionStateStore';
 
 export type GlobalOverrideActionsType = RefluxActions<{
@@ -27,7 +27,10 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
   }),
 );
 
-export const GlobalOverrideStore = singletonStore(
+type GlobalOverrideStoreState = ?GlobalOverride;
+type GlobalOverrideStoreType = Store<GlobalOverrideStoreState>;
+
+export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
   'views.GlobalOverride',
   () => Reflux.createStore({
     listenables: [GlobalOverrideActions],

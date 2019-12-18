@@ -17,6 +17,7 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
+import type { Store } from '../../stores/StoreTypes';
 
 export type ViewStoreState = {
   activeQuery: QueryId,
@@ -54,12 +55,7 @@ export const ViewActions: ViewActionsType = singletonActions(
   }),
 );
 
-type ViewStoreUnsubscribe = () => void;
-
-type ViewStoreType = {
-  listen: ((ViewStoreState) => void) => ViewStoreUnsubscribe,
-  getInitialState: () => ViewStoreState,
-};
+type ViewStoreType = Store<ViewStoreState>;
 
 export const ViewStore: ViewStoreType = singletonStore(
   'views.View',
