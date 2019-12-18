@@ -4,6 +4,19 @@ import { Set } from 'immutable';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type { TimeUnit } from '../../../Constants';
+
+const mapTimeunit = (unit: TimeUnit) => {
+  switch (unit) {
+    case 'seconds': return 's';
+    case 'minutes': return 'm';
+    case 'hours': return 'h';
+    case 'days': return 'd';
+    case 'weeks': return 'w';
+    case 'months': return 'M';
+    default: throw new Error(`Invalid time unit: ${unit}`);
+  }
+};
 
 const formatPivot = (pivot: Pivot) => {
   const { type, field, config } = pivot;
@@ -15,7 +28,7 @@ const formatPivot = (pivot: Pivot) => {
       if (newConfig.interval.type === 'timeunit') {
         /* $FlowFixMe: newConfig.interval has unit and value since it is from type timeunit */
         const { unit, value } = newConfig.interval;
-        newConfig.interval = { type: 'timeunit', timeunit: `${value}${unit[0]}` };
+        newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
       }
       break;
     default:
