@@ -85,7 +85,7 @@ class BootstrapModalForm extends React.Component {
   };
 
   render() {
-    const { submitButtonDisabled, formProps, bsSize, onModalClose, cancelButtonText, show, submitButtonText, onModalOpen, title, children } = this.props;
+    const { backdrop, submitButtonDisabled, formProps, bsSize, onModalClose, cancelButtonText, show, submitButtonText, onModalOpen, title, children } = this.props;
     const body = (
       <div className="container-fluid">
         {children}
@@ -98,7 +98,7 @@ class BootstrapModalForm extends React.Component {
                              onClose={onModalClose}
                              bsSize={bsSize}
                              showModal={show}
-                             backdrop={this.props.backdrop}
+                             backdrop={backdrop}
                              onHide={this.onModalCancel}>
         <Modal.Header closeButton>
           <Modal.Title>{title}</Modal.Title>
