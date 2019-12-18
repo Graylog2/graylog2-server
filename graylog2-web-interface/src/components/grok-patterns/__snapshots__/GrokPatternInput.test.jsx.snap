@@ -1,242 +1,1383 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`] = `
-<div
-  className="row"
+<GrokPatternInput
+  className=""
+  onPatternChange={[Function]}
+  pattern=""
+  patterns={
+    Array [
+      Object {
+        "name": "COMMONMAC",
+        "pattern": "(?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})",
+      },
+      Object {
+        "name": "DATA",
+        "pattern": ".*?",
+      },
+      Object {
+        "name": "DATE",
+        "pattern": "%{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}",
+      },
+    ]
+  }
 >
-  <div
-    className="col-sm-8"
+  <Row
+    bsClass="row"
+    className=""
+    componentClass="div"
   >
     <div
-      className="form-group"
+      className="row"
     >
-      <label
-        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-        htmlFor="pattern-input"
+      <Col
+        bsClass="col"
+        componentClass="div"
+        sm={8}
       >
-        Pattern
-      </label>
-      <span>
-        <textarea
-          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-          id="pattern-input"
-          label="Pattern"
-          name="pattern-input"
-          onChange={[Function]}
-          placeholder=""
-          required={true}
-          rows={9}
-          type="textarea"
-          value=""
-        />
-        <span
-          className="HelpBlock-i8is92-0 huFHQV help-block"
+        <div
+          className="col-sm-8"
         >
-          The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
-        </span>
-      </span>
-    </div>
-  </div>
-  <div
-    className="col-sm-4"
-  >
-    <div
-      className="filterFormGroup"
-    >
-      <label
-        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-        htmlFor="pattern-selector"
-      >
-        Filter pattern
-      </label>
-      <span>
-        <input
-          autoComplete="off"
-          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-          id="pattern-selector"
-          label="Filter pattern"
-          name="pattern-selector"
-          onChange={[Function]}
-          onKeyDown={[Function]}
-          placeholder=""
-          type="text"
-          value=""
-        />
-        
-      </span>
-    </div>
-    <div
-      className="resultList"
-    >
-      <span
-        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-        id="list-item-0"
-        onKeyDown={[Function]}
-      >
-        <h4
-          className="list-group-item-heading"
-        >
-          COMMONMAC
-        </h4>
-        <p
-          className="list-group-item-text"
-        >
-          <span
-            className="patternDisplay"
+          <Input
+            addonAfter={null}
+            bsStyle={null}
+            buttonAfter={null}
+            help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
+            id="pattern-input"
+            label="Pattern"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            rows={9}
+            type="textarea"
+            value=""
           >
-            (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
-          </span>
-          <span
-            className="addButton"
-          >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
+            <FormGroup
+              bsClass="form-group"
+              controlId="pattern-input"
+              validationState={null}
             >
-              Add
-            </button>
-          </span>
-        </p>
-      </span>
-      <span
-        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-        id="list-item-1"
-        onKeyDown={[Function]}
+              <div
+                className="form-group"
+              >
+                <ControlLabel>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ControlLabel-sc-1edmum5-0",
+                          "isStatic": true,
+                          "lastClassName": "iZJNbd",
+                          "rules": Array [
+                            "color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          ],
+                        },
+                        "displayName": "ControlLabel",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                  >
+                    <ControlLabel
+                      bsClass="control-label"
+                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                      srOnly={false}
+                    >
+                      <label
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        htmlFor="pattern-input"
+                      >
+                        Pattern
+                      </label>
+                    </ControlLabel>
+                  </StyledComponent>
+                </ControlLabel>
+                <InputWrapper>
+                  <span>
+                    <FormControl
+                      componentClass="textarea"
+                      inputRef={[Function]}
+                      label="Pattern"
+                      name="pattern-input"
+                      onChange={[Function]}
+                      placeholder=""
+                      required={true}
+                      rows={9}
+                      type="textarea"
+                      value=""
+                    >
+                      <StyledComponent
+                        componentClass="textarea"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": true,
+                              "lastClassName": "hdNTyr",
+                              "rules": Array [
+                                "color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#FFF",
+                                ";border-color:",
+                                "#DCE1E5",
+                                ";&:focus{border-color:",
+                                "#6DC6E7",
+                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                "rgba(109,198,231,0.4)",
+                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                "#b8b8b8",
+                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                "#DCE1E5",
+                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        inputRef={[Function]}
+                        label="Pattern"
+                        name="pattern-input"
+                        onChange={[Function]}
+                        placeholder=""
+                        required={true}
+                        rows={9}
+                        type="textarea"
+                        value=""
+                      >
+                        <FormControl
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                          componentClass="textarea"
+                          inputRef={[Function]}
+                          label="Pattern"
+                          name="pattern-input"
+                          onChange={[Function]}
+                          placeholder=""
+                          required={true}
+                          rows={9}
+                          type="textarea"
+                          value=""
+                        >
+                          <textarea
+                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                            id="pattern-input"
+                            label="Pattern"
+                            name="pattern-input"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            rows={9}
+                            type="textarea"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
+                    </FormControl>
+                    <HelpBlock>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "HelpBlock-i8is92-0",
+                              "isStatic": true,
+                              "lastClassName": "huFHQV",
+                              "rules": Array [
+                                "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                "#9f9f9f",
+                                ";",
+                              ],
+                            },
+                            "displayName": "HelpBlock",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "HelpBlock-i8is92-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                      >
+                        <HelpBlock
+                          bsClass="help-block"
+                          className="HelpBlock-i8is92-0 huFHQV"
+                        >
+                          <span
+                            className="HelpBlock-i8is92-0 huFHQV help-block"
+                          >
+                            The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+                          </span>
+                        </HelpBlock>
+                      </StyledComponent>
+                    </HelpBlock>
+                  </span>
+                </InputWrapper>
+              </div>
+            </FormGroup>
+          </Input>
+        </div>
+      </Col>
+      <Col
+        bsClass="col"
+        componentClass="div"
+        sm={4}
       >
-        <h4
-          className="list-group-item-heading"
+        <div
+          className="col-sm-4"
         >
-          DATA
-        </h4>
-        <p
-          className="list-group-item-text"
-        >
-          <span
-            className="patternDisplay"
+          <Input
+            addonAfter={null}
+            autoComplete="off"
+            bsStyle={null}
+            buttonAfter={null}
+            formGroupClassName="filterFormGroup"
+            help=""
+            id="pattern-selector"
+            label="Filter pattern"
+            onChange={[Function]}
+            onKeyDown={[Function]}
+            placeholder=""
+            type="text"
+            value=""
           >
-            .*?
-          </span>
-          <span
-            className="addButton"
-          >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
+            <FormGroup
+              bsClass="filterFormGroup"
+              controlId="pattern-selector"
+              validationState={null}
             >
-              Add
-            </button>
-          </span>
-        </p>
-      </span>
-      <span
-        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
-        id="list-item-2"
-        onKeyDown={[Function]}
-      >
-        <h4
-          className="list-group-item-heading"
-        >
-          DATE
-        </h4>
-        <p
-          className="list-group-item-text"
-        >
-          <span
-            className="patternDisplay"
+              <div
+                className="filterFormGroup"
+              >
+                <ControlLabel>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ControlLabel-sc-1edmum5-0",
+                          "isStatic": true,
+                          "lastClassName": "iZJNbd",
+                          "rules": Array [
+                            "color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          ],
+                        },
+                        "displayName": "ControlLabel",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                  >
+                    <ControlLabel
+                      bsClass="control-label"
+                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                      srOnly={false}
+                    >
+                      <label
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        htmlFor="pattern-selector"
+                      >
+                        Filter pattern
+                      </label>
+                    </ControlLabel>
+                  </StyledComponent>
+                </ControlLabel>
+                <InputWrapper>
+                  <span>
+                    <FormControl
+                      autoComplete="off"
+                      componentClass="input"
+                      inputRef={[Function]}
+                      label="Filter pattern"
+                      name="pattern-selector"
+                      onChange={[Function]}
+                      onKeyDown={[Function]}
+                      placeholder=""
+                      type="text"
+                      value=""
+                    >
+                      <StyledComponent
+                        autoComplete="off"
+                        componentClass="input"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": true,
+                              "lastClassName": "hdNTyr",
+                              "rules": Array [
+                                "color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#FFF",
+                                ";border-color:",
+                                "#DCE1E5",
+                                ";&:focus{border-color:",
+                                "#6DC6E7",
+                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                "rgba(109,198,231,0.4)",
+                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                "#b8b8b8",
+                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                "#DCE1E5",
+                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        inputRef={[Function]}
+                        label="Filter pattern"
+                        name="pattern-selector"
+                        onChange={[Function]}
+                        onKeyDown={[Function]}
+                        placeholder=""
+                        type="text"
+                        value=""
+                      >
+                        <FormControl
+                          autoComplete="off"
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                          componentClass="input"
+                          inputRef={[Function]}
+                          label="Filter pattern"
+                          name="pattern-selector"
+                          onChange={[Function]}
+                          onKeyDown={[Function]}
+                          placeholder=""
+                          type="text"
+                          value=""
+                        >
+                          <input
+                            autoComplete="off"
+                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                            id="pattern-selector"
+                            label="Filter pattern"
+                            name="pattern-selector"
+                            onChange={[Function]}
+                            onKeyDown={[Function]}
+                            placeholder=""
+                            type="text"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
+                    </FormControl>
+                  </span>
+                </InputWrapper>
+              </div>
+            </FormGroup>
+          </Input>
+          <ListGroup
+            bsClass="resultList"
           >
-            %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
-          </span>
-          <span
-            className="addButton"
-          >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-xs btn-primary"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
+            <div
+              className="resultList"
             >
-              Add
-            </button>
-          </span>
-        </p>
-      </span>
+              <ForwardRef
+                header="COMMONMAC"
+                id="list-item-0"
+                key="COMMONMAC"
+                onKeyDown={[Function]}
+              >
+                <ListGroupItem
+                  header="COMMONMAC"
+                  id="list-item-0"
+                  onKeyDown={[Function]}
+                >
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ListGroupItem-sc-1ky0joo-0",
+                          "isStatic": false,
+                          "lastClassName": "igGIXt",
+                          "rules": Array [
+                            "&.list-group-item-action{color:",
+                            "#1F1F1F",
+                            ";&:hover,&:focus{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#F1F2F2",
+                            ";}&:active{color:",
+                            "#424344",
+                            ";background-color:",
+                            "#DCE1E5",
+                            ";}}&.list-group-item{background-color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#DCE1E5",
+                            ";&.disabled,&:disabled{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#FFF",
+                            ";}}",
+                            [Function],
+                          ],
+                        },
+                        "displayName": "ListGroupItem",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    header="COMMONMAC"
+                    id="list-item-0"
+                    onKeyDown={[Function]}
+                  >
+                    <ListGroupItem
+                      bsClass="list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      header="COMMONMAC"
+                      id="list-item-0"
+                      listItem={false}
+                      onKeyDown={[Function]}
+                    >
+                      <span
+                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        id="list-item-0"
+                        onKeyDown={[Function]}
+                      >
+                        <h4
+                          className="list-group-item-heading"
+                        >
+                          COMMONMAC
+                        </h4>
+                        <p
+                          className="list-group-item-text"
+                        >
+                          <span
+                            className="patternDisplay"
+                          >
+                            (?:(?:[A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2})
+                          </span>
+                          <span
+                            className="addButton"
+                          >
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="primary"
+                              onClick={[Function]}
+                            >
+                              <Button
+                                bsSize="xsmall"
+                                bsStyle="primary"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="primary"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "ghlLDE",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="primary"
+                                    className="Button-c9cbmb-0 ghlLDE"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Add
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button>
+                            </ForwardRef>
+                          </span>
+                        </p>
+                      </span>
+                    </ListGroupItem>
+                  </StyledComponent>
+                </ListGroupItem>
+              </ForwardRef>
+              <ForwardRef
+                header="DATA"
+                id="list-item-1"
+                key="DATA"
+                onKeyDown={[Function]}
+              >
+                <ListGroupItem
+                  header="DATA"
+                  id="list-item-1"
+                  onKeyDown={[Function]}
+                >
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ListGroupItem-sc-1ky0joo-0",
+                          "isStatic": false,
+                          "lastClassName": "igGIXt",
+                          "rules": Array [
+                            "&.list-group-item-action{color:",
+                            "#1F1F1F",
+                            ";&:hover,&:focus{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#F1F2F2",
+                            ";}&:active{color:",
+                            "#424344",
+                            ";background-color:",
+                            "#DCE1E5",
+                            ";}}&.list-group-item{background-color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#DCE1E5",
+                            ";&.disabled,&:disabled{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#FFF",
+                            ";}}",
+                            [Function],
+                          ],
+                        },
+                        "displayName": "ListGroupItem",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    header="DATA"
+                    id="list-item-1"
+                    onKeyDown={[Function]}
+                  >
+                    <ListGroupItem
+                      bsClass="list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      header="DATA"
+                      id="list-item-1"
+                      listItem={false}
+                      onKeyDown={[Function]}
+                    >
+                      <span
+                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        id="list-item-1"
+                        onKeyDown={[Function]}
+                      >
+                        <h4
+                          className="list-group-item-heading"
+                        >
+                          DATA
+                        </h4>
+                        <p
+                          className="list-group-item-text"
+                        >
+                          <span
+                            className="patternDisplay"
+                          >
+                            .*?
+                          </span>
+                          <span
+                            className="addButton"
+                          >
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="primary"
+                              onClick={[Function]}
+                            >
+                              <Button
+                                bsSize="xsmall"
+                                bsStyle="primary"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="primary"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "ghlLDE",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="primary"
+                                    className="Button-c9cbmb-0 ghlLDE"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Add
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button>
+                            </ForwardRef>
+                          </span>
+                        </p>
+                      </span>
+                    </ListGroupItem>
+                  </StyledComponent>
+                </ListGroupItem>
+              </ForwardRef>
+              <ForwardRef
+                header="DATE"
+                id="list-item-2"
+                key="DATE"
+                onKeyDown={[Function]}
+              >
+                <ListGroupItem
+                  header="DATE"
+                  id="list-item-2"
+                  onKeyDown={[Function]}
+                >
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "STYLES": Array [
+                          "success",
+                          "warning",
+                          "danger",
+                          "info",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ListGroupItem-sc-1ky0joo-0",
+                          "isStatic": false,
+                          "lastClassName": "igGIXt",
+                          "rules": Array [
+                            "&.list-group-item-action{color:",
+                            "#1F1F1F",
+                            ";&:hover,&:focus{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#F1F2F2",
+                            ";}&:active{color:",
+                            "#424344",
+                            ";background-color:",
+                            "#DCE1E5",
+                            ";}}&.list-group-item{background-color:",
+                            "#FFF",
+                            ";border-color:",
+                            "#DCE1E5",
+                            ";&.disabled,&:disabled{color:",
+                            "#1F1F1F",
+                            ";background-color:",
+                            "#FFF",
+                            ";}}",
+                            [Function],
+                          ],
+                        },
+                        "displayName": "ListGroupItem",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ListGroupItem-sc-1ky0joo-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                    header="DATE"
+                    id="list-item-2"
+                    onKeyDown={[Function]}
+                  >
+                    <ListGroupItem
+                      bsClass="list-group-item"
+                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      header="DATE"
+                      id="list-item-2"
+                      listItem={false}
+                      onKeyDown={[Function]}
+                    >
+                      <span
+                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        id="list-item-2"
+                        onKeyDown={[Function]}
+                      >
+                        <h4
+                          className="list-group-item-heading"
+                        >
+                          DATE
+                        </h4>
+                        <p
+                          className="list-group-item-text"
+                        >
+                          <span
+                            className="patternDisplay"
+                          >
+                            %{MONTHDAY}[./-]%{MONTHNUM}[./-]%{YEAR}
+                          </span>
+                          <span
+                            className="addButton"
+                          >
+                            <ForwardRef
+                              bsSize="xsmall"
+                              bsStyle="primary"
+                              onClick={[Function]}
+                            >
+                              <Button
+                                bsSize="xsmall"
+                                bsStyle="primary"
+                                onClick={[Function]}
+                              >
+                                <StyledComponent
+                                  bsSize="xsmall"
+                                  bsStyle="primary"
+                                  forwardedComponent={
+                                    Object {
+                                      "$$typeof": Symbol(react.forward_ref),
+                                      "SIZES": Array [
+                                        "large",
+                                        "small",
+                                        "xsmall",
+                                      ],
+                                      "STYLES": Array [
+                                        "success",
+                                        "warning",
+                                        "danger",
+                                        "info",
+                                        "default",
+                                        "primary",
+                                        "link",
+                                      ],
+                                      "attrs": Array [],
+                                      "componentStyle": ComponentStyle {
+                                        "componentId": "Button-c9cbmb-0",
+                                        "isStatic": false,
+                                        "lastClassName": "ghlLDE",
+                                        "rules": Array [
+                                          [Function],
+                                        ],
+                                      },
+                                      "displayName": "Button",
+                                      "foldedComponentIds": Array [],
+                                      "render": [Function],
+                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "target": [Function],
+                                      "toString": [Function],
+                                      "warnTooManyClasses": [Function],
+                                      "withComponent": [Function],
+                                    }
+                                  }
+                                  forwardedRef={null}
+                                  onClick={[Function]}
+                                >
+                                  <Button
+                                    active={false}
+                                    block={false}
+                                    bsClass="btn"
+                                    bsSize="xsmall"
+                                    bsStyle="primary"
+                                    className="Button-c9cbmb-0 ghlLDE"
+                                    disabled={false}
+                                    onClick={[Function]}
+                                  >
+                                    <button
+                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                      disabled={false}
+                                      onClick={[Function]}
+                                      type="button"
+                                    >
+                                      Add
+                                    </button>
+                                  </Button>
+                                </StyledComponent>
+                              </Button>
+                            </ForwardRef>
+                          </span>
+                        </p>
+                      </span>
+                    </ListGroupItem>
+                  </StyledComponent>
+                </ListGroupItem>
+              </ForwardRef>
+            </div>
+          </ListGroup>
+        </div>
+      </Col>
     </div>
-  </div>
-</div>
+  </Row>
+</GrokPatternInput>
 `;
 
 exports[`<GrokPatternInput /> should render grok pattern input without patterns 1`] = `
-<div
-  className="row"
+<GrokPatternInput
+  className=""
+  onPatternChange={[Function]}
+  pattern=""
+  patterns={Array []}
 >
-  <div
-    className="col-sm-8"
+  <Row
+    bsClass="row"
+    className=""
+    componentClass="div"
   >
     <div
-      className="form-group"
+      className="row"
     >
-      <label
-        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-        htmlFor="pattern-input"
+      <Col
+        bsClass="col"
+        componentClass="div"
+        sm={8}
       >
-        Pattern
-      </label>
-      <span>
-        <textarea
-          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-          id="pattern-input"
-          label="Pattern"
-          name="pattern-input"
-          onChange={[Function]}
-          placeholder=""
-          required={true}
-          rows={9}
-          type="textarea"
-          value=""
-        />
-        <span
-          className="HelpBlock-i8is92-0 huFHQV help-block"
+        <div
+          className="col-sm-8"
         >
-          The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
-        </span>
-      </span>
-    </div>
-  </div>
-  <div
-    className="col-sm-4"
-  >
-    <div
-      className="filterFormGroup"
-    >
-      <label
-        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-        htmlFor="pattern-selector"
+          <Input
+            addonAfter={null}
+            bsStyle={null}
+            buttonAfter={null}
+            help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
+            id="pattern-input"
+            label="Pattern"
+            onChange={[Function]}
+            placeholder=""
+            required={true}
+            rows={9}
+            type="textarea"
+            value=""
+          >
+            <FormGroup
+              bsClass="form-group"
+              controlId="pattern-input"
+              validationState={null}
+            >
+              <div
+                className="form-group"
+              >
+                <ControlLabel>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ControlLabel-sc-1edmum5-0",
+                          "isStatic": true,
+                          "lastClassName": "iZJNbd",
+                          "rules": Array [
+                            "color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          ],
+                        },
+                        "displayName": "ControlLabel",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                  >
+                    <ControlLabel
+                      bsClass="control-label"
+                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                      srOnly={false}
+                    >
+                      <label
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        htmlFor="pattern-input"
+                      >
+                        Pattern
+                      </label>
+                    </ControlLabel>
+                  </StyledComponent>
+                </ControlLabel>
+                <InputWrapper>
+                  <span>
+                    <FormControl
+                      componentClass="textarea"
+                      inputRef={[Function]}
+                      label="Pattern"
+                      name="pattern-input"
+                      onChange={[Function]}
+                      placeholder=""
+                      required={true}
+                      rows={9}
+                      type="textarea"
+                      value=""
+                    >
+                      <StyledComponent
+                        componentClass="textarea"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": true,
+                              "lastClassName": "hdNTyr",
+                              "rules": Array [
+                                "color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#FFF",
+                                ";border-color:",
+                                "#DCE1E5",
+                                ";&:focus{border-color:",
+                                "#6DC6E7",
+                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                "rgba(109,198,231,0.4)",
+                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                "#b8b8b8",
+                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                "#DCE1E5",
+                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        inputRef={[Function]}
+                        label="Pattern"
+                        name="pattern-input"
+                        onChange={[Function]}
+                        placeholder=""
+                        required={true}
+                        rows={9}
+                        type="textarea"
+                        value=""
+                      >
+                        <FormControl
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                          componentClass="textarea"
+                          inputRef={[Function]}
+                          label="Pattern"
+                          name="pattern-input"
+                          onChange={[Function]}
+                          placeholder=""
+                          required={true}
+                          rows={9}
+                          type="textarea"
+                          value=""
+                        >
+                          <textarea
+                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                            id="pattern-input"
+                            label="Pattern"
+                            name="pattern-input"
+                            onChange={[Function]}
+                            placeholder=""
+                            required={true}
+                            rows={9}
+                            type="textarea"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
+                    </FormControl>
+                    <HelpBlock>
+                      <StyledComponent
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "HelpBlock-i8is92-0",
+                              "isStatic": true,
+                              "lastClassName": "huFHQV",
+                              "rules": Array [
+                                "display:block;margin-top:5px;margin-bottom:10px;color:",
+                                "#9f9f9f",
+                                ";",
+                              ],
+                            },
+                            "displayName": "HelpBlock",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "HelpBlock-i8is92-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                      >
+                        <HelpBlock
+                          bsClass="help-block"
+                          className="HelpBlock-i8is92-0 huFHQV"
+                        >
+                          <span
+                            className="HelpBlock-i8is92-0 huFHQV help-block"
+                          >
+                            The pattern which will match the log line e.g: '%{IP:client}' or '.*?'
+                          </span>
+                        </HelpBlock>
+                      </StyledComponent>
+                    </HelpBlock>
+                  </span>
+                </InputWrapper>
+              </div>
+            </FormGroup>
+          </Input>
+        </div>
+      </Col>
+      <Col
+        bsClass="col"
+        componentClass="div"
+        sm={4}
       >
-        Filter pattern
-      </label>
-      <span>
-        <input
-          autoComplete="off"
-          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-          id="pattern-selector"
-          label="Filter pattern"
-          name="pattern-selector"
-          onChange={[Function]}
-          onKeyDown={[Function]}
-          placeholder=""
-          type="text"
-          value=""
-        />
-        
-      </span>
+        <div
+          className="col-sm-4"
+        >
+          <Input
+            addonAfter={null}
+            autoComplete="off"
+            bsStyle={null}
+            buttonAfter={null}
+            formGroupClassName="filterFormGroup"
+            help=""
+            id="pattern-selector"
+            label="Filter pattern"
+            onChange={[Function]}
+            onKeyDown={[Function]}
+            placeholder=""
+            type="text"
+            value=""
+          >
+            <FormGroup
+              bsClass="filterFormGroup"
+              controlId="pattern-selector"
+              validationState={null}
+            >
+              <div
+                className="filterFormGroup"
+              >
+                <ControlLabel>
+                  <StyledComponent
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "ControlLabel-sc-1edmum5-0",
+                          "isStatic": true,
+                          "lastClassName": "iZJNbd",
+                          "rules": Array [
+                            "color:",
+                            "#1F1F1F",
+                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          ],
+                        },
+                        "displayName": "ControlLabel",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
+                      }
+                    }
+                    forwardedRef={null}
+                  >
+                    <ControlLabel
+                      bsClass="control-label"
+                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                      srOnly={false}
+                    >
+                      <label
+                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                        htmlFor="pattern-selector"
+                      >
+                        Filter pattern
+                      </label>
+                    </ControlLabel>
+                  </StyledComponent>
+                </ControlLabel>
+                <InputWrapper>
+                  <span>
+                    <FormControl
+                      autoComplete="off"
+                      componentClass="input"
+                      inputRef={[Function]}
+                      label="Filter pattern"
+                      name="pattern-selector"
+                      onChange={[Function]}
+                      onKeyDown={[Function]}
+                      placeholder=""
+                      type="text"
+                      value=""
+                    >
+                      <StyledComponent
+                        autoComplete="off"
+                        componentClass="input"
+                        forwardedComponent={
+                          Object {
+                            "$$typeof": Symbol(react.forward_ref),
+                            "Feedback": [Function],
+                            "SIZES": Array [
+                              "small",
+                              "large",
+                            ],
+                            "Static": [Function],
+                            "attrs": Array [],
+                            "componentStyle": ComponentStyle {
+                              "componentId": "FormControl-sc-1amoaox-0",
+                              "isStatic": true,
+                              "lastClassName": "hdNTyr",
+                              "rules": Array [
+                                "color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#FFF",
+                                ";border-color:",
+                                "#DCE1E5",
+                                ";&:focus{border-color:",
+                                "#6DC6E7",
+                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                "rgba(109,198,231,0.4)",
+                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                "#b8b8b8",
+                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                "#DCE1E5",
+                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                              ],
+                            },
+                            "displayName": "FormControl",
+                            "foldedComponentIds": Array [],
+                            "render": [Function],
+                            "styledComponentId": "FormControl-sc-1amoaox-0",
+                            "target": [Function],
+                            "toString": [Function],
+                            "warnTooManyClasses": [Function],
+                            "withComponent": [Function],
+                          }
+                        }
+                        forwardedRef={null}
+                        inputRef={[Function]}
+                        label="Filter pattern"
+                        name="pattern-selector"
+                        onChange={[Function]}
+                        onKeyDown={[Function]}
+                        placeholder=""
+                        type="text"
+                        value=""
+                      >
+                        <FormControl
+                          autoComplete="off"
+                          bsClass="form-control"
+                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                          componentClass="input"
+                          inputRef={[Function]}
+                          label="Filter pattern"
+                          name="pattern-selector"
+                          onChange={[Function]}
+                          onKeyDown={[Function]}
+                          placeholder=""
+                          type="text"
+                          value=""
+                        >
+                          <input
+                            autoComplete="off"
+                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                            id="pattern-selector"
+                            label="Filter pattern"
+                            name="pattern-selector"
+                            onChange={[Function]}
+                            onKeyDown={[Function]}
+                            placeholder=""
+                            type="text"
+                            value=""
+                          />
+                        </FormControl>
+                      </StyledComponent>
+                    </FormControl>
+                  </span>
+                </InputWrapper>
+              </div>
+            </FormGroup>
+          </Input>
+          <ListGroup
+            bsClass="resultList"
+          >
+            <ul
+              className="resultList"
+            />
+          </ListGroup>
+        </div>
+      </Col>
     </div>
-    <ul
-      className="resultList"
-    />
-  </div>
-</div>
+  </Row>
+</GrokPatternInput>
 `;

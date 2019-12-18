@@ -1,0 +1,11 @@
+{
+  "dashboards": [
+    {
+      "_id" : { "$oid": "5ddf8ed5b2d44b2e04472992" },
+      "creator_user_id" : "admin",
+      "description" : "This dashboard is empty and does not have any widgets.",
+      "created_at" : { "$date": "2019-11-28T09:09:41.688Z" },
+      "title" : "No Widgets at all"
+    }
+  ]
+}

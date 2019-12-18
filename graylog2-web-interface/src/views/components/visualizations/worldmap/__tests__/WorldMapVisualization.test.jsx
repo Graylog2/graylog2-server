@@ -1,7 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Viewport from 'views/logic/aggregationbuilder/visualizations/Viewport';

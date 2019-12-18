@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 import 'helpers/mocking/react-dom_mock';
@@ -13,39 +12,39 @@ jest.mock('react-portal', () => ({ Portal: mockComponent('MockPortal') }));
 describe('BookmarkForm', () => {
   describe('render the BookmarkForm', () => {
     it('should render create new', () => {
-      const wrapper = renderer.create(<BookmarkForm value="new Title"
-                                                    onChangeTitle={() => {}}
-                                                    saveAsSearch={() => {}}
-                                                    disableCreateNew={false}
-                                                    toggleModal={() => {}}
-                                                    isCreateNew
-                                                    target={() => {}}
-                                                    saveSearch={() => {}} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<BookmarkForm value="new Title"
+                                          onChangeTitle={() => {}}
+                                          saveAsSearch={() => {}}
+                                          disableCreateNew={false}
+                                          toggleModal={() => {}}
+                                          isCreateNew
+                                          target={() => {}}
+                                          saveSearch={() => {}} />);
+      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render save', () => {
-      const wrapper = renderer.create(<BookmarkForm value="new Title"
-                                                    onChangeTitle={() => {}}
-                                                    saveAsSearch={() => {}}
-                                                    disableCreateNew={false}
-                                                    toggleModal={() => {}}
-                                                    isCreateNew={false}
-                                                    target={() => {}}
-                                                    saveSearch={() => {}} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<BookmarkForm value="new Title"
+                                          onChangeTitle={() => {}}
+                                          saveAsSearch={() => {}}
+                                          disableCreateNew={false}
+                                          toggleModal={() => {}}
+                                          isCreateNew={false}
+                                          target={() => {}}
+                                          saveSearch={() => {}} />);
+      expect(wrapper).toMatchSnapshot();
     });
 
     it('should render disabled create new', () => {
-      const wrapper = renderer.create(<BookmarkForm value="new Title"
-                                                    onChangeTitle={() => {}}
-                                                    saveAsSearch={() => {}}
-                                                    disableCreateNew
-                                                    toggleModal={() => {}}
-                                                    isCreateNew={false}
-                                                    target={() => {}}
-                                                    saveSearch={() => {}} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<BookmarkForm value="new Title"
+                                          onChangeTitle={() => {}}
+                                          saveAsSearch={() => {}}
+                                          disableCreateNew
+                                          toggleModal={() => {}}
+                                          isCreateNew={false}
+                                          target={() => {}}
+                                          saveSearch={() => {}} />);
+      expect(wrapper).toMatchSnapshot();
     });
   });
 

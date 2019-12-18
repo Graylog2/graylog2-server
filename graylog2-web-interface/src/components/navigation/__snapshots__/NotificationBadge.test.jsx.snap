@@ -105,7 +105,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Badge-sc-4gzqz0-0",
                                   "isStatic": false,
-                                  "lastClassName": "iRhcGJ",
+                                  "lastClassName": "gNbYGy",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -126,12 +126,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="Badge-sc-4gzqz0-0 iRhcGJ"
+                              className="Badge-sc-4gzqz0-0 gNbYGy"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="Badge-sc-4gzqz0-0 iRhcGJ badge badge-danger"
+                                className="Badge-sc-4gzqz0-0 gNbYGy badge badge-danger"
                                 id="notification-badge"
                               >
                                 42

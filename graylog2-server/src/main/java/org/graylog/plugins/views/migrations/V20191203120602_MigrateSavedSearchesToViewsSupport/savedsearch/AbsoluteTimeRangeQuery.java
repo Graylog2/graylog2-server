@@ -24,6 +24,9 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class AbsoluteTimeRangeQuery implements Query {
@@ -47,8 +50,9 @@ public abstract class AbsoluteTimeRangeQuery implements Query {
             @JsonProperty("fields") String fields,
             @JsonProperty("query") String query,
             @JsonProperty("from") DateTime from,
-            @JsonProperty("to") DateTime to
+            @JsonProperty("to") DateTime to,
+            @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_AbsoluteTimeRangeQuery(rangeType, fields, query, from, to);
+        return new AutoValue_AbsoluteTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, from, to);
     }
 }

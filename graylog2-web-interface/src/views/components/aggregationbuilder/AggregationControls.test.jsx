@@ -1,8 +1,8 @@
 // @flow strict
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'enzyme';
-import { render } from '@testing-library/react';
+import { mount } from 'wrappedEnzyme';
+import { render } from 'wrappedTestingLibrary';
 import '@testing-library/jest-dom/extend-expect';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 

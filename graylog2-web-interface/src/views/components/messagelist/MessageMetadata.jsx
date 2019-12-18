@@ -1,11 +1,12 @@
 // @flow strict
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 type Props = {
   timestamp: string,
   receivedBy: React.Node,
   index: string,
-  streams: Array<React.Node>,
+  streams: Immutable.Set<React.Node>,
 };
 
 const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
@@ -16,7 +17,7 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams }: Props) => (
     <dt>Stored in index</dt>
     <dd>{index || 'Message is not stored'}</dd>
 
-    {streams.length > 0 && (
+    {streams.size > 0 && (
       <React.Fragment>
         <dt>Routed into streams</dt>
         <dd className="stream-list">

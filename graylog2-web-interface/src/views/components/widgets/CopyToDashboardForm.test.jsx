@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup, fireEvent } from 'wrappedTestingLibrary';
 import { DashboardsActions } from 'views/stores/DashboardsStore';
 import mockAction from 'helpers/mocking/MockAction';
 

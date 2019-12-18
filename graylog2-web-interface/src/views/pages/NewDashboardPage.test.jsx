@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { render, cleanup, waitForElement } from '@testing-library/react';
+import { render, cleanup, waitForElement } from 'wrappedTestingLibrary';
 
 import mockAction from 'helpers/mocking/MockAction';
 import { ViewActions } from 'views/stores/ViewStore';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render } from 'wrappedTestingLibrary';
 
 import { ScratchpadProvider } from 'providers/ScratchpadProvider';
 import Scratchpad from './Scratchpad';

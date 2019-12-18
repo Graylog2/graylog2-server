@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 import URLUtils from 'util/URLUtils';
 
@@ -28,8 +27,8 @@ describe('<ContentPackVersions />', () => {
   const contentPackRevision = new ContentPackRevisions(contentPack);
 
   it('should render with content pack versions', () => {
-    const wrapper = renderer.create(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackVersions contentPackRevisions={contentPackRevision} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should fire on change when clicked on a version', () => {

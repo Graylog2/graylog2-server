@@ -1,43 +1,256 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`SeriesConfiguration renders the configuration dialog 1`] = `
-<span>
-  <div
-    className="form-group"
-  >
-    <label
-      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-    >
-      Name
-    </label>
-    <input
-      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-      onChange={[Function]}
-      type="text"
-      value="count()"
-    />
-    <span
-      className="HelpBlock-i8is92-0 huFHQV help-block"
-    >
-      The name of the series as it appears in the chart.
-    </span>
-  </div>
-  <div
-    className="pull-right"
-    style={
-      Object {
-        "marginBottom": "10px",
-      }
+<SeriesConfiguration
+  onClose={[Function]}
+  series={
+    Object {
+      "config": Object {
+        "name": undefined,
+      },
+      "function": "count()",
     }
-  >
-    <button
-      className="Button-c9cbmb-0 GLfOY btn btn-success"
-      disabled={false}
-      onClick={[Function]}
-      type="button"
+  }
+>
+  <span>
+    <FormGroup
+      bsClass="form-group"
     >
-      Done
-    </button>
-  </div>
-</span>
+      <div
+        className="form-group"
+      >
+        <ControlLabel>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "ControlLabel-sc-1edmum5-0",
+                  "isStatic": true,
+                  "lastClassName": "iZJNbd",
+                  "rules": Array [
+                    "color:",
+                    "#1F1F1F",
+                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                  ],
+                },
+                "displayName": "ControlLabel",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+          >
+            <ControlLabel
+              bsClass="control-label"
+              className="ControlLabel-sc-1edmum5-0 iZJNbd"
+              srOnly={false}
+            >
+              <label
+                className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+              >
+                Name
+              </label>
+            </ControlLabel>
+          </StyledComponent>
+        </ControlLabel>
+        <FormControl
+          onChange={[Function]}
+          type="text"
+          value="count()"
+        >
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "Feedback": [Function],
+                "SIZES": Array [
+                  "small",
+                  "large",
+                ],
+                "Static": [Function],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "FormControl-sc-1amoaox-0",
+                  "isStatic": true,
+                  "lastClassName": "hdNTyr",
+                  "rules": Array [
+                    "color:",
+                    "#1F1F1F",
+                    ";background-color:",
+                    "#FFF",
+                    ";border-color:",
+                    "#DCE1E5",
+                    ";&:focus{border-color:",
+                    "#6DC6E7",
+                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                    "rgba(109,198,231,0.4)",
+                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                    "#b8b8b8",
+                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                    "#DCE1E5",
+                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                  ],
+                },
+                "displayName": "FormControl",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "FormControl-sc-1amoaox-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onChange={[Function]}
+            type="text"
+            value="count()"
+          >
+            <FormControl
+              bsClass="form-control"
+              className="FormControl-sc-1amoaox-0 hdNTyr"
+              componentClass="input"
+              onChange={[Function]}
+              type="text"
+              value="count()"
+            >
+              <input
+                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                onChange={[Function]}
+                type="text"
+                value="count()"
+              />
+            </FormControl>
+          </StyledComponent>
+        </FormControl>
+        <HelpBlock>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "HelpBlock-i8is92-0",
+                  "isStatic": true,
+                  "lastClassName": "huFHQV",
+                  "rules": Array [
+                    "display:block;margin-top:5px;margin-bottom:10px;color:",
+                    "#9f9f9f",
+                    ";",
+                  ],
+                },
+                "displayName": "HelpBlock",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "HelpBlock-i8is92-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+          >
+            <HelpBlock
+              bsClass="help-block"
+              className="HelpBlock-i8is92-0 huFHQV"
+            >
+              <span
+                className="HelpBlock-i8is92-0 huFHQV help-block"
+              >
+                The name of the series as it appears in the chart.
+              </span>
+            </HelpBlock>
+          </StyledComponent>
+        </HelpBlock>
+      </div>
+    </FormGroup>
+    <div
+      className="pull-right"
+      style={
+        Object {
+          "marginBottom": "10px",
+        }
+      }
+    >
+      <ForwardRef
+        bsStyle="success"
+        onClick={[Function]}
+      >
+        <Button
+          bsStyle="success"
+          onClick={[Function]}
+        >
+          <StyledComponent
+            bsStyle="success"
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "SIZES": Array [
+                  "large",
+                  "small",
+                  "xsmall",
+                ],
+                "STYLES": Array [
+                  "success",
+                  "warning",
+                  "danger",
+                  "info",
+                  "default",
+                  "primary",
+                  "link",
+                ],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Button-c9cbmb-0",
+                  "isStatic": false,
+                  "lastClassName": "jKsGyd",
+                  "rules": Array [
+                    [Function],
+                  ],
+                },
+                "displayName": "Button",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Button-c9cbmb-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onClick={[Function]}
+          >
+            <Button
+              active={false}
+              block={false}
+              bsClass="btn"
+              bsStyle="success"
+              className="Button-c9cbmb-0 jKsGyd"
+              disabled={false}
+              onClick={[Function]}
+            >
+              <button
+                className="Button-c9cbmb-0 jKsGyd btn btn-success"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                Done
+              </button>
+            </Button>
+          </StyledComponent>
+        </Button>
+      </ForwardRef>
+    </div>
+  </span>
+</SeriesConfiguration>
 `;
