@@ -53,7 +53,7 @@
 
 :local(.decoratorListContainer) {
     display: inline-block;
-    overflow-y: auto;
+    overflow: visible;
     width: 100%;
 }
 
