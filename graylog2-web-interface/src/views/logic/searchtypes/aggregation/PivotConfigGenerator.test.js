@@ -51,4 +51,32 @@ describe('PivotConfigGenerator', () => {
       id: expect.any(String),
     });
   });
+  describe('maps time units for time pivots with timeunit intervals', () => {
+    const createWidgetConfigWithPivot = pivot => AggregationWidgetConfig.builder()
+      .rollup(true)
+      .rowPivots([pivot])
+      .columnPivots([])
+      .series([Series.forFunction('count')])
+      .build();
+    const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit }) => {
+      const config = createWidgetConfigWithPivot(Pivot.create(
+        'foo',
+        'time',
+        { interval: { type: 'timeunit', unit: timeUnit, value: 1 } },
+      ));
+      const result = PivotConfigGenerator({ config });
+      const [{ config: { row_groups: [pivot] } }] = result;
+      const { interval: { timeunit } } = pivot;
+      expect(timeunit).toEqual(expectedMappedTimeUnit);
+    };
+    it.each`
+    timeUnit      | expectedMappedTimeUnit
+    ${'seconds'}  | ${'1s'}
+    ${'minutes'}  | ${'1m'}
+    ${'hours'}    | ${'1h'}
+    ${'days'}     | ${'1d'}
+    ${'weeks'}    | ${'1w'}
+    ${'months'}   | ${'1M'}
+  `('maps time unit $timeUnit to short name $expectedMappedTimeUnit', generateConfigForPivotWithTimeUnit);
+  });
 });
