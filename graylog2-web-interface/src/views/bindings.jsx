@@ -48,7 +48,6 @@ import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTab
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
-import Store from 'logic/local-storage/Store';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';

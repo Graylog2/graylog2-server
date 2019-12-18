@@ -1,5 +1,5 @@
 // @flow strict
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { values, isEmpty } from 'lodash';
 import Immutable from 'immutable';
@@ -8,7 +8,6 @@ import { CurrentViewStateStore } from 'views/stores/CurrentViewStateStore';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 import SearchActions from 'views/actions/SearchActions';
 
-import View from 'views/logic/views/View';
 import Store from 'logic/local-storage/Store';
 import { widgetDefinition } from 'views/logic/Widgets';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
@@ -21,7 +20,6 @@ import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizatio
 import type { InterpolationMode } from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 
 import { Alert, Button, Row, Col } from 'components/graylog';
-import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import Spinner from 'components/common/Spinner';
 
 // localStorage keys
