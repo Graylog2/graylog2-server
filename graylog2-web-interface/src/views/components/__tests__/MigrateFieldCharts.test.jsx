@@ -3,6 +3,7 @@ import React from 'react';
 import { render, fireEvent, wait, cleanup } from '@testing-library/react';
 import { StoreMock as MockStore } from 'helpers/mocking';
 
+import View from 'views/logic/views/View';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -11,6 +12,7 @@ import asMock from 'helpers/mocking/AsMock';
 
 import Store from 'logic/local-storage/Store';
 import SearchActions from 'views/actions/SearchActions';
+import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 import { ViewStatesActions } from 'views/stores/ViewStatesStore';
 
 import MigrateFieldCharts from '../MigrateFieldCharts';
@@ -72,7 +74,11 @@ const getNewWidgetConfig = (actionMock) => {
 };
 
 const renderAndMigrate = () => {
-  const { queryByText, getByText } = render(<MigrateFieldCharts />);
+  const { queryByText, getByText } = render(
+    <ViewTypeContext.Provider value={View.Type.Search}>
+      <MigrateFieldCharts />
+    </ViewTypeContext.Provider>,
+  );
   const migrateButton = getByText('Migrate');
   fireEvent.click(migrateButton);
   return { queryByText };
@@ -86,14 +92,58 @@ describe('MigrateFieldCharts', () => {
 
   it('should be visible if migration never got executed', () => {
     Store.get.mockImplementation(mockStoreGet());
-    const { getByText } = render(<MigrateFieldCharts />);
+    const { getByText } = render(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <MigrateFieldCharts />
+      </ViewTypeContext.Provider>,
+    );
 
     expect(getByText('Migrate existing search page charts')).not.toBeNull();
   });
 
   it('should not be visible if migration already got executed', () => {
     Store.get.mockImplementation(mockStoreGet(undefined, true));
-    const { queryByText } = render(<MigrateFieldCharts />);
+    const { queryByText } = render(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <MigrateFieldCharts />
+      </ViewTypeContext.Provider>,
+    );
+    expect(queryByText('Migrate existing search page charts')).toBeNull();
+  });
+
+  it('should not be visible on dashboards', () => {
+    Store.get.mockImplementation(mockStoreGet());
+    const { queryByText } = render(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <MigrateFieldCharts />
+      </ViewTypeContext.Provider>,
+    );
+
+    expect(Store.get).not.toHaveBeenCalled();
+    expect(queryByText('Migrate existing search page charts')).toBeNull();
+  });
+
+  it('should be visible on the search page', () => {
+    Store.get.mockImplementation(mockStoreGet());
+    const { getByText } = render(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <MigrateFieldCharts />
+      </ViewTypeContext.Provider>,
+    );
+
+    expect(Store.get).toHaveBeenCalled();
+    expect(getByText('Migrate existing search page charts')).not.toBeNull();
+  });
+
+  it('should not be visible on dashboards', () => {
+    Store.get.mockImplementation(mockStoreGet());
+    const { queryByText } = render(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <MigrateFieldCharts />
+      </ViewTypeContext.Provider>,
+    );
+
+    expect(Store.get).not.toHaveBeenCalled();
     expect(queryByText('Migrate existing search page charts')).toBeNull();
   });
 
