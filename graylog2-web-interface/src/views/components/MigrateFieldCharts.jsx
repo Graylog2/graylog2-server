@@ -188,11 +188,6 @@ const _onCancel = (setMigrationFinished) => {
 };
 
 const MigrateFieldCharts = () => {
-  const viewType = useContext(ViewTypeContext);
-  if (viewType !== View.Type.Search) {
-    return null;
-  }
-
   const [migrating, setMigrating] = useState(false);
   const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));

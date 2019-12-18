@@ -22,6 +22,7 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
+import IfSearch from 'views/components/search/IfSearch';
 
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -107,8 +108,6 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
-
-const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && !!Store.get('pinned-field-charts');
 
 export default {
   pages: {
@@ -353,7 +352,7 @@ export default {
     requirementsProvided,
     bindSearchParamsFromQuery,
   ],
-  'views.elements.header': [() => hasLegacyFieldCharts() && (
-    <MigrateFieldCharts />
-  )],
+  'views.elements.header': [
+    () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+  ],
 };
