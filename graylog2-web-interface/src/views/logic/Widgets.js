@@ -11,6 +11,7 @@ import MessageWidget from './widgets/MessagesWidget';
 import MessageWidgetConfig from './widgets/MessagesWidgetConfig.js';
 import Series from './aggregationbuilder/Series';
 import FieldType from './fieldtypes/FieldType';
+import type { Decorator } from './widgets/MessagesWidgetConfig';
 
 const widgetsKey = 'enterpriseWidgets';
 
@@ -48,7 +49,7 @@ export const resultHistogram = (id: string = uuid()) => AggregationWidget.builde
   )
   .build();
 
-export const allMessagesTable = (id: string = uuid(), decorators) => MessageWidget.builder()
+export const allMessagesTable = (id: string = uuid(), decorators: Array<Decorator>) => MessageWidget.builder()
   .id(id)
   .config(MessageWidgetConfig.builder()
     .fields(DEFAULT_MESSAGE_FIELDS)

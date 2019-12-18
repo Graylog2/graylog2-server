@@ -2,7 +2,13 @@
 import * as Immutable from 'immutable';
 import WidgetConfig from './WidgetConfig';
 
-type Decorator = any;
+export type Decorator = {
+  id: string,
+  type: string,
+  config: any,
+  stream: ?string,
+  order: number,
+};
 
 type InternalState = {
   decorators: Array<Decorator>,

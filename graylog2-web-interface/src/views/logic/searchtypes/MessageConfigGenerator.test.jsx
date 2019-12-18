@@ -17,8 +17,8 @@ describe('MessageConfigGenerator', () => {
   });
   it('adds decorators to search type', () => {
     const decorators = [
-      { id: 'decorator1', type: 'something' },
-      { id: 'decorator2', type: 'something else' },
+      { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
+      { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
     ];
     const widget = MessagesWidget.builder().config(
       MessagesWidgetConfig.builder()
@@ -30,8 +30,8 @@ describe('MessageConfigGenerator', () => {
 
     expect(result).toEqual([{
       decorators: [
-        { id: 'decorator1', type: 'something' },
-        { id: 'decorator2', type: 'something else' },
+        { id: 'decorator1', type: 'something', config: {}, stream: null, order: 0 },
+        { id: 'decorator2', type: 'something else', config: {}, stream: null, order: 1 },
       ],
       type: 'messages',
     }]);
