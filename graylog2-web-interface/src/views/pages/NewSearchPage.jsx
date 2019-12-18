@@ -2,13 +2,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import UserNotification from 'util/UserNotification';
 import withPluginEntities from 'views/logic/withPluginEntities';
 import { Spinner } from 'components/common';
 import { ViewActions } from 'views/stores/ViewStore';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import View from 'views/logic/views/View';
-import ViewLoader from 'views/logic/views/ViewLoader';
+import ViewLoader, { processHooks } from 'views/logic/views/ViewLoader';
 import { SearchActions } from 'views/stores/SearchStore';
 
 import { ExtendedSearchPage } from 'views/pages';
@@ -44,7 +45,18 @@ class NewSearchPage extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    ViewActions.create(View.Type.Search).then(() => this.setState({ loaded: true }));
+    const { location, loadingViewHooks, executingViewHooks } = this.props;
+    const { query } = location;
+    processHooks(
+      ViewActions.create(View.Type.Search).then(({ view }) => view),
+      loadingViewHooks,
+      executingViewHooks,
+      query,
+    ).then(
+      () => this.setState({ loaded: true }),
+    ).catch(
+      error => UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'),
+    );
   }
 
   loadView = (viewId: string): Promise<?View> => {

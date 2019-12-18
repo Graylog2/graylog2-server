@@ -38,7 +38,7 @@ import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHa
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import AggregationControls from 'views/components/aggregationbuilder/AggregationControls';
 import EditMessageList from 'views/components/widgets/EditMessageList';
-import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage } from 'views/pages';
+import { DashboardsPage, ShowViewPage, NewSearchPage, ViewManagementPage, NewDashboardPage, StreamSearchPage } from 'views/pages';
 import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 
 import AddMessageCountActionHandler from 'views/logic/fieldactions/AddMessageCountActionHandler';
@@ -64,6 +64,7 @@ import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandle
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
 import OperatorCompletion from 'views/components/searchbar/completions/OperatorCompletion';
 import requirementsProvided from 'views/hooks/RequirementsProvided';
+import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import {
   dashboardsPath, dashboardsTvPath,
   extendedSearchPath,
@@ -73,8 +74,6 @@ import {
   showSearchPath,
   viewsPath,
 } from 'views/Constants';
-import NewDashboardPage from 'views/pages/NewDashboardPage';
-import StreamSearchPage from 'views/pages/StreamSearchPage';
 import ShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import AppConfig from 'util/AppConfig';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
@@ -367,6 +366,7 @@ export default {
   ],
   'views.hooks.loadingView': [
     requirementsProvided,
+    bindSearchParamsFromQuery,
   ],
   'views.elements.header': [() => hasLegacyFieldCharts() && (
     <MigrateFieldCharts />
