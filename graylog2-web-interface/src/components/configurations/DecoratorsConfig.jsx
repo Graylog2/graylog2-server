@@ -47,7 +47,7 @@ const DecoratorsConfig = () => {
 
   const decoratorsGroupedByStream = groupBy(decorators, decorator => (decorator.stream || DEFAULT_SEARCH_ID));
 
-  const currentDecorators = decoratorsGroupedByStream[currentStream];
+  const currentDecorators = decoratorsGroupedByStream[currentStream] || [];
   const sortedDecorators = currentDecorators
     .sort((d1, d2) => d1.order - d2.order);
   const readOnlyDecoratorItems = sortedDecorators.map(decorator => formatDecorator(decorator, currentDecorators, types));
