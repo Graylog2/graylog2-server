@@ -43,7 +43,8 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }: Pro
     },
   } = message;
 
-  const isDecoratedField = decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined;
+  const isDecoratedField = decorationStats
+    && (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
 
   const ValueContext = isDecoratedField
     ? ({ children }) => (
