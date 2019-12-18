@@ -135,18 +135,6 @@ describe('MigrateFieldCharts', () => {
     expect(getByText('Migrate existing search page charts')).not.toBeNull();
   });
 
-  it('should not be visible on dashboards', () => {
-    Store.get.mockImplementation(mockStoreGet());
-    const { queryByText } = render(
-      <ViewTypeContext.Provider value={View.Type.Dashboard}>
-        <MigrateFieldCharts />
-      </ViewTypeContext.Provider>,
-    );
-
-    expect(Store.get).not.toHaveBeenCalled();
-    expect(queryByText('Migrate existing search page charts')).toBeNull();
-  });
-
   describe('migration should', () => {
     it('execute search, when finished', async () => {
       Store.get.mockImplementation(mockStoreGet());
