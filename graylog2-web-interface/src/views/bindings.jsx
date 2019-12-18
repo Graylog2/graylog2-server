@@ -194,11 +194,12 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      isEnabled: (({ type }) => !type.isCompound(): ActionHandlerCondition),
+      isEnabled: (({ type }) => (!type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'statistics',
       title: 'Statistics',
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
       handler: FieldStatisticsHandler,
     },
     {
@@ -219,11 +220,13 @@ export default {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
     },
   ],
   valueActions: [
@@ -231,13 +234,13 @@ export default {
       type: 'exclude',
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
-      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
+      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
-      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
+      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
     },
     {
       type: 'new-query',
@@ -254,7 +257,7 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: (({ type }) => type.type === 'string': ActionHandlerCondition),
+      isEnabled: (({ type }) => (type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
       component: SelectExtractorType,
     },
     {
