@@ -24,12 +24,12 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
 @JsonAutoDetect
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public abstract class Query {
     @JsonProperty
     public abstract String id();
@@ -37,9 +37,8 @@ public abstract class Query {
     @JsonProperty
     public abstract TimeRange timerange();
 
-    @Nullable
     @JsonProperty
-    public Object filter() { return null; }
+    public abstract Optional<StreamFilter> filter();
 
     @Nonnull
     @JsonProperty
@@ -49,7 +48,29 @@ public abstract class Query {
     @JsonProperty("search_types")
     public abstract Set<SearchType> searchTypes();
 
-    public static Query create(String id, TimeRange timeRange, String query, Set<SearchType> searchTypes) {
-        return new AutoValue_Query(id, timeRange, ElasticsearchQueryString.create(query), searchTypes);
+    public static Builder builder() {
+        return new AutoValue_Query.Builder();
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder {
+        public abstract Builder id(String id);
+
+        public abstract Builder timerange(TimeRange timeRange);
+
+        abstract Builder query(ElasticsearchQueryString query);
+        public Builder query(String query) {
+            return this.query(ElasticsearchQueryString.create(query));
+        }
+
+        public abstract Builder searchTypes(Set<SearchType> searchTypes);
+
+        public abstract Builder filter(StreamFilter filter);
+
+        public Builder streamId(String streamId) {
+            return filter(StreamFilter.create(streamId));
+        }
+
+        public abstract Query build();
     }
 }

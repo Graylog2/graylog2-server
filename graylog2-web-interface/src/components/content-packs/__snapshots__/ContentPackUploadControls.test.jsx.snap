@@ -1,15 +1,220 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<ContentPackUploadControls /> should render 1`] = `
-<span>
-  <button
-    className="button Button-c9cbmb-0 GLfOY btn btn-success"
-    disabled={false}
-    id="upload-content-pack-button"
-    onClick={[Function]}
-    type="button"
-  >
-    Upload
-  </button>
-</span>
+<ContentPackUploadControls>
+  <span>
+    <ForwardRef
+      active={false}
+      bsStyle="success"
+      className="button"
+      id="upload-content-pack-button"
+      onClick={[Function]}
+    >
+      <Button
+        active={false}
+        bsStyle="success"
+        className="button"
+        id="upload-content-pack-button"
+        onClick={[Function]}
+      >
+        <StyledComponent
+          active={false}
+          bsStyle="success"
+          className="button"
+          forwardedComponent={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "SIZES": Array [
+                "large",
+                "small",
+                "xsmall",
+              ],
+              "STYLES": Array [
+                "success",
+                "warning",
+                "danger",
+                "info",
+                "default",
+                "primary",
+                "link",
+              ],
+              "attrs": Array [],
+              "componentStyle": ComponentStyle {
+                "componentId": "Button-c9cbmb-0",
+                "isStatic": false,
+                "lastClassName": "jKsGyd",
+                "rules": Array [
+                  [Function],
+                ],
+              },
+              "displayName": "Button",
+              "foldedComponentIds": Array [],
+              "render": [Function],
+              "styledComponentId": "Button-c9cbmb-0",
+              "target": [Function],
+              "toString": [Function],
+              "warnTooManyClasses": [Function],
+              "withComponent": [Function],
+            }
+          }
+          forwardedRef={null}
+          id="upload-content-pack-button"
+          onClick={[Function]}
+        >
+          <Button
+            active={false}
+            block={false}
+            bsClass="btn"
+            bsStyle="success"
+            className="button Button-c9cbmb-0 jKsGyd"
+            disabled={false}
+            id="upload-content-pack-button"
+            onClick={[Function]}
+          >
+            <button
+              className="button Button-c9cbmb-0 jKsGyd btn btn-success"
+              disabled={false}
+              id="upload-content-pack-button"
+              onClick={[Function]}
+              type="button"
+            >
+              Upload
+            </button>
+          </Button>
+        </StyledComponent>
+      </Button>
+    </ForwardRef>
+    <BootstrapModalForm
+      cancelButtonText="Cancel"
+      formProps={Object {}}
+      onCancel={[Function]}
+      onModalClose={[Function]}
+      onModalOpen={[Function]}
+      onSubmitForm={[Function]}
+      show={false}
+      submitButtonDisabled={false}
+      submitButtonText="Upload"
+      title="Upload Content Pack"
+    >
+      <BootstrapModalWrapper
+        backdrop="static"
+        onClose={[Function]}
+        onHide={[Function]}
+        onOpen={[Function]}
+        showModal={false}
+      >
+        <Modal
+          backdrop="static"
+          onHide={[Function]}
+          show={false}
+        >
+          <StyledComponent
+            backdrop="static"
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "BACKDROP_TRANSITION_DURATION": 150,
+                "Body": [Function],
+                "Dialog": [Function],
+                "Footer": [Function],
+                "Header": [Function],
+                "SIZES": Array [
+                  "large",
+                  "small",
+                ],
+                "TRANSITION_DURATION": 300,
+                "Title": [Function],
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "Modal-nuree8-0",
+                  "isStatic": true,
+                  "lastClassName": "cHlGak",
+                  "rules": Array [
+                    ".modal-content{background-color:",
+                    "#FFF",
+                    ";border-color:",
+                    "rgba(31,31,31,0.2)",
+                    ";.modal-header{border-bottom-color:",
+                    "#DCE1E5",
+                    ";}.modal-footer{border-top-color:",
+                    "#DCE1E5",
+                    ";}}",
+                  ],
+                },
+                "displayName": "Modal",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "Modal-nuree8-0",
+                "target": [Function],
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+            onHide={[Function]}
+            show={false}
+          >
+            <Modal
+              animation={true}
+              autoFocus={true}
+              backdrop="static"
+              bsClass="modal"
+              className="Modal-nuree8-0 cHlGak"
+              dialogComponentClass={[Function]}
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                ModalManager {
+                  "add": [Function],
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "isTopModal": [Function],
+                  "modals": Array [],
+                  "remove": [Function],
+                }
+              }
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              restoreFocus={true}
+              show={false}
+            >
+              <Modal
+                autoFocus={true}
+                backdrop="static"
+                backdropClassName="modal-backdrop"
+                backdropTransitionTimeout={150}
+                containerClassName="modal-open"
+                dialogTransitionTimeout={300}
+                enforceFocus={true}
+                keyboard={true}
+                manager={
+                  ModalManager {
+                    "add": [Function],
+                    "containers": Array [],
+                    "data": Array [],
+                    "handleContainerOverflow": true,
+                    "hideSiblingNodes": true,
+                    "isTopModal": [Function],
+                    "modals": Array [],
+                    "remove": [Function],
+                  }
+                }
+                onEntering={[Function]}
+                onExited={[Function]}
+                onHide={[Function]}
+                renderBackdrop={[Function]}
+                restoreFocus={true}
+                show={false}
+                transition={[Function]}
+              />
+            </Modal>
+          </StyledComponent>
+        </Modal>
+      </BootstrapModalWrapper>
+    </BootstrapModalForm>
+  </span>
+</ContentPackUploadControls>
 `;

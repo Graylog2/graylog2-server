@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import mockComponent from 'helpers/mocking/MockComponent';
 
 import asMock from 'helpers/mocking/AsMock';

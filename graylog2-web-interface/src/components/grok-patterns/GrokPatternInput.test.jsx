@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import GrokPatternInput from 'components/grok-patterns/GrokPatternInput';
@@ -13,13 +12,13 @@ describe('<GrokPatternInput />', () => {
   ];
 
   it('should render grok pattern input without patterns', () => {
-    const wrapper = renderer.create(<GrokPatternInput patterns={[]} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<GrokPatternInput patterns={[]} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render grok pattern input with patterns', () => {
-    const wrapper = renderer.create(<GrokPatternInput patterns={grokPatterns} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<GrokPatternInput patterns={grokPatterns} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should add a grok pattern when selected', () => {

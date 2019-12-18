@@ -1,6 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import Wizard from 'components/common/Wizard';
@@ -13,23 +12,23 @@ describe('<Wizard />', () => {
   ];
 
   it('should render with 3 steps', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with 3 steps and children', () => {
-    const wrapper = renderer.create(<Wizard steps={steps}><span>Preview</span></Wizard>);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps}><span>Preview</span></Wizard>);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} horizontal />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} horizontal />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render in horizontal mode with 3 steps and children', () => {
-    const wrapper = renderer.create(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+    expect(wrapper).toMatchSnapshot();
   });
 
   describe('When used in an uncontrolled way', () => {
@@ -112,6 +111,7 @@ describe('<Wizard />', () => {
     });
 
     it('should show a warning when activeStep is not a key in steps', () => {
+      /* eslint-disable no-console */
       const consoleWarn = console.warn;
       console.warn = jest.fn();
       const wrapper = mount(<Wizard steps={steps} activeStep={0} />);
@@ -125,6 +125,7 @@ describe('<Wizard />', () => {
       expect(wrapper.find('div[children="Component3"]').exists()).toBe(false);
       expect(console.warn.mock.calls.length).toBe(2);
       console.warn = consoleWarn;
+      /* eslint-enable no-console */
     });
   });
 

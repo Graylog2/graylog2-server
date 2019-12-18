@@ -1,5 +1,5 @@
 import React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import WidgetCreationModal from './WidgetCreationModal';
 
@@ -28,16 +28,16 @@ const CustomModalDynamicConfig = class extends React.Component {
 };
 
 const CustomModalBothConfigs = class extends React.Component {
-  static initialConfiguration = {
-    foo: '3',
-  };
-
   constructor(props) {
     super(props);
     props.setInitialConfiguration({
       foo: '4',
     });
   }
+
+  static initialConfiguration = {
+    foo: '3',
+  };
 
   render() {
     return null;

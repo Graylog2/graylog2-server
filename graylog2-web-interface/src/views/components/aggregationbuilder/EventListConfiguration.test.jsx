@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, cleanup } from '@testing-library/react';
+import { render, fireEvent, cleanup } from 'wrappedTestingLibrary';
 
 import EventListConfiguration from './EventListConfiguration';
 

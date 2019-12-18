@@ -1,6 +1,6 @@
 // @flow strict
 import * as React from 'react';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import EmptyAggregationContent from './EmptyAggregationContent';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';

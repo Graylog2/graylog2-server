@@ -1,17 +1,18 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
 import Entity from 'logic/content-packs/Entity';
 
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
+
 describe('<ContentPackSelection />', () => {
   it('should render with empty content pack', () => {
     const contentPack = new ContentPack.builder().build();
-    const wrapper = renderer.create(<ContentPackSelection contentPack={contentPack} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackSelection contentPack={contentPack} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with filled content pack', () => {
@@ -35,13 +36,13 @@ describe('<ContentPackSelection />', () => {
       spaceship: [entity],
     };
 
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ContentPackSelection contentPack={contentPack}
                             edit
                             entities={entities}
                             selectedEntities={{}} />,
     );
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should update the state when filling out the form', () => {

@@ -1,9 +1,11 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
 import ContentPack from 'logic/content-packs/ContentPack';
+
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackParameters />', () => {
   it('should render with empty parameters', () => {
@@ -11,8 +13,8 @@ describe('<ContentPackParameters />', () => {
       parameters: [],
       entities: [],
     };
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render a parameter', () => {
@@ -44,7 +46,7 @@ describe('<ContentPackParameters />', () => {
       )
       .entities([entity])
       .build();
-    const wrapper = renderer.create(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });

@@ -1,11 +1,12 @@
 import React from 'react';
-import { mount } from 'enzyme';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
 import Entity from 'logic/content-packs/Entity';
+
+jest.mock('uuid/v4', () => jest.fn(() => 'dead-beef'));
 
 describe('<ContentPackEntitiesList />', () => {
   const parameter = {
@@ -52,16 +53,16 @@ describe('<ContentPackEntitiesList />', () => {
 
   it('should render with empty entities', () => {
     const emptyContentPack = { entities: [] };
-    const wrapper = renderer.create(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with entities and parameters without readOnly', () => {
     const appliedParameter = { '111-beef': [{ configKey: 'title', paramName: 'A parameter name' }] };
 
-    const wrapper = renderer.create(<ContentPackEntitiesList contentPack={contentPack}
-                                                             appliedParameter={appliedParameter} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack}
+                                                   appliedParameter={appliedParameter} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should filter entities', () => {
