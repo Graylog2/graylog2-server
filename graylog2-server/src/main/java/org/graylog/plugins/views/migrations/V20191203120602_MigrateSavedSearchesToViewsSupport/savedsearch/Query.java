@@ -23,6 +23,7 @@ import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearches
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -36,6 +37,7 @@ public interface Query {
     String rangeType();
     String fields();
     String query();
+    Optional<String> streamId();
 
     TimeRange toTimeRange();
 

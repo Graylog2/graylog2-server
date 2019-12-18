@@ -130,20 +130,8 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
         assertThat(migrationCompleted.savedSearchIds())
                 .containsExactly(new AbstractMap.SimpleEntry<>("5c7e5499f38ed7e1d8d6a613", "5de0e98900002a0017000002"));
 
-        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
-        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
-
-        verify(viewService, times(1)).save(newViewsCaptor.capture());
-        verify(searchService, times(1)).save(newSearchesCaptor.capture());
-
-        final List<View> newViews = newViewsCaptor.getAllValues();
-        final List<Search> newSearches = newSearchesCaptor.getAllValues();
-
-        assertThat(newViews).hasSize(1);
-        assertThat(newSearches).hasSize(1);
-
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_relative-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_relative-expected_searches.json"), false);
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_relative-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_relative-expected_searches.json"));
     }
 
     @Test
@@ -155,20 +143,8 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
         assertThat(migrationCompleted.savedSearchIds())
                 .containsExactly(new AbstractMap.SimpleEntry<>("5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000002"));
 
-        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
-        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
-
-        verify(viewService, times(1)).save(newViewsCaptor.capture());
-        verify(searchService, times(1)).save(newSearchesCaptor.capture());
-
-        final List<View> newViews = newViewsCaptor.getAllValues();
-        final List<Search> newSearches = newSearchesCaptor.getAllValues();
-
-        assertThat(newViews).hasSize(1);
-        assertThat(newSearches).hasSize(1);
-
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_absolute-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_absolute-expected_searches.json"), false);
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_absolute-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_absolute-expected_searches.json"));
     }
 
     @Test
@@ -180,20 +156,42 @@ public class V20191203120602_MigrateSavedSearchesToViewsTest {
         assertThat(migrationCompleted.savedSearchIds())
                 .containsExactly(new AbstractMap.SimpleEntry<>("5de660c6b2d44b5813c1d806", "5de0e98900002a0017000002"));
 
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_keyword-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_keyword-expected_searches.json"));
+    }
+
+    @Test
+    @MongoDBFixtures("sample_saved_search_with_stream.json")
+    public void migrateSavedSearchWithStreamId() throws Exception {
+        this.migration.upgrade();
+
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.savedSearchIds())
+                .containsExactly(new AbstractMap.SimpleEntry<>("5de660b7b2d44b5813c1d7f6", "5de0e98900002a0017000002"));
+
+        assertViewServiceCreatedViews(1, resourceFile("sample_saved_search_with_stream-expected_views.json"));
+        assertSearchServiceCreated(1, resourceFile("sample_saved_search_with_stream-expected_searches.json"));
+    }
+
+    private void assertViewServiceCreatedViews(int count, String viewsCollection) throws Exception {
         final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
+        verify(viewService, times(count)).save(newViewsCaptor.capture());
+        final List<View> newViews = newViewsCaptor.getAllValues();
+        assertThat(newViews).hasSize(count);
+
+        JSONAssert.assertEquals(toJSON(newViews), viewsCollection, true);
+    }
+
+    private void assertSearchServiceCreated(int count, String searchCollection) throws Exception {
         final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
 
-        verify(viewService, times(1)).save(newViewsCaptor.capture());
-        verify(searchService, times(1)).save(newSearchesCaptor.capture());
+        verify(searchService, times(count)).save(newSearchesCaptor.capture());
 
-        final List<View> newViews = newViewsCaptor.getAllValues();
         final List<Search> newSearches = newSearchesCaptor.getAllValues();
 
-        assertThat(newViews).hasSize(1);
-        assertThat(newSearches).hasSize(1);
+        assertThat(newSearches).hasSize(count);
 
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_saved_search_keyword-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_saved_search_keyword-expected_searches.json"), false);
+        JSONAssert.assertEquals(toJSON(newSearches), searchCollection, true);
     }
 
     private MigrationCompleted captureMigrationCompleted() {

@@ -76,7 +76,7 @@ class GenericPlot extends React.Component<Props, State> {
     layout: {},
     onZoom: () => true,
     getChartColor: undefined,
-    setChartColor: () => ({}),
+    setChartColor: undefined,
   };
 
   state = {};

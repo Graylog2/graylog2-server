@@ -27,7 +27,7 @@ export default class QueryResult {
     const { duration, timestamp, effective_timerange } = queryResult.execution_stats;
     this._state = {
       query: queryResult.query,
-      errors: queryResult.error.map(error => new SearchError(error)),
+      errors: queryResult.errors.map(error => new SearchError(error)),
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,

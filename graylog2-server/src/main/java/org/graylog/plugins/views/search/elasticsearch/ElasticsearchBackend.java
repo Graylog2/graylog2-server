@@ -349,7 +349,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         final String mainQueryString = ((ElasticsearchQueryString) query.query()).queryString();
         final java.util.stream.Stream<String> queryStringStreams = java.util.stream.Stream.concat(
                 java.util.stream.Stream.of(mainQueryString),
-                query.searchTypes().stream().flatMap(searchType -> queryStringsFromFilter(searchType.filter()).stream())
+                query.searchTypes().stream().flatMap(this::queryStringsFromSearchType)
         );
 
         final QueryMetadata metadataForParameters = queryStringStreams
@@ -360,5 +360,15 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
 
         return metadataForParameters;
+    }
+
+    private java.util.stream.Stream<String> queryStringsFromSearchType(SearchType searchType) {
+        return java.util.stream.Stream.concat(
+                searchType.query().filter(query -> query instanceof ElasticsearchQueryString)
+                        .map(query -> ((ElasticsearchQueryString) query).queryString())
+                        .map(java.util.stream.Stream::of)
+                        .orElse(java.util.stream.Stream.empty()),
+                queryStringsFromFilter(searchType.filter()).stream()
+        );
     }
 }
