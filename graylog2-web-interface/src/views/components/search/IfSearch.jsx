@@ -8,9 +8,7 @@ type Props = {
 };
 const IfSearch = ({ children }: Props) => (
   <ViewTypeContext.Consumer>
-    {(viewType) => {
-      return ((viewType === View.Type.Search) ? children : null);
-    }}
+    {viewType => ((viewType === View.Type.Search) ? children : null)}
   </ViewTypeContext.Consumer>
 );
 
