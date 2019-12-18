@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Immutable from 'immutable';
 import DocsHelper from 'util/DocsHelper';
 
-import connect from 'stores/connect';
 import { Jumbotron } from 'components/graylog';
 import { CurrentViewStateActions } from 'views/stores/CurrentViewStateStore';
 import { Spinner } from 'components/common';
@@ -12,11 +11,9 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import IfSearch from 'views/components/search/IfSearch';
 import WidgetGrid from 'views/components/WidgetGrid';
-import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { PositionsMap, ImmutableWidgetsMap } from './widgets/WidgetPropTypes';
 import InteractiveContext from './contexts/InteractiveContext';
-import { QueriesStore } from '../stores/QueriesStore';
 
 const MAXIMUM_GRID_SIZE = 12;
 
@@ -99,22 +96,6 @@ const EmptyDashboardInfo = () => (
   </Jumbotron>
 );
 
-const _QueryContextProvider = ({ children, queryId, queries = Immutable.Map() }) => (
-  <AdditionalContext.Provider value={{ query: queries.get(queryId) }}>
-    {children}
-  </AdditionalContext.Provider>
-);
-
-_QueryContextProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  queryId: PropTypes.string.isRequired,
-  queries: PropTypes.object.isRequired,
-};
-
-const QueryContextProvider = connect(
-  _QueryContextProvider,
-  { queries: QueriesStore },
-);
 
 const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, queryId }) => {
   if (!widgets || widgets.isEmpty()) {
@@ -123,7 +104,7 @@ const Query = ({ allFields, fields, results, positions, widgetMapping, widgets, 
 
   if (results) {
     const content = _renderWidgetGrid(widgets, widgetMapping.toJS(), results, positions, queryId, fields, allFields);
-    return (<QueryContextProvider queryId={queryId}>{content}</QueryContextProvider>);
+    return (<span>{content}</span>);
   }
 
   return <Spinner />;
