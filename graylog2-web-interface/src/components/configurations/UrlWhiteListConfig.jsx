@@ -107,8 +107,6 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
-
-          <h3>Urls</h3>
           <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} />
         </BootstrapModalForm>
       </div>
