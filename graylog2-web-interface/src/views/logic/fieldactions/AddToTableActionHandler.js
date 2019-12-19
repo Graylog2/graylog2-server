@@ -1,8 +1,5 @@
 // @flow strict
 import { WidgetActions } from 'views/stores/WidgetStore';
-import MessagesWidget from '../widgets/MessagesWidget';
-import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import type { ActionContexts } from '../ActionContext';
 import type { FieldActionHandler } from './FieldActionHandler';
 
 const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
@@ -13,8 +10,8 @@ const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget
   return WidgetActions.updateConfig(widget.id, newConfig);
 };
 
-AddToTableActionHandler.isEnabled = ({ contexts: { widget }, field }) => {
-  if (widget instanceof MessagesWidget && widget.config instanceof MessagesWidgetConfig) {
+AddToTableActionHandler.isEnabled = ({ contexts: { widget }, field }): boolean => {
+  if (widget.constructor.name === 'MessagesWidget' && widget.config.constructor.name === 'MessagesWidgetConfig') {
     const fields = widget.config.fields || [];
     return !fields.includes(field);
   }
@@ -22,6 +19,8 @@ AddToTableActionHandler.isEnabled = ({ contexts: { widget }, field }) => {
 };
 
 /* Hide AddToTableHandler in the sidebar */
-AddToTableActionHandler.isHidden = (context: ActionContexts): boolean => !context.widget;
+AddToTableActionHandler.isHidden = ({ contexts: { widget } }): boolean => {
+  return !widget;
+};
 
 export default AddToTableActionHandler;
