@@ -150,8 +150,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
             <Input id={`url-input-type-${idx}`}
                    required
                    autoFocus>
-              <Select placeholder="Select Cache Type"
-                      clearable={false}
+              <Select clearable={false}
                       options={options}
                       matchProp="label"
                       onChange={option => _onUpdateType(idx, option)}
@@ -159,11 +158,9 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
             </Input>
           </td>
           <td>
-            <span className="">
-              <Button onClick={event => _onRemove(event, idx)}>
-                <Icon name="fa-trash" style={{ cursor: 'pointer' }} />
-              </Button>
-            </span>
+            <Button onClick={event => _onRemove(event, idx)}>
+              <Icon name="fa-trash" style={{ cursor: 'pointer' }} />
+            </Button>
           </td>
         </tr>
       );
@@ -189,7 +186,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           <tr>
             <th>#</th>
             <th>Title</th>
-            <th>Url</th>
+            <th>URL</th>
             <th>Type</th>
             <th>Actions</th>
           </tr>
