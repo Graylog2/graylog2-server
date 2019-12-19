@@ -44,14 +44,14 @@ describe('UrlWhitelistForm', () => {
     it('should create new instance', () => {
       wrapper = renderer.create(<UrlWhiteListForm urls={config.entries}
                                                   disabled={config.disabled}
-                                                  update={onUpdate} />);
+                                                  onUpdate={onUpdate} />);
       expect(wrapper.toJSON()).toMatchSnapshot();
     });
 
     it('should display Url form list table', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
-                                        update={onUpdate} />);
+                                        onUpdate={onUpdate} />);
       expect(wrapper.find('.form-group')).toBeDefined();
       const title = wrapper.find('input#title-input0').at(0);
       expect(title.instance().value).toBe(config.entries[0].title);
@@ -60,7 +60,7 @@ describe('UrlWhitelistForm', () => {
     it('should validate and update on input change', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
-                                        update={onUpdate} />);
+                                        onUpdate={onUpdate} />);
       const title = wrapper.find('input#title-input0').at(0);
       title.instance().value = 'world';
       title.simulate('change');
@@ -70,7 +70,7 @@ describe('UrlWhitelistForm', () => {
     it('should add a new row to the form', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
-                                        update={onUpdate} />);
+                                        onUpdate={onUpdate} />);
       const button = wrapper.find('button').at(0);
       button.simulate('click');
       const listItems = wrapper.find('tbody>tr');
@@ -80,7 +80,7 @@ describe('UrlWhitelistForm', () => {
     it('should delete a row', () => {
       wrapper = mount(<UrlWhiteListForm urls={config.entries}
                                         disabled={config.disabled}
-                                        update={onUpdate} />);
+                                        onUpdate={onUpdate} />);
       const deleteButton = wrapper.find('i.fa-trash').at(0);
       deleteButton.simulate('click');
       const listItems = wrapper.find('tbody>tr');

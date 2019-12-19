@@ -31,6 +31,14 @@ Array [
       </span>
     </span>
   </div>,
+  <button
+    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Add Url
+  </button>,
   <table
     className="top-margin Table-ztr4bi-0 ZHHeb table table-striped table-bordered"
   >
@@ -218,15 +226,21 @@ Array [
           <span
             className=""
           >
-            <i
-              className="fa fa-trash"
+            <button
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
+              disabled={false}
               onClick={[Function]}
-              style={
-                Object {
-                  "cursor": "pointer",
+              type="button"
+            >
+              <i
+                className="fa fa-trash"
+                style={
+                  Object {
+                    "cursor": "pointer",
+                  }
                 }
-              }
-            />
+              />
+            </button>
           </span>
         </td>
       </tr>
@@ -394,15 +408,21 @@ Array [
           <span
             className=""
           >
-            <i
-              className="fa fa-trash"
+            <button
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
+              disabled={false}
               onClick={[Function]}
-              style={
-                Object {
-                  "cursor": "pointer",
+              type="button"
+            >
+              <i
+                className="fa fa-trash"
+                style={
+                  Object {
+                    "cursor": "pointer",
+                  }
                 }
-              }
-            />
+              />
+            </button>
           </span>
         </td>
       </tr>
@@ -570,22 +590,28 @@ Array [
           <span
             className=""
           >
-            <i
-              className="fa fa-trash"
+            <button
+              className="Button-c9cbmb-0 GLfOY btn btn-default"
+              disabled={false}
               onClick={[Function]}
-              style={
-                Object {
-                  "cursor": "pointer",
+              type="button"
+            >
+              <i
+                className="fa fa-trash"
+                style={
+                  Object {
+                    "cursor": "pointer",
+                  }
                 }
-              }
-            />
+              />
+            </button>
           </span>
         </td>
       </tr>
     </tbody>
   </table>,
   <button
-    className="Button-c9cbmb-0 GLfOY btn btn-xs btn-default"
+    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
     disabled={false}
     onClick={[Function]}
     type="button"
