@@ -7,7 +7,7 @@ import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
 import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
-import type { Url, Config } from 'stores/configurations/ConfigurationsStore';
+import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import StoreProvider from 'injection/StoreProvider';
 
 const ToolsStore = StoreProvider.getStore('Tools');
@@ -16,7 +16,7 @@ const ToolsStore = StoreProvider.getStore('Tools');
 type Props = {
   urls: Array<Url>,
   disabled: boolean,
-  update: (config: Config, valid: boolean) => void
+  update: (config: WhiteListConfig, valid: boolean) => void
 };
 const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
   const literal = 'literal';
@@ -24,7 +24,7 @@ const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
   const options = [{ value: literal, label: 'Literal' }, { value: regex, label: 'Regex' }];
   // eslint-disable-next-line prefer-const
   let inputs = {};
-  const [state, setState] = useState<Config>({ entries: urls, disabled });
+  const [state, setState] = useState<WhiteListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
 
   const _onAdd = (event: Event) => {

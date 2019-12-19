@@ -6,7 +6,7 @@ import { Button, Table } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
-import type { Config } from 'stores/configurations/ConfigurationsStore';
+import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 
 
 type State = {
@@ -15,8 +15,8 @@ type State = {
 };
 
 type Props = {
-  config: Config,
-  updateConfig: (config: Config) => Promise<void>,
+  config: WhiteListConfig,
+  updateConfig: (config: WhiteListConfig) => Promise<void>,
 };
 class UrlWhiteListConfig extends React.Component<Props, State> {
   configModal: ?BootstrapModalForm;

@@ -16,7 +16,7 @@ export type Url = {
   type: string,
 };
 
-export type Config = {
+export type WhiteListConfig = {
   entries: Array<Url>,
   disabled: boolean
 };
