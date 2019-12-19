@@ -80,7 +80,7 @@ exports[`BookmarkList render the BookmarkList should render empty 1`] = `
               style="float: right;"
             >
               <div
-                class="form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
@@ -304,7 +304,7 @@ exports[`BookmarkList render the BookmarkList should render with views 1`] = `
               style="float: right;"
             >
               <div
-                class="form-group"
+                class="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
               >
                 <label
                   class="ControlLabel-sc-1edmum5-0 iZJNbd control-label"

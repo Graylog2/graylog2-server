@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import createReactClass from 'create-react-class';
 import {
   ControlLabel,
@@ -212,7 +213,7 @@ const TimeUnitInput = createReactClass({
           <InputGroup>
             {(!required && !hideCheckbox) && checkbox}
             <FormControl type="number" disabled={!this._isChecked()} onChange={this._onUpdate} value={lodash.defaultTo(this._getEffectiveValue(), '')} />
-            <DropdownButton componentClass={InputGroup.Button}
+            <DropdownButton componentClass={InputGroup.Button.type}
                             id="input-dropdown-addon"
                             pullRight={pullRight}
                             title={unitOptions.filter(o => o.value === unit)[0].label}

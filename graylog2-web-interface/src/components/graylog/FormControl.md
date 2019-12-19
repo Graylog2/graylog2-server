@@ -125,8 +125,7 @@ class FormExample extends React.Component {
             <DropdownButton
               componentClass={InputGroup.Button}
               id="input-dropdown-addon"
-              title="Action"
-            >
+              title="Action">
               <MenuItem key="1">Item</MenuItem>
             </DropdownButton>
           </InputGroup>
