@@ -277,8 +277,8 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         "5ddf8ed8b2d44b2e044729d8"
                 );
 
-        assertViewsWritten(1, resourceFile("ops_dashboards-expected_views.json"));
-        assertSearchesWritten(1, resourceFile("ops_dashboards-expected_searches.json"));
+        assertViewsWritten(5, resourceFile("ops_dashboards-expected_views.json"));
+        assertSearchesWritten(5, resourceFile("ops_dashboards-expected_searches.json"));
     }
 
     @Test
