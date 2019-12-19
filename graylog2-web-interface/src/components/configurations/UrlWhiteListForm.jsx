@@ -178,6 +178,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
              checked={config.disabled}
              onChange={() => setConfig({ ...config, disabled: !config.disabled })}
              help="Disable this white list." />
+      <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
       <Table striped bordered className="top-margin">
         <thead>
           <tr>
@@ -192,7 +193,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           {_getSummary()}
         </tbody>
       </Table>
-      <Button bsSize="xs" onClick={event => _onAdd(event)}>Add Url</Button>
+      <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
     </>
   );
 };
