@@ -36,6 +36,9 @@ const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
     event.preventDefault();
     // eslint-disable-next-line prefer-const
     let stateUpdate = ObjectUtils.clone(state);
+    const validationUpdate = ObjectUtils.clone(validationState);
+    validationUpdate.errors[idx] = null;
+    setValidationState(validationUpdate);
     stateUpdate.entries.splice(idx, 1);
 
     setState(stateUpdate);
