@@ -6,6 +6,7 @@ import { cloneDeep } from 'lodash';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import { Button, Modal } from 'components/graylog';
 import { IfPermitted } from 'components/common';
+import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import AddDecoratorButton from 'views/components/messagelist/decorators/AddDecoratorButton';
 import type { Decorator } from 'views/components/messagelist/decorators/Types';
@@ -13,7 +14,7 @@ import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSele
 import formatDecorator from './FormatDecorator';
 
 type Props = {
-  streams: Array<{ title: string, id: string }>,
+  streams: Array<Stream>,
   decorators: Array<Decorator>,
   types: { [string]: any },
   show?: boolean,

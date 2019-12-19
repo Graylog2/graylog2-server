@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import Select from 'components/common/Select';
+import type { Stream } from 'stores/streams/StreamsStore';
 import { defaultCompare } from 'views/logic/DefaultCompare';
 
 export const DEFAULT_STREAM_ID = '000000000000000000000001';
@@ -16,7 +17,7 @@ const SelectContainer: React.ComponentType<{}> = styled.div`
 type Props = {
   onChange: string => void,
   value: string,
-  streams: Array<{ id: string, title: string }>,
+  streams: Array<Stream>,
 };
 
 const StreamSelect = ({ onChange, value, streams }: Props) => {
