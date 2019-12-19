@@ -113,6 +113,11 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     const stateUpdate = ObjectUtils.clone(config);
     _validate('value', idx, type, stateUpdate.entries[idx].value);
   };
+
+  const _getErrorMessage = (type: string) => {
+    return type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL';
+  };
+
   const _getSummary = () => {
     return (config.entries.map((url, idx) => {
       return (
@@ -123,7 +128,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
             <Input type="text"
                    id={`title-input${idx}`}
                    ref={(elem) => { inputs[`title${idx}`] = elem; }}
-                   help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'required' : null}
+                   help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Title is required' : null}
                    name="title"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
                    onChange={event => _onInputChange(event, idx, url.type)}
@@ -134,7 +139,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
             <Input type="text"
                    id={`value-input${idx}`}
                    ref={(elem) => { inputs[`value${idx}`] = elem; }}
-                   help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'Not valid' : null}
+                   help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
                    name="value"
                    bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
                    onChange={event => _onInputChange(event, idx, url.type)}
@@ -177,7 +182,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
              label="Disabled"
              checked={config.disabled}
              onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-             help="Disable this white list." />
+             help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk." />
       <Button bsSize="sm" onClick={event => _onAdd(event)}>Add Url</Button>
       <Table striped bordered className="top-margin">
         <thead>
