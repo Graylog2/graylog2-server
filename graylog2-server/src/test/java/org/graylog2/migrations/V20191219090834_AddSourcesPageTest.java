@@ -70,7 +70,6 @@ public class V20191219090834_AddSourcesPageTest {
 
         migration.upgrade();
 
-        verifyZeroInteractions(configService);
         verifyZeroInteractions(contentPackService);
     }
 
