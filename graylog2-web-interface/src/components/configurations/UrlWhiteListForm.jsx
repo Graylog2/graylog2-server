@@ -16,9 +16,10 @@ const ToolsStore = StoreProvider.getStore('Tools');
 type Props = {
   urls: Array<Url>,
   disabled: boolean,
-  update: (config: WhiteListConfig, valid: boolean) => void
+  onUpdate: (config: WhiteListConfig, valid: boolean) => void
 };
-const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
+
+const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
   const options = [{ value: literal, label: 'Literal' }, { value: regex, label: 'Regex' }];
@@ -54,6 +55,7 @@ const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
     }
     return isValid;
   };
+
   const _isFormValid = (): boolean => {
     let isValid = true;
     if (validationState.errors.length > 0
@@ -63,18 +65,21 @@ const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
     }
     return isValid;
   };
+
   const _updateState = (idx: number, type: string, name: string, value: string) => {
     const stateUpdate = ObjectUtils.clone(state);
     stateUpdate.entries[idx][name] = value;
     stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
     setState(stateUpdate);
   };
+
   const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
     const validationUpdate = ObjectUtils.clone(validationState);
     validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
     setValidationState(validationUpdate);
     _updateState(idx, type, name, value);
   };
+
   const _validate = (name: string, idx: number, type: string, value: string): void => {
     switch (name) {
       case 'title': {
@@ -162,7 +167,7 @@ const UrlWhiteListForm = ({ urls, update, disabled }: Props) => {
 
   useEffect(() => {
     const valid = _isFormValid();
-    update(state, valid);
+    onUpdate(state, valid);
   }, [state]);
 
   return (
