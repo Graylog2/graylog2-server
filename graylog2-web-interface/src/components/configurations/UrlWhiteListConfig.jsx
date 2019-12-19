@@ -9,7 +9,7 @@ import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore'
 
 type State = {
   config: WhiteListConfig,
-  valid: boolean
+  isValid: boolean
 };
 
 type Props = {
@@ -27,7 +27,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     const { config } = this.props;
     this.state = {
       config,
-      valid: false,
+      isValid: false,
     };
   }
 
@@ -58,17 +58,17 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   }
 
   _saveConfig = () => {
-    const { config, valid } = this.state;
+    const { config, isValid } = this.state;
     const { updateConfig } = this.props;
-    if (valid) {
+    if (isValid) {
       updateConfig(config).then(() => {
         this._closeModal();
       });
     }
   }
 
-  _update = (config: WhiteListConfig, valid: boolean) => {
-    const updatedState = { config, valid };
+  _update = (config: WhiteListConfig, isValid: boolean) => {
+    const updatedState = { config, isValid };
     this.setState(updatedState);
   }
 
@@ -82,6 +82,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
 
   render() {
     const { config: { entries, disabled } } = this.props;
+    const { isValid } = this.state;
     return (
       <div>
         <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>
@@ -106,6 +107,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
                             title="Update White List Configuration"
                             onSubmitForm={this._saveConfig}
                             onModalClose={this._resetConfig}
+                            submitButtonDisabled={!isValid}
                             submitButtonText="Save">
           <UrlWhiteListForm urls={entries} disabled={disabled} onUpdate={this._update} />
         </BootstrapModalForm>
