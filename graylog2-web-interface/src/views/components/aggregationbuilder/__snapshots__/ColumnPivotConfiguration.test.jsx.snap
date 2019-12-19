@@ -21,7 +21,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
       placeholder=""
       type="checkbox"
     >
-      <FormGroup
+      <Component
         controlId="rollup"
         validationState={null}
       >
@@ -152,7 +152,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
             </FormGroup>
           </StyledComponent>
         </FormGroup__StyledFormGroup>
-      </FormGroup>
+      </Component>
     </Input>
     <div
       className="pull-right"

@@ -13,7 +13,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
   }
 >
   <span>
-    <FormGroup
+    <Component
       validationState={null}
     >
       <FormGroup__StyledFormGroup
@@ -213,7 +213,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
           </FormGroup>
         </StyledComponent>
       </FormGroup__StyledFormGroup>
-    </FormGroup>
+    </Component>
     <div
       className="pull-right"
       style={

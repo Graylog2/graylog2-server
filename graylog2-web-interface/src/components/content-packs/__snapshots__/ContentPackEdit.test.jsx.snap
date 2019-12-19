@@ -540,7 +540,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 type="text"
                                 value=""
                               >
-                                <FormGroup
+                                <Component
                                   controlId="name"
                                   validationState={null}
                                 >
@@ -775,7 +775,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -792,7 +792,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 type="text"
                                 value=""
                               >
-                                <FormGroup
+                                <Component
                                   controlId="summary"
                                   validationState={null}
                                 >
@@ -1027,7 +1027,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -1043,7 +1043,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 type="textarea"
                                 value=""
                               >
-                                <FormGroup
+                                <Component
                                   controlId="description"
                                   validationState={null}
                                 >
@@ -1274,7 +1274,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -1291,7 +1291,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 type="text"
                                 value=""
                               >
-                                <FormGroup
+                                <Component
                                   controlId="vendor"
                                   validationState={null}
                                 >
@@ -1526,7 +1526,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -1542,7 +1542,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                 type="text"
                                 value=""
                               >
-                                <FormGroup
+                                <Component
                                   controlId="url"
                                   validationState={null}
                                 >
@@ -1773,7 +1773,7 @@ exports[`<ContentPackEdit /> should render empty content pack for create 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                             </fieldset>
                           </form>
@@ -2987,7 +2987,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 type="text"
                                 value="Content Pack the movie"
                               >
-                                <FormGroup
+                                <Component
                                   controlId="name"
                                   validationState={null}
                                 >
@@ -3222,7 +3222,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -3239,7 +3239,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 type="text"
                                 value="A old content pack"
                               >
-                                <FormGroup
+                                <Component
                                   controlId="summary"
                                   validationState={null}
                                 >
@@ -3474,7 +3474,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -3490,7 +3490,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 type="textarea"
                                 value="## No one dares"
                               >
-                                <FormGroup
+                                <Component
                                   controlId="description"
                                   validationState={null}
                                 >
@@ -3721,7 +3721,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -3738,7 +3738,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 type="text"
                                 value="Beinstein"
                               >
-                                <FormGroup
+                                <Component
                                   controlId="vendor"
                                   validationState={null}
                                 >
@@ -3973,7 +3973,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                               <Input
                                 addonAfter={null}
@@ -3989,7 +3989,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                 type="text"
                                 value="http://beinstein.com"
                               >
-                                <FormGroup
+                                <Component
                                   controlId="url"
                                   validationState={null}
                                 >
@@ -4220,7 +4220,7 @@ exports[`<ContentPackEdit /> should render with content pack for edit 1`] = `
                                       </FormGroup>
                                     </StyledComponent>
                                   </FormGroup__StyledFormGroup>
-                                </FormGroup>
+                                </Component>
                               </Input>
                             </fieldset>
                           </form>

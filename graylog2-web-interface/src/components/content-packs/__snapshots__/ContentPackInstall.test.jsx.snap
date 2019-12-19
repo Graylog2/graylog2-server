@@ -83,7 +83,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               value=""
               wrapperClassName="col-sm-7"
             >
-              <FormGroup
+              <Component
                 controlId="comment"
                 validationState={null}
               >
@@ -281,7 +281,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     </FormGroup>
                   </StyledComponent>
                 </FormGroup__StyledFormGroup>
-              </FormGroup>
+              </Component>
             </Input>
           </div>
         </Col>
@@ -326,7 +326,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               value="parameter"
               wrapperClassName="col-sm-7"
             >
-              <FormGroup
+              <Component
                 controlId="PARAM"
                 validationState={null}
               >
@@ -528,7 +528,7 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                     </FormGroup>
                   </StyledComponent>
                 </FormGroup__StyledFormGroup>
-              </FormGroup>
+              </Component>
             </Input>
           </div>
         </Col>
