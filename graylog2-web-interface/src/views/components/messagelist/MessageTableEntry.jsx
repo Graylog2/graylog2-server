@@ -63,9 +63,9 @@ type Props = {
 const isDecoratedField = (field, decorationStats) => decorationStats
   && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats}, fields) => isDecoratedField(fieldName, decorationStats)
+const fieldType = (fieldName, { decoration_stats: decorationStats }, fields) => (isDecoratedField(fieldName, decorationStats)
   ? FieldType.Decorated
-  : fields.find(t => t.name === fieldName, undefined, FieldTypeMapping.create(fieldName, FieldType.Unknown)).type;
+  : fields.find(t => t.name === fieldName, undefined, FieldTypeMapping.create(fieldName, FieldType.Unknown)).type);
 
 const MessageTableEntry = ({
   disableSurroundingSearch,

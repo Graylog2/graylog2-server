@@ -8,7 +8,6 @@ import { Icon, SortableList } from 'components/common';
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import DecoratorStyles from '!style!css!./decoratorStyles.css';
-import type { Decorator } from './Types';
 
 const AlertContainer: React.ComponentType<{}> = styled.div`
   margin-bottom: 20px;
