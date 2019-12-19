@@ -19,20 +19,12 @@ package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsTo
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.FieldChartConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.QuickValuesConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.QuickValuesHistogramConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultChartConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.SearchResultCountConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StackedChartConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.StatsCountConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.UnknownWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
 
 import java.util.Set;
 
@@ -72,17 +64,7 @@ public abstract class Widget {
         public abstract Builder creatorUserId(String creatorUserId);
         @JsonProperty(FIELD_CONFIG)
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type", defaultImpl = UnknownWidget.class)
-        @JsonSubTypes({
-                @JsonSubTypes.Type(value = FieldChartConfig.class, name = "FIELD_CHART"),
-                @JsonSubTypes.Type(value = SearchResultChartConfig.class, name = "SEARCH_RESULT_CHART"),
-                @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "SEARCH_RESULT_COUNT"),
-                @JsonSubTypes.Type(value = SearchResultCountConfig.class, name = "STREAM_SEARCH_RESULT_COUNT"),
-                @JsonSubTypes.Type(value = StackedChartConfig.class, name = "STACKED_CHART"),
-                @JsonSubTypes.Type(value = StatsCountConfig.class, name = "STATS_COUNT"),
-                @JsonSubTypes.Type(value = QuickValuesConfig.class, name = "QUICKVALUES"),
-                @JsonSubTypes.Type(value = QuickValuesHistogramConfig.class, name = "QUICKVALUES_HISTOGRAM"),
-                @JsonSubTypes.Type(value = WorldMapConfig.class, name = "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy")
-        })
+        @JsonTypeIdResolver(WidgetConfigResolver.class)
         public abstract Builder config(WidgetConfig config);
 
         public abstract Widget build();
