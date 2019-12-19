@@ -7,7 +7,7 @@ import connect from 'stores/connect';
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
-
+import PermissionsMixin from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
@@ -17,6 +17,7 @@ import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import {} from 'components/maps/configurations';
 import 'components/configurations/ConfigurationStyles.css';
 
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
@@ -32,12 +33,14 @@ class ConfigurationsPage extends React.Component {
    URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist'
 
    componentDidMount() {
+     const { currentUser: { permissions } } = this.props;
      ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
      ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
      ConfigurationActions.list(this.SIDECAR_CONFIG);
      ConfigurationActions.list(this.EVENTS_CONFIG);
-     ConfigurationActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
-
+     if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
+       ConfigurationActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
+     }
      PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
        ConfigurationActions.list(systemConfig.configType);
      });
@@ -102,6 +105,7 @@ class ConfigurationsPage extends React.Component {
   }
 
   render() {
+    const { currentUser: { permissions } } = this.props;
     const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
@@ -150,7 +154,7 @@ class ConfigurationsPage extends React.Component {
                             updateConfig={this._onUpdate(this.URL_WHITELIST_CONFIG)} />
       );
     } else {
-      eventsConfigComponent = (<Spinner />);
+      urlwhiteListConfigComponent = PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read']) ? <Spinner /> : null;
     }
     const pluginConfigRows = this._pluginConfigRows();
 
@@ -202,9 +206,11 @@ class ConfigurationsPage extends React.Component {
 
 ConfigurationsPage.propTypes = {
   configuration: PropTypes.object.isRequired,
+  currentUser: PropTypes.object.isRequired,
 };
 
-export default connect(ConfigurationsPage, { configurationsStore: ConfigurationsStore }, ({ configurationsStore, ...otherProps }) => ({
+export default connect(ConfigurationsPage, { configurationsStore: ConfigurationsStore, currentUserStore: CurrentUserStore }, ({ configurationsStore, currentUserStore, ...otherProps }) => ({
   ...configurationsStore,
+  ...currentUserStore,
   ...otherProps,
 }));

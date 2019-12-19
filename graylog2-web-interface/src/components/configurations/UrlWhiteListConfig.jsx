@@ -98,7 +98,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
             {this._summary()}
           </tbody>
         </Table>
-        <IfPermitted permissions="clusterconfigentry:edit">
+        <IfPermitted permissions="urlwhitelist:write">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
