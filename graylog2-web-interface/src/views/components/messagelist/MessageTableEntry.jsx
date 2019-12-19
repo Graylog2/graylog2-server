@@ -125,7 +125,7 @@ const MessageTableEntry = ({
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
               <CustomHighlighting field="message" value={message.fields.message}>
-                <DecoratedValue field="message" value={message.fields.message} type={fieldType('message', message, fields)} />
+                <TypeSpecificValue field="message" value={message.fields.message} type={fieldType('message', message, fields)} render={DecoratedValue} />
               </CustomHighlighting>
             </div>
           </td>
