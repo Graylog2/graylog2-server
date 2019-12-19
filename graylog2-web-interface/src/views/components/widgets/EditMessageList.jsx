@@ -10,6 +10,7 @@ import { defaultCompare } from 'views/logic/DefaultCompare';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
+import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
 import style from './EditMessageList.css';
 
@@ -24,17 +25,14 @@ const _onShowMessageRowChanged = (config, onChange) => {
   return onChange(newConfig);
 };
 
-const _renderChildrenWithContainerHeight = (children, containerHeight) => React.Children.map(children, child => React.cloneElement(child, { containerHeight }));
-
 type Props = {
   children: React.Node,
   config: MessagesWidgetConfig,
-  containerHeight: number,
   fields: Immutable.Set<FieldTypeMapping>,
   onChange: (MessagesWidgetConfig) => void,
 };
 
-const EditMessageList = ({ children, config, containerHeight, fields, onChange }: Props) => {
+const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const fieldsForSelect = fields
     .map(fieldType => fieldType.name)
     .map(fieldName => ({ label: fieldName, value: fieldName }))
@@ -42,6 +40,8 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
     .toJS()
     .sort((v1, v2) => defaultCompare(v1.label, v2.label));
   const selectedFieldsForSelect = config.fields.map(fieldName => ({ field: fieldName }));
+
+  const onDecoratorsChange = newDecorators => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
     <Row>
@@ -55,9 +55,15 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
             Show message in new row
           </Checkbox>
         </DescriptionBox>
+        <DescriptionBox description="Decorators">
+          <DecoratorSidebar stream="000000000000000000000001"
+                            decorators={config.decorators}
+                            maximumHeight={600}
+                            onChange={onDecoratorsChange} />
+        </DescriptionBox>
       </Col>
       <Col md={9}>
-        {_renderChildrenWithContainerHeight(children, containerHeight)}
+        {children}
       </Col>
     </Row>
   );
@@ -65,10 +71,7 @@ const EditMessageList = ({ children, config, containerHeight, fields, onChange }
 
 EditMessageList.propTypes = {
   children: CustomPropTypes.OneOrMoreChildren.isRequired,
-  config: PropTypes.shape({
-    fields: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
-  containerHeight: PropTypes.number.isRequired,
+  config: PropTypes.object.isRequired,
   fields: CustomPropTypes.FieldListType.isRequired,
   onChange: PropTypes.func.isRequired,
 };

@@ -1,0 +1,62 @@
+:local(.fullWidth) {
+    width: 100%;
+}
+
+:local(.decoratorBox) {
+    display: flex;
+    justify-content: space-between;
+}
+
+:local(.decoratorType) {
+    line-height: 1.5;
+}
+
+:local(.addDecoratorButtonContainer) {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+:local(.addDecoratorSelect) {
+    margin-right: 5px;
+    width: 100%;
+}
+
+:local(.helpLink) {
+    font-size: 12px;
+    padding-top: 0px;
+    padding-right: 0px;
+    float: right;
+}
+
+:local(.helpPopover) {
+    font-size: 12px;
+}
+
+:local(.decoratorMarker) {
+    color: #AAA;
+    font-weight: normal;
+}
+
+:local(.decoratorFieldWrapper) {
+    display: inline-block;
+}
+
+:local(.decoratorMarkerSidebar) {
+    margin-left: 5px;
+    top: 3px;
+    position: relative;
+}
+
+:local(.helpLinkContainer) {
+    height: 20px;
+}
+
+:local(.decoratorListContainer) {
+    display: inline-block;
+    overflow: visible;
+    width: 100%;
+}
+
+:local(.noDecoratorsAlert) {
+    margin-top: 2em;
+}

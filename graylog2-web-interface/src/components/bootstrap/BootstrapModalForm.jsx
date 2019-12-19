@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
 
-import { Modal, Button } from 'components/graylog';
+import { Button, Modal } from 'components/graylog';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 import { validate } from 'legacy/validations.js';
@@ -12,20 +12,6 @@ import { validate } from 'legacy/validations.js';
  * has, and providing form validation using HTML5 and our custom validation.
  */
 class BootstrapModalForm extends React.Component {
-  static defaultProps = {
-    backdrop: undefined,
-    formProps: {},
-    cancelButtonText: 'Cancel',
-    submitButtonText: 'Submit',
-    submitButtonDisabled: false,
-    onModalOpen: () => {},
-    onModalClose: () => {},
-    onSubmitForm: undefined,
-    onCancel: () => {},
-    bsSize: undefined,
-    show: false,
-  };
-
   static propTypes = {
     backdrop: PropTypes.oneOf([true, false, 'static']),
     bsSize: PropTypes.oneOf(['lg', 'large', 'sm', 'small']),
@@ -50,18 +36,29 @@ class BootstrapModalForm extends React.Component {
     show: PropTypes.bool,
   };
 
+  static defaultProps = {
+    backdrop: undefined,
+    formProps: {},
+    cancelButtonText: 'Cancel',
+    submitButtonText: 'Submit',
+    submitButtonDisabled: false,
+    onModalOpen: () => {},
+    onModalClose: () => {},
+    onSubmitForm: undefined,
+    onCancel: () => {},
+    bsSize: undefined,
+    show: false,
+  };
+
   onModalCancel = () => {
-    this.props.onCancel();
+    const { onCancel } = this.props;
+    onCancel();
     this.close();
   };
 
-  open = () => {
-    this.modal.open();
-  };
+  open = () => this.modal.open();
 
-  close = () => {
-    this.modal.close();
-  };
+  close = () => this.modal.close();
 
   submit = (event) => {
     const formDOMNode = this.form;
@@ -80,37 +77,39 @@ class BootstrapModalForm extends React.Component {
     }
 
     // If function is not given, let the browser continue propagating the submit event
-    if (typeof this.props.onSubmitForm === 'function') {
+    const { onSubmitForm } = this.props;
+    if (typeof onSubmitForm === 'function') {
       event.preventDefault();
-      this.props.onSubmitForm(event);
+      onSubmitForm(event);
     }
   };
 
   render() {
+    const { backdrop, submitButtonDisabled, formProps, bsSize, onModalClose, cancelButtonText, show, submitButtonText, onModalOpen, title, children } = this.props;
     const body = (
       <div className="container-fluid">
-        {this.props.children}
+        {children}
       </div>
     );
 
     return (
       <BootstrapModalWrapper ref={(c) => { this.modal = c; }}
-                             onOpen={this.props.onModalOpen}
-                             onClose={this.props.onModalClose}
-                             bsSize={this.props.bsSize}
-                             showModal={this.props.show}
-                             backdrop={this.props.backdrop}
+                             onOpen={onModalOpen}
+                             onClose={onModalClose}
+                             bsSize={bsSize}
+                             showModal={show}
+                             backdrop={backdrop}
                              onHide={this.onModalCancel}>
         <Modal.Header closeButton>
-          <Modal.Title>{this.props.title}</Modal.Title>
+          <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
-        <form ref={(c) => { this.form = c; }} onSubmit={this.submit} {...this.props.formProps}>
+        <form ref={(c) => { this.form = c; }} onSubmit={this.submit} {...formProps}>
           <Modal.Body>
             {body}
           </Modal.Body>
           <Modal.Footer>
-            <Button type="button" onClick={this.onModalCancel}>{this.props.cancelButtonText}</Button>
-            <Button type="submit" disabled={this.props.submitButtonDisabled} bsStyle="primary">{this.props.submitButtonText}</Button>
+            <Button type="button" onClick={this.onModalCancel}>{cancelButtonText}</Button>
+            <Button type="submit" disabled={submitButtonDisabled} bsStyle="primary">{submitButtonText}</Button>
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>

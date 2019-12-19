@@ -9,11 +9,11 @@ import type { ValueActionHandler } from './ValueActionHandler';
 import View from '../views/View';
 import type { ActionHandlerCondition } from '../../components/actions/ActionHandler';
 
-const UseInNewQueryHandler: ValueActionHandler = ({ field, value, contexts: { view } }) => {
+const UseInNewQueryHandler: ValueActionHandler = async ({ field, value, contexts: { view } }) => {
   const query: Query = QueryGenerator().toBuilder()
     .query({ type: 'elasticsearch', query_string: `${field}:${escape(value)}` })
     .build();
-  const state: ViewState = ViewStateGenerator(view.type);
+  const state: ViewState = await ViewStateGenerator(view.type);
   return QueriesActions.create(query, state);
 };
 

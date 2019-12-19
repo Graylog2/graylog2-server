@@ -27,7 +27,7 @@ export type ViewStoreState = {
 };
 
 type ViewActionsType = RefluxActions<{
-  create: (ViewType) => Promise<ViewStoreState>,
+  create: (ViewType, ?string) => Promise<ViewStoreState>,
   description: (string) => Promise<ViewStoreState>,
   load: (View) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
@@ -78,22 +78,25 @@ export const ViewStore: ViewStoreType = singletonStore(
       return this._state();
     },
 
-    create(type: ViewType) {
-      const [view] = this._updateSearch(ViewGenerator(type));
-      this.view = view;
-      const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
-      this.activeQuery = queries.first().id;
+    create(type: ViewType, streamId: ?string = null) {
+      return ViewGenerator(type, streamId)
+        .then((newView) => {
+          const [view] = this._updateSearch(newView);
+          this.view = view;
+          const queries: QuerySet = get(view, 'search.queries', Immutable.Set());
+          this.activeQuery = queries.first().id;
+          return view;
+        }).then((view) => {
+          const promise = ViewActions.search(view.search)
+            .then(() => {
+              this.dirty = false;
+              this.isNew = true;
+            })
+            .then(() => this._trigger());
 
-      const promise = ViewActions.search(view.search)
-        .then(() => {
-          this.dirty = false;
-          this.isNew = true;
-        })
-        .then(() => this._trigger());
-
-      ViewActions.create.promise(promise.then(() => this._state()));
-
-      return promise;
+          ViewActions.create.promise(promise.then(() => this._state()));
+          return promise;
+        });
     },
     createQuery(query: Query, viewState: ViewState) {
       if (query.id === undefined) {
