@@ -1,13 +1,11 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
-
 import { Button, Table } from 'components/graylog';
 import { IfPermitted } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import UrlWhiteListForm from 'components/configurations/UrlWhiteListForm';
 import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
-
 
 type State = {
   config: WhiteListConfig,
@@ -87,7 +85,6 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     return (
       <div>
         <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>
-
         <Table striped bordered condensed className="top-margin">
           <thead>
             <tr>
@@ -104,7 +101,6 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
         <IfPermitted permissions="clusterconfigentry:edit">
           <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
         </IfPermitted>
-
         <BootstrapModalForm ref={(configModal) => { this.configModal = configModal; }}
                             bsSize="lg"
                             title="Update White List Configuration"

@@ -12,7 +12,6 @@ import StoreProvider from 'injection/StoreProvider';
 
 const ToolsStore = StoreProvider.getStore('Tools');
 
-
 type Props = {
   urls: Array<Url>,
   disabled: boolean,
@@ -25,24 +24,23 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const options = [{ value: literal, label: 'Literal' }, { value: regex, label: 'Regex' }];
   // eslint-disable-next-line prefer-const
   let inputs = {};
-  const [state, setState] = useState<WhiteListConfig>({ entries: urls, disabled });
+  const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
   const [validationState, setValidationState] = useState({ errors: [] });
 
   const _onAdd = (event: Event) => {
     event.preventDefault();
-    setState({ ...state, entries: [...state.entries, { id: uuid(), title: '', value: '', type: literal }] });
+    setConfig({ ...config, entries: [...config.entries, { id: uuid(), title: '', value: '', type: literal }] });
   };
 
   const _onRemove = (event: MouseEvent, idx: number) => {
     event.preventDefault();
     // eslint-disable-next-line prefer-const
-    let stateUpdate = ObjectUtils.clone(state);
+    let stateUpdate = ObjectUtils.clone(config);
     const validationUpdate = ObjectUtils.clone(validationState);
     validationUpdate.errors[idx] = null;
     setValidationState(validationUpdate);
     stateUpdate.entries.splice(idx, 1);
-
-    setState(stateUpdate);
+    setConfig(stateUpdate);
   };
 
   const validURL = (str: string) => {
@@ -67,10 +65,10 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   const _updateState = (idx: number, type: string, name: string, value: string) => {
-    const stateUpdate = ObjectUtils.clone(state);
+    const stateUpdate = ObjectUtils.clone(config);
     stateUpdate.entries[idx][name] = value;
     stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
-    setState(stateUpdate);
+    setConfig(stateUpdate);
   };
 
   const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
@@ -112,11 +110,11 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   const _onUpdateType = (idx: number, type: string) => {
-    const stateUpdate = ObjectUtils.clone(state);
+    const stateUpdate = ObjectUtils.clone(config);
     _validate('value', idx, type, stateUpdate.entries[idx].value);
   };
-  const _summary = () => {
-    return (state.entries.map((url, idx) => {
+  const _getSummary = () => {
+    return (config.entries.map((url, idx) => {
       return (
       // eslint-disable-next-line react/no-array-index-key
         <tr key={url.id}>
@@ -167,16 +165,16 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   useEffect(() => {
     const valid = _isFormValid();
-    onUpdate(state, valid);
-  }, [state]);
+    onUpdate(config, valid);
+  }, [config]);
 
   return (
     <>
       <Input type="checkbox"
              id="whitelist-disabled"
              label="Disabled"
-             checked={state.disabled}
-             onChange={() => setState({ ...state, disabled: !state.disabled })}
+             checked={config.disabled}
+             onChange={() => setConfig({ ...config, disabled: !config.disabled })}
              help="Disable this white list." />
       <Table striped bordered className="top-margin">
         <thead>
@@ -189,7 +187,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {_summary()}
+          {_getSummary()}
         </tbody>
       </Table>
       <Button bsSize="xs" onClick={event => _onAdd(event)}>Add Url</Button>
