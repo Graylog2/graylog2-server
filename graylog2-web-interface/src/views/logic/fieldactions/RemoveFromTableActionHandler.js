@@ -1,5 +1,6 @@
 // @flow strict
 import { WidgetActions } from 'views/stores/WidgetStore';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
 
 const RemoveFromTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
@@ -11,7 +12,7 @@ const RemoveFromTableActionHandler: FieldActionHandler = ({ field, contexts: { w
 };
 
 const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field }) => {
-  if (widget.type === 'messages' && widget.config) {
+  if (MessagesWidget.isMessagesWidget(widget) && widget.config) {
     const fields = widget.config.fields || [];
     return fields.includes(field);
   }
@@ -19,7 +20,7 @@ const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field })
 };
 
 /* Hide RemoveFromTableHandler in the sidebar */
-const isHidden = ({ contexts: { widget } }): boolean => !widget;
+const isHidden: FieldActionHandlerCondition = ({ contexts: { widget } }): boolean => !widget;
 
 RemoveFromTableActionHandler.isEnabled = isEnabled;
 RemoveFromTableActionHandler.isHidden = isHidden;

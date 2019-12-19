@@ -1,5 +1,6 @@
 // @flow strict
 import { WidgetActions } from 'views/stores/WidgetStore';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import type { FieldActionHandler, FieldActionHandlerCondition } from 'views/logic/fieldactions/FieldActionHandler';
 
 const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
@@ -11,7 +12,7 @@ const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget
 };
 
 const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field }) => {
-  if (widget.type === 'messages' && widget.config) {
+  if (MessagesWidget.isMessagesWidget(widget) && widget.config) {
     const fields = widget.config.fields || [];
     return !fields.includes(field);
   }
