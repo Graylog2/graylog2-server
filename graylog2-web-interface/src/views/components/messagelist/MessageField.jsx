@@ -61,7 +61,7 @@ const MessageField = ({ fieldName, fieldType, message, value, currentView }: Pro
       </dt>
       <dd>
         <ValueContext>
-          <Value queryId={activeQuery} field={fieldName} value={innerValue} type={fieldType} render={DecoratedValue} />
+          <Value queryId={activeQuery} field={fieldName} value={innerValue} type={isDecoratedField ? FieldType.Decorated : fieldType} render={DecoratedValue} />
         </ValueContext>
       </dd>
     </React.Fragment>

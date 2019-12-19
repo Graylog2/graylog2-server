@@ -60,6 +60,13 @@ type Props = {
   toggleDetail: (string) => void,
 };
 
+const isDecoratedField = (field, decorationStats) => decorationStats
+  && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
+
+const fieldType = (fieldName, { decoration_stats: decorationStats}, fields) => isDecoratedField(fieldName, decorationStats)
+  ? FieldType.Decorated
+  : fields.find(t => t.name === fieldName, undefined, FieldTypeMapping.create(fieldName, FieldType.Unknown)).type;
+
 const MessageTableEntry = ({
   disableSurroundingSearch,
   expandAllRenderAsync,
@@ -91,12 +98,11 @@ const MessageTableEntry = ({
   if (message.id === highlightMessage) {
     classes += ' message-highlight';
   }
-  const messageFieldType = fields.find(type => type.name === 'message', undefined, FieldTypeMapping.create('message', FieldType.Unknown)).type;
   return (
     <tbody className={classes}>
       <tr className="fields-row" onClick={_toggleDetail}>
         { selectedFields.toArray().map((selectedFieldName, idx) => {
-          const { type } = fields.find(t => t.name === selectedFieldName, undefined, FieldTypeMapping.create(selectedFieldName, FieldType.Unknown));
+          const type = fieldType(selectedFieldName, message, fields);
           return (
             <td className={style.fieldsRowField} key={selectedFieldName}>
               {_renderStrong(
@@ -119,7 +125,7 @@ const MessageTableEntry = ({
           <td colSpan={colSpanFixup}>
             <div className="message-wrapper">
               <CustomHighlighting field="message" value={message.fields.message}>
-                <DecoratedValue field="message" value={message.fields.message} type={messageFieldType} />
+                <DecoratedValue field="message" value={message.fields.message} type={fieldType('message', message, fields)} />
               </CustomHighlighting>
             </div>
           </td>
@@ -151,6 +157,11 @@ MessageTableEntry.propTypes = {
     highlight_ranges: PropTypes.object,
     id: PropTypes.string.isRequired,
     index: PropTypes.string.isRequired,
+    decoration_stats: PropTypes.shape({
+      added_fields: PropTypes.object,
+      changed_fields: PropTypes.object,
+      removed_fields: PropTypes.object,
+    }),
   }).isRequired,
   selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
   showMessageRow: PropTypes.bool,

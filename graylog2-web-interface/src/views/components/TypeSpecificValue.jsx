@@ -10,6 +10,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import EmptyValue from './EmptyValue';
 import CustomPropTypes from './CustomPropTypes';
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
+import DecoratorValue from './DecoratorValue';
 
 const _formatValue = (field, value, truncate, render, type) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
@@ -32,6 +33,9 @@ const defaultComponent = ({ value }: ValueRendererProps) => value;
 const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
   if (value === undefined) {
     return null;
+  }
+  if (type.isDecorated()) {
+    return <DecoratorValue value={value} field={field} render={render} type={type} truncate={truncate} />;
   }
   switch (type.type) {
     case 'date': return <UserTimezoneTimestamp dateTime={value} />;
