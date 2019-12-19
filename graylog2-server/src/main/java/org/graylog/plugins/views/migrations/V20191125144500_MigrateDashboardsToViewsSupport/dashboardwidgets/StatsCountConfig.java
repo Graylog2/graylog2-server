@@ -40,8 +40,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
 
     public abstract String field();
     public abstract String statsFunction();
-    public abstract Boolean lowerIsBetter();
-    public abstract Boolean trend();
+    public abstract Optional<Boolean> lowerIsBetter();
+    public abstract Optional<Boolean> trend();
     public abstract Optional<String> streamId();
 
     private Series series() {
@@ -56,8 +56,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
                         .visualization(NUMERIC_VISUALIZATION)
                         .visualizationConfig(
                                 NumberVisualizationConfig.builder()
-                                        .trend(trend())
-                                        .trendPreference(lowerIsBetter()
+                                        .trend(trend().orElse(false))
+                                        .trendPreference(lowerIsBetter().orElse(false)
                                                 ? NumberVisualizationConfig.TrendPreference.LOWER
                                                 : NumberVisualizationConfig.TrendPreference.HIGHER)
                                         .build()
@@ -81,8 +81,8 @@ public abstract class StatsCountConfig extends WidgetConfigBase implements Widge
                 query,
                 field,
                 statsFunction,
-                lowerIsBetter,
-                trend,
+                Optional.ofNullable(lowerIsBetter),
+                Optional.ofNullable(trend),
                 Optional.ofNullable(streamId)
         );
     }
