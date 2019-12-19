@@ -42,6 +42,7 @@ import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -123,6 +124,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         }
         final List<SearchResponseDecorator> searchResponseDecorators = decorators
                 .stream()
+                .sorted(Comparator.comparing(Decorator::order))
                 .map(decorator -> this.searchResponseDecorators.get(decorator.type()).create(decorator))
                 .collect(Collectors.toList());
         return decoratorProcessor.decorate(searchResponse, searchResponseDecorators);
