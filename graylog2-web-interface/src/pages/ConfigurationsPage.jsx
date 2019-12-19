@@ -110,12 +110,12 @@ class ConfigurationsPage extends React.Component {
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
     const eventsConfig = this._getConfig(this.EVENTS_CONFIG);
-    const urlwhiteListConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
+    const urlWhiteListConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
     let eventsConfigComponent;
-    let urlwhiteListConfigComponent;
+    let urlWhiteListConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -148,13 +148,13 @@ class ConfigurationsPage extends React.Component {
     } else {
       eventsConfigComponent = (<Spinner />);
     }
-    if (urlwhiteListConfig) {
-      urlwhiteListConfigComponent = (
-        <UrlWhiteListConfig config={urlwhiteListConfig}
+    if (urlWhiteListConfig) {
+      urlWhiteListConfigComponent = (
+        <UrlWhiteListConfig config={urlWhiteListConfig}
                             updateConfig={this._onUpdate(this.URL_WHITELIST_CONFIG)} />
       );
     } else {
-      urlwhiteListConfigComponent = PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read']) ? <Spinner /> : null;
+      urlWhiteListConfigComponent = PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read']) ? <Spinner /> : null;
     }
     const pluginConfigRows = this._pluginConfigRows();
 
@@ -181,7 +181,7 @@ class ConfigurationsPage extends React.Component {
               {eventsConfigComponent}
             </Col>
             <Col md={6}>
-              {urlwhiteListConfigComponent}
+              {urlWhiteListConfigComponent}
             </Col>
           </Row>
 
