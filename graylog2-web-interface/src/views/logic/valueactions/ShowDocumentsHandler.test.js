@@ -7,10 +7,19 @@ import ShowDocumentsHandler from './ShowDocumentsHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';
+import { createElasticsearchQueryString } from '../queries/Query';
+import { TitlesActions } from '../../stores/TitlesStore';
+import TitleTypes from '../../stores/TitleTypes';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
     create: jest.fn(widget => Promise.resolve(widget)),
+  },
+}));
+
+jest.mock('views/stores/TitlesStore', () => ({
+  TitlesActions: {
+    set: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -40,7 +49,7 @@ describe('ShowDocumentsHandler', () => {
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-        expect(newWidget.filter).toEqual('');
+        expect(newWidget.query).toEqual(createElasticsearchQueryString());
       });
   });
   it('adds the given value path as widget filter for new message widget', () => {
@@ -48,25 +57,24 @@ describe('ShowDocumentsHandler', () => {
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-        expect(newWidget.filter).toEqual('foo:Hello\\! AND bar:42');
+        expect(newWidget.query).toEqual(createElasticsearchQueryString('foo:Hello\\! AND bar:42'));
       });
   });
-  it('adds the given value path to an existing widget filter', () => {
-    const widgetWithFilter = widget.toBuilder().filter('baz:23').build();
+  it('adds the given value path to an existing widget query', () => {
+    const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('baz:23')).build();
     return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
       .then(() => {
         expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-        expect(newWidget.filter).toEqual('baz:23 AND foo:Hello\\! AND bar:42');
+        expect(newWidget.query).toEqual(createElasticsearchQueryString('baz:23 AND foo:Hello\\! AND bar:42'));
       });
   });
-  it('deduplicates widget filter', () => {
-    const widgetWithFilter = widget.toBuilder().filter('bar:42').build();
-    return ShowDocumentsHandler({ queryId, field, value: 42, type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { [field]: 'Hello!' }] } })
+  it('sets title for new messages widget', () => {
+    const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
+    return ShowDocumentsHandler({ queryId, field: 'hello', value: 'world', type: FieldType.Unknown, contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }] } })
       .then(() => {
-        expect(WidgetActions.create).toHaveBeenCalled();
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-        expect(newWidget.filter).toEqual('bar:42 AND foo:Hello\\!');
+        expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, newWidget.id, 'Messages for hello:world AND bar:42');
       });
   });
 });
