@@ -11,7 +11,7 @@ const AddToTableActionHandler: FieldActionHandler = ({ field, contexts: { widget
 };
 
 const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field }) => {
-  if (widget.type === 'messages') {
+  if (widget.type === 'messages' && widget.config) {
     const fields = widget.config.fields || [];
     return !fields.includes(field);
   }
