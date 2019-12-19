@@ -15,7 +15,6 @@ import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 
 import {} from 'components/maps/configurations';
-
 import 'components/configurations/ConfigurationStyles.css';
 
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
@@ -45,6 +44,7 @@ class ConfigurationsPage extends React.Component {
    }
 
    componentWillUnmount() {
+
    }
 
 
@@ -106,12 +106,12 @@ class ConfigurationsPage extends React.Component {
     const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
     const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
     const eventsConfig = this._getConfig(this.EVENTS_CONFIG);
-    const urlwhitelistConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
+    const urlwhiteListConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
     let eventsConfigComponent;
-    let urlwhitelistConfigComponent;
+    let urlwhiteListConfigComponent;
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
@@ -144,9 +144,9 @@ class ConfigurationsPage extends React.Component {
     } else {
       eventsConfigComponent = (<Spinner />);
     }
-    if (urlwhitelistConfig) {
-      urlwhitelistConfigComponent = (
-        <UrlWhiteListConfig config={urlwhitelistConfig}
+    if (urlwhiteListConfig) {
+      urlwhiteListConfigComponent = (
+        <UrlWhiteListConfig config={urlwhiteListConfig}
                             updateConfig={this._onUpdate(this.URL_WHITELIST_CONFIG)} />
       );
     } else {
@@ -177,7 +177,7 @@ class ConfigurationsPage extends React.Component {
               {eventsConfigComponent}
             </Col>
             <Col md={6}>
-              {urlwhitelistConfigComponent}
+              {urlwhiteListConfigComponent}
             </Col>
           </Row>
 
