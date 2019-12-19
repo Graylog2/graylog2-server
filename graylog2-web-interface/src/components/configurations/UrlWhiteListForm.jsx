@@ -155,7 +155,9 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           </td>
           <td>
             <span className="">
-              <Icon name="fa-trash" style={{ cursor: 'pointer' }} onClick={event => _onRemove(event, idx)} />
+              <Button onClick={event => _onRemove(event, idx)}>
+                <Icon name="fa-trash" style={{ cursor: 'pointer' }} />
+              </Button>
             </span>
           </td>
         </tr>
