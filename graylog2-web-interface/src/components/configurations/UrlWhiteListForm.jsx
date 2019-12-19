@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
+import { cloneDeep } from 'lodash';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
@@ -35,8 +36,8 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const _onRemove = (event: MouseEvent, idx: number) => {
     event.preventDefault();
     // eslint-disable-next-line prefer-const
-    let stateUpdate = ObjectUtils.clone(config);
-    const validationUpdate = ObjectUtils.clone(validationState);
+    let stateUpdate = cloneDeep(config);
+    const validationUpdate = cloneDeep(validationState);
     validationUpdate.errors[idx] = null;
     setValidationState(validationUpdate);
     stateUpdate.entries.splice(idx, 1);
@@ -65,14 +66,14 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   const _updateState = (idx: number, type: string, name: string, value: string) => {
-    const stateUpdate = ObjectUtils.clone(config);
+    const stateUpdate = cloneDeep(config);
     stateUpdate.entries[idx][name] = value;
     stateUpdate.entries[idx] = { ...stateUpdate.entries[idx], type };
     setConfig(stateUpdate);
   };
 
   const _updateValidationError = (idx: number, type: string, name: string, result: Object, value: string) => {
-    const validationUpdate = ObjectUtils.clone(validationState);
+    const validationUpdate = cloneDeep(validationState);
     validationUpdate.errors[idx] = { ...validationUpdate.errors[idx], [name]: result };
     setValidationState(validationUpdate);
     _updateState(idx, type, name, value);
@@ -110,7 +111,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   const _onUpdateType = (idx: number, type: string) => {
-    const stateUpdate = ObjectUtils.clone(config);
+    const stateUpdate = cloneDeep(config);
     _validate('value', idx, type, stateUpdate.entries[idx].value);
   };
 
