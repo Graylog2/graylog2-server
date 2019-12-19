@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import * as Immutable from 'immutable';
 import { get, isEqualWith } from 'lodash';
 
-import type { RefluxActions } from 'stores/StoreTypes';
+import type { RefluxActions, Store } from 'stores/StoreTypes';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import { QueriesActions } from 'views/actions/QueriesActions';
@@ -17,7 +17,6 @@ import SearchActions from 'views/actions/SearchActions';
 import { singletonActions, singletonStore } from 'views/logic/singleton';
 import type { QueryId } from 'views/logic/queries/Query';
 import { ViewManagementActions } from './ViewManagementStore';
-import type { Store } from '../../stores/StoreTypes';
 
 export type ViewStoreState = {
   activeQuery: QueryId,
@@ -29,7 +28,7 @@ export type ViewStoreState = {
 type ViewActionsType = RefluxActions<{
   create: (ViewType, ?string) => Promise<ViewStoreState>,
   description: (string) => Promise<ViewStoreState>,
-  load: (View) => Promise<ViewStoreState>,
+  load: (View, ?boolean) => Promise<ViewStoreState>,
   properties: (Properties) => Promise<void>,
   search: (Search) => Promise<View>,
   selectQuery: (string) => Promise<string>,
@@ -129,7 +128,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       ViewActions.description.promise(promise);
       return promise;
     },
-    load(view: View): Promise<ViewStoreState> {
+    load(view: View, isNew: ?boolean = false): Promise<ViewStoreState> {
       this.view = view;
       this.dirty = false;
 
@@ -139,7 +138,7 @@ export const ViewStore: ViewStoreType = singletonStore(
       const firstQueryId = get(queries.first(), 'id');
       const selectedQuery = this.activeQuery && queries.find(q => (q.id === this.activeQuery)) ? this.activeQuery : firstQueryId;
       this.selectQuery(selectedQuery);
-      this.isNew = false;
+      this.isNew = isNew;
 
       const promise = Promise.resolve(this._state());
       ViewActions.load.promise(promise);
