@@ -151,7 +151,9 @@ const Panel = ({
     onToggle(nextIsExpanded);
   };
 
-  if (header || footer || title || collapsible || typeof children === 'string') {
+  const hasDeprecatedChildren = typeof children === 'string' || (Array.isArray(children) && typeof children[0] === 'string');
+
+  if (header || footer || title || collapsible || hasDeprecatedChildren) {
     /** NOTE: Deprecated & should be removed in 4.0 */
     useEffect(() => {
       /* eslint-disable-next-line no-console */

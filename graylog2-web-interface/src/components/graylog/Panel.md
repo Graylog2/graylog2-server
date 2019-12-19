@@ -47,6 +47,18 @@ const PanelClickExample = () => {
 </Panel>
 ```
 
+### Panel w/ longer content
+
+```js
+<Panel>
+  <Panel.Body>
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
+    <br/>
+    Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati exercitationem quis amet!
+  </Panel.Body>
+</Panel>
+```
+
 ### Panel w/ Variants
 
 ```js
@@ -167,6 +179,15 @@ const DeprecatedPanelClickExample = () => {
 </Panel>
 ```
 
+### Deprecated Panel w/ longer content
+
+```js
+<Panel bsStyle="info">
+  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex, expedita eveniet, exercitationem, iure corporis quae inventore excepturi saepe laudantium consequatur facere labore reiciendis recusandae adipisci alias explicabo?
+  <br/>
+  Quidem, consectetur sunt.Enim placeat amet cum eum quidem autem accusamus quam modi temporibus mollitia dolores iste aliquam tenetur officia, laboriosam totam, ratione velit! Architecto reiciendis quod aliquid impedit obcaecati exercitationem quis amet!
+</Panel>
+```
 
 ### Deprecated Panel w/ Variants
 
