@@ -40,6 +40,12 @@ describe('ViewStore', () => {
   it('.load should select first query if activeQuery is set but not present in view', () => ViewActions.selectQuery('nonExistingQueryId')
     .then(() => ViewActions.load(dummyView))
     .then(state => expect(state.activeQuery).toBe('firstQueryId')));
+  it('.load should not mark isNew as true by default', () => ViewActions.selectQuery('nonExistingQueryId')
+    .then(() => ViewActions.load(dummyView))
+    .then(state => expect(state.isNew).toBe(false)));
+  it('.load should allow to mark isNew as true', () => ViewActions.selectQuery('nonExistingQueryId')
+    .then(() => ViewActions.load(dummyView, true))
+    .then(state => expect(state.isNew).toBe(true)));
   describe('maintains dirty flag:', () => {
     beforeEach(() => {
       SearchActions.create = mockAction(jest.fn(s => Promise.resolve({ search: s })));
