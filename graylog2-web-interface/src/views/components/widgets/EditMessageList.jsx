@@ -13,9 +13,10 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
-const ListWrapper = styled.div`
+const FullHeightCol = styled(Col)`
   height: 100%;
-  padding-bottom: 25px;
+  padding-bottom: 10px;
+  overflow: auto;
 `;
 
 const ValueComponent = styled.span`
@@ -52,8 +53,8 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const onDecoratorsChange = newDecorators => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
-    <Row style={{ height: '100%' }}>
-      <Col md={3}>
+    <Row style={{ height: '100%', paddingBottom: '15px' }}>
+      <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
           <SortableSelect options={fieldsForSelect}
                           onChange={newFields => _onFieldSelectionChanged(newFields, config, onChange)}
@@ -69,12 +70,10 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
                             maximumHeight={600}
                             onChange={onDecoratorsChange} />
         </DescriptionBox>
-      </Col>
-      <Col md={9} style={{ height: '100%' }}>
-        <ListWrapper>
-          {children}
-        </ListWrapper>
-      </Col>
+      </FullHeightCol>
+      <FullHeightCol md={9}>
+        {children}
+      </FullHeightCol>
     </Row>
   );
 };
