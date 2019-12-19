@@ -30,9 +30,9 @@ import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToV
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.UnknownWidget;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WidgetConfig;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.dashboardwidgets.WorldMapConfig;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.IOException;
+import java.util.Locale;
 
 public class WidgetConfigResolver implements TypeIdResolver {
     private JavaType superType;
@@ -43,7 +43,7 @@ public class WidgetConfigResolver implements TypeIdResolver {
     }
 
     private Class<? extends WidgetConfig> resolveTypeId(String id) {
-        switch (id.toUpperCase()) {
+        switch (id.toUpperCase(Locale.ENGLISH)) {
             case "FIELD_CHART": return FieldChartConfig.class;
             case "SEARCH_RESULT_CHART": return SearchResultChartConfig.class;
             case "SEARCH_RESULT_COUNT": return SearchResultCountConfig.class;
