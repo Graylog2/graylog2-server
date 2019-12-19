@@ -10,7 +10,7 @@ import type { WhiteListConfig } from 'stores/configurations/ConfigurationsStore'
 
 
 type State = {
-  config: Config,
+  config: WhiteListConfig,
   valid: boolean
 };
 
@@ -18,6 +18,7 @@ type Props = {
   config: WhiteListConfig,
   updateConfig: (config: WhiteListConfig) => Promise<void>,
 };
+
 class UrlWhiteListConfig extends React.Component<Props, State> {
   configModal: ?BootstrapModalForm;
 
@@ -68,7 +69,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     }
   }
 
-  _update = (config: Config, valid: boolean) => {
+  _update = (config: WhiteListConfig, valid: boolean) => {
     const updatedState = { config, valid };
     this.setState(updatedState);
   }
