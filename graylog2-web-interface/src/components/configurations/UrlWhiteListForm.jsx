@@ -200,13 +200,13 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 UrlWhiteListForm.propTypes = {
   urls: PropTypes.array,
   disabled: PropTypes.bool,
-  update: PropTypes.func,
+  onUpdate: PropTypes.func,
 };
 
 UrlWhiteListForm.defaultProps = {
   urls: [],
   disabled: false,
-  update: () => {},
+  onUpdate: () => {},
 };
 
 export default UrlWhiteListForm;
