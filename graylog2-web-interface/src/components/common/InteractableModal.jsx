@@ -10,8 +10,8 @@ import teinte from 'theme/teinte';
 import { debounce } from 'lodash';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
-const halfWidth = Math.ceil((document.body.offsetWidth / 2) - (DEFAULT_SIZE.width / 2));
-const halfHeight = Math.ceil((document.body.offsetHeight / 2) - (DEFAULT_SIZE.height / 2));
+const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
+const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
 const DEFAULT_POSITION = {
   x: halfWidth,
@@ -90,56 +90,56 @@ const InteractableModal = ({
   const [resizeSize, setResizeSize] = useState(size);
 
   const handleDragStop = (event, newPosition) => {
-    const { x, y, node } = newPosition;
-    const width = parseFloat(node.style.width);
-    const height = parseFloat(node.style.height);
-    const bodyWidth = document.body.offsetWidth;
-    const bodyHeight = document.body.offsetHeight;
+    const { x, y } = newPosition;
+
+    const setPosition = { x, y };
+    setDragPosition(setPosition);
+    onDrag(setPosition);
+  };
+
+  const handleBrowserResize = debounce(() => {
+    const { x, y } = dragPosition;
+    const { width, height } = resizeSize;
+    const { innerWidth, innerHeight } = window;
     const boundingBox = {
       top: 0,
-      right: bodyWidth - width,
-      bottom: bodyHeight - height,
+      right: innerWidth - width,
+      bottom: innerHeight - height,
       left: 0,
     };
 
     const tooFarLeft = x < boundingBox.left;
     const tooFarRight = x > boundingBox.right;
-    const newRight = tooFarRight ? bodyWidth - width : x;
-    const newX = tooFarLeft ? 0 : newRight;
+    const newRight = tooFarRight ? boundingBox.right : x;
+    const nextX = tooFarLeft ? 0 : newRight;
 
     const tooFarUp = y < boundingBox.top;
     const tooFarDown = y > boundingBox.bottom;
-    const newDown = tooFarDown ? bodyHeight - height : y;
-    const newY = tooFarUp ? 0 : newDown;
+    const newDown = tooFarDown ? boundingBox.bottom : y;
+    const nextY = tooFarUp ? 0 : newDown;
 
-    const setPosition = {
-      x: newX < 0 ? 0 : newX,
-      y: newY < 0 ? 0 : newY,
-    };
-    setDragPosition(setPosition);
-    onDrag(setPosition);
-  };
-
-  const handleBrowserResize = debounce((event) => {
-    handleDragStop(event, { node: { style: { ...resizeSize } }, ...dragPosition });
+    handleDragStop(null, { x: nextX, y: nextY });
   }, 150);
 
   useEffect(() => {
     setDragHandleClassName(dragHandleRef.current.classList[0]);
+  }, []);
+
+  useEffect(() => {
     window.addEventListener('resize', handleBrowserResize, false);
 
     return () => {
       window.removeEventListener('resize', handleBrowserResize);
     };
-  }, []);
+  }, [dragPosition]);
 
   return (
     <InteractableModalWrapper className={wrapperClassName}>
       <StyledRnd default={{ ...position, ...size }}
                  minHeight={minHeight}
                  minWidth={minWidth}
-                 maxHeight={document.body.offsetHeight}
-                 maxWidth={document.body.offsetWidth}
+                 maxHeight={window.innerHeight}
+                 maxWidth={window.innerWidth}
                  dragHandleClassName={dragHandleClassName}
                  onDragStop={handleDragStop}
                  onResizeStop={(event, direction, ref) => {
@@ -152,7 +152,8 @@ const InteractableModal = ({
                  }}
                  position={dragPosition}
                  size={resizeSize}
-                 className={className}>
+                 className={className}
+                 bounds="window">
         <Header ref={dragHandleRef}>
           <Title><DragBars name="bars" />{title}</Title>
 
