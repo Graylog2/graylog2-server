@@ -15,8 +15,13 @@ const AlertContainer: React.ComponentType<{}> = styled.div`
 `;
 
 type ReorderedItems = Array<{ id: string }>;
+type DecoratorSummary = {
+  id: string,
+  order: number,
+  title: React.Node,
+};
 type Props = {
-  decorators: Array<Decorator>,
+  decorators: Array<DecoratorSummary>,
   disableDragging?: boolean,
   onReorder: (ReorderedItems) => mixed,
 };
