@@ -40,7 +40,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -107,7 +107,7 @@ public class V20191219090834_AddSourcesPageTest {
     }
 
     @Test
-    public void upgradeFailesBecauseSourcePageContentPackExists() throws IOException {
+    public void upgradeFailsBecauseSourcePageContentPackExists() throws IOException {
         final URL contentPackURL = V20191219090834_AddSourcesPage.class
                 .getResource("V20191219090834_AddSourcesPage_Content_Pack.json");
         final ContentPack contentPack = ContentPackV1.builder()
@@ -132,13 +132,7 @@ public class V20191219090834_AddSourcesPageTest {
         when(configService.get(V20191219090834_AddSourcesPage.MigrationCompleted.class)).thenReturn(null);
         when(objectMapper.readValue(contentPackURL, ContentPack.class)).thenReturn(contentPack);
         when(contentPackPersistenceService.insert(contentPack)).thenReturn(Optional.empty());
-        boolean exceptionCalled = false;
-        try {
-            migration.upgrade();
-        } catch (ContentPackException e) {
-           exceptionCalled = true;
-        }
-        assertThat(exceptionCalled).isTrue();
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> migration.upgrade()).withMessage("Could not install Source Page Content Pack.");
         verify(configService).write(V20191219090834_AddSourcesPage.MigrationCompleted.create("04fcf179-49e0-4e8f-9c02-0ff13062efbe"));
         verifyZeroInteractions(contentPackService);
     }

@@ -77,15 +77,11 @@ public class V20191219090834_AddSourcesPage extends Migration {
                         return new ContentPackException("Content pack " + contentPack.id() + " with this revision " + contentPack.revision() + " already found!");
                     });
 
-            try {
-                contentPackService.installContentPack(pack, Collections.emptyMap(), "Add Sources Page", "admin");
-            } catch(ContentPackException e) {
-                LOG.warn("Could not install sources page: {}", e.getMessage());
-            }
+            contentPackService.installContentPack(pack, Collections.emptyMap(), "Add Sources Page", "admin");
 
             configService.write(V20191219090834_AddSourcesPage.MigrationCompleted.create(pack.id().toString()));
-        } catch (IOException e) {
-            LOG.error("Unable to import content pack for sources page: {}", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not install Source Page Content Pack.", e);
         }
     }
 
