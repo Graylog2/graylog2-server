@@ -228,7 +228,7 @@ describe('AggregationConditionExpression', () => {
                                         expression={expression} />,
       );
 
-      const addGroupButton = wrapper.find('button > [name="code-fork"]');
+      const addGroupButton = wrapper.find('button[children="Add Group"]');
       expect(addGroupButton).toHaveLength(1);
       addGroupButton.simulate('click');
       expect(onChange.mock.calls.length).toBe(1);
