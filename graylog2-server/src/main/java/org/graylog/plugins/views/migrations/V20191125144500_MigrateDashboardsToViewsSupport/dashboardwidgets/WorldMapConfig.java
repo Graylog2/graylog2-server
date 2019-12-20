@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -69,7 +70,7 @@ public abstract class WorldMapConfig extends WidgetConfigBase implements WidgetC
     ) {
         return new AutoValue_WorldMapConfig(
                 timerange,
-                query,
+                Strings.nullToEmpty(query),
                 field,
                 Optional.ofNullable(streamId)
         );

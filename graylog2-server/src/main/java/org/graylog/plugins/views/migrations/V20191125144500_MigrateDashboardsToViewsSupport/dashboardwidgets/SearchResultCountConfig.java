@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -38,9 +39,9 @@ import java.util.Set;
 public abstract class SearchResultCountConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String NUMERIC_VISUALIZATION = "numeric";
 
-    public abstract Boolean lowerIsBetter();
+    public abstract Optional<Boolean> lowerIsBetter();
 
-    public abstract Boolean trend();
+    public abstract Optional<Boolean> trend();
 
     public abstract Optional<String> streamId();
 
@@ -63,7 +64,7 @@ public abstract class SearchResultCountConfig extends WidgetConfigBase implement
                                         .visualizationConfig(
                                                 NumberVisualizationConfig.builder()
                                                         .trend(true)
-                                                        .trendPreference(lowerIsBetter()
+                                                        .trendPreference(lowerIsBetter().orElse(false)
                                                                 ? NumberVisualizationConfig.TrendPreference.LOWER
                                                                 : NumberVisualizationConfig.TrendPreference.HIGHER)
                                                         .build()
@@ -75,17 +76,17 @@ public abstract class SearchResultCountConfig extends WidgetConfigBase implement
 
     @JsonCreator
     static SearchResultCountConfig create(
-            @JsonProperty("lower_is_better") Boolean lowerIsBetter,
-            @JsonProperty("trend") Boolean trend,
-            @JsonProperty("query") String query,
+            @JsonProperty("lower_is_better") @Nullable Boolean lowerIsBetter,
+            @JsonProperty("trend") @Nullable Boolean trend,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange,
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_SearchResultCountConfig(
                 timerange,
-                query,
-                lowerIsBetter,
-                trend,
+                Strings.nullToEmpty(query),
+                Optional.ofNullable(lowerIsBetter),
+                Optional.ofNullable(trend),
                 Optional.ofNullable(streamId)
         );
     }

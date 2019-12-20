@@ -13,3 +13,8 @@ export type ListenableAction<R> = R & {
 export type RefluxAction = <Fn>(Fn) => ListenableAction<Fn>;
 
 export type RefluxActions<A> = $ObjMap<A, RefluxAction>;
+
+export type Store<State> = {
+  listen: ((State) => mixed) => () => void,
+  getInitialState: () => State,
+};

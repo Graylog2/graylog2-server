@@ -1,10 +1,6 @@
 // @flow strict
 import { trim } from 'lodash';
 
-const queryContainsTerm = (query: string, termInQuestion: string) => {
-  return query.indexOf(termInQuestion) !== -1;
-};
-
 const isPhrase = (searchTerm: ?string) => {
   return String(searchTerm).indexOf(' ') !== -1;
 };
@@ -29,10 +25,6 @@ const escape = (searchTerm: ?string) => {
 };
 
 const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND') => {
-  if (queryContainsTerm(oldQuery, newTerm)) {
-    return oldQuery;
-  }
-
   if (trim(oldQuery) === '*' || trim(oldQuery) === '') {
     return newTerm;
   }
@@ -40,4 +32,4 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
-export { queryContainsTerm, isPhrase, escape, addToQuery };
+export { isPhrase, escape, addToQuery };

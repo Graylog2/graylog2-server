@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class V20191125144500_MigrateDashboardsToViews extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20191125144500_MigrateDashboardsToViews.class);
@@ -205,6 +206,9 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                 .flatMap(entry -> {
                     final WidgetPosition widgetPosition = entry.getValue();
                     final Set<String> viewWidgetIds = migratedWidgetIds.get(entry.getKey());
+                    if (viewWidgetIds == null) {
+                        return Stream.empty();
+                    }
                     final Set<ViewWidget> newViewWidgets = viewWidgetIds.stream()
                             .map(viewWidgetId -> viewWidgets
                                 .stream()
@@ -213,13 +217,13 @@ public class V20191125144500_MigrateDashboardsToViews extends Migration {
                                     .orElse(null)
                             ).filter(Objects::nonNull)
                             .collect(Collectors.toSet());
-                    final Widget dashboardWidget = dashboard.widgets().stream()
+                    final Optional<Widget> dashboardWidget = dashboard.widgets().stream()
                             .filter(widget -> widget.id().equals(entry.getKey()))
-                            .findFirst()
-                            .orElseThrow(() -> new RuntimeException("Unable to find widget with id <" + entry.getKey()));
-                    return dashboardWidget.config().toViewWidgetPositions(newViewWidgets, widgetPosition)
+                            .findFirst();
+                    return dashboardWidget.map(widget -> widget.config().toViewWidgetPositions(newViewWidgets, widgetPosition)
                             .entrySet()
-                            .stream();
+                            .stream())
+                            .orElse(Stream.empty());
                 }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

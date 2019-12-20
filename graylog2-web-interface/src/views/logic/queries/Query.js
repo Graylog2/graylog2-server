@@ -29,6 +29,8 @@ export type ElasticsearchQueryString = {
   query_string: string,
 };
 
+export const createElasticsearchQueryString = (query: string = ''): ElasticsearchQueryString => ({ type: 'elasticsearch', query_string: query });
+
 export type QueryString = ElasticsearchQueryString;
 
 export type TimeRangeTypes = 'relative' | 'absolute' | 'keyword';

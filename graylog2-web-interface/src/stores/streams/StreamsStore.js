@@ -10,7 +10,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-type Stream = {
+export type Stream = {
   id: string,
   title: string,
   description: string,

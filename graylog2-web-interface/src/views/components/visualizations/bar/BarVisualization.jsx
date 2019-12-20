@@ -62,7 +62,7 @@ const BarVisualization: VisualizationComponent = ({ config, data, effectiveTimer
 
 BarVisualization.propTypes = {
   config: AggregationType.isRequired,
-  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  data: PropTypes.object.isRequired,
 };
 
 BarVisualization.type = 'bar';

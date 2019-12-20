@@ -17,7 +17,6 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import { RefreshActions } from 'views/stores/RefreshStore';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import WidgetModel from 'views/logic/widgets/Widget';
-import WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import SearchActions from 'views/actions/SearchActions';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
@@ -63,10 +62,9 @@ type Props = {
   onPositionsChange: () => void,
 };
 type State = {
-  configChanged?: boolean,
   editing: boolean,
   loading: boolean;
-  oldConfig?: WidgetConfig,
+  oldWidget?: WidgetModel,
   showCopyToDashboard: boolean,
 };
 
@@ -136,7 +134,7 @@ class Widget extends React.Component<Props, State> {
       showCopyToDashboard: false,
     };
     if (editing) {
-      this.state = { ...this.state, oldConfig: props.widget.config };
+      this.state = { ...this.state, oldWidget: props.widget };
     }
   }
 
@@ -195,36 +193,29 @@ class Widget extends React.Component<Props, State> {
       if (state.editing) {
         return {
           editing: false,
-          oldConfig: undefined,
-          configChanged: undefined,
+          oldWidget: undefined,
         };
       }
       RefreshActions.disable();
       return {
         editing: true,
-        oldConfig: widget.config,
+        oldWidget: widget,
       };
     });
   };
 
   _onCancelEdit = () => {
-    const { configChanged } = this.state;
-    if (configChanged) {
+    const { oldWidget } = this.state;
+    if (oldWidget) {
       const { id } = this.props;
-      const { oldConfig } = this.state;
-      WidgetActions.updateConfig(id, oldConfig);
+      WidgetActions.update(id, oldWidget);
     }
     this._onToggleEdit();
   };
 
-  _onWidgetConfigChange = (widgetId, config) => {
-    this.setState({ configChanged: true });
-    WidgetActions.updateConfig(widgetId, config);
-  };
+  _onWidgetConfigChange = (widgetId, config) => WidgetActions.updateConfig(widgetId, config);
 
-  _setLoadingState = (loading: boolean) => {
-    this.setState({ loading });
-  }
+  _setLoadingState = (loading: boolean) => this.setState({ loading });
 
   visualize = () => {
     const { data, errors, title } = this.props;
