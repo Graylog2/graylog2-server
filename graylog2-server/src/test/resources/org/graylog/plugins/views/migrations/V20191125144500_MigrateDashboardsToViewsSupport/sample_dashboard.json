@@ -83,6 +83,12 @@
           "col": 7,
           "row": 1,
           "height": 3
+        },
+        "f2e76256-0379-483e-8622-8efd661ca939": {
+          "width": 23,
+          "col": 8,
+          "row": 8,
+          "height": 42
         }
       },
       "title": "Sample Dashboard",
