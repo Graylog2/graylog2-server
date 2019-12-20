@@ -52,7 +52,7 @@ public class GraylogVersionConstraintChecker implements ConstraintChecker {
             if (constraint instanceof GraylogVersionConstraint) {
                 final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
                 final Requirement requiredVersion = versionConstraint.version();
-                if (requiredVersion.isSatisfiedBy(graylogVersion.toString())) {
+                if (requiredVersion.isSatisfiedBy(graylogVersion.withClearedSuffixAndBuild())) {
                     fulfilledConstraints.add(constraint);
                 }
             }
@@ -68,7 +68,7 @@ public class GraylogVersionConstraintChecker implements ConstraintChecker {
                 final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
                 final Requirement requiredVersion = versionConstraint.version();
                 final ConstraintCheckResult constraintCheckResult = ConstraintCheckResult.create(versionConstraint,
-                        requiredVersion.isSatisfiedBy(graylogVersion.toString()));
+                        requiredVersion.isSatisfiedBy(graylogVersion.withClearedSuffix()));
                 fulfilledConstraints.add(constraintCheckResult);
             }
         }
