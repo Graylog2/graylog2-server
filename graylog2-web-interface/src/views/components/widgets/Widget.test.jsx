@@ -229,6 +229,7 @@ describe('<Widget />', () => {
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
     WidgetActions.updateConfig = mockAction(jest.fn());
+    WidgetActions.update = mockAction(jest.fn());
     const onChangeBtn = getByText('Click me');
     fireEvent.click(onChangeBtn);
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
@@ -236,12 +237,14 @@ describe('<Widget />', () => {
     const cancelButton = getByText('Cancel');
     fireEvent.click(cancelButton);
 
-    expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 42 });
+    expect(WidgetActions.update).toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
-  it('does not restores original state of widget config when clicking "Finish Editing"', () => {
+  it('does not restore original state of widget config when clicking "Finish Editing"', () => {
     const widgetWithConfig = { config: { foo: 42 }, id: 'widgetId', type: 'dummy' };
     const { getByText } = render(<DummyWidget editing widget={widgetWithConfig} />);
 
+    WidgetActions.updateConfig = mockAction(jest.fn());
+    WidgetActions.update = mockAction(jest.fn());
     const onChangeBtn = getByText('Click me');
     fireEvent.click(onChangeBtn);
     expect(WidgetActions.updateConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
@@ -249,7 +252,7 @@ describe('<Widget />', () => {
     const saveButton = getByText('Save');
     fireEvent.click(saveButton);
 
-    expect(WidgetActions.updateConfig).not.toHaveBeenCalledWith('widgetId', { foo: 42 });
+    expect(WidgetActions.update).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
   });
 
   describe('copy widget to dashboard', () => {

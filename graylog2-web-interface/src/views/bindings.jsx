@@ -22,6 +22,7 @@ import ScatterVisualization from 'views/components/visualizations/scatter/Scatte
 import WorldMapVisualization from 'views/components/visualizations/worldmap/WorldMapVisualization';
 import HeatmapVisualization from 'views/components/visualizations/heatmap/HeatmapVisualization';
 import MigrateFieldCharts from 'views/components/MigrateFieldCharts';
+import IfSearch from 'views/components/search/IfSearch';
 
 import PivotConfigGenerator from 'views/logic/searchtypes/aggregation/PivotConfigGenerator';
 import PivotHandler from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -47,7 +48,6 @@ import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTab
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import CreateCustomAggregation from 'views/logic/creatoractions/CreateCustomAggregation';
 import SelectExtractorType from 'views/logic/valueactions/SelectExtractorType';
-import Store from 'logic/local-storage/Store';
 
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import WorldMapVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/WorldMapVisualizationConfig';
@@ -87,6 +87,7 @@ import LineVisualizationConfiguration from './components/aggregationbuilder/Line
 import AreaVisualizationConfiguration from './components/aggregationbuilder/AreaVisualizationConfiguration';
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
+import MessageConfigGenerator from './logic/searchtypes/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
@@ -107,8 +108,6 @@ ViewSharing.registerSubtype(SpecificUsers.Type, SpecificUsers);
 
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
-
-const hasLegacyFieldCharts = () => !Store.get('pinned-field-charts-migrated') && !!Store.get('pinned-field-charts');
 
 export default {
   pages: {
@@ -134,7 +133,7 @@ export default {
       visualizationComponent: MessageList,
       editComponent: EditMessageList,
       searchResultTransformer: (data: Array<*>) => data[0],
-      searchTypes: () => [{ type: 'messages' }],
+      searchTypes: MessageConfigGenerator,
       titleGenerator: () => 'Untitled Message Table',
     },
     {
@@ -160,6 +159,7 @@ export default {
       type: 'default',
       visualizationComponent: UnknownWidget,
       editComponent: UnknownWidget,
+      searchTypes: () => [],
     },
   ],
   searchTypes: [
@@ -193,11 +193,12 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      isEnabled: (({ type }) => !type.isCompound(): ActionHandlerCondition),
+      isEnabled: (({ type }) => (!type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'statistics',
       title: 'Statistics',
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
       handler: FieldStatisticsHandler,
     },
     {
@@ -218,11 +219,13 @@ export default {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
+      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
     },
   ],
   valueActions: [
@@ -230,13 +233,13 @@ export default {
       type: 'exclude',
       title: 'Exclude from results',
       handler: new ExcludeFromQueryHandler().handle,
-      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
+      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
     },
     {
       type: 'add-to-query',
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
-      isEnabled: ({ field }: ActionHandlerArguments) => !isFunction(field),
+      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
     },
     {
       type: 'new-query',
@@ -253,7 +256,7 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: (({ type }) => type.type === 'string': ActionHandlerCondition),
+      isEnabled: (({ type }) => (type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
       component: SelectExtractorType,
     },
     {
@@ -353,7 +356,7 @@ export default {
     requirementsProvided,
     bindSearchParamsFromQuery,
   ],
-  'views.elements.header': [() => hasLegacyFieldCharts() && (
-    <MigrateFieldCharts />
-  )],
+  'views.elements.header': [
+    () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+  ],
 };

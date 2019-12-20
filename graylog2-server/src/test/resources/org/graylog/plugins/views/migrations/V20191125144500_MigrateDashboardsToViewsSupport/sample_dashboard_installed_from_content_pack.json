@@ -1,0 +1,395 @@
+{
+  "dashboards": [
+    {
+      "_id": { "$oid": "5c7fc3f9f38ed741ac154697" },
+      "creator_user_id": "admin",
+      "description": "Hey!",
+      "created_at": { "$date": "2019-03-06T12:58:33.610Z" },
+      "positions": {
+        "da111daa-0d0a-47b9-98ed-8b8aa8a4f575": {
+          "width": 2,
+          "col": 5,
+          "row": 5,
+          "height": 2
+        },
+        "40c9cf4e-0956-4dc1-9ccd-83868fa83277": {
+          "width": 6,
+          "col": 7,
+          "row": 4,
+          "height": 3
+        },
+        "a8eadf94-6494-4271-8c0e-3c8d08e65623": {
+          "width": 6,
+          "col": 7,
+          "row": 7,
+          "height": 5
+        },
+        "6f2cc355-bcbb-4b3f-be01-bfba299aa51a": {
+          "width": 3,
+          "col": 1,
+          "row": 7,
+          "height": 5
+        },
+        "9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3": {
+          "width": 4,
+          "col": 1,
+          "row": 14,
+          "height": 2
+        },
+        "5020d62d-24a0-4b0c-8819-78e668cc2428": {
+          "width": 4,
+          "col": 1,
+          "row": 1,
+          "height": 2
+        },
+        "91b37752-e3a8-4274-910f-3d66d19f1028": {
+          "width": 4,
+          "col": 1,
+          "row": 12,
+          "height": 2
+        },
+        "05b03c7b-fe23-4789-a1c8-a38a583d3ba6": {
+          "width": 2,
+          "col": 5,
+          "row": 1,
+          "height": 2
+        },
+        "76b7f7e1-76ac-486b-894b-bc31bf4808f1": {
+          "width": 3,
+          "col": 4,
+          "row": 7,
+          "height": 5
+        },
+        "10c1b3f9-6b34-4b34-9457-892d12b84151": {
+          "width": 2,
+          "col": 5,
+          "row": 3,
+          "height": 2
+        },
+        "4a192616-51d3-474e-9e18-a680f2577769": {
+          "width": 4,
+          "col": 1,
+          "row": 5,
+          "height": 2
+        },
+        "e9efdfaf-f7be-47ca-97fe-871c05a24d3c": {
+          "width": 4,
+          "col": 1,
+          "row": 3,
+          "height": 2
+        },
+        "2afb1838-24ee-489f-929f-ef7d47485021": {
+          "width": 6,
+          "col": 7,
+          "row": 1,
+          "height": 3
+        }
+      },
+      "title": "Sample Dashboard",
+      "widgets": [
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "KPI",
+          "id": "a8eadf94-6494-4271-8c0e-3c8d08e65623",
+          "type": "field_chart",
+          "config": {
+            "valuetype": "total",
+            "renderer": "line",
+            "interpolation": "linear",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "rangeType": "relative",
+            "field": "nf_bytes",
+            "query": "",
+            "interval": "minute",
+            "relative": 300
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Field graph",
+          "id": "40c9cf4e-0956-4dc1-9ccd-83868fa83277",
+          "type": "field_chart",
+          "config": {
+            "valuetype": "total",
+            "renderer": "line",
+            "interpolation": "linear",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "rangeType": "relative",
+            "field": "nf_bytes",
+            "query": "",
+            "interval": "minute",
+            "relative": 300
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Search result graph",
+          "id": "e9efdfaf-f7be-47ca-97fe-871c05a24d3c",
+          "type": "search_result_chart",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 28800
+            },
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Important!",
+          "id": "5020d62d-24a0-4b0c-8819-78e668cc2428",
+          "type": "field_chart",
+          "config": {
+            "valuetype": "total",
+            "renderer": "line",
+            "interpolation": "linear",
+            "timerange": {
+              "type": "relative",
+              "range": 28800
+            },
+            "rangeType": "relative",
+            "field": "nf_bytes",
+            "query": "",
+            "interval": "minute",
+            "relative": 28800
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Search result count",
+          "id": "05b03c7b-fe23-4789-a1c8-a38a583d3ba6",
+          "type": "search_result_count",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "lower_is_better": true,
+            "trend": true,
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values",
+          "id": "6f2cc355-bcbb-4b3f-be01-bfba299aa51a",
+          "type": "quickvalues",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "facility",
+            "query": "",
+            "show_data_table": true,
+            "limit": 5,
+            "show_pie_chart": true,
+            "sort_order": "desc",
+            "stacked_fields": "",
+            "data_table_limit": 50
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Statistical value",
+          "id": "10c1b3f9-6b34-4b34-9457-892d12b84151",
+          "type": "stats_count",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "nf_src_address_geolocation",
+            "trend": false,
+            "query": "",
+            "stats_function": "cardinality",
+            "lower_is_better": false
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Search result graph",
+          "id": "2afb1838-24ee-489f-929f-ef7d47485021",
+          "type": "search_result_chart",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "World Map Example",
+          "id": "76b7f7e1-76ac-486b-894b-bc31bf4808f1",
+          "type": "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "nf_dst_address_geolocation",
+            "stream_id": "5c2e07eeba33a9681ad6070a",
+            "query": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Some Statistical values",
+          "id": "da111daa-0d0a-47b9-98ed-8b8aa8a4f575",
+          "type": "stats_count",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "nf_proto",
+            "stream_id": "5c2e07eeba33a9681ad6070a",
+            "trend": true,
+            "query": "",
+            "stats_function": "cardinality",
+            "lower_is_better": true
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Field Chart with absolute time range",
+          "id": "9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3",
+          "type": "field_chart",
+          "config": {
+            "valuetype": "count",
+            "renderer": "bar",
+            "interpolation": "linear",
+            "timerange": {
+              "from": { "$date": "2019-11-25T00:00:00.000Z" },
+              "to": { "$date": "2019-11-26T00:00:00.000Z" },
+              "type": "absolute"
+            },
+            "rangeType": "absolute",
+            "field": "nf_bytes",
+            "query": "",
+            "interval": "minute",
+            "from": "2019-11-25T00:00:00.000Z",
+            "to": "2019-11-26T00:00:00.000Z"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Field chart with keyword time range",
+          "id": "91b37752-e3a8-4274-910f-3d66d19f1028",
+          "type": "field_chart",
+          "config": {
+            "valuetype": "count",
+            "renderer": "bar",
+            "interpolation": "linear",
+            "timerange": {
+              "type": "keyword",
+              "keyword": "yesterday"
+            },
+            "rangeType": "keyword",
+            "field": "nf_bytes",
+            "query": "",
+            "interval": "minute",
+            "keyword": "yesterday"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values Histogram",
+          "id": "4a192616-51d3-474e-9e18-a680f2577769",
+          "type": "quickvalues_histogram",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "facility",
+            "query": "",
+            "limit": 5,
+            "interval": "hour",
+            "sort_order": "desc",
+            "stacked_fields": ""
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Stacked Field graph",
+          "id": "f6e9d960-9cc8-4d16-b3c8-770501b2709f",
+          "type": "stacked_chart",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "renderer": "bar",
+            "interpolation": "linear",
+            "series": [
+              {
+                "query": "",
+                "field": "dns_client",
+                "statistical_function": "count"
+              },
+              {
+                "query": "",
+                "field": "nf_bytes",
+                "statistical_function": "count"
+              }
+            ]
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Stacked graph with custom timerange & query",
+          "id": "d9be20a1-82d7-427b-8a2d-c7ea9cd114de",
+          "type": "stacked_chart",
+          "config": {
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 7200
+            },
+            "renderer": "bar",
+            "interpolation": "linear",
+            "series": [
+              {
+                "query": "",
+                "field": "dns_client",
+                "statistical_function": "count"
+              },
+              {
+                "query": "",
+                "field": "nf_bytes",
+                "statistical_function": "count"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

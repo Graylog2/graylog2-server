@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Strings;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.RandomUUIDProvider;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.TimeRange;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.ViewWidget;
@@ -71,13 +72,13 @@ public abstract class SearchResultChartConfig extends WidgetConfigBase implement
     @JsonCreator
     static SearchResultChartConfig create(
             @JsonProperty("interval") String interval,
-            @JsonProperty("query") String query,
+            @JsonProperty("query") @Nullable String query,
             @JsonProperty("timerange") TimeRange timerange,
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_SearchResultChartConfig(
                 timerange,
-                query,
+                Strings.nullToEmpty(query),
                 Optional.ofNullable(streamId),
                 interval
         );

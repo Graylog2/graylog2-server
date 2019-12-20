@@ -23,6 +23,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
+import org.graylog2.decorators.Decorator;
+import org.graylog2.decorators.DecoratorImpl;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @AutoValue
 @JsonTypeName(MessageListConfigDTO.NAME)
@@ -31,12 +37,16 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     public static final String NAME = "messages";
     private static final String FIELD_FIELDS = "fields";
     private static final String FIELD_SHOW_MESSAGE_ROW = "show_message_row";
+    private static final String FIELD_DECORATORS = "decorators";
 
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<String> fields();
 
     @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
     public abstract boolean showMessageRow();
+
+    @JsonProperty(FIELD_DECORATORS)
+    public abstract List<Decorator> decorators();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -46,11 +56,18 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
         @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
         public abstract Builder showMessageRow(boolean showMessageRow);
 
+        @JsonProperty(FIELD_DECORATORS)
+        public Builder _decorators(List<DecoratorImpl> decorators) {
+            return decorators(new ArrayList<>(decorators));
+        }
+        public abstract Builder decorators(List<Decorator> decorators);
+
         public abstract MessageListConfigDTO build();
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_MessageListConfigDTO.Builder();
+            return new AutoValue_MessageListConfigDTO.Builder()
+                    .decorators(Collections.emptyList());
         }
     }
 }

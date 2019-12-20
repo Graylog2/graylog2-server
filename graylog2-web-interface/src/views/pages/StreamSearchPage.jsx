@@ -34,7 +34,7 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
 
   useEffect(() => {
     processHooks(
-      ViewActions.create(View.Type.Search)
+      ViewActions.create(View.Type.Search, streamId)
         .then(({ view, activeQuery }) => {
           return QueryFiltersActions.streams(activeQuery, [streamId]).then(() => view);
         }),

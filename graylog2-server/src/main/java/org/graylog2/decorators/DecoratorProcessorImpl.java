@@ -46,9 +46,14 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
 
     @Override
     public SearchResponse decorate(SearchResponse searchResponse, Optional<String> streamId) {
+        final List<SearchResponseDecorator> searchResponseDecorators = streamId.isPresent() ?
+                decoratorResolver.searchResponseDecoratorsForStream(streamId.get()) : decoratorResolver.searchResponseDecoratorsForGlobal();
+        return decorate(searchResponse, searchResponseDecorators);
+    }
+
+    @Override
+    public SearchResponse decorate(SearchResponse searchResponse, List<SearchResponseDecorator> searchResponseDecorators) {
         try {
-            final List<SearchResponseDecorator> searchResponseDecorators = streamId.isPresent() ?
-                    decoratorResolver.searchResponseDecoratorsForStream(streamId.get()) : decoratorResolver.searchResponseDecoratorsForGlobal();
             final Optional<SearchResponseDecorator> metaDecorator = searchResponseDecorators.stream()
                     .reduce((f, g) -> (v) -> g.apply(f.apply(v)));
             if (metaDecorator.isPresent()) {
