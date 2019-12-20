@@ -89,13 +89,41 @@ const InteractableModal = ({
   const [dragPosition, setDragPosition] = useState(position);
   const [resizeSize, setResizeSize] = useState(size);
 
-  const handleDragStop = (event, newPosition) => {
+  const handleDragStop = React.useCallback((event, newPosition) => {
     const { x, y } = newPosition;
 
     const setPosition = { x, y };
     setDragPosition(setPosition);
     onDrag(setPosition);
-  };
+  }, [dragPosition]);
+
+  const handleResizeStop = React.useCallback((event, direction, ref) => {
+    const newSize = {
+      width: ref.style.width,
+      height: ref.style.height,
+    };
+    let newCoords = { ...dragPosition };
+
+    switch (direction) {
+      case 'left':
+      case 'bottomLeft':
+      case 'topLeft':
+      case 'top':
+      case 'topRight':
+        newCoords = {
+          x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
+          y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    setResizeSize(newSize);
+    onResize(newSize);
+    setDragPosition(newCoords);
+  }, [dragPosition, resizeSize]);
 
   const handleBrowserResize = debounce(() => {
     const { x, y } = dragPosition;
@@ -142,14 +170,7 @@ const InteractableModal = ({
                  maxWidth={window.innerWidth}
                  dragHandleClassName={dragHandleClassName}
                  onDragStop={handleDragStop}
-                 onResizeStop={(event, direction, ref) => {
-                   const newSize = {
-                     width: ref.style.width,
-                     height: ref.style.height,
-                   };
-                   setResizeSize(newSize);
-                   onResize(newSize);
-                 }}
+                 onResizeStop={handleResizeStop}
                  position={dragPosition}
                  size={resizeSize}
                  className={className}
