@@ -20,6 +20,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESMessageList;
 import org.graylog.plugins.views.search.elasticsearch.searchtypes.ESSearchTypeHandler;
@@ -35,6 +38,7 @@ import org.junit.Test;
 
 import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -91,5 +95,38 @@ public class ElasticsearchBackendTest {
 
         assertThat(queryMetadata.usedParameterNames())
                 .containsOnly("username", "foo", "bar", "baz");
+    }
+
+    @Test
+    public void generatesSearchForEmptySearchTypes() throws Exception {
+        final Query query = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .timerange(RelativeRange.create(300))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+
+        backend.generate(job, query, Collections.emptySet());
+    }
+
+    @Test
+    public void executesSearchForEmptySearchTypes() throws Exception {
+        final Query query = Query.builder()
+                .id("query1")
+                .query(ElasticsearchQueryString.builder().queryString("").build())
+                .timerange(RelativeRange.create(300))
+                .build();
+        final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
+        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+
+        final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+
+        final QueryResult queryResult = backend.doRun(job, query, queryContext, Collections.emptySet());
+
+        assertThat(queryResult).isNotNull();
+        assertThat(queryResult.searchTypes()).isEmpty();
+        assertThat(queryResult.executionStats()).isNotNull();
+        assertThat(queryResult.errors()).isEmpty();
     }
 }
