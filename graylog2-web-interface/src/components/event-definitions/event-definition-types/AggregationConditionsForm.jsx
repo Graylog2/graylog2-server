@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
-import { Row } from 'components/graylog';
+import { Button, Row, Well } from 'components/graylog';
+import { Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
+import AggregationConditionSummary from './AggregationConditionSummary';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -23,6 +26,10 @@ const extractSeriesReferences = (expression, acc = []) => {
   return acc;
 };
 
+const StyledWell = styled(Well)`
+  margin-top: 10px;
+`;
+
 class AggregationConditionsForm extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
@@ -30,6 +37,15 @@ class AggregationConditionsForm extends React.Component {
     formattedFields: PropTypes.array.isRequired,
     aggregationFunctions: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
+  };
+
+  state = {
+    showConditionSummary: false,
+  };
+
+  toggleShowConditionSummary = () => {
+    const { showConditionSummary } = this.state;
+    this.setState({ showConditionSummary: !showConditionSummary });
   };
 
   handleChange = (changes) => {
@@ -54,6 +70,7 @@ class AggregationConditionsForm extends React.Component {
   };
 
   render() {
+    const { showConditionSummary } = this.state;
     const { eventDefinition } = this.props;
     const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
 
@@ -66,6 +83,17 @@ class AggregationConditionsForm extends React.Component {
                                           {...this.props}
                                           onChange={this.handleChange} />
         </Row>
+
+
+        <Button bsSize="small" bsStyle="link" className="btn-text" onClick={this.toggleShowConditionSummary}>
+          <Icon name={showConditionSummary ? 'caret-down' : 'caret-right'} />
+          &nbsp;{showConditionSummary ? 'Hide' : 'Show'} condition preview
+        </Button>
+        {showConditionSummary && (
+          <StyledWell bsSize="small">
+            <AggregationConditionSummary series={eventDefinition.config.series} conditions={eventDefinition.config.conditions} />
+          </StyledWell>
+        )}
       </React.Fragment>
     );
   }
