@@ -10,7 +10,7 @@ const OperatorSelector = styled.div`
   font-size: 14px;
 `;
 
-const BooleanOperatorSelect = styled(FormGroup.type)`
+const BooleanOperatorSelect = styled(({ isFirstElement, ...props }) => <FormGroup {...props} />)`
   width: 100px;
   margin-left: ${props => (props.isFirstElement ? '' : '1em')};
   margin-right: 1em;
