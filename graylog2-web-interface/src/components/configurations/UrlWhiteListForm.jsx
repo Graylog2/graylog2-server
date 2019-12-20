@@ -127,7 +127,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
       return (
       // eslint-disable-next-line react/no-array-index-key
         <tr key={url.id}>
-          <td style={{ 'vertical-align': 'middle', 'text-align': 'center' }}>{idx + 1}</td>
+          <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
           <td>
             <Input type="text"
                    id={`title-input${idx}`}

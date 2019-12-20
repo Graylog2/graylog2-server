@@ -27,7 +27,7 @@ Array [
       <span
         className="HelpBlock-i8is92-0 huFHQV help-block"
       >
-        Disable this white list.
+        Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk.
       </span>
     </span>
   </div>,
@@ -51,7 +51,7 @@ Array [
           Title
         </th>
         <th>
-          Url
+          URL
         </th>
         <th>
           Type
@@ -63,7 +63,14 @@ Array [
     </thead>
     <tbody>
       <tr>
-        <td>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
           1
         </td>
         <td>
@@ -223,29 +230,32 @@ Array [
           </div>
         </td>
         <td>
-          <span
-            className=""
+          <button
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              <i
-                className="fa fa-trash"
-                style={
-                  Object {
-                    "cursor": "pointer",
-                  }
+            <i
+              className="fa fa-trash"
+              style={
+                Object {
+                  "cursor": "pointer",
                 }
-              />
-            </button>
-          </span>
+              }
+            />
+          </button>
         </td>
       </tr>
       <tr>
-        <td>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
           2
         </td>
         <td>
@@ -405,29 +415,32 @@ Array [
           </div>
         </td>
         <td>
-          <span
-            className=""
+          <button
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              <i
-                className="fa fa-trash"
-                style={
-                  Object {
-                    "cursor": "pointer",
-                  }
+            <i
+              className="fa fa-trash"
+              style={
+                Object {
+                  "cursor": "pointer",
                 }
-              />
-            </button>
-          </span>
+              }
+            />
+          </button>
         </td>
       </tr>
       <tr>
-        <td>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
           3
         </td>
         <td>
@@ -587,25 +600,21 @@ Array [
           </div>
         </td>
         <td>
-          <span
-            className=""
+          <button
+            className="Button-c9cbmb-0 GLfOY btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
           >
-            <button
-              className="Button-c9cbmb-0 GLfOY btn btn-default"
-              disabled={false}
-              onClick={[Function]}
-              type="button"
-            >
-              <i
-                className="fa fa-trash"
-                style={
-                  Object {
-                    "cursor": "pointer",
-                  }
+            <i
+              className="fa fa-trash"
+              style={
+                Object {
+                  "cursor": "pointer",
                 }
-              />
-            </button>
-          </span>
+              }
+            />
+          </button>
         </td>
       </tr>
     </tbody>
