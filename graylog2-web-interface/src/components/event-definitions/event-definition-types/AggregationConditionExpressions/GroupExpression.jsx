@@ -26,15 +26,17 @@ const GroupExpression = (props) => {
   };
 
   return (
-    <Group>
+    <>
       <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
       <Clearfix />
-      <AggregationConditionExpression {...props}
-                                      expression={expression.child}
-                                      parent={expression}
-                                      onChange={onChildChange('child')}
-                                      level={level + 1} />
-    </Group>
+      <Group>
+        <AggregationConditionExpression {...props}
+                                        expression={expression.child}
+                                        parent={expression}
+                                        onChange={onChildChange('child')}
+                                        level={level + 1} />
+      </Group>
+    </>
   );
 };
 
