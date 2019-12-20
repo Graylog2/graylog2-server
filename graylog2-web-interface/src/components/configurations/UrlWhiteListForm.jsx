@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import uuid from 'uuid/v4';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 import Input from 'components/bootstrap/Input';
 import { Select, Icon } from 'components/common';
 import { Button, Table } from 'components/graylog';
-import ObjectUtils from 'util/ObjectUtils';
 import FormUtils from 'util/FormsUtils';
 import type { Url, WhiteListConfig } from 'stores/configurations/ConfigurationsStore';
 import StoreProvider from 'injection/StoreProvider';
@@ -107,6 +106,10 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   };
 
   const _onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
+    if (type === regex) {
+      const debouncedValidate = debounce(_validate, 500);
+      debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
+    }
     _validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
   };
 
