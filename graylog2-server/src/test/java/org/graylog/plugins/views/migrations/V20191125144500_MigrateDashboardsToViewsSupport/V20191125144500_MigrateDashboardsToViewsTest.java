@@ -154,20 +154,8 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         .build()
         );
 
-        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
-        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
-
-        verify(viewService, times(1)).save(newViewsCaptor.capture());
-        verify(searchService, times(1)).save(newSearchesCaptor.capture());
-
-        final List<View> newViews = newViewsCaptor.getAllValues();
-        final List<Search> newSearches = newSearchesCaptor.getAllValues();
-
-        assertThat(newViews).hasSize(1);
-        assertThat(newSearches).hasSize(1);
-
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_dashboard-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_dashboard-expected_searches.json"), false);
+        assertViewsWritten(1,resourceFile("sample_dashboard-expected_views.json"));
+        assertSearchesWritten(1, resourceFile("sample_dashboard-expected_searches.json"));
     }
 
     @Test
@@ -197,20 +185,25 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         .build()
         );
 
-        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
-        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
+        assertViewsWritten(1, resourceFile("sample_dashboard-expected_views.json"));
+        assertSearchesWritten(1, resourceFile("sample_dashboard-expected_searches.json"));
+    }
 
-        verify(viewService, times(1)).save(newViewsCaptor.capture());
-        verify(searchService, times(1)).save(newSearchesCaptor.capture());
+    @Test
+    @MongoDBFixtures("dashboard_with_minimal_quickvalues_widget.json")
+    public void migrateDashboardWithMinimalQuickValuesWidget() throws Exception {
+        this.migration.upgrade();
 
-        final List<View> newViews = newViewsCaptor.getAllValues();
-        final List<Search> newSearches = newSearchesCaptor.getAllValues();
+        final MigrationCompleted migrationCompleted = captureMigrationCompleted();
+        assertThat(migrationCompleted.migratedDashboardIds()).containsExactly("5c7fc3f9f38ed741ac154697");
+        assertThat(migrationCompleted.widgetMigrationIds()).containsAllEntriesOf(
+                ImmutableMap.<String, Set<String>>builder()
+                        .put("6f2cc355-bcbb-4b3f-be01-bfba299aa51a", ImmutableSet.of("0000016e-b690-426f-0000-016eb690426f", "0000016e-b690-4270-0000-016eb690426f"))
+                        .build()
+        );
 
-        assertThat(newViews).hasSize(1);
-        assertThat(newSearches).hasSize(1);
-
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("sample_dashboard-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("sample_dashboard-expected_searches.json"), false);
+        assertViewsWritten(1, resourceFile("dashboard_with_minimal_quickvalues_widget-expected_views.json"));
+        assertSearchesWritten(1, resourceFile("dashboard_with_minimal_quickvalues_widget-expected_searches.json"));
     }
 
     @Test
@@ -284,20 +277,8 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
                         "5ddf8ed8b2d44b2e044729d8"
                 );
 
-        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
-        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
-
-        verify(viewService, times(5)).save(newViewsCaptor.capture());
-        verify(searchService, times(5)).save(newSearchesCaptor.capture());
-
-        final List<View> newViews = newViewsCaptor.getAllValues();
-        final List<Search> newSearches = newSearchesCaptor.getAllValues();
-
-        assertThat(newViews).hasSize(5);
-        assertThat(newSearches).hasSize(5);
-
-        JSONAssert.assertEquals(toJSON(newViews), resourceFile("ops_dashboards-expected_views.json"), false);
-        JSONAssert.assertEquals(toJSON(newSearches), resourceFile("ops_dashboards-expected_searches.json"), false);
+        assertViewsWritten(5, resourceFile("ops_dashboards-expected_views.json"));
+        assertSearchesWritten(5, resourceFile("ops_dashboards-expected_searches.json"));
     }
 
     @Test
@@ -364,6 +345,24 @@ public class V20191125144500_MigrateDashboardsToViewsTest {
 
         verify(viewService, times(1)).save(any());
         verify(searchService, times(1)).save(any());
+    }
+
+    private void assertSearchesWritten(int count, String expectedEntities) throws Exception {
+        final ArgumentCaptor<Search> newSearchesCaptor = ArgumentCaptor.forClass(Search.class);
+        verify(searchService, times(count)).save(newSearchesCaptor.capture());
+        final List<Search> newSearches = newSearchesCaptor.getAllValues();
+        assertThat(newSearches).hasSize(count);
+
+        JSONAssert.assertEquals(toJSON(newSearches), expectedEntities, false);
+    }
+
+    private void assertViewsWritten(int count, String expectedEntities) throws Exception {
+        final ArgumentCaptor<View> newViewsCaptor = ArgumentCaptor.forClass(View.class);
+        verify(viewService, times(count)).save(newViewsCaptor.capture());
+        final List<View> newViews = newViewsCaptor.getAllValues();
+        assertThat(newViews).hasSize(count);
+
+        JSONAssert.assertEquals(toJSON(newViews), expectedEntities, false);
     }
 
     private MigrationCompleted captureMigrationCompleted() {
