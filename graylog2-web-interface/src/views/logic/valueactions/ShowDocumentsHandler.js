@@ -22,20 +22,23 @@ type Arguments = {
   contexts: Contexts;
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
+const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget, view } }: Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
     .map(([k, v]) => `${k}:${escape(String(v))}`)
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
-  const newWidget = MessagesWidget.builder()
+  const newWidgetBuilder = MessagesWidget.builder()
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(new MessagesWidgetConfig.builder()
       .fields([...DEFAULT_MESSAGE_FIELDS, ...(Object.keys(mergedObject))])
-      .showMessageRow(true).build())
-    .build();
+      .showMessageRow(true).build());
+
+  const newWidget = (view && view.type === View.Type.Dashboard)
+    ? newWidgetBuilder.timerange(widget.timerange).streams(widget.streams).build()
+    : newWidgetBuilder.build();
   return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Messages for ${valuePathQuery}`));
 };
 

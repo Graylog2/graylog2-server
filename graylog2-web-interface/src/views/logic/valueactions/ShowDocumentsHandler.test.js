@@ -2,14 +2,15 @@
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import asMock from 'helpers/mocking/AsMock';
+import { TitlesActions } from 'views/stores/TitlesStore';
+import TitleTypes from 'views/stores/TitleTypes';
+import View from 'views/logic/views/View';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';
 import { createElasticsearchQueryString } from '../queries/Query';
-import { TitlesActions } from '../../stores/TitlesStore';
-import TitleTypes from '../../stores/TitleTypes';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -76,5 +77,42 @@ describe('ShowDocumentsHandler', () => {
         const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
         expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, newWidget.id, 'Messages for hello:world AND bar:42');
       });
+  });
+  describe('on dashboard', () => {
+    const view = View.builder().type(View.Type.Dashboard).build();
+    it('copies timerange of original widget', () => {
+      const widgetWithFilter = widget.toBuilder()
+        .timerange({ type: 'relative', range: 1800 })
+        .query(createElasticsearchQueryString())
+        .build();
+      return ShowDocumentsHandler({
+        queryId,
+        field: 'hello',
+        value: 'world',
+        type: FieldType.Unknown,
+        contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }], view },
+      })
+        .then(() => {
+          const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+          expect(newWidget.timerange).toEqual({ type: 'relative', range: 1800 });
+        });
+    });
+    it('copies timerange of original widget', () => {
+      const widgetWithFilter = widget.toBuilder()
+        .streams(['deadbeef', 'cafecafe'])
+        .query(createElasticsearchQueryString())
+        .build();
+      return ShowDocumentsHandler({
+        queryId,
+        field: 'hello',
+        value: 'world',
+        type: FieldType.Unknown,
+        contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }], view },
+      })
+        .then(() => {
+          const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+          expect(newWidget.streams).toEqual(['deadbeef', 'cafecafe']);
+        });
+    });
   });
 });
