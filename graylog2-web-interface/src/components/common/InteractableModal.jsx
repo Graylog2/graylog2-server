@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled from 'styled-components';
@@ -89,15 +89,12 @@ const InteractableModal = ({
   const [dragPosition, setDragPosition] = useState(position);
   const [resizeSize, setResizeSize] = useState(size);
 
-  const handleDragStop = React.useCallback((event, newPosition) => {
-    const { x, y } = newPosition;
+  const handleDragStop = (event, { x, y }) => {
+    setDragPosition({ x, y });
+    onDrag({ x, y });
+  };
 
-    const setPosition = { x, y };
-    setDragPosition(setPosition);
-    onDrag(setPosition);
-  }, [dragPosition]);
-
-  const handleResizeStop = React.useCallback((event, direction, ref) => {
+  const handleResizeStop = (event, direction, ref) => {
     const newSize = {
       width: ref.style.width,
       height: ref.style.height,
@@ -106,12 +103,24 @@ const InteractableModal = ({
 
     switch (direction) {
       case 'left':
-      case 'bottomLeft':
       case 'topLeft':
       case 'top':
-      case 'topRight':
         newCoords = {
           x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
+          y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
+        };
+        break;
+
+      case 'bottomLeft':
+        newCoords = {
+          x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
+          y: dragPosition.y,
+        };
+        break;
+
+      case 'topRight':
+        newCoords = {
+          x: dragPosition.x,
           y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
         };
         break;
@@ -122,11 +131,11 @@ const InteractableModal = ({
 
     setResizeSize(newSize);
     onResize(newSize);
-    setDragPosition(newCoords);
-  }, [dragPosition, resizeSize]);
+    handleDragStop(null, newCoords);
+  };
 
   const handleBrowserResize = debounce(() => {
-    const { x, y } = dragPosition;
+    const { x: currentX, y: currentY } = dragPosition;
     const { width, height } = resizeSize;
     const { innerWidth, innerHeight } = window;
     const boundingBox = {
@@ -136,17 +145,20 @@ const InteractableModal = ({
       left: 0,
     };
 
-    const tooFarLeft = x < boundingBox.left;
-    const tooFarRight = x > boundingBox.right;
-    const newRight = tooFarRight ? boundingBox.right : x;
-    const nextX = tooFarLeft ? 0 : newRight;
+    const isTooFarLeft = currentX < boundingBox.left;
+    const isTooFarRight = currentX > boundingBox.right;
+    const newX = isTooFarRight ? boundingBox.right : currentX;
 
-    const tooFarUp = y < boundingBox.top;
-    const tooFarDown = y > boundingBox.bottom;
-    const newDown = tooFarDown ? boundingBox.bottom : y;
-    const nextY = tooFarUp ? 0 : newDown;
+    const isTooFarUp = currentY < boundingBox.top;
+    const isTooFarDown = currentY > boundingBox.bottom;
+    const newY = isTooFarDown ? boundingBox.bottom : currentY;
 
-    handleDragStop(null, { x: nextX, y: nextY });
+    const newCoords = {
+      x: isTooFarLeft ? 0 : newX,
+      y: isTooFarUp ? 0 : newY,
+    };
+
+    handleDragStop(null, newCoords);
   }, 150);
 
   useEffect(() => {
