@@ -68,7 +68,7 @@ public class GraylogVersionConstraintChecker implements ConstraintChecker {
                 final GraylogVersionConstraint versionConstraint = (GraylogVersionConstraint) constraint;
                 final Requirement requiredVersion = versionConstraint.version();
                 final ConstraintCheckResult constraintCheckResult = ConstraintCheckResult.create(versionConstraint,
-                        requiredVersion.isSatisfiedBy(graylogVersion.withClearedSuffix()));
+                        requiredVersion.isSatisfiedBy(graylogVersion.withClearedSuffixAndBuild()));
                 fulfilledConstraints.add(constraintCheckResult);
             }
         }
