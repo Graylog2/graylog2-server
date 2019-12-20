@@ -1,19 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { Col, FormControl, FormGroup } from 'components/graylog';
 
 import { Select } from 'components/common';
 
+const OperatorSelector = styled.div`
+  margin-bottom: 15px;
+  font-size: 14px;
+`;
+
+const BooleanOperatorSelect = styled(FormGroup.type)`
+  width: 100px;
+  margin-left: ${props => (props.isFirstElement ? '' : '1em')};
+  margin-right: 1em;
+`;
+
 const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) => {
   return (
     <Col md={12}>
-      <div className="form-inline" style={{ marginBottom: '15px', fontSize: '14px' }}>
+      <OperatorSelector className="form-inline">
         {initialText && (
           <FormGroup>
             <FormControl.Static>{initialText} </FormControl.Static>
           </FormGroup>
         )}
-        <FormGroup style={{ width: '100px', marginLeft: '1em', marginRight: '1em' }}>
+        <BooleanOperatorSelect isFirstElement={!initialText}>
           <Select className="boolean-operator"
                   matchProp="label"
                   size="small"
@@ -23,11 +35,11 @@ const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) =>
                     { label: 'any', value: '||' },
                   ]}
                   value={operator} />
-        </FormGroup>
+        </BooleanOperatorSelect>
         <FormGroup>
           <FormControl.Static> of the following rules:</FormControl.Static>
         </FormGroup>
-      </div>
+      </OperatorSelector>
     </Col>
   );
 };
