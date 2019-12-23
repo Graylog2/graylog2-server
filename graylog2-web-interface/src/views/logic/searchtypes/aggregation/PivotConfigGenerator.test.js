@@ -58,11 +58,11 @@ describe('PivotConfigGenerator', () => {
       .columnPivots([])
       .series([Series.forFunction('count')])
       .build();
-    const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit }) => {
+    const generateConfigForPivotWithTimeUnit = ({ timeUnit, expectedMappedTimeUnit, value = 1 }) => {
       const config = createWidgetConfigWithPivot(Pivot.create(
         'foo',
         'time',
-        { interval: { type: 'timeunit', unit: timeUnit, value: 1 } },
+        { interval: { type: 'timeunit', unit: timeUnit, value } },
       ));
       const result = PivotConfigGenerator({ config });
       const [{ config: { row_groups: [pivot] } }] = result;
@@ -78,5 +78,19 @@ describe('PivotConfigGenerator', () => {
     ${'weeks'}    | ${'1w'}
     ${'months'}   | ${'1M'}
   `('maps time unit $timeUnit to short name $expectedMappedTimeUnit', generateConfigForPivotWithTimeUnit);
+    it.each`
+    timeUnit      | value | expectedMappedTimeUnit
+    ${'seconds'}  | ${2}  | ${'2s'}
+    ${'minutes'}  | ${2}  | ${'2m'}
+    ${'hours'}    | ${2}  | ${'2h'}
+    ${'days'}     | ${2}  | ${'2d'}
+    ${'weeks'}    | ${1}  | ${'1w'}
+    ${'weeks'}    | ${2}  | ${'14d'}
+    ${'weeks'}    | ${3}  | ${'21d'}
+    ${'weeks'}    | ${4}  | ${'28d'}
+    ${'months'}   | ${1}  | ${'1M'}
+    ${'months'}   | ${2}  | ${'60d'}
+    ${'months'}   | ${3}  | ${'90d'}
+  `('maps time unit $value$timeUnit to $expectedMappedTimeUnit', generateConfigForPivotWithTimeUnit);
   });
 });

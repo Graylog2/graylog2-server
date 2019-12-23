@@ -18,6 +18,39 @@ const mapTimeunit = (unit: TimeUnit) => {
   }
 };
 
+type UnitValueInterval = { unit: TimeUnit, value: number };
+
+const convertToDays = (interval: UnitValueInterval) => {
+  const { unit, value } = interval;
+  switch (unit) {
+    case 'seconds':
+    case 'minutes':
+    case 'hours':
+    case 'days': return interval;
+    case 'weeks': return { unit: 'days', value: value * 7 };
+    case 'months': return { unit: 'days', value: value * 30 };
+    default: throw new Error(`Invalid time unit: ${unit}`);
+  }
+};
+
+const adjustUnitsLongerThanDays = (interval: UnitValueInterval) => {
+  const { unit, value } = interval;
+  switch (unit) {
+    case 'seconds':
+    case 'minutes':
+    case 'hours':
+    case 'days': return interval;
+    case 'weeks':
+    case 'months': return value <= 1 ? interval : convertToDays(interval);
+    default: throw new Error(`Invalid time unit: ${unit}`);
+  }
+};
+
+const mapToTimeUnitInterval = (interval: UnitValueInterval) => {
+  const { unit, value } = adjustUnitsLongerThanDays(interval);
+  return { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` }
+};
+
 const formatPivot = (pivot: Pivot) => {
   const { type, field, config } = pivot;
   const newConfig = Object.assign({}, config);
@@ -27,8 +60,7 @@ const formatPivot = (pivot: Pivot) => {
     case 'time':
       if (newConfig.interval.type === 'timeunit') {
         /* $FlowFixMe: newConfig.interval has unit and value since it is from type timeunit */
-        const { unit, value } = newConfig.interval;
-        newConfig.interval = { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
+        newConfig.interval = mapToTimeUnitInterval(newConfig.interval);
       }
       break;
     default:
