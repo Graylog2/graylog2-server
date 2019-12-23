@@ -180,7 +180,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     <>
       <Input type="checkbox"
              id="whitelist-disabled"
-             label="Disabled"
+             label="Disable Whitelist"
              checked={config.disabled}
              onChange={() => setConfig({ ...config, disabled: !config.disabled })}
              help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk." />

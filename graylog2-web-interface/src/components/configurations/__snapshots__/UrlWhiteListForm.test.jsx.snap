@@ -15,13 +15,13 @@ Array [
           <input
             checked={false}
             disabled={false}
-            label="Disabled"
+            label="Disable Whitelist"
             name="whitelist-disabled"
             onChange={[Function]}
             placeholder=""
             type="checkbox"
           />
-          Disabled
+          Disable Whitelist
         </label>
       </div>
       <span
