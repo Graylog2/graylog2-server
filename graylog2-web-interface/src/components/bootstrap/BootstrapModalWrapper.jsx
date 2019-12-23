@@ -7,15 +7,6 @@ import { Modal } from 'components/graylog';
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
  */
 class BootstrapModalWrapper extends React.Component {
-  static defaultProps = {
-    showModal: false,
-    onOpen: () => {},
-    onClose: () => {},
-    onHide: () => {},
-    bsSize: undefined,
-    backdrop: 'static',
-  };
-
   static propTypes = {
     showModal: PropTypes.bool,
     children: PropTypes.oneOfType([
@@ -31,29 +22,44 @@ class BootstrapModalWrapper extends React.Component {
     backdrop: PropTypes.oneOf(['static', true, false]),
   };
 
+  static defaultProps = {
+    showModal: false,
+    onOpen: () => {},
+    onClose: () => {},
+    onHide: () => {},
+    bsSize: undefined,
+    backdrop: 'static',
+  };
+
   state = {
+    // eslint-disable-next-line react/destructuring-assignment
     showModal: this.props.showModal || false,
   };
 
   open = () => {
-    this.setState({ showModal: true }, this.props.onOpen);
+    const { onOpen } = this.props;
+    this.setState({ showModal: true }, onOpen);
   };
 
   close = () => {
-    this.setState({ showModal: false }, this.props.onClose);
+    const { onClose } = this.props;
+    this.setState({ showModal: false }, onClose);
   };
 
   hide = () => {
-    this.setState({ showModal: false }, this.props.onHide);
+    const { onHide } = this.props;
+    this.setState({ showModal: false }, onHide);
   };
 
   render() {
+    const { showModal } = this.state;
+    const { children, bsSize, backdrop } = this.props;
     return (
-      <Modal show={this.state.showModal}
+      <Modal show={showModal}
              onHide={this.hide}
-             bsSize={this.props.bsSize}
-             backdrop={this.props.backdrop}>
-        {this.props.children}
+             bsSize={bsSize}
+             backdrop={backdrop}>
+        {children}
       </Modal>
     );
   }

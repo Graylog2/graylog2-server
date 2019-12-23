@@ -72,7 +72,7 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void includesCustomNameinResultIfPresent() {
+    public void includesCustomNameinResultIfPresent() throws Exception {
         final ESMessageList esMessageList = new ESMessageList(new ESQueryDecorators(Collections.emptySet()));
         final MessageList messageList = MessageList.builder()
                 .id("amessagelist")
@@ -81,9 +81,19 @@ public class ESMessageListTest {
                 .offset(0)
                 .build();
 
+        final Query query = Query.builder()
+                .id("deadbeef")
+                .query(ElasticsearchQueryString.builder()
+                        .queryString("Something else")
+                        .build())
+                .timerange(RelativeRange.create(300))
+                .searchTypes(Collections.emptySet())
+                .build();
+
+
         final SearchResult result = new MockSearchResult(Collections.emptyList(), (long)0);
 
-        final SearchType.Result searchTypeResult = esMessageList.doExtractResult(null, null, messageList, result, null, null);
+        final SearchType.Result searchTypeResult = esMessageList.doExtractResult(null, query, messageList, result, null, null);
 
         assertThat(searchTypeResult.name()).contains("customResult");
     }

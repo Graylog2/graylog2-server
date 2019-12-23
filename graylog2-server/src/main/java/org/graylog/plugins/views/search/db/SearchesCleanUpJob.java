@@ -72,7 +72,7 @@ public class SearchesCleanUpJob extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 0;
+        return 3600;
     }
 
     @Override

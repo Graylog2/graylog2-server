@@ -1,0 +1,2021 @@
+[ {
+  "id" : "5de0e98900002a0017000002",
+  "queries" : [ {
+    "id" : "0000016e-b690-42a3-0000-016eb690426f",
+    "timerange" : {
+      "type" : "relative",
+      "range" : 300
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : ""
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-42a1-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "BadBot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(BadBot)",
+        "field" : "BadBot"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429b-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestURI",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestURI",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429d-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429c-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "BadBot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42a0-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:false"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeolocation",
+        "limit" : 15,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429a-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCityCode",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCityCode",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429f-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCountry",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCountry",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42a2-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestUserAgent",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestUserAgent",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-429e-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-429d-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Bot:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:42.241Z",
+  "requires" : { }
+}, {
+  "id" : "5de0e98900002a0017000005",
+  "queries" : [ {
+    "id" : "0000016e-b690-42f3-0000-016eb690426f",
+    "timerange" : {
+      "type" : "relative",
+      "range" : 300
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : ""
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-42e6-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ef-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestMethod",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestMethod",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ee-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "sum",
+        "id" : "sum(CacheResponseBytes)",
+        "field" : "CacheResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ea-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestURI",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestURI",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e3-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeolocation",
+        "limit" : 15,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e9-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestReferer",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestReferer",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42eb-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestProtocol",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestProtocol",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ec-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ed-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-42ec-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42f0-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "EdgeResponseContentType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "EdgeResponseContentType",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42f1-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "sum",
+        "id" : "sum(EdgeResponseBytes)",
+        "field" : "EdgeResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e7-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-42e6-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e4-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCityCode",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCityCode",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e8-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseBytes)",
+        "field" : "EdgeResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42f2-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCountry",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCountry",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42e5-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientDeviceType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientDeviceType",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:44.200Z",
+  "requires" : { }
+}, {
+  "id" : "5de0e98900002a0017000004",
+  "queries" : [ {
+    "id" : "0000016e-b690-42d4-0000-016eb690426f",
+    "timerange" : {
+      "type" : "relative",
+      "range" : 300
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : ""
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-42cf-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42d2-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestUserAgent",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestUserAgent",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42cd-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ThreatType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ThreatType",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42c8-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ThreatType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ThreatType",
+        "limit" : 50,
+        "type" : "values"
+      }, {
+        "field" : "ClientIP",
+        "limit" : 15,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42d3-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIP",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIP",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42cb-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-42ca-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ce-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCountry",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCountry",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ca-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42d1-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ThreatType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "ThreatType",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-42c9-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientIpGeoCityCode",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeoCityCode",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42d0-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-42cf-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "Threat:true"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42cc-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgePathingOp:ban OR EdgePathingOp:wl"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientIpGeolocation",
+        "limit" : 15,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:44.150Z",
+  "requires" : { }
+}, {
+  "id" : "5de0e98900002a0017000003",
+  "queries" : [ {
+    "id" : "0000016e-b690-42bd-0000-016eb690426f",
+    "timerange" : {
+      "type" : "relative",
+      "range" : 300
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : ""
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-42b5-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "OriginResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "OriginResponseStatusClass",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b8-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgeResponseStatusClass:4xx"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseStatusClass)",
+        "field" : "EdgeResponseStatusClass"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b7-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgeResponseStatusClass:5xx"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseStatusClass)",
+        "field" : "EdgeResponseStatusClass"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42bb-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgeResponseStatusClass:4xx"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestURI",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestURI",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42ba-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "EdgeResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "EdgeResponseStatusClass",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b3-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "OriginResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "OriginResponseStatusClass",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-42b9-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "EdgeResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "EdgeResponseStatusClass",
+        "limit" : 5,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b2-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-42b1-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b4-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "OriginResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "OriginResponseStatusClass",
+        "limit" : 5,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b1-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b6-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgeResponseStatusClass:3xx"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseStatusClass)",
+        "field" : "EdgeResponseStatusClass"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-42b0-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "CacheResponseStatusClass",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "CacheResponseStatusClass",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-42bc-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "EdgeResponseStatusClass:4xx"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestURI",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestURI",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:43.076Z",
+  "requires" : { }
+}, {
+  "id" : "5de0e98900002a0017000001",
+  "queries" : [ {
+    "id" : "0000016e-b690-4291-0000-016eb690426f",
+    "timerange" : {
+      "type" : "relative",
+      "range" : 300
+    },
+    "query" : {
+      "type" : "elasticsearch",
+      "query_string" : ""
+    },
+    "search_types" : [ {
+      "id" : "0000016e-b690-428d-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(CacheResponseBytes)",
+        "field" : "CacheResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-427f-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "max",
+        "id" : "max(OriginResponseTimeMillis)",
+        "field" : "OriginResponseTimeMillis"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4283-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "NOT CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4282-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "CacheCacheStatus",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "CacheCacheStatus",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4280-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestMethod",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "ClientRequestMethod",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-4286-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "card",
+        "id" : "card(CacheCacheStatus)",
+        "field" : "CacheCacheStatus"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4287-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "EdgeRequestHost",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "EdgeRequestHost",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-428c-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseBytes)",
+        "field" : "EdgeResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-428f-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-428e-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4289-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "stddev",
+        "id" : "stddev(OriginResponseTimeMillis)",
+        "field" : "OriginResponseTimeMillis"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-428b-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(OriginResponseTimeMillis)",
+        "field" : "OriginResponseTimeMillis"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-428e-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-428a-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "EdgeResponseContentType",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "EdgeResponseContentType",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-4284-0000-016eb690426f",
+      "timerange" : {
+        "type" : "offset",
+        "source" : "search_type",
+        "id" : "0000016e-b690-4283-0000-016eb690426f",
+        "offset" : "1i"
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "NOT CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "trend",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4281-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestURI",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "ClientRequestURI",
+        "limit" : 50,
+        "type" : "values"
+      } ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4290-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "NOT CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count(EdgeResponseBytes)",
+        "field" : "EdgeResponseBytes"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    }, {
+      "id" : "0000016e-b690-4288-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : "CacheCacheStatus:hit"
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "count",
+        "id" : "count()",
+        "field" : null
+      } ],
+      "sort" : [ {
+        "type" : "series",
+        "field" : "ClientRequestProtocol",
+        "direction" : "Descending"
+      } ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ {
+        "field" : "timestamp",
+        "interval" : {
+          "scaling" : 1.0,
+          "type" : "auto"
+        },
+        "type" : "time"
+      } ],
+      "column_groups" : [ {
+        "field" : "ClientRequestProtocol",
+        "limit" : 5,
+        "type" : "values"
+      } ]
+    }, {
+      "id" : "0000016e-b690-4285-0000-016eb690426f",
+      "timerange" : {
+        "type" : "relative",
+        "range" : 3600
+      },
+      "query" : {
+        "type" : "elasticsearch",
+        "query_string" : ""
+      },
+      "streams" : [ "5ddf8ed5b2d44b2e0447298c" ],
+      "name" : "chart",
+      "series" : [ {
+        "type" : "avg",
+        "id" : "avg(OriginResponseTimeMillis)",
+        "field" : "OriginResponseTimeMillis"
+      } ],
+      "sort" : [ ],
+      "rollup" : true,
+      "type" : "pivot",
+      "filter" : null,
+      "row_groups" : [ ],
+      "column_groups" : [ ]
+    } ]
+  } ],
+  "parameters" : [ ],
+  "owner" : "admin",
+  "created_at" : "2019-11-28T09:09:41.688Z",
+  "requires" : { }
+} ]

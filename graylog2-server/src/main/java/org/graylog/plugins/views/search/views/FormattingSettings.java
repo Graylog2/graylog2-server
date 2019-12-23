@@ -35,6 +35,10 @@ public abstract class FormattingSettings {
     @JsonProperty(FIELD_HIGHLIGHTING)
     public abstract Set<HighlightingRule> highlighting();
 
+    public static Builder builder() {
+        return Builder.create();
+    }
+
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_HIGHLIGHTING)

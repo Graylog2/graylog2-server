@@ -36,7 +36,6 @@ const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
-const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
@@ -67,7 +66,6 @@ const SidecarNewConfigurationPage = loadAsync(() => import('pages/SidecarNewConf
 const SidecarsPage = loadAsync(() => import('pages/SidecarsPage'));
 const SidecarStatusPage = loadAsync(() => import('pages/SidecarStatusPage'));
 const SimulatorPage = loadAsync(() => import('./SimulatorPage'));
-const SourcesPage = loadAsync(() => import('./SourcesPage'));
 const StartPage = loadAsync(() => import('./StartPage'));
 const StreamAlertsOverviewPage = loadAsync(() => import('pages/StreamAlertsOverviewPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
@@ -116,7 +114,6 @@ export {
   IndicesPage,
   InputsPage,
   LoadingPage,
-  LoggedInPage,
   LoggersPage,
   LoginPage,
   LUTCachesPage,
@@ -147,7 +144,6 @@ export {
   SidecarsPage,
   SidecarStatusPage,
   SimulatorPage,
-  SourcesPage,
   StartPage,
   StreamAlertsOverviewPage,
   StreamEditPage,

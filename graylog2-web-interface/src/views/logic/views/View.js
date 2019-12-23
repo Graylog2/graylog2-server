@@ -130,7 +130,7 @@ export default class View {
   }
 
   get requires(): Requirements {
-    return this._value.requires;
+    return this._value.requires || {};
   }
 
   // eslint-disable-next-line no-use-before-define

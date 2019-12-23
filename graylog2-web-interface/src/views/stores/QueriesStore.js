@@ -12,9 +12,15 @@ import { singletonStore } from 'views/logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
+import type { Store } from '../../stores/StoreTypes';
 
 export { QueriesActions } from 'views/actions/QueriesActions';
-export const QueriesStore = singletonStore(
+
+type QueriesStoreState = Immutable.OrderedMap<QueryId, Query>;
+
+type QueriesStoreType = Store<QueriesStoreState>;
+
+export const QueriesStore: QueriesStoreType = singletonStore(
   'views.Queries',
   () => Reflux.createStore({
     listenables: [QueriesActions],

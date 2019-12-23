@@ -76,7 +76,7 @@ class GenericPlot extends React.Component<Props, State> {
     layout: {},
     onZoom: () => true,
     getChartColor: undefined,
-    setChartColor: () => ({}),
+    setChartColor: undefined,
   };
 
   state = {};
@@ -143,7 +143,7 @@ class GenericPlot extends React.Component<Props, State> {
 
     const style = { height: 'calc(100% - 10px)', width: '100%' };
 
-    const config = { displayModeBar: false, doubleClick: false };
+    const config = { displayModeBar: false, doubleClick: false, responsive: true };
 
     const { legendConfig } = this.state;
 

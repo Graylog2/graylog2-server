@@ -18,7 +18,7 @@ export type ActionHandlerArguments = {|
   contexts: ActionContexts
 |};
 
-export type ActionHandler = (ActionHandlerArguments) => Promise<void | *>;
+export type ActionHandler = (ActionHandlerArguments) => Promise<mixed>;
 export type ActionHandlerCondition = (ActionHandlerArguments) => boolean;
 
 export type ActionHandlerConditions = {

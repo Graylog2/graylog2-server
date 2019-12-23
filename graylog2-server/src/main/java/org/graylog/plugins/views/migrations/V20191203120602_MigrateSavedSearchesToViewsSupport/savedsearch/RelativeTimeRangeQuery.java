@@ -23,6 +23,9 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.RelativeRange;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.view.TimeRange;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class RelativeTimeRangeQuery implements Query {
@@ -43,8 +46,9 @@ public abstract class RelativeTimeRangeQuery implements Query {
             @JsonProperty("rangeType") String rangeType,
             @JsonProperty("fields") String fields,
             @JsonProperty("query") String query,
-            @JsonProperty("relative") int relative
+            @JsonProperty("relative") int relative,
+            @JsonProperty("streamId") @Nullable String streamId
     ) {
-        return new AutoValue_RelativeTimeRangeQuery(rangeType, fields, query, relative);
+        return new AutoValue_RelativeTimeRangeQuery(Optional.ofNullable(streamId), rangeType, fields, query, relative);
     }
 }

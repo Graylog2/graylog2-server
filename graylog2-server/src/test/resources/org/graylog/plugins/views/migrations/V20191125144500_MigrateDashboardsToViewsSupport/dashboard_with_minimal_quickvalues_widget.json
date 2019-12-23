@@ -1,0 +1,38 @@
+{
+  "dashboards": [
+    {
+      "_id": { "$oid": "5c7fc3f9f38ed741ac154697" },
+      "creator_user_id": "admin",
+      "description": "Hey!",
+      "created_at": { "$date": "2019-03-06T12:58:33.610Z" },
+      "positions": {
+        "6f2cc355-bcbb-4b3f-be01-bfba299aa51a": {
+          "width": 3,
+          "col": 1,
+          "row": 7,
+          "height": 5
+        }
+      },
+      "title": "Sample Dashboard",
+      "widgets": [
+        {
+          "creator_user_id": "admin",
+          "cache_time": 10,
+          "description": "Quick values",
+          "id": "6f2cc355-bcbb-4b3f-be01-bfba299aa51a",
+          "type": "QUICKVALUES",
+          "config": {
+            "timerange": {
+              "type": "relative",
+              "range": 300
+            },
+            "field": "facility",
+            "query": "",
+            "show_data_table": true,
+            "show_pie_chart": true
+          }
+        }
+      ]
+    }
+  ]
+}

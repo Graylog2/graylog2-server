@@ -125,10 +125,12 @@ public class V20191203120602_MigrateSavedSearchesToViews extends Migration {
                     return widgetSearchTypes.stream();
                 })
                 .collect(Collectors.toSet());
-        final Query query = Query.create(randomUUIDProvider.get(),
-                savedSearch.query().toTimeRange(),
-                savedSearch.query().query(),
-                searchTypes);
+        final Query.Builder queryBuilder = Query.builder()
+                .id(randomUUIDProvider.get())
+                .timerange(savedSearch.query().toTimeRange())
+                .query(savedSearch.query().query())
+                .searchTypes(searchTypes);
+        final Query query = savedSearch.query().streamId().map(queryBuilder::streamId).orElse(queryBuilder).build();
         final Search newSearch = Search.create(randomObjectIdProvider.get(), Collections.singleton(query), savedSearch.creatorUserId(), savedSearch.createdAt());
 
         final Titles titles = Titles.ofWidgetTitles(ImmutableMap.of(
