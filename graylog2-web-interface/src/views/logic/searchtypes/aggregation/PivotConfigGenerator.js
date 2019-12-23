@@ -48,7 +48,7 @@ const adjustUnitsLongerThanDays = (interval: UnitValueInterval) => {
 
 const mapToTimeUnitInterval = (interval: UnitValueInterval) => {
   const { unit, value } = adjustUnitsLongerThanDays(interval);
-  return { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` }
+  return { type: 'timeunit', timeunit: `${value}${mapTimeunit(unit)}` };
 };
 
 const formatPivot = (pivot: Pivot) => {
