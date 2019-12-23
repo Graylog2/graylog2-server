@@ -271,6 +271,22 @@ public class BooleanNumberConditionsVisitorTest {
     }
 
     @Test
+    public void testGroupedEvaluation() throws  Exception {
+        // [count() >= 10 AND count() < 100 AND count() > 20] OR [count() == 101 OR count() == 402 OR [count() > 200 AND count() < 300]]
+        final Expression<Boolean> condition = loadCondition("condition-grouped.json");
+        final String ref = "count-";
+
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 42d)))).isTrue();
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 8d)))).isFalse();
+
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 402d)))).isTrue();
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 403d)))).isFalse();
+
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 250d)))).isTrue();
+        assertThat(condition.accept(new BooleanNumberConditionsVisitor(Collections.singletonMap(ref, 300d)))).isFalse();
+    }
+
+    @Test
     public void testSerialization() throws Exception {
         final Expr.NumberValue left = Expr.NumberValue.create(2);
         final Expr.NumberReference right = Expr.NumberReference.create("the-ref");
@@ -330,6 +346,13 @@ public class BooleanNumberConditionsVisitorTest {
             assertThat.jsonPathAsString("$.left.expr").isEqualTo("==");
             assertThat.jsonPathAsString("$.left.left.expr").isEqualTo("number");
             assertThat.jsonPathAsString("$.left.right.expr").isEqualTo("number-ref");
+        });
+
+        assertJsonPath(Expr.Group.create(Expr.Equal.create(left, right), "&&"), assertThat -> {
+            assertThat.jsonPathAsString("$.expr").isEqualTo("group");
+            assertThat.jsonPathAsString("$.operator").isEqualTo("&&");
+            assertThat.jsonPathAsString("$.child.expr").isEqualTo("==");
+
         });
     }
 
