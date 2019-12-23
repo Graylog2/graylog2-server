@@ -111,7 +111,7 @@
     "react-window": "^1.8.2",
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.1.x",
-    "superagent": "^3.4.3",
+    "superagent": "^5.1.3",
     "superagent-bluebird-promise": "^4.1.0",
     "terser-webpack-plugin": "^1.3.0",
     "toastr": "^2.1.2",
