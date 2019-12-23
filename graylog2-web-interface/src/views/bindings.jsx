@@ -159,6 +159,7 @@ export default {
       type: 'default',
       visualizationComponent: UnknownWidget,
       editComponent: UnknownWidget,
+      searchTypes: () => [],
     },
   ],
   searchTypes: [

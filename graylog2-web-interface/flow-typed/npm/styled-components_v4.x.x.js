@@ -182,7 +182,8 @@ declare module 'styled-components' {
   |}
 
   declare export type StyledShorthandFactory<V> = {|
-    [[call]]: <StyleProps, Theme>(string[] | func, ...Interpolation<PropsWithTheme<StyleProps, Theme>>[]) => StyledComponent<StyleProps, Theme, V>;
+    [[call]]: <StyleProps, Theme>(string[], ...Interpolation<PropsWithTheme<StyleProps, Theme>>[]) => StyledComponent<StyleProps, Theme, V>;
+    [[call]]: <StyleProps, Theme>((props: PropsWithTheme<StyleProps, Theme>) => Interpolation<any>) => StyledComponent<StyleProps, Theme, V>;
     +attrs: <A: {...}, StyleProps = {||}, Theme = {||}>(((StyleProps) => A) | A) => TaggedTemplateLiteral<
       PropsWithTheme<{|...$Exact<StyleProps>, ...$Exact<A>|}, Theme>,
       StyledComponent<React$Config<{|...$Exact<StyleProps>, ...$Exact<A>|}, $Exact<A>>, Theme, V>

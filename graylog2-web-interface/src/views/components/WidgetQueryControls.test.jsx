@@ -102,7 +102,7 @@ describe('WidgetQueryControls', () => {
 
     fireEvent.change(timeRangeSelect, { target: { value: optionForAllMessages.value } });
 
-    expect(WidgetActions.timerange).toHaveBeenCalledWith('deadbeef', { range: '0' });
+    expect(WidgetActions.timerange).toHaveBeenCalledWith('deadbeef', { type: 'relative', range: '0' });
     expect(getByDisplayValue('Search in all messages')).not.toBeNull();
   });
 
