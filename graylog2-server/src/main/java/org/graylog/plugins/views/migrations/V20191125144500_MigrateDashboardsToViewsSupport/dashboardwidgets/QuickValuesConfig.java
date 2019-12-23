@@ -51,39 +51,42 @@ import java.util.stream.Collectors;
 public abstract class QuickValuesConfig extends WidgetConfigBase implements WidgetConfigWithQueryAndStreams {
     private static final String VISUALIZATION_PIE = "pie";
     private static final String VISUALIZATION_TABLE = "table";
+    private static final int DEFAULT_LIMIT = 15;
+    private static final String DEFAULT_SORT_ORDER = "desc";
 
     public abstract String field();
     public abstract Boolean showDataTable();
     public abstract Boolean showPieChart();
-    public abstract Integer limit();
-    public abstract Integer dataTableLimit();
-    public abstract String sortOrder();
-    public abstract String stackedFields();
+    public abstract Optional<Integer> limit();
+    public abstract Optional<Integer> dataTableLimit();
+    public abstract Optional<String> sortOrder();
+    public abstract Optional<String> stackedFields();
 
     private Series series() {
         return countSeries();
     }
 
     private List<Pivot> stackedFieldPivots() {
-        return Strings.isNullOrEmpty(stackedFields())
+        final String fieldNames = stackedFields().orElse("");
+        return Strings.isNullOrEmpty(fieldNames)
                 ? Collections.emptyList()
                 : Splitter.on(",")
-                .splitToList(stackedFields())
+                .splitToList(fieldNames)
                 .stream()
                 .map(fieldName -> valuesPivotForField(fieldName, 15))
                 .collect(Collectors.toList());
     }
 
     private Pivot piePivot() {
-        return valuesPivotForField(field(), limit());
+        return valuesPivotForField(field(), limit().orElse(DEFAULT_LIMIT));
     }
 
     private Pivot dataTablePivot() {
-        return valuesPivotForField(field(), dataTableLimit());
+        return valuesPivotForField(field(), dataTableLimit().orElse(DEFAULT_LIMIT));
     }
 
     private SortConfig.Direction order() {
-        return sortDirection(sortOrder());
+        return sortDirection(sortOrder().orElse(DEFAULT_SORT_ORDER));
     }
 
     private SortConfig sort() {
@@ -173,7 +176,7 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
             @JsonProperty("limit") Integer limit,
             @JsonProperty("data_table_limit") Integer dataTableLimit,
             @JsonProperty("sort_order") String sortOrder,
-            @JsonProperty("stacked_fields") String stackedFields,
+            @JsonProperty("stacked_fields") @Nullable String stackedFields,
             @JsonProperty("stream_id") @Nullable String streamId
     ) {
         return new AutoValue_QuickValuesConfig(
@@ -183,10 +186,10 @@ public abstract class QuickValuesConfig extends WidgetConfigBase implements Widg
                 field,
                 showDataTable,
                 showPieChart,
-                limit,
-                dataTableLimit,
-                sortOrder,
-                stackedFields
+                Optional.ofNullable(limit),
+                Optional.ofNullable(dataTableLimit),
+                Optional.ofNullable(sortOrder),
+                Optional.ofNullable(stackedFields)
         );
     }
 }

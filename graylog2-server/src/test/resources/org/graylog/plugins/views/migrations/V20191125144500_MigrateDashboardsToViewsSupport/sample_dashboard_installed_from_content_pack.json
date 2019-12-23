@@ -83,12 +83,6 @@
           "col": 7,
           "row": 1,
           "height": 3
-        },
-        "f2e76256-0379-483e-8622-8efd661ca939": {
-          "width": 23,
-          "col": 8,
-          "row": 8,
-          "height": 42
         }
       },
       "title": "Sample Dashboard",
@@ -98,7 +92,7 @@
           "cache_time": 10,
           "description": "KPI",
           "id": "a8eadf94-6494-4271-8c0e-3c8d08e65623",
-          "type": "FIELD_CHART",
+          "type": "field_chart",
           "config": {
             "valuetype": "total",
             "renderer": "line",
@@ -119,7 +113,7 @@
           "cache_time": 10,
           "description": "Field graph",
           "id": "40c9cf4e-0956-4dc1-9ccd-83868fa83277",
-          "type": "FIELD_CHART",
+          "type": "field_chart",
           "config": {
             "valuetype": "total",
             "renderer": "line",
@@ -140,7 +134,7 @@
           "cache_time": 10,
           "description": "Search result graph",
           "id": "e9efdfaf-f7be-47ca-97fe-871c05a24d3c",
-          "type": "SEARCH_RESULT_CHART",
+          "type": "search_result_chart",
           "config": {
             "interval": "minute",
             "timerange": {
@@ -155,7 +149,7 @@
           "cache_time": 10,
           "description": "Important!",
           "id": "5020d62d-24a0-4b0c-8819-78e668cc2428",
-          "type": "FIELD_CHART",
+          "type": "field_chart",
           "config": {
             "valuetype": "total",
             "renderer": "line",
@@ -176,7 +170,7 @@
           "cache_time": 10,
           "description": "Search result count",
           "id": "05b03c7b-fe23-4789-a1c8-a38a583d3ba6",
-          "type": "SEARCH_RESULT_COUNT",
+          "type": "search_result_count",
           "config": {
             "timerange": {
               "type": "relative",
@@ -192,7 +186,7 @@
           "cache_time": 10,
           "description": "Quick values",
           "id": "6f2cc355-bcbb-4b3f-be01-bfba299aa51a",
-          "type": "QUICKVALUES",
+          "type": "quickvalues",
           "config": {
             "timerange": {
               "type": "relative",
@@ -213,7 +207,7 @@
           "cache_time": 10,
           "description": "Statistical value",
           "id": "10c1b3f9-6b34-4b34-9457-892d12b84151",
-          "type": "STATS_COUNT",
+          "type": "stats_count",
           "config": {
             "timerange": {
               "type": "relative",
@@ -231,7 +225,7 @@
           "cache_time": 10,
           "description": "Search result graph",
           "id": "2afb1838-24ee-489f-929f-ef7d47485021",
-          "type": "SEARCH_RESULT_CHART",
+          "type": "search_result_chart",
           "config": {
             "interval": "minute",
             "timerange": {
@@ -262,7 +256,7 @@
           "cache_time": 10,
           "description": "Some Statistical values",
           "id": "da111daa-0d0a-47b9-98ed-8b8aa8a4f575",
-          "type": "STATS_COUNT",
+          "type": "stats_count",
           "config": {
             "timerange": {
               "type": "relative",
@@ -281,7 +275,7 @@
           "cache_time": 10,
           "description": "Field Chart with absolute time range",
           "id": "9b55d975-a5d4-4df6-8b2e-6fc7b48d52c3",
-          "type": "FIELD_CHART",
+          "type": "field_chart",
           "config": {
             "valuetype": "count",
             "renderer": "bar",
@@ -304,7 +298,7 @@
           "cache_time": 10,
           "description": "Field chart with keyword time range",
           "id": "91b37752-e3a8-4274-910f-3d66d19f1028",
-          "type": "FIELD_CHART",
+          "type": "field_chart",
           "config": {
             "valuetype": "count",
             "renderer": "bar",
@@ -325,7 +319,7 @@
           "cache_time": 10,
           "description": "Quick values Histogram",
           "id": "4a192616-51d3-474e-9e18-a680f2577769",
-          "type": "QUICKVALUES_HISTOGRAM",
+          "type": "quickvalues_histogram",
           "config": {
             "timerange": {
               "type": "relative",
@@ -344,7 +338,7 @@
           "cache_time": 10,
           "description": "Stacked Field graph",
           "id": "f6e9d960-9cc8-4d16-b3c8-770501b2709f",
-          "type": "STACKED_CHART",
+          "type": "stacked_chart",
           "config": {
             "interval": "minute",
             "timerange": {
@@ -372,7 +366,7 @@
           "cache_time": 10,
           "description": "Stacked graph with custom timerange & query",
           "id": "d9be20a1-82d7-427b-8a2d-c7ea9cd114de",
-          "type": "STACKED_CHART",
+          "type": "stacked_chart",
           "config": {
             "interval": "minute",
             "timerange": {

@@ -83,146 +83,109 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               value=""
               wrapperClassName="col-sm-7"
             >
-              <FormGroup
-                bsClass="form-group"
+              <Component
                 controlId="comment"
                 validationState={null}
               >
-                <div
-                  className="form-group"
+                <FormGroup__StyledFormGroup
+                  controlId="comment"
+                  validationState={null}
                 >
-                  <ControlLabel
-                    className="col-sm-3"
-                  >
-                    <StyledComponent
-                      className="col-sm-3"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ControlLabel-sc-1edmum5-0",
-                            "isStatic": true,
-                            "lastClassName": "iZJNbd",
-                            "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                            ],
-                          },
-                          "displayName": "ControlLabel",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
+                  <StyledComponent
+                    controlId="comment"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                          "isStatic": false,
+                          "lastClassName": "ekazNr",
+                          "rules": Array [
+                            [Function],
+                            ";",
+                          ],
+                        },
+                        "displayName": "FormGroup__StyledFormGroup",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
                       }
-                      forwardedRef={null}
-                    >
-                      <ControlLabel
-                        bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
-                        srOnly={false}
-                      >
-                        <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                          htmlFor="comment"
-                        >
-                          Comment
-                        </label>
-                      </ControlLabel>
-                    </StyledComponent>
-                  </ControlLabel>
-                  <InputWrapper
-                    className="col-sm-7"
+                    }
+                    forwardedRef={null}
+                    validationState={null}
                   >
-                    <div
-                      className="col-sm-7"
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      controlId="comment"
+                      validationState={null}
                     >
-                      <FormControl
-                        componentClass="input"
-                        inputRef={[Function]}
-                        label="Comment"
-                        maxLength={512}
-                        name="comment"
-                        onChange={[Function]}
-                        placeholder=""
-                        type="text"
-                        value=""
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                       >
-                        <StyledComponent
-                          componentClass="input"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "Feedback": [Function],
-                              "SIZES": Array [
-                                "small",
-                                "large",
-                              ],
-                              "Static": [Function],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "FormControl-sc-1amoaox-0",
-                                "isStatic": true,
-                                "lastClassName": "hdNTyr",
-                                "rules": Array [
-                                  "color:",
-                                  "#1F1F1F",
-                                  ";background-color:",
-                                  "#FFF",
-                                  ";border-color:",
-                                  "#DCE1E5",
-                                  ";&:focus{border-color:",
-                                  "#6DC6E7",
-                                  ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                  "rgba(109,198,231,0.4)",
-                                  ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                  "#b8b8b8",
-                                  ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                  "#DCE1E5",
-                                  ";}~ .form-control-feedback.glyphicon{display:none;}",
-                                ],
-                              },
-                              "displayName": "FormControl",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          inputRef={[Function]}
-                          label="Comment"
-                          maxLength={512}
-                          name="comment"
-                          onChange={[Function]}
-                          placeholder=""
-                          type="text"
-                          value=""
+                        <ControlLabel
+                          className="col-sm-3"
                         >
-                          <FormControl
-                            bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 hdNTyr"
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="Comment"
-                            maxLength={512}
-                            name="comment"
-                            onChange={[Function]}
-                            placeholder=""
-                            type="text"
-                            value=""
+                          <StyledComponent
+                            className="col-sm-3"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ControlLabel-sc-1edmum5-0",
+                                  "isStatic": true,
+                                  "lastClassName": "iZJNbd",
+                                  "rules": Array [
+                                    "color:",
+                                    "#1F1F1F",
+                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                  ],
+                                },
+                                "displayName": "ControlLabel",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                           >
-                            <input
-                              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                              id="comment"
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
+                              srOnly={false}
+                            >
+                              <label
+                                className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                htmlFor="comment"
+                              >
+                                Comment
+                              </label>
+                            </ControlLabel>
+                          </StyledComponent>
+                        </ControlLabel>
+                        <InputWrapper
+                          className="col-sm-7"
+                        >
+                          <div
+                            className="col-sm-7"
+                          >
+                            <FormControl
+                              componentClass="input"
+                              inputRef={[Function]}
                               label="Comment"
                               maxLength={512}
                               name="comment"
@@ -230,14 +193,95 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               placeholder=""
                               type="text"
                               value=""
-                            />
-                          </FormControl>
-                        </StyledComponent>
-                      </FormControl>
-                    </div>
-                  </InputWrapper>
-                </div>
-              </FormGroup>
+                            >
+                              <StyledComponent
+                                componentClass="input"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": true,
+                                      "lastClassName": "hdNTyr",
+                                      "rules": Array [
+                                        "color:",
+                                        "#1F1F1F",
+                                        ";background-color:",
+                                        "#FFF",
+                                        ";border-color:",
+                                        "#DCE1E5",
+                                        ";&:focus{border-color:",
+                                        "#6DC6E7",
+                                        ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                        "rgba(109,198,231,0.4)",
+                                        ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                        "#b8b8b8",
+                                        ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                        "#DCE1E5",
+                                        ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                inputRef={[Function]}
+                                label="Comment"
+                                maxLength={512}
+                                name="comment"
+                                onChange={[Function]}
+                                placeholder=""
+                                type="text"
+                                value=""
+                              >
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hdNTyr"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+                                  label="Comment"
+                                  maxLength={512}
+                                  name="comment"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  type="text"
+                                  value=""
+                                >
+                                  <input
+                                    className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                    id="comment"
+                                    label="Comment"
+                                    maxLength={512}
+                                    name="comment"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    type="text"
+                                    value=""
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+                            </FormControl>
+                          </div>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </StyledComponent>
+                </FormGroup__StyledFormGroup>
+              </Component>
             </Input>
           </div>
         </Col>
@@ -282,149 +326,109 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
               value="parameter"
               wrapperClassName="col-sm-7"
             >
-              <FormGroup
-                bsClass="form-group"
+              <Component
                 controlId="PARAM"
                 validationState={null}
               >
-                <div
-                  className="form-group"
+                <FormGroup__StyledFormGroup
+                  controlId="PARAM"
+                  validationState={null}
                 >
-                  <ControlLabel
-                    className="col-sm-3"
-                  >
-                    <StyledComponent
-                      className="col-sm-3"
-                      forwardedComponent={
-                        Object {
-                          "$$typeof": Symbol(react.forward_ref),
-                          "attrs": Array [],
-                          "componentStyle": ComponentStyle {
-                            "componentId": "ControlLabel-sc-1edmum5-0",
-                            "isStatic": true,
-                            "lastClassName": "iZJNbd",
-                            "rules": Array [
-                              "color:",
-                              "#1F1F1F",
-                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
-                            ],
-                          },
-                          "displayName": "ControlLabel",
-                          "foldedComponentIds": Array [],
-                          "render": [Function],
-                          "styledComponentId": "ControlLabel-sc-1edmum5-0",
-                          "target": [Function],
-                          "toString": [Function],
-                          "warnTooManyClasses": [Function],
-                          "withComponent": [Function],
-                        }
+                  <StyledComponent
+                    controlId="PARAM"
+                    forwardedComponent={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "SIZES": Array [
+                          "large",
+                          "small",
+                        ],
+                        "attrs": Array [],
+                        "componentStyle": ComponentStyle {
+                          "componentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                          "isStatic": false,
+                          "lastClassName": "ekazNr",
+                          "rules": Array [
+                            [Function],
+                            ";",
+                          ],
+                        },
+                        "displayName": "FormGroup__StyledFormGroup",
+                        "foldedComponentIds": Array [],
+                        "render": [Function],
+                        "styledComponentId": "FormGroup__StyledFormGroup-sc-1wv4cm9-0",
+                        "target": [Function],
+                        "toString": [Function],
+                        "warnTooManyClasses": [Function],
+                        "withComponent": [Function],
                       }
-                      forwardedRef={null}
-                    >
-                      <ControlLabel
-                        bsClass="control-label"
-                        className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
-                        srOnly={false}
-                      >
-                        <label
-                          className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
-                          htmlFor="PARAM"
-                        >
-                          A parameter
-                        </label>
-                      </ControlLabel>
-                    </StyledComponent>
-                  </ControlLabel>
-                  <InputWrapper
-                    className="col-sm-7"
+                    }
+                    forwardedRef={null}
+                    validationState={null}
                   >
-                    <div
-                      className="col-sm-7"
+                    <FormGroup
+                      bsClass="form-group"
+                      className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr"
+                      controlId="PARAM"
+                      validationState={null}
                     >
-                      <FormControl
-                        componentClass="input"
-                        inputRef={[Function]}
-                        label="A parameter"
-                        maxLength={250}
-                        name="PARAM"
-                        onChange={[Function]}
-                        placeholder=""
-                        required={true}
-                        type="text"
-                        value="parameter"
+                      <div
+                        className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
                       >
-                        <StyledComponent
-                          componentClass="input"
-                          forwardedComponent={
-                            Object {
-                              "$$typeof": Symbol(react.forward_ref),
-                              "Feedback": [Function],
-                              "SIZES": Array [
-                                "small",
-                                "large",
-                              ],
-                              "Static": [Function],
-                              "attrs": Array [],
-                              "componentStyle": ComponentStyle {
-                                "componentId": "FormControl-sc-1amoaox-0",
-                                "isStatic": true,
-                                "lastClassName": "hdNTyr",
-                                "rules": Array [
-                                  "color:",
-                                  "#1F1F1F",
-                                  ";background-color:",
-                                  "#FFF",
-                                  ";border-color:",
-                                  "#DCE1E5",
-                                  ";&:focus{border-color:",
-                                  "#6DC6E7",
-                                  ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                  "rgba(109,198,231,0.4)",
-                                  ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                  "#b8b8b8",
-                                  ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                  "#DCE1E5",
-                                  ";}~ .form-control-feedback.glyphicon{display:none;}",
-                                ],
-                              },
-                              "displayName": "FormControl",
-                              "foldedComponentIds": Array [],
-                              "render": [Function],
-                              "styledComponentId": "FormControl-sc-1amoaox-0",
-                              "target": [Function],
-                              "toString": [Function],
-                              "warnTooManyClasses": [Function],
-                              "withComponent": [Function],
-                            }
-                          }
-                          forwardedRef={null}
-                          inputRef={[Function]}
-                          label="A parameter"
-                          maxLength={250}
-                          name="PARAM"
-                          onChange={[Function]}
-                          placeholder=""
-                          required={true}
-                          type="text"
-                          value="parameter"
+                        <ControlLabel
+                          className="col-sm-3"
                         >
-                          <FormControl
-                            bsClass="form-control"
-                            className="FormControl-sc-1amoaox-0 hdNTyr"
-                            componentClass="input"
-                            inputRef={[Function]}
-                            label="A parameter"
-                            maxLength={250}
-                            name="PARAM"
-                            onChange={[Function]}
-                            placeholder=""
-                            required={true}
-                            type="text"
-                            value="parameter"
+                          <StyledComponent
+                            className="col-sm-3"
+                            forwardedComponent={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "attrs": Array [],
+                                "componentStyle": ComponentStyle {
+                                  "componentId": "ControlLabel-sc-1edmum5-0",
+                                  "isStatic": true,
+                                  "lastClassName": "iZJNbd",
+                                  "rules": Array [
+                                    "color:",
+                                    "#1F1F1F",
+                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                  ],
+                                },
+                                "displayName": "ControlLabel",
+                                "foldedComponentIds": Array [],
+                                "render": [Function],
+                                "styledComponentId": "ControlLabel-sc-1edmum5-0",
+                                "target": [Function],
+                                "toString": [Function],
+                                "warnTooManyClasses": [Function],
+                                "withComponent": [Function],
+                              }
+                            }
+                            forwardedRef={null}
                           >
-                            <input
-                              className="FormControl-sc-1amoaox-0 hdNTyr form-control"
-                              id="PARAM"
+                            <ControlLabel
+                              bsClass="control-label"
+                              className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd"
+                              srOnly={false}
+                            >
+                              <label
+                                className="col-sm-3 ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                htmlFor="PARAM"
+                              >
+                                A parameter
+                              </label>
+                            </ControlLabel>
+                          </StyledComponent>
+                        </ControlLabel>
+                        <InputWrapper
+                          className="col-sm-7"
+                        >
+                          <div
+                            className="col-sm-7"
+                          >
+                            <FormControl
+                              componentClass="input"
+                              inputRef={[Function]}
                               label="A parameter"
                               maxLength={250}
                               name="PARAM"
@@ -433,14 +437,98 @@ exports[`<ContentPackInstall /> should render a install 1`] = `
                               required={true}
                               type="text"
                               value="parameter"
-                            />
-                          </FormControl>
-                        </StyledComponent>
-                      </FormControl>
-                    </div>
-                  </InputWrapper>
-                </div>
-              </FormGroup>
+                            >
+                              <StyledComponent
+                                componentClass="input"
+                                forwardedComponent={
+                                  Object {
+                                    "$$typeof": Symbol(react.forward_ref),
+                                    "Feedback": [Function],
+                                    "SIZES": Array [
+                                      "small",
+                                      "large",
+                                    ],
+                                    "Static": [Function],
+                                    "attrs": Array [],
+                                    "componentStyle": ComponentStyle {
+                                      "componentId": "FormControl-sc-1amoaox-0",
+                                      "isStatic": true,
+                                      "lastClassName": "hdNTyr",
+                                      "rules": Array [
+                                        "color:",
+                                        "#1F1F1F",
+                                        ";background-color:",
+                                        "#FFF",
+                                        ";border-color:",
+                                        "#DCE1E5",
+                                        ";&:focus{border-color:",
+                                        "#6DC6E7",
+                                        ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                        "rgba(109,198,231,0.4)",
+                                        ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                        "#b8b8b8",
+                                        ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
+                                        "#DCE1E5",
+                                        ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                      ],
+                                    },
+                                    "displayName": "FormControl",
+                                    "foldedComponentIds": Array [],
+                                    "render": [Function],
+                                    "styledComponentId": "FormControl-sc-1amoaox-0",
+                                    "target": [Function],
+                                    "toString": [Function],
+                                    "warnTooManyClasses": [Function],
+                                    "withComponent": [Function],
+                                  }
+                                }
+                                forwardedRef={null}
+                                inputRef={[Function]}
+                                label="A parameter"
+                                maxLength={250}
+                                name="PARAM"
+                                onChange={[Function]}
+                                placeholder=""
+                                required={true}
+                                type="text"
+                                value="parameter"
+                              >
+                                <FormControl
+                                  bsClass="form-control"
+                                  className="FormControl-sc-1amoaox-0 hdNTyr"
+                                  componentClass="input"
+                                  inputRef={[Function]}
+                                  label="A parameter"
+                                  maxLength={250}
+                                  name="PARAM"
+                                  onChange={[Function]}
+                                  placeholder=""
+                                  required={true}
+                                  type="text"
+                                  value="parameter"
+                                >
+                                  <input
+                                    className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                    id="PARAM"
+                                    label="A parameter"
+                                    maxLength={250}
+                                    name="PARAM"
+                                    onChange={[Function]}
+                                    placeholder=""
+                                    required={true}
+                                    type="text"
+                                    value="parameter"
+                                  />
+                                </FormControl>
+                              </StyledComponent>
+                            </FormControl>
+                          </div>
+                        </InputWrapper>
+                      </div>
+                    </FormGroup>
+                  </StyledComponent>
+                </FormGroup__StyledFormGroup>
+              </Component>
             </Input>
           </div>
         </Col>
