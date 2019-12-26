@@ -6,8 +6,7 @@ import styled, { css } from 'styled-components';
 import styledTheme from 'styled-theming';
 import { darken, lighten } from 'polished';
 
-import { teinte, themeModes } from 'theme';
-import colorLevel from 'theme/util/colorLevel';
+import { teinte, themeModes, util } from 'theme';
 import FormControl from './FormControl';
 import InputGroup from './InputGroup';
 
@@ -20,19 +19,19 @@ const createCss = (validationState) => {
 
   switch (validationState) {
     case 'success':
-      text = colorLevel(teinte.tertiary.tre, 6);
+      text = util.colorLevel(teinte.tertiary.tre, 6);
       border = teinte.tertiary.tre;
-      background = colorLevel(teinte.tertiary.tre, -6);
+      background = util.colorLevel(teinte.tertiary.tre, -6);
       break;
     case 'warning':
-      text = colorLevel(teinte.tertiary.sei, 6);
+      text = util.colorLevel(teinte.tertiary.sei, 6);
       border = teinte.tertiary.sei;
-      background = colorLevel(teinte.tertiary.sei, -6);
+      background = util.colorLevel(teinte.tertiary.sei, -6);
       break;
     case 'error':
-      text = colorLevel(teinte.secondary.uno, 6);
+      text = util.colorLevel(teinte.secondary.uno, 6);
       border = teinte.secondary.uno;
-      background = colorLevel(teinte.secondary.uno, -6);
+      background = util.colorLevel(teinte.secondary.uno, -6);
       break;
     default:
       break;
