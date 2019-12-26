@@ -18,8 +18,9 @@
     "build:stats": "disable_plugins=true webpack --profile --json > ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json",
     "build:analyze": "yarn build:stats && webpack-bundle-analyzer ./webpack/stats-$(git rev-parse --abbrev-ref HEAD).json ./target/web/build --mode=\"static\" --report=\"./webpack/analysis-$(git rev-parse --abbrev-ref HEAD).html\"",
     "lint": "eslint --ext js,jsx src",
-    "lint:css":"stylelint './src/**/*.{js,jsx,tsx}'",
     "lint:path": "eslint --ext js,jsx",
+    "lint:styles":"stylelint --",
+    "lint:styles:all":"stylelint './src/**/*.{js,jsx,tsx}'",
     "lint:changes": "./dev/lintChanges.sh",
     "test": "jest",
     "check-production-build": "node checkProductionBuild.js"
