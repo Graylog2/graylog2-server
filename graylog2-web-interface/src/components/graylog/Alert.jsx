@@ -6,7 +6,9 @@ import { darken, lighten } from 'polished';
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
 import { util } from 'theme';
-import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
+import bsStyleThemeVariant from './variants/bsStyle';
+
+const styleVariants = ['danger', 'info', 'success', 'warning'];
 
 const alertStyles = (hex) => {
   const lightenBorder = lighten(0.30, hex);
@@ -37,11 +39,11 @@ const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
 
 Alert.propTypes = {
   /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(bsStyles),
+  bsStyle: PropTypes.oneOf(styleVariants),
 };
 
 Alert.defaultProps = {
-  bsStyle: 'default',
+  bsStyle: 'info',
 };
 
 export default Alert;

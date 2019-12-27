@@ -1,5 +1,16 @@
+### Default
+
 ```js
-const styles = ['Danger', 'Warning', 'Success', 'Info'];
+<Alert>
+  <i className="fa fa-exclamation-triangle fa-fw fa-lg" />{' '}
+  <strong>Default</strong> Lorem ipsum dolor sit amet consectetur adipisicing elit.
+</Alert>
+```
+
+### Variants
+
+```js
+const styles = ['Danger', 'Info', 'Success', 'Warning'];
 
 styles.map((style, i) => {
   return (
