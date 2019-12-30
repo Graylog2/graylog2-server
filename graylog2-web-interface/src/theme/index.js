@@ -3,9 +3,7 @@ import breakpoints from './breakpoints';
 import util from './util';
 
 const theme = {
-  teinte: {
-    ...teinte,
-  },
+  teinte,
   breakpoint: {
     ...breakpoints,
   },

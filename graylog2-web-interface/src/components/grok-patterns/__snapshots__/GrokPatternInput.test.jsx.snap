@@ -547,6 +547,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                           "isStatic": false,
                           "lastClassName": "jNPkhE",
                           "rules": Array [
+<<<<<<< HEAD
                             "background-color:",
                             "#FFF",
                             ";border-color:",
@@ -580,6 +581,8 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";background-color:",
                             "#9E1F63",
                             ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                             [Function],
                           ],
                         },
@@ -735,6 +738,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                           "isStatic": false,
                           "lastClassName": "jNPkhE",
                           "rules": Array [
+<<<<<<< HEAD
                             "background-color:",
                             "#FFF",
                             ";border-color:",
@@ -768,6 +772,8 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";background-color:",
                             "#9E1F63",
                             ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                             [Function],
                           ],
                         },
@@ -923,6 +929,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                           "isStatic": false,
                           "lastClassName": "jNPkhE",
                           "rules": Array [
+<<<<<<< HEAD
                             "background-color:",
                             "#FFF",
                             ";border-color:",
@@ -956,6 +963,8 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                             ";background-color:",
                             "#9E1F63",
                             ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                             [Function],
                           ],
                         },

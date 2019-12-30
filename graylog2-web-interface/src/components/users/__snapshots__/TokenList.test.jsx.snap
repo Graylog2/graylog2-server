@@ -762,6 +762,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               "isStatic": false,
                               "lastClassName": "jNPkhE",
                               "rules": Array [
+<<<<<<< HEAD
                                 "background-color:",
                                 "#FFF",
                                 ";border-color:",
@@ -795,6 +796,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 ";background-color:",
                                 "#9E1F63",
                                 ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                 [Function],
                               ],
                             },
@@ -846,6 +849,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                               "isStatic": false,
                               "lastClassName": "jNPkhE",
                               "rules": Array [
+<<<<<<< HEAD
                                 "background-color:",
                                 "#FFF",
                                 ";border-color:",
@@ -879,6 +883,8 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 ";background-color:",
                                 "#9E1F63",
                                 ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                 [Function],
                               ],
                             },
@@ -1740,6 +1746,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "isStatic": false,
                               "lastClassName": "jNPkhE",
                               "rules": Array [
+<<<<<<< HEAD
                                 "background-color:",
                                 "#FFF",
                                 ";border-color:",
@@ -1773,6 +1780,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 ";background-color:",
                                 "#9E1F63",
                                 ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                 [Function],
                               ],
                             },
@@ -1826,6 +1835,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "isStatic": false,
                               "lastClassName": "jNPkhE",
                               "rules": Array [
+<<<<<<< HEAD
                                 "background-color:",
                                 "#FFF",
                                 ";border-color:",
@@ -1859,6 +1869,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 ";background-color:",
                                 "#9E1F63",
                                 ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                 [Function],
                               ],
                             },
@@ -2016,6 +2028,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                               "isStatic": false,
                               "lastClassName": "jNPkhE",
                               "rules": Array [
+<<<<<<< HEAD
                                 "background-color:",
                                 "#FFF",
                                 ";border-color:",
@@ -2049,6 +2062,8 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 ";background-color:",
                                 "#9E1F63",
                                 ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                 [Function],
                               ],
                             },

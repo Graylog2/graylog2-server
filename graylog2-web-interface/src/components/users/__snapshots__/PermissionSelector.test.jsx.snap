@@ -773,6 +773,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -806,6 +807,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -965,6 +968,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -998,6 +1002,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -1326,6 +1332,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -1359,6 +1366,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -2224,6 +2233,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -2257,6 +2267,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -2416,6 +2428,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -2449,6 +2462,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -2777,6 +2792,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -2810,6 +2826,8 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -3918,6 +3936,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -3951,6 +3970,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -4110,6 +4131,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -4143,6 +4165,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -4471,6 +4495,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -4504,6 +4529,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -5369,6 +5396,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -5402,6 +5430,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -5561,6 +5591,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -5594,6 +5625,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
@@ -5922,6 +5955,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                       "isStatic": false,
                                                       "lastClassName": "jNPkhE",
                                                       "rules": Array [
+<<<<<<< HEAD
                                                         "background-color:",
                                                         "#FFF",
                                                         ";border-color:",
@@ -5955,6 +5989,8 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                                                         ";background-color:",
                                                         "#9E1F63",
                                                         ";}}}",
+=======
+>>>>>>> f424759c0... Updating ThemeProvider
                                                         [Function],
                                                       ],
                                                     },
