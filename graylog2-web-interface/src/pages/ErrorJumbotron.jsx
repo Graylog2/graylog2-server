@@ -19,7 +19,11 @@ const ContainerRow = styled(Row)`
 `;
 
 const StyledErrorJumbotron = styled(StyledJumbotron)(({ theme }) => css`
+<<<<<<< HEAD
   && {
+=======
+  & {
+>>>>>>> ca5860ea44... Updating ThemeProvider
     background-color: ${rgba(theme.color.primary.due, 0.8)};
     text-align: center;
   }
