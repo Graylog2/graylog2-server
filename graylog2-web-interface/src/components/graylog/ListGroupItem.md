@@ -1,7 +1,16 @@
 ### Normal List
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
+
+<ListGroup>
+  <ListGroupItem>Default</ListGroupItem>
+</ListGroup>
+```
+
+### Variant List
+```js
+import { ListGroup } from 'components/graylog';
+const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup>
   {styles.map((style) => (
@@ -13,7 +22,7 @@ const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 ### Ordered List
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
+const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup componentClass="ol">
   {styles.map((style, i) => (
@@ -25,7 +34,7 @@ const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 ### Disabled List
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
+const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup>
   {styles.map((style) => (
@@ -37,19 +46,18 @@ const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 ### Active Items
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup>
-  {styles.map((style) => (
-    <ListGroupItem key={`lgi-${style}`} bsStyle={style.toLowerCase()} active>{style}</ListGroupItem>
-  ))}
+  <ListGroupItem href="#" active>Link 1</ListGroupItem>
+  <ListGroupItem href="#">Link 2</ListGroupItem>
+  <ListGroupItem href="#" disabled>Link 3</ListGroupItem>
 </ListGroup>
 ```
 
 ### Link List
 ```js
 import { ListGroup } from 'components/graylog';
-const styles = ['Default', 'Danger', 'Warning', 'Success', 'Info'];
+const styles = ['Danger', 'Warning', 'Success', 'Info'];
 
 <ListGroup>
   {styles.map((style) => (

@@ -1,6 +1,6 @@
 ### Uncontrolled
 ```js
-import { Tab } from './index';
+import { Tab } from 'components/graylog';
 
 <Tabs defaultActiveKey={2} id="uncontrolled-tab-example">
   <Tab eventKey={1} title="Tab 1">
@@ -18,7 +18,7 @@ import { Tab } from './index';
 ### Controlled
 
 ```js
-import { Tab } from './index';
+import { Tab } from 'components/graylog';
 
 const TabExample = () => {
   const [activeTab, setActiveTab] = React.useState(1);
@@ -53,7 +53,7 @@ const TabExample = () => {
 ### Tabs with Dropdown
 
 ```js
-import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from './index';
+import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from 'components/graylog';
 
 <Tab.Container id="tabs-with-dropdown" defaultActiveKey="first">
   <Row className="clearfix">
