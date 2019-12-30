@@ -3,12 +3,14 @@ import { MenuItem } from 'components/graylog';
 
 const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Default'];
 
-styles.map((style, i) => {
+styles.map((style) => {
+  const styleName = style.toLowerCase();
+
   return (
-    <span key={`split-button-${i}`}>
+    <span key={`split-button-${styleName}`}>
       <DropdownButton title={style}
-                      bsStyle={style.toLowerCase()}
-                      id={`split-button-${i}`}>
+                      bsStyle={styleName}
+                      id={`split-button-${styleName}`}>
         <MenuItem header>Header</MenuItem>
         <MenuItem eventKey="1">Default</MenuItem>
         <MenuItem eventKey="2" active>Active</MenuItem>

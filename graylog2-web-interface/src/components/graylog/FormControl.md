@@ -123,7 +123,7 @@ class FormExample extends React.Component {
           <InputGroup>
             <FormControl type="text" />
             <DropdownButton
-              componentClass={InputGroup.Button}
+              componentClass={InputGroup.Button.type}
               id="input-dropdown-addon"
               title="Action">
               <MenuItem key="1">Item</MenuItem>

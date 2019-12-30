@@ -15,30 +15,31 @@ const listGroupItemStyles = (hex) => {
   const textColor = colorLevel(hex, 6);
 
   return css`
-    && {
+    color: ${textColor};
+    background-color: ${backgroundColor};
+
+    &.list-group-item-action {
+      &:hover,
+      &:focus {
+        color: ${textColor};
+        background-color: ${darken(0.05, backgroundColor)};
+      }
+
+      &.active {
+        color: ${contrastingColor(textColor)};
+        background-color: ${textColor};
+        border-color: ${textColor};
+      }
+    }
+
+    &.list-group-item {
       color: ${textColor};
       background-color: ${backgroundColor};
 
-      &.list-group-item-action {
-        &:hover,
-        &:focus {
-          color: ${textColor};
-          background-color: ${darken(0.05, backgroundColor)};
-        }
-
-        &.active {
-          color: ${contrastingColor(textColor)};
-          background-color: ${textColor};
-          border-color: ${textColor};
-        }
-      }
-
-      &.list-group-item {
-        &.active {
-          color: ${contrastingColor(hex)};
-          background-color: ${hex};
-          border-color: ${hex};
-        }
+      &.active {
+        color: ${contrastingColor(hex)};
+        background-color: ${hex};
+        border-color: ${hex};
       }
     }
   `;

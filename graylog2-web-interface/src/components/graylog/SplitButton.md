@@ -8,7 +8,7 @@ styles.map((style) => {
     <span key={`split-button-${style.toLowerCase()}`}>
       <SplitButton title={style}
                    bsStyle={style.toLowerCase()}
-                   id={`split-button-${i}`}>
+                   id={`split-button-${style.toLowerCase()}`}>
         <MenuItem header>Header</MenuItem>
         <MenuItem eventKey="1">Default</MenuItem>
         <MenuItem eventKey="2" active>Active</MenuItem>
