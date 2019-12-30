@@ -18,9 +18,9 @@ package org.graylog2.shared.buffers.processors;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.annotations.VisibleForTesting;
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +33,11 @@ public class MessageULIDGenerator {
 
     private final Cache<String, Integer> sequenceNrCache;
     private final ULID ulid;
-    private static final long RANDOM_MSB_MASK = 0xFFFFL;
-    private static final int OFFSET_GAP = 500;
+    static final long RANDOM_MSB_MASK = 0xFFFFL;
+    static final int OFFSET_GAP = 500;
 
     @Inject
-    public MessageULIDGenerator(ULID ulid, Journal journal) {
+    public MessageULIDGenerator(ULID ulid) {
         this.ulid = ulid;
 
         sequenceNrCache = Caffeine.newBuilder()
@@ -46,7 +46,12 @@ public class MessageULIDGenerator {
                 .build();
     }
 
-    public Message addULID(Message message) {
+    public String createULID(Message message) {
+        return createULID(message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
+    }
+
+    @VisibleForTesting
+    String createULID(String inputId, long timestamp, int sequenceNr) {
         // Fill the first 16 bits of the ULIDs random section with a sequence number that reflects the order
         // in which messages were received by an input.
         //
@@ -60,24 +65,20 @@ public class MessageULIDGenerator {
         // This means that the first recorded sequence number can be higher than the one of later messages.
         // To account for this, we simply add a constant (OFFSET_GAP) to prevent negative messageSequenceNrs.
 
-        final long messageTimestamp = message.getTimestamp().getMillis();
-        final int sequenceNr = message.getSequenceNr();
-
-        final String key = message.getSourceInputId() + messageTimestamp;
+        final String key = inputId + timestamp;
         final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
 
-        final ULID.Value nextUlid = ulid.nextValue(messageTimestamp);
+        final ULID.Value nextUlid = ulid.nextValue(timestamp);
         final long mostSignificantBits = nextUlid.getMostSignificantBits();
         final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
-        final long msbWithZeroedRandom = mostSignificantBits & ~RANDOM_MSB_MASK;
+        final long msbWithZeroedRandom = timestamp << 16;
         long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
         if (messageSequenceNr >= RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number does not fit into ULID ({} >= 65535). Sort order might be wrong.", messageSequenceNr);
             messageSequenceNr %= RANDOM_MSB_MASK;
         }
         final ULID.Value sequencedUlid = new ULID.Value(msbWithZeroedRandom + messageSequenceNr, leastSignificantBits);
-        message.addField(Message.FIELD_GL2_MESSAGE_ID, sequencedUlid.toString());
-        return message;
+        return sequencedUlid.toString();
     }
 }
