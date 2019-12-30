@@ -3,7 +3,6 @@ import createReactClass from 'create-react-class';
 import { ExpandableListItem } from 'components/common';
 
 const ExpandableListExample = createReactClass({
-
   render() {
     return (
       <ExpandableList>
@@ -20,7 +19,7 @@ const ExpandableListExample = createReactClass({
                 <ExpandableListItem selectable expandable={false} header="Rand" />
                 <ExpandableListItem selectable expandable={false} header="Perrin" />
                 <ExpandableListItem selectable expandable={false} header="Egwene" />
-                <ExpandableListItem checked expandable={false} header="Mat" />
+                <ExpandableListItem checked readOnly expandable={false} header="Mat" />
                 <ExpandableListItem expandable={false} selectable header="Nynaeve" />
               </ExpandableList>
             </ExpandableListItem>
