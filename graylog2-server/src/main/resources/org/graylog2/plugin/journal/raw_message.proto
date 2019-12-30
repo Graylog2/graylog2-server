@@ -3,7 +3,7 @@ syntax = "proto2";
 package org.graylog2.plugin.journal;
 
 // to regenerate JournalMessages.java:
-// install protobuf compiler (at the time of writing 3.0.0)
+// install protobuf compiler (at the time of writing 2.5.0)
 // cd graylog2-server/src/main && protoc --java_out=java resources/org/graylog2/plugin/journal/raw_message.proto
 
 option java_package = "org.graylog2.plugin.journal";
