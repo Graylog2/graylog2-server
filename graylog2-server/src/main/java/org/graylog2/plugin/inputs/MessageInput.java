@@ -388,7 +388,7 @@ public abstract class MessageInput implements Stoppable {
         rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
         rawMessage.addSourceNode(getId(), serverStatus.getNodeId());
-        rawMessage.setSequenceNr(sequenceNr.incrementAndGet());
+        rawMessage.setSequenceNr(sequenceNr.getAndUpdate(i -> i == Integer.MAX_VALUE ? 0 : i + 1));
 
         inputBuffer.insert(rawMessage);
 

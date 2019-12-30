@@ -47,7 +47,12 @@ public class MessageULIDGenerator {
     }
 
     public String createULID(Message message) {
-        return createULID(message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
+        try {
+            return createULID(message.getSourceInputId(), message.getTimestamp().getMillis(), message.getSequenceNr());
+        } catch (Exception e) {
+            LOG.error("Exception while creating ULID.", e);
+            return ulid.nextULID(message.getTimestamp().getMillis()).toString();
+        }
     }
 
     @VisibleForTesting
@@ -69,12 +74,19 @@ public class MessageULIDGenerator {
         final Integer subtrahend = sequenceNrCache.get(key, k -> sequenceNr);
 
         final ULID.Value nextUlid = ulid.nextValue(timestamp);
-        final long mostSignificantBits = nextUlid.getMostSignificantBits();
         final long leastSignificantBits = nextUlid.getLeastSignificantBits();
 
         final long msbWithZeroedRandom = timestamp << 16;
         long messageSequenceNr = sequenceNr - subtrahend + OFFSET_GAP;
-        if (messageSequenceNr >= RANDOM_MSB_MASK) {
+
+        // If the sequenceNr counter in a MessageInput wraps while we're processing the same timestamp
+        // the messageSequenceNr can become negative. We handle this by updating the sequenceNrCache and
+        // setting the messageSequenceNr accordingly.
+        if (messageSequenceNr < 0) {
+            LOG.warn("Message sequence number wrapped ({} -> {}). Sort order might be wrong.", subtrahend, sequenceNr);
+            messageSequenceNr = OFFSET_GAP;
+            sequenceNrCache.put(key, sequenceNr);
+        } else if (messageSequenceNr >= RANDOM_MSB_MASK) {
             LOG.warn("Message sequence number does not fit into ULID ({} >= 65535). Sort order might be wrong.", messageSequenceNr);
             messageSequenceNr %= RANDOM_MSB_MASK;
         }
