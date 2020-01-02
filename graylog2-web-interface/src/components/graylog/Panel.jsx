@@ -22,7 +22,7 @@ const panelVariantStyles = hex => css`
   border-color: ${borderColor(hex)};
 
   & > ${PanelHeading} {
-    color: ${colorLevel(backgroundColor(hex), 9)};
+    color: ${util.colorLevel(backgroundColor(hex), 9)};
     background-color: ${backgroundColor(hex)};
     border-color: ${borderColor(hex)};
 
