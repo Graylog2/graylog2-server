@@ -27,6 +27,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.messageq.MessageQueue;
+import org.graylog2.shared.messageq.MessageQueueWriter;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +52,7 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
     private static final Logger log = LoggerFactory.getLogger(JournallingMessageHandler.class);
 
     private static final Set<Journal.Entry> NULL_SINGLETON = Collections.singleton(null);
+    private static final Set<MessageQueue.Entry> MESSAGE_JOURNAL_NULL_SINGLETON = Collections.singleton(null);
     private static final Retryer<Void> JOURNAL_WRITE_RETRYER = RetryerBuilder.<Void>newBuilder()
             .retryIfException(new Predicate<Throwable>() {
                 @Override
@@ -64,15 +68,18 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
     private final Journal journal;
+    private final MessageQueueWriter messageQueueWriter;
     private final ProcessingStatusRecorder processingStatusRecorder;
     private final Semaphore journalFilled;
 
     @Inject
     public JournallingMessageHandler(MetricRegistry metrics,
                                      Journal journal,
+                                     MessageQueueWriter messageQueueWriter,
                                      ProcessingStatusRecorder processingStatusRecorder,
                                      @Named("JournalSignal") Semaphore journalFilled) {
         this.journal = journal;
+        this.messageQueueWriter = messageQueueWriter;
         this.processingStatusRecorder = processingStatusRecorder;
         this.journalFilled = journalFilled;
         byteCounter = metrics.counter(MetricRegistry.name(JournallingMessageHandler.class, "written_bytes"));
@@ -87,11 +94,15 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             // write batch to journal
 
             final Converter converter = new Converter();
+            final MessageJournalConverter messageJournalConverter = new MessageJournalConverter();
+            // Needs to run before the other converter because that one is setting fields to null
+            final ArrayList<MessageQueue.Entry> messageQueueEntries = Lists.newArrayList(transform(batch, messageJournalConverter));
             // copy to avoid re-running this all the time
             final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
 
             // Remove all null values returned from the converter (might happen if the Converter throws an exception)
             entries.removeAll(NULL_SINGLETON);
+            messageQueueEntries.removeAll(MESSAGE_JOURNAL_NULL_SINGLETON);
 
             // Clear the batch list after transforming it with the Converter because the fields of the RawMessageEvent
             // objects in there have been set to null and cannot be used anymore.
@@ -101,6 +112,11 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
             // This basically blocks if the journal write always throws an exception. Once the write succeeds, we will
             // continue.
             try {
+                try {
+                    messageQueueWriter.write(messageQueueEntries);
+                } catch (Exception e) {
+                    log.error("Unable to write to MessageJournal", e);
+                }
                 writeToJournal(converter, entries);
 
                 // The converter computed the latest receive timestamp of all messages in the batch so we don't have to
@@ -127,6 +143,24 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
                 converter.getBytesWritten(),
                 lastOffset);
         journalFilled.release();
+    }
+
+    private class MessageJournalConverter implements Function<RawMessageEvent, MessageQueue.Entry> {
+        @Nullable
+        @Override
+        public MessageQueue.Entry apply(@Nullable RawMessageEvent input) {
+            try {
+                final byte[] messageIdBytes = input.getMessageIdBytes();
+                final byte[] encodedRawMessage = input.getEncodedRawMessage();
+
+                // TODO: Check Converter implementation and copy relevant parts here (e.g. setting fields to null and metrics)
+
+                return messageQueueWriter.createEntry(messageIdBytes, encodedRawMessage);
+            } catch (Exception e) {
+                log.error("Unable to convert RawMessageEvent to MessageJournal.Entry - skipping event", e);
+                return null;
+            }
+        }
     }
 
     private class Converter implements Function<RawMessageEvent, Journal.Entry> {

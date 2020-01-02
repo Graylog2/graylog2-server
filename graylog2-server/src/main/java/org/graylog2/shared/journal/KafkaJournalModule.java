@@ -18,10 +18,13 @@ package org.graylog2.shared.journal;
 
 import com.google.inject.Scopes;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.shared.messageq.MessageQueueModule;
 
 public class KafkaJournalModule extends Graylog2Module {
     @Override
     protected void configure() {
         bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
+
+        install(new MessageQueueModule());
     }
 }

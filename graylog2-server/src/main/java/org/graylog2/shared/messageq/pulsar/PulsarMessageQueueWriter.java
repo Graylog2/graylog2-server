@@ -5,7 +5,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.assistedinject.Assisted;
 import org.apache.pulsar.client.api.CompressionType;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +29,8 @@ import java.util.concurrent.TimeUnit;
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Singleton
 public class PulsarMessageQueueWriter extends AbstractIdleService implements MessageQueueWriter {
-    public interface Factory extends MessageQueueWriter.Factory<PulsarMessageQueueWriter> {
-        @Override
-        PulsarMessageQueueWriter create(@Assisted("name") String name);
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(PulsarMessageQueueWriter.class);
 
@@ -51,8 +48,8 @@ public class PulsarMessageQueueWriter extends AbstractIdleService implements Mes
     private Producer<byte[]> producer;
 
     @Inject
-    public PulsarMessageQueueWriter(MetricRegistry metricRegistry, @Assisted("name") String name) {
-        this.name = name;
+    public PulsarMessageQueueWriter(MetricRegistry metricRegistry) {
+        this.name = "input"; // TODO: use cluster-id?
         this.topic = name + "-message-queue"; // TODO: Make configurable
         this.serviceUrl = "pulsar://localhost:6650"; // TODO: Make configurable
 

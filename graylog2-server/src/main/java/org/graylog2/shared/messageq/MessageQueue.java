@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.Service;
 import org.apache.pulsar.client.api.MessageId;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 public interface MessageQueue extends Service {
     default Entry createEntry(byte[] id, byte[] value) {
@@ -45,16 +44,5 @@ public interface MessageQueue extends Service {
          * @return the event time in milliseconds
          */
         long timestamp();
-    }
-
-    interface Envelope extends Iterable<Entry> {
-        // TODO: Do we really want this or would a simple Iterable/Iterator implementation enough? That would allow
-        //       us to stream the entries instead of loading all of them into memory.
-        List<Entry> entries();
-
-        void commitAll() throws MessageQueueException;
-
-        // TODO: Do we need a negative ack?
-        void commit(Entry entry) throws MessageQueueException;
     }
 }

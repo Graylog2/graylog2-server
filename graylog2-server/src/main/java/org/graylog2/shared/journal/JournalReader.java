@@ -27,6 +27,9 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.messageq.MessageQueue;
+import org.graylog2.shared.messageq.MessageQueueException;
+import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +37,19 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class JournalReader extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
     private final Journal journal;
     private final ProcessBuffer processBuffer;
+    private final MessageQueueReader messageQueueReader;
+    private final ScheduledExecutorService daemonScheduler;
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
     private final EventBus eventBus;
@@ -55,11 +62,15 @@ public class JournalReader extends AbstractExecutionThreadService {
     @Inject
     public JournalReader(Journal journal,
                          ProcessBuffer processBuffer,
+                         MessageQueueReader messageQueueReader,
+                         @Named("daemonScheduler") ScheduledExecutorService daemonScheduler,
                          @Named("JournalSignal") Semaphore journalFilled,
                          MetricRegistry metricRegistry,
                          EventBus eventBus) {
         this.journal = journal;
         this.processBuffer = processBuffer;
+        this.messageQueueReader = messageQueueReader;
+        this.daemonScheduler = daemonScheduler;
         this.journalFilled = journalFilled;
         this.metricRegistry = metricRegistry;
         this.eventBus = eventBus;
@@ -119,6 +130,26 @@ public class JournalReader extends AbstractExecutionThreadService {
 
     @Override
     protected void run() throws Exception {
+        daemonScheduler.schedule(() -> {
+            while (isRunning()) {
+                try {
+                    final List<MessageQueue.Entry> entries = messageQueueReader.read(1);
+                    entries.forEach(entry -> {
+                        log.info("Consumed message: {}", entry);
+                        final RawMessage rawMessage = RawMessage.decode(entry.value(), 0);
+                        processBuffer.insertBlocking(rawMessage);
+                        try {
+                            messageQueueReader.commit(entry.commitId());
+                        } catch (MessageQueueException e) {
+                            log.error("Couldn't commit entry", e);
+                        }
+                    });
+                } catch (MessageQueueException e) {
+                    log.error("Consumer error", e);
+                }
+            }
+        }, 0, SECONDS);
+
         try {
             requestedReadCount = metricRegistry.register(name(this.getClass(), "requestedReadCount"), new HdrHistogram(processBuffer.getRingBufferSize() + 1, 3));
         } catch (IllegalArgumentException e) {
@@ -162,8 +193,8 @@ public class JournalReader extends AbstractExecutionThreadService {
                         journal.markJournalOffsetCommitted(encodedRawMessage.getOffset());
                         continue;
                     }
-
-                    processBuffer.insertBlocking(rawMessage);
+                    //processBuffer.insertBlocking(rawMessage);
+                    journal.markJournalOffsetCommitted(encodedRawMessage.getOffset());
                 }
             }
         }

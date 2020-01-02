@@ -6,7 +6,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.assistedinject.Assisted;
 import org.apache.pulsar.client.api.ConsumerInterceptor;
 import org.apache.pulsar.client.api.Message;
 import org.apache.pulsar.client.api.MessageId;
@@ -21,20 +20,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.Iterator;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+@Singleton
 public class PulsarMessageQueueReader extends AbstractIdleService implements MessageQueueReader {
-    public interface Factory extends MessageQueueReader.Factory<PulsarMessageQueueReader> {
-        @Override
-        PulsarMessageQueueReader create(@Assisted("name") String name);
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(PulsarMessageQueueReader.class);
 
@@ -52,8 +47,8 @@ public class PulsarMessageQueueReader extends AbstractIdleService implements Mes
     private org.apache.pulsar.client.api.Consumer<byte[]> consumer;
 
     @Inject
-    public PulsarMessageQueueReader(MetricRegistry metricRegistry, @Assisted("name") String name) {
-        this.name = name;
+    public PulsarMessageQueueReader(MetricRegistry metricRegistry) {
+        this.name = "input"; // TODO: use cluster-id?
         this.topic = name + "-message-queue"; // TODO: Make configurable
         this.serviceUrl = "pulsar://localhost:6650"; // TODO: Make configurable
 
@@ -97,8 +92,19 @@ public class PulsarMessageQueueReader extends AbstractIdleService implements Mes
     }
 
     @Override
-    public MessageQueue.Envelope read(long entries) throws MessageQueueException {
+    public List<MessageQueue.Entry> read(long entries) throws MessageQueueException {
         final ImmutableList.Builder<MessageQueue.Entry> builder = ImmutableList.builder();
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            LOG.info("Got interrupted", e);
+            Thread.currentThread().interrupt();
+            return builder.build();
+        }
+        if (!isRunning()) {
+            throw new MessageQueueException("Message queue service is not running");
+        }
 
         for (int consumed = 0; consumed < entries; consumed++) {
             try {
@@ -112,62 +118,19 @@ public class PulsarMessageQueueReader extends AbstractIdleService implements Mes
             }
         }
 
-        return new Envelope(builder.build());
+        return builder.build();
     }
 
     @Override
-    public void subscribe(Consumer<MessageQueue.Envelope> envelopeConsumer) throws MessageQueueException {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            LOG.info("Got interrupted", e);
-            Thread.currentThread().interrupt();
-            return;
-        }
-        while (isRunning()) {
+    public void commit(Object AckID) throws MessageQueueException {
+        if (AckID instanceof MessageId) {
             try {
-                final Message<byte[]> message = consumer.receive(5, TimeUnit.SECONDS);
-
-                if (message != null) {
-                    envelopeConsumer.accept(new Envelope(ImmutableList.of(PulsarMessageQueueEntry.fromMessage(message))));
-                }
-            } catch (PulsarClientException e) {
-                throw new MessageQueueException("Error consuming messages", e);
-            }
-        }
-    }
-
-    private class Envelope implements MessageQueueReader.Envelope {
-        private final ImmutableList<Entry> entries;
-
-        public Envelope(ImmutableList<Entry> entries) {
-            this.entries = entries;
-        }
-
-        @Override
-        public List<Entry> entries() {
-            return entries;
-        }
-
-        @Override
-        public void commitAll() throws MessageQueueException {
-            for (final Entry entry : entries) {
-                commit(entry);
-            }
-        }
-
-        @Override
-        public void commit(Entry entry) throws MessageQueueException {
-            try {
-                consumer.acknowledge(entry.commitId());
+                consumer.acknowledge((MessageId) AckID);
             } catch (PulsarClientException e) {
                 throw new MessageQueueException("Couldn't acknowledge message", e);
             }
-        }
-
-        @Override
-        public Iterator<Entry> iterator() {
-            return entries.iterator();
+        } else {
+            throw new MessageQueueException("Couldn't acknowledge unknown message type <" + AckID + ">");
         }
     }
 
