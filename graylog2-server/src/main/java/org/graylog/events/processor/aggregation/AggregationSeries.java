@@ -53,7 +53,16 @@ public abstract class AggregationSeries {
 
         public abstract Builder field(@Nullable String field);
 
-        public abstract AggregationSeries build();
+        abstract Optional<String> field();
+        abstract AggregationSeries autoBuild();
+
+        public AggregationSeries build() {
+            // Most of the views code doesn't handle empty strings. Best to convert them here.
+            if (field().isPresent() && field().get().isEmpty()) {
+                field(null);
+            }
+            return autoBuild();
+        }
     }
 
     @JsonCreator
