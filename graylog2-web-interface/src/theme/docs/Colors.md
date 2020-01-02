@@ -18,6 +18,14 @@ const Swatches = styled.div`
   margin: 0 0 15px;
 `;
 
+const StyledColorSwatch = styled(ColorSwatch)`
+  margin-right: 6px;
+
+  &:last-of-type {
+    margin: 0;
+  }
+`;
+
 const Colors = () => {
   useEffect(() => {
      const clipboard = new ClipboardJS('[data-clipboard-button]');
@@ -38,9 +46,9 @@ const Colors = () => {
               {Object.keys(teinte[section]).map((name) => {
                 const value = teinte[section][name];
 
-                return (<ColorSwatch name={name}
-                                     color={value}
-                                     path={`teinte.${section}.${name}`} />);
+                return (<StyledColorSwatch name={name}
+                                           color={value}
+                                           copyText={`teinte.${section}.${name}`} />);
               })}
             </Swatches>
           </>

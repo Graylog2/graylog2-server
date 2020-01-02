@@ -27,12 +27,7 @@ const Swatch = styled.div(({ color }) => `
   padding: 3px;
   flex-direction: column;
   cursor: pointer;
-  margin-right: 6px;
   flex: 1;
-
-  &:last-of-type {
-    margin: 0;
-  }
 
   &:hover {
     ${Value} {
@@ -41,7 +36,24 @@ const Swatch = styled.div(({ color }) => `
   }
 `);
 
-const ColorSwatch = ({ color, name, path }) => {
+
+const Wrapped = ({ copyText, children }) => {
+  if (!copyText) {
+    return <>{children}</>;
+  }
+
+  return (
+    <OverlayTrigger placement="top"
+                    overlay={<Tooltip id={`tooltip-swatch-${copyText}`}>Copied!</Tooltip>}
+                    trigger="click"
+                    delayShow={300}
+                    delayHide={150}
+                    id={`overlay-swatch-${copyText}`}>{children}
+    </OverlayTrigger>
+  );
+};
+
+const ColorSwatch = ({ color, name, copyText }) => {
   let clipboard;
 
   if (ClipboardJS.isSupported()) {
@@ -55,31 +67,31 @@ const ColorSwatch = ({ color, name, path }) => {
   }
 
   return (
-    <OverlayTrigger placement="top"
-                    overlay={<Tooltip id={`tooltip-swatch-${path}`}>Copied!</Tooltip>}
-                    trigger="click"
-                    delayShow={300}
-                    delayHide={150}
-                    id={`overlay-swatch-${path}`}>
+    <Wrapped>
       <Swatch color={color}
               data-clipboard-button
-              data-clipboard-text={path}>
+              data-clipboard-text={copyText}>
         <Name>{name}</Name>
         <Value>{color}</Value>
       </Swatch>
-    </OverlayTrigger>
+    </Wrapped>
   );
 };
 
 ColorSwatch.propTypes = {
   color: PropTypes.string.isRequired,
+  copyText: PropTypes.string,
   name: PropTypes.string,
-  path: PropTypes.string,
 };
 
 ColorSwatch.defaultProps = {
+  copyText: undefined,
   name: '',
-  path: '',
+};
+
+Wrapped.propTypes = {
+  children: PropTypes.node.isRequired,
+  copyText: PropTypes.string.isRequired,
 };
 
 export default ColorSwatch;
