@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+
 import styled from 'styled-components';
 import ClipboardJS from 'clipboard';
 import { readableColor } from 'polished';
 
-import { teinte } from 'theme';
 import { OverlayTrigger, Tooltip } from 'components/graylog';
 
 const Name = styled.div`
@@ -15,15 +16,6 @@ const Value = styled.div`
   text-align: right;
   opacity: 0.5;
   transition: opacity 150ms ease-in-out;
-`;
-
-const Section = styled.h3`
-  margin: 0 0 6px;
-`;
-
-const Swatches = styled.div`
-  display: flex;
-  margin: 0 0 15px;
 `;
 
 const Swatch = styled.div(({ color }) => `
@@ -49,17 +41,12 @@ const Swatch = styled.div(({ color }) => `
   }
 `);
 
-const Colors = () => {
+const ColorSwatch = ({ color, name, path }) => {
   let clipboard;
-  const handleCopySuccess = () => {
-
-  };
 
   if (ClipboardJS.isSupported()) {
     useEffect(() => {
       clipboard = new ClipboardJS('[data-clipboard-button]', {});
-
-      clipboard.on('success', handleCopySuccess);
 
       return () => {
         clipboard.destroy();
@@ -67,40 +54,32 @@ const Colors = () => {
     }, []);
   }
 
-
   return (
-    <div>
-      {Object.keys(teinte).map((section) => {
-        return (
-          <>
-            <Section>{section}</Section>
-
-            <Swatches>
-              {Object.keys(teinte[section]).map((color) => {
-                const name = `teinte.${section}.${color}`;
-                const value = teinte[section][color];
-
-                return (
-                  <OverlayTrigger placement="top"
-                                  overlay={<Tooltip id={`tooltip-teinte-${section}-${color}`}>Copied!</Tooltip>}
-                                  trigger="click"
-                                  delayShow={300}
-                                  delayHide={150}>
-                    <Swatch color={value}
-                            data-clipboard-button
-                            data-clipboard-text={name}>
-                      <Name>{color}</Name>
-                      <Value>{value}</Value>
-                    </Swatch>
-                  </OverlayTrigger>
-                );
-              })}
-            </Swatches>
-          </>
-        );
-      })}
-    </div>
+    <OverlayTrigger placement="top"
+                    overlay={<Tooltip id={`tooltip-swatch-${path}`}>Copied!</Tooltip>}
+                    trigger="click"
+                    delayShow={300}
+                    delayHide={150}
+                    id={`overlay-swatch-${path}`}>
+      <Swatch color={color}
+              data-clipboard-button
+              data-clipboard-text={path}>
+        <Name>{name}</Name>
+        <Value>{color}</Value>
+      </Swatch>
+    </OverlayTrigger>
   );
 };
 
-export default Colors;
+ColorSwatch.propTypes = {
+  color: PropTypes.string.isRequired,
+  name: PropTypes.string,
+  path: PropTypes.string,
+};
+
+ColorSwatch.defaultProps = {
+  name: '',
+  path: '',
+};
+
+export default ColorSwatch;
