@@ -1,85 +1,70 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import createReactClass from 'create-react-class';
 import Immutable from 'immutable';
 
 import { Button, Alert, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/graylog';
 import { Input } from 'components/bootstrap';
 import PermissionSelector from 'components/users/PermissionSelector';
-import PermissionsMixin from 'util/PermissionsMixin';
 
-const EditRole = createReactClass({
-  displayName: 'EditRole',
-
-  propTypes: {
-    initialRole: PropTypes.object.isRequired,
-    onSave: PropTypes.func.isRequired,
-    cancelEdit: PropTypes.func.isRequired,
-    streams: PropTypes.object.isRequired,
-    dashboards: PropTypes.object.isRequired,
-  },
-
-  mixins: [PermissionsMixin],
-
-  getInitialState() {
+class EditRole extends React.Component {
+  constructor(props) {
+    super(props);
     const { initialRole } = this.props;
+    const role = initialRole;
+    this.state = {
+      role,
+      initialName: this._safeRoleName(initialRole),
+    };
+  }
 
-    let role = initialRole;
-    if (role === null) {
-      // for the create dialog
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const {
       role = {
         name: null,
         description: null,
         permissions: [],
-      };
-    }
-    return {
-      role,
-      initialName: this._safeRoleName(initialRole),
-    };
-  },
+      },
+    } = prevState;
+    return { role: role };
+  }
 
-  componentWillReceiveProps(newProps) {
-    this.setState({ role: newProps.initialRole, initialName: this._safeRoleName(newProps.initialRole) });
-  },
-
-  _safeRoleName(role) {
+  _safeRoleName = (role) => {
     return role === null ? null : role.name;
-  },
+  }
 
-  _setName(ev) {
+  _setName = (ev) => {
     const { role } = this.state;
     role.name = ev.target.value;
     this.setState({ role });
-  },
+  }
 
-  _setDescription(ev) {
+  _setDescription = (ev) => {
     const { role } = this.state;
     role.description = ev.target.value;
     this.setState({ role });
-  },
+  }
 
-  _updatePermissions(addedPerms, deletedPerms) {
+  _updatePermissions = (addedPerms, deletedPerms) => {
     const { role } = this.state;
     role.permissions = Immutable.Set(role.permissions)
       .subtract(deletedPerms)
       .union(addedPerms)
       .toJS();
     this.setState({ role });
-  },
+  }
 
-  _saveDisabled() {
+  _saveDisabled = () => {
     const { role } = this.state;
 
     return role === null || role.name === null || role.name === '' || role.permissions.length === 0;
-  },
+  }
 
-  _onSave() {
+  _onSave = () => {
     const { onSave } = this.props;
     const { initialName, role } = this.state;
 
     onSave(initialName, role);
-  },
+  }
 
   render() {
     const { initialName, role } = this.state;
@@ -137,7 +122,22 @@ const EditRole = createReactClass({
         </Col>
       </Row>
     );
+  }
+}
+
+EditRole.propTypes = {
+  initialRole: PropTypes.object,
+  onSave: PropTypes.func.isRequired,
+  cancelEdit: PropTypes.func.isRequired,
+  streams: PropTypes.object.isRequired,
+  dashboards: PropTypes.object.isRequired,
+};
+EditRole.defaultProps = {
+  initialRole: {
+    name: null,
+    description: null,
+    permissions: [],
   },
-});
+};
 
 export default EditRole;
