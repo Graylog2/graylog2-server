@@ -3,8 +3,6 @@ _Click any color block below to copy the color path._
 ```js noeditor
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import ClipboardJS from 'clipboard';
-import { readableColor } from 'polished';
 
 import { teinte } from 'theme';
 import ColorSwatch from './Colors';
@@ -27,18 +25,9 @@ const StyledColorSwatch = styled(ColorSwatch)`
 `;
 
 const Colors = () => {
-  useEffect(() => {
-     const clipboard = new ClipboardJS('[data-clipboard-button]');
-
-    return () => {
-      clipboard.destroy();
-    };
-  }, []);
-
   return (
     <div>
-      {Object.keys(teinte).map((section) => {
-        return (
+      {Object.keys(teinte).map((section) => (
           <>
             <Section>{section}</Section>
 
@@ -52,8 +41,8 @@ const Colors = () => {
               })}
             </Swatches>
           </>
-        );
-      })}
+        )
+      )}
     </div>
   );
 };

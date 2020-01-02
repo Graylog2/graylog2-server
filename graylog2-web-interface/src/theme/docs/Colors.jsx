@@ -47,28 +47,31 @@ const Wrapped = ({ copyText, children }) => {
                     overlay={<Tooltip id={`tooltip-swatch-${copyText}`}>Copied!</Tooltip>}
                     trigger="click"
                     delayShow={300}
-                    delayHide={150}
-                    id={`overlay-swatch-${copyText}`}>{children}
+                    delayHide={150}>
+      {children}
     </OverlayTrigger>
   );
 };
 
-const ColorSwatch = ({ color, name, copyText }) => {
+const ColorSwatch = ({ className, color, name, copyText }) => {
   let clipboard;
 
-  if (ClipboardJS.isSupported()) {
-    useEffect(() => {
+  useEffect(() => {
+    if (ClipboardJS.isSupported() && !!copyText) {
       clipboard = new ClipboardJS('[data-clipboard-button]', {});
+    }
 
-      return () => {
+    return () => {
+      if (clipboard) {
         clipboard.destroy();
-      };
-    }, []);
-  }
+      }
+    };
+  }, []);
 
   return (
-    <Wrapped>
+    <Wrapped copyText={copyText}>
       <Swatch color={color}
+              className={className}
               data-clipboard-button
               data-clipboard-text={copyText}>
         <Name>{name}</Name>
@@ -79,12 +82,14 @@ const ColorSwatch = ({ color, name, copyText }) => {
 };
 
 ColorSwatch.propTypes = {
+  className: PropTypes.string,
   color: PropTypes.string.isRequired,
   copyText: PropTypes.string,
   name: PropTypes.string,
 };
 
 ColorSwatch.defaultProps = {
+  className: undefined,
   copyText: undefined,
   name: '',
 };
