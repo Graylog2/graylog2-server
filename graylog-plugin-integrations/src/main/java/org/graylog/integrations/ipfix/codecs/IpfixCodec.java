@@ -71,8 +71,8 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
 
     @VisibleForTesting
     static final String CK_IPFIX_DEFINITION_PATH = "ipfix_definition_path";
-
     private static final Logger LOG = LoggerFactory.getLogger(IpfixCodec.class);
+    private static final String IPFIX_STANDARD_DEFINITION = "/ipfix-iana-elements.json";
 
     private final IpfixAggregator ipfixAggregator;
     private final IpfixParser parser;
@@ -82,9 +82,9 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     protected IpfixCodec(@Assisted Configuration configuration, IpfixAggregator ipfixAggregator) throws IOException {
         super(configuration);
         this.ipfixAggregator = ipfixAggregator;
-        final URL standardIPFixDefTemplate = Resources.getResource("ipfix-iana-elements.json");
-        final String ipFixCustomDefPath    = (String) configuration.getSource().get(CK_IPFIX_DEFINITION_PATH);
-
+        // Standard IPFIX definition file is loaded from the classpath and is mandatory. We don't check for null or empty.
+        final URL standardIPFixDefTemplate = Resources.getResource(IpfixCodec.class, IPFIX_STANDARD_DEFINITION);
+        final String ipFixCustomDefPath = (String) configuration.getSource().get(CK_IPFIX_DEFINITION_PATH);
         if (ipFixCustomDefPath == null || ipFixCustomDefPath.trim().isEmpty()) {
             infoElementDefs = new InformationElementDefinitions(standardIPFixDefTemplate);
         } else {
@@ -129,7 +129,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     private static String createMessageString(long packetCount, long octetCount, String srcAddr, String dstAddr,
                                               Number srcPort, Number dstPort, long protocol) {
         String message = String.format(Locale.ROOT, "Ipfix [" + srcAddr + "]:" + srcPort + " <> [" + dstAddr + "]:" + dstPort + " " +
-                                                    "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
+                "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
         return message;
     }
 
