@@ -41,5 +41,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20190730100900_AddAlertsManagerRole.class);
         addMigration(V20190730000000_CreateDefaultEventsConfiguration.class);
         addMigration(V20191121145100_FixDefaultGrokPatterns.class);
+        addMigration(V20200102140000_UnifyEventSeriesId.class);
     }
 }
