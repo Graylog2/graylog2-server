@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { Row, Col, Checkbox } from 'components/graylog';
 import * as Immutable from 'immutable';
 
@@ -12,7 +13,15 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DescriptionBox from 'views/components/aggregationbuilder/DescriptionBox';
 import DecoratorSidebar from 'views/components/messagelist/decorators/DecoratorSidebar';
 
-import style from './EditMessageList.css';
+const FullHeightCol = styled(Col)`
+  height: 100%;
+  padding-bottom: 10px;
+  overflow: auto;
+`;
+
+const ValueComponent = styled.span`
+  padding: 2px 5px;
+`;
 
 const _onFieldSelectionChanged = (fields, config, onChange) => {
   const newFields = fields.map(({ value }) => value);
@@ -44,12 +53,12 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
   const onDecoratorsChange = newDecorators => onChange(config.toBuilder().decorators(newDecorators).build());
 
   return (
-    <Row>
-      <Col md={3}>
+    <Row style={{ height: '100%', paddingBottom: '15px' }}>
+      <FullHeightCol md={3}>
         <DescriptionBox description="Fields">
           <SortableSelect options={fieldsForSelect}
                           onChange={newFields => _onFieldSelectionChanged(newFields, config, onChange)}
-                          valueComponent={({ children: _children }) => <span className={style.valueComponent}>{_children}</span>}
+                          valueComponent={({ children: _children }) => <ValueComponent>{_children}</ValueComponent>}
                           value={selectedFieldsForSelect} />
           <Checkbox checked={config.showMessageRow} onChange={() => _onShowMessageRowChanged(config, onChange)}>
             Show message in new row
@@ -61,10 +70,10 @@ const EditMessageList = ({ children, config, fields, onChange }: Props) => {
                             maximumHeight={600}
                             onChange={onDecoratorsChange} />
         </DescriptionBox>
-      </Col>
-      <Col md={9}>
+      </FullHeightCol>
+      <FullHeightCol md={9}>
         {children}
-      </Col>
+      </FullHeightCol>
     </Row>
   );
 };

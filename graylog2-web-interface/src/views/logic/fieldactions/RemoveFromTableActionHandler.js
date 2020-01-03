@@ -1,14 +1,9 @@
 // @flow strict
 import { WidgetActions } from 'views/stores/WidgetStore';
-import type { ActionContexts } from 'views/logic/ActionContext';
-import MessagesWidget from '../widgets/MessagesWidget';
-import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
-import type {
-  FieldActionHandlerCondition,
-  FieldActionHandler,
-} from './FieldActionHandler';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import type { FieldActionHandlerCondition, FieldActionHandler } from './FieldActionHandler';
 
-const RemoveFromTableActionHandler = ({ field, contexts: { widget } }) => {
+const RemoveFromTableActionHandler: FieldActionHandler = ({ field, contexts: { widget } }) => {
   const newFields = widget.config.fields.filter(f => (f !== field));
   const newConfig = widget.config.toBuilder()
     .fields(newFields)
@@ -17,16 +12,17 @@ const RemoveFromTableActionHandler = ({ field, contexts: { widget } }) => {
 };
 
 const isEnabled: FieldActionHandlerCondition = ({ contexts: { widget }, field }) => {
-  if (widget instanceof MessagesWidget && widget.config instanceof MessagesWidgetConfig) {
+  if (MessagesWidget.isMessagesWidget(widget) && widget.config) {
     const fields = widget.config.fields || [];
     return fields.includes(field);
   }
   return false;
 };
 
-RemoveFromTableActionHandler.isEnabled = isEnabled;
-
 /* Hide RemoveFromTableHandler in the sidebar */
-RemoveFromTableActionHandler.isHidden = (context: ActionContexts): boolean => !context.widget;
+const isHidden: FieldActionHandlerCondition = ({ contexts: { widget } }): boolean => !widget;
 
-export default (RemoveFromTableActionHandler: FieldActionHandler);
+RemoveFromTableActionHandler.isEnabled = isEnabled;
+RemoveFromTableActionHandler.isHidden = isHidden;
+
+export default RemoveFromTableActionHandler;

@@ -1,8 +1,7 @@
 import { css } from 'styled-components';
 import { darken, lighten, getLuminance } from 'polished';
 
-import teinte from 'theme/teinte';
-import contrastingColor from 'util/contrastingColor';
+import { teinte, util } from 'theme';
 import bsStyleThemeVariant from '../variants/bsStyle';
 
 const buttonStyles = ({ bsStyle }) => {
@@ -14,7 +13,7 @@ const buttonStyles = ({ bsStyle }) => {
         return backgroundColor;
       }
 
-      return contrastingColor(backgroundColor);
+      return util.contrastingColor(backgroundColor);
     };
 
     const shouldMix = (value, originalColor) => {

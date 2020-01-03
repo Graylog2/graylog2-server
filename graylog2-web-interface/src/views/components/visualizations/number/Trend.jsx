@@ -2,8 +2,8 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import numeral from 'numeral';
-import teinte from 'theme/teinte';
-import contrastingColor from 'util/contrastingColor';
+
+import { teinte, util } from 'theme';
 
 import Icon from 'components/common/Icon';
 import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -26,7 +26,7 @@ const Background: React.AbstractComponent<{trend: ?string}> = styled.div(({ tren
 
     ${trend && css`
       background-color: ${bgColor};
-      color: ${contrastingColor(bgColor)};
+      color: ${util.contrastingColor(bgColor)};
     `}
   `;
 });

@@ -32,6 +32,10 @@ export default class MessagesWidget extends Widget {
     // eslint-disable-next-line no-use-before-define
     return new Builder();
   }
+
+  static isMessagesWidget(widget = {}) {
+    return widget.type === MessagesWidget.type;
+  }
 }
 
 class Builder extends Widget.Builder {

@@ -1,4 +1,11 @@
 import colorLevel from './colorLevel';
+import contrastingColor from './contrastingColor';
+import readableColor from './readableColor';
 
-// eslint-disable-next-line import/prefer-default-export
-export { colorLevel };
+const util = {
+  colorLevel,
+  contrastingColor,
+  readableColor,
+};
+
+export default util;
