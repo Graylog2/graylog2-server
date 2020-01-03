@@ -101,12 +101,6 @@ const Navigation = ({ permissions, fullName, location, loginName }) => {
             <NavItem>Dashboards</NavItem>
           </LinkContainer>
 
-          <IfPermitted permissions="sources:read">
-            <LinkContainer to={Routes.SOURCES}>
-              <NavItem>Sources</NavItem>
-            </LinkContainer>
-          </IfPermitted>
-
           {pluginNavigations}
 
           <SystemMenu />

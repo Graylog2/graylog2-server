@@ -3,19 +3,18 @@ import styled, { css } from 'styled-components';
 import { Panel as BootstrapPanel } from 'react-bootstrap';
 import { adjustHue, darken } from 'polished';
 
-import teinte from 'theme/teinte';
-import { colorLevel } from 'theme/util';
+import { teinte, util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const panelVariantStyles = (hex) => {
-  const backgroundColor = colorLevel(hex, -9);
+  const backgroundColor = util.colorLevel(hex, -9);
   const borderColor = darken(0.05, adjustHue(-10, hex));
 
   return css`
     border-color: ${borderColor};
 
     & > .panel-heading {
-      color: ${colorLevel(backgroundColor, 9)};
+      color: ${util.colorLevel(backgroundColor, 9)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
