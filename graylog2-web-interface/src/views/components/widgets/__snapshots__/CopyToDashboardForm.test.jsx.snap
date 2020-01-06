@@ -338,7 +338,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="list-group"
             >
               <button
-                class="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                class="ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                 type="button"
               >
                 <h4
@@ -351,7 +351,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
                 />
               </button>
               <button
-                class="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                class="ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                 type="button"
               >
                 <h4

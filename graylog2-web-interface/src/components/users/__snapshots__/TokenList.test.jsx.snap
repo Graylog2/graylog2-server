@@ -760,7 +760,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "hjCxIT",
                               "rules": Array [
                                 "background-color:",
                                 "#FFF",
@@ -794,6 +794,12 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "#9E1F63",
                                 ";background-color:",
                                 "#9E1F63",
+                                ";}&.active{color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#DCE1E5",
+                                ";border-color:",
+                                "#DCE1E5",
                                 ";}}}",
                                 [Function],
                               ],
@@ -812,11 +818,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 hjCxIT"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -844,7 +850,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "hjCxIT",
                               "rules": Array [
                                 "background-color:",
                                 "#FFF",
@@ -878,6 +884,12 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "#9E1F63",
                                 ";background-color:",
                                 "#9E1F63",
+                                ";}&.active{color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#DCE1E5",
+                                ";border-color:",
+                                "#DCE1E5",
                                 ";}}}",
                                 [Function],
                               ],
@@ -896,11 +908,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem-sc-1ky0joo-0 hjCxIT"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                           >
                             No items to display
                           </span>
@@ -1738,7 +1750,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "hjCxIT",
                               "rules": Array [
                                 "background-color:",
                                 "#FFF",
@@ -1772,6 +1784,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#9E1F63",
                                 ";background-color:",
                                 "#9E1F63",
+                                ";}&.active{color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#DCE1E5",
+                                ";border-color:",
+                                "#DCE1E5",
                                 ";}}}",
                                 [Function],
                               ],
@@ -1790,11 +1808,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 hjCxIT"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -1824,7 +1842,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "hjCxIT",
                               "rules": Array [
                                 "background-color:",
                                 "#FFF",
@@ -1858,6 +1876,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#9E1F63",
                                 ";background-color:",
                                 "#9E1F63",
+                                ";}&.active{color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#DCE1E5",
+                                ";border-color:",
+                                "#DCE1E5",
                                 ";}}}",
                                 [Function],
                               ],
@@ -1876,11 +1900,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem-sc-1ky0joo-0 hjCxIT"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
@@ -2014,7 +2038,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "jNPkhE",
+                              "lastClassName": "hjCxIT",
                               "rules": Array [
                                 "background-color:",
                                 "#FFF",
@@ -2048,6 +2072,12 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#9E1F63",
                                 ";background-color:",
                                 "#9E1F63",
+                                ";}&.active{color:",
+                                "#1F1F1F",
+                                ";background-color:",
+                                "#DCE1E5",
+                                ";border-color:",
+                                "#DCE1E5",
                                 ";}}}",
                                 [Function],
                               ],
@@ -2066,11 +2096,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 jNPkhE"
+                          className="ListGroupItem-sc-1ky0joo-0 hjCxIT"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 jNPkhE list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 hjCxIT list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
