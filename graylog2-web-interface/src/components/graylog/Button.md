@@ -5,10 +5,10 @@ const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Link', 'Defa
 
 styles.map((style, i) => {
   return (
-    <p>
-      <Button bsStyle={style.toLowerCase()} key={`button-${style}-${i}`}>{style}</Button>{' '}
-      <Button active bsStyle={style.toLowerCase()} key={`button-active-${style}-${i}`}>{style} Active</Button>{' '}
-      <Button disabled bsStyle={style.toLowerCase()} key={`button-disabled-${style}-${i}`}>{style} Disabled</Button>{' '}
+    <p key={`button-example-${style}-${i}`}>
+      <Button bsStyle={style.toLowerCase()}>{style}</Button>{' '}
+      <Button active bsStyle={style.toLowerCase()}>{style} Active</Button>{' '}
+      <Button disabled bsStyle={style.toLowerCase()}>{style} Disabled</Button>{' '}
     </p>
   )
 })
