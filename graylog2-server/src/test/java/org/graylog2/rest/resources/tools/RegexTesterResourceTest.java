@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.tools;
 
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
+import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -92,5 +93,22 @@ public class RegexTesterResourceTest {
         assertThat(response.regex()).isEqualTo("([0-9]+)");
         assertThat(response.string()).isEqualTo("test");
         assertThat(response.match()).isNull();
+    }
+
+    @Test
+    public void testValidateValidRegex() {
+        final RegexValidationResponse response = resource.validateRegex(".*");
+        assertThat(response.regex()).isEqualTo(".*");
+        assertThat(response.isValid()).isTrue();
+        assertThat(response.validationMessage().isPresent()).isFalse();
+    }
+
+    @Test
+    public void testValidateInvalidRegex() {
+        final RegexValidationResponse response = resource.validateRegex("?*foo");
+        assertThat(response.regex()).isEqualTo("?*foo");
+        assertThat(response.isValid()).isFalse();
+        assertThat(response.validationMessage().isPresent()).isTrue();
+        assertThat(response.validationMessage().get()).isNotBlank();
     }
 }

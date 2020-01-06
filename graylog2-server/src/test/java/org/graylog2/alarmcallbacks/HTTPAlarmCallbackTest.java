@@ -37,6 +37,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamMock;
+import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
@@ -53,7 +54,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class HTTPAlarmCallbackTest {
     @Rule
@@ -64,6 +67,7 @@ public class HTTPAlarmCallbackTest {
     private OkHttpClient httpClient;
     private ObjectMapper objectMapper;
     private HTTPAlarmCallback alarmCallback;
+    private UrlWhitelistService whitelistService;
 
     private MockWebServer server;
 
@@ -71,7 +75,8 @@ public class HTTPAlarmCallbackTest {
     public void setUp() throws Exception {
         httpClient = new OkHttpClient();
         objectMapper = new ObjectMapperProvider().get();
-        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper);
+        whitelistService = mock(UrlWhitelistService.class);
+        alarmCallback = new HTTPAlarmCallback(httpClient, objectMapper, whitelistService);
 
         server = new MockWebServer();
     }
@@ -94,6 +99,8 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callSucceedsIfRemoteRequestSucceeds() throws Exception {
+        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+
         server.enqueue(new MockResponse().setResponseCode(200));
         server.start();
 
@@ -145,6 +152,8 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void callThrowsAlarmCallbackExceptionIfRemoteServerReturnsError() throws Exception {
+        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+
         server.enqueue(new MockResponse().setResponseCode(500));
         server.start();
 
@@ -209,6 +218,19 @@ public class HTTPAlarmCallbackTest {
     }
 
     @Test
+    public void callThrowsAlarmCallbackExceptionIfURLIsNotWhitelisted() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://not-whitelisted"));
+        alarmCallback.initialize(configuration);
+
+        final Stream stream = new StreamMock(Collections.singletonMap("_id", "stream-id"));
+
+        expectedException.expect(AlarmCallbackException.class);
+        expectedException.expectMessage("URL <http://not-whitelisted> is not whitelisted.");
+
+        alarmCallback.call(stream, null);
+    }
+
+    @Test
     public void callThrowsAlarmCallbackExceptionIfRequestBodyCanNotBeBuilt() throws Exception {
         final Configuration configuration = new Configuration(ImmutableMap.of("url", "http://example.org"));
         alarmCallback.initialize(configuration);
@@ -251,6 +273,8 @@ public class HTTPAlarmCallbackTest {
 
     @Test
     public void checkConfigurationSucceedsWithValidConfiguration() throws Exception {
+        when(whitelistService.isWhitelisted(anyString())).thenReturn(true);
+
         final Map<String, Object> configMap = ImmutableMap.of("url", "http://example.com/");
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
