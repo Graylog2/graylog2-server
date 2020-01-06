@@ -10,6 +10,15 @@ const Nav = styled(BootstrapNav)(() => {
 
   return css`
     &.nav {
+      .open > a {
+        &,
+        &:hover,
+        &:focus {
+          background-color: ${util.colorLevel(teinte.secondary.due, -3)};
+          border-color: ${borderColor};
+        }
+      }
+
       > li {
         > a {
           &:hover,
@@ -51,7 +60,7 @@ const Nav = styled(BootstrapNav)(() => {
       }
     }
 
-    &${navTabsStyles()}
+    ${navTabsStyles};
   `;
 });
 

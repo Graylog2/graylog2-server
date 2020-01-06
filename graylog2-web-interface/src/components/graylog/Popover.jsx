@@ -7,7 +7,7 @@ import teinte from 'theme/teinte';
 
 const borderColor = transparentize(0.8, teinte.primary.tre);
 const Popover = styled(BoostrapPopover)`
-  & {
+  && {
     background-color: ${teinte.primary.due};
     border-color: ${borderColor};
 

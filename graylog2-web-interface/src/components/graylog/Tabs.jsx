@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import navTabsStyles from './styles/nav-tabs';
 
 const Tabs = styled(BootstrapTabs)`
-  ${navTabsStyles()};
+  ${navTabsStyles};
 `;
 
 export default Tabs;
