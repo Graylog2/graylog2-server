@@ -21,27 +21,23 @@ import CustomHighlighting from './CustomHighlighting';
 import style from './MessageTableEntry.css';
 import type { Message } from './Types';
 
-const { NodesStore } = CombinedProvider.get('Nodes');
 const { InputsStore } = CombinedProvider.get('Inputs');
 
 const ConnectedMessageDetail = connect(
   MessageDetail,
   {
     availableInputs: InputsStore,
-    availableNodes: NodesStore,
     availableStreams: StreamsStore,
     configurations: SearchConfigStore,
   },
-  ({ availableStreams = {}, availableNodes = {}, availableInputs = {}, configurations = {}, ...rest }) => {
+  ({ availableStreams = {}, availableInputs = {}, configurations = {}, ...rest }) => {
     const { streams = [] } = availableStreams;
-    const { nodes } = availableNodes;
     const { inputs = [] } = availableInputs;
     const { searchesClusterConfig } = configurations;
     return ({
       ...rest,
       allStreams: Immutable.List(streams),
       streams: Immutable.Map(streams.map(stream => [stream.id, stream])),
-      nodes: Immutable.Map(nodes),
       inputs: Immutable.Map(inputs.map(input => [input.id, input])),
       searchConfig: searchesClusterConfig,
     });
