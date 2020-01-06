@@ -16,11 +16,9 @@
  */
 package org.graylog2.system.urlwhitelist;
 
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableList;
 
@@ -29,9 +27,6 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UrlWhitelistServiceTest {
-    @Mock
-    ClusterConfigService clusterConfigService;
-
     @InjectMocks
     UrlWhitelistService urlWhitelistService;
 

@@ -156,6 +156,7 @@ class MessageTable extends React.Component<Props, State> {
       id: m.message._id,
       index: m.index,
       highlight_ranges: m.highlight_ranges,
+      decoration_stats: m.decoration_stats,
     }));
   };
 

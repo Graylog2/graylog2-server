@@ -34,7 +34,7 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
 
   useEffect(() => {
     processHooks(
-      ViewActions.create(View.Type.Search)
+      ViewActions.create(View.Type.Search, streamId)
         .then(({ view, activeQuery }) => {
           return QueryFiltersActions.streams(activeQuery, [streamId]).then(() => view);
         }),
@@ -46,7 +46,7 @@ const StreamSearchPage = ({ params: { streamId }, route, loadingViewHooks, execu
     ).catch(
       (error) => { UserNotification.error(`Executing search failed with error: ${error}`, 'Could not execute search'); },
     );
-  }, []);
+  }, [streamId]);
 
   const loadView = (viewId: string): Promise<?View> => {
     return ViewLoader(

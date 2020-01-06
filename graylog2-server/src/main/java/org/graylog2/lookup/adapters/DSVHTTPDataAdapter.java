@@ -119,7 +119,8 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
             return;
         }
 
-        boolean urlWasNotWhitelisted = getError().filter(UrlNotWhitelistedException.class::isInstance).isPresent();
+        final boolean urlWasNotWhitelisted =
+                getError().filter(UrlNotWhitelistedException.class::isInstance).isPresent();
 
         try {
             // reload file if the url was blacklisted so that any errors with the file will surface again

@@ -34,19 +34,10 @@ export default (widgets: Array<Widget>): ResultType => {
         console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
       }
       const { defaults = {} } = typeDefinition || {};
-      const { config, filter, timerange, query, streams } = searchType;
-      const filterMap = filter ? { filter } : {};
-      const timerangeMap = timerange ? { timerange } : {};
-      const queryMap = query ? { query } : {};
-      const streamsMap = streams ? { streams } : {};
-      const nameMap = searchType.name ? { name: searchType.name } : {};
+      const { config, widgetId, ...rest } = searchType;
       return new Immutable.Map(defaults)
+        .merge(rest)
         .merge(config)
-        .merge(filterMap)
-        .merge(timerangeMap)
-        .merge(queryMap)
-        .merge(streamsMap)
-        .merge(nameMap)
         .merge(
           {
             id: searchType.id,

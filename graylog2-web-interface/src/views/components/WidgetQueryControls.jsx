@@ -66,7 +66,7 @@ const _updateRangeType = (oldTimerange: ?TimeRange, id: string, newRangeType: Ti
 type Delta = {| range: number |} | {| from: string |} | {| to: string |} | {| keyword: string |};
 
 // $FlowFixMe: Resulting time range could actually be inconsistent/incomplete at this point. Need to fix and improve.
-const _updateRangeParams = (currentTimerange: ?TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, ...delta });
+const _updateRangeParams = (rangeType: string, currentTimerange: ?TimeRange, id: string, delta: Delta) => WidgetActions.timerange(id, { ...currentTimerange, type: rangeType, ...delta });
 
 const _updateStreams = (id: string, streams: Array<string>) => WidgetActions.streams(id, streams);
 
@@ -121,7 +121,7 @@ const WidgetQueryControls = ({ availableStreams, config, globalOverride = {}, wi
             <TimeRangeTypeSelector onSelect={newRangeType => _updateRangeType(timerange, id, newRangeType)}
                                    disabled={isGloballyOverridden}
                                    value={rangeType} />
-            <TimeRangeInput onChange={(key, value) => _updateRangeParams(timerange, id, { [key]: value })}
+            <TimeRangeInput onChange={(key, value) => _updateRangeParams(rangeType, timerange, id, { [key]: value })}
                             disabled={isGloballyOverridden}
                             rangeType={rangeType}
                             rangeParams={rangeParams}

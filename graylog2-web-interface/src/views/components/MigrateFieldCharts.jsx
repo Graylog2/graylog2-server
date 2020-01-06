@@ -190,7 +190,6 @@ const MigrateFieldCharts = () => {
   const [migrationFinished, setMigrationFinished] = useState(!!Store.get(FIELD_CHARTS_MIGRATED_KEY));
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
-
   if (migrationFinished || isEmpty(legacyCharts)) {
     return null;
   }

@@ -33,8 +33,6 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.Version;
 import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 import org.graylog2.system.urlwhitelist.WhitelistEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -45,8 +43,6 @@ import java.util.stream.Collectors;
 import static org.graylog2.contentpacks.model.ModelTypes.URL_WHITELIST_ENTRY_V1;
 
 public class UrlWhitelistFacade implements EntityFacade<WhitelistEntry> {
-    private static final Logger LOG = LoggerFactory.getLogger(UrlWhitelistFacade.class);
-
     public static final ModelType TYPE_V1 = URL_WHITELIST_ENTRY_V1;
 
     private final ObjectMapper objectMapper;

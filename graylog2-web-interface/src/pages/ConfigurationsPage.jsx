@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col } from 'components/graylog';
+import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
@@ -13,14 +13,15 @@ import MessageProcessorsConfig from 'components/configurations/MessageProcessors
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
 import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
-
+import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import {} from 'components/maps/configurations';
-import 'components/configurations/ConfigurationStyles.css';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const ConfigurationsStore = StoreProvider.getStore('Configurations');
 const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import style from '!style/useable!css!components/configurations/ConfigurationStyles.css';
 class ConfigurationsPage extends React.Component {
    SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
 
@@ -33,6 +34,7 @@ class ConfigurationsPage extends React.Component {
    URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist'
 
    componentDidMount() {
+     style.use();
      const { currentUser: { permissions } } = this.props;
      ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
      ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
@@ -46,9 +48,9 @@ class ConfigurationsPage extends React.Component {
      });
    }
 
-   componentWillUnmount() {
-
-   }
+  componentWillUnmount() {
+    style.unuse();
+  }
 
 
   _getConfig = (configType) => {
@@ -57,18 +59,18 @@ class ConfigurationsPage extends React.Component {
       return configuration[configType];
     }
     return null;
-  }
+  };
 
   _onUpdate = (configType) => {
     return (config) => {
       switch (configType) {
-        case this.MESSAGE_PROCESSORS_CONFIG:
-          return ConfigurationActions.updateMessageProcessorsConfig(configType, config);
+        case MESSAGE_PROCESSORS_CONFIG:
+          return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
         default:
-          return ConfigurationActions.update(configType, config);
+          return ConfigurationsActions.update(configType, config);
       }
     };
-  }
+  };
 
   _pluginConfigs = () => {
     return PluginStore.exports('systemConfigurations').map((systemConfig, idx) => {
@@ -79,7 +81,7 @@ class ConfigurationsPage extends React.Component {
         updateConfig: this._onUpdate(systemConfig.configType),
       });
     });
-  }
+  };
 
   _pluginConfigRows = () => {
     const pluginConfigs = this._pluginConfigs();
@@ -102,7 +104,7 @@ class ConfigurationsPage extends React.Component {
     }
 
     return rows;
-  }
+  };
 
   render() {
     const { currentUser: { permissions } } = this.props;
@@ -119,7 +121,7 @@ class ConfigurationsPage extends React.Component {
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
-                        updateConfig={this._onUpdate(this.SEARCHES_CLUSTER_CONFIG)} />
+                        updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
       );
     } else {
       searchesConfigComponent = (<Spinner />);
@@ -127,7 +129,7 @@ class ConfigurationsPage extends React.Component {
     if (messageProcessorsConfig) {
       messageProcessorsConfigComponent = (
         <MessageProcessorsConfig config={messageProcessorsConfig}
-                                 updateConfig={this._onUpdate(this.MESSAGE_PROCESSORS_CONFIG)} />
+                                 updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
       );
     } else {
       messageProcessorsConfigComponent = (<Spinner />);
@@ -135,7 +137,7 @@ class ConfigurationsPage extends React.Component {
     if (sidecarConfig) {
       sidecarConfigComponent = (
         <SidecarConfig config={sidecarConfig}
-                       updateConfig={this._onUpdate(this.SIDECAR_CONFIG)} />
+                       updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
       );
     } else {
       sidecarConfigComponent = (<Spinner />);
@@ -143,7 +145,7 @@ class ConfigurationsPage extends React.Component {
     if (eventsConfig) {
       eventsConfigComponent = (
         <EventsConfig config={eventsConfig}
-                      updateConfig={this._onUpdate(this.EVENTS_CONFIG)} />
+                      updateConfig={this._onUpdate(EVENTS_CONFIG)} />
       );
     } else {
       eventsConfigComponent = (<Spinner />);
@@ -183,6 +185,9 @@ class ConfigurationsPage extends React.Component {
             <Col md={6}>
               {urlWhiteListConfigComponent}
             </Col>
+            <Col md={6}>
+              <DecoratorsConfig />
+            </Col>
           </Row>
 
           {pluginConfigRows.length > 0 && (
@@ -209,8 +214,8 @@ ConfigurationsPage.propTypes = {
   currentUser: PropTypes.object.isRequired,
 };
 
-export default connect(ConfigurationsPage, { configurationsStore: ConfigurationsStore, currentUserStore: CurrentUserStore }, ({ configurationsStore, currentUserStore, ...otherProps }) => ({
-  ...configurationsStore,
-  ...currentUserStore,
+export default connect(ConfigurationsPage, { configurations: ConfigurationsStore, currentUser: CurrentUserStore }, ({ configurations, currentUser, ...otherProps }) => ({
+  ...configurations,
+  ...currentUser,
   ...otherProps,
 }));
