@@ -105,12 +105,14 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
     }
   };
 
+  const debouncedValidate = debounce(_validate, 500);
+
   const _onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
     if (type === regex) {
-      const debouncedValidate = debounce(_validate, 1000);
       debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
+    } else {
+      _validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
     }
-    _validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
   };
 
   const _onUpdateType = (idx: number, type: string) => {

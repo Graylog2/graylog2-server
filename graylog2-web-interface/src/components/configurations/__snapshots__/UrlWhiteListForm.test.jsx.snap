@@ -3,7 +3,7 @@
 exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
 Array [
   <div
-    className="form-group"
+    className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
   >
     <span>
       <div
@@ -75,7 +75,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -95,7 +95,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -115,7 +115,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -238,11 +238,6 @@ Array [
           >
             <i
               className="fa fa-trash"
-              style={
-                Object {
-                  "cursor": "pointer",
-                }
-              }
             />
           </button>
         </td>
@@ -260,7 +255,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -280,7 +275,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -300,7 +295,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -423,11 +418,6 @@ Array [
           >
             <i
               className="fa fa-trash"
-              style={
-                Object {
-                  "cursor": "pointer",
-                }
-              }
             />
           </button>
         </td>
@@ -445,7 +435,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -465,7 +455,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -485,7 +475,7 @@ Array [
         </td>
         <td>
           <div
-            className="form-group"
+            className="FormGroup__StyledFormGroup-sc-1wv4cm9-0 ekazNr form-group"
           >
             
             <span>
@@ -504,7 +494,7 @@ Array [
                     <div
                       className="css-13zpnff-singleValue"
                     >
-                      Literal
+                      Exact match
                     </div>
                     <div
                       className="css-1g6gooi"
@@ -608,11 +598,6 @@ Array [
           >
             <i
               className="fa fa-trash"
-              style={
-                Object {
-                  "cursor": "pointer",
-                }
-              }
             />
           </button>
         </td>

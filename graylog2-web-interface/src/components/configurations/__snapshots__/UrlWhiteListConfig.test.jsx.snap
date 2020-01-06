@@ -67,7 +67,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
           http://localhost:8080/system/
         </td>
         <td>
-          literal
+          Exact match
         </td>
       </tr>
     </tbody>
