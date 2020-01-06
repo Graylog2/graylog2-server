@@ -495,9 +495,8 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               autoFocus={true}
               backdrop="static"
               backdropClassName="modal-backdrop"
-              backdropTransitionTimeout={150}
+              backdropTransition={[Function]}
               containerClassName="modal-open"
-              dialogTransitionTimeout={300}
               enforceFocus={true}
               keyboard={true}
               manager={
@@ -515,6 +514,7 @@ exports[`<ContentPackParameterList /> should render with empty parameters withou
               onEntering={[Function]}
               onExited={[Function]}
               onHide={[Function]}
+              onMouseUp={[Function]}
               renderBackdrop={[Function]}
               restoreFocus={true}
               show={false}
@@ -1484,9 +1484,8 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               autoFocus={true}
               backdrop="static"
               backdropClassName="modal-backdrop"
-              backdropTransitionTimeout={150}
+              backdropTransition={[Function]}
               containerClassName="modal-open"
-              dialogTransitionTimeout={300}
               enforceFocus={true}
               keyboard={true}
               manager={
@@ -1504,6 +1503,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
               onEntering={[Function]}
               onExited={[Function]}
               onHide={[Function]}
+              onMouseUp={[Function]}
               renderBackdrop={[Function]}
               restoreFocus={true}
               show={false}
@@ -2221,9 +2221,8 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                       autoFocus={true}
                                       backdrop="static"
                                       backdropClassName="modal-backdrop"
-                                      backdropTransitionTimeout={150}
+                                      backdropTransition={[Function]}
                                       containerClassName="modal-open"
-                                      dialogTransitionTimeout={300}
                                       enforceFocus={true}
                                       keyboard={true}
                                       manager={
@@ -2241,6 +2240,7 @@ exports[`<ContentPackParameterList /> should render with parameters without read
                                       onEntering={[Function]}
                                       onExited={[Function]}
                                       onHide={[Function]}
+                                      onMouseUp={[Function]}
                                       renderBackdrop={[Function]}
                                       restoreFocus={true}
                                       show={false}
