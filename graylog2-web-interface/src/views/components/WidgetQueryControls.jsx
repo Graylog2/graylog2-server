@@ -96,7 +96,7 @@ const ResetFilterButton = styled(Button)`
   vertical-align: initial;
 `;
 
-const _resetOverride = () => GlobalOverrideActions.reset().then(SearchActions.executeWithCurrentState);
+const _resetOverride = () => GlobalOverrideActions.reset().then(SearchActions.refresh);
 
 const ResetOverrideHint = () => (
   <CenteredBox>

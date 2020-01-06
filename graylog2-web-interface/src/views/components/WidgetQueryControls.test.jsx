@@ -22,7 +22,7 @@ jest.mock('views/stores/GlobalOverrideStore', () => ({
   },
 }));
 jest.mock('views/actions/SearchActions', () => ({
-  executeWithCurrentState: jest.fn(() => Promise.resolve()),
+  refresh: jest.fn(() => Promise.resolve()),
 }));
 jest.mock('stores/connect', () => x => x);
 
@@ -84,7 +84,7 @@ describe('WidgetQueryControls', () => {
       const { getByTestId } = renderSUT({ globalOverride: globalOverrideWithQuery });
       const resetFilterButton = await waitForElement(() => getByTestId('reset-filter'));
       fireEvent.click(resetFilterButton);
-      await wait(() => expect(SearchActions.executeWithCurrentState).toHaveBeenCalled());
+      await wait(() => expect(SearchActions.refresh).toHaveBeenCalled());
     });
 
     it('emptying `globalOverride` prop removes notification', async () => {
