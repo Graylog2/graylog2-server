@@ -29,7 +29,7 @@ class DataTable extends React.Component {
     /** Label to use next to the data filter input. */
     filterLabel: PropTypes.string,
     /** List of object keys to use as filter in the data filter input. Use an empty array to disable data filter. */
-    filterKeys: PropTypes.array.isRequired,
+    filterKeys: PropTypes.array,
     /** Array to use as suggestions in the data filter input. */
     filterSuggestions: PropTypes.array,
     /**
@@ -64,6 +64,7 @@ class DataTable extends React.Component {
     className: '',
     filterBy: '',
     filterSuggestions: [],
+    filterKeys: [],
     filterLabel: 'Filter',
     displayKey: 'value',
     noDataText: 'No data available.',

@@ -19,15 +19,6 @@ class Wizard extends React.Component {
      * Array of objects which will describe the wizard. The object must
      * contain a unique 'key' attribute, a 'title' which will be shown as step link on the left side and
      * a 'component' attribute which will hold the component which is to render for the step.
-     *
-     * e.g:
-     * <pre>
-     * [
-     *   {key: 'key1', title: 'General Information', component: (<Acomponent1 />)},
-     *   {key: 'key2', title: 'Details', component: (<Acomponent2 />), disabled: true},
-     *   {key: 'key3', title: 'Preview', component: (<Acomponent3 />), disabled: true},
-     * ]
-     * </pre>
      */
     steps: PropTypes.arrayOf(PropTypes.object).isRequired,
     /**
