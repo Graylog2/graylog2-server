@@ -1182,32 +1182,29 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           >
                                             <ForwardRef
                                               bsClass="badge installed"
-                                              bsStyle="default"
                                               key="installed"
                                             >
-                                              <Badge
+                                              <Badge__StyledBadge
                                                 bsClass="badge installed"
-                                                bsStyle="default"
                                               >
                                                 <StyledComponent
                                                   bsClass="badge installed"
-                                                  bsStyle="default"
                                                   forwardedComponent={
                                                     Object {
                                                       "$$typeof": Symbol(react.forward_ref),
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
-                                                        "componentId": "Badge-sc-4gzqz0-0",
+                                                        "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "cwxrQE",
+                                                        "lastClassName": "gDhrrS",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
                                                       },
-                                                      "displayName": "Badge",
+                                                      "displayName": "Badge__StyledBadge",
                                                       "foldedComponentIds": Array [],
                                                       "render": [Function],
-                                                      "styledComponentId": "Badge-sc-4gzqz0-0",
+                                                      "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                       "target": [Function],
                                                       "toString": [Function],
                                                       "warnTooManyClasses": [Function],
@@ -1218,18 +1215,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge installed"
-                                                    bsStyle="default"
-                                                    className="Badge-sc-4gzqz0-0 cwxrQE"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
                                                     pullRight={false}
                                                   >
                                                     <span
-                                                      className="Badge-sc-4gzqz0-0 cwxrQE badge installed badge installed-default"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
                                                     >
                                                       installed
                                                     </span>
                                                   </Badge>
                                                 </StyledComponent>
-                                              </Badge>
+                                              </Badge__StyledBadge>
                                             </ForwardRef>
                                           </a>
                                         </Link>
@@ -2035,32 +2031,29 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           >
                                             <ForwardRef
                                               bsClass="badge installed"
-                                              bsStyle="default"
                                               key="installed"
                                             >
-                                              <Badge
+                                              <Badge__StyledBadge
                                                 bsClass="badge installed"
-                                                bsStyle="default"
                                               >
                                                 <StyledComponent
                                                   bsClass="badge installed"
-                                                  bsStyle="default"
                                                   forwardedComponent={
                                                     Object {
                                                       "$$typeof": Symbol(react.forward_ref),
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
-                                                        "componentId": "Badge-sc-4gzqz0-0",
+                                                        "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                         "isStatic": false,
-                                                        "lastClassName": "cwxrQE",
+                                                        "lastClassName": "gDhrrS",
                                                         "rules": Array [
                                                           [Function],
                                                         ],
                                                       },
-                                                      "displayName": "Badge",
+                                                      "displayName": "Badge__StyledBadge",
                                                       "foldedComponentIds": Array [],
                                                       "render": [Function],
-                                                      "styledComponentId": "Badge-sc-4gzqz0-0",
+                                                      "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                                       "target": [Function],
                                                       "toString": [Function],
                                                       "warnTooManyClasses": [Function],
@@ -2071,18 +2064,17 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 >
                                                   <Badge
                                                     bsClass="badge installed"
-                                                    bsStyle="default"
-                                                    className="Badge-sc-4gzqz0-0 cwxrQE"
+                                                    className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS"
                                                     pullRight={false}
                                                   >
                                                     <span
-                                                      className="Badge-sc-4gzqz0-0 cwxrQE badge installed badge installed-default"
+                                                      className="Badge__StyledBadge-sc-4gzqz0-0 gDhrrS badge installed"
                                                     >
                                                       installed
                                                     </span>
                                                   </Badge>
                                                 </StyledComponent>
-                                              </Badge>
+                                              </Badge__StyledBadge>
                                             </ForwardRef>
                                           </a>
                                         </Link>

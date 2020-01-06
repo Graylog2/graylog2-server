@@ -258,7 +258,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
                     "isStatic": false,
-                    "lastClassName": "cUmrKl",
+                    "lastClassName": "cNZzzj",
                     "rules": Array [
                       [Function],
                     ],
@@ -281,7 +281,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 cUmrKl"
+                className="Nav-dzawzr-0 cNZzzj"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -289,7 +289,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps 1`] = `
                 stacked={false}
               >
                 <ul
-                  className="Nav-dzawzr-0 cUmrKl nav nav-pills"
+                  className="Nav-dzawzr-0 cNZzzj nav nav-pills"
                   role={null}
                 >
                   <NavItem
@@ -658,7 +658,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
                     "isStatic": false,
-                    "lastClassName": "cUmrKl",
+                    "lastClassName": "cNZzzj",
                     "rules": Array [
                       [Function],
                     ],
@@ -681,7 +681,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 cUmrKl"
+                className="Nav-dzawzr-0 cNZzzj"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -689,7 +689,7 @@ exports[`<Wizard /> should render in horizontal mode with 3 steps and children 1
                 stacked={false}
               >
                 <ul
-                  className="Nav-dzawzr-0 cUmrKl nav nav-pills"
+                  className="Nav-dzawzr-0 cNZzzj nav nav-pills"
                   role={null}
                 >
                   <NavItem
@@ -887,7 +887,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
                     "isStatic": false,
-                    "lastClassName": "cUmrKl",
+                    "lastClassName": "cNZzzj",
                     "rules": Array [
                       [Function],
                     ],
@@ -911,7 +911,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 cUmrKl"
+                className="Nav-dzawzr-0 cNZzzj"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -919,7 +919,7 @@ exports[`<Wizard /> should render with 3 steps 1`] = `
                 stacked={true}
               >
                 <ul
-                  className="Nav-dzawzr-0 cUmrKl nav nav-pills nav-stacked"
+                  className="Nav-dzawzr-0 cNZzzj nav nav-pills nav-stacked"
                   role={null}
                 >
                   <NavItem
@@ -1286,7 +1286,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                   "componentStyle": ComponentStyle {
                     "componentId": "Nav-dzawzr-0",
                     "isStatic": false,
-                    "lastClassName": "cUmrKl",
+                    "lastClassName": "cNZzzj",
                     "rules": Array [
                       [Function],
                     ],
@@ -1310,7 +1310,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 activeKey="Key1"
                 bsClass="nav"
                 bsStyle="pills"
-                className="Nav-dzawzr-0 cUmrKl"
+                className="Nav-dzawzr-0 cNZzzj"
                 justified={false}
                 onSelect={[Function]}
                 pullLeft={false}
@@ -1318,7 +1318,7 @@ exports[`<Wizard /> should render with 3 steps and children 1`] = `
                 stacked={true}
               >
                 <ul
-                  className="Nav-dzawzr-0 cUmrKl nav nav-pills nav-stacked"
+                  className="Nav-dzawzr-0 cNZzzj nav nav-pills nav-stacked"
                   role={null}
                 >
                   <NavItem
