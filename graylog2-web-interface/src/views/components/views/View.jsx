@@ -15,7 +15,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const formatTitle = (title, id, disabled = false) => (disabled
   ? <h2>{title}</h2>
-  : <Link to={Routes.pluginRoute('VIEWS_VIEWID')(id)}>{title}</Link>);
+  : <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>);
 
 const _OwnerTag = ({ owner, currentUser }) => {
   if (!owner || owner === currentUser.username) {
