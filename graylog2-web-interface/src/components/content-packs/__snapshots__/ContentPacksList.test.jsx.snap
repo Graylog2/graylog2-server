@@ -426,7 +426,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": true,
-                                              "lastClassName": "hdNTyr",
+                                              "lastClassName": "deAIE",
                                               "rules": Array [
                                                 "color:",
                                                 "#1F1F1F",
@@ -434,12 +434,12 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                                 "#FFF",
                                                 ";border-color:",
                                                 "#DCE1E5",
-                                                ";&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                 "#b8b8b8",
+                                                ";}&:focus{border-color:",
+                                                "#6DC6E7",
+                                                ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                "rgba(109,198,231,0.4)",
                                                 ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                 "#DCE1E5",
                                                 ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -464,7 +464,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                                          className="FormControl-sc-1amoaox-0 deAIE"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -473,7 +473,7 @@ exports[`<ContentPacksList /> should render with content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                            className="FormControl-sc-1amoaox-0 deAIE form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
@@ -9608,7 +9608,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
                                               "isStatic": true,
-                                              "lastClassName": "hdNTyr",
+                                              "lastClassName": "deAIE",
                                               "rules": Array [
                                                 "color:",
                                                 "#1F1F1F",
@@ -9616,12 +9616,12 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                                 "#FFF",
                                                 ";border-color:",
                                                 "#DCE1E5",
-                                                ";&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
+                                                ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
                                                 "#b8b8b8",
+                                                ";}&:focus{border-color:",
+                                                "#6DC6E7",
+                                                ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
+                                                "rgba(109,198,231,0.4)",
                                                 ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
                                                 "#DCE1E5",
                                                 ";}~ .form-control-feedback.glyphicon{display:none;}",
@@ -9646,7 +9646,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                                          className="FormControl-sc-1amoaox-0 deAIE"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Filter"
@@ -9655,7 +9655,7 @@ exports[`<ContentPacksList /> should render with empty content packs 1`] = `
                                           type="text"
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                            className="FormControl-sc-1amoaox-0 deAIE form-control"
                                             id="content-packs-filter"
                                             label="Filter"
                                             name="content-packs-filter"
