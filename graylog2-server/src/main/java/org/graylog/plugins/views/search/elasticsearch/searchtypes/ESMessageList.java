@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -31,6 +32,7 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
+import org.graylog2.Configuration;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ResultMessage;
@@ -53,35 +55,56 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private final ESQueryDecorators esQueryDecorators;
     private final DecoratorProcessor decoratorProcessor;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
+    private final Configuration configuration;
 
     @Inject
     public ESMessageList(ESQueryDecorators esQueryDecorators,
                          DecoratorProcessor decoratorProcessor,
-                         Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
+                         Map<String, SearchResponseDecorator.Factory> searchResponseDecorators,
+                         Configuration configuration) {
         this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
         this.searchResponseDecorators = searchResponseDecorators;
+        this.configuration = configuration;
     }
 
     @VisibleForTesting
     public ESMessageList(ESQueryDecorators esQueryDecorators) {
-        this(esQueryDecorators, new DecoratorProcessor.Fake(), Collections.emptyMap());
+        this(esQueryDecorators, new DecoratorProcessor.Fake(), Collections.emptyMap(), new Configuration());
     }
 
     @Override
     public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, ESGeneratedQueryContext queryContext) {
-        final String queryString = this.esQueryDecorators.decorate(((ElasticsearchQueryString)query.query()).queryString(), job, query, Collections.emptySet());
 
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(messageList)
                 .size(messageList.limit())
-                .from(messageList.offset())
-                .highlighter(new HighlightBuilder().requireFieldMatch(false)
-                        .highlightQuery(QueryBuilders.queryStringQuery(queryString))
-                        .field("*")
-                        .fragmentSize(0)
-                        .numOfFragments(0));
+                .from(messageList.offset());
+
+        applyHighlightingIfActivated(searchSourceBuilder, job, query);
+
         final List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, SortOrder.DESC)));
         sorts.forEach(sort -> searchSourceBuilder.sort(sort.field(), sort.order()));
+    }
+
+    private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
+        if (!configuration.isAllowHighlighting())
+            return;
+
+        final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);
+
+        searchSourceBuilder.highlighter(new HighlightBuilder().requireFieldMatch(false)
+                .highlightQuery(highlightQuery)
+                .field("*")
+                .fragmentSize(0)
+                .numOfFragments(0));
+    }
+
+    private QueryStringQueryBuilder decoratedHighlightQuery(SearchJob job, Query query) {
+        final String raw = ((ElasticsearchQueryString) query.query()).queryString();
+
+        final String decorated = this.esQueryDecorators.decorate(raw, job, query, Collections.emptySet());
+
+        return QueryBuilders.queryStringQuery(decorated);
     }
 
     @Override
