@@ -324,6 +324,7 @@ public class Expr {
         @JsonProperty(CHILD)
         public abstract Expression<Boolean> child();
 
+        /* This operator is not used for evaluating expressions, but to document which operator is used in the expressions belonging to this group. */
         @JsonProperty(OPERATOR)
         public abstract String operator();
 
