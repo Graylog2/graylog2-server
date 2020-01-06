@@ -6,7 +6,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
 import CombinedProvider from 'injection/CombinedProvider';
 
-import ActionsProvider from 'injection/ActionsProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
@@ -19,38 +18,34 @@ import {} from 'components/maps/configurations';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!components/configurations/ConfigurationStyles.css';
 
-const { CurrentUserStore } = CombinedProvider.getStore('CurrentUser');
-const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.getStore('Configurations');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.get('Configurations');
+
+const SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig';
+const MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig';
+const SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration';
+const EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration';
+const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
+
 class ConfigurationsPage extends React.Component {
-   SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
+  componentDidMount() {
+    style.use();
+    const { currentUser: { permissions } } = this.props;
+    ConfigurationsActions.list(SEARCHES_CLUSTER_CONFIG);
+    ConfigurationsActions.listMessageProcessorsConfig(MESSAGE_PROCESSORS_CONFIG);
+    ConfigurationsActions.list(SIDECAR_CONFIG);
+    ConfigurationsActions.list(EVENTS_CONFIG);
+    if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
+      ConfigurationsActions.listWhiteListConfig(URL_WHITELIST_CONFIG);
+    }
+    PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
+      ConfigurationsActions.list(systemConfig.configType);
+    });
+  }
 
-   MESSAGE_PROCESSORS_CONFIG = 'org.graylog2.messageprocessors.MessageProcessorsConfig'
-
-   SIDECAR_CONFIG = 'org.graylog.plugins.sidecar.system.SidecarConfiguration'
-
-   EVENTS_CONFIG = 'org.graylog.events.configuration.EventsConfiguration'
-
-   URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist'
-
-   componentDidMount() {
-     style.use();
-     const { currentUser: { permissions } } = this.props;
-     ConfigurationsActions.list(this.SEARCHES_CLUSTER_CONFIG);
-     ConfigurationsActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
-     ConfigurationsActions.list(this.SIDECAR_CONFIG);
-     ConfigurationsActions.list(this.EVENTS_CONFIG);
-     if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
-       ConfigurationsActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
-     }
-     PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
-       ConfigurationsActions.list(systemConfig.configType);
-     });
-   }
-
-   componentWillUnmount() {
-     style.unuse();
-   }
-
+  componentWillUnmount() {
+    style.unuse();
+  }
 
   _getConfig = (configType) => {
     const { configuration } = this.props;
@@ -63,7 +58,7 @@ class ConfigurationsPage extends React.Component {
   _onUpdate = (configType) => {
     return (config) => {
       switch (configType) {
-        case this.MESSAGE_PROCESSORS_CONFIG:
+        case MESSAGE_PROCESSORS_CONFIG:
           return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
         default:
           return ConfigurationsActions.update(configType, config);
@@ -107,11 +102,11 @@ class ConfigurationsPage extends React.Component {
 
   render() {
     const { currentUser: { permissions } } = this.props;
-    const searchesConfig = this._getConfig(this.SEARCHES_CLUSTER_CONFIG);
-    const messageProcessorsConfig = this._getConfig(this.MESSAGE_PROCESSORS_CONFIG);
-    const sidecarConfig = this._getConfig(this.SIDECAR_CONFIG);
-    const eventsConfig = this._getConfig(this.EVENTS_CONFIG);
-    const urlWhiteListConfig = this._getConfig(this.URL_WHITELIST_CONFIG);
+    const searchesConfig = this._getConfig(SEARCHES_CLUSTER_CONFIG);
+    const messageProcessorsConfig = this._getConfig(MESSAGE_PROCESSORS_CONFIG);
+    const sidecarConfig = this._getConfig(SIDECAR_CONFIG);
+    const eventsConfig = this._getConfig(EVENTS_CONFIG);
+    const urlWhiteListConfig = this._getConfig(URL_WHITELIST_CONFIG);
     let searchesConfigComponent;
     let messageProcessorsConfigComponent;
     let sidecarConfigComponent;
@@ -120,7 +115,7 @@ class ConfigurationsPage extends React.Component {
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
-                        updateConfig={this._onUpdate(this.SEARCHES_CLUSTER_CONFIG)} />
+                        updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
       );
     } else {
       searchesConfigComponent = (<Spinner />);
@@ -128,7 +123,7 @@ class ConfigurationsPage extends React.Component {
     if (messageProcessorsConfig) {
       messageProcessorsConfigComponent = (
         <MessageProcessorsConfig config={messageProcessorsConfig}
-                                 updateConfig={this._onUpdate(this.MESSAGE_PROCESSORS_CONFIG)} />
+                                 updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
       );
     } else {
       messageProcessorsConfigComponent = (<Spinner />);
@@ -136,7 +131,7 @@ class ConfigurationsPage extends React.Component {
     if (sidecarConfig) {
       sidecarConfigComponent = (
         <SidecarConfig config={sidecarConfig}
-                       updateConfig={this._onUpdate(this.SIDECAR_CONFIG)} />
+                       updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
       );
     } else {
       sidecarConfigComponent = (<Spinner />);
@@ -152,7 +147,7 @@ class ConfigurationsPage extends React.Component {
     if (urlWhiteListConfig) {
       urlWhiteListConfigComponent = (
         <UrlWhiteListConfig config={urlWhiteListConfig}
-                            updateConfig={this._onUpdate(this.URL_WHITELIST_CONFIG)} />
+                            updateConfig={this._onUpdate(URL_WHITELIST_CONFIG)} />
       );
     } else {
       urlWhiteListConfigComponent = PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read']) ? <Spinner /> : null;
