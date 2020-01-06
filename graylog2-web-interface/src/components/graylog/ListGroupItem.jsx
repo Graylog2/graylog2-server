@@ -5,7 +5,6 @@ import styled, { css } from 'styled-components';
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { darken } from 'polished';
 
-import { useTheme } from 'theme/GraylogThemeContext';
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
@@ -44,40 +43,39 @@ const listGroupItemStyles = (hex) => {
 };
 
 const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
-  const { colors } = useTheme();
   const StyledListGroupItem = useMemo(
     () => {
-      return styled(BootstrapListGroupItem)`
+      return styled(BootstrapListGroupItem)(({ theme }) => css`
         &.list-group-item-action {
-          color: ${colors.primary.tre};
+          color: ${theme.color.primary.tre};
 
           &:hover,
           &:focus {
-            color: ${colors.primary.tre};
-            background-color: ${colors.secondary.due};
+            color: ${theme.color.primary.tre};
+            background-color: ${theme.color.secondary.due};
           }
 
           &:active {
-            color: ${util.contrastingColor(colors.secondary.tre)};
-            background-color: ${colors.secondary.tre};
+            color: ${util.contrastingColor(theme.color.secondary.tre)};
+            background-color: ${theme.color.secondary.tre};
           }
         }
 
         &.list-group-item {
-          background-color: ${colors.primary.due};
-          border-color: ${colors.secondary.tre};
+          background-color: ${theme.color.primary.due};
+          border-color: ${theme.color.secondary.tre};
 
           &.disabled,
           &:disabled {
-            color: ${colors.primary.tre};
-            background-color: ${colors.primary.due};
+            color: ${theme.color.primary.tre};
+            background-color: ${theme.color.primary.due};
           }
         }
 
         ${bsStyleThemeVariant(listGroupItemStyles)}
-      `;
+      `);
     },
-    [bsStyle, colors],
+    [bsStyle],
   );
 
   return (
