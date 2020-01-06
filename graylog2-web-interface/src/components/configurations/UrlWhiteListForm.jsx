@@ -107,7 +107,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const _onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
     if (type === regex) {
-      const debouncedValidate = debounce(_validate, 500);
+      const debouncedValidate = debounce(_validate, 1000);
       debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
     }
     _validate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
@@ -125,7 +125,6 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const _getSummary = () => {
     return (config.entries.map((url, idx) => {
       return (
-      // eslint-disable-next-line react/no-array-index-key
         <tr key={url.id}>
           <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
           <td>
@@ -163,7 +162,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
           </td>
           <td>
             <Button onClick={event => _onRemove(event, idx)}>
-              <Icon name="fa-trash" style={{ cursor: 'pointer' }} />
+              <Icon name="fa-trash" />
             </Button>
           </td>
         </tr>
