@@ -109,7 +109,6 @@ const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
     background-color: ${theme.color.secondary.tre};
     border-top-color: ${theme.color.secondary.due};
   }
-
   .panel-group {
     .panel-heading {
       + .panel-collapse > .panel-body,
@@ -117,7 +116,6 @@ const DeprecatedStyledPanel = styled(BootstrapPanel)(({ theme }) => css`
         border-top-color: ${theme.color.secondary.due};
       }
     }
-
     .panel-footer {
       + .panel-collapse .panel-body {
         border-bottom-color: ${theme.color.secondary.due};
