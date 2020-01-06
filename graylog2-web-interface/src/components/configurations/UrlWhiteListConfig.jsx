@@ -87,6 +87,11 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
     return (
       <div>
         <h2>URL Whitelist Configuration  {disabled ? <small>(Disabled)</small> : <small>(Enabled)</small> }</h2>
+        <p>
+          When enabled, outgoing HTTP requests from Graylog servers, such as event notifications or HTTP-based data adapter requests, are validated against the whitelists configured here.
+          Because the HTTP requests are made from the Graylog servers, they might be able to reach more sensitive systems than an external user would have access to, including AWS EC2 metadata, which can contain keys and other secrets, Elasticsearch and others.
+          Whitelist administrative access is separate from data adapters and event notification configuration.
+        </p>
         <Table striped bordered condensed className="top-margin">
           <thead>
             <tr>
