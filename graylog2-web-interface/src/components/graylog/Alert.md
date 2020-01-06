@@ -16,7 +16,7 @@ styles.map((style, i) => {
   return (
     <Alert bsStyle={style.toLowerCase()} key={`button-${style}-${i}`}>
       <i className="fa fa-exclamation-triangle fa-fw fa-lg" />{' '}
-      <strong>{style}</strong> Lorem ipsum dolor sit amet consectetur adipisicing elit.
+      <strong>{style}</strong> Lorem ipsum dolor sit amet consectetur <a href="#">adipisicing elit</a>.
     </Alert>
   )
 })

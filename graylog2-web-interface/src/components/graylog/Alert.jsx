@@ -23,6 +23,10 @@ const alertStyles = (hex) => {
     background-color: ${backgroundColor};
     border-color: ${borderColor};
     color: ${textColor};
+
+    & a {
+      color: ${util.colorLevel(hex, 7)};
+    }
   `;
 };
 
