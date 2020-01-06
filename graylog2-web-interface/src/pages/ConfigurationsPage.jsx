@@ -4,7 +4,7 @@ import { Col, Row } from 'components/graylog';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import connect from 'stores/connect';
-import StoreProvider from 'injection/StoreProvider';
+import CombinedProvider from 'injection/CombinedProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -19,9 +19,8 @@ import {} from 'components/maps/configurations';
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!components/configurations/ConfigurationStyles.css';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const ConfigurationsStore = StoreProvider.getStore('Configurations');
-const ConfigurationsActions = ActionsProvider.getActions('Configuration');
+const { CurrentUserStore } = CombinedProvider.getStore('CurrentUser');
+const { ConfigurationsActions, ConfigurationsStore } = CombinedProvider.getStore('Configurations');
 class ConfigurationsPage extends React.Component {
    SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
 
