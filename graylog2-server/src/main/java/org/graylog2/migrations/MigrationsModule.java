@@ -43,5 +43,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20191121145100_FixDefaultGrokPatterns.class);
         addMigration(V20191129134600_CreateInitialUrlWhitelist.class);
         addMigration(V20191219090834_AddSourcesPage.class);
+        addMigration(V20200102140000_UnifyEventSeriesId.class);
     }
 }
