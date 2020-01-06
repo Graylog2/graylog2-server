@@ -4,11 +4,11 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Label as BootstrapLabel } from 'react-bootstrap';
 
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
 
 const labelStyles = (hex) => {
-  const textColor = contrastingColor(hex);
+  const textColor = util.contrastingColor(hex);
 
   return css`
     background-color: ${hex};

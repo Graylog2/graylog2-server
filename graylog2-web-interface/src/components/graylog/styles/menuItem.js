@@ -1,7 +1,7 @@
 import { css } from 'styled-components';
 
 import teinte from 'theme/teinte';
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 
 const menuItemStyles = (options = {}) => {
   const { sibling = false } = options;
@@ -13,29 +13,29 @@ const menuItemStyles = (options = {}) => {
 
       :hover,
       :focus {
-        color: ${contrastingColor(teinte.secondary.due)};
+        color: ${util.contrastingColor(teinte.secondary.due)};
         background-color: ${teinte.secondary.due};
       }
     }
 
     > .active > a {
       background-color: ${teinte.tertiary.due};
-      color: ${contrastingColor(teinte.tertiary.due)};
+      color: ${util.contrastingColor(teinte.tertiary.due)};
 
       :hover,
       :focus {
         background-color: ${teinte.tertiary.uno};
-        color: ${contrastingColor(teinte.tertiary.uno)};
+        color: ${util.contrastingColor(teinte.tertiary.uno)};
       }
     }
 
     > .disabled > a {
-      color: ${contrastingColor(teinte.primary.tre, 'AA')};
+      color: ${util.contrastingColor(teinte.primary.tre, 'AA')};
 
       :hover,
       :focus {
         background-color: ${teinte.secondary.due};
-        color: ${contrastingColor(teinte.primary.tre, 'AAA')};
+        color: ${util.contrastingColor(teinte.primary.tre, 'AAA')};
       }
     }
   }

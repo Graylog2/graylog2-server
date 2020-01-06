@@ -3,7 +3,6 @@ import { IndexRoute, Redirect, Router, Route } from 'react-router';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import App from 'routing/App';
-import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithExtendedSearchBar from 'routing/AppWithExtendedSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import AppWithGlobalNotifications from 'routing/AppWithGlobalNotifications';
@@ -75,7 +74,6 @@ import {
   SidecarsPage,
   SidecarStatusPage,
   SimulatorPage,
-  SourcesPage,
   StartPage,
   StreamAlertsOverviewPage,
   StreamEditPage,
@@ -120,9 +118,6 @@ const AppRouter = () => {
           <Route component={AppWithGlobalNotifications}>
             <IndexRoute component={StartPage} />
             {pluginRoutesWithParent}
-            <Route component={AppWithSearchBar}>
-              <Route path={Routes.SOURCES} component={SourcesPage} />
-            </Route>
             <Route component={AppWithExtendedSearchBar}>
               <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
             </Route>

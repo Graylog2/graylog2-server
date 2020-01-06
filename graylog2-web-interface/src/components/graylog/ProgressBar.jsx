@@ -1,9 +1,9 @@
 // eslint-disable-next-line no-restricted-imports
 import { ProgressBar } from 'react-bootstrap';
 import { css } from 'styled-components';
+import { transparentize } from 'polished';
 
 import teinte from 'theme/teinte';
-import { transparentize } from 'polished';
 import { variantColors } from './variants/bsStyle';
 
 const defaultStripColor = transparentize(0.75, teinte.primary.due);

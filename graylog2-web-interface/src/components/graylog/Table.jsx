@@ -2,29 +2,28 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Table as BootstrapTable } from 'react-bootstrap';
 
-import { colorLevel } from 'theme/util';
-import teinte from 'theme/teinte';
+import { teinte, util } from 'theme';
 
 const variants = {
   active: {
-    background: colorLevel(teinte.secondary.tre, -10),
-    hover: colorLevel(teinte.secondary.tre, -9),
+    background: util.colorLevel(teinte.secondary.tre, -10),
+    hover: util.colorLevel(teinte.secondary.tre, -9),
   },
   success: {
-    background: colorLevel(teinte.tertiary.tre, -10),
-    hover: colorLevel(teinte.tertiary.tre, -9),
+    background: util.colorLevel(teinte.tertiary.tre, -10),
+    hover: util.colorLevel(teinte.tertiary.tre, -9),
   },
   info: {
-    background: colorLevel(teinte.tertiary.uno, -10),
-    hover: colorLevel(teinte.tertiary.uno, -9),
+    background: util.colorLevel(teinte.tertiary.uno, -10),
+    hover: util.colorLevel(teinte.tertiary.uno, -9),
   },
   warning: {
-    background: colorLevel(teinte.tertiary.sei, -10),
-    hover: colorLevel(teinte.tertiary.sei, -9),
+    background: util.colorLevel(teinte.tertiary.sei, -10),
+    hover: util.colorLevel(teinte.tertiary.sei, -9),
   },
   danger: {
-    background: colorLevel(teinte.tertiary.quattro, -10),
-    hover: colorLevel(teinte.tertiary.quattro, -9),
+    background: util.colorLevel(teinte.tertiary.quattro, -10),
+    hover: util.colorLevel(teinte.tertiary.quattro, -9),
   },
 };
 
@@ -84,7 +83,7 @@ const Table = styled(BootstrapTable)`
     background-color: ${teinte.primary.due};
   }
   &.table-bordered {
-    border-color: ${colorLevel(teinte.secondary.tre, -2)};
+    border-color: ${util.colorLevel(teinte.secondary.tre, -2)};
   }
   &.table-bordered > thead > tr > th,
   &.table-bordered > tbody > tr > th,
@@ -92,14 +91,14 @@ const Table = styled(BootstrapTable)`
   &.table-bordered > thead > tr > td,
   &.table-bordered > tbody > tr > td,
   &.table-bordered > tfoot > tr > td {
-    border-color: ${colorLevel(teinte.secondary.tre, -2)};
+    border-color: ${util.colorLevel(teinte.secondary.tre, -2)};
   }
 
   &.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: ${colorLevel(teinte.secondary.tre, -10)};
+    background-color: ${util.colorLevel(teinte.secondary.tre, -10)};
   }
   &.table-hover > tbody > tr:hover {
-    background-color: ${colorLevel(teinte.secondary.tre, -9)};
+    background-color: ${util.colorLevel(teinte.secondary.tre, -9)};
   }
 
   ${variantRowStyles()}
