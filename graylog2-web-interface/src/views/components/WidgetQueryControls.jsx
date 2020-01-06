@@ -18,6 +18,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import type { TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
 import { GlobalOverrideActions, GlobalOverrideStore } from 'views/stores/GlobalOverrideStore';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
+import SearchActions from 'views/actions/SearchActions';
 import TimeRangeTypeSelector from './searchbar/TimeRangeTypeSelector';
 import TimeRangeInput from './searchbar/TimeRangeInput';
 import StreamsFilter from './searchbar/StreamsFilter';
@@ -95,10 +96,12 @@ const ResetFilterButton = styled(Button)`
   vertical-align: initial;
 `;
 
+const _resetOverride = () => GlobalOverrideActions.reset().then(SearchActions.refresh);
+
 const ResetOverrideHint = () => (
   <CenteredBox>
     These controls are disabled, because a filter is applied to all widgets.{' '}
-    <ResetFilterButton bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={GlobalOverrideActions.reset}>Reset filter</ResetFilterButton>
+    <ResetFilterButton bsSize="xs" bsStyle="primary" data-testid="reset-filter" onClick={_resetOverride}>Reset filter</ResetFilterButton>
   </CenteredBox>
 );
 
