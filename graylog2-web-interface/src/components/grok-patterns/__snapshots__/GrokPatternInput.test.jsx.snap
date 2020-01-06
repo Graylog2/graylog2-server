@@ -545,7 +545,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jIVtxi",
                           "rules": Array [
                             [Function],
                           ],
@@ -567,14 +567,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jIVtxi"
                       header="COMMONMAC"
                       id="list-item-0"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jIVtxi list-group-item"
                         id="list-item-0"
                         onKeyDown={[Function]}
                       >
@@ -700,7 +700,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jIVtxi",
                           "rules": Array [
                             [Function],
                           ],
@@ -722,14 +722,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jIVtxi"
                       header="DATA"
                       id="list-item-1"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jIVtxi list-group-item"
                         id="list-item-1"
                         onKeyDown={[Function]}
                       >
@@ -855,7 +855,7 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                         "componentStyle": ComponentStyle {
                           "componentId": "ListGroupItem-sc-1ky0joo-0",
                           "isStatic": false,
-                          "lastClassName": "igGIXt",
+                          "lastClassName": "jIVtxi",
                           "rules": Array [
                             [Function],
                           ],
@@ -877,14 +877,14 @@ exports[`<GrokPatternInput /> should render grok pattern input with patterns 1`]
                   >
                     <ListGroupItem
                       bsClass="list-group-item"
-                      className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                      className="ListGroupItem-sc-1ky0joo-0 jIVtxi"
                       header="DATE"
                       id="list-item-2"
                       listItem={false}
                       onKeyDown={[Function]}
                     >
                       <span
-                        className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                        className="ListGroupItem-sc-1ky0joo-0 jIVtxi list-group-item"
                         id="list-item-2"
                         onKeyDown={[Function]}
                       >

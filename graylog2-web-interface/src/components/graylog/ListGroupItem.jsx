@@ -71,6 +71,18 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
             color: ${theme.color.primary.tre};
             background-color: ${theme.color.primary.due};
           }
+
+          &.active {
+            color: ${util.readableColor(theme.color.secondary.tre)};
+            background-color: ${theme.color.secondary.tre};
+            border-color: ${theme.color.secondary.tre};
+          }
+
+          &.active {
+            color: ${util.readableColor(theme.color.secondary.tre)};
+            background-color: ${theme.color.secondary.tre};
+            border-color: ${theme.color.secondary.tre};
+          }
         }
 
         ${bsStyleThemeVariant(listGroupItemStyles)}
