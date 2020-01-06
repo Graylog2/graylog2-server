@@ -11,7 +11,6 @@ module.exports = {
     'toastr/toastr.less',
     'rickshaw/rickshaw.css',
     'stylesheets/typeahead.less',
-    'stylesheets/graylog2.less',
     'injection/builtins.js',
   ],
   sections: [
