@@ -5,7 +5,7 @@ const teinte = {
     tre: '#1F1F1F',
   },
   secondary: {
-    uno: '#FF3B00', /* TODO: Replace with #AD0707 */
+    uno: '#AD0707',
     due: '#F1F2F2', /* TODO: Replace with #A6AFBD */
     tre: '#DCE1E5',
   },

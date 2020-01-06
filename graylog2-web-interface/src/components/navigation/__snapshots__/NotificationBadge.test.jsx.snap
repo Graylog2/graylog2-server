@@ -19,7 +19,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "cUmrKl",
+            "lastClassName": "cNZzzj",
             "rules": Array [
               [Function],
             ],
@@ -39,7 +39,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 cUmrKl"
+        className="Nav-dzawzr-0 cNZzzj"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -47,7 +47,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 cUmrKl nav navbar-nav"
+          className="Nav-dzawzr-0 cNZzzj nav navbar-nav"
           role={null}
         >
           <LinkContainer
@@ -92,7 +92,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                         bsStyle="danger"
                         id="notification-badge"
                       >
-                        <Badge
+                        <Badge__StyledBadge
                           bsStyle="danger"
                           id="notification-badge"
                         >
@@ -103,17 +103,17 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "$$typeof": Symbol(react.forward_ref),
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Badge-sc-4gzqz0-0",
+                                  "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                   "isStatic": false,
-                                  "lastClassName": "gNbYGy",
+                                  "lastClassName": "cPDALi",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Badge",
+                                "displayName": "Badge__StyledBadge",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Badge-sc-4gzqz0-0",
+                                "styledComponentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -126,19 +126,19 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="Badge-sc-4gzqz0-0 gNbYGy"
+                              className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="Badge-sc-4gzqz0-0 gNbYGy badge badge-danger"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi badge badge-danger"
                                 id="notification-badge"
                               >
                                 42
                               </span>
                             </Badge>
                           </StyledComponent>
-                        </Badge>
+                        </Badge__StyledBadge>
                       </ForwardRef>
                     </a>
                   </SafeAnchor>
