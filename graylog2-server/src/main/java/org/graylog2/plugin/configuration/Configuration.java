@@ -138,6 +138,10 @@ public class Configuration implements Serializable {
         return firstNonNull(lists.get(key), defaultValue);
     }
 
+    public boolean listIsSet(String key) {
+        return !lists.isEmpty();
+    }
+
     @Nullable
     public Map<String, Object> getSource() {
         return source;
