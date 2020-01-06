@@ -74,16 +74,19 @@ describe('CopyToDashboardForm', () => {
     expect(onSubmit).toHaveBeenCalledWith('widget-id', 'view-1');
   });
 
-  it('should handle search of dashboards', () => {
+  it('should query for all dashboards & specific dashboards', () => {
     DashboardsActions.search = mockAction(jest.fn(() => Promise.resolve()));
-    const { getByPlaceholderText, getByText } = render(<CopyToDashboardForm dashboards={dashboardState}
-                                                                            widgetId="widget-id"
-                                                                            onCancel={() => {}}
-                                                                            onSubmit={() => {}} />);
+    const { getByPlaceholderText, getByText } = render(
+      <CopyToDashboardForm dashboards={dashboardState}
+                           widgetId="widget-id"
+                           onCancel={() => {}}
+                           onSubmit={() => {}} />,
+    );
+    expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
     const searchInput = getByPlaceholderText('Enter search query...');
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
     const searchButton = getByText('Search');
     fireEvent.click(searchButton);
-    expect(DashboardsActions.search).toHaveBeenCalledTimes(1);
+    expect(DashboardsActions.search).toHaveBeenCalledTimes(2);
   });
 });

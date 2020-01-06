@@ -9,13 +9,14 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
     aria-hidden="true"
   />
   <div
+    aria-hidden="true"
     role="dialog"
   >
     <div
-      class="modal-backdrop fade in"
+      class="fade modal-backdrop in"
     />
     <div
-      class="Modal-nuree8-0 cHlGak fade in modal"
+      class="fade Modal-nuree8-0 cHlGak in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -124,7 +125,7 @@ exports[`CopyToDashboardForm should render the modal minimal 1`] = `
               class="text-center"
             >
               <ul
-                class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+                class="pagination pagination-sm"
               >
                 <li
                   class="disabled"
@@ -226,13 +227,14 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
     aria-hidden="true"
   />
   <div
+    aria-hidden="true"
     role="dialog"
   >
     <div
-      class="modal-backdrop fade in"
+      class="fade modal-backdrop in"
     />
     <div
-      class="Modal-nuree8-0 cHlGak fade in modal"
+      class="fade Modal-nuree8-0 cHlGak in modal"
       role="dialog"
       style="display: block; padding-right: 0px;"
       tabindex="-1"
@@ -368,7 +370,7 @@ exports[`CopyToDashboardForm should render the modal with entries 1`] = `
               class="text-center"
             >
               <ul
-                class="Pagination-sc-1u3exqe-0 gSmbxW pagination pagination-sm"
+                class="pagination pagination-sm"
               >
                 <li
                   class="disabled"
