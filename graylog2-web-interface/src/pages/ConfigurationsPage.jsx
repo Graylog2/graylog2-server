@@ -16,12 +16,12 @@ import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
 import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
 import {} from 'components/maps/configurations';
 
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const ConfigurationsStore = StoreProvider.getStore('Configurations');
-const ConfigurationActions = ActionsProvider.getActions('Configuration');
-
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import style from '!style/useable!css!components/configurations/ConfigurationStyles.css';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const ConfigurationsStore = StoreProvider.getStore('Configurations');
+const ConfigurationsActions = ActionsProvider.getActions('Configuration');
 class ConfigurationsPage extends React.Component {
    SEARCHES_CLUSTER_CONFIG = 'org.graylog2.indexer.searches.SearchesClusterConfig'
 
@@ -36,21 +36,21 @@ class ConfigurationsPage extends React.Component {
    componentDidMount() {
      style.use();
      const { currentUser: { permissions } } = this.props;
-     ConfigurationActions.list(this.SEARCHES_CLUSTER_CONFIG);
-     ConfigurationActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
-     ConfigurationActions.list(this.SIDECAR_CONFIG);
-     ConfigurationActions.list(this.EVENTS_CONFIG);
+     ConfigurationsActions.list(this.SEARCHES_CLUSTER_CONFIG);
+     ConfigurationsActions.listMessageProcessorsConfig(this.MESSAGE_PROCESSORS_CONFIG);
+     ConfigurationsActions.list(this.SIDECAR_CONFIG);
+     ConfigurationsActions.list(this.EVENTS_CONFIG);
      if (PermissionsMixin.isPermitted(permissions, ['urlwhitelist:read'])) {
-       ConfigurationActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
+       ConfigurationsActions.listWhiteListConfig(this.URL_WHITELIST_CONFIG);
      }
      PluginStore.exports('systemConfigurations').forEach((systemConfig) => {
-       ConfigurationActions.list(systemConfig.configType);
+       ConfigurationsActions.list(systemConfig.configType);
      });
    }
 
-  componentWillUnmount() {
-    style.unuse();
-  }
+   componentWillUnmount() {
+     style.unuse();
+   }
 
 
   _getConfig = (configType) => {
@@ -64,7 +64,7 @@ class ConfigurationsPage extends React.Component {
   _onUpdate = (configType) => {
     return (config) => {
       switch (configType) {
-        case MESSAGE_PROCESSORS_CONFIG:
+        case this.MESSAGE_PROCESSORS_CONFIG:
           return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
         default:
           return ConfigurationsActions.update(configType, config);
@@ -121,7 +121,7 @@ class ConfigurationsPage extends React.Component {
     if (searchesConfig) {
       searchesConfigComponent = (
         <SearchesConfig config={searchesConfig}
-                        updateConfig={this._onUpdate(SEARCHES_CLUSTER_CONFIG)} />
+                        updateConfig={this._onUpdate(this.SEARCHES_CLUSTER_CONFIG)} />
       );
     } else {
       searchesConfigComponent = (<Spinner />);
@@ -129,7 +129,7 @@ class ConfigurationsPage extends React.Component {
     if (messageProcessorsConfig) {
       messageProcessorsConfigComponent = (
         <MessageProcessorsConfig config={messageProcessorsConfig}
-                                 updateConfig={this._onUpdate(MESSAGE_PROCESSORS_CONFIG)} />
+                                 updateConfig={this._onUpdate(this.MESSAGE_PROCESSORS_CONFIG)} />
       );
     } else {
       messageProcessorsConfigComponent = (<Spinner />);
@@ -137,7 +137,7 @@ class ConfigurationsPage extends React.Component {
     if (sidecarConfig) {
       sidecarConfigComponent = (
         <SidecarConfig config={sidecarConfig}
-                       updateConfig={this._onUpdate(SIDECAR_CONFIG)} />
+                       updateConfig={this._onUpdate(this.SIDECAR_CONFIG)} />
       );
     } else {
       sidecarConfigComponent = (<Spinner />);
@@ -145,7 +145,7 @@ class ConfigurationsPage extends React.Component {
     if (eventsConfig) {
       eventsConfigComponent = (
         <EventsConfig config={eventsConfig}
-                      updateConfig={this._onUpdate(EVENTS_CONFIG)} />
+                      updateConfig={this._onUpdate(this.EVENTS_CONFIG)} />
       );
     } else {
       eventsConfigComponent = (<Spinner />);

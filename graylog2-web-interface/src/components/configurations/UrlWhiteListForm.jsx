@@ -21,7 +21,7 @@ type Props = {
 const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
-  const options = [{ value: literal, label: 'Literal' }, { value: regex, label: 'Regex' }];
+  const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
   // eslint-disable-next-line prefer-const
   let inputs = {};
   const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });

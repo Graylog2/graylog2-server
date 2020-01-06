@@ -32,6 +32,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
   }
 
   _summary = (): React.Element<'tr'>[] => {
+    const literal = 'literal';
     const { config: { entries } } = this.props;
     return entries.map((urlConfig, idx) => {
       return (
@@ -39,7 +40,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
           <td>{idx + 1}</td>
           <td>{urlConfig.title}</td>
           <td>{urlConfig.value}</td>
-          <td>{urlConfig.type}</td>
+          <td>{urlConfig.type === literal ? 'Exact match' : urlConfig.type}</td>
         </tr>
       );
     });
