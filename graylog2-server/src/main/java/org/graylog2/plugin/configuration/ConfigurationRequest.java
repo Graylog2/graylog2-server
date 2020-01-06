@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.ListField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.slf4j.Logger;
@@ -37,7 +38,8 @@ public class ConfigurationRequest {
 
     private final Map<String, ConfigurationField> fields = Maps.newLinkedHashMap();
 
-    public ConfigurationRequest() {}
+    public ConfigurationRequest() {
+    }
 
     public void putAll(Map<String, ConfigurationField> fields) {
         this.fields.putAll(fields);
@@ -150,6 +152,8 @@ public class ConfigurationRequest {
                     }
                     break;
                 case TextField.FIELD_TYPE:
+                case ListField.FIELD_TYPE:
+                    break;
                 case DropdownField.FIELD_TYPE:
                     if (config.stringIsSet(name)) {
                         values.put(name, config.getString(name));
@@ -193,7 +197,5 @@ public class ConfigurationRequest {
                     NumberField.Attribute.ONLY_POSITIVE
             );
         }
-
     }
-
 }
