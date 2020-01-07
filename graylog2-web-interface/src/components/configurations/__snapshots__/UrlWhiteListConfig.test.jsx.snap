@@ -42,7 +42,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
           http://localhost:8080/system/
         </td>
         <td>
-          regex
+          Regex
         </td>
       </tr>
       <tr>
@@ -56,7 +56,7 @@ exports[`UrlWhiteListConfig render the UrlWhiteListConfig component should creat
           http://localhost:8080/system/
         </td>
         <td>
-          regex
+          Regex
         </td>
       </tr>
       <tr>
