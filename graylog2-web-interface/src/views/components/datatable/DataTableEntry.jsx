@@ -37,6 +37,11 @@ const _column = (field: string, value: *, selectedQuery: string, idx: number, ty
   </td>
 );
 
+const columnNameToField = (column, series = []) => {
+  const currentSeries = series.find(s => s.effectiveName === column);
+  return currentSeries ? currentSeries.function : column;
+};
+
 const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivotValues, valuePath, item, types }: Props) => {
   const classes = 'message-group';
   const { activeQuery } = currentView;
@@ -57,7 +62,7 @@ const DataTableEntry = ({ columnPivots, currentView, fields, series, columnPivot
   return (
     <tbody className={classes}>
       <tr className="fields-row">
-        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(field, types), path.slice()))}
+        {columns.map(({ field, value, path }, idx) => _column(field, value, activeQuery, idx, fieldTypeFor(columnNameToField(field, series), types), path.slice()))}
       </tr>
     </tbody>
   );
