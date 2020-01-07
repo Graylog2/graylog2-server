@@ -36,6 +36,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -118,7 +119,7 @@ public class MessagesIT extends ElasticsearchBaseTest {
         // Each Message is about 1 MB
         final String message = Strings.repeat('A', 1024 * 1024);
         for (int i = 0; i < size; i++) {
-            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", DateTime.now())));
+            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", DateTime.now(DateTimeZone.UTC))));
         }
         return messageList;
     }
