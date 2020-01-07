@@ -39,6 +39,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class MessagesIT extends ElasticsearchBaseTest {
             .title("Index set 1")
             .description("For testing")
             .indexPrefix("graylog")
-            .creationDate(ZonedDateTime.now())
+            .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
             .shards(1)
             .replicas(0)
             .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
