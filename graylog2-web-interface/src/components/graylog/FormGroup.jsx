@@ -6,36 +6,17 @@ import styled, { css } from 'styled-components';
 import styledTheme from 'styled-theming';
 import { darken, lighten } from 'polished';
 
-import { teinte, themeModes, util } from 'theme';
+import { themeModes, util } from 'theme';
 import FormControl from './FormControl';
 import InputGroup from './InputGroup';
 
 const VALID_STATES = ['error', 'warning', 'success'];
 
-const createCss = (validationState) => {
-  let text;
-  let border;
-  let background;
-
-  switch (validationState) {
-    case 'success':
-      text = util.colorLevel(teinte.tertiary.tre, 6);
-      border = teinte.tertiary.tre;
-      background = util.colorLevel(teinte.tertiary.tre, -6);
-      break;
-    case 'warning':
-      text = util.colorLevel(teinte.tertiary.sei, 6);
-      border = teinte.tertiary.sei;
-      background = util.colorLevel(teinte.tertiary.sei, -6);
-      break;
-    case 'error':
-      text = util.colorLevel(teinte.secondary.uno, 6);
-      border = teinte.secondary.uno;
-      background = util.colorLevel(teinte.secondary.uno, -6);
-      break;
-    default:
-      break;
-  }
+const createCss = validationState => css(({ theme }) => {
+  const variant = validationState === 'error' ? 'danger' : validationState;
+  const text = util.colorLevel(theme.color.variant[variant], 6);
+  const border = theme.color.variant[variant];
+  const background = util.colorLevel(theme.color.variant[variant], -6);
 
   return css`
     &.has-${validationState} {
@@ -74,7 +55,7 @@ const createCss = (validationState) => {
       }
     }
   `;
-};
+});
 
 const validationStates = {};
 VALID_STATES.forEach((validState) => {

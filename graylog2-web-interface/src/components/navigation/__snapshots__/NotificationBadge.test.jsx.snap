@@ -19,7 +19,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
           "componentStyle": ComponentStyle {
             "componentId": "Nav-dzawzr-0",
             "isStatic": false,
-            "lastClassName": "cNZzzj",
+            "lastClassName": "davntF",
             "rules": Array [
               [Function],
             ],
@@ -39,7 +39,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
     >
       <Nav
         bsClass="nav"
-        className="Nav-dzawzr-0 cNZzzj"
+        className="Nav-dzawzr-0 davntF"
         justified={false}
         navbar={true}
         pullLeft={false}
@@ -47,7 +47,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
         stacked={false}
       >
         <ul
-          className="Nav-dzawzr-0 cNZzzj nav navbar-nav"
+          className="Nav-dzawzr-0 davntF nav navbar-nav"
           role={null}
         >
           <LinkContainer
@@ -105,7 +105,7 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Badge__StyledBadge-sc-4gzqz0-0",
                                   "isStatic": false,
-                                  "lastClassName": "cPDALi",
+                                  "lastClassName": "dXZEpb",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -126,12 +126,12 @@ exports[`NotificationBadge renders count when there are notifications 1`] = `
                             <Badge
                               bsClass="badge"
                               bsStyle="danger"
-                              className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi"
+                              className="Badge__StyledBadge-sc-4gzqz0-0 dXZEpb"
                               id="notification-badge"
                               pullRight={false}
                             >
                               <span
-                                className="Badge__StyledBadge-sc-4gzqz0-0 cPDALi badge badge-danger"
+                                className="Badge__StyledBadge-sc-4gzqz0-0 dXZEpb badge badge-danger"
                                 id="notification-badge"
                               >
                                 42

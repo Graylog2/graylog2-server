@@ -1,108 +1,91 @@
-import React, { forwardRef, useMemo } from 'react';
-import PropTypes from 'prop-types';
+import { memo } from 'react';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
-import { darken } from 'polished';
 
 import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
-const listGroupItemStyles = (hex) => {
-  const backgroundColor = util.colorLevel(hex, -9);
-  const textColor = util.colorLevel(hex, 6);
+const listGroupItemStyles = (hex, variant) => css(({ theme }) => {
+  const backgroundColor = util.colorLevel(theme.color.variant[variant], -9);
+  const textColor = util.readableColor(backgroundColor);
 
   return css`
-    color: ${textColor};
-    background-color: ${backgroundColor};
-
-    &.list-group-item-action {
-      &:hover,
-      &:focus {
-        color: ${textColor};
-        background-color: ${darken(0.05, backgroundColor)};
-      }
-
-      &.active {
-        color: ${util.contrastingColor(textColor)};
-        background-color: ${textColor};
-        border-color: ${textColor};
-      }
-    }
-
-    &.list-group-item {
+    &.list-group-item-${variant} {
       color: ${textColor};
       background-color: ${backgroundColor};
 
-      &.active {
-        color: ${util.contrastingColor(hex)};
-        background-color: ${hex};
-        border-color: ${hex};
+      a&,
+      button& {
+        color: ${textColor};
+
+        .list-group-item-heading {
+          color: inherit;
+        }
+
+        &:hover,
+        &:focus {
+          color: ${textColor};
+          background-color: ${theme.color.variant.light[variant]};
+        }
+
+        &.active,
+        &.active:hover,
+        &.active:focus {
+          color: ${util.readableColor(theme.color.variant.light[variant])};
+          background-color: ${theme.color.variant.light[variant]};
+          border-color: ${theme.color.variant.light[variant]};
+        }
       }
     }
   `;
-};
-
-const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
-  const StyledListGroupItem = useMemo(
-    () => {
-      return styled(BootstrapListGroupItem)(({ theme }) => css`
-        &.list-group-item-action {
-          color: ${theme.color.primary.tre};
-
-          &:hover,
-          &:focus {
-            color: ${theme.color.primary.tre};
-            background-color: ${theme.color.secondary.due};
-          }
-
-          &:active {
-            color: ${util.contrastingColor(theme.color.secondary.tre)};
-            background-color: ${theme.color.secondary.tre};
-          }
-        }
-
-        &.list-group-item {
-          background-color: ${theme.color.primary.due};
-          border-color: ${theme.color.secondary.tre};
-
-          &.disabled,
-          &:disabled {
-            color: ${theme.color.primary.tre};
-            background-color: ${theme.color.primary.due};
-          }
-
-          &.active {
-            color: ${util.readableColor(theme.color.secondary.tre)};
-            background-color: ${theme.color.secondary.tre};
-            border-color: ${theme.color.secondary.tre};
-          }
-
-          &.active {
-            color: ${util.readableColor(theme.color.secondary.tre)};
-            background-color: ${theme.color.secondary.tre};
-            border-color: ${theme.color.secondary.tre};
-          }
-        }
-
-        ${bsStyleThemeVariant(listGroupItemStyles)}
-      `);
-    },
-    [bsStyle],
-  );
-
-  return (
-    <StyledListGroupItem bsStyle={bsStyle} ref={ref} {...props} />
-  );
 });
 
-ListGroupItem.propTypes = {
-  /* Bootstrap `bsStyle` variant name */
-  bsStyle: PropTypes.oneOf(['success', 'warning', 'danger', 'info']),
-};
+const ListGroupItem = memo(styled(BootstrapListGroupItem)(({ theme }) => {
+  return css`
+    ${bsStyleThemeVariant(listGroupItemStyles, {}, ['success', 'info', 'warning', 'danger'])};
 
-ListGroupItem.defaultProps = {
-  bsStyle: undefined,
-};
+    background-color: ${theme.color.gray[90]};
+    border-color: ${theme.color.gray[80]};
+
+    &&.disabled,
+    &&.disabled:hover,
+    &&.disabled:focus {
+      color: ${theme.color.gray[60]};
+      background-color: ${theme.color.gray[90]};
+
+      .list-group-item-text {
+        color: ${theme.color.gray[60]};
+      }
+    }
+
+    &.active,
+    &.active:hover,
+    &.active:focus {
+      color: ${theme.color.gray[100]};
+      background-color: ${theme.color.variant.primary};
+      border-color: ${theme.color.variant.light.primary};
+
+      .list-group-item-text {
+        color: ${theme.color.variant.light.primary};
+      }
+    }
+
+    a&,
+    button& {
+      color: ${theme.color.global.link};
+
+      .list-group-item-heading {
+        color: ${theme.color.gray[20]};
+      }
+
+      &:hover,
+      &:focus {
+        color: ${theme.color.global.linkHover};
+        background-color: ${theme.color.gray[80]};
+      }
+    }
+  `;
+}));
 
 export default ListGroupItem;

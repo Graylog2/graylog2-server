@@ -7,8 +7,10 @@ import '@testing-library/jest-dom/extend-expect';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
+import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
+
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -52,8 +54,10 @@ describe('WidgetQueryControls', () => {
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
   const renderSUT = (props = {}) => render(
-    <WidgetQueryControls {...defaultProps}
-                         {...props} />,
+    <GraylogThemeProvider>
+      <WidgetQueryControls {...defaultProps}
+                           {...props} />
+    </GraylogThemeProvider>,
   );
   it('should do something', () => {
     const { container } = renderSUT();
@@ -91,7 +95,11 @@ describe('WidgetQueryControls', () => {
       const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
       await waitForElement(() => getByText(indicatorText));
 
-      rerender(<WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />);
+      rerender(
+        <GraylogThemeProvider>
+          <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />
+        </GraylogThemeProvider>,
+      );
 
       expect(queryByText(indicatorText)).toBeNull();
     });

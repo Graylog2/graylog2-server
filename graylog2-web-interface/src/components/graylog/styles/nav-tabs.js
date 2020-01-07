@@ -1,28 +1,44 @@
 import { css } from 'styled-components';
-import { breakpoint, teinte, util } from 'theme';
+import { breakpoint, util } from 'theme';
 
-const borderColor = util.colorLevel(teinte.tertiary.due, -3);
+const navTabsStyles = () => css(({ theme }) => {
+  const borderColor = util.colorLevel(theme.color.variant.info, -3);
 
-const navTabsStyles = css`
-  .nav-tabs {
-    border-bottom-color: ${borderColor};
+  return css`
+    .nav-tabs {
+      border-bottom-color: ${borderColor};
 
-    > li {
-      > a {
-        &:hover {
-          border-color: ${teinte.secondary.due} ${teinte.secondary.due} ${borderColor};
-          background-color: ${teinte.secondary.due};
+      > li {
+        > a {
+          color: ${borderColor};
+
+          &:hover {
+            border-color: ${theme.color.gray[90]} ${theme.color.gray[90]} ${borderColor};
+            background-color: ${theme.color.gray[90]};
+            color: ${theme.color.variant.info};
+          }
         }
-      }
 
-      &.active > a {
-        &,
-        &:hover,
-        &:focus {
-          color: ${teinte.primary.tre};
-          background-color: ${teinte.primary.due};
-          border-color: ${borderColor};
-          border-bottom-color: transparent;
+        &.active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.color.gray[10]};
+            background-color: ${theme.color.gray[100]};
+            border-color: ${borderColor};
+            border-bottom-color: transparent;
+          }
+        }
+
+        &.disabled > a {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.color.gray[60]};
+            background-color: ${theme.color.gray[100]};
+            border-color: ${theme.color.gray[100]} ${theme.color.gray[100]} ${borderColor};
+            cursor: not-allowed;
+          }
         }
       }
     }
@@ -40,17 +56,14 @@ const navTabsStyles = css`
         > li > a {
           border-bottom-color: ${borderColor};
         }
-
-        > .active > a {
-          &,
-          &:hover,
-          &:focus {
-            border-bottom-color: ${teinte.primary.due};
-          }
+        > .active > a,
+        > .active > a:hover,
+        > .active > a:focus {
+          border-bottom-color: ${theme.color.gray[100]};
         }
       }
     }
-  }
-`;
+  `;
+});
 
 export default navTabsStyles;

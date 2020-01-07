@@ -1,24 +1,24 @@
-import teinte from './teinte';
+import colors from './colors'; // TODO: this will need to be modified by the user in the future
 import breakpoints from './breakpoints';
-import util from './util';
+import utils from './utils';
 
 const theme = {
-  teinte: {
-    ...teinte,
-  },
+  color: colors,
   breakpoint: {
     ...breakpoints,
   },
-  util,
+  util: {
+    ...utils,
+  },
 };
 
-const themeModes = ['teinte', 'noire'];
+const themeModes = Object.keys(colors);
 
 export default theme;
 
 export {
   breakpoints as breakpoint,
-  teinte,
+  colors as color,
+  utils as util,
   themeModes,
-  util,
 };

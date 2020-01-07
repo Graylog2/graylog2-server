@@ -114,12 +114,10 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                             "attrs": Array [],
                             "componentStyle": ComponentStyle {
                               "componentId": "HelpBlock-i8is92-0",
-                              "isStatic": true,
-                              "lastClassName": "huFHQV",
+                              "isStatic": false,
+                              "lastClassName": "hCBNCb",
                               "rules": Array [
-                                "display:block;margin-top:5px;margin-bottom:10px;color:",
-                                "#9f9f9f",
-                                ";",
+                                [Function],
                               ],
                             },
                             "displayName": "HelpBlock",
@@ -136,10 +134,10 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                       >
                         <HelpBlock
                           bsClass="help-block"
-                          className="HelpBlock-i8is92-0 huFHQV"
+                          className="HelpBlock-i8is92-0 hCBNCb"
                         >
                           <span
-                            className="HelpBlock-i8is92-0 huFHQV help-block"
+                            className="HelpBlock-i8is92-0 hCBNCb help-block"
                           >
                             When rollup is enabled, an additional trace totalling individual subtraces will be included.
                           </span>
@@ -166,7 +164,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
         bsStyle="success"
         onClick={[Function]}
       >
-        <Button
+        <Button__StyledButton
           bsStyle="success"
           onClick={[Function]}
         >
@@ -191,17 +189,17 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
                 ],
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
-                  "componentId": "Button-c9cbmb-0",
+                  "componentId": "Button__StyledButton-c9cbmb-0",
                   "isStatic": false,
-                  "lastClassName": "jKsGyd",
+                  "lastClassName": "dRMLmK",
                   "rules": Array [
                     [Function],
                   ],
                 },
-                "displayName": "Button",
+                "displayName": "Button__StyledButton",
                 "foldedComponentIds": Array [],
                 "render": [Function],
-                "styledComponentId": "Button-c9cbmb-0",
+                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                 "target": [Function],
                 "toString": [Function],
                 "warnTooManyClasses": [Function],
@@ -216,12 +214,12 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
               block={false}
               bsClass="btn"
               bsStyle="success"
-              className="Button-c9cbmb-0 jKsGyd"
+              className="Button__StyledButton-c9cbmb-0 dRMLmK"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="Button-c9cbmb-0 jKsGyd btn btn-success"
+                className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
                 disabled={false}
                 onClick={[Function]}
                 type="button"
@@ -230,7 +228,7 @@ exports[`<ColumnPivotConfiguraiton /> should render as expected 1`] = `
               </button>
             </Button>
           </StyledComponent>
-        </Button>
+        </Button__StyledButton>
       </ForwardRef>
     </div>
   </div>

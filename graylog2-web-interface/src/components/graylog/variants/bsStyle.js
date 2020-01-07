@@ -1,25 +1,33 @@
 import theme from 'styled-theming';
+import { color, themeModes } from 'theme';
 
-import teinte from 'theme/teinte';
-
-const variantColors = {
-  danger: teinte.secondary.uno,
-  default: teinte.secondary.due,
-  info: teinte.tertiary.uno,
-  primary: teinte.tertiary.quattro,
-  success: teinte.tertiary.tre,
-  warning: teinte.tertiary.sei,
+const variantColors = (mode) => {
+  return {
+    danger: color[mode].variant.danger,
+    default: color[mode].variant.default,
+    info: color[mode].variant.info,
+    primary: color[mode].variant.primary,
+    success: color[mode].variant.success,
+    warning: color[mode].variant.warning,
+  };
 };
-const bsStyles = Object.keys(variantColors);
+
+const bsStyles = Object.keys(variantColors(themeModes[0]));
 
 const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}, includedVariants = bsStyles) => {
-  const variants = includedVariants.map((variant) => {
-    return {
-      [variant]: {
-        teinte: cssBuilder(variantColors[variant], variant),
-      },
-    };
-  });
+  const styleModes = (variant) => {
+    const modes = {};
+
+    themeModes.forEach((mode) => {
+      modes[mode] = cssBuilder(variantColors(mode)[variant], variant);
+    });
+
+    return modes;
+  };
+
+  const variants = includedVariants.map(variant => ({
+    [variant]: { ...styleModes(variant) },
+  }));
 
   return theme.variants('mode', 'bsStyle', Object.assign(additionalVariants, ...variants));
 };

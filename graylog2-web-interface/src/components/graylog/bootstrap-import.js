@@ -3,8 +3,8 @@ export {
   /* 👇 no custom theme colors needed 👇 */
   ButtonGroup,
   ButtonToolbar,
-  Clearfix,
   Checkbox, // NOTE: do we want custom or keep OS styles
+  Clearfix,
   Col,
   Collapse,
   Dropdown,
