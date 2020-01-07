@@ -2,7 +2,7 @@ import { css } from 'styled-components';
 import { breakpoint, util } from 'theme';
 
 const navTabsStyles = css(({ theme }) => {
-  const borderColor = util.colorLevel(theme.color.tertiary.due, -3);
+  const borderColor = util.colorLevel(theme.color.variant.info, -3);
 
   return css`
     .nav-tabs {
@@ -10,9 +10,12 @@ const navTabsStyles = css(({ theme }) => {
 
       > li {
         > a {
+          color: ${borderColor};
+
           &:hover {
-            border-color: ${theme.color.secondary.due} ${theme.color.secondary.due} ${borderColor};
-            background-color: ${theme.color.secondary.due};
+            border-color: ${theme.color.gray[90]} ${theme.color.gray[90]} ${borderColor};
+            background-color: ${theme.color.gray[90]};
+            color: ${theme.color.variant.info};
           }
         }
 
@@ -20,35 +23,44 @@ const navTabsStyles = css(({ theme }) => {
           &,
           &:hover,
           &:focus {
-            color: ${theme.color.primary.tre};
-            background-color: ${theme.color.primary.due};
+            color: ${theme.color.gray[10]};
+            background-color: ${theme.color.gray[100]};
             border-color: ${borderColor};
             border-bottom-color: transparent;
           }
         }
-      }
 
-      &.nav-justified {
-        > .active > a {
+        &.disabled > a {
           &,
           &:hover,
           &:focus {
-            border-color: ${borderColor};
+            color: ${theme.color.gray[60]};
+            background-color: ${theme.color.gray[100]};
+            border-color: ${theme.color.gray[100]} ${theme.color.gray[100]} ${borderColor};
+            cursor: not-allowed;
           }
         }
+      }
+    }
 
-        @media (min-width: ${breakpoint.min.sm}) {
-          > li > a {
-            border-bottom-color: ${borderColor};
-          }
+    &.nav-justified {
+      > .active > a {
+        &,
+        &:hover,
+        &:focus {
+          border-color: ${borderColor};
+        }
+      }
 
-          > .active > a {
-            &,
-            &:hover,
-            &:focus {
-              border-bottom-color: ${theme.color.primary.due};
-            }
-          }
+      @media (min-width: ${breakpoint.min.sm}) {
+        > li > a {
+          border-bottom-color: ${borderColor};
+        }
+
+        > .active > a,
+        > .active > a:hover,
+        > .active > a:focus {
+          border-bottom-color: ${theme.color.gray[100]};
         }
       }
     }

@@ -2,10 +2,15 @@ import colorLevel from './colorLevel';
 import contrastingColor from './contrastingColor';
 import readableColor from './readableColor';
 
-const util = {
+const utils = {
   colorLevel,
   contrastingColor,
   readableColor,
 };
 
-export default util;
+export default utils;
+export {
+  colorLevel,
+  contrastingColor,
+  readableColor,
+};

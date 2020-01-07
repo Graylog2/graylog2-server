@@ -5,15 +5,15 @@ import { transparentize } from 'polished';
 
 const Modal = styled(BootstrapModal)(({ theme }) => css`
   .modal-content {
-    background-color: ${theme.color.primary.due};
-    border-color: ${transparentize(0.8, theme.color.primary.tre)};
+    background-color: ${theme.color.global.contentBackground};
+    border-color: ${transparentize(0.8, theme.color.gray[0])};
 
     .modal-header {
-      border-bottom-color: ${theme.color.secondary.tre};
+      border-bottom-color: ${theme.color.gray[90]};
     }
 
     .modal-footer {
-      border-top-color: ${theme.color.secondary.tre};
+      border-top-color: ${theme.color.gray[90]};
     }
   }
 

@@ -2,6 +2,8 @@
 import { Tooltip as BootstrapTooltip } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
+import { util } from 'theme';
+
 const Tooltip = styled(BootstrapTooltip)(({ theme }) => css`
   &.top .tooltip-arrow {
     bottom: 0;
@@ -10,26 +12,26 @@ const Tooltip = styled(BootstrapTooltip)(({ theme }) => css`
   &.top .tooltip-arrow,
   &.top-left .tooltip-arrow,
   &.top-right .tooltip-arrow {
-    border-top-color: ${theme.color.primary.tre};
+    border-top-color: ${theme.color.gray[10]};
   }
 
   &.right .tooltip-arrow {
-    border-right-color: ${theme.color.primary.tre};
+    border-right-color: ${theme.color.gray[10]};
   }
 
   &.left .tooltip-arrow {
-    border-left-color: ${theme.color.primary.tre};
+    border-left-color: ${theme.color.gray[10]};
   }
 
   &.bottom .tooltip-arrow,
   &.bottom-left .tooltip-arrow,
   &.bottom-right .tooltip-arrow {
-    border-bottom-color: ${theme.color.primary.tre};
+    border-bottom-color: ${theme.color.gray[10]};
   }
 
   .tooltip-inner {
-    color: ${theme.color.primary.due};
-    background-color: ${theme.color.primary.tre};
+    color: ${util.readableColor(theme.color.gray[10])};
+    background-color: ${theme.color.gray[10]};
   }
 `);
 

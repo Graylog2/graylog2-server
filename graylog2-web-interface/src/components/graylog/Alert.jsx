@@ -25,6 +25,7 @@ const alertStyles = (hex) => {
   `;
 };
 
+
 const Alert = forwardRef(({ bsStyle, ...props }, ref) => {
   const StyledAlert = useMemo(
     () => styled(BootstrapAlert)`

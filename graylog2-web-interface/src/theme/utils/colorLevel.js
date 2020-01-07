@@ -1,6 +1,6 @@
 
 import { mix } from 'polished';
-import teinte from '../teinte';
+import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
 
 export default function colorLevel(colorHex, level = 0) {
   /**
@@ -10,8 +10,10 @@ export default function colorLevel(colorHex, level = 0) {
    * @param {string} color - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
    * @param {number} level - any positive or negative number
    */
-  const colorBase = level > 0 ? teinte.primary.tre : teinte.primary.due;
+  const colorBase = level > 0 ? teinte.global.textDefault : teinte.global.textAlt;
   const absLevel = Math.abs(level) * 0.08; // TODO: make 8% a theme variable
+  const upperLevel = absLevel > 1 ? 1 : absLevel;
+  const mixLevel = absLevel < 0 ? 0 : upperLevel;
 
-  return mix(absLevel, colorBase, colorHex);
+  return mix(mixLevel, colorBase, colorHex);
 }

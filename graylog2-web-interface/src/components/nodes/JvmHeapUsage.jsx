@@ -34,18 +34,18 @@ const Blob = styled.span(({ theme }) => css`
   border: 1px solid;
 
   &.used-memory {
-    background-color: ${theme.color.tertiary.quattro};
-    border-color: ${darken(0.1, theme.color.tertiary.quattro)};
+    background-color: ${theme.color.variant.primary};
+    border-color: ${theme.color.variant.dark.primary};
   }
 
   &.committed-memory {
-    background-color: ${theme.color.tertiary.sei};
-    border-color: ${darken(0.1, theme.color.tertiary.sei)};
+    background-color: ${theme.color.variant.warning};
+    border-color: ${theme.color.variant.dark.warning};
   }
 
   &.max-memory {
-    background-color: ${theme.color.secondary.due};
-    border-color: ${darken(0.1, theme.color.secondary.due)};
+    background-color: ${theme.color.global.background};
+    border-color: ${theme.color.gray[80]};
   }
 `);
 

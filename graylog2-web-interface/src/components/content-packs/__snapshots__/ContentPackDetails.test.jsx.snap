@@ -140,7 +140,7 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                       "componentStyle": ComponentStyle {
                         "componentId": "Well-sc-19gs1oc-0",
                         "isStatic": false,
-                        "lastClassName": "kezSPd",
+                        "lastClassName": "hnzchw",
                         "rules": Array [
                           [Function],
                         ],
@@ -159,10 +159,10 @@ exports[`<ContentPackDetails /> should render with content pack 1`] = `
                 >
                   <Well
                     bsClass="well"
-                    className="Well-sc-19gs1oc-0 kezSPd"
+                    className="Well-sc-19gs1oc-0 hnzchw"
                   >
                     <div
-                      className="Well-sc-19gs1oc-0 kezSPd well"
+                      className="Well-sc-19gs1oc-0 hnzchw well"
                     >
                       <div
                         dangerouslySetInnerHTML={

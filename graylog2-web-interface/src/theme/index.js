@@ -1,17 +1,21 @@
-// @flow
-import teinte from './teinte';
+// @flow strict
+import colors from './colors';
 import breakpoints from './breakpoints';
-import util from './util';
+import utils from './utils';
 
 const theme = {
-  teinte,
+  color: {
+    ...colors,
+  },
   breakpoint: {
     ...breakpoints,
   },
-  util,
+  util: {
+    ...utils,
+  },
 };
 
-const themeModes = ['teinte', 'noire'];
+const themeModes = Object.keys(colors);
 
 export type ThemeInterface = {
   color: {
@@ -25,7 +29,7 @@ export default theme;
 
 export {
   breakpoints as breakpoint,
-  teinte,
+  colors as color,
+  utils as util,
   themeModes,
-  util,
 };

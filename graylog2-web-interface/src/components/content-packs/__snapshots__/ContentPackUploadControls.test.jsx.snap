@@ -10,7 +10,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
       id="upload-content-pack-button"
       onClick={[Function]}
     >
-      <Button
+      <Button__StyledButton
         active={false}
         bsStyle="success"
         className="button"
@@ -40,17 +40,17 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               ],
               "attrs": Array [],
               "componentStyle": ComponentStyle {
-                "componentId": "Button-c9cbmb-0",
+                "componentId": "Button__StyledButton-c9cbmb-0",
                 "isStatic": false,
-                "lastClassName": "jKsGyd",
+                "lastClassName": "dRMLmK",
                 "rules": Array [
                   [Function],
                 ],
               },
-              "displayName": "Button",
+              "displayName": "Button__StyledButton",
               "foldedComponentIds": Array [],
               "render": [Function],
-              "styledComponentId": "Button-c9cbmb-0",
+              "styledComponentId": "Button__StyledButton-c9cbmb-0",
               "target": [Function],
               "toString": [Function],
               "warnTooManyClasses": [Function],
@@ -66,13 +66,13 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             block={false}
             bsClass="btn"
             bsStyle="success"
-            className="button Button-c9cbmb-0 jKsGyd"
+            className="button Button__StyledButton-c9cbmb-0 dRMLmK"
             disabled={false}
             id="upload-content-pack-button"
             onClick={[Function]}
           >
             <button
-              className="button Button-c9cbmb-0 jKsGyd btn btn-success"
+              className="button Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
               disabled={false}
               id="upload-content-pack-button"
               onClick={[Function]}
@@ -82,7 +82,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
             </button>
           </Button>
         </StyledComponent>
-      </Button>
+      </Button__StyledButton>
     </ForwardRef>
     <BootstrapModalForm
       cancelButtonText="Cancel"
@@ -128,7 +128,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
                 "componentStyle": ComponentStyle {
                   "componentId": "Modal-nuree8-0",
                   "isStatic": false,
-                  "lastClassName": "bmCcvm",
+                  "lastClassName": "fWOZMp",
                   "rules": Array [
                     [Function],
                   ],
@@ -152,7 +152,7 @@ exports[`<ContentPackUploadControls /> should render 1`] = `
               autoFocus={true}
               backdrop="static"
               bsClass="modal"
-              className="Modal-nuree8-0 bmCcvm"
+              className="Modal-nuree8-0 fWOZMp"
               dialogComponentClass={[Function]}
               enforceFocus={true}
               keyboard={true}

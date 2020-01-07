@@ -14,20 +14,20 @@ Negative numbers render a lighter color, positive numbers get darker. Check out 
 import { teinte, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { uno, quattro } = teinte.tertiary;
+const { info, primary } = teinte.variant;
 
 <>
   <p>
-    <ColorSwatch name='uno -5' color={util.colorLevel(uno, -5)} />
-    <ColorSwatch name='uno' color={uno} />
-    <ColorSwatch name='uno +5' color={util.colorLevel(uno, 5)} />
+    <ColorSwatch name='info -5' color={util.colorLevel(info, -5)} />
+    <ColorSwatch name='info' color={info} />
+    <ColorSwatch name='info +5' color={util.colorLevel(info, 5)} />
   </p>
   <p>
-    <ColorSwatch name='quattro -8' color={util.colorLevel(quattro, -8)} />
-    <ColorSwatch name='quattro -2' color={util.colorLevel(quattro, -2)} />
-    <ColorSwatch name='quattro' color={quattro} />
-    <ColorSwatch name='quattro +2' color={util.colorLevel(quattro, 2)} />
-    <ColorSwatch name='quattro +8' color={util.colorLevel(quattro, 8)} />
+    <ColorSwatch name='primary -8' color={util.colorLevel(primary, -8)} />
+    <ColorSwatch name='primary -2' color={util.colorLevel(primary, -2)} />
+    <ColorSwatch name='primary' color={primary} />
+    <ColorSwatch name='primary +2' color={util.colorLevel(primary, 2)} />
+    <ColorSwatch name='primary +8' color={util.colorLevel(primary, 8)} />
   </p>
 </>
 ```
@@ -45,26 +45,26 @@ Accepts a color and [WCAG](https://www.w3.org/TR/WCAG21/#distinguishable) level,
 import { teinte, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { quattro, uno } = teinte.tertiary;
-const { tre } = teinte.primary;
+const { info, primary } = teinte.variant;
+const { textDefault } = teinte.global;
 
 <>
   <p>
-    <ColorSwatch name='uno AAA' color={util.contrastingColor(uno)} />
-    <ColorSwatch name='uno' color={uno} />
-    <ColorSwatch name='uno AA' color={util.contrastingColor(uno, 'AA')} />
+    <ColorSwatch name='info AAA' color={util.contrastingColor(info)} />
+    <ColorSwatch name='info' color={info} />
+    <ColorSwatch name='info AA' color={util.contrastingColor(info, 'AA')} />
   </p>
   <p>
-    <ColorSwatch name='tre AAALarge' color={util.contrastingColor(tre, 'AAALarge')} />
-    <ColorSwatch name='tre AAA' color={util.contrastingColor(tre)} />
-    <ColorSwatch name='tre' color={tre} />
-    <ColorSwatch name='tre AALarge' color={util.contrastingColor(tre, 'AALarge')} />
-    <ColorSwatch name='tre AA' color={util.contrastingColor(tre, 'AA')} />
+    <ColorSwatch name='textDefault AAALarge' color={util.contrastingColor(textDefault, 'AAALarge')} />
+    <ColorSwatch name='textDefault AAA' color={util.contrastingColor(textDefault)} />
+    <ColorSwatch name='textDefault' color={textDefault} />
+    <ColorSwatch name='textDefault AALarge' color={util.contrastingColor(textDefault, 'AALarge')} />
+    <ColorSwatch name='textDefault AA' color={util.contrastingColor(textDefault, 'AA')} />
   </p>
   <p>
-    <ColorSwatch name='quattro AAA' color={util.contrastingColor(quattro)} />
-    <ColorSwatch name='quattro' color={quattro} />
-    <ColorSwatch name='quattro AA' color={util.contrastingColor(quattro, 'AA')} />
+    <ColorSwatch name='primary AAA' color={util.contrastingColor(primary)} />
+    <ColorSwatch name='primary' color={primary} />
+    <ColorSwatch name='primary AA' color={util.contrastingColor(primary, 'AA')} />
   </p>
 </>
 ```
@@ -76,29 +76,29 @@ Generating a readable color following W3C specs using [polished](https://polishe
   - any string that represents a color (ex: "#f00" or "rgb(255, 0, 0)")
 
 **`darkColor`**
-  - defaults: Currently `teinte.primary.tre`
+  - defaults: Currently `teinte.global.textDefault`
 
 **`lightColor`**
-  - defaults: Currently `teinte.primary.due`
+  - defaults: Currently `teinte.global.textAlt`
 
 ```js
 import { teinte, util } from 'theme';
 import ColorSwatch from './Colors';
 
-const { quattro, uno } = teinte.tertiary;
-const { tre } = teinte.primary;
+const { info, primary } = teinte.variant;
+const { textDefault } = teinte.global;
 
 <>
   <p>
-    <ColorSwatch name='uno' color={uno} />
-    <ColorSwatch name='uno readableColor' color={util.readableColor(uno)} />
+    <ColorSwatch name='info' color={info} />
+    <ColorSwatch name='info readableColor' color={util.readableColor(info)} />
   </p>
   <p>
-    <ColorSwatch name='tre' color={tre} />
-    <ColorSwatch name='tre readableColor' color={util.readableColor(tre)} />
+    <ColorSwatch name='textDefault' color={textDefault} />
+    <ColorSwatch name='textDefault readableColor' color={util.readableColor(textDefault)} />
   </p>
   <p>
-    <ColorSwatch name='quattro' color={quattro} />
-    <ColorSwatch name='quattro readableColor' color={util.readableColor(quattro)} />
+    <ColorSwatch name='primary' color={primary} />
+    <ColorSwatch name='primary readableColor' color={util.readableColor(primary)} />
   </p>
 </>

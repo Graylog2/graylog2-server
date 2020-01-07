@@ -4,24 +4,24 @@ import PropTypes from 'prop-types';
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { Pagination as DeprecatedPagination } from '@react-bootstrap/pagination';
 import { css } from 'styled-components';
-import { darken } from 'polished';
 
 import { DEPRECATION_NOTICE } from 'util/constants';
+import { util } from 'theme';
 
 export const paginationStyles = css(({ theme }) => css`
   &.pagination {
     > li {
       > a,
       > span {
-        color: ${theme.color.tertiary.quattro};
-        background-color: ${theme.color.primary.due};
-        border-color: ${theme.color.secondary.tre};
+        color: ${util.readableColor(theme.color.gray[100])};
+        background-color: ${theme.color.gray[100]};
+        border-color: ${theme.color.gray[80]};
 
         &:hover,
         &:focus {
-          color: ${darken(0.15, theme.color.tertiary.quattro)};
-          background-color: ${theme.color.secondary.due};
-          border-color: ${theme.color.secondary.tre};
+          color: ${theme.color.variant.dark.primary};
+          background-color: ${theme.color.gray[90]};
+          border-color: ${theme.color.gray[80]};
         }
       }
     }
@@ -31,9 +31,9 @@ export const paginationStyles = css(({ theme }) => css`
       &,
       &:hover,
       &:focus {
-        color: ${darken(0.15, theme.color.tertiary.quattro)};
-        background-color: ${theme.color.secondary.due};
-        border-color: ${theme.color.secondary.tre};
+        color: ${theme.color.variant.dark.primary};
+        background-color: ${theme.color.gray[90]};
+        border-color: ${theme.color.gray[80]};
       }
     }
 
@@ -44,9 +44,9 @@ export const paginationStyles = css(({ theme }) => css`
       > a,
       > a:hover,
       > a:focus {
-        color: ${darken(0.25, theme.color.secondary.tre)};
-        background-color: ${theme.color.primary.due};
-        border-color: ${theme.color.secondary.tre};
+        color: ${theme.color.gray[60]};
+        background-color: ${theme.color.gray[80]};
+        border-color: ${theme.color.gray[80]};
       }
     }
   }

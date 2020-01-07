@@ -5,7 +5,7 @@ import bgImage from 'images/auth/loginbg.jpg';
 const AuthThemeStyles = createGlobalStyle(({ theme }) => css`
   body {
     /* we love science */
-    background: url(${bgImage}) no-repeat center center fixed ${theme.color.secondary.due};
+    background: url(${bgImage}) no-repeat center center fixed ${theme.color.global.background};
     background-size: cover;
   }
 `);

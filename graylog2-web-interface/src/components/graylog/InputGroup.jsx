@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { InputGroup as BootstrapInputGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { lighten } from 'polished';
 import classNames from 'classnames';
 
 const StyledBootstrapInputAddon = ({ className, ...rest }) => {
@@ -13,9 +12,9 @@ const StyledBootstrapInputAddon = ({ className, ...rest }) => {
 const Addon = ({ bsClass, className, ...addonProps }) => {
   const StyledAddon = styled(StyledBootstrapInputAddon)(({ theme }) => css`
     && {
-      color: ${lighten(0.30, theme.color.primary.tre)};
-      background-color: ${theme.color.primary.due};
-      border-color: ${theme.color.secondary.tre};
+      color: ${theme.color.gray[30]};
+      background-color: ${theme.color.gray[100]};
+      border-color: ${theme.color.gray[80]};
     }
   `);
 

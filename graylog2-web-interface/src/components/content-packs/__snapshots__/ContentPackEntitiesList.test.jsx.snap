@@ -80,7 +80,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               disabled={false}
               type="submit"
             >
-              <Button
+              <Button__StyledButton
                 bsStyle="default"
                 className="submit-button"
                 disabled={false}
@@ -109,17 +109,17 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                       ],
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "Button-c9cbmb-0",
+                        "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "iKWoaE",
+                        "lastClassName": "kojzoH",
                         "rules": Array [
                           [Function],
                         ],
                       },
-                      "displayName": "Button",
+                      "displayName": "Button__StyledButton",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "Button-c9cbmb-0",
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -134,12 +134,12 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button-c9cbmb-0 iKWoaE"
+                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -147,7 +147,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                     </button>
                   </Button>
                 </StyledComponent>
-              </Button>
+              </Button__StyledButton>
             </ForwardRef>
           </div>
           <div
@@ -164,7 +164,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
               onClick={[Function]}
               type="reset"
             >
-              <Button
+              <Button__StyledButton
                 bsStyle="default"
                 className="reset-button"
                 onClick={[Function]}
@@ -192,17 +192,17 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                       ],
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "Button-c9cbmb-0",
+                        "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "iKWoaE",
+                        "lastClassName": "kojzoH",
                         "rules": Array [
                           [Function],
                         ],
                       },
-                      "displayName": "Button",
+                      "displayName": "Button__StyledButton",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "Button-c9cbmb-0",
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -218,13 +218,13 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button-c9cbmb-0 iKWoaE"
+                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -233,7 +233,7 @@ exports[`<ContentPackEntitiesList /> should render with empty entities 1`] = `
                     </button>
                   </Button>
                 </StyledComponent>
-              </Button>
+              </Button__StyledButton>
             </ForwardRef>
           </div>
         </form>
@@ -447,7 +447,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               disabled={false}
               type="submit"
             >
-              <Button
+              <Button__StyledButton
                 bsStyle="default"
                 className="submit-button"
                 disabled={false}
@@ -476,17 +476,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       ],
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "Button-c9cbmb-0",
+                        "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "iKWoaE",
+                        "lastClassName": "cAlWKw",
                         "rules": Array [
                           [Function],
                         ],
                       },
-                      "displayName": "Button",
+                      "displayName": "Button__StyledButton",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "Button-c9cbmb-0",
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -501,12 +501,12 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="submit-button Button-c9cbmb-0 iKWoaE"
+                    className="submit-button Button__StyledButton-c9cbmb-0 kojzoH"
                     disabled={false}
                     type="submit"
                   >
                     <button
-                      className="submit-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                      className="submit-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                       disabled={false}
                       type="submit"
                     >
@@ -514,7 +514,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     </button>
                   </Button>
                 </StyledComponent>
-              </Button>
+              </Button__StyledButton>
             </ForwardRef>
           </div>
           <div
@@ -531,7 +531,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
               onClick={[Function]}
               type="reset"
             >
-              <Button
+              <Button__StyledButton
                 bsStyle="default"
                 className="reset-button"
                 onClick={[Function]}
@@ -559,17 +559,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                       ],
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
-                        "componentId": "Button-c9cbmb-0",
+                        "componentId": "Button__StyledButton-c9cbmb-0",
                         "isStatic": false,
-                        "lastClassName": "iKWoaE",
+                        "lastClassName": "cAlWKw",
                         "rules": Array [
                           [Function],
                         ],
                       },
-                      "displayName": "Button",
+                      "displayName": "Button__StyledButton",
                       "foldedComponentIds": Array [],
                       "render": [Function],
-                      "styledComponentId": "Button-c9cbmb-0",
+                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                       "target": [Function],
                       "toString": [Function],
                       "warnTooManyClasses": [Function],
@@ -585,13 +585,13 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     block={false}
                     bsClass="btn"
                     bsStyle="default"
-                    className="reset-button Button-c9cbmb-0 iKWoaE"
+                    className="reset-button Button__StyledButton-c9cbmb-0 kojzoH"
                     disabled={false}
                     onClick={[Function]}
                     type="reset"
                   >
                     <button
-                      className="reset-button Button-c9cbmb-0 iKWoaE btn btn-default"
+                      className="reset-button Button__StyledButton-c9cbmb-0 kojzoH btn btn-default"
                       disabled={false}
                       onClick={[Function]}
                       type="reset"
@@ -600,7 +600,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                     </button>
                   </Button>
                 </StyledComponent>
-              </Button>
+              </Button__StyledButton>
             </ForwardRef>
           </div>
         </form>
@@ -849,7 +849,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
+                              <Button__StyledButton
                                 bsSize="xs"
                                 bsStyle="primary"
                                 disabled={false}
@@ -878,17 +878,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                       ],
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "ghlLDE",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
                                       },
-                                      "displayName": "Button",
+                                      "displayName": "Button__StyledButton",
                                       "foldedComponentIds": Array [],
                                       "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                       "target": [Function],
                                       "toString": [Function],
                                       "warnTooManyClasses": [Function],
@@ -904,12 +904,12 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     bsClass="btn"
                                     bsSize="xs"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
+                                    className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -918,14 +918,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     </button>
                                   </Button>
                                 </StyledComponent>
-                              </Button>
+                              </Button__StyledButton>
                             </ForwardRef>
                             <ForwardRef
                               bsSize="xs"
                               bsStyle="info"
                               onClick={[Function]}
                             >
-                              <Button
+                              <Button__StyledButton
                                 bsSize="xs"
                                 bsStyle="info"
                                 onClick={[Function]}
@@ -952,17 +952,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                       ],
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "gZfKUo",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
                                       },
-                                      "displayName": "Button",
+                                      "displayName": "Button__StyledButton",
                                       "foldedComponentIds": Array [],
                                       "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                       "target": [Function],
                                       "toString": [Function],
                                       "warnTooManyClasses": [Function],
@@ -978,12 +978,12 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     bsClass="btn"
                                     bsSize="xs"
                                     bsStyle="info"
-                                    className="Button-c9cbmb-0 gZfKUo"
+                                    className="Button__StyledButton-c9cbmb-0 cAlWKw"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-xs btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -992,7 +992,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     </button>
                                   </Button>
                                 </StyledComponent>
-                              </Button>
+                              </Button__StyledButton>
                             </ForwardRef>
                           </div>
                         </ButtonToolbar>
@@ -1032,7 +1032,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "bmCcvm",
+                                  "lastClassName": "fWOZMp",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1057,7 +1057,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 bmCcvm"
+                              className="Modal-nuree8-0 fWOZMp"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1146,7 +1146,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "bmCcvm",
+                                  "lastClassName": "fWOZMp",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1171,7 +1171,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 bmCcvm"
+                              className="Modal-nuree8-0 fWOZMp"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1311,7 +1311,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               disabled={false}
                               onClick={[Function]}
                             >
-                              <Button
+                              <Button__StyledButton
                                 bsSize="xs"
                                 bsStyle="primary"
                                 disabled={false}
@@ -1340,17 +1340,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                       ],
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "ghlLDE",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
                                       },
-                                      "displayName": "Button",
+                                      "displayName": "Button__StyledButton",
                                       "foldedComponentIds": Array [],
                                       "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                       "target": [Function],
                                       "toString": [Function],
                                       "warnTooManyClasses": [Function],
@@ -1366,12 +1366,12 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     bsClass="btn"
                                     bsSize="xs"
                                     bsStyle="primary"
-                                    className="Button-c9cbmb-0 ghlLDE"
+                                    className="Button__StyledButton-c9cbmb-0 dYxYaY"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 ghlLDE btn btn-xs btn-primary"
+                                      className="Button__StyledButton-c9cbmb-0 dYxYaY btn btn-xs btn-primary"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1380,14 +1380,14 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     </button>
                                   </Button>
                                 </StyledComponent>
-                              </Button>
+                              </Button__StyledButton>
                             </ForwardRef>
                             <ForwardRef
                               bsSize="xs"
                               bsStyle="info"
                               onClick={[Function]}
                             >
-                              <Button
+                              <Button__StyledButton
                                 bsSize="xs"
                                 bsStyle="info"
                                 onClick={[Function]}
@@ -1414,17 +1414,17 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                       ],
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
-                                        "componentId": "Button-c9cbmb-0",
+                                        "componentId": "Button__StyledButton-c9cbmb-0",
                                         "isStatic": false,
-                                        "lastClassName": "gZfKUo",
+                                        "lastClassName": "cAlWKw",
                                         "rules": Array [
                                           [Function],
                                         ],
                                       },
-                                      "displayName": "Button",
+                                      "displayName": "Button__StyledButton",
                                       "foldedComponentIds": Array [],
                                       "render": [Function],
-                                      "styledComponentId": "Button-c9cbmb-0",
+                                      "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                       "target": [Function],
                                       "toString": [Function],
                                       "warnTooManyClasses": [Function],
@@ -1440,12 +1440,12 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     bsClass="btn"
                                     bsSize="xs"
                                     bsStyle="info"
-                                    className="Button-c9cbmb-0 gZfKUo"
+                                    className="Button__StyledButton-c9cbmb-0 cAlWKw"
                                     disabled={false}
                                     onClick={[Function]}
                                   >
                                     <button
-                                      className="Button-c9cbmb-0 gZfKUo btn btn-xs btn-info"
+                                      className="Button__StyledButton-c9cbmb-0 cAlWKw btn btn-xs btn-info"
                                       disabled={false}
                                       onClick={[Function]}
                                       type="button"
@@ -1454,7 +1454,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                     </button>
                                   </Button>
                                 </StyledComponent>
-                              </Button>
+                              </Button__StyledButton>
                             </ForwardRef>
                           </div>
                         </ButtonToolbar>
@@ -1494,7 +1494,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "bmCcvm",
+                                  "lastClassName": "fWOZMp",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1519,7 +1519,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 bmCcvm"
+                              className="Modal-nuree8-0 fWOZMp"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}
@@ -1608,7 +1608,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                                 "componentStyle": ComponentStyle {
                                   "componentId": "Modal-nuree8-0",
                                   "isStatic": false,
-                                  "lastClassName": "bmCcvm",
+                                  "lastClassName": "fWOZMp",
                                   "rules": Array [
                                     [Function],
                                   ],
@@ -1633,7 +1633,7 @@ exports[`<ContentPackEntitiesList /> should render with entities and parameters 
                               backdrop="static"
                               bsClass="modal"
                               bsSize="large"
-                              className="Modal-nuree8-0 bmCcvm"
+                              className="Modal-nuree8-0 fWOZMp"
                               dialogComponentClass={[Function]}
                               enforceFocus={true}
                               keyboard={true}

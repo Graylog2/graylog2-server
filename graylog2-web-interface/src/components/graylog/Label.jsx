@@ -8,7 +8,7 @@ import { util } from 'theme';
 import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
 
 const labelStyles = (hex) => {
-  const textColor = util.contrastingColor(hex);
+  const textColor = util.readableColor(hex);
 
   return css`
     background-color: ${hex};
