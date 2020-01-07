@@ -115,12 +115,10 @@ public class ConfigurationRequest {
                         }
                         break;
                     case TextField.FIELD_TYPE:
-                        break;
                     case ListField.FIELD_TYPE:
                         if (!configuration.listIsSet(fieldName)) {
                             throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
                         }
-                        break;
                     case DropdownField.FIELD_TYPE:
                         if (!configuration.stringIsSet(fieldName)) {
                             throw new ConfigurationException("Mandatory configuration field \"" + fieldName + "\" is missing or has the wrong data type");
@@ -158,10 +156,10 @@ public class ConfigurationRequest {
                     }
                     break;
                 case TextField.FIELD_TYPE:
-                    break;
                 case ListField.FIELD_TYPE:
-                    addListField(values,config,name);
-                    break;
+                    if (config.listIsSet(name)) {
+                        values.put(name, config.getList(name));
+                    }
                 case DropdownField.FIELD_TYPE:
                     if (config.stringIsSet(name)) {
                         values.put(name, config.getString(name));

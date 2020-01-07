@@ -139,7 +139,7 @@ public class Configuration implements Serializable {
     }
 
     public boolean listIsSet(String key) {
-        return !lists.isEmpty();
+        return lists.containsKey(key);
     }
 
     @Nullable
