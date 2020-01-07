@@ -5,13 +5,17 @@ exports[`IfSearch should not render children without context 1`] = `
   <span>
     I must not fear.
   </span>
+  <IfSearch />
 </div>
 `;
 
 exports[`IfSearch should not render children without search context 1`] = `
-<span>
-  I must not fear.
-</span>
+Array [
+  <span>
+    I must not fear.
+  </span>,
+  <IfSearch />,
+]
 `;
 
 exports[`IfSearch should render children with search context 1`] = `
@@ -19,8 +23,10 @@ Array [
   <span>
     I must not fear.
   </span>,
-  <span>
-    Fear is the mind-killer.
-  </span>,
+  <IfSearch>
+    <span>
+      Fear is the mind-killer.
+    </span>
+  </IfSearch>,
 ]
 `;

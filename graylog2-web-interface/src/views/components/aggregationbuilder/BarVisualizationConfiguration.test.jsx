@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 
 import BarVisualizationConfiguration from './BarVisualizationConfiguration';
 import BarVisualizationConfig from '../../logic/aggregationbuilder/visualizations/BarVisualizationConfig';
@@ -8,16 +8,16 @@ describe('BarVisualizationConfiguration', () => {
   // NOTE: Why is this testing `HoverForHelp` component?
 
   it('should render without props', () => {
-    const wrapper = renderer.create(<BarVisualizationConfiguration />);
+    const wrapper = mount(<BarVisualizationConfiguration />);
 
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   // NOTE: Why is this testing `HoverForHelp` component?
 
   it('should render with props', () => {
-    const wrapper = renderer.create(<BarVisualizationConfiguration config={BarVisualizationConfig.create('stack')} />);
+    const wrapper = mount(<BarVisualizationConfiguration config={BarVisualizationConfig.create('stack')} />);
 
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 });

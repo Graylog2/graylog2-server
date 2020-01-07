@@ -1,17 +1,156 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`NumberVisualization should render a number visualization 1`] = `
-<div
-  className="NumberVisualization__SingleItemGrid-lb6dwm-1 ioFQRZ"
+<NumberVisualization
+  currentView={
+    Object {
+      "activeQuery": "dead-beef",
+    }
+  }
+  data={
+    Object {
+      "chart": Array [
+        Object {
+          "key": Array [],
+          "source": "leaf",
+          "values": Array [
+            Object {
+              "key": Array [
+                "sum(lines_add)",
+              ],
+              "rollup": true,
+              "source": "row-leaf",
+              "value": 2134342,
+            },
+          ],
+        },
+      ],
+    }
+  }
+  fields={
+    Immutable.List [
+      FieldTypeMapping {
+        "value": Object {
+          "name": "lines_add",
+          "type": FieldType {
+            "value": Immutable.Map {
+              "type": "int",
+              "properties": Immutable.Set [
+                "numeric",
+                "enumerable",
+              ],
+              "indexNames": Immutable.Set [],
+            },
+          },
+        },
+      },
+    ]
+  }
+  height={200}
+  width={200}
 >
-  <div
-    className="NumberVisualization__NumberBox-lb6dwm-2 hHukuE"
-  >
-    <div>
-      <div>
-        2134342
+  <NumberVisualization__SingleItemGrid>
+    <StyledComponent
+      forwardedComponent={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "attrs": Array [],
+          "componentStyle": ComponentStyle {
+            "componentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
+            "isStatic": true,
+            "lastClassName": "ioFQRZ",
+            "rules": Array [
+              "display:grid;grid-template-columns:1fr;grid-template-rows:1fr;grid-column-gap:0px;grid-row-gap:0px;height:100%;width:100%;",
+            ],
+          },
+          "displayName": "NumberVisualization__SingleItemGrid",
+          "foldedComponentIds": Array [],
+          "render": [Function],
+          "styledComponentId": "NumberVisualization__SingleItemGrid-lb6dwm-1",
+          "target": "div",
+          "toString": [Function],
+          "warnTooManyClasses": [Function],
+          "withComponent": [Function],
+        }
+      }
+      forwardedRef={null}
+    >
+      <div
+        className="NumberVisualization__SingleItemGrid-lb6dwm-1 ioFQRZ"
+      >
+        <NumberVisualization__NumberBox>
+          <StyledComponent
+            forwardedComponent={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "attrs": Array [],
+                "componentStyle": ComponentStyle {
+                  "componentId": "NumberVisualization__NumberBox-lb6dwm-2",
+                  "isStatic": true,
+                  "lastClassName": "hHukuE",
+                  "rules": Array [
+                    "display:flex;justify-content:center;align-items:center;height:100%;width:100%;text-align:center;padding-bottom:10px;",
+                  ],
+                },
+                "displayName": "NumberVisualization__NumberBox",
+                "foldedComponentIds": Array [],
+                "render": [Function],
+                "styledComponentId": "NumberVisualization__NumberBox-lb6dwm-2",
+                "target": "div",
+                "toString": [Function],
+                "warnTooManyClasses": [Function],
+                "withComponent": [Function],
+              }
+            }
+            forwardedRef={null}
+          >
+            <div
+              className="NumberVisualization__NumberBox-lb6dwm-2 hHukuE"
+            >
+              <SizeMe
+                monitorHeight={true}
+                monitorWidth={true}
+              >
+                <Component
+                  height={240}
+                  width={320}
+                >
+                  <Component
+                    field="sum(lines_add)"
+                    value={2134342}
+                  >
+                    <div>
+                      <Component
+                        field="sum(lines_add)"
+                        queryId="dead-beef"
+                        render={[Function]}
+                        type={
+                          FieldType {
+                            "value": Immutable.Map {
+                              "type": "float",
+                              "properties": Immutable.Set [
+                                "numeric",
+                                "enumerable",
+                              ],
+                              "indexNames": Immutable.Set [],
+                            },
+                          }
+                        }
+                        value={2134342}
+                      >
+                        <div>
+                          2134342
+                        </div>
+                      </Component>
+                    </div>
+                  </Component>
+                </Component>
+              </SizeMe>
+            </div>
+          </StyledComponent>
+        </NumberVisualization__NumberBox>
       </div>
-    </div>
-  </div>
-</div>
+    </StyledComponent>
+  </NumberVisualization__SingleItemGrid>
+</NumberVisualization>
 `;
