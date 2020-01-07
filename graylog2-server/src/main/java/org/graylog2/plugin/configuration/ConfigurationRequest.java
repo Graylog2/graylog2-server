@@ -160,9 +160,7 @@ public class ConfigurationRequest {
                 case TextField.FIELD_TYPE:
                     break;
                 case ListField.FIELD_TYPE:
-                    if(config.listIsSet(name)){
-                        values.put(name,config.getList(name));
-                    }
+                    addListField(values,config,name);
                     break;
                 case DropdownField.FIELD_TYPE:
                     if (config.stringIsSet(name)) {
@@ -174,6 +172,13 @@ public class ConfigurationRequest {
             }
         }
         return new Configuration(values);
+    }
+
+    public Map<String, Object> addListField(Map<String,Object> values, Configuration config, String name) {
+        if(config.listIsSet(name)){
+            values.put(name,config.getList(name));
+        }
+        return values;
     }
 
     public static class Templates {
