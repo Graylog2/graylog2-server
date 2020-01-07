@@ -1,6 +1,7 @@
 // @flow strict
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { trim } from 'lodash';
 
 import Select from 'views/components/Select';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -33,11 +34,11 @@ const _wrapOption = series => ({ label: series.effectiveName, value: series });
 type Props = {
   onChange: (Array<Series>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions >, for: (string | number, ?(string | number)) => Array<Option> },
+  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>, for: (string | number, ?(string | number)) => Array<Option> },
 };
 
 type State = {
-  options: Array<Option | IncompleteOption | ParameterNeededOption| BackToFunctions>,
+  options: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
 };
 
 class SeriesSelect extends React.Component<Props, State> {
@@ -100,10 +101,14 @@ class SeriesSelect extends React.Component<Props, State> {
     const valueComponent = ({ children, innerProps, ...rest }) => {
       const element = rest.data.value;
       const { className } = innerProps;
+      const usedNames = series.filter(s => s !== element)
+        .map(s => (s && s.config && s.config.name ? s.config.name : null))
+        .map(name => trim(name))
+        .filter(name => name !== null && name !== undefined && name !== '');
       return (
         <span className={className}>
           <ConfigurableElement {...rest}
-                               configuration={({ onClose }) => <SeriesConfiguration series={element} onClose={onClose} />}
+                               configuration={({ onClose }) => <SeriesConfiguration series={element} usedNames={usedNames} onClose={onClose} />}
                                onChange={newElement => newSeriesConfigChange(series, element, newElement, onChange)}
                                title="Series Configuration">
             {children}
