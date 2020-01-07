@@ -1,13 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<WidgetGrid /> should render with minimal props 1`] = `
-<div>
-  <div
-    className="dashboard"
+<ConnectStoresWrapper[WidgetGrid] stores=titles
+  allFields={Immutable.List []}
+  data={Object {}}
+  errors={Object {}}
+  fields={Immutable.List []}
+  onPositionsChange={[Function]}
+  titles={Immutable.Map {}}
+  widgets={Object {}}
+>
+  <WidgetGrid
+    allFields={Immutable.List []}
+    data={Object {}}
+    errors={Object {}}
+    fields={Immutable.List []}
+    locked={true}
+    onPositionsChange={[Function]}
+    positions={Object {}}
+    staticWidgets={Array []}
+    titles={Immutable.Map {}}
+    widgets={Object {}}
   >
-    <span
-      width={200}
-    />
-  </div>
-</div>
+    <SizeMe
+      monitorWidth={true}
+      refreshRate={100}
+    >
+      <div>
+        <div
+          className="dashboard"
+        >
+          <span
+            width={200}
+          />
+        </div>
+      </div>
+    </SizeMe>
+  </WidgetGrid>
+</ConnectStoresWrapper[WidgetGrid] stores=titles>
 `;
