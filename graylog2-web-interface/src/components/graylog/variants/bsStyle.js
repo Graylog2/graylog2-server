@@ -1,4 +1,5 @@
 import theme from 'styled-theming';
+
 import teinte from 'theme/teinte';
 
 const variantColors = {
@@ -22,7 +23,6 @@ const bsStyleThemeVariant = (cssBuilder, additionalVariants = {}, includedVarian
 
   return theme.variants('mode', 'bsStyle', Object.assign(additionalVariants, ...variants));
 };
-
 
 export default bsStyleThemeVariant;
 export { bsStyles, variantColors };

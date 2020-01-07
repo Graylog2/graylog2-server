@@ -39,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = Expr.LesserEqual.class, name = Expr.LesserEqual.EXPR),
         @JsonSubTypes.Type(value = Expr.NumberValue.class, name = Expr.NumberValue.EXPR),
         @JsonSubTypes.Type(value = Expr.NumberReference.class, name = Expr.NumberReference.EXPR),
+        @JsonSubTypes.Type(value = Expr.Group.class, name = Expr.Group.EXPR),
 })
 public interface Expression<T> {
     String FIELD_EXPR = "expr";

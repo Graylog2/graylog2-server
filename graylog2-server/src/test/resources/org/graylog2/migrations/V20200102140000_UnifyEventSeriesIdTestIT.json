@@ -1,0 +1,134 @@
+{
+  "event_definitions": [
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491344e"
+      },
+      "title" : "agg",
+      "description" : "",
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "application_name:sshd AND accepted",
+        "query_parameters" : [],
+        "streams" : [
+          "000000000000000000000001"
+        ],
+        "group_by" : [
+          "username",
+          "remote_ip"
+        ],
+        "series" : [
+          {
+            "id" : "4711-2342",
+            "function" : "max",
+            "field" : "login_count"
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : ">",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "4711-2342"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 3.0
+            }
+          }
+        },
+        "search_within_ms" : 60000,
+        "execute_every_ms" : 60000
+      },
+      "field_spec" : {
+        "username" : {
+          "data_type" : "string",
+          "providers" : [
+            {
+              "type" : "template-v1",
+              "template" : "${source.username}",
+              "require_values" : false
+            }
+          ]
+        }
+      },
+      "key_spec" : [
+        "username"
+      ],
+      "notification_settings" : {
+        "grace_period_ms" : 2000,
+        "backlog_size" : 0
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ]
+    },
+
+    {
+      "_id": {
+        "$oid": "5d3af98fdc820b587bc354bc"
+      },
+      "title" : "more than 4 logins",
+      "description" : "",
+      "priority" : 2,
+      "alert" : false,
+      "config" : {
+        "type" : "aggregation-v1",
+        "query" : "application_name:sshd AND accepted ",
+        "query_parameters" : [],
+        "streams" : [
+          "000000000000000000000001"
+        ],
+        "group_by" : [
+          "username",
+          "remote_ip"
+        ],
+        "series" : [
+          {
+            "id" : "1234-5678",
+            "function" : "count",
+            "field" : ""
+          }
+        ],
+        "conditions" : {
+          "expression" : {
+            "expr" : ">",
+            "left" : {
+              "expr" : "number-ref",
+              "ref" : "1234-5678"
+            },
+            "right" : {
+              "expr" : "number",
+              "value" : 4.0
+            }
+          }
+        },
+        "search_within_ms" : 300000,
+        "execute_every_ms" : 60000
+      },
+      "field_spec" : {},
+      "key_spec" : [],
+      "notification_settings" : {
+        "grace_period_ms" : 600000,
+        "backlog_size" : 11
+      },
+      "notifications" : [],
+      "storage" : [
+        {
+          "type" : "persist-to-streams-v1",
+          "streams" : [
+            "000000000000000000000002"
+          ]
+        }
+      ]
+    }
+  ]
+}
