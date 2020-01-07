@@ -3,14 +3,15 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Link } from 'react-router';
 
-import { Row, Col, Label } from 'components/graylog';
+import { Col, Label, Row } from 'components/graylog';
 import StreamLink from 'components/streams/StreamLink';
 import { MessageFields } from 'views/components/messagelist';
-import { Spinner, Timestamp, Icon } from 'components/common';
+import { Icon, Spinner, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';
 import MessageActions from './MessageActions';
 import MessageMetadata from './MessageMetadata';
+import NodeName from './NodeName';
 
 class MessageDetail extends React.Component {
   static propTypes = {
@@ -23,7 +24,6 @@ class MessageDetail extends React.Component {
     fields: PropTypes.object.isRequired,
     inputs: PropTypes.object,
     message: PropTypes.object,
-    nodes: PropTypes.object,
     searchConfig: PropTypes.object,
     showTimestamp: PropTypes.bool,
     streams: PropTypes.object,
@@ -38,7 +38,6 @@ class MessageDetail extends React.Component {
     expandAllRenderAsync: false,
     inputs: {},
     message: {},
-    nodes: {},
     searchConfig: {},
     showTimestamp: true,
     streams: {},
@@ -49,27 +48,9 @@ class MessageDetail extends React.Component {
   };
 
   _inputName = (inputId) => {
-    const input = this.props.inputs.get(inputId);
+    const { inputs } = this.props;
+    const input = inputs.get(inputId);
     return input ? <span style={{ wordBreak: 'break-word' }}>{input.title}</span> : 'deleted input';
-  };
-
-  _nodeName = (nodeId) => {
-    const node = this.props.nodes.get(nodeId);
-    let nodeInformation;
-
-    if (node) {
-      const nodeURL = Routes.node(nodeId);
-      nodeInformation = (
-        <a href={nodeURL}>
-          <Icon name="code-fork" />
-          &nbsp;
-          <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;<span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
-        </a>
-      );
-    } else {
-      nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
-    }
-    return nodeInformation;
   };
 
   _toggleShowOriginal = () => {
@@ -86,7 +67,7 @@ class MessageDetail extends React.Component {
         <dt>Received by</dt>
         <dd>
           <em>{this._inputName(sourceInputId)}</em>{' '}
-          on {this._nodeName(sourceNodeId)}
+          on <NodeName nodeId={sourceNodeId} />
         </dd>
       </div>
     );
@@ -102,7 +83,19 @@ class MessageDetail extends React.Component {
   };
 
   render() {
-    const { expandAllRenderAsync, message, allStreams } = this.props;
+    const {
+      expandAllRenderAsync,
+      message,
+      fields: messageFields,
+      allStreams,
+      disableFieldActions,
+      disableMessageActions,
+      disableSurroundingSearch,
+      disableTestAgainstStream,
+      searchConfig,
+      showTimestamp,
+    } = this.props;
+    const { showOriginal } = this.state;
     const { fields, index, id } = message;
     // Short circuit when all messages are being expanded at the same time
     if (expandAllRenderAsync) {
@@ -117,6 +110,7 @@ class MessageDetail extends React.Component {
 
     const streamIds = Immutable.Set(fields.streams);
     const streams = streamIds.map((streamId) => {
+      // eslint-disable-next-line react/destructuring-assignment
       const stream = this.props.streams.get(streamId);
       if (stream !== undefined) {
         return <li key={stream.id}><StreamLink stream={stream} /></li>;
@@ -125,7 +119,7 @@ class MessageDetail extends React.Component {
     });
 
     let timestamp = null;
-    if (this.props.showTimestamp) {
+    if (showTimestamp) {
       timestamp = [];
       const rawTimestamp = fields.timestamp;
 
@@ -147,12 +141,12 @@ class MessageDetail extends React.Component {
                             id={id}
                             fields={fields}
                             decorationStats={message.decoration_stats}
-                            disabled={this.props.disableMessageActions}
-                            disableSurroundingSearch={this.props.disableSurroundingSearch}
-                            disableTestAgainstStream={this.props.disableTestAgainstStream}
-                            showOriginal={this.state.showOriginal}
+                            disabled={disableMessageActions}
+                            disableSurroundingSearch={disableSurroundingSearch}
+                            disableTestAgainstStream={disableTestAgainstStream}
+                            showOriginal={showOriginal}
                             toggleShowOriginal={this._toggleShowOriginal}
-                            searchConfig={this.props.searchConfig}
+                            searchConfig={searchConfig}
                             streams={allStreams} />
             <h3 className="message-details-title">
               <Icon name="envelope" />
@@ -170,9 +164,9 @@ class MessageDetail extends React.Component {
           </Col>
           <Col md={9}>
             <MessageFields message={message}
-                           fields={this.props.fields}
-                           disableFieldActions={this.props.disableFieldActions}
-                           showDecoration={this.state.showOriginal} />
+                           fields={messageFields}
+                           disableFieldActions={disableFieldActions}
+                           showDecoration={showOriginal} />
           </Col>
         </Row>
       </React.Fragment>
