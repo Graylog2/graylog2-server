@@ -71,7 +71,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
-    private static final int MAX_SPLIT_TRIES = 3;
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
             .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
@@ -145,22 +144,20 @@ public class Messages {
 
         int chunkSize = messageList.size();
         List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        int tries;
-        for (tries = 0; tries < MAX_SPLIT_TRIES; tries++) {
+        for (;;) {
             try {
                 failedItems = bulkIndexChunked(messageList, isSystemTraffic, chunkSize);
                 break; // on success
             } catch (EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
-                if (tries == 0) {
+                if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting.");
                 }
                 chunkSize /= 2;
             }
-        }
-        if (tries == MAX_SPLIT_TRIES) {
-            throw new ElasticsearchException(
-                    String.format(Locale.US, "Bulk index failed after splitting up output batch %d times.", tries));
+            if (chunkSize == 0) {
+                throw new ElasticsearchException("Bulk index cannot split output batch any further.");
+            }
         }
 
 
