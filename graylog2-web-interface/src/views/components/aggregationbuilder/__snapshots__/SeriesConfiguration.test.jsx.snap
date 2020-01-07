@@ -67,12 +67,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "ControlLabel-sc-1edmum5-0",
-                        "isStatic": true,
-                        "lastClassName": "iZJNbd",
+                        "isStatic": false,
+                        "lastClassName": "brPnzl",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                          [Function],
                         ],
                       },
                       "displayName": "ControlLabel",
@@ -89,11 +87,11 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <ControlLabel
                     bsClass="control-label"
-                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                     srOnly={false}
                   >
                     <label
-                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                     >
                       Name
                     </label>
@@ -118,24 +116,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "FormControl-sc-1amoaox-0",
-                        "isStatic": true,
-                        "lastClassName": "deAIE",
+                        "isStatic": false,
+                        "lastClassName": "jJEiYy",
                         "rules": Array [
-                          "color:",
-                          "#1F1F1F",
-                          ";background-color:",
-                          "#FFF",
-                          ";border-color:",
-                          "#DCE1E5",
-                          ";&::-moz-placeholder,&::-webkit-input-placeholder,&:-ms-input-placeholder{color:",
-                          "#b8b8b8",
-                          ";}&:focus{border-color:",
-                          "#6DC6E7",
-                          ";box-shadow:inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                          "rgba(109,198,231,0.4)",
-                          ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                          "#DCE1E5",
-                          ";}~ .form-control-feedback.glyphicon{display:none;}",
+                          [Function],
                         ],
                       },
                       "displayName": "FormControl",
@@ -155,14 +139,14 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <FormControl
                     bsClass="form-control"
-                    className="FormControl-sc-1amoaox-0 deAIE"
+                    className="FormControl-sc-1amoaox-0 jJEiYy"
                     componentClass="input"
                     onChange={[Function]}
                     type="text"
                     value="count()"
                   >
                     <input
-                      className="FormControl-sc-1amoaox-0 deAIE form-control"
+                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                       onChange={[Function]}
                       type="text"
                       value="count()"
@@ -178,12 +162,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                       "attrs": Array [],
                       "componentStyle": ComponentStyle {
                         "componentId": "HelpBlock-i8is92-0",
-                        "isStatic": true,
-                        "lastClassName": "huFHQV",
+                        "isStatic": false,
+                        "lastClassName": "hCBNCb",
                         "rules": Array [
-                          "display:block;margin-top:5px;margin-bottom:10px;color:",
-                          "#9f9f9f",
-                          ";",
+                          [Function],
                         ],
                       },
                       "displayName": "HelpBlock",
@@ -200,10 +182,10 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 >
                   <HelpBlock
                     bsClass="help-block"
-                    className="HelpBlock-i8is92-0 huFHQV"
+                    className="HelpBlock-i8is92-0 hCBNCb"
                   >
                     <span
-                      className="HelpBlock-i8is92-0 huFHQV help-block"
+                      className="HelpBlock-i8is92-0 hCBNCb help-block"
                     >
                       The name of the series as it appears in the chart.
                     </span>
@@ -228,7 +210,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
         disabled={false}
         onClick={[Function]}
       >
-        <Button
+        <Button__StyledButton
           bsStyle="success"
           disabled={false}
           onClick={[Function]}
@@ -255,17 +237,17 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
                 ],
                 "attrs": Array [],
                 "componentStyle": ComponentStyle {
-                  "componentId": "Button-c9cbmb-0",
+                  "componentId": "Button__StyledButton-c9cbmb-0",
                   "isStatic": false,
-                  "lastClassName": "jKsGyd",
+                  "lastClassName": "dRMLmK",
                   "rules": Array [
                     [Function],
                   ],
                 },
-                "displayName": "Button",
+                "displayName": "Button__StyledButton",
                 "foldedComponentIds": Array [],
                 "render": [Function],
-                "styledComponentId": "Button-c9cbmb-0",
+                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                 "target": [Function],
                 "toString": [Function],
                 "warnTooManyClasses": [Function],
@@ -280,12 +262,12 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               block={false}
               bsClass="btn"
               bsStyle="success"
-              className="Button-c9cbmb-0 jKsGyd"
+              className="Button__StyledButton-c9cbmb-0 dRMLmK"
               disabled={false}
               onClick={[Function]}
             >
               <button
-                className="Button-c9cbmb-0 jKsGyd btn btn-success"
+                className="Button__StyledButton-c9cbmb-0 dRMLmK btn btn-success"
                 disabled={false}
                 onClick={[Function]}
                 type="button"
@@ -294,7 +276,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
               </button>
             </Button>
           </StyledComponent>
-        </Button>
+        </Button__StyledButton>
       </ForwardRef>
     </div>
   </span>

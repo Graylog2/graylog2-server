@@ -1,8 +1,8 @@
 import { readableColor as polishedColor } from 'polished';
 
-import teinte from '../teinte'; // TODO: replace this with whatever is coming from ThemeProvider
+import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
 
-export default function readableColor(color, darkColor = teinte.primary.tre, lightColor = teinte.primary.due) {
+export default function readableColor(color, darkColor = teinte.global.textDefault, lightColor = teinte.global.textAlt) {
   /**
    * Generating a readable color following W3C specs using [polished](https://polished.js.org/docs/#readablecolor)
    *

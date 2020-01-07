@@ -63,7 +63,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
             onClick={[Function]}
             title="Show widget configuration"
           >
-            <Button
+            <Button__StyledButton
               bsStyle="link"
               className="btn-text"
               onClick={[Function]}
@@ -91,17 +91,17 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
                     ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "Button-c9cbmb-0",
+                      "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "bTFtAM",
+                      "lastClassName": "dYxYaY",
                       "rules": Array [
                         [Function],
                       ],
                     },
-                    "displayName": "Button",
+                    "displayName": "Button__StyledButton",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "Button-c9cbmb-0",
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -117,13 +117,13 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
                   block={false}
                   bsClass="btn"
                   bsStyle="link"
-                  className="btn-text Button-c9cbmb-0 bTFtAM"
+                  className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY"
                   disabled={false}
                   onClick={[Function]}
                   title="Show widget configuration"
                 >
                   <button
-                    className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                    className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                     disabled={false}
                     onClick={[Function]}
                     title="Show widget configuration"
@@ -143,7 +143,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
                   </button>
                 </Button>
               </StyledComponent>
-            </Button>
+            </Button__StyledButton>
           </ForwardRef>
         </div>
       </div>
@@ -215,7 +215,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
             href="http://example.org"
             title="Replay search"
           >
-            <Button
+            <Button__StyledButton
               bsStyle="link"
               className="btn-text"
               href="http://example.org"
@@ -243,17 +243,17 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                     ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "Button-c9cbmb-0",
+                      "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "bTFtAM",
+                      "lastClassName": "dYxYaY",
                       "rules": Array [
                         [Function],
                       ],
                     },
-                    "displayName": "Button",
+                    "displayName": "Button__StyledButton",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "Button-c9cbmb-0",
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -269,20 +269,20 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                   block={false}
                   bsClass="btn"
                   bsStyle="link"
-                  className="btn-text Button-c9cbmb-0 bTFtAM"
+                  className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY"
                   disabled={false}
                   href="http://example.org"
                   title="Replay search"
                 >
                   <SafeAnchor
-                    className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                    className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                     componentClass="a"
                     disabled={false}
                     href="http://example.org"
                     title="Replay search"
                   >
                     <a
-                      className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                      className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                       href="http://example.org"
                       onClick={[Function]}
                       onKeyDown={[Function]}
@@ -303,7 +303,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                   </SafeAnchor>
                 </Button>
               </StyledComponent>
-            </Button>
+            </Button__StyledButton>
           </ForwardRef>
         </div>
         <div
@@ -315,7 +315,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
             onClick={[Function]}
             title="Show widget configuration"
           >
-            <Button
+            <Button__StyledButton
               bsStyle="link"
               className="btn-text"
               onClick={[Function]}
@@ -343,17 +343,17 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                     ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "Button-c9cbmb-0",
+                      "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "bTFtAM",
+                      "lastClassName": "dYxYaY",
                       "rules": Array [
                         [Function],
                       ],
                     },
-                    "displayName": "Button",
+                    "displayName": "Button__StyledButton",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "Button-c9cbmb-0",
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -369,13 +369,13 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                   block={false}
                   bsClass="btn"
                   bsStyle="link"
-                  className="btn-text Button-c9cbmb-0 bTFtAM"
+                  className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY"
                   disabled={false}
                   onClick={[Function]}
                   title="Show widget configuration"
                 >
                   <button
-                    className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                    className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                     disabled={false}
                     onClick={[Function]}
                     title="Show widget configuration"
@@ -395,7 +395,7 @@ exports[`<WidgetFooter /> should render a widget footer locked and enabled repla
                   </button>
                 </Button>
               </StyledComponent>
-            </Button>
+            </Button__StyledButton>
           </ForwardRef>
         </div>
       </div>
@@ -467,7 +467,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
             onClick={[Function]}
             title="Delete widget"
           >
-            <Button
+            <Button__StyledButton
               bsStyle="link"
               className="btn-text"
               onClick={[Function]}
@@ -495,17 +495,17 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                     ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "Button-c9cbmb-0",
+                      "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "bTFtAM",
+                      "lastClassName": "dYxYaY",
                       "rules": Array [
                         [Function],
                       ],
                     },
-                    "displayName": "Button",
+                    "displayName": "Button__StyledButton",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "Button-c9cbmb-0",
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -521,13 +521,13 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                   block={false}
                   bsClass="btn"
                   bsStyle="link"
-                  className="btn-text Button-c9cbmb-0 bTFtAM"
+                  className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY"
                   disabled={false}
                   onClick={[Function]}
                   title="Delete widget"
                 >
                   <button
-                    className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                    className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                     disabled={false}
                     onClick={[Function]}
                     title="Delete widget"
@@ -547,7 +547,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                   </button>
                 </Button>
               </StyledComponent>
-            </Button>
+            </Button__StyledButton>
           </ForwardRef>
         </div>
         <div
@@ -559,7 +559,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
             onClick={[Function]}
             title="Edit widget"
           >
-            <Button
+            <Button__StyledButton
               bsStyle="link"
               className="btn-text"
               onClick={[Function]}
@@ -587,17 +587,17 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                     ],
                     "attrs": Array [],
                     "componentStyle": ComponentStyle {
-                      "componentId": "Button-c9cbmb-0",
+                      "componentId": "Button__StyledButton-c9cbmb-0",
                       "isStatic": false,
-                      "lastClassName": "bTFtAM",
+                      "lastClassName": "dYxYaY",
                       "rules": Array [
                         [Function],
                       ],
                     },
-                    "displayName": "Button",
+                    "displayName": "Button__StyledButton",
                     "foldedComponentIds": Array [],
                     "render": [Function],
-                    "styledComponentId": "Button-c9cbmb-0",
+                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                     "target": [Function],
                     "toString": [Function],
                     "warnTooManyClasses": [Function],
@@ -613,13 +613,13 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                   block={false}
                   bsClass="btn"
                   bsStyle="link"
-                  className="btn-text Button-c9cbmb-0 bTFtAM"
+                  className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY"
                   disabled={false}
                   onClick={[Function]}
                   title="Edit widget"
                 >
                   <button
-                    className="btn-text Button-c9cbmb-0 bTFtAM btn btn-link"
+                    className="btn-text Button__StyledButton-c9cbmb-0 dYxYaY btn btn-link"
                     disabled={false}
                     onClick={[Function]}
                     title="Edit widget"
@@ -639,7 +639,7 @@ exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
                   </button>
                 </Button>
               </StyledComponent>
-            </Button>
+            </Button__StyledButton>
           </ForwardRef>
         </div>
       </div>

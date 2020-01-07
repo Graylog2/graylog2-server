@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
-import styled from 'styled-components';
-import { lighten } from 'polished';
+import styled, { css } from 'styled-components';
+import { debounce } from 'lodash';
 
 import { Button } from 'components/graylog';
 import Icon from 'components/common/Icon';
-import teinte from 'theme/teinte';
-import { debounce } from 'lodash';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
 const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
@@ -28,42 +26,42 @@ const InteractableModalWrapper = styled.div`
   pointer-events: none;
 `;
 
-const StyledRnd = styled(Rnd)`
+const StyledRnd = styled(Rnd)(({ theme }) => css`
   box-shadow: 0 0 9px rgba(31, 31, 31, .25),
               0 0 6px rgba(31, 31, 31, .25),
               0 0 3px rgba(31, 31, 31, .25);
-  background-color: ${lighten(0.15, teinte.primary.tre)};
+  background-color: ${theme.color.gray[20]};
   border-radius: 3px;
   flex-direction: column;
   display: flex !important;
   pointer-events: auto;
-`;
+`);
 
 const Content = styled.div`
   flex: 1;
   padding: 0 15px;
 `;
 
-const Header = styled.header`
+const Header = styled.header(({ theme }) => css`
   padding: 6px 12px 9px;
   display: flex;
   align-items: center;
-  background-color: ${lighten(0.25, teinte.primary.tre)};
-  border-bottom: 1px solid ${teinte.primary.tre};
+  background-color: ${theme.color.gray[30]};
+  border-bottom: 1px solid ${theme.color.gray[0]};
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   cursor: move;
-`;
+`);
 
-const Title = styled.h3`
-  color: ${teinte.primary.due};
+const Title = styled.h3(({ theme }) => css`
+  color: ${theme.color.global.textAlt};
   flex: 1;
-`;
+`);
 
-const DragBars = styled(Icon)`
-  color: ${teinte.secondary.tre};
+const DragBars = styled(Icon)(({ theme }) => css`
+  color: ${theme.color.gray[70]};
   margin-right: 9px;
-`;
+`);
 
 /**
  * A resizable and draggable modal component

@@ -3,25 +3,25 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { Pagination as DeprecatedPagination } from '@react-bootstrap/pagination';
-import { css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { darken } from 'polished';
 
-import teinte from 'theme/teinte';
+import { util } from 'theme';
 
-export const paginationStyles = css`
+export const paginationStyles = css(({ theme }) => css`
   &.pagination {
     > li {
       > a,
       > span {
-        color: ${teinte.tertiary.quattro};
-        background-color: ${teinte.primary.due};
-        border-color: ${teinte.secondary.tre};
+        color: ${util.readableColor(theme.color.gray[100])};
+        background-color: ${theme.color.gray[100]};
+        border-color: ${theme.color.gray[80]};
 
         &:hover,
         &:focus {
-          color: ${darken(0.15, teinte.tertiary.quattro)};
-          background-color: ${teinte.secondary.due};
-          border-color: ${teinte.secondary.tre};
+          color: ${darken(0.15, theme.color.variant.primary)};
+          background-color: ${theme.color.gray[90]};
+          border-color: ${theme.color.gray[80]};
         }
       }
     }
@@ -31,9 +31,9 @@ export const paginationStyles = css`
       &,
       &:hover,
       &:focus {
-        color: ${teinte.primary.due};
-        background-color: ${teinte.tertiary.quattro};
-        border-color: ${teinte.tertiary.quattro};
+        color: ${theme.color.variant.dark.primary};
+        background-color: ${theme.color.gray[90]};
+        border-color: ${theme.color.gray[80]};
       }
     }
 
@@ -44,13 +44,13 @@ export const paginationStyles = css`
       > a,
       > a:hover,
       > a:focus {
-        color: ${darken(0.25, teinte.secondary.tre)};
-        background-color: ${teinte.primary.due};
-        border-color: ${teinte.secondary.tre};
+        color: ${theme.color.gray[60]};
+        background-color: ${theme.color.gray[80]};
+        border-color: ${theme.color.gray[80]};
       }
     }
   }
-`;
+`);
 
 const Pagination = ({
   activePage,

@@ -11,7 +11,6 @@ import Entity from 'logic/content-packs/Entity';
 
 import style from './ContentPackSelection.css';
 
-
 class ContentPackSelection extends React.Component {
   static propTypes = {
     contentPack: PropTypes.object.isRequired,

@@ -313,6 +313,7 @@ class Widget extends React.Component<Props, State> {
               </WidgetHeader>
             )}
           </InteractiveContext.Consumer>
+
           <WidgetErrorBoundary>
             {visualization}
           </WidgetErrorBoundary>
