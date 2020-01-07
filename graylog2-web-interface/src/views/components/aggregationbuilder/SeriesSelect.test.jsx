@@ -1,6 +1,5 @@
 // @flow strict
 import * as React from 'react';
-import renderer from 'react-test-renderer';
 import { mount } from 'wrappedEnzyme';
 
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -21,8 +20,8 @@ describe('SeriesSelect', () => {
     suggester.defaults = [];
   });
   it('renders with minimal props', () => {
-    const wrapper = renderer.create(<SeriesSelect series={[]} onChange={() => true} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<SeriesSelect series={[]} onChange={() => true} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders given series', () => {

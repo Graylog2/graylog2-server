@@ -7,6 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
+import WrappingContainer from 'WrappingContainer';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
 
@@ -52,8 +53,10 @@ describe('WidgetQueryControls', () => {
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
   const renderSUT = (props = {}) => render(
-    <WidgetQueryControls {...defaultProps}
-                         {...props} />,
+    <WrappingContainer>
+      <WidgetQueryControls {...defaultProps}
+                           {...props} />
+    </WrappingContainer>,
   );
   it('should do something', () => {
     const { container } = renderSUT();
@@ -91,7 +94,11 @@ describe('WidgetQueryControls', () => {
       const { getByText, rerender, queryByText } = renderSUT({ globalOverride: globalOverrideWithQuery });
       await waitForElement(() => getByText(indicatorText));
 
-      rerender(<WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />);
+      rerender(
+        <WrappingContainer>
+          <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />
+        </WrappingContainer>,
+      );
 
       expect(queryByText(indicatorText)).toBeNull();
     });

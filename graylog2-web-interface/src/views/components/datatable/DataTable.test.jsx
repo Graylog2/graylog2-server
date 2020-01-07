@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
-import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import 'helpers/mocking/react-dom_mock';
@@ -50,11 +49,11 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={{}}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataTable config={config}
+                                     currentView={currentView}
+                                     data={{}}
+                                     fields={Immutable.List([])} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with filled data with rollup', () => {
@@ -66,11 +65,11 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={data}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataTable config={config}
+                                     currentView={currentView}
+                                     data={data}
+                                     fields={Immutable.List([])} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with filled data without rollup', () => {
@@ -82,11 +81,11 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={data}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataTable config={config}
+                                     currentView={currentView}
+                                     data={data}
+                                     fields={Immutable.List([])} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('renders column pivot header without offset when rollup is disabled', () => {
@@ -113,11 +112,11 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = renderer.create(<DataTable config={config}
-                                               currentView={currentView}
-                                               data={protocolData}
-                                               fields={Immutable.List([])} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<DataTable config={config}
+                                     currentView={currentView}
+                                     data={protocolData}
+                                     fields={Immutable.List([])} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('passes inferred types to fields', () => {

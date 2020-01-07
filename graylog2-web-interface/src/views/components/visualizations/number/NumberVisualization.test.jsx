@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { mount } from 'wrappedEnzyme';
 import { List } from 'immutable';
-import renderer from 'react-test-renderer';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
@@ -47,12 +46,12 @@ describe('NumberVisualization', () => {
   const fields = List([FieldTypeMapping.create('lines_add', FieldTypes.INT())]);
 
   it('should render a number visualization', () => {
-    const wrapper = renderer.create(<NumberVisualization data={data}
-                                                         width={200}
-                                                         height={200}
-                                                         fields={fields}
-                                                         currentView={currentView} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<NumberVisualization data={data}
+                                               width={200}
+                                               height={200}
+                                               fields={fields}
+                                               currentView={currentView} />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('calls render completion callback after first render', (done) => {
@@ -64,7 +63,7 @@ describe('NumberVisualization', () => {
                            currentView={currentView} />
     );
     const onRenderComplete = jest.fn(done);
-    renderer.create((
+    mount((
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <Component />
       </RenderCompletionCallback.Provider>
