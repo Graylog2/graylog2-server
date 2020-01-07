@@ -221,6 +221,7 @@ const ApiRoutes = {
     jsonTest: () => { return { url: '/tools/json_tester' }; },
     naturalDateTest: (text) => { return { url: `/tools/natural_date_tester?string=${text}` }; },
     regexTest: () => { return { url: '/tools/regex_tester' }; },
+    regexValidate: (regex) => { return { url: `/tools/regex_tester/validate?regex=${regex}` }; },
     regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' }; },
     splitAndIndexTest: () => { return { url: '/tools/split_and_index_tester' }; },
     substringTest: () => { return { url: '/tools/substring_tester' }; },

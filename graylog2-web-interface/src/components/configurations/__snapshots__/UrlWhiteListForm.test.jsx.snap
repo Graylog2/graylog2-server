@@ -1,0 +1,616 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UrlWhitelistForm render the UrlWhitelistForm component should create new instance 1`] = `
+Array [
+  <div
+    className="form-group"
+  >
+    <span>
+      <div
+        className="checkbox"
+      >
+        <label
+          title=""
+        >
+          <input
+            checked={false}
+            disabled={false}
+            label="Disable Whitelist"
+            name="whitelist-disabled"
+            onChange={[Function]}
+            placeholder=""
+            type="checkbox"
+          />
+          Disable Whitelist
+        </label>
+      </div>
+      <span
+        className="help-block"
+      >
+        Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk.
+      </span>
+    </span>
+  </div>,
+  <button
+    className="btn btn-sm btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Add Url
+  </button>,
+  <table
+    className="top-margin table table-striped table-bordered"
+  >
+    <thead>
+      <tr>
+        <th>
+          #
+        </th>
+        <th>
+          Title
+        </th>
+        <th>
+          URL
+        </th>
+        <th>
+          Type
+        </th>
+        <th>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
+          1
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="testam"
+                id="title-input0"
+                label=""
+                name="title"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="http://localhost:8080/system/"
+                id="value-input0"
+                label=""
+                name="value"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <div
+                className="css-1pcexqc-container"
+                onKeyDown={[Function]}
+              >
+                <div
+                  className="css-mxcylq-control"
+                  onMouseDown={[Function]}
+                  onTouchEnd={[Function]}
+                >
+                  <div
+                    className="css-1hio1c"
+                  >
+                    <div
+                      className="css-13zpnff-singleValue"
+                    >
+                      Regex
+                    </div>
+                    <div
+                      className="css-1g6gooi"
+                    >
+                      <div
+                        className=""
+                        style={
+                          Object {
+                            "display": "inline-block",
+                          }
+                        }
+                      >
+                        <input
+                          aria-autocomplete="list"
+                          autoCapitalize="none"
+                          autoComplete="off"
+                          autoCorrect="off"
+                          disabled={false}
+                          id="react-select-2-input"
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "background": 0,
+                              "border": 0,
+                              "boxSizing": "content-box",
+                              "color": "inherit",
+                              "fontSize": "inherit",
+                              "label": "input",
+                              "opacity": 1,
+                              "outline": 0,
+                              "padding": 0,
+                              "width": "1px",
+                            }
+                          }
+                          tabIndex="0"
+                          type="text"
+                          value=""
+                        />
+                        <div
+                          style={
+                            Object {
+                              "height": 0,
+                              "left": 0,
+                              "overflow": "scroll",
+                              "position": "absolute",
+                              "top": 0,
+                              "visibility": "hidden",
+                              "whiteSpace": "pre",
+                            }
+                          }
+                        >
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="css-1wy0on6"
+                  >
+                    <div
+                      aria-hidden="true"
+                      onMouseDown={[Function]}
+                      onTouchEnd={[Function]}
+                      style={
+                        Object {
+                          ":hover": Object {
+                            "color": "hsl(0, 0%, 60%)",
+                          },
+                          "boxSizing": "border-box",
+                          "color": "hsl(0, 0%, 80%)",
+                          "display": "flex",
+                          "fontSize": "150%",
+                          "label": "indicatorContainer",
+                          "marginRight": "1rem",
+                          "padding": "0px",
+                          "transform": false,
+                          "transition": "color 150ms",
+                        }
+                      }
+                    >
+                      <i
+                        className="fa fa-caret-down"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </span>
+          </div>
+        </td>
+        <td>
+          <button
+            className="btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            <i
+              className="fa fa-trash"
+            />
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
+          2
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="test"
+                id="title-input1"
+                label=""
+                name="title"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="http://localhost:8080/system/"
+                id="value-input1"
+                label=""
+                name="value"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <div
+                className="css-1pcexqc-container"
+                onKeyDown={[Function]}
+              >
+                <div
+                  className="css-mxcylq-control"
+                  onMouseDown={[Function]}
+                  onTouchEnd={[Function]}
+                >
+                  <div
+                    className="css-1hio1c"
+                  >
+                    <div
+                      className="css-13zpnff-singleValue"
+                    >
+                      Regex
+                    </div>
+                    <div
+                      className="css-1g6gooi"
+                    >
+                      <div
+                        className=""
+                        style={
+                          Object {
+                            "display": "inline-block",
+                          }
+                        }
+                      >
+                        <input
+                          aria-autocomplete="list"
+                          autoCapitalize="none"
+                          autoComplete="off"
+                          autoCorrect="off"
+                          disabled={false}
+                          id="react-select-3-input"
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "background": 0,
+                              "border": 0,
+                              "boxSizing": "content-box",
+                              "color": "inherit",
+                              "fontSize": "inherit",
+                              "label": "input",
+                              "opacity": 1,
+                              "outline": 0,
+                              "padding": 0,
+                              "width": "1px",
+                            }
+                          }
+                          tabIndex="0"
+                          type="text"
+                          value=""
+                        />
+                        <div
+                          style={
+                            Object {
+                              "height": 0,
+                              "left": 0,
+                              "overflow": "scroll",
+                              "position": "absolute",
+                              "top": 0,
+                              "visibility": "hidden",
+                              "whiteSpace": "pre",
+                            }
+                          }
+                        >
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="css-1wy0on6"
+                  >
+                    <div
+                      aria-hidden="true"
+                      onMouseDown={[Function]}
+                      onTouchEnd={[Function]}
+                      style={
+                        Object {
+                          ":hover": Object {
+                            "color": "hsl(0, 0%, 60%)",
+                          },
+                          "boxSizing": "border-box",
+                          "color": "hsl(0, 0%, 80%)",
+                          "display": "flex",
+                          "fontSize": "150%",
+                          "label": "indicatorContainer",
+                          "marginRight": "1rem",
+                          "padding": "0px",
+                          "transform": false,
+                          "transition": "color 150ms",
+                        }
+                      }
+                    >
+                      <i
+                        className="fa fa-caret-down"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </span>
+          </div>
+        </td>
+        <td>
+          <button
+            className="btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            <i
+              className="fa fa-trash"
+            />
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td
+          style={
+            Object {
+              "textAlign": "center",
+              "verticalAlign": "middle",
+            }
+          }
+        >
+          3
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="test"
+                id="title-input2"
+                label=""
+                name="title"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <input
+                className="form-control"
+                defaultValue="http://localhost:8080/system/"
+                id="value-input2"
+                label=""
+                name="value"
+                onChange={[Function]}
+                placeholder=""
+                required={true}
+                type="text"
+              />
+            </span>
+          </div>
+        </td>
+        <td>
+          <div
+            className="form-group"
+          >
+            
+            <span>
+              <div
+                className="css-1pcexqc-container"
+                onKeyDown={[Function]}
+              >
+                <div
+                  className="css-mxcylq-control"
+                  onMouseDown={[Function]}
+                  onTouchEnd={[Function]}
+                >
+                  <div
+                    className="css-1hio1c"
+                  >
+                    <div
+                      className="css-13zpnff-singleValue"
+                    >
+                      Exact match
+                    </div>
+                    <div
+                      className="css-1g6gooi"
+                    >
+                      <div
+                        className=""
+                        style={
+                          Object {
+                            "display": "inline-block",
+                          }
+                        }
+                      >
+                        <input
+                          aria-autocomplete="list"
+                          autoCapitalize="none"
+                          autoComplete="off"
+                          autoCorrect="off"
+                          disabled={false}
+                          id="react-select-4-input"
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          spellCheck="false"
+                          style={
+                            Object {
+                              "background": 0,
+                              "border": 0,
+                              "boxSizing": "content-box",
+                              "color": "inherit",
+                              "fontSize": "inherit",
+                              "label": "input",
+                              "opacity": 1,
+                              "outline": 0,
+                              "padding": 0,
+                              "width": "1px",
+                            }
+                          }
+                          tabIndex="0"
+                          type="text"
+                          value=""
+                        />
+                        <div
+                          style={
+                            Object {
+                              "height": 0,
+                              "left": 0,
+                              "overflow": "scroll",
+                              "position": "absolute",
+                              "top": 0,
+                              "visibility": "hidden",
+                              "whiteSpace": "pre",
+                            }
+                          }
+                        >
+                          
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className="css-1wy0on6"
+                  >
+                    <div
+                      aria-hidden="true"
+                      onMouseDown={[Function]}
+                      onTouchEnd={[Function]}
+                      style={
+                        Object {
+                          ":hover": Object {
+                            "color": "hsl(0, 0%, 60%)",
+                          },
+                          "boxSizing": "border-box",
+                          "color": "hsl(0, 0%, 80%)",
+                          "display": "flex",
+                          "fontSize": "150%",
+                          "label": "indicatorContainer",
+                          "marginRight": "1rem",
+                          "padding": "0px",
+                          "transform": false,
+                          "transition": "color 150ms",
+                        }
+                      }
+                    >
+                      <i
+                        className="fa fa-caret-down"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+            </span>
+          </div>
+        </td>
+        <td>
+          <button
+            className="btn btn-default"
+            disabled={false}
+            onClick={[Function]}
+            type="button"
+          >
+            <i
+              className="fa fa-trash"
+            />
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>,
+  <button
+    className="btn btn-sm btn-default"
+    disabled={false}
+    onClick={[Function]}
+    type="button"
+  >
+    Add Url
+  </button>,
+]
+`;
