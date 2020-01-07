@@ -7,7 +7,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 import SearchActions from 'views/actions/SearchActions';
 import Widget from 'views/logic/widgets/Widget';
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import WrappingContainer from 'WrappingContainer';
 import WidgetQueryControls from './WidgetQueryControls';
 import { WidgetActions } from '../stores/WidgetStore';
 
@@ -54,10 +54,10 @@ describe('WidgetQueryControls', () => {
   const globalOverrideWithQuery = { query: { type: 'elasticsearch', query_string: 'source:foo' } };
 
   const renderSUT = (props = {}) => render(
-    <GraylogThemeProvider>
+    <WrappingContainer>
       <WidgetQueryControls {...defaultProps}
                            {...props} />
-    </GraylogThemeProvider>,
+    </WrappingContainer>,
   );
   it('should do something', () => {
     const { container } = renderSUT();
@@ -96,9 +96,9 @@ describe('WidgetQueryControls', () => {
       await waitForElement(() => getByText(indicatorText));
 
       rerender(
-        <GraylogThemeProvider>
+        <WrappingContainer>
           <WidgetQueryControls {...defaultProps} globalOverride={emptyGlobalOverride} />
-        </GraylogThemeProvider>,
+        </WrappingContainer>,
       );
 
       expect(queryByText(indicatorText)).toBeNull();

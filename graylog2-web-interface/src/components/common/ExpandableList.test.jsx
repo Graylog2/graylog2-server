@@ -1,5 +1,4 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
@@ -8,32 +7,36 @@ import ExpandableListItem from 'components/common/ExpandableListItem';
 
 describe('<ExpandableList />', () => {
   it('should render with no children', () => {
-    const wrapper = renderer.create(<ExpandableList />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ExpandableList />);
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with a Item', () => {
-    const wrapper = renderer.create(
+    const checkFn = jest.fn();
+
+    const wrapper = mount(
       <ExpandableList>
-        <ExpandableListItem header="Wheel of time">
+        <ExpandableListItem header="Wheel of time" onChange={checkFn}>
           <span>Edmonds Field</span>
         </ExpandableListItem>
       </ExpandableList>,
     );
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
   it('should render with a nested ExpandableList', () => {
-    const wrapper = renderer.create(
+    const checkFn = jest.fn();
+
+    const wrapper = mount(
       <ExpandableList>
-        <ExpandableListItem expandable expanded header="Wheel of time">
+        <ExpandableListItem expandable expanded header="Wheel of time" onChange={checkFn}>
           <ExpandableList>
-            <ExpandableListItem expandable expanded={false} header="Edmonds Field" />
+            <ExpandableListItem expandable expanded={false} header="Edmonds Field" onChange={checkFn} />
           </ExpandableList>
         </ExpandableListItem>
       </ExpandableList>,
     );
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    expect(wrapper).toMatchSnapshot();
   });
 
 

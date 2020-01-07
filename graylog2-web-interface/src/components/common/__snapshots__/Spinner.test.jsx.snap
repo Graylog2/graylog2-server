@@ -1,21 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Spinner /> should render with a different text string 1`] = `
-<span>
-  <i
-    className="fa fa-spinner fa-spin"
-  />
-   
-  Hello world!
-</span>
+<Spinner
+  name="spinner"
+  text="Hello world!"
+>
+  <span>
+    <ForwardRef
+      fixedWidth={false}
+      inverse={false}
+      name="spinner"
+      pulse={false}
+      spin={true}
+    >
+      <i
+        className="fa fa-spinner fa-spin"
+      />
+    </ForwardRef>
+     
+    Hello world!
+  </span>
+</Spinner>
 `;
 
 exports[`<Spinner /> should render without props 1`] = `
-<span>
-  <i
-    className="fa fa-spinner fa-spin"
-  />
-   
-  Loading...
-</span>
+<Spinner
+  name="spinner"
+  text="Loading..."
+>
+  <span>
+    <ForwardRef
+      fixedWidth={false}
+      inverse={false}
+      name="spinner"
+      pulse={false}
+      spin={true}
+    >
+      <i
+        className="fa fa-spinner fa-spin"
+      />
+    </ForwardRef>
+     
+    Loading...
+  </span>
+</Spinner>
 `;

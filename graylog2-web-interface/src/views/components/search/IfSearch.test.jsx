@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import View from 'views/logic/views/View';
@@ -9,7 +9,7 @@ import IfSearch from './IfSearch';
 
 describe('IfSearch', () => {
   it('should render children with search context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Search}>
         <span>I must not fear.</span>
         <IfSearch>
@@ -21,7 +21,7 @@ describe('IfSearch', () => {
   });
 
   it('should not render children without context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <div>
         <span>I must not fear.</span>
         <IfSearch>
@@ -34,7 +34,7 @@ describe('IfSearch', () => {
   });
 
   it('should not render children without search context', () => {
-    const wrapper = renderer.create(
+    const wrapper = mount(
       <ViewTypeContext.Provider value={View.Type.Dashboard}>
         <span>I must not fear.</span>
         <IfSearch>

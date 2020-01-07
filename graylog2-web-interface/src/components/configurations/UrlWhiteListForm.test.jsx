@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 import UrlWhiteListForm from './UrlWhiteListForm';
 
@@ -42,10 +41,10 @@ describe('UrlWhitelistForm', () => {
 
   describe('render the UrlWhitelistForm component', () => {
     it('should create new instance', () => {
-      wrapper = renderer.create(<UrlWhiteListForm urls={config.entries}
-                                                  disabled={config.disabled}
-                                                  onUpdate={onUpdate} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      wrapper = mount(<UrlWhiteListForm urls={config.entries}
+                                        disabled={config.disabled}
+                                        onUpdate={onUpdate} />);
+      expect(wrapper).toMatchSnapshot();
     });
 
     it('should display Url form list table', () => {

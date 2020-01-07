@@ -1,7 +1,6 @@
 // @flow strict
 import React from 'react';
-import renderer from 'react-test-renderer';
-import { mount } from 'enzyme';
+import { mount } from 'wrappedEnzyme';
 
 import 'helpers/mocking/react-dom_mock';
 import UrlWhiteListConfig from './UrlWhiteListConfig';
@@ -33,9 +32,9 @@ describe('UrlWhiteListConfig', () => {
       disabled: false,
     };
     it('should create new instance', () => {
-      const wrapper = renderer.create(<UrlWhiteListConfig config={config}
-                                                          updateConfig={onUpdate} />);
-      expect(wrapper.toJSON()).toMatchSnapshot();
+      const wrapper = mount(<UrlWhiteListConfig config={config}
+                                                updateConfig={onUpdate} />);
+      expect(wrapper).toMatchSnapshot();
     });
     it('should display Url list table', () => {
       const wrapper = mount(<UrlWhiteListConfig config={config}

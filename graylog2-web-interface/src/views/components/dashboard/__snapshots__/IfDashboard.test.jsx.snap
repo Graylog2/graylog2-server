@@ -5,13 +5,17 @@ exports[`IfDashboard should not render children without context 1`] = `
   <span>
     I must not fear.
   </span>
+  <IfDashboard />
 </div>
 `;
 
 exports[`IfDashboard should not render children without dashboard context 1`] = `
-<span>
-  I must not fear.
-</span>
+Array [
+  <span>
+    I must not fear.
+  </span>,
+  <IfDashboard />,
+]
 `;
 
 exports[`IfDashboard should render children with dashboard context 1`] = `
@@ -19,8 +23,10 @@ Array [
   <span>
     I must not fear.
   </span>,
-  <span>
-    Fear is the mind-killer.
-  </span>,
+  <IfDashboard>
+    <span>
+      Fear is the mind-killer.
+    </span>
+  </IfDashboard>,
 ]
 `;

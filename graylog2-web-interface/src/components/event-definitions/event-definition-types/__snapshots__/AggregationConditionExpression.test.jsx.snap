@@ -2143,12 +2143,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
-                                            "isStatic": true,
-                                            "lastClassName": "iZJNbd",
+                                            "isStatic": false,
+                                            "lastClassName": "brPnzl",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "ControlLabel",
@@ -2165,11 +2163,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     >
                                       <ControlLabel
                                         bsClass="control-label"
-                                        className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl"
                                         srOnly={false}
                                       >
                                         <label
-                                          className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                          className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                           htmlFor="aggregation-function"
                                         >
                                           If
@@ -5073,12 +5071,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -5095,11 +5091,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="aggregation-condition"
                                     >
                                       Is
@@ -6928,12 +6924,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
-                                              "lastClassName": "iZJNbd",
+                                              "isStatic": false,
+                                              "lastClassName": "brPnzl",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -6950,11 +6944,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                       >
                                         <ControlLabel
                                           bsClass="control-label"
-                                          className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                          className="ControlLabel-sc-1edmum5-0 brPnzl"
                                           srOnly={false}
                                         >
                                           <label
-                                            className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                            className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                             htmlFor="aggregation-threshold"
                                           >
                                             Threshold
@@ -6988,24 +6982,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "hdNTyr",
+                                                  "isStatic": false,
+                                                  "lastClassName": "jJEiYy",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -7029,7 +7009,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                                              className="FormControl-sc-1amoaox-0 jJEiYy"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -7040,7 +7020,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -7137,7 +7117,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -7164,17 +7144,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -7190,12 +7170,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -7214,14 +7194,14 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -7248,17 +7228,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -7274,12 +7254,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -7298,14 +7278,14 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -7332,17 +7312,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -7358,12 +7338,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -7372,7 +7352,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                         </div>
                       </ButtonToolbar>
@@ -12415,24 +12395,10 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "hdNTyr",
+                                                  "isStatic": false,
+                                                  "lastClassName": "jJEiYy",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -12456,7 +12422,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                                              className="FormControl-sc-1amoaox-0 jJEiYy"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label=""
@@ -12467,7 +12433,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                 id="aggregation-threshold"
                                                 label=""
                                                 name="threshold"
@@ -12562,7 +12528,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -12589,17 +12555,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -12615,12 +12581,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -12639,14 +12605,14 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -12673,17 +12639,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -12699,12 +12665,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -12723,14 +12689,14 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -12757,17 +12723,17 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -12783,12 +12749,12 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -12797,7 +12763,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                         </div>
                       </ButtonToolbar>
@@ -14973,12 +14939,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
                                             "componentId": "ControlLabel-sc-1edmum5-0",
-                                            "isStatic": true,
-                                            "lastClassName": "iZJNbd",
+                                            "isStatic": false,
+                                            "lastClassName": "brPnzl",
                                             "rules": Array [
-                                              "color:",
-                                              "#1F1F1F",
-                                              ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                              [Function],
                                             ],
                                           },
                                           "displayName": "ControlLabel",
@@ -14995,11 +14959,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     >
                                       <ControlLabel
                                         bsClass="control-label"
-                                        className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl"
                                         srOnly={false}
                                       >
                                         <label
-                                          className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                          className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                           htmlFor="aggregation-function"
                                         >
                                           If
@@ -17903,12 +17867,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -17925,11 +17887,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="aggregation-condition"
                                     >
                                       Is
@@ -19758,12 +19720,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
-                                              "lastClassName": "iZJNbd",
+                                              "isStatic": false,
+                                              "lastClassName": "brPnzl",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -19780,11 +19740,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       >
                                         <ControlLabel
                                           bsClass="control-label"
-                                          className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                          className="ControlLabel-sc-1edmum5-0 brPnzl"
                                           srOnly={false}
                                         >
                                           <label
-                                            className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                            className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                             htmlFor="aggregation-threshold"
                                           >
                                             Threshold
@@ -19818,24 +19778,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "FormControl-sc-1amoaox-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "hdNTyr",
+                                                  "isStatic": false,
+                                                  "lastClassName": "jJEiYy",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";background-color:",
-                                                    "#FFF",
-                                                    ";border-color:",
-                                                    "#DCE1E5",
-                                                    ";&:focus{border-color:",
-                                                    "#6DC6E7",
-                                                    ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                    "rgba(109,198,231,0.4)",
-                                                    ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                    "#b8b8b8",
-                                                    ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                    "#DCE1E5",
-                                                    ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "FormControl",
@@ -19859,7 +19805,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           >
                                             <FormControl
                                               bsClass="form-control"
-                                              className="FormControl-sc-1amoaox-0 hdNTyr"
+                                              className="FormControl-sc-1amoaox-0 jJEiYy"
                                               componentClass="input"
                                               inputRef={[Function]}
                                               label="Threshold"
@@ -19870,7 +19816,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               value={0}
                                             >
                                               <input
-                                                className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                 id="aggregation-threshold"
                                                 label="Threshold"
                                                 name="threshold"
@@ -19967,7 +19913,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -19994,17 +19940,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -20020,12 +19966,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -20044,14 +19990,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -20078,17 +20024,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -20104,12 +20050,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -20128,14 +20074,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                           <ForwardRef
                             bsSize="sm"
                             bsStyle="default"
                             onClick={[Function]}
                           >
-                            <Button
+                            <Button__StyledButton
                               bsSize="sm"
                               bsStyle="default"
                               onClick={[Function]}
@@ -20162,17 +20108,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     ],
                                     "attrs": Array [],
                                     "componentStyle": ComponentStyle {
-                                      "componentId": "Button-c9cbmb-0",
+                                      "componentId": "Button__StyledButton-c9cbmb-0",
                                       "isStatic": false,
-                                      "lastClassName": "GLfOY",
+                                      "lastClassName": "kojzoH",
                                       "rules": Array [
                                         [Function],
                                       ],
                                     },
-                                    "displayName": "Button",
+                                    "displayName": "Button__StyledButton",
                                     "foldedComponentIds": Array [],
                                     "render": [Function],
-                                    "styledComponentId": "Button-c9cbmb-0",
+                                    "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                     "target": [Function],
                                     "toString": [Function],
                                     "warnTooManyClasses": [Function],
@@ -20188,12 +20134,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsClass="btn"
                                   bsSize="sm"
                                   bsStyle="default"
-                                  className="Button-c9cbmb-0 GLfOY"
+                                  className="Button__StyledButton-c9cbmb-0 kojzoH"
                                   disabled={false}
                                   onClick={[Function]}
                                 >
                                   <button
-                                    className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                    className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                     disabled={false}
                                     onClick={[Function]}
                                     type="button"
@@ -20202,7 +20148,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   </button>
                                 </Button>
                               </StyledComponent>
-                            </Button>
+                            </Button__StyledButton>
                           </ForwardRef>
                         </div>
                       </ButtonToolbar>
@@ -27075,24 +27021,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           "attrs": Array [],
                                                           "componentStyle": ComponentStyle {
                                                             "componentId": "FormControl-sc-1amoaox-0",
-                                                            "isStatic": true,
-                                                            "lastClassName": "hdNTyr",
+                                                            "isStatic": false,
+                                                            "lastClassName": "jJEiYy",
                                                             "rules": Array [
-                                                              "color:",
-                                                              "#1F1F1F",
-                                                              ";background-color:",
-                                                              "#FFF",
-                                                              ";border-color:",
-                                                              "#DCE1E5",
-                                                              ";&:focus{border-color:",
-                                                              "#6DC6E7",
-                                                              ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                              "rgba(109,198,231,0.4)",
-                                                              ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                              "#b8b8b8",
-                                                              ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                              "#DCE1E5",
-                                                              ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                              [Function],
                                                             ],
                                                           },
                                                           "displayName": "FormControl",
@@ -27116,7 +27048,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     >
                                                       <FormControl
                                                         bsClass="form-control"
-                                                        className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                        className="FormControl-sc-1amoaox-0 jJEiYy"
                                                         componentClass="input"
                                                         inputRef={[Function]}
                                                         label=""
@@ -27127,7 +27059,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         value={0}
                                                       >
                                                         <input
-                                                          className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                          className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                           id="aggregation-threshold"
                                                           label=""
                                                           name="threshold"
@@ -27222,7 +27154,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       bsStyle="default"
                                       onClick={[Function]}
                                     >
-                                      <Button
+                                      <Button__StyledButton
                                         bsSize="sm"
                                         bsStyle="default"
                                         onClick={[Function]}
@@ -27249,17 +27181,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               ],
                                               "attrs": Array [],
                                               "componentStyle": ComponentStyle {
-                                                "componentId": "Button-c9cbmb-0",
+                                                "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "GLfOY",
+                                                "lastClassName": "kojzoH",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
                                               },
-                                              "displayName": "Button",
+                                              "displayName": "Button__StyledButton",
                                               "foldedComponentIds": Array [],
                                               "render": [Function],
-                                              "styledComponentId": "Button-c9cbmb-0",
+                                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                               "target": [Function],
                                               "toString": [Function],
                                               "warnTooManyClasses": [Function],
@@ -27275,12 +27207,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button-c9cbmb-0 GLfOY"
+                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
@@ -27299,14 +27231,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             </button>
                                           </Button>
                                         </StyledComponent>
-                                      </Button>
+                                      </Button__StyledButton>
                                     </ForwardRef>
                                     <ForwardRef
                                       bsSize="sm"
                                       bsStyle="default"
                                       onClick={[Function]}
                                     >
-                                      <Button
+                                      <Button__StyledButton
                                         bsSize="sm"
                                         bsStyle="default"
                                         onClick={[Function]}
@@ -27333,17 +27265,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               ],
                                               "attrs": Array [],
                                               "componentStyle": ComponentStyle {
-                                                "componentId": "Button-c9cbmb-0",
+                                                "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "GLfOY",
+                                                "lastClassName": "kojzoH",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
                                               },
-                                              "displayName": "Button",
+                                              "displayName": "Button__StyledButton",
                                               "foldedComponentIds": Array [],
                                               "render": [Function],
-                                              "styledComponentId": "Button-c9cbmb-0",
+                                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                               "target": [Function],
                                               "toString": [Function],
                                               "warnTooManyClasses": [Function],
@@ -27359,12 +27291,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button-c9cbmb-0 GLfOY"
+                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
@@ -27383,14 +27315,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             </button>
                                           </Button>
                                         </StyledComponent>
-                                      </Button>
+                                      </Button__StyledButton>
                                     </ForwardRef>
                                     <ForwardRef
                                       bsSize="sm"
                                       bsStyle="default"
                                       onClick={[Function]}
                                     >
-                                      <Button
+                                      <Button__StyledButton
                                         bsSize="sm"
                                         bsStyle="default"
                                         onClick={[Function]}
@@ -27417,17 +27349,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               ],
                                               "attrs": Array [],
                                               "componentStyle": ComponentStyle {
-                                                "componentId": "Button-c9cbmb-0",
+                                                "componentId": "Button__StyledButton-c9cbmb-0",
                                                 "isStatic": false,
-                                                "lastClassName": "GLfOY",
+                                                "lastClassName": "kojzoH",
                                                 "rules": Array [
                                                   [Function],
                                                 ],
                                               },
-                                              "displayName": "Button",
+                                              "displayName": "Button__StyledButton",
                                               "foldedComponentIds": Array [],
                                               "render": [Function],
-                                              "styledComponentId": "Button-c9cbmb-0",
+                                              "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                               "target": [Function],
                                               "toString": [Function],
                                               "warnTooManyClasses": [Function],
@@ -27443,12 +27375,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             bsClass="btn"
                                             bsSize="sm"
                                             bsStyle="default"
-                                            className="Button-c9cbmb-0 GLfOY"
+                                            className="Button__StyledButton-c9cbmb-0 kojzoH"
                                             disabled={false}
                                             onClick={[Function]}
                                           >
                                             <button
-                                              className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                              className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                               disabled={false}
                                               onClick={[Function]}
                                               type="button"
@@ -27457,7 +27389,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             </button>
                                           </Button>
                                         </StyledComponent>
-                                      </Button>
+                                      </Button__StyledButton>
                                     </ForwardRef>
                                   </div>
                                 </ButtonToolbar>
@@ -29550,12 +29482,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "attrs": Array [],
                                                 "componentStyle": ComponentStyle {
                                                   "componentId": "ControlLabel-sc-1edmum5-0",
-                                                  "isStatic": true,
-                                                  "lastClassName": "iZJNbd",
+                                                  "isStatic": false,
+                                                  "lastClassName": "brPnzl",
                                                   "rules": Array [
-                                                    "color:",
-                                                    "#1F1F1F",
-                                                    ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                    [Function],
                                                   ],
                                                 },
                                                 "displayName": "ControlLabel",
@@ -29572,11 +29502,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           >
                                             <ControlLabel
                                               bsClass="control-label"
-                                              className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                              className="ControlLabel-sc-1edmum5-0 brPnzl"
                                               srOnly={false}
                                             >
                                               <label
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                 htmlFor="aggregation-function"
                                               >
                                                 If
@@ -32480,12 +32410,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "ControlLabel-sc-1edmum5-0",
-                                              "isStatic": true,
-                                              "lastClassName": "iZJNbd",
+                                              "isStatic": false,
+                                              "lastClassName": "brPnzl",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "ControlLabel",
@@ -32502,11 +32430,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       >
                                         <ControlLabel
                                           bsClass="control-label"
-                                          className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                          className="ControlLabel-sc-1edmum5-0 brPnzl"
                                           srOnly={false}
                                         >
                                           <label
-                                            className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                            className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                             htmlFor="aggregation-condition"
                                           >
                                             Is
@@ -34335,12 +34263,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "attrs": Array [],
                                                   "componentStyle": ComponentStyle {
                                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                                    "isStatic": true,
-                                                    "lastClassName": "iZJNbd",
+                                                    "isStatic": false,
+                                                    "lastClassName": "brPnzl",
                                                     "rules": Array [
-                                                      "color:",
-                                                      "#1F1F1F",
-                                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                                      [Function],
                                                     ],
                                                   },
                                                   "displayName": "ControlLabel",
@@ -34357,11 +34283,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             >
                                               <ControlLabel
                                                 bsClass="control-label"
-                                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                                className="ControlLabel-sc-1edmum5-0 brPnzl"
                                                 srOnly={false}
                                               >
                                                 <label
-                                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                                   htmlFor="aggregation-threshold"
                                                 >
                                                   Threshold
@@ -34395,24 +34321,10 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "attrs": Array [],
                                                       "componentStyle": ComponentStyle {
                                                         "componentId": "FormControl-sc-1amoaox-0",
-                                                        "isStatic": true,
-                                                        "lastClassName": "hdNTyr",
+                                                        "isStatic": false,
+                                                        "lastClassName": "jJEiYy",
                                                         "rules": Array [
-                                                          "color:",
-                                                          "#1F1F1F",
-                                                          ";background-color:",
-                                                          "#FFF",
-                                                          ";border-color:",
-                                                          "#DCE1E5",
-                                                          ";&:focus{border-color:",
-                                                          "#6DC6E7",
-                                                          ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                          "rgba(109,198,231,0.4)",
-                                                          ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                          "#b8b8b8",
-                                                          ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                          "#DCE1E5",
-                                                          ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                          [Function],
                                                         ],
                                                       },
                                                       "displayName": "FormControl",
@@ -34436,7 +34348,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 >
                                                   <FormControl
                                                     bsClass="form-control"
-                                                    className="FormControl-sc-1amoaox-0 hdNTyr"
+                                                    className="FormControl-sc-1amoaox-0 jJEiYy"
                                                     componentClass="input"
                                                     inputRef={[Function]}
                                                     label="Threshold"
@@ -34447,7 +34359,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     value={0}
                                                   >
                                                     <input
-                                                      className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                                      className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                                       id="aggregation-threshold"
                                                       label="Threshold"
                                                       name="threshold"
@@ -34544,7 +34456,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   bsStyle="default"
                                   onClick={[Function]}
                                 >
-                                  <Button
+                                  <Button__StyledButton
                                     bsSize="sm"
                                     bsStyle="default"
                                     onClick={[Function]}
@@ -34571,17 +34483,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           ],
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
-                                            "componentId": "Button-c9cbmb-0",
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "GLfOY",
+                                            "lastClassName": "kojzoH",
                                             "rules": Array [
                                               [Function],
                                             ],
                                           },
-                                          "displayName": "Button",
+                                          "displayName": "Button__StyledButton",
                                           "foldedComponentIds": Array [],
                                           "render": [Function],
-                                          "styledComponentId": "Button-c9cbmb-0",
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                           "target": [Function],
                                           "toString": [Function],
                                           "warnTooManyClasses": [Function],
@@ -34597,12 +34509,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button-c9cbmb-0 GLfOY"
+                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -34621,14 +34533,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         </button>
                                       </Button>
                                     </StyledComponent>
-                                  </Button>
+                                  </Button__StyledButton>
                                 </ForwardRef>
                                 <ForwardRef
                                   bsSize="sm"
                                   bsStyle="default"
                                   onClick={[Function]}
                                 >
-                                  <Button
+                                  <Button__StyledButton
                                     bsSize="sm"
                                     bsStyle="default"
                                     onClick={[Function]}
@@ -34655,17 +34567,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           ],
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
-                                            "componentId": "Button-c9cbmb-0",
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "GLfOY",
+                                            "lastClassName": "kojzoH",
                                             "rules": Array [
                                               [Function],
                                             ],
                                           },
-                                          "displayName": "Button",
+                                          "displayName": "Button__StyledButton",
                                           "foldedComponentIds": Array [],
                                           "render": [Function],
-                                          "styledComponentId": "Button-c9cbmb-0",
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                           "target": [Function],
                                           "toString": [Function],
                                           "warnTooManyClasses": [Function],
@@ -34681,12 +34593,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button-c9cbmb-0 GLfOY"
+                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -34705,14 +34617,14 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         </button>
                                       </Button>
                                     </StyledComponent>
-                                  </Button>
+                                  </Button__StyledButton>
                                 </ForwardRef>
                                 <ForwardRef
                                   bsSize="sm"
                                   bsStyle="default"
                                   onClick={[Function]}
                                 >
-                                  <Button
+                                  <Button__StyledButton
                                     bsSize="sm"
                                     bsStyle="default"
                                     onClick={[Function]}
@@ -34739,17 +34651,17 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           ],
                                           "attrs": Array [],
                                           "componentStyle": ComponentStyle {
-                                            "componentId": "Button-c9cbmb-0",
+                                            "componentId": "Button__StyledButton-c9cbmb-0",
                                             "isStatic": false,
-                                            "lastClassName": "GLfOY",
+                                            "lastClassName": "kojzoH",
                                             "rules": Array [
                                               [Function],
                                             ],
                                           },
-                                          "displayName": "Button",
+                                          "displayName": "Button__StyledButton",
                                           "foldedComponentIds": Array [],
                                           "render": [Function],
-                                          "styledComponentId": "Button-c9cbmb-0",
+                                          "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                           "target": [Function],
                                           "toString": [Function],
                                           "warnTooManyClasses": [Function],
@@ -34765,12 +34677,12 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         bsClass="btn"
                                         bsSize="sm"
                                         bsStyle="default"
-                                        className="Button-c9cbmb-0 GLfOY"
+                                        className="Button__StyledButton-c9cbmb-0 kojzoH"
                                         disabled={false}
                                         onClick={[Function]}
                                       >
                                         <button
-                                          className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                          className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                           disabled={false}
                                           onClick={[Function]}
                                           type="button"
@@ -34779,7 +34691,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         </button>
                                       </Button>
                                     </StyledComponent>
-                                  </Button>
+                                  </Button__StyledButton>
                                 </ForwardRef>
                               </div>
                             </ButtonToolbar>
@@ -36758,12 +36670,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -36780,11 +36690,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="aggregation-function"
                                     >
                                       If
@@ -39493,12 +39403,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
-                                    "lastClassName": "iZJNbd",
+                                    "isStatic": false,
+                                    "lastClassName": "brPnzl",
                                     "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      [Function],
                                     ],
                                   },
                                   "displayName": "ControlLabel",
@@ -39515,11 +39423,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                             >
                               <ControlLabel
                                 bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                className="ControlLabel-sc-1edmum5-0 brPnzl"
                                 srOnly={false}
                               >
                                 <label
-                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   htmlFor="aggregation-condition"
                                 >
                                   Is
@@ -41336,12 +41244,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
-                                          "isStatic": true,
-                                          "lastClassName": "iZJNbd",
+                                          "isStatic": false,
+                                          "lastClassName": "brPnzl",
                                           "rules": Array [
-                                            "color:",
-                                            "#1F1F1F",
-                                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                            [Function],
                                           ],
                                         },
                                         "displayName": "ControlLabel",
@@ -41358,11 +41264,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                   >
                                     <ControlLabel
                                       bsClass="control-label"
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                                       srOnly={false}
                                     >
                                       <label
-                                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                         htmlFor="aggregation-threshold"
                                       >
                                         Threshold
@@ -41396,24 +41302,10 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
-                                              "isStatic": true,
-                                              "lastClassName": "hdNTyr",
+                                              "isStatic": false,
+                                              "lastClassName": "jJEiYy",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "#DCE1E5",
-                                                ";&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                "#b8b8b8",
-                                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                "#DCE1E5",
-                                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "FormControl",
@@ -41437,7 +41329,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                                          className="FormControl-sc-1amoaox-0 jJEiYy"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -41448,7 +41340,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           value={0}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                            className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"
@@ -41545,7 +41437,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -41572,17 +41464,17 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -41598,12 +41490,12 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -41622,14 +41514,14 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -41656,17 +41548,17 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -41682,12 +41574,12 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -41706,14 +41598,14 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -41740,17 +41632,17 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -41766,12 +41658,12 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -41780,7 +41672,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </ButtonToolbar>
@@ -43778,12 +43670,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       "attrs": Array [],
                                       "componentStyle": ComponentStyle {
                                         "componentId": "ControlLabel-sc-1edmum5-0",
-                                        "isStatic": true,
-                                        "lastClassName": "iZJNbd",
+                                        "isStatic": false,
+                                        "lastClassName": "brPnzl",
                                         "rules": Array [
-                                          "color:",
-                                          "#1F1F1F",
-                                          ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                          [Function],
                                         ],
                                       },
                                       "displayName": "ControlLabel",
@@ -43800,11 +43690,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 >
                                   <ControlLabel
                                     bsClass="control-label"
-                                    className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                    className="ControlLabel-sc-1edmum5-0 brPnzl"
                                     srOnly={false}
                                   >
                                     <label
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                       htmlFor="aggregation-function"
                                     >
                                       If
@@ -46708,12 +46598,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                   "attrs": Array [],
                                   "componentStyle": ComponentStyle {
                                     "componentId": "ControlLabel-sc-1edmum5-0",
-                                    "isStatic": true,
-                                    "lastClassName": "iZJNbd",
+                                    "isStatic": false,
+                                    "lastClassName": "brPnzl",
                                     "rules": Array [
-                                      "color:",
-                                      "#1F1F1F",
-                                      ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                      [Function],
                                     ],
                                   },
                                   "displayName": "ControlLabel",
@@ -46730,11 +46618,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                             >
                               <ControlLabel
                                 bsClass="control-label"
-                                className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                className="ControlLabel-sc-1edmum5-0 brPnzl"
                                 srOnly={false}
                               >
                                 <label
-                                  className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                  className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                   htmlFor="aggregation-condition"
                                 >
                                   Is
@@ -48598,12 +48486,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                         "attrs": Array [],
                                         "componentStyle": ComponentStyle {
                                           "componentId": "ControlLabel-sc-1edmum5-0",
-                                          "isStatic": true,
-                                          "lastClassName": "iZJNbd",
+                                          "isStatic": false,
+                                          "lastClassName": "brPnzl",
                                           "rules": Array [
-                                            "color:",
-                                            "#1F1F1F",
-                                            ";font-weight:bold;margin-bottom:5px;display:inline-block;",
+                                            [Function],
                                           ],
                                         },
                                         "displayName": "ControlLabel",
@@ -48620,11 +48506,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                   >
                                     <ControlLabel
                                       bsClass="control-label"
-                                      className="ControlLabel-sc-1edmum5-0 iZJNbd"
+                                      className="ControlLabel-sc-1edmum5-0 brPnzl"
                                       srOnly={false}
                                     >
                                       <label
-                                        className="ControlLabel-sc-1edmum5-0 iZJNbd control-label"
+                                        className="ControlLabel-sc-1edmum5-0 brPnzl control-label"
                                         htmlFor="aggregation-threshold"
                                       >
                                         Threshold
@@ -48658,24 +48544,10 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                             "attrs": Array [],
                                             "componentStyle": ComponentStyle {
                                               "componentId": "FormControl-sc-1amoaox-0",
-                                              "isStatic": true,
-                                              "lastClassName": "hdNTyr",
+                                              "isStatic": false,
+                                              "lastClassName": "jJEiYy",
                                               "rules": Array [
-                                                "color:",
-                                                "#1F1F1F",
-                                                ";background-color:",
-                                                "#FFF",
-                                                ";border-color:",
-                                                "#DCE1E5",
-                                                ";&:focus{border-color:",
-                                                "#6DC6E7",
-                                                ";box-shadow(inset 0 1px 1px rgba(0,0,0,.075),0 0 8px ",
-                                                "rgba(109,198,231,0.4)",
-                                                ");}&::-moz-placeholder,&:-ms-input-placeholder,&::-webkit-input-placeholder{color:",
-                                                "#b8b8b8",
-                                                ";}&[disabled],&[readonly],fieldset[disabled] &{background-color:",
-                                                "#DCE1E5",
-                                                ";}~ .form-control-feedback.glyphicon{display:none;}",
+                                                [Function],
                                               ],
                                             },
                                             "displayName": "FormControl",
@@ -48699,7 +48571,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       >
                                         <FormControl
                                           bsClass="form-control"
-                                          className="FormControl-sc-1amoaox-0 hdNTyr"
+                                          className="FormControl-sc-1amoaox-0 jJEiYy"
                                           componentClass="input"
                                           inputRef={[Function]}
                                           label="Threshold"
@@ -48710,7 +48582,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           value={12}
                                         >
                                           <input
-                                            className="FormControl-sc-1amoaox-0 hdNTyr form-control"
+                                            className="FormControl-sc-1amoaox-0 jJEiYy form-control"
                                             id="aggregation-threshold"
                                             label="Threshold"
                                             name="threshold"
@@ -48807,7 +48679,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -48834,17 +48706,17 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -48860,12 +48732,12 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -48884,14 +48756,14 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -48918,17 +48790,17 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -48944,12 +48816,12 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -48968,14 +48840,14 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                       <ForwardRef
                         bsSize="sm"
                         bsStyle="default"
                         onClick={[Function]}
                       >
-                        <Button
+                        <Button__StyledButton
                           bsSize="sm"
                           bsStyle="default"
                           onClick={[Function]}
@@ -49002,17 +48874,17 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 ],
                                 "attrs": Array [],
                                 "componentStyle": ComponentStyle {
-                                  "componentId": "Button-c9cbmb-0",
+                                  "componentId": "Button__StyledButton-c9cbmb-0",
                                   "isStatic": false,
-                                  "lastClassName": "GLfOY",
+                                  "lastClassName": "kojzoH",
                                   "rules": Array [
                                     [Function],
                                   ],
                                 },
-                                "displayName": "Button",
+                                "displayName": "Button__StyledButton",
                                 "foldedComponentIds": Array [],
                                 "render": [Function],
-                                "styledComponentId": "Button-c9cbmb-0",
+                                "styledComponentId": "Button__StyledButton-c9cbmb-0",
                                 "target": [Function],
                                 "toString": [Function],
                                 "warnTooManyClasses": [Function],
@@ -49028,12 +48900,12 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               bsClass="btn"
                               bsSize="sm"
                               bsStyle="default"
-                              className="Button-c9cbmb-0 GLfOY"
+                              className="Button__StyledButton-c9cbmb-0 kojzoH"
                               disabled={false}
                               onClick={[Function]}
                             >
                               <button
-                                className="Button-c9cbmb-0 GLfOY btn btn-sm btn-default"
+                                className="Button__StyledButton-c9cbmb-0 kojzoH btn btn-sm btn-default"
                                 disabled={false}
                                 onClick={[Function]}
                                 type="button"
@@ -49042,7 +48914,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               </button>
                             </Button>
                           </StyledComponent>
-                        </Button>
+                        </Button__StyledButton>
                       </ForwardRef>
                     </div>
                   </ButtonToolbar>

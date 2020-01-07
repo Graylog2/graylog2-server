@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
 
 import ContentPackEntityConfig from 'components/content-packs/ContentPackEntityConfig';
@@ -14,9 +14,9 @@ describe('<ContentPackEntityConfig />', () => {
     };
     const appliedParameter = [{ configKey: 'descr', paramName: 'descrParam' }];
     const parameter = [{ name: 'descrParam', title: 'A descr Parameter', type: 'string' }];
-    const wrapper = renderer.create(<ContentPackEntityConfig entity={entity}
-                                                             appliedParameter={appliedParameter}
-                                                             parameters={parameter} />);
-    expect(wrapper.toJSON()).toMatchSnapshot();
+    const wrapper = mount(<ContentPackEntityConfig entity={entity}
+                                                   appliedParameter={appliedParameter}
+                                                   parameters={parameter} />);
+    expect(wrapper).toMatchSnapshot();
   });
 });
