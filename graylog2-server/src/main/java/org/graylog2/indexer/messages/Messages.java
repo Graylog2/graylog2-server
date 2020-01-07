@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
-import io.searchbox.client.http.JestHttpClient;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
 import io.searchbox.core.DocumentResult;
@@ -43,6 +42,7 @@ import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
@@ -240,7 +240,7 @@ public class Messages {
         try {
             // Enable Expect-Continue to catch 413 errors before we send the actual data
             final RequestConfig requestConfig = RequestConfig.custom().setExpectContinueEnabled(true).build();
-            return BULK_REQUEST_RETRYER.call(() -> ((JestHttpClient)client).execute(request, requestConfig));
+            return BULK_REQUEST_RETRYER.call(() -> JestUtils.execute(client, requestConfig, request));
         } catch (ExecutionException | RetryException e) {
             if (e instanceof RetryException) {
                 LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());
