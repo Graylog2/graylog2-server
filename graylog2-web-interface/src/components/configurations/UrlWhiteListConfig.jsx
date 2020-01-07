@@ -40,7 +40,7 @@ class UrlWhiteListConfig extends React.Component<Props, State> {
           <td>{idx + 1}</td>
           <td>{urlConfig.title}</td>
           <td>{urlConfig.value}</td>
-          <td>{urlConfig.type === literal ? 'Exact match' : urlConfig.type}</td>
+          <td>{urlConfig.type === literal ? 'Exact match' : 'Regex'}</td>
         </tr>
       );
     });
