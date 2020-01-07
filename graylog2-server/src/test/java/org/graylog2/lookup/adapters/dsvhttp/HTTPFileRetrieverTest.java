@@ -97,6 +97,32 @@ public class HTTPFileRetrieverTest {
     }
 
     @Test
+    public void fetchFileDoesNotSendIfModifiedSinceHeader() throws Exception {
+        final MockResponse response = new MockResponse().setResponseCode(200)
+                .setBody("foobar")
+                .setHeader("Last-Modified", "Fri, 18 Aug 2017 15:02:41 GMT");
+        this.server.enqueue(response);
+        this.server.enqueue(response);
+        server.start();
+
+        final HTTPFileRetriever httpFileRetriever = new HTTPFileRetriever(new OkHttpClient());
+
+        assertThat(httpFileRetriever.fetchFileIfNotModified(server.url("/").toString()))
+                .isNotNull()
+                .isPresent()
+                .contains("foobar");
+        assertThat(server.takeRequest()
+                .getHeader("If-Modified-Since")).isNull();
+
+        assertThat(httpFileRetriever.fetchFile(server.url("/").toString()))
+                .isNotNull()
+                .isPresent()
+                .contains("foobar");
+        assertThat(server.takeRequest()
+                .getHeader("If-Modified-Since")).isNull();
+    }
+
+    @Test
     public void unsuccessfulRetrieve() throws Exception {
         this.server.enqueue(new MockResponse()
                 .setResponseCode(500)

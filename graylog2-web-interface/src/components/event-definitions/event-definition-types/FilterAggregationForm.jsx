@@ -4,6 +4,7 @@ import lodash from 'lodash';
 import { Col, ControlLabel, FormGroup, Radio, Row } from 'components/graylog';
 
 import FormsUtils from 'util/FormsUtils';
+
 import FilterForm from './FilterForm';
 import FilterPreviewContainer from './FilterPreviewContainer';
 import AggregationForm from './AggregationForm';
@@ -42,8 +43,9 @@ class FilterAggregationForm extends React.Component {
     super(props);
 
     // eslint-disable-next-line camelcase
-    const { group_by, series } = props.eventDefinition.config;
-    const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series)
+    const { group_by, series, conditions } = props.eventDefinition.config;
+    const expression = lodash.get(conditions, 'expression', {});
+    const defaultConditionType = (lodash.isEmpty(group_by) && lodash.isEmpty(series) && lodash.isEmpty(expression)
       ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
 
     this.state = {

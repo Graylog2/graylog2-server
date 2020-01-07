@@ -38,4 +38,6 @@ public interface ExpressionVisitor {
     double visit(Expr.NumberValue numberValue);
 
     double visit(Expr.NumberReference numberReference);
+
+    boolean visit(Expr.Group group);
 }

@@ -7,7 +7,6 @@ import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
-import connect from 'stores/connect';
 import { Col, Row } from 'components/graylog';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import MessageDetail from 'views/components/messagelist/MessageDetail';
@@ -15,12 +14,15 @@ import MessageDetail from 'views/components/messagelist/MessageDetail';
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
 const MessagesActions = ActionsProvider.getActions('Messages');
-const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
 
-const ConnectedMessageDetail = connect(MessageDetail, { nodes: NodesStore }, ({ nodes }) => ({ nodes: Immutable.Map(nodes.nodes) }));
-
-const ShowMessagePage = ({ params: { index, messageId }, params }) => {
+type Props = {
+  params: {
+    index: string,
+    messageId: string,
+  },
+};
+const ShowMessagePage = ({ params: { index, messageId }, params }: Props) => {
   const [message, setMessage] = useState();
   const [inputs, setInputs] = useState(Immutable.Map);
   const [streams, setStreams] = useState();
@@ -59,13 +61,13 @@ const ShowMessagePage = ({ params: { index, messageId }, params }) => {
         <Row className="content">
           <Col md={12}>
             <InteractiveContext.Provider value={false}>
-              <ConnectedMessageDetail fields={Immutable.Map()}
-                                      streams={streams}
-                                      allStreams={allStreams}
-                                      disableSurroundingSearch
-                                      disableFieldActions
-                                      inputs={inputs}
-                                      message={message} />
+              <MessageDetail fields={Immutable.Map()}
+                             streams={streams}
+                             allStreams={allStreams}
+                             disableSurroundingSearch
+                             disableFieldActions
+                             inputs={inputs}
+                             message={message} />
             </InteractiveContext.Provider>
           </Col>
         </Row>
@@ -82,4 +84,4 @@ ShowMessagePage.propTypes = {
   }).isRequired,
 };
 
-export default connect(ShowMessagePage, { nodes: NodesStore });
+export default ShowMessagePage;

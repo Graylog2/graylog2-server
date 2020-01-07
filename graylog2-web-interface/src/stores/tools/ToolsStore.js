@@ -57,6 +57,17 @@ const ToolsStore = Reflux.createStore({
 
     return promise;
   },
+  testRegexValidity(regex: string): Promise<Object> {
+    const { url } = ApiRoutes.ToolsApiController.regexValidate(regex);
+    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+
+    promise.catch((errorThrown) => {
+      UserNotification.error(`Details: ${errorThrown}`,
+        'Could not validate regular expression. Make sure that it is valid.');
+    });
+
+    return promise;
+  },
   testRegex(regex: string, string: string): Promise<Object> {
     const { url } = ApiRoutes.ToolsApiController.regexTest();
     const promise = fetch('POST', URLUtils.qualifyUrl(url), {

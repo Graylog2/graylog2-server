@@ -53,7 +53,20 @@ public abstract class AggregationSeries {
 
         public abstract Builder field(@Nullable String field);
 
-        public abstract AggregationSeries build();
+        abstract Optional<String> field();
+        abstract AggregationSeries autoBuild();
+
+        public AggregationSeries build() {
+            // Most of the views code doesn't handle empty strings. Best to convert them here.
+            // See: https://github.com/Graylog2/graylog2-server/issues/6933#issuecomment-568447111
+            // TODO: It would be cleaner to use validations like "@NotBlank" and fix the frontend to send
+            //       "null" instead of an empty string. This requires an auto-value update and some other
+            //       modifications but we didn't want to do this in 3.2-beta.
+            if (field().isPresent() && field().get().isEmpty()) {
+                field(null);
+            }
+            return autoBuild();
+        }
     }
 
     @JsonCreator
