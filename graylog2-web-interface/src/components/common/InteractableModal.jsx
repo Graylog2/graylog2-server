@@ -138,25 +138,21 @@ const InteractableModal = ({
     const { x: currentX, y: currentY } = dragPosition;
     const { width, height } = resizeSize;
     const { innerWidth, innerHeight } = window;
+
     const boundingBox = {
       top: 0,
-      right: innerWidth - width,
-      bottom: innerHeight - height,
+      bottom: parseFloat(height),
       left: 0,
+      right: parseFloat(width),
     };
 
-    const isTooFarLeft = currentX < boundingBox.left;
-    const isTooFarRight = currentX > boundingBox.right;
-    const newX = isTooFarRight ? boundingBox.right : currentX;
+    const newCoords = {};
 
-    const isTooFarUp = currentY < boundingBox.top;
-    const isTooFarDown = currentY > boundingBox.bottom;
-    const newY = isTooFarDown ? boundingBox.bottom : currentY;
+    const modalXWithNewWidth = innerWidth - boundingBox.right;
+    newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
 
-    const newCoords = {
-      x: isTooFarLeft ? 0 : newX,
-      y: isTooFarUp ? 0 : newY,
-    };
+    const modalYWithNewHeight = innerHeight - boundingBox.bottom;
+    newCoords.y = Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top);
 
     handleDragStop(null, newCoords);
   }, 150);
