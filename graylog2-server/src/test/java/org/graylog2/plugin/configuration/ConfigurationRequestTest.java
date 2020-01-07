@@ -17,10 +17,17 @@
 package org.graylog2.plugin.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,6 +38,7 @@ public class ConfigurationRequestTest {
     public void setUp() throws Exception {
         configurationRequest = new ConfigurationRequest();
     }
+
 
     @Test
     public void putAllRetainsOrder() throws Exception {
@@ -64,5 +72,23 @@ public class ConfigurationRequestTest {
 
         assertThat(configurationRequest.asList().keySet())
                 .containsSequence("field0", "field1", "field2", "field3", "field4");
+    }
+
+    @Test
+    public void addListField() {
+
+        //Build Configuration Object and expectedValue
+        final Map<String, Object> map = new HashMap<>();
+        List<String> expectedValue = Arrays.asList("~/ipfix/test.json", "~/ipfix/test1.json");
+        map.put("custDefList", expectedValue);
+        final Configuration configuration = new Configuration(map);
+        //Validate Configuration Object
+        assertThat(configuration.getList("custDefList").size()).isEqualTo(2);
+        //SetUp ConfigurationRequest
+        Map<String, Object> configReqMap = configurationRequest.addListField(Maps.newHashMap(), configuration, "custDefList");
+        //Validate ConfigRequest Map
+        Stream.of(configReqMap.keySet().toArray())
+                .forEach(key -> assertThat( configReqMap.get(key).equals(expectedValue)));
+
     }
 }
