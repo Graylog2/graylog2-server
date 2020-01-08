@@ -313,8 +313,8 @@ class Select extends React.Component<Props, State> {
     }
 
     const {
-      multi: isMulti = false,
-      disabled: isDisabled = false,
+      multi: isMulti,
+      disabled: isDisabled,
       clearable: isClearable,
       ...rest
     } = this.props;
