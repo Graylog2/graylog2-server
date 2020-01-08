@@ -107,6 +107,7 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled }: Props) => {
 
   const debouncedValidate = debounce(_validate, 500);
 
+  // eslint-disable-next-line no-undef
   const _onInputChange = (event: SyntheticInputEvent<EventTarget>, idx: number, type: string) => {
     if (type === regex) {
       debouncedValidate(event.target.name, idx, type, FormUtils.getValueFromInput(event.target));
