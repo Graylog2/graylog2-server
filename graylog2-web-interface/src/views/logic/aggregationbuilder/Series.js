@@ -18,13 +18,14 @@ type InternalState = {
 export type Definition = {
   type: string,
   field?: string,
+  percentile?: string,
 };
 
 const parametersRegex = /\((.+)\)/;
 const funcNameRegex = /(\w+)\(/;
 const testSeriesRegex = /^(\w+)\((\w*)(,(\w+))*\)$/;
 
-const definitionFor = (type : string, parameters : Array<string>) => {
+const definitionFor = (type: string, parameters: Array<string>): Definition => {
   // eslint-disable-next-line no-unused-vars
   const [field, parameter] = parameters;
   if (type === 'percentile') {
