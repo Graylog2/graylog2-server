@@ -2,7 +2,7 @@
 import * as React from 'react';
 import lodash from 'lodash';
 import PropTypes from 'prop-types';
-import ReactSelect, { components as Components, Creatable } from 'react-select';
+import ReactSelect, { components as Components, Creatable, createFilter } from 'react-select';
 
 import Icon from './Icon';
 
@@ -162,7 +162,7 @@ type Props = {
   delimiter?: string,
   options: Array<Option>,
   components: ?{string: React.Node},
-  matchProp?: string,
+  matchProp?: 'any' | 'label' | 'value',
   value?: string,
   autoFocus?: boolean,
   size?: 'normal' | 'small',
@@ -215,6 +215,7 @@ class Select extends React.Component<Props, State> {
     components: PropTypes.arrayOf(PropTypes.node),
     disabled: PropTypes.bool,
     clearable: PropTypes.bool,
+    matchProp: PropTypes.oneOf(['any', 'label', 'value']),
   };
 
   static defaultProps = {
@@ -225,7 +226,7 @@ class Select extends React.Component<Props, State> {
     delimiter: ',',
     allowCreate: false,
     value: undefined,
-    matchProp: undefined,
+    matchProp: 'any',
     autoFocus: false,
     disabled: false,
     addLabelText: undefined,
@@ -316,8 +317,12 @@ class Select extends React.Component<Props, State> {
       multi: isMulti,
       disabled: isDisabled,
       clearable: isClearable,
+      matchProp,
       ...rest
     } = this.props;
+
+    const stringify = option => option[matchProp];
+    const customFilter = matchProp === 'any' ? createFilter() : createFilter({ stringify });
 
     return (
       <SelectComponent {...rest}
@@ -327,6 +332,7 @@ class Select extends React.Component<Props, State> {
                        isClearable={isClearable}
                        getOptionLabel={option => option[displayKey]}
                        getOptionValue={option => option[valueKey]}
+                       filterOption={customFilter}
                        components={{
                          ..._components,
                          ...components,

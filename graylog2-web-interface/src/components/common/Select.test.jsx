@@ -35,5 +35,22 @@ describe('Select', () => {
       const wrapper = mount(<Select options={customOptions} onChange={onChange} valueKey="customValue" menuIsOpen />);
       expect(wrapper.find(Components.Option).props().value).toBe(42);
     });
+
+    it('should use matchProp to configure how options are filtered', () => {
+      const matchAnyWrapper = shallow(<Select options={options} onChange={onChange} />);
+      const matchAnyFilter = matchAnyWrapper.find(SelectComponent).props().filterOption;
+      expect(matchAnyFilter(options[0], 'label')).toBeTruthy();
+      expect(matchAnyFilter(options[0], 'value')).toBeTruthy();
+
+      const matchLabelWrapper = shallow(<Select options={options} onChange={onChange} matchProp="label" />);
+      const matchLabelFilter = matchLabelWrapper.find(SelectComponent).props().filterOption;
+      expect(matchLabelFilter(options[0], 'label')).toBeTruthy();
+      expect(matchLabelFilter(options[0], 'value')).toBeFalsy();
+
+      const matchValueWrapper = shallow(<Select options={options} onChange={onChange} matchProp="value" />);
+      const matchValueFilter = matchValueWrapper.find(SelectComponent).props().filterOption;
+      expect(matchValueFilter(options[0], 'label')).toBeFalsy();
+      expect(matchValueFilter(options[0], 'value')).toBeTruthy();
+    });
   });
 });
