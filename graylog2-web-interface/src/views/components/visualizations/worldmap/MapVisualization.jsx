@@ -6,6 +6,8 @@ import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 import style from 'components/maps/widgets/MapVisualization.css';
 
+import 'leaflet/dist/leaflet.css';
+
 const DEFAULT_VIEWPORT = {
   center: [0, 0],
   zoom: 1,
