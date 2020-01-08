@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.elasticsearch.searchtypes;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.name.Named;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -32,7 +33,6 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
-import org.graylog2.Configuration;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ResultMessage;
@@ -55,22 +55,22 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private final ESQueryDecorators esQueryDecorators;
     private final DecoratorProcessor decoratorProcessor;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
-    private final Configuration configuration;
+    private final boolean allowHighlighting;
 
     @Inject
     public ESMessageList(ESQueryDecorators esQueryDecorators,
                          DecoratorProcessor decoratorProcessor,
                          Map<String, SearchResponseDecorator.Factory> searchResponseDecorators,
-                         Configuration configuration) {
+                         @Named("allow_highlighting") boolean allowHighlighting) {
         this.esQueryDecorators = esQueryDecorators;
         this.decoratorProcessor = decoratorProcessor;
         this.searchResponseDecorators = searchResponseDecorators;
-        this.configuration = configuration;
+        this.allowHighlighting = allowHighlighting;
     }
 
     @VisibleForTesting
     public ESMessageList(ESQueryDecorators esQueryDecorators) {
-        this(esQueryDecorators, new DecoratorProcessor.Fake(), Collections.emptyMap(), new Configuration());
+        this(esQueryDecorators, new DecoratorProcessor.Fake(), Collections.emptyMap(), false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     private void applyHighlightingIfActivated(SearchSourceBuilder searchSourceBuilder, SearchJob job, Query query) {
-        if (!configuration.isAllowHighlighting())
+        if (!allowHighlighting)
             return;
 
         final QueryStringQueryBuilder highlightQuery = decoratedHighlightQuery(job, query);

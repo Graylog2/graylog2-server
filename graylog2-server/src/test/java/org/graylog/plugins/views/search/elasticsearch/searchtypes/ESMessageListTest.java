@@ -30,7 +30,6 @@ import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorator;
 import org.graylog.plugins.views.search.elasticsearch.ESQueryDecorators;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.Configuration;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -61,7 +60,7 @@ public class ESMessageListTest {
     public void usesHighlightingIfActivatedInConfig() {
         MessageList messageList = someMessageList();
 
-        ESGeneratedQueryContext context = generateQueryPartFor(messageList, configWithHighlighting(true));
+        ESGeneratedQueryContext context = generateQueryPartWithHighlighting(messageList);
 
         assertThat(context.searchSourceBuilder(messageList).highlighter()).isNotNull();
     }
@@ -70,7 +69,7 @@ public class ESMessageListTest {
     public void doesNotUseHighlightingIfDeactivatedInConfig() {
         MessageList messageList = someMessageList();
 
-        ESGeneratedQueryContext context = generateQueryPartFor(messageList, configWithHighlighting(false));
+        ESGeneratedQueryContext context = generateQueryPartWithoutHighlighting(messageList);
 
         assertThat(context.searchSourceBuilder(messageList).highlighter())
                 .as("there should be no highlighter configured")
@@ -83,7 +82,7 @@ public class ESMessageListTest {
 
         final MessageList messageList = someMessageList();
 
-        ESGeneratedQueryContext queryContext = generateQueryPartFor(messageList, configWithHighlighting(true), Collections.singleton(esQueryDecorator));
+        ESGeneratedQueryContext queryContext = generateQueryPartWithHighlighting(messageList, Collections.singleton(esQueryDecorator));
 
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.highlight.highlight_query.query_string.query").isEqualTo("Foobar!");
@@ -116,17 +115,25 @@ public class ESMessageListTest {
                 .build();
     }
 
-    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, Configuration config) {
-        return generateQueryPartFor(messageList, config, Collections.emptySet());
+    private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList) {
+        return generateQueryPartFor(messageList, true, Collections.emptySet());
     }
 
-    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, Configuration config, Set<ESQueryDecorator> decorators) {
+    private ESGeneratedQueryContext generateQueryPartWithHighlighting(MessageList messageList, Set<ESQueryDecorator> decorators) {
+        return generateQueryPartFor(messageList, true, decorators);
+    }
+
+    private ESGeneratedQueryContext generateQueryPartWithoutHighlighting(MessageList messageList) {
+        return generateQueryPartFor(messageList, false, Collections.emptySet());
+    }
+
+    private ESGeneratedQueryContext generateQueryPartFor(MessageList messageList, boolean allowHighlighting, Set<ESQueryDecorator> decorators) {
 
         ESMessageList sut = new ESMessageList(
                 new ESQueryDecorators(decorators),
                 new DecoratorProcessor.Fake(),
                 Collections.emptyMap(),
-                config);
+                allowHighlighting);
 
         ESGeneratedQueryContext context = mock(ESGeneratedQueryContext.class);
 
@@ -135,11 +142,5 @@ public class ESMessageListTest {
         sut.doGenerateQueryPart(mock(SearchJob.class), someQuery(), messageList, context);
 
         return context;
-    }
-
-    private Configuration configWithHighlighting(boolean highlightingValue) {
-        Configuration configuration = mock(Configuration.class);
-        when(configuration.isAllowHighlighting()).thenReturn(highlightingValue);
-        return configuration;
     }
 }
