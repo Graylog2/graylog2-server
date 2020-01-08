@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
@@ -30,7 +28,6 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,25 +39,21 @@ import org.mockito.junit.MockitoRule;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchResourceTest {
-    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -72,9 +65,6 @@ public class SearchResourceTest {
 
     @Mock
     private SearchJobService searchJobService;
-
-    @Mock
-    private PermittedStreams permittedStreams;
 
     @Mock
     private SearchExecutionGuard executionGuard;
@@ -93,8 +83,8 @@ public class SearchResourceTest {
     class SearchTestResource extends SearchResource {
         private final Subject subject;
 
-        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService, ObjectMapper objectMapper, PermittedStreams streamLoader) {
-            super(queryEngine, searchDbService, searchJobService, objectMapper, streamLoader, executionGuard, searchDomain);
+        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService) {
+            super(queryEngine, searchDbService, searchJobService, executionGuard, searchDomain);
             this.subject = subject;
         }
 
@@ -114,14 +104,14 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService, objectMapperProvider.get(), permittedStreams);
+        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService);
 
-        when(currentUser.getName()).thenReturn("admin");
+        mockCurrentUserName("admin");
     }
 
     @Test
     public void saveAddsOwnerToSearch() {
-        when(currentUser.getName()).thenReturn("eberhard");
+        mockCurrentUserName("eberhard");
         final Search search = Search.builder().build();
 
         this.searchResource.createSearch(search);
@@ -142,96 +132,21 @@ public class SearchResourceTest {
     }
 
     @Test
-    public void getSearchThrowsNotFoundIfSearchDoesntExist() {
-        when(searchDomain.getForUser(any(), any(), any())).thenReturn(Optional.empty());
+    public void ForbiddenExceptionOnAsyncExecutionIsNotCaughtSoItLeadsTo403() {
+        final Search search = mockExistingSearch();
 
-        assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> this.searchResource.getSearch("god"))
-                .withMessageContaining("god");
+        when(searchDomain.executeAsync(any(), any(), any(), any(), any())).thenThrow(new ForbiddenException());
+
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(() -> searchResource.executeQuery(search.id(), null));
     }
 
     @Test
-    public void executeQueryAddsCurrentUserAsOwner() {
-        mockCurrentUserName("basti");
+    public void ForbiddenExceptionOnSynchronousExecutionIsNotCaughtSoItLeadsTo403() {
+        final Search search = mockNewSearch();
 
-        final Search search = mockExistingSearch();
+        when(searchDomain.executeSync(any(), any(), any(), anyLong())).thenThrow(new ForbiddenException());
 
-        this.searchResource.executeQuery(search.id(), Collections.emptyMap());
-
-        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
-
-        assertThat(usernameCaptor.getValue()).isEqualTo("basti");
-    }
-
-    @Test
-    public void executeSyncJobAddsCurrentUserAsOwner() {
-        mockCurrentUserName("peterchen");
-
-        final Search search = mockExistingSearch();
-
-        this.searchResource.executeSyncJob(search, 100);
-
-        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
-        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
-
-        assertThat(usernameCaptor.getValue()).isEqualTo("peterchen");
-    }
-
-    @Test
-    public void executeQueryAppliesExecutionState() {
-        final Search search = mockExistingSearch();
-        final Map<String, Object> executionState = ImmutableMap.of("foo", 42);
-
-        when(searchDbService.get(search.id())).thenReturn(Optional.of(search));
-
-        this.searchResource.executeQuery(search.id(), executionState);
-
-        //noinspection unchecked
-        final ArgumentCaptor<Map<String, Object>> executionStateCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
-
-        assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
-    }
-
-    @Test
-    public void guardExceptionInAsyncExecutionLeadsTo403() {
-        final Search search = mockExistingSearch();
-
-        throwGuardExceptionFor(search);
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null));
-    }
-
-    @Test
-    public void guardExceptionInSynchronousExecutionLeadsTo403() {
-        final Search search = mockExistingSearch();
-
-        throwGuardExceptionFor(search);
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
-    }
-
-    @Test
-    public void failureToAddDefaultStreamsInAsyncSearchLeadsTo403() {
-        final Search search = mockExistingSearch();
-
-        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeQuery(search.id(), null));
-    }
-
-    @Test
-    public void failureToAddDefaultStreamsInSynchronousSearchLeadsTo403() {
-        final Search search = mockExistingSearch();
-
-        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> this.searchResource.executeSyncJob(search, 0));
+        assertThatExceptionOfType(ForbiddenException.class).isThrownBy(() -> searchResource.executeSyncJob(search, 1));
     }
 
     @Test
@@ -275,7 +190,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDomain.getForUser(eq(search.id()), any(), any())).thenReturn(Optional.of(search));
+        when(searchDomain.find(eq(search.id()), any(), any())).thenReturn(search);
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));

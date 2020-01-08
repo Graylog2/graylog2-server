@@ -16,18 +16,29 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.ws.rs.ForbiddenException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,10 +46,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchDomainTest {
+    private static final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -47,67 +63,93 @@ public class SearchDomainTest {
     @Mock
     private SearchDbService dbService;
 
-    private List<Search> allSearchesInDb = new ArrayList<>();
+    @Mock
+    private QueryEngine queryEngine;
+
+    @Mock
+    private SearchJobService searchJobService;
 
     @Mock
     private ViewPermissions viewPermissions;
 
+    @Mock
+    private PermittedStreams permittedStreams;
+
+    @Mock
+    private SearchExecutionGuard executionGuard;
+
+    private ObjectMapper objectMapper = objectMapperProvider.get();
+
+    private List<Search> allSearchesInDb = new ArrayList<>();
+
+    static class TestSearchDomain extends SearchDomain {
+        public TestSearchDomain(SearchDbService dbService, QueryEngine queryEngine, SearchJobService searchJobService, ViewPermissions viewPermissions, PermittedStreams permittedStreams, SearchExecutionGuard executionGuard, ObjectMapper objectMapper) {
+            super(dbService, queryEngine, searchJobService, viewPermissions, permittedStreams, executionGuard, objectMapper);
+        }
+
+        // this is a hack to facilitate testing in the short term.
+        // search execution should ultimately be extracted to a dedicated class which gets stubbed here.
+        @Override
+        protected void forceCompletion(SearchJob runningSearchJob, long timeout) {
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
         allSearchesInDb.clear();
         when(dbService.streamAll()).thenReturn(allSearchesInDb.stream());
-        sut = new SearchDomain(dbService, viewPermissions);
+        sut = new TestSearchDomain(dbService, queryEngine, searchJobService, viewPermissions, permittedStreams, executionGuard, objectMapper);
     }
 
     @Test
-    public void returnsEmptyOptionalWhenIdDoesntExist() {
+    public void throwsWhenIdDoesntExist() {
         when(dbService.get("some-id")).thenReturn(Optional.empty());
 
-        final Optional<Search> result = sut.getForUser("some-id", mock(User.class), id -> true);
-
-        assertThat(result).isEqualTo(Optional.empty());
+        assertThatExceptionOfType(EntityNotFoundException.class)
+                .isThrownBy(() -> sut.find("some-id", mock(User.class), id -> true));
     }
 
     @Test
     public void loadsSearchIfUserIsOwner() {
         final User user = user("boeser-willi");
 
-        final Search search = mockSearchWithOwner(user.getName());
+        final Search search = mockExistingSearchWithOwner(user.getName());
 
-        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
+        final Search result = sut.find(search.id(), user, id -> true);
 
-        assertThat(result).isEqualTo(Optional.of(search));
+        assertThat(result).isEqualTo(search);
     }
 
     @Test
     public void loadsSearchIfSearchIsPermittedViaViews() {
         final User user = user("someone");
-        final Search search = mockSearchWithOwner("someone else");
+        final Search search = mockExistingSearchWithOwner("someone else");
 
         when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
 
-        final Optional<Search> result = sut.getForUser(search.id(), user, id -> true);
+        final Search result = sut.find(search.id(), user, id -> true);
 
-        assertThat(result).isEqualTo(Optional.of(search));
+        assertThat(result).isEqualTo(search);
     }
 
     @Test
     public void throwsPermissionExceptionIfNeitherOwnedNorPermittedFromViews() {
         final User user = user("someone");
-        final Search search = mockSearchWithOwner("someone else");
+        final Search search = mockExistingSearchWithOwner("someone else");
 
         when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(false);
 
         assertThatExceptionOfType(PermissionException.class)
-                .isThrownBy(() -> sut.getForUser(search.id(), user, id -> true));
+                .isThrownBy(() -> sut.find(search.id(), user, id -> true));
     }
 
     @Test
     public void includesOwnedSearchesInList() {
         final User user = user("boeser-willi");
 
-        final Search ownedSearch = mockSearchWithOwner(user.getName());
-        mockSearchWithOwner("someone else");
+        final Search ownedSearch = mockExistingSearchWithOwner(user.getName());
+        mockExistingSearchWithOwner("someone else");
 
         List<Search> result = sut.getAllForUser(user, id -> true);
 
@@ -118,8 +160,8 @@ public class SearchDomainTest {
     public void includesSearchesPermittedViaViewsInList() {
         final User user = user("someone");
 
-        final Search permittedSearch = mockSearchWithOwner("someone else");
-        mockSearchWithOwner("someone else");
+        final Search permittedSearch = mockExistingSearchWithOwner("someone else");
+        mockExistingSearchWithOwner("someone else");
 
         when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user), any())).thenReturn(true);
 
@@ -132,12 +174,117 @@ public class SearchDomainTest {
     public void listIsEmptyIfNoSearchesPermitted() {
         final User user = user("someone");
 
-        mockSearchWithOwner("someone else");
-        mockSearchWithOwner("someone else");
+        mockExistingSearchWithOwner("someone else");
+        mockExistingSearchWithOwner("someone else");
 
         List<Search> result = sut.getAllForUser(user, id -> true);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void executeAsyncAddsExecutingUserAsOwner() {
+        Search search = mockExistingSearchWithOwner("peterchen");
+        when(viewPermissions.isSearchPermitted(eq(search.id()), any(), any())).thenReturn(true);
+
+        executeAsync(search, user("basti"));
+
+        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
+
+        assertThat(usernameCaptor.getValue()).isEqualTo("basti");
+    }
+
+    @Test
+    public void executeSyncAddsExecutingUserAsOwner() {
+        final Search search = mockSearchWithOwner("peterchen");
+
+        executeSync(search, user("basti"));
+
+        final ArgumentCaptor<String> usernameCaptor = ArgumentCaptor.forClass(String.class);
+        verify(searchJobService, times(1)).create(eq(search), usernameCaptor.capture());
+
+        assertThat(usernameCaptor.getValue()).isEqualTo("basti");
+    }
+
+    @Test
+    public void executeAsyncAppliesExecutionState() {
+        final Search search = mockExistingSearch();
+        final Map<String, Object> executionState = ImmutableMap.of("foo", 42);
+
+        when(dbService.get(search.id())).thenReturn(Optional.of(search));
+
+        executeAsync(search, executionState, ownerOf(search));
+
+        //noinspection unchecked
+        final ArgumentCaptor<Map<String, Object>> executionStateCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(search, times(1)).applyExecutionState(any(), executionStateCaptor.capture());
+
+        assertThat(executionStateCaptor.getValue()).isEqualTo(executionState);
+    }
+
+    @Test
+    public void executeAsyncIsGuardedForPermissions() {
+        final Search search = mockExistingSearch();
+
+        throwGuardExceptionFor(search);
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> executeAsync(search));
+    }
+
+    @Test
+    public void executeSyncIsGuardedForPermissions() {
+        final Search search = mockSearch();
+
+        throwGuardExceptionFor(search);
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> executeSync(search));
+    }
+
+    @Test
+    public void failingToAddDefaultStreamsThrowsInExecuteAsync() {
+        final Search search = mockExistingSearch();
+
+        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> executeAsync(search));
+    }
+
+    @Test
+    public void failingToAddDefaultStreamsThrowsInExecuteSync() {
+        final Search search = mockSearch();
+
+        doThrow(new ForbiddenException()).when(search).addStreamsToQueriesWithoutStreams(any());
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> executeSync(search));
+    }
+
+    private void executeAsync(Search search, Map<String, Object> execState, User executingUser) {
+        sut.executeAsync(search.id(), execState, x -> true, x -> true, executingUser);
+    }
+
+    private void executeAsync(Search search, User executingUser) {
+        executeAsync(search, Collections.emptyMap(), executingUser);
+    }
+
+    private void executeAsync(Search search) {
+        executeAsync(search, Collections.emptyMap(), ownerOf(search));
+    }
+
+    private void executeSync(Search search, User executingUser) {
+        sut.executeSync(search, x -> true, executingUser, 1000);
+    }
+
+    private void executeSync(Search search) {
+        executeSync(search, ownerOf(search));
+    }
+
+    private void throwGuardExceptionFor(Search search) {
+        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
     }
 
     private User user(String name) {
@@ -146,10 +293,36 @@ public class SearchDomainTest {
         return user;
     }
 
-    private Search mockSearchWithOwner(String owner) {
-        Search search = Search.builder().id(UUID.randomUUID().toString()).owner(owner).build();
+    private User ownerOf(Search search) {
+        final User user = mock(User.class);
+        String name = search.owner().orElse("peterchen");
+        when(user.getName()).thenReturn(name);
+        return user;
+    }
+
+    private Search mockExistingSearch() {
+        return mockExistingSearchWithOwner("peterchen");
+    }
+
+    private Search mockExistingSearchWithOwner(String owner) {
+
+        Search search = mockSearchWithOwner(owner);
+
         allSearchesInDb.add(search);
         when(dbService.get(search.id())).thenReturn(Optional.of(search));
+        return search;
+    }
+
+    private Search mockSearch() {
+        return mockSearchWithOwner("peterchen");
+    }
+
+    private Search mockSearchWithOwner(String owner) {
+        Search search = mock(Search.class);
+        when(search.id()).thenReturn(UUID.randomUUID().toString());
+        when(search.owner()).thenReturn(Optional.of(owner));
+        when(search.addStreamsToQueriesWithoutStreams(any())).thenReturn(search);
+        when(search.applyExecutionState(any(), any())).thenReturn(search);
         return search;
     }
 }

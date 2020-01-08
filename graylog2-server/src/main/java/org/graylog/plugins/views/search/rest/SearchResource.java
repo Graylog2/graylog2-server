@@ -16,9 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
@@ -51,7 +49,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -61,7 +58,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,8 +65,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
 
 @Api(value = "Search")
 @Path("/views/search")
@@ -84,8 +78,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final QueryEngine queryEngine;
     private final SearchDbService searchDbService;
     private final SearchJobService searchJobService;
-    private final ObjectMapper objectMapper;
-    private final PermittedStreams permittedStreams;
     private final SearchExecutionGuard executionGuard;
     private final SearchDomain searchDomain;
 
@@ -93,15 +85,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public SearchResource(QueryEngine queryEngine,
                           SearchDbService searchDbService,
                           SearchJobService searchJobService,
-                          ObjectMapper objectMapper,
-                          PermittedStreams permittedStreams,
                           SearchExecutionGuard executionGuard,
                           SearchDomain searchDomain) {
         this.queryEngine = queryEngine;
         this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
-        this.objectMapper = objectMapper;
-        this.permittedStreams = permittedStreams;
         this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
     }
@@ -142,8 +130,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDomain.getForUser(searchId, getCurrentUser(), this::hasViewReadPermission)
-                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+        return searchDomain.find(searchId, getCurrentUser(), this::hasViewReadPermission);
     }
 
     private boolean hasViewReadPermission(String viewId) {
@@ -164,25 +151,17 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_JOB_CREATE)
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam Map<String, Object> executionState) {
-        Search search = getSearch(id);
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
-
-        guard(search);
-
-        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
-
-        final SearchJob searchJob = searchJobService.create(search, username());
-
-        final SearchJob runningSearchJob = queryEngine.execute(searchJob);
+        final SearchJob runningSearchJob = searchDomain.executeAsync(
+                id,
+                executionState,
+                this::hasStreamReadPermission,
+                this::hasViewReadPermission,
+                getCurrentUser());
 
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
-    }
-
-    private ImmutableSet<String> loadAllAllowedStreamsForUser() {
-        return permittedStreams.load(this::hasStreamReadPermission);
     }
 
     private boolean hasStreamReadPermission(String streamId) {
@@ -200,30 +179,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeSyncJob(@ApiParam Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final String username = username();
+        final SearchJob finishedSearchJob = searchDomain.executeSync(
+                search,
+                this::hasStreamReadPermission,
+                getCurrentUser(),
+                timeout);
 
-        search = search.addStreamsToQueriesWithoutStreams(this::loadAllAllowedStreamsForUser);
-
-        guard(search);
-
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username));
-
-        try {
-            //noinspection UnstableApiUsage
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException e) {
-            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
-            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
-        } catch (TimeoutException e) {
-            throw new InternalServerErrorException("Timeout while executing search job");
-        } catch (Exception e) {
-            LOG.error("Other error", e);
-            throw e;
-        }
-
-        return Response.ok(searchJob).build();
+        return Response.ok(finishedSearchJob).build();
     }
-
 
     @GET
     @ApiOperation(value = "Retrieve the status of an executed query")

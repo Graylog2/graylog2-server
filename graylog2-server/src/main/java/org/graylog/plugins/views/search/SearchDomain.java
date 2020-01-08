@@ -16,24 +16,52 @@
  */
 package org.graylog.plugins.views.search;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.errors.PermissionException;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog2.plugin.database.users.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.InternalServerErrorException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class SearchDomain {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchDomain.class);
+
     private final SearchDbService dbService;
+    private final QueryEngine queryEngine;
+    private final SearchJobService searchJobService;
     private final ViewPermissions viewPermissions;
+    private final PermittedStreams permittedStreams;
+    private final SearchExecutionGuard executionGuard;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public SearchDomain(SearchDbService dbService, ViewPermissions viewPermissions) {
+    public SearchDomain(SearchDbService dbService, QueryEngine queryEngine, SearchJobService searchJobService, ViewPermissions viewPermissions, PermittedStreams permittedStreams, SearchExecutionGuard executionGuard, ObjectMapper objectMapper) {
         this.dbService = dbService;
+        this.queryEngine = queryEngine;
+        this.searchJobService = searchJobService;
         this.viewPermissions = viewPermissions;
+        this.permittedStreams = permittedStreams;
+        this.executionGuard = executionGuard;
+        this.objectMapper = objectMapper;
     }
 
     public Optional<Search> getForUser(String id, User user, Predicate<String> viewReadPermission) {
@@ -42,6 +70,70 @@ public class SearchDomain {
         search.ifPresent(s -> checkPermission(user, viewReadPermission, s));
 
         return search;
+    }
+
+    public Search find(String id, User user, Predicate<String> viewReadPermission) {
+        final Search search = dbService.get(id)
+                .orElseThrow(() -> new EntityNotFoundException(id, Search.class));
+
+        checkPermission(user, viewReadPermission, search);
+
+        return search;
+    }
+
+    public SearchJob executeAsync(String id, Map<String, Object> executionState, Predicate<String> streamReadPermission, Predicate<String> viewReadPermission, User user) {
+
+        Search search = find(id, user, viewReadPermission);
+
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(streamReadPermission));
+
+        guard(search, streamReadPermission);
+
+        search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
+
+        return execute(search, user);
+    }
+
+    private ImmutableSet<String> loadAllAllowedStreamsForUser(Predicate<String> streamReadPermission) {
+        return permittedStreams.load(streamReadPermission);
+    }
+
+    private void guard(Search search, Predicate<String> streamReadPermission) {
+        this.executionGuard.check(search, streamReadPermission);
+    }
+
+    public SearchJob executeSync(Search search, Predicate<String> streamReadPermission, User user, long timeout) {
+
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(streamReadPermission));
+
+        guard(search, streamReadPermission);
+
+        final SearchJob runningSearchJob = execute(search, user);
+
+        forceCompletion(runningSearchJob, timeout);
+
+        return runningSearchJob;
+    }
+
+    protected void forceCompletion(SearchJob runningSearchJob, long timeout) {
+        try {
+            //noinspection UnstableApiUsage
+            Uninterruptibles.getUninterruptibly(runningSearchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            LOG.error("Error executing search job <{}>", runningSearchJob.getId(), e);
+            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
+        } catch (TimeoutException e) {
+            throw new InternalServerErrorException("Timeout while executing search job");
+        } catch (Exception e) {
+            LOG.error("Other error", e);
+            throw e;
+        }
+    }
+
+    private SearchJob execute(Search search, User user) {
+        final SearchJob searchJob = searchJobService.create(search, user.getName());
+
+        return queryEngine.execute(searchJob);
     }
 
     private void checkPermission(User user, Predicate<String> viewReadPermission, Search s) {
@@ -66,4 +158,6 @@ public class SearchDomain {
     private boolean isOwned(Search search, User user) {
         return search.owner().map(o -> o.equals(user.getName())).orElse(false);
     }
+
+
 }

@@ -25,8 +25,8 @@ import org.graylog.plugins.views.migrations.V20190127111728_MigrateWidgetFormatS
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
 import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardStateFromViews;
 import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.V20191125144500_MigrateDashboardsToViews;
-import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.V20191203120602_MigrateSavedSearchesToViews;
+import org.graylog.plugins.views.migrations.V20191204000000_RemoveLegacyViewsPermissions;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.SearchRequiresParameterSupport;
 import org.graylog.plugins.views.search.ValueParameter;
@@ -39,6 +39,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
+import org.graylog.plugins.views.search.rest.exceptionmappers.EntityNotFoundExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
@@ -208,5 +209,6 @@ public class ViewsBindings extends ViewsModule {
     private void registerExceptionMappers() {
         addJerseyExceptionMapper(MissingCapabilitiesExceptionMapper.class);
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
+        addJerseyExceptionMapper(EntityNotFoundExceptionMapper.class);
     }
 }
