@@ -10,18 +10,27 @@ describe('Select', () => {
     const onChange = () => { };
 
     it('should convert multi to isMulti', () => {
-      const wrapper = shallow(<Select multi options={options} onChange={onChange} />);
-      expect(wrapper.props().isMulti).toBeTruthy();
+      const multiWrapper = shallow(<Select multi options={options} onChange={onChange} />);
+      expect(multiWrapper.props().isMulti).toBeTruthy();
+
+      const nonMultiWrapper = shallow(<Select options={options} onChange={onChange} />);
+      expect(nonMultiWrapper.props().isMulti).toBeFalsy();
     });
 
     it('should convert disabled to isDisabled', () => {
-      const wrapper = shallow(<Select disabled options={options} onChange={onChange} />);
-      expect(wrapper.props().isDisabled).toBeTruthy();
+      const disabledWrapper = shallow(<Select disabled options={options} onChange={onChange} />);
+      expect(disabledWrapper.props().isDisabled).toBeTruthy();
+
+      const enabledWrapper = shallow(<Select options={options} onChange={onChange} />);
+      expect(enabledWrapper.props().isDisabled).toBeFalsy();
     });
 
     it('should convert clearable to isClearable', () => {
-      const wrapper = shallow(<Select clearable options={options} onChange={onChange} />);
-      expect(wrapper.props().isClearable).toBeTruthy();
+      const clearableWrapper = shallow(<Select options={options} onChange={onChange} />);
+      expect(clearableWrapper.props().isClearable).toBeTruthy();
+
+      const nonClearableWrapper = shallow(<Select clearable={false} options={options} onChange={onChange} />);
+      expect(nonClearableWrapper.props().isClearable).toBeFalsy();
     });
 
     it('should use displayKey to select the option label', () => {
