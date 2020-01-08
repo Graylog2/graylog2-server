@@ -11,6 +11,7 @@ import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from '../aggregationbuilder/AggregationWidgetConfig';
 import PivotGenerator from '../searchtypes/aggregation/PivotGenerator';
 import { createElasticsearchQueryString } from '../queries/Query';
+import Widget from '../widgets/Widget';
 
 jest.mock('views/stores/WidgetStore', () => ({
   WidgetActions: {
@@ -93,40 +94,31 @@ describe('ShowDocumentsHandler', () => {
       });
   });
   describe('on dashboard', () => {
-    const view = View.builder().type(View.Type.Dashboard).build();
-    it('copies timerange of original widget', () => {
-      const widgetWithFilter = widget.toBuilder()
-        .timerange({ type: 'relative', range: 1800 })
-        .query(createElasticsearchQueryString())
+    it('duplicates query/timerange/streams/filter of original widget', () => {
+      const origWidget = Widget.builder()
+        .filter('author: "Vanth"')
+        .query(createElasticsearchQueryString('foo:42'))
+        .streams(['stream1', 'stream23'])
+        .timerange({ type: 'relative', range: 3600 })
         .build();
+
       return ShowDocumentsHandler({
         queryId,
         field: 'hello',
         value: 'world',
         type: FieldType.Unknown,
-        contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }], view },
-      })
-        .then(() => {
-          const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-          expect(newWidget.timerange).toEqual({ type: 'relative', range: 1800 });
-        });
-    });
-    it('copies timerange of original widget', () => {
-      const widgetWithFilter = widget.toBuilder()
-        .streams(['deadbeef', 'cafecafe'])
-        .query(createElasticsearchQueryString())
-        .build();
-      return ShowDocumentsHandler({
-        queryId,
-        field: 'hello',
-        value: 'world',
-        type: FieldType.Unknown,
-        contexts: { widget: widgetWithFilter, valuePath: [{ bar: 42 }, { hello: 'world' }], view },
-      })
-        .then(() => {
-          const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
-          expect(newWidget.streams).toEqual(['deadbeef', 'cafecafe']);
-        });
+        contexts: {
+          widget: origWidget,
+          valuePath: [{ bar: 42 }, { hello: 'world' }],
+        },
+      }).then(() => {
+        expect(WidgetActions.create).toHaveBeenCalled();
+        const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+        expect(filter).toEqual('author: "Vanth"');
+        expect(query).toEqual(createElasticsearchQueryString('foo:42 AND hello:world AND bar:42'));
+        expect(streams).toEqual(['stream1', 'stream23']);
+        expect(timerange).toEqual({ type: 'relative', range: 3600 });
+      });
     });
   });
 });

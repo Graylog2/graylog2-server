@@ -7,8 +7,9 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTable from 'views/components/datatable/DataTable';
 import type { FieldActionHandler } from './FieldActionHandler';
+import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
-const AggregateActionHandler: FieldActionHandler = ({ field, type, contexts: { widget: origWidget = Widget.empty() } }) => {
+const AggregateActionHandler: FieldActionHandler = ({ field, type, contexts: { widget = Widget.empty() } }) => {
   const newWidgetBuilder = AggregationWidget.builder()
     .newId()
     .config(AggregationWidgetConfig.builder()
@@ -16,10 +17,9 @@ const AggregateActionHandler: FieldActionHandler = ({ field, type, contexts: { w
       .series([Series.forFunction('count()')])
       .visualization(DataTable.type)
       .build());
-  if (origWidget.filter) {
-    newWidgetBuilder.filter(origWidget.filter);
-  }
-  return WidgetActions.create(newWidgetBuilder.build());
+  const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();
+
+  return WidgetActions.create(newWidget);
 };
 
 export default AggregateActionHandler;
