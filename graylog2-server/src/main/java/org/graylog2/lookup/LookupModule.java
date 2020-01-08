@@ -16,8 +16,7 @@
  */
 package org.graylog2.lookup;
 
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-
+import com.google.inject.Scopes;
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
 import org.graylog2.lookup.adapters.DSVHTTPDataAdapter;
 import org.graylog2.lookup.adapters.DnsLookupDataAdapter;
@@ -25,11 +24,16 @@ import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.lookup.caches.GuavaLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
+import org.graylog2.system.urlwhitelist.UrlWhitelistService;
 
 public class LookupModule extends Graylog2Module {
 
     @Override
     protected void configure() {
+        serviceBinder().addBinding().to(UrlWhitelistService.class).in(Scopes.SINGLETON);
+        binder().bind(UrlWhitelistNotificationService.class).in(Scopes.SINGLETON);
+
         serviceBinder().addBinding().to(LookupTableService.class).asEagerSingleton();
 
         installLookupCache(NullCache.NAME,
