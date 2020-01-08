@@ -32,6 +32,11 @@ public abstract class LineVisualizationConfigDTO implements VisualizationConfigD
     @JsonProperty(FIELD_INTERPOLATION)
     public abstract Interpolation interpolation();
 
+    public static Builder builder() {
+        return new AutoValue_LineVisualizationConfigDTO.Builder()
+                .interpolation(Interpolation.defaultValue());
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERPOLATION)

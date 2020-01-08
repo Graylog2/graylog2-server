@@ -20,10 +20,14 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeResolver;
 import org.graylog2.contentpacks.jackson.ValueReferenceTypeResolverBuilder;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+
+import java.util.Map;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM, include = JsonTypeInfo.As.WRAPPER_OBJECT, property = TypedEntity.FIELD_META_TYPE, visible = true)
 @JsonSubTypes({
@@ -47,4 +51,6 @@ public abstract class TimeRangeEntity implements TypedEntity {
             throw new IllegalArgumentException("Unknown time range type " + timeRange.getClass());
         }
     }
+
+    public abstract TimeRange convert(Map<String, ValueReference> parameters) throws InvalidRangeParametersException;
 }

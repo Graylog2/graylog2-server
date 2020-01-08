@@ -18,6 +18,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -81,6 +82,7 @@ public class DashboardV1FacadeTest {
     public void setUp() {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
+        objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(OrFilter.class, OrFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
@@ -114,6 +116,6 @@ public class DashboardV1FacadeTest {
         assertThat(viewDTO.state()).isNotNull();
         assertThat(viewDTO.state().size()).isEqualTo(1);
         ViewStateDTO viewState = viewDTO.state().values().iterator().next();
-        assertThat(viewState.widgets().size()).isEqualTo(1);
+        assertThat(viewState.widgets().size()).isEqualTo(3);
     }
 }

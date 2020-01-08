@@ -32,6 +32,11 @@ public abstract class AreaVisualizationConfigDTO implements VisualizationConfigD
     @JsonProperty(FIELD_INTERPOLATION)
     public abstract Interpolation interpolation();
 
+    public static Builder builder() {
+        return new AutoValue_AreaVisualizationConfigDTO.Builder()
+                .interpolation(Interpolation.defaultValue());
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_INTERPOLATION)
