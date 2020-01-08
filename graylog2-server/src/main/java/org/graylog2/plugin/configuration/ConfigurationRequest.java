@@ -132,6 +132,8 @@ public class ConfigurationRequest {
         }
     }
 
+
+
     /**
      * Creates a new {@link org.graylog2.plugin.configuration.Configuration configuration object} containing only the
      * fields specified in this request object.
@@ -174,12 +176,6 @@ public class ConfigurationRequest {
         return new Configuration(values);
     }
 
-    public Map<String, Object> addListField(Map<String,Object> values, Configuration config, String name) {
-        if(config.listIsSet(name)){
-            values.put(name,config.getList(name));
-        }
-        return values;
-    }
 
     public static class Templates {
 
