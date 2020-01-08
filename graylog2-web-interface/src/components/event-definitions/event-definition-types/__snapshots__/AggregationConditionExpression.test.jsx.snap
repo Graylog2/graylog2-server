@@ -246,6 +246,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                 allowCreate={false}
                                 autoFocus={false}
                                 className="boolean-operator"
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -287,6 +288,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   displayKey="label"
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -353,6 +355,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     getOptionLabel={[Function]}
                                     getOptionValue={[Function]}
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -472,6 +475,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "getOptionLabel": [Function],
                                           "getOptionValue": [Function],
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -623,6 +627,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               "getOptionLabel": [Function],
                                               "getOptionValue": [Function],
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -766,6 +771,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -913,6 +919,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -1049,6 +1056,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -1280,6 +1288,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -1422,6 +1431,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -1568,6 +1578,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -2194,6 +2205,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             allowCreate={false}
                                             autoFocus={false}
                                             className="aggregation-function"
+                                            clearable={false}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
@@ -2225,6 +2237,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               displayKey="label"
                                               getOptionLabel={[Function]}
                                               getOptionValue={[Function]}
+                                              isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
                                               matchProp="label"
@@ -2278,6 +2291,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 getOptionLabel={[Function]}
                                                 getOptionValue={[Function]}
                                                 inputValue=""
+                                                isClearable={false}
                                                 isDisabled={false}
                                                 isLoading={false}
                                                 isMulti={false}
@@ -2372,6 +2386,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -2500,6 +2515,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -2620,6 +2636,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -2740,6 +2757,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -2864,6 +2882,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -3072,6 +3091,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -3191,6 +3211,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -3314,6 +3335,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -3450,11 +3472,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             allowCreate={true}
                                             autoFocus={false}
                                             className="aggregation-function-field"
+                                            clearable={true}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
                                             displayKey="label"
-                                            isClearable={true}
                                             matchProp="label"
                                             multi={false}
                                             onChange={[Function]}
@@ -5112,6 +5134,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                               <Select
                                 allowCreate={false}
                                 autoFocus={false}
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -5166,6 +5189,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
                                   id="aggregation-condition"
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -5242,6 +5266,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     getOptionValue={[Function]}
                                     id="aggregation-condition"
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -5381,6 +5406,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "getOptionValue": [Function],
                                           "id": "aggregation-condition",
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -5554,6 +5580,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -5718,6 +5745,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -5882,6 +5910,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -6027,6 +6056,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -6279,6 +6309,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -6442,6 +6473,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -6609,6 +6641,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -7707,6 +7740,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             allowCreate={false}
                                             autoFocus={false}
                                             className="aggregation-function"
+                                            clearable={false}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
@@ -7738,6 +7772,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               displayKey="label"
                                               getOptionLabel={[Function]}
                                               getOptionValue={[Function]}
+                                              isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
                                               matchProp="label"
@@ -7791,6 +7826,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 getOptionLabel={[Function]}
                                                 getOptionValue={[Function]}
                                                 inputValue=""
+                                                isClearable={false}
                                                 isDisabled={false}
                                                 isLoading={false}
                                                 isMulti={false}
@@ -7885,6 +7921,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -8013,6 +8050,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -8133,6 +8171,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -8253,6 +8292,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -8377,6 +8417,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -8585,6 +8626,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -8704,6 +8746,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -8827,6 +8870,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -8963,11 +9007,11 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                             allowCreate={true}
                                             autoFocus={false}
                                             className="aggregation-function-field"
+                                            clearable={true}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
                                             displayKey="label"
-                                            isClearable={true}
                                             matchProp="label"
                                             multi={false}
                                             onChange={[Function]}
@@ -10583,6 +10627,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                               <Select
                                 allowCreate={false}
                                 autoFocus={false}
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -10637,6 +10682,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
                                   id="aggregation-condition"
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -10713,6 +10759,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                     getOptionValue={[Function]}
                                     id="aggregation-condition"
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -10852,6 +10899,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                           "getOptionValue": [Function],
                                           "id": "aggregation-condition",
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -11025,6 +11073,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -11189,6 +11238,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -11353,6 +11403,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -11498,6 +11549,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -11750,6 +11802,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -11913,6 +11966,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -12080,6 +12134,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -13065,6 +13120,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 allowCreate={false}
                                 autoFocus={false}
                                 className="boolean-operator"
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -13106,6 +13162,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   displayKey="label"
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -13172,6 +13229,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     getOptionLabel={[Function]}
                                     getOptionValue={[Function]}
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -13291,6 +13349,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "getOptionLabel": [Function],
                                           "getOptionValue": [Function],
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -13442,6 +13501,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "getOptionLabel": [Function],
                                               "getOptionValue": [Function],
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -13585,6 +13645,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -13732,6 +13793,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -13868,6 +13930,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -14099,6 +14162,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -14241,6 +14305,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -14387,6 +14452,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -15025,6 +15091,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             allowCreate={false}
                                             autoFocus={false}
                                             className="aggregation-function"
+                                            clearable={false}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
@@ -15056,6 +15123,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               displayKey="label"
                                               getOptionLabel={[Function]}
                                               getOptionValue={[Function]}
+                                              isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
                                               matchProp="label"
@@ -15109,6 +15177,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 getOptionLabel={[Function]}
                                                 getOptionValue={[Function]}
                                                 inputValue=""
+                                                isClearable={false}
                                                 isDisabled={false}
                                                 isLoading={false}
                                                 isMulti={false}
@@ -15203,6 +15272,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -15331,6 +15401,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -15451,6 +15522,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -15571,6 +15643,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -15695,6 +15768,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -15903,6 +15977,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -16022,6 +16097,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -16145,6 +16221,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                   "getOptionLabel": [Function],
                                                                   "getOptionValue": [Function],
                                                                   "inputValue": "",
+                                                                  "isClearable": false,
                                                                   "isDisabled": false,
                                                                   "isLoading": false,
                                                                   "isMulti": false,
@@ -16281,11 +16358,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             allowCreate={true}
                                             autoFocus={false}
                                             className="aggregation-function-field"
+                                            clearable={true}
                                             components={null}
                                             delimiter=","
                                             disabled={false}
                                             displayKey="label"
-                                            isClearable={true}
                                             matchProp="label"
                                             multi={false}
                                             onChange={[Function]}
@@ -17943,6 +18020,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                               <Select
                                 allowCreate={false}
                                 autoFocus={false}
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -17997,6 +18075,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
                                   id="aggregation-condition"
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -18073,6 +18152,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     getOptionValue={[Function]}
                                     id="aggregation-condition"
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -18212,6 +18292,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           "getOptionValue": [Function],
                                           "id": "aggregation-condition",
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -18385,6 +18466,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -18549,6 +18631,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -18713,6 +18796,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -18858,6 +18942,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -19110,6 +19195,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -19273,6 +19359,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -19440,6 +19527,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       "getOptionValue": [Function],
                                                       "id": "aggregation-condition",
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -20503,6 +20591,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       allowCreate={false}
                                       autoFocus={false}
                                       className="boolean-operator"
+                                      clearable={false}
                                       components={null}
                                       delimiter=","
                                       disabled={false}
@@ -20544,6 +20633,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         displayKey="label"
                                         getOptionLabel={[Function]}
                                         getOptionValue={[Function]}
+                                        isClearable={false}
                                         isDisabled={false}
                                         isMulti={false}
                                         matchProp="label"
@@ -20610,6 +20700,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           getOptionLabel={[Function]}
                                           getOptionValue={[Function]}
                                           inputValue=""
+                                          isClearable={false}
                                           isDisabled={false}
                                           isLoading={false}
                                           isMulti={false}
@@ -20729,6 +20820,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "getOptionLabel": [Function],
                                                 "getOptionValue": [Function],
                                                 "inputValue": "",
+                                                "isClearable": false,
                                                 "isDisabled": false,
                                                 "isLoading": false,
                                                 "isMulti": false,
@@ -20880,6 +20972,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     "getOptionLabel": [Function],
                                                     "getOptionValue": [Function],
                                                     "inputValue": "",
+                                                    "isClearable": false,
                                                     "isDisabled": false,
                                                     "isLoading": false,
                                                     "isMulti": false,
@@ -21023,6 +21116,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -21170,6 +21264,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionLabel": [Function],
                                                             "getOptionValue": [Function],
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -21306,6 +21401,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionLabel": [Function],
                                                             "getOptionValue": [Function],
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -21537,6 +21633,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -21679,6 +21776,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionLabel": [Function],
                                                             "getOptionValue": [Function],
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -21825,6 +21923,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionLabel": [Function],
                                                             "getOptionValue": [Function],
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -22365,6 +22464,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       allowCreate={false}
                                                       autoFocus={false}
                                                       className="aggregation-function"
+                                                      clearable={false}
                                                       components={null}
                                                       delimiter=","
                                                       disabled={false}
@@ -22396,6 +22496,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         displayKey="label"
                                                         getOptionLabel={[Function]}
                                                         getOptionValue={[Function]}
+                                                        isClearable={false}
                                                         isDisabled={false}
                                                         isMulti={false}
                                                         matchProp="label"
@@ -22449,6 +22550,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           getOptionLabel={[Function]}
                                                           getOptionValue={[Function]}
                                                           inputValue=""
+                                                          isClearable={false}
                                                           isDisabled={false}
                                                           isLoading={false}
                                                           isMulti={false}
@@ -22543,6 +22645,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionLabel": [Function],
                                                                 "getOptionValue": [Function],
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -22671,6 +22774,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     "getOptionLabel": [Function],
                                                                     "getOptionValue": [Function],
                                                                     "inputValue": "",
+                                                                    "isClearable": false,
                                                                     "isDisabled": false,
                                                                     "isLoading": false,
                                                                     "isMulti": false,
@@ -22791,6 +22895,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -22911,6 +23016,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             "getOptionLabel": [Function],
                                                                             "getOptionValue": [Function],
                                                                             "inputValue": "",
+                                                                            "isClearable": false,
                                                                             "isDisabled": false,
                                                                             "isLoading": false,
                                                                             "isMulti": false,
@@ -23035,6 +23141,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             "getOptionLabel": [Function],
                                                                             "getOptionValue": [Function],
                                                                             "inputValue": "",
+                                                                            "isClearable": false,
                                                                             "isDisabled": false,
                                                                             "isLoading": false,
                                                                             "isMulti": false,
@@ -23243,6 +23350,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -23362,6 +23470,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             "getOptionLabel": [Function],
                                                                             "getOptionValue": [Function],
                                                                             "inputValue": "",
+                                                                            "isClearable": false,
                                                                             "isDisabled": false,
                                                                             "isLoading": false,
                                                                             "isMulti": false,
@@ -23485,6 +23594,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                             "getOptionLabel": [Function],
                                                                             "getOptionValue": [Function],
                                                                             "inputValue": "",
+                                                                            "isClearable": false,
                                                                             "isDisabled": false,
                                                                             "isLoading": false,
                                                                             "isMulti": false,
@@ -23621,11 +23731,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       allowCreate={true}
                                                       autoFocus={false}
                                                       className="aggregation-function-field"
+                                                      clearable={true}
                                                       components={null}
                                                       delimiter=","
                                                       disabled={false}
                                                       displayKey="label"
-                                                      isClearable={true}
                                                       matchProp="label"
                                                       multi={false}
                                                       onChange={[Function]}
@@ -25241,6 +25351,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         <Select
                                           allowCreate={false}
                                           autoFocus={false}
+                                          clearable={false}
                                           components={null}
                                           delimiter=","
                                           disabled={false}
@@ -25295,6 +25406,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             getOptionLabel={[Function]}
                                             getOptionValue={[Function]}
                                             id="aggregation-condition"
+                                            isClearable={false}
                                             isDisabled={false}
                                             isMulti={false}
                                             matchProp="label"
@@ -25371,6 +25483,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               getOptionValue={[Function]}
                                               id="aggregation-condition"
                                               inputValue=""
+                                              isClearable={false}
                                               isDisabled={false}
                                               isLoading={false}
                                               isMulti={false}
@@ -25510,6 +25623,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     "getOptionValue": [Function],
                                                     "id": "aggregation-condition",
                                                     "inputValue": "",
+                                                    "isClearable": false,
                                                     "isDisabled": false,
                                                     "isLoading": false,
                                                     "isMulti": false,
@@ -25683,6 +25797,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionValue": [Function],
                                                         "id": "aggregation-condition",
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -25847,6 +25962,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -26011,6 +26127,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionValue": [Function],
                                                                 "id": "aggregation-condition",
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -26156,6 +26273,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionValue": [Function],
                                                                 "id": "aggregation-condition",
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -26408,6 +26526,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -26571,6 +26690,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionValue": [Function],
                                                                 "id": "aggregation-condition",
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -26738,6 +26858,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionValue": [Function],
                                                                 "id": "aggregation-condition",
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -27696,6 +27817,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   allowCreate={false}
                                   autoFocus={false}
                                   className="boolean-operator"
+                                  clearable={false}
                                   components={null}
                                   delimiter=","
                                   disabled={false}
@@ -27737,6 +27859,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     displayKey="label"
                                     getOptionLabel={[Function]}
                                     getOptionValue={[Function]}
+                                    isClearable={false}
                                     isDisabled={false}
                                     isMulti={false}
                                     matchProp="label"
@@ -27803,6 +27926,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                       getOptionLabel={[Function]}
                                       getOptionValue={[Function]}
                                       inputValue=""
+                                      isClearable={false}
                                       isDisabled={false}
                                       isLoading={false}
                                       isMulti={false}
@@ -27922,6 +28046,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             "getOptionLabel": [Function],
                                             "getOptionValue": [Function],
                                             "inputValue": "",
+                                            "isClearable": false,
                                             "isDisabled": false,
                                             "isLoading": false,
                                             "isMulti": false,
@@ -28073,6 +28198,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "getOptionLabel": [Function],
                                                 "getOptionValue": [Function],
                                                 "inputValue": "",
+                                                "isClearable": false,
                                                 "isDisabled": false,
                                                 "isLoading": false,
                                                 "isMulti": false,
@@ -28216,6 +28342,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     "getOptionLabel": [Function],
                                                     "getOptionValue": [Function],
                                                     "inputValue": "",
+                                                    "isClearable": false,
                                                     "isDisabled": false,
                                                     "isLoading": false,
                                                     "isMulti": false,
@@ -28363,6 +28490,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -28499,6 +28627,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -28730,6 +28859,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     "getOptionLabel": [Function],
                                                     "getOptionValue": [Function],
                                                     "inputValue": "",
+                                                    "isClearable": false,
                                                     "isDisabled": false,
                                                     "isLoading": false,
                                                     "isMulti": false,
@@ -28872,6 +29002,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -29018,6 +29149,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionLabel": [Function],
                                                         "getOptionValue": [Function],
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -29600,6 +29732,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   allowCreate={false}
                                                   autoFocus={false}
                                                   className="aggregation-function"
+                                                  clearable={false}
                                                   components={null}
                                                   delimiter=","
                                                   disabled={false}
@@ -29631,6 +29764,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     displayKey="label"
                                                     getOptionLabel={[Function]}
                                                     getOptionValue={[Function]}
+                                                    isClearable={false}
                                                     isDisabled={false}
                                                     isMulti={false}
                                                     matchProp="label"
@@ -29684,6 +29818,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       getOptionLabel={[Function]}
                                                       getOptionValue={[Function]}
                                                       inputValue=""
+                                                      isClearable={false}
                                                       isDisabled={false}
                                                       isLoading={false}
                                                       isMulti={false}
@@ -29778,6 +29913,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionLabel": [Function],
                                                             "getOptionValue": [Function],
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -29906,6 +30042,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                 "getOptionLabel": [Function],
                                                                 "getOptionValue": [Function],
                                                                 "inputValue": "",
+                                                                "isClearable": false,
                                                                 "isDisabled": false,
                                                                 "isLoading": false,
                                                                 "isMulti": false,
@@ -30026,6 +30163,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     "getOptionLabel": [Function],
                                                                     "getOptionValue": [Function],
                                                                     "inputValue": "",
+                                                                    "isClearable": false,
                                                                     "isDisabled": false,
                                                                     "isLoading": false,
                                                                     "isMulti": false,
@@ -30146,6 +30284,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -30270,6 +30409,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -30478,6 +30618,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                     "getOptionLabel": [Function],
                                                                     "getOptionValue": [Function],
                                                                     "inputValue": "",
+                                                                    "isClearable": false,
                                                                     "isDisabled": false,
                                                                     "isLoading": false,
                                                                     "isMulti": false,
@@ -30597,6 +30738,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -30720,6 +30862,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                                         "getOptionLabel": [Function],
                                                                         "getOptionValue": [Function],
                                                                         "inputValue": "",
+                                                                        "isClearable": false,
                                                                         "isDisabled": false,
                                                                         "isLoading": false,
                                                                         "isMulti": false,
@@ -30856,11 +30999,11 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                   allowCreate={true}
                                                   autoFocus={false}
                                                   className="aggregation-function-field"
+                                                  clearable={true}
                                                   components={null}
                                                   delimiter=","
                                                   disabled={false}
                                                   displayKey="label"
-                                                  isClearable={true}
                                                   matchProp="label"
                                                   multi={false}
                                                   onChange={[Function]}
@@ -32518,6 +32661,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     <Select
                                       allowCreate={false}
                                       autoFocus={false}
+                                      clearable={false}
                                       components={null}
                                       delimiter=","
                                       disabled={false}
@@ -32572,6 +32716,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         getOptionLabel={[Function]}
                                         getOptionValue={[Function]}
                                         id="aggregation-condition"
+                                        isClearable={false}
                                         isDisabled={false}
                                         isMulti={false}
                                         matchProp="label"
@@ -32648,6 +32793,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                           getOptionValue={[Function]}
                                           id="aggregation-condition"
                                           inputValue=""
+                                          isClearable={false}
                                           isDisabled={false}
                                           isLoading={false}
                                           isMulti={false}
@@ -32787,6 +32933,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 "getOptionValue": [Function],
                                                 "id": "aggregation-condition",
                                                 "inputValue": "",
+                                                "isClearable": false,
                                                 "isDisabled": false,
                                                 "isLoading": false,
                                                 "isMulti": false,
@@ -32960,6 +33107,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     "getOptionValue": [Function],
                                                     "id": "aggregation-condition",
                                                     "inputValue": "",
+                                                    "isClearable": false,
                                                     "isDisabled": false,
                                                     "isLoading": false,
                                                     "isMulti": false,
@@ -33124,6 +33272,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionValue": [Function],
                                                         "id": "aggregation-condition",
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -33288,6 +33437,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -33433,6 +33583,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -33685,6 +33836,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         "getOptionValue": [Function],
                                                         "id": "aggregation-condition",
                                                         "inputValue": "",
+                                                        "isClearable": false,
                                                         "isDisabled": false,
                                                         "isLoading": false,
                                                         "isMulti": false,
@@ -33848,6 +34000,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -34015,6 +34168,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                             "getOptionValue": [Function],
                                                             "id": "aggregation-condition",
                                                             "inputValue": "",
+                                                            "isClearable": false,
                                                             "isDisabled": false,
                                                             "isLoading": false,
                                                             "isMulti": false,
@@ -35023,6 +35177,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 allowCreate={false}
                                 autoFocus={false}
                                 className="boolean-operator"
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -35064,6 +35219,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                   displayKey="label"
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -35130,6 +35286,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                     getOptionLabel={[Function]}
                                     getOptionValue={[Function]}
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -35249,6 +35406,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           "getOptionLabel": [Function],
                                           "getOptionValue": [Function],
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -35400,6 +35558,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                               "getOptionLabel": [Function],
                                               "getOptionValue": [Function],
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -35543,6 +35702,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -35690,6 +35850,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -35826,6 +35987,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -36057,6 +36219,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -36199,6 +36362,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -36345,6 +36509,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -36807,6 +36972,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                         allowCreate={false}
                                         autoFocus={false}
                                         className="aggregation-function"
+                                        clearable={false}
                                         components={null}
                                         delimiter=","
                                         disabled={false}
@@ -36837,6 +37003,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           displayKey="label"
                                           getOptionLabel={[Function]}
                                           getOptionValue={[Function]}
+                                          isClearable={false}
                                           isDisabled={false}
                                           isMulti={false}
                                           matchProp="label"
@@ -36890,6 +37057,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                             getOptionLabel={[Function]}
                                             getOptionValue={[Function]}
                                             inputValue=""
+                                            isClearable={false}
                                             isDisabled={false}
                                             isLoading={false}
                                             isMulti={false}
@@ -36984,6 +37152,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -37112,6 +37281,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -37232,6 +37402,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -37352,6 +37523,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -37476,6 +37648,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -37684,6 +37857,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -37803,6 +37977,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -37926,6 +38101,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -38062,11 +38238,11 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                         allowCreate={true}
                                         autoFocus={false}
                                         className="aggregation-function-field"
+                                        clearable={true}
                                         components={null}
                                         delimiter=","
                                         disabled={false}
                                         displayKey="label"
-                                        isClearable={true}
                                         matchProp="label"
                                         multi={false}
                                         onChange={[Function]}
@@ -39529,6 +39705,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                           <Select
                             allowCreate={false}
                             autoFocus={false}
+                            clearable={false}
                             components={null}
                             delimiter=","
                             disabled={false}
@@ -39583,6 +39760,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               getOptionLabel={[Function]}
                               getOptionValue={[Function]}
                               id="aggregation-condition"
+                              isClearable={false}
                               isDisabled={false}
                               isMulti={false}
                               matchProp="label"
@@ -39659,6 +39837,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                 getOptionValue={[Function]}
                                 id="aggregation-condition"
                                 inputValue=""
+                                isClearable={false}
                                 isDisabled={false}
                                 isLoading={false}
                                 isMulti={false}
@@ -39798,6 +39977,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                       "getOptionValue": [Function],
                                       "id": "aggregation-condition",
                                       "inputValue": "",
+                                      "isClearable": false,
                                       "isDisabled": false,
                                       "isLoading": false,
                                       "isMulti": false,
@@ -39971,6 +40151,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           "getOptionValue": [Function],
                                           "id": "aggregation-condition",
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -40135,6 +40316,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -40299,6 +40481,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -40444,6 +40627,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -40696,6 +40880,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -40859,6 +41044,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -41026,6 +41212,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -42023,6 +42210,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 allowCreate={false}
                                 autoFocus={false}
                                 className="boolean-operator"
+                                clearable={false}
                                 components={null}
                                 delimiter=","
                                 disabled={false}
@@ -42064,6 +42252,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                   displayKey="label"
                                   getOptionLabel={[Function]}
                                   getOptionValue={[Function]}
+                                  isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
                                   matchProp="label"
@@ -42130,6 +42319,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                     getOptionLabel={[Function]}
                                     getOptionValue={[Function]}
                                     inputValue=""
+                                    isClearable={false}
                                     isDisabled={false}
                                     isLoading={false}
                                     isMulti={false}
@@ -42249,6 +42439,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           "getOptionLabel": [Function],
                                           "getOptionValue": [Function],
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -42400,6 +42591,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                               "getOptionLabel": [Function],
                                               "getOptionValue": [Function],
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -42543,6 +42735,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -42690,6 +42883,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -42826,6 +43020,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -43057,6 +43252,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -43199,6 +43395,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -43345,6 +43542,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -43825,6 +44023,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                         allowCreate={false}
                                         autoFocus={false}
                                         className="aggregation-function"
+                                        clearable={false}
                                         components={null}
                                         delimiter=","
                                         disabled={false}
@@ -43856,6 +44055,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           displayKey="label"
                                           getOptionLabel={[Function]}
                                           getOptionValue={[Function]}
+                                          isClearable={false}
                                           isDisabled={false}
                                           isMulti={false}
                                           matchProp="label"
@@ -43909,6 +44109,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                             getOptionLabel={[Function]}
                                             getOptionValue={[Function]}
                                             inputValue=""
+                                            isClearable={false}
                                             isDisabled={false}
                                             isLoading={false}
                                             isMulti={false}
@@ -44003,6 +44204,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionLabel": [Function],
                                                   "getOptionValue": [Function],
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -44131,6 +44333,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                       "getOptionLabel": [Function],
                                                       "getOptionValue": [Function],
                                                       "inputValue": "",
+                                                      "isClearable": false,
                                                       "isDisabled": false,
                                                       "isLoading": false,
                                                       "isMulti": false,
@@ -44251,6 +44454,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -44371,6 +44575,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -44495,6 +44700,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -44703,6 +44909,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                           "getOptionLabel": [Function],
                                                           "getOptionValue": [Function],
                                                           "inputValue": "",
+                                                          "isClearable": false,
                                                           "isDisabled": false,
                                                           "isLoading": false,
                                                           "isMulti": false,
@@ -44822,6 +45029,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -44945,6 +45153,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                               "getOptionLabel": [Function],
                                                               "getOptionValue": [Function],
                                                               "inputValue": "",
+                                                              "isClearable": false,
                                                               "isDisabled": false,
                                                               "isLoading": false,
                                                               "isMulti": false,
@@ -45081,11 +45290,11 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                         allowCreate={true}
                                         autoFocus={false}
                                         className="aggregation-function-field"
+                                        clearable={true}
                                         components={null}
                                         delimiter=","
                                         disabled={false}
                                         displayKey="label"
-                                        isClearable={true}
                                         matchProp="label"
                                         multi={false}
                                         onChange={[Function]}
@@ -46743,6 +46952,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                           <Select
                             allowCreate={false}
                             autoFocus={false}
+                            clearable={false}
                             components={null}
                             delimiter=","
                             disabled={false}
@@ -46798,6 +47008,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               getOptionLabel={[Function]}
                               getOptionValue={[Function]}
                               id="aggregation-condition"
+                              isClearable={false}
                               isDisabled={false}
                               isMulti={false}
                               matchProp="label"
@@ -46877,6 +47088,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                 getOptionValue={[Function]}
                                 id="aggregation-condition"
                                 inputValue=""
+                                isClearable={false}
                                 isDisabled={false}
                                 isLoading={false}
                                 isMulti={false}
@@ -47019,6 +47231,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                       "getOptionValue": [Function],
                                       "id": "aggregation-condition",
                                       "inputValue": "",
+                                      "isClearable": false,
                                       "isDisabled": false,
                                       "isLoading": false,
                                       "isMulti": false,
@@ -47195,6 +47408,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           "getOptionValue": [Function],
                                           "id": "aggregation-condition",
                                           "inputValue": "",
+                                          "isClearable": false,
                                           "isDisabled": false,
                                           "isLoading": false,
                                           "isMulti": false,
@@ -47362,6 +47576,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -47533,6 +47748,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -47681,6 +47897,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -47936,6 +48153,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                               "getOptionValue": [Function],
                                               "id": "aggregation-condition",
                                               "inputValue": "",
+                                              "isClearable": false,
                                               "isDisabled": false,
                                               "isLoading": false,
                                               "isMulti": false,
@@ -48102,6 +48320,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,
@@ -48272,6 +48491,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                                   "getOptionValue": [Function],
                                                   "id": "aggregation-condition",
                                                   "inputValue": "",
+                                                  "isClearable": false,
                                                   "isDisabled": false,
                                                   "isLoading": false,
                                                   "isMulti": false,

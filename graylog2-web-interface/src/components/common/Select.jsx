@@ -156,7 +156,7 @@ type Option = { [string]: any };
 type Props = {
   onChange: (string) => void,
   placeholder: string,
-  clearable: boolean,
+  clearable?: boolean,
   displayKey?: string,
   valueKey?: string,
   delimiter?: string,
@@ -214,6 +214,7 @@ class Select extends React.Component<Props, State> {
      */
     components: PropTypes.arrayOf(PropTypes.node),
     disabled: PropTypes.bool,
+    clearable: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -230,6 +231,7 @@ class Select extends React.Component<Props, State> {
     addLabelText: undefined,
     onReactSelectChange: undefined,
     components: null,
+    clearable: true,
   };
 
   constructor(props: Props) {
@@ -313,6 +315,7 @@ class Select extends React.Component<Props, State> {
     const {
       multi: isMulti = false,
       disabled: isDisabled = false,
+      clearable: isClearable,
       ...rest
     } = this.props;
 
@@ -321,6 +324,7 @@ class Select extends React.Component<Props, State> {
                        onChange={onReactSelectChange || this._onChange}
                        isMulti={isMulti}
                        isDisabled={isDisabled}
+                       isClearable={isClearable}
                        getOptionLabel={option => option[displayKey]}
                        getOptionValue={option => option[valueKey]}
                        components={{

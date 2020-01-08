@@ -88,6 +88,7 @@ const NumberRefExpression = ({
                     placeholder="Select Function"
                     onChange={handleAggregationFunctionChange}
                     options={formatFunctions(aggregationFunctions)}
+                    clearable={false}
                     value={series.function} />
           </Col>
           <Col md={6}>
@@ -97,8 +98,7 @@ const NumberRefExpression = ({
                     onChange={handleAggregationFieldChange}
                     options={formattedFields}
                     value={series.field}
-                    allowCreate
-                    isClearable />
+                    allowCreate />
           </Col>
         </Row>
         {validation.errors.series && (

@@ -106,7 +106,6 @@ class AddDecoratorButton extends React.Component {
                     onChange={this._onTypeChange}
                     options={decoratorTypeOptions}
                     matchProp="label"
-                    isClearable
                     disabled={disabled}
                     value={typeName} />
           </div>
