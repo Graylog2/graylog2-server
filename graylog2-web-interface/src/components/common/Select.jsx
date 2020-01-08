@@ -213,6 +213,7 @@ class Select extends React.Component<Props, State> {
      * A collection of custom `react-select` components from https://react-select.com/components
      */
     components: PropTypes.arrayOf(PropTypes.node),
+    disabled: PropTypes.bool,
   };
 
   static defaultProps = {
