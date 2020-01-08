@@ -6,6 +6,7 @@ import chroma from 'chroma-js';
 import { flatten } from 'lodash';
 import style from 'components/maps/widgets/MapVisualization.css';
 
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import leafletStyles from '!style/useable!css!leaflet/dist/leaflet.css';
 
 const DEFAULT_VIEWPORT = {
