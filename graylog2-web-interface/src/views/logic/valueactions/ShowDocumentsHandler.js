@@ -22,6 +22,15 @@ type Arguments = {
   contexts: Contexts;
 };
 
+const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
+  return valuePath.map(item => Object.entries(item)
+    // $FlowFixMe: We know that values are strings
+    .map(([key, value]: [string, string]) => (
+      key === '_exists_' ? value : key)))
+    .reduce((prev, cur) => [...prev, ...cur], [])
+    .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
+};
+
 const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget, view } }: Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
@@ -29,17 +38,19 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
     .map(([k, v]) => `${k}:${escape(String(v))}`)
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
+  const valuePathFields = extractFieldsFromValuePath(valuePath);
   const newWidgetBuilder = MessagesWidget.builder()
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(new MessagesWidgetConfig.builder()
-      .fields([...DEFAULT_MESSAGE_FIELDS, ...(Object.keys(mergedObject))])
+      .fields([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields])
       .showMessageRow(true).build());
 
   const newWidget = (view && view.type === View.Type.Dashboard)
     ? newWidgetBuilder.timerange(widget.timerange).streams(widget.streams).build()
     : newWidgetBuilder.build();
-  return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Messages for ${valuePathQuery}`));
+  const title = `Messages for ${valuePathQuery}`;
+  return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };
 
 ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) => (valuePath !== undefined && widget !== undefined);
