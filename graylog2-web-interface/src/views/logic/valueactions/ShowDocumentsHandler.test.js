@@ -4,7 +4,6 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import asMock from 'helpers/mocking/AsMock';
 import { TitlesActions } from 'views/stores/TitlesStore';
 import TitleTypes from 'views/stores/TitleTypes';
-import View from 'views/logic/views/View';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import ShowDocumentsHandler from './ShowDocumentsHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';

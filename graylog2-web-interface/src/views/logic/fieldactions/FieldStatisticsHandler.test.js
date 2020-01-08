@@ -7,7 +7,6 @@ import { TitlesActions, TitleTypes } from 'views/stores/TitlesStore';
 import handler from './FieldStatisticsHandler';
 import FieldType from '../fieldtypes/FieldType';
 import { createElasticsearchQueryString } from '../queries/Query';
-import ChartActionHandler from './ChartActionHandler';
 import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/WidgetStore', () => ({

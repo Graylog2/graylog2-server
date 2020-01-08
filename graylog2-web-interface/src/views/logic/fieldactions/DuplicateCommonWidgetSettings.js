@@ -8,7 +8,7 @@ const duplicateCommonWidgetSettings = (widgetBuilder: Widget.Builder, originalWi
     result = result.filter(filter);
   }
   if (query) {
-    result = result.query(query)
+    result = result.query(query);
   }
   if (streams) {
     result = result.streams(streams);
