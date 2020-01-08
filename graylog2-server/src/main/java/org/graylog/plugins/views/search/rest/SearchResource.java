@@ -96,7 +96,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     private ViewsUser viewsUser() {
-        return ViewsUser.fromDbUser(getCurrentUser(), this::hasStreamReadPermission, this::hasViewReadPermission, this::isPermitted);
+        return ViewsUser.fromDbUser(
+                getCurrentUser(),
+                streamId -> isPermitted(RestPermissions.STREAMS_READ, streamId),
+                viewId -> isPermitted(ViewsRestPermissions.VIEW_READ, viewId),
+                this::isPermitted);
     }
 
     private String username() {
@@ -107,18 +111,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve a search query")
     @Path("{id}")
     public Search getSearch(@ApiParam(name = "id") @PathParam("id") String searchId) {
-        return searchDomain.find(searchId, getCurrentUser(), this::hasViewReadPermission);
-    }
-
-    private boolean hasViewReadPermission(String viewId) {
-        return isPermitted(ViewsRestPermissions.VIEW_READ, viewId);
+        return searchDomain.find(searchId, viewsUser());
     }
 
     @GET
     @ApiOperation(value = "Get all searches which the user may see")
     public List<Search> getAllSearches() {
         // TODO should be paginated
-        return searchDomain.getAllForUser(getCurrentUser(), this::hasViewReadPermission);
+        return searchDomain.getAllForUser(viewsUser());
     }
 
     @POST
@@ -129,20 +129,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeQuery(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam Map<String, Object> executionState) {
 
-        final SearchJob runningSearchJob = searchDomain.executeAsync(
-                id,
-                executionState,
-                this::hasStreamReadPermission,
-                this::hasViewReadPermission,
-                getCurrentUser());
+        final SearchJob runningSearchJob = searchDomain.executeAsync(id, executionState, viewsUser());
 
         return Response.created(URI.create(BASE_PATH + "/status/" + runningSearchJob.getId()))
                 .entity(runningSearchJob)
                 .build();
-    }
-
-    private boolean hasStreamReadPermission(String streamId) {
-        return isPermitted(RestPermissions.STREAMS_READ, streamId);
     }
 
     @POST
@@ -152,11 +143,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     public Response executeSyncJob(@ApiParam Search search,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
-        final SearchJob finishedSearchJob = searchDomain.executeSync(
-                search,
-                this::hasStreamReadPermission,
-                getCurrentUser(),
-                timeout);
+        final SearchJob finishedSearchJob = searchDomain.executeSync(search, viewsUser(), timeout);
 
         return Response.ok(finishedSearchJob).build();
     }

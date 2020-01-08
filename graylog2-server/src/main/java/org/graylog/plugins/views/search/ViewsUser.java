@@ -6,23 +6,24 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public class ViewsUser {
+    private final User dbUser;
     private final Predicate<String> hasStreamReadPermission;
     private final Predicate<String> hasViewReadPermission;
-    private final Predicate<String> hasPermission;
     private final String name;
     private final boolean isAdmin;
 
     public static ViewsUser fromDbUser(User dbUser, Predicate<String> hasStreamReadPermission, Predicate<String> hasViewReadPermission, Predicate<String> hasPermission) {
         Objects.requireNonNull(dbUser);
-        return new ViewsUser(dbUser.getName(), dbUser.isLocalAdmin(), hasStreamReadPermission, hasViewReadPermission, hasPermission);
+        return new ViewsUser(dbUser, hasStreamReadPermission, hasViewReadPermission, hasPermission);
     }
 
-    public ViewsUser(String name, boolean isLocalAdmin, Predicate<String> hasStreamReadPermission, Predicate<String> hasViewReadPermission, Predicate<String> hasPermission) {
+    public ViewsUser(User dbUser, Predicate<String> hasStreamReadPermission, Predicate<String> hasViewReadPermission, Predicate<String> hasPermission) {
+        Objects.requireNonNull(dbUser);
+        this.dbUser = dbUser;
+        this.name = dbUser.getName();
+        this.isAdmin = dbUser.isLocalAdmin() || hasPermission.test("*");
         this.hasStreamReadPermission = hasStreamReadPermission;
         this.hasViewReadPermission = hasViewReadPermission;
-        this.hasPermission = hasPermission;
-        this.name = name;
-        this.isAdmin = isLocalAdmin || hasPermission.test("*");
     }
 
     public String getName() {
@@ -41,5 +42,14 @@ public class ViewsUser {
 
     public boolean hasStreamReadPermission(String streamId) {
         return hasStreamReadPermission.test(streamId);
+    }
+
+    public boolean hasViewReadPermission(String viewId) {
+        return hasViewReadPermission.test(viewId);
+    }
+
+    //this is in here for compatibility with legacy code which depend on that class. should be removed, if possible.
+    public User getDbUser() {
+        return dbUser;
     }
 }

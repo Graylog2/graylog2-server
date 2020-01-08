@@ -108,77 +108,77 @@ public class SearchDomainTest {
         when(dbService.get("some-id")).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(EntityNotFoundException.class)
-                .isThrownBy(() -> sut.find("some-id", mock(User.class), id -> true));
+                .isThrownBy(() -> sut.find("some-id", user()));
     }
 
     @Test
     public void loadsSearchIfUserIsOwner() {
-        final User user = user("boeser-willi");
+        final ViewsUser user = user("boeser-willi");
 
         final Search search = mockExistingSearchWithOwner(user.getName());
 
-        final Search result = sut.find(search.id(), user, id -> true);
+        final Search result = sut.find(search.id(), user);
 
         assertThat(result).isEqualTo(search);
     }
 
     @Test
     public void loadsSearchIfSearchIsPermittedViaViews() {
-        final User user = user("someone");
+        final ViewsUser user = user("someone");
         final Search search = mockExistingSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(true);
+        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user.getDbUser()), any())).thenReturn(true);
 
-        final Search result = sut.find(search.id(), user, id -> true);
+        final Search result = sut.find(search.id(), user);
 
         assertThat(result).isEqualTo(search);
     }
 
     @Test
     public void throwsPermissionExceptionIfNeitherOwnedNorPermittedFromViews() {
-        final User user = user("someone");
+        final ViewsUser user = user("someone");
         final Search search = mockExistingSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user), any())).thenReturn(false);
+        when(viewPermissions.isSearchPermitted(eq(search.id()), eq(user.getDbUser()), any())).thenReturn(false);
 
         assertThatExceptionOfType(PermissionException.class)
-                .isThrownBy(() -> sut.find(search.id(), user, id -> true));
+                .isThrownBy(() -> sut.find(search.id(), user));
     }
 
     @Test
     public void includesOwnedSearchesInList() {
-        final User user = user("boeser-willi");
+        final ViewsUser user = user("someone");
 
         final Search ownedSearch = mockExistingSearchWithOwner(user.getName());
         mockExistingSearchWithOwner("someone else");
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(user);
 
         assertThat(result).containsExactly(ownedSearch);
     }
 
     @Test
     public void includesSearchesPermittedViaViewsInList() {
-        final User user = user("someone");
+        final ViewsUser user = user("someone");
 
         final Search permittedSearch = mockExistingSearchWithOwner("someone else");
         mockExistingSearchWithOwner("someone else");
 
-        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user), any())).thenReturn(true);
+        when(viewPermissions.isSearchPermitted(eq(permittedSearch.id()), eq(user.getDbUser()), any())).thenReturn(true);
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(user);
 
         assertThat(result).containsExactly(permittedSearch);
     }
 
     @Test
     public void listIsEmptyIfNoSearchesPermitted() {
-        final User user = user("someone");
+        final ViewsUser user = user("someone");
 
         mockExistingSearchWithOwner("someone else");
         mockExistingSearchWithOwner("someone else");
 
-        List<Search> result = sut.getAllForUser(user, id -> true);
+        List<Search> result = sut.getAllForUser(user);
 
         assertThat(result).isEmpty();
     }
@@ -189,7 +189,7 @@ public class SearchDomainTest {
 
         assignIdOnSave();
 
-        this.sut.create(search, viewsUser("eberhard"));
+        this.sut.create(search, user("eberhard"));
 
         final ArgumentCaptor<Search> ownerCaptor = ArgumentCaptor.forClass(Search.class);
         verify(dbService).save(ownerCaptor.capture());
@@ -201,12 +201,14 @@ public class SearchDomainTest {
         when(dbService.save(any())).thenAnswer(invocation -> ((Search) invocation.getArguments()[0]).toBuilder().id("some-id").build());
     }
 
-    private ViewsUser viewsUser(String name) {
-        return new ViewsUser(name, false, x -> true, x -> true, x -> true);
+    private ViewsUser user(String name) {
+        User legacyUser = mock(User.class);
+        when(legacyUser.getName()).thenReturn(name);
+        return new ViewsUser(legacyUser, x -> true, x -> true, x -> true);
     }
 
-    private ViewsUser viewsUser() {
-        return viewsUser("peterchen");
+    private ViewsUser user() {
+        return user("peterchen");
     }
 
     @Test
@@ -216,7 +218,7 @@ public class SearchDomainTest {
         throwGuardExceptionFor(search);
 
         assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> sut.create(search, viewsUser()));
+                .isThrownBy(() -> sut.create(search, user()));
     }
 
     @Test
@@ -251,7 +253,7 @@ public class SearchDomainTest {
 
         when(dbService.get(search.id())).thenReturn(Optional.of(search));
 
-        executeAsync(search, executionState, ownerOf(search));
+        sut.executeAsync(search.id(), executionState, ownerOf(search));
 
         //noinspection unchecked
         final ArgumentCaptor<Map<String, Object>> executionStateCaptor = ArgumentCaptor.forClass(Map.class);
@@ -300,20 +302,16 @@ public class SearchDomainTest {
                 .isThrownBy(() -> executeSync(search));
     }
 
-    private void executeAsync(Search search, Map<String, Object> execState, User executingUser) {
-        sut.executeAsync(search.id(), execState, x -> true, x -> true, executingUser);
-    }
-
-    private void executeAsync(Search search, User executingUser) {
-        executeAsync(search, Collections.emptyMap(), executingUser);
+    private void executeAsync(Search search, ViewsUser executingUser) {
+        sut.executeAsync(search.id(), Collections.emptyMap(), executingUser);
     }
 
     private void executeAsync(Search search) {
-        executeAsync(search, Collections.emptyMap(), ownerOf(search));
+        executeAsync(search, ownerOf(search));
     }
 
-    private void executeSync(Search search, User executingUser) {
-        sut.executeSync(search, x -> true, executingUser, 1000);
+    private void executeSync(Search search, ViewsUser executingUser) {
+        sut.executeSync(search, executingUser, 1000);
     }
 
     private void executeSync(Search search) {
@@ -324,17 +322,9 @@ public class SearchDomainTest {
         doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
     }
 
-    private User user(String name) {
-        final User user = mock(User.class);
-        when(user.getName()).thenReturn(name);
-        return user;
-    }
-
-    private User ownerOf(Search search) {
-        final User user = mock(User.class);
+    private ViewsUser ownerOf(Search search) {
         String name = search.owner().orElse("peterchen");
-        when(user.getName()).thenReturn(name);
-        return user;
+        return user(name);
     }
 
     private Search mockExistingSearch() {

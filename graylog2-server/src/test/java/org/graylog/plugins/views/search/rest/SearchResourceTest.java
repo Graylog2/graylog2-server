@@ -108,7 +108,7 @@ public class SearchResourceTest {
     public void ForbiddenExceptionOnAsyncExecutionIsNotCaughtSoItLeadsTo403() {
         final Search search = mockExistingSearch();
 
-        when(searchDomain.executeAsync(any(), any(), any(), any(), any())).thenThrow(new ForbiddenException());
+        when(searchDomain.executeAsync(any(), any(), any())).thenThrow(new ForbiddenException());
 
         assertThatExceptionOfType(ForbiddenException.class).isThrownBy(() -> searchResource.executeQuery(search.id(), null));
     }
@@ -117,7 +117,7 @@ public class SearchResourceTest {
     public void ForbiddenExceptionOnSynchronousExecutionIsNotCaughtSoItLeadsTo403() {
         final Search search = mockNewSearch();
 
-        when(searchDomain.executeSync(any(), any(), any(), anyLong())).thenThrow(new ForbiddenException());
+        when(searchDomain.executeSync(any(), any(), anyLong())).thenThrow(new ForbiddenException());
 
         assertThatExceptionOfType(ForbiddenException.class).isThrownBy(() -> searchResource.executeSyncJob(search, 1));
     }
@@ -145,7 +145,7 @@ public class SearchResourceTest {
         when(search.id()).thenReturn(searchId);
 
         when(search.applyExecutionState(any(), any())).thenReturn(search);
-        when(searchDomain.find(eq(search.id()), any(), any())).thenReturn(search);
+        when(searchDomain.find(eq(search.id()), any())).thenReturn(search);
 
         final SearchJob searchJob = mock(SearchJob.class);
         when(searchJob.getResultFuture()).thenReturn(CompletableFuture.completedFuture(null));

@@ -65,30 +65,34 @@ public class SearchDomain {
         this.objectMapper = objectMapper;
     }
 
+    //left in here to not break dependencies in enterprise plugin.
+    @Deprecated()
     public Optional<Search> getForUser(String id, User user, Predicate<String> viewReadPermission) {
+        ViewsUser viewsUser = ViewsUser.fromDbUser(user, streamId -> false, viewReadPermission, genericPermission -> false);
+
         final Optional<Search> search = dbService.get(id);
 
-        search.ifPresent(s -> checkPermission(user, viewReadPermission, s));
+        search.ifPresent(s -> checkPermission(viewsUser, s));
 
         return search;
     }
 
-    public Search find(String id, User user, Predicate<String> viewReadPermission) {
+    public Search find(String id, ViewsUser user) {
         final Search search = dbService.get(id)
                 .orElseThrow(() -> new EntityNotFoundException(id, Search.class));
 
-        checkPermission(user, viewReadPermission, search);
+        checkPermission(user, search);
 
         return search;
     }
 
-    public SearchJob executeAsync(String id, Map<String, Object> executionState, Predicate<String> streamReadPermission, Predicate<String> viewReadPermission, User user) {
+    public SearchJob executeAsync(String id, Map<String, Object> executionState, ViewsUser user) {
 
-        Search search = find(id, user, viewReadPermission);
+        Search search = find(id, user);
 
-        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(streamReadPermission));
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(user::hasStreamReadPermission));
 
-        guard(search, streamReadPermission);
+        guard(search, user::hasStreamReadPermission);
 
         search = search.applyExecutionState(objectMapper, firstNonNull(executionState, Collections.emptyMap()));
 
@@ -103,11 +107,11 @@ public class SearchDomain {
         this.executionGuard.check(search, streamReadPermission);
     }
 
-    public SearchJob executeSync(Search search, Predicate<String> streamReadPermission, User user, long timeout) {
+    public SearchJob executeSync(Search search, ViewsUser user, long timeout) {
 
-        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(streamReadPermission));
+        search = search.addStreamsToQueriesWithoutStreams(() -> loadAllAllowedStreamsForUser(user::hasStreamReadPermission));
 
-        guard(search, streamReadPermission);
+        guard(search, user::hasStreamReadPermission);
 
         final SearchJob runningSearchJob = execute(search, user);
 
@@ -131,33 +135,29 @@ public class SearchDomain {
         }
     }
 
-    private SearchJob execute(Search search, User user) {
+    private SearchJob execute(Search search, ViewsUser user) {
         final SearchJob searchJob = searchJobService.create(search, user.getName());
 
         return queryEngine.execute(searchJob);
     }
 
-    private void checkPermission(User user, Predicate<String> viewReadPermission, Search s) {
-        if (!hasReadPermissionFor(user, viewReadPermission, s))
+    private void checkPermission(ViewsUser user, Search s) {
+        if (!hasReadPermissionFor(user, s))
             throw new PermissionException("User " + user + " does not have permission to load search " + s.id());
     }
 
-    public List<Search> getAllForUser(User user, Predicate<String> viewReadPermission) {
+    public List<Search> getAllForUser(ViewsUser user) {
         return dbService.streamAll()
-                .filter(s -> hasReadPermissionFor(user, viewReadPermission, s))
+                .filter(s -> hasReadPermissionFor(user, s))
                 .collect(Collectors.toList());
     }
 
-    private boolean hasReadPermissionFor(User user, Predicate<String> viewReadPermission, Search search) {
-        return isOwned(search, user) || hasPermissionFromViews(search, user, viewReadPermission);
+    private boolean hasReadPermissionFor(ViewsUser user, Search search) {
+        return user.isOwnerOf(search) || hasPermissionFromViews(search, user);
     }
 
-    private boolean hasPermissionFromViews(Search search, User user, Predicate<String> hasViewReadPermission) {
-        return viewPermissions.isSearchPermitted(search.id(), user, hasViewReadPermission);
-    }
-
-    private boolean isOwned(Search search, User user) {
-        return search.owner().map(o -> o.equals(user.getName())).orElse(false);
+    private boolean hasPermissionFromViews(Search search, ViewsUser user) {
+        return viewPermissions.isSearchPermitted(search.id(), user.getDbUser(), user::hasViewReadPermission);
     }
 
     public Search create(Search search, ViewsUser user) {

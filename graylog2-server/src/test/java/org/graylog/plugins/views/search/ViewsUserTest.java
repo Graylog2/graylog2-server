@@ -16,9 +16,12 @@
  */
 package org.graylog.plugins.views.search;
 
+import org.graylog2.plugin.database.users.User;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ViewsUserTest {
 
@@ -50,6 +53,8 @@ public class ViewsUserTest {
     }
 
     private ViewsUser karl() {
-        return new ViewsUser("karl", false, x -> true, x -> true, x -> true);
+        User legacyUser = mock(User.class);
+        when(legacyUser.getName()).thenReturn("karl");
+        return new ViewsUser(legacyUser, x -> true, x -> true, x -> true);
     }
 }
