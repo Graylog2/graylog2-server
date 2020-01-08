@@ -1,6 +1,7 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
+import SelectComponent, { components as Components } from 'react-select';
 import Select from './Select';
 
 describe('Select', () => {
@@ -21,6 +22,18 @@ describe('Select', () => {
     it('should convert clearable to isClearable', () => {
       const wrapper = shallow(<Select clearable options={options} onChange={onChange} />);
       expect(wrapper.props().isClearable).toBeTruthy();
+    });
+
+    it('should use displayKey to select the option label', () => {
+      const customOptions = [{ customLabel: 'my great label', value: 'value' }];
+      const wrapper = mount(<Select options={customOptions} onChange={onChange} displayKey="customLabel" menuIsOpen />);
+      expect(wrapper.find(Components.Option).props().label).toBe('my great label');
+    });
+
+    it('should use valueKey to select the option value', () => {
+      const customOptions = [{ label: 'label', customValue: 42 }];
+      const wrapper = mount(<Select options={customOptions} onChange={onChange} valueKey="customValue" menuIsOpen />);
+      expect(wrapper.find(Components.Option).props().value).toBe(42);
     });
   });
 });
