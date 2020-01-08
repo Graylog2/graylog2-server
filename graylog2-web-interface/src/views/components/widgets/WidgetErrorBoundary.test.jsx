@@ -34,7 +34,7 @@ describe('WidgetErrorBoundary', () => {
     asMock(console.error).mockRestore();
   });
 
-  it('passes own props to child component', () => {
+  it('passes own props to its children', () => {
     const Component = props => <div data-testid="child-component-test-id" {...props} />;
     const { getByTestId } = render((
       <WidgetErrorBoundary extraProp="The extra prop">
