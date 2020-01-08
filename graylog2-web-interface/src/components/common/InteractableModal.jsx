@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Rnd } from 'react-rnd';
 import styled from 'styled-components';
@@ -7,10 +7,11 @@ import { lighten } from 'polished';
 import { Button } from 'components/graylog';
 import Icon from 'components/common/Icon';
 import teinte from 'theme/teinte';
+import { debounce } from 'lodash';
 
-const DEFAULT_SIZE = { width: 450, height: 300 };
-const halfWidth = Math.ceil((document.body.offsetWidth / 2) - (DEFAULT_SIZE.width / 2));
-const halfHeight = Math.ceil((document.body.offsetHeight / 2) - (DEFAULT_SIZE.height / 2));
+const DEFAULT_SIZE = { width: 450, height: 400 };
+const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
+const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
 const DEFAULT_POSITION = {
   x: halfWidth,
@@ -61,6 +62,7 @@ const Title = styled.h3`
 
 const DragBars = styled(Icon)`
   color: ${teinte.secondary.tre};
+  margin-right: 9px;
 `;
 
 /**
@@ -87,63 +89,102 @@ const InteractableModal = ({
   const [dragPosition, setDragPosition] = useState(position);
   const [resizeSize, setResizeSize] = useState(size);
 
+  const handleDragStop = (event, { x, y }) => {
+    setDragPosition({ x, y });
+    onDrag({ x, y });
+  };
+
+  const handleResizeStop = (event, direction, ref) => {
+    const newSize = {
+      width: ref.style.width,
+      height: ref.style.height,
+    };
+    let newCoords = { ...dragPosition };
+
+    switch (direction) {
+      case 'left':
+      case 'topLeft':
+      case 'top':
+        newCoords = {
+          x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
+          y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
+        };
+        break;
+
+      case 'bottomLeft':
+        newCoords = {
+          x: dragPosition.x - (parseFloat(ref.style.width) - parseFloat(resizeSize.width)),
+          y: dragPosition.y,
+        };
+        break;
+
+      case 'topRight':
+        newCoords = {
+          x: dragPosition.x,
+          y: dragPosition.y - (parseFloat(ref.style.height) - parseFloat(resizeSize.height)),
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    setResizeSize(newSize);
+    onResize(newSize);
+    handleDragStop(null, newCoords);
+  };
+
+  const handleBrowserResize = debounce(() => {
+    const { x: currentX, y: currentY } = dragPosition;
+    const { width, height } = resizeSize;
+    const { innerWidth, innerHeight } = window;
+
+    const boundingBox = {
+      top: 0,
+      bottom: parseFloat(height),
+      left: 0,
+      right: parseFloat(width),
+    };
+
+    const newCoords = {};
+
+    const modalXWithNewWidth = innerWidth - boundingBox.right;
+    newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
+
+    const modalYWithNewHeight = innerHeight - boundingBox.bottom;
+    newCoords.y = Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top);
+
+    handleDragStop(null, newCoords);
+  }, 150);
+
   useEffect(() => {
     setDragHandleClassName(dragHandleRef.current.classList[0]);
   }, []);
 
-  const handleDragStop = (event, newPosition) => {
-    const { x, y, node } = newPosition;
-    const width = parseFloat(node.style.width);
-    const height = parseFloat(node.style.height);
-    const bodyWidth = document.body.offsetWidth;
-    const bodyHeight = document.body.offsetHeight;
-    const boundingBox = {
-      top: 0,
-      right: bodyWidth - width,
-      bottom: bodyHeight - height,
-      left: 0,
+  useEffect(() => {
+    window.addEventListener('resize', handleBrowserResize, false);
+
+    return () => {
+      window.removeEventListener('resize', handleBrowserResize);
     };
-
-    const tooFarLeft = x < boundingBox.left;
-    const tooFarRight = x > boundingBox.right;
-    const newRight = tooFarRight ? bodyWidth - width : x;
-    const newX = tooFarLeft ? 0 : newRight;
-
-    const tooFarUp = y < boundingBox.top;
-    const tooFarDown = y > boundingBox.bottom;
-    const newDown = tooFarDown ? bodyHeight - height : y;
-    const newY = tooFarUp ? 0 : newDown;
-
-    const setPosition = {
-      x: newX,
-      y: newY,
-    };
-    setDragPosition(setPosition);
-    onDrag(setPosition);
-  };
+  }, [dragPosition]);
 
   return (
     <InteractableModalWrapper className={wrapperClassName}>
       <StyledRnd default={{ ...position, ...size }}
                  minHeight={minHeight}
                  minWidth={minWidth}
-                 maxHeight={document.body.offsetHeight}
-                 maxWidth={document.body.offsetWidth}
+                 maxHeight={window.innerHeight}
+                 maxWidth={window.innerWidth}
                  dragHandleClassName={dragHandleClassName}
                  onDragStop={handleDragStop}
-                 onResizeStop={(event, direction, ref) => {
-                   const newSize = {
-                     width: ref.style.width,
-                     height: ref.style.height,
-                   };
-                   setResizeSize(newSize);
-                   onResize(newSize);
-                 }}
+                 onResizeStop={handleResizeStop}
                  position={dragPosition}
                  size={resizeSize}
-                 className={className}>
+                 className={className}
+                 bounds="window">
         <Header ref={dragHandleRef}>
-          <Title><DragBars name="bars" />{' '}{title}</Title>
+          <Title><DragBars name="bars" />{title}</Title>
 
           <Button bsStyle="default" onClick={onClose} bsSize="sm">
             <Icon name="times" size="lg" />

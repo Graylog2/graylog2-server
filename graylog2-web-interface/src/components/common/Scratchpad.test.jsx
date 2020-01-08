@@ -6,7 +6,11 @@ import Scratchpad from './Scratchpad';
 
 describe('<Scratchpad />', () => {
   it('properly renders', () => {
-    const { firstChild } = render(<Scratchpad loginName="scooby-doo" />, { wrapper: ScratchpadProvider });
+    const { firstChild } = render(
+      <ScratchpadProvider loginName="scooby-doo">
+        <Scratchpad />
+      </ScratchpadProvider>,
+    );
 
     expect(firstChild).toMatchSnapshot();
   });
