@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
 import java.util.Collections;
 import java.util.List;
@@ -159,5 +160,33 @@ public class SearchDomain {
         return search.owner().map(o -> o.equals(user.getName())).orElse(false);
     }
 
+    public Search create(Search search, ViewsUser user) {
+        makeSureUserMayOverwriteExistingSearchIfOneExists(search, user);
 
+        guard(search, user::hasStreamReadPermission);
+
+        Search searchWithOwner = search.toBuilder().owner(user.getName()).build();
+
+        final Search saved = dbService.save(searchWithOwner);
+
+        if (saved == null || saved.id() == null) {
+            throw new RuntimeException("Failed to save search");
+        }
+        return saved;
+    }
+
+    private void makeSureUserMayOverwriteExistingSearchIfOneExists(Search search, ViewsUser user) {
+        final Optional<Search> previous = dbService.get(search.id());
+
+        if (!previous.isPresent())
+            return;
+
+        if (!mayOverwrite(user, previous.get())) {
+            throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
+        }
+    }
+
+    private boolean mayOverwrite(ViewsUser user, Search previous) {
+        return user.isAdmin() || user.isOwnerOf(previous);
+    }
 }

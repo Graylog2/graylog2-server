@@ -19,27 +19,21 @@ package org.graylog.plugins.views.search;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
-import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.errors.PermissionException;
-import org.graylog.plugins.views.search.filter.StreamFilter;
-import org.graylog.plugins.views.search.searchtypes.MessageList;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.graylog.plugins.views.search.TestData.queriesWithSearchTypes;
+import static org.graylog.plugins.views.search.TestData.queryWithStreams;
+import static org.graylog.plugins.views.search.TestData.searchTypeWithStreams;
+import static org.graylog.plugins.views.search.TestData.searchWithQueriesWithStreams;
 
 public class SearchTest {
     @Test
@@ -168,57 +162,5 @@ public class SearchTest {
         executionState.put("global_override", searchTypes);
 
         return executionState;
-    }
-
-    private MessageList messageList(String id) {
-        return MessageList.builder().id(id).build();
-    }
-
-    private Search searchWithQueriesWithStreams(String... queriesWithStreams) {
-        Set<Query> queries = Arrays.stream(queriesWithStreams).map(this::queryWithStreams).collect(Collectors.toSet());
-
-        return Search.builder().queries(ImmutableSet.copyOf(queries)).build();
-    }
-
-    private ImmutableSet<Query> queriesWithSearchTypes(String... queriesWithSearchTypes) {
-        Set<Query> queries = Arrays.stream(queriesWithSearchTypes)
-                .map(this::queryWithSearchTypes).collect(Collectors.toSet());
-        return ImmutableSet.copyOf(queries);
-    }
-
-    private Query queryWithSearchTypes(String searchTypeIds) {
-        String[] split = searchTypeIds.isEmpty() ? new String[0] : searchTypeIds.split(",");
-        return validQueryBuilder().searchTypes(searchTypes(split)).build();
-    }
-
-    private Set<SearchType> searchTypes(String... ids) {
-        return Arrays.stream(ids).map(this::messageList).collect(Collectors.toSet());
-    }
-
-    private Query queryWithStreams(String streamIds) {
-        String[] split = streamIds.isEmpty() ? new String[0] : streamIds.split(",");
-        return queryWithStreams(split);
-    }
-
-    private Query queryWithStreams(String... streamIds) {
-        Query.Builder builder = validQueryBuilder();
-
-        if (streamIds.length > 0)
-            builder = builder.filter(StreamFilter.anyIdOf(streamIds));
-
-        return builder.build();
-    }
-
-    private Query.Builder validQueryBuilder() {
-        return Query.builder().id(UUID.randomUUID().toString()).timerange(mock(TimeRange.class)).query(new BackendQuery.Fallback());
-    }
-
-    private SearchType searchTypeWithStreams(String streamIds) {
-        final SearchType searchType = mock(SearchType.class);
-        final Set<String> streamIdSet = streamIds.isEmpty() ? Collections.emptySet() : new HashSet<>(Arrays.asList(streamIds.split(",")));
-        when(searchType.effectiveStreams()).thenReturn(streamIdSet);
-        when(searchType.id()).thenReturn(UUID.randomUUID().toString());
-
-        return searchType;
     }
 }

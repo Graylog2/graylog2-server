@@ -44,6 +44,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.graylog.plugins.views.search.TestData.searchWithQueriesWithStreams;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -180,6 +181,42 @@ public class SearchDomainTest {
         List<Search> result = sut.getAllForUser(user, id -> true);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void saveAddsOwnerToSearch() {
+        Search search = searchWithQueriesWithStreams().toBuilder().owner("peterchen").build();
+
+        assignIdOnSave();
+
+        this.sut.create(search, viewsUser("eberhard"));
+
+        final ArgumentCaptor<Search> ownerCaptor = ArgumentCaptor.forClass(Search.class);
+        verify(dbService).save(ownerCaptor.capture());
+
+        assertThat(ownerCaptor.getValue().owner()).isEqualTo(Optional.of("eberhard"));
+    }
+
+    private void assignIdOnSave() {
+        when(dbService.save(any())).thenAnswer(invocation -> ((Search) invocation.getArguments()[0]).toBuilder().id("some-id").build());
+    }
+
+    private ViewsUser viewsUser(String name) {
+        return new ViewsUser(name, false, x -> true, x -> true, x -> true);
+    }
+
+    private ViewsUser viewsUser() {
+        return viewsUser("peterchen");
+    }
+
+    @Test
+    public void saveIsGuardedForPermissions() {
+        final Search search = mockSearch();
+
+        throwGuardExceptionFor(search);
+
+        assertThatExceptionOfType(ForbiddenException.class)
+                .isThrownBy(() -> sut.create(search, viewsUser()));
     }
 
     @Test

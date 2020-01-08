@@ -21,9 +21,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog2.plugin.database.users.User;
@@ -32,7 +30,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -40,7 +37,6 @@ import org.mockito.junit.MockitoRule;
 import javax.annotation.Nullable;
 import javax.ws.rs.ForbiddenException;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,9 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SearchResourceTest {
@@ -61,13 +55,7 @@ public class SearchResourceTest {
     private QueryEngine queryEngine;
 
     @Mock
-    private SearchDbService searchDbService;
-
-    @Mock
     private SearchJobService searchJobService;
-
-    @Mock
-    private SearchExecutionGuard executionGuard;
 
     @Mock
     private SearchDomain searchDomain;
@@ -83,8 +71,8 @@ public class SearchResourceTest {
     class SearchTestResource extends SearchResource {
         private final Subject subject;
 
-        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchDbService searchDbService, SearchJobService searchJobService) {
-            super(queryEngine, searchDbService, searchJobService, executionGuard, searchDomain);
+        SearchTestResource(Subject subject, QueryEngine queryEngine, SearchJobService searchJobService) {
+            super(queryEngine, searchJobService, searchDomain);
             this.subject = subject;
         }
 
@@ -104,22 +92,7 @@ public class SearchResourceTest {
     public void setUp() throws Exception {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        this.searchResource = new SearchTestResource(subject, queryEngine, searchDbService, searchJobService);
-
-        mockCurrentUserName("admin");
-    }
-
-    @Test
-    public void saveAddsOwnerToSearch() {
-        mockCurrentUserName("eberhard");
-        final Search search = Search.builder().build();
-
-        this.searchResource.createSearch(search);
-
-        final ArgumentCaptor<Search> ownerCaptor = ArgumentCaptor.forClass(Search.class);
-        verify(searchDbService).save(ownerCaptor.capture());
-
-        assertThat(ownerCaptor.getValue().owner()).isEqualTo(Optional.of("eberhard"));
+        this.searchResource = new SearchTestResource(subject, queryEngine, searchJobService);
     }
 
     @Test
@@ -147,24 +120,6 @@ public class SearchResourceTest {
         when(searchDomain.executeSync(any(), any(), any(), anyLong())).thenThrow(new ForbiddenException());
 
         assertThatExceptionOfType(ForbiddenException.class).isThrownBy(() -> searchResource.executeSyncJob(search, 1));
-    }
-
-    @Test
-    public void guardExceptionOnPostLeadsTo403() {
-        final Search search = mockNewSearch();
-
-        throwGuardExceptionFor(search);
-
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> searchResource.createSearch(search));
-    }
-
-    private void mockCurrentUserName(String name) {
-        when(currentUser.getName()).thenReturn(name);
-    }
-
-    private void throwGuardExceptionFor(Search search) {
-        doThrow(new ForbiddenException()).when(executionGuard).check(eq(search), any());
     }
 
     private Search mockNewSearch() {

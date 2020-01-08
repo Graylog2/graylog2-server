@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
@@ -30,10 +29,9 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchMetadata;
-import org.graylog.plugins.views.search.db.SearchDbService;
+import org.graylog.plugins.views.search.ViewsUser;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -47,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -61,7 +58,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -76,50 +72,31 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private static final String BASE_PATH = "views/search";
 
     private final QueryEngine queryEngine;
-    private final SearchDbService searchDbService;
     private final SearchJobService searchJobService;
-    private final SearchExecutionGuard executionGuard;
     private final SearchDomain searchDomain;
 
     @Inject
     public SearchResource(QueryEngine queryEngine,
-                          SearchDbService searchDbService,
                           SearchJobService searchJobService,
-                          SearchExecutionGuard executionGuard,
                           SearchDomain searchDomain) {
         this.queryEngine = queryEngine;
-        this.searchDbService = searchDbService;
         this.searchJobService = searchJobService;
-        this.executionGuard = executionGuard;
         this.searchDomain = searchDomain;
-    }
-
-    @VisibleForTesting
-    boolean isOwnerOfSearch(Search search, String username) {
-        return search.owner()
-                .map(owner -> owner.equals(username))
-                .orElse(true);
     }
 
     @POST
     @ApiOperation(value = "Create a search query", response = Search.class, code = 201)
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     public Response createSearch(@ApiParam Search search) {
-        final String username = username();
-        final boolean isAdmin = getCurrentUser() != null && (getCurrentUser().isLocalAdmin() || isPermitted("*"));
-        final Optional<Search> previous = searchDbService.get(search.id());
-        if (!isAdmin && !previous.map(existingSearch -> isOwnerOfSearch(existingSearch, username)).orElse(true)) {
-            throw new ForbiddenException("Unable to update search with id <" + search.id() + ">, already exists and user is not permitted to overwrite it.");
-        }
+        final Search saved = searchDomain.create(search, viewsUser());
 
-        guard(search);
-
-        final Search saved = searchDbService.save(search.toBuilder().owner(username).build());
-        if (saved == null || saved.id() == null) {
-            return Response.serverError().build();
-        }
         LOG.debug("Created new search object {}", saved.id());
+
         return Response.created(URI.create(Objects.requireNonNull(saved.id()))).entity(saved).build();
+    }
+
+    private ViewsUser viewsUser() {
+        return ViewsUser.fromDbUser(getCurrentUser(), this::hasStreamReadPermission, this::hasViewReadPermission, this::isPermitted);
     }
 
     private String username() {
@@ -166,10 +143,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     private boolean hasStreamReadPermission(String streamId) {
         return isPermitted(RestPermissions.STREAMS_READ, streamId);
-    }
-
-    private void guard(Search search) {
-        this.executionGuard.check(search, this::hasStreamReadPermission);
     }
 
     @POST
@@ -221,6 +194,4 @@ public class SearchResource extends RestResource implements PluginRestResource {
         final Map<String, QueryMetadata> queryMetadatas = StreamEx.of(search.queries()).toMap(Query::id, query -> queryEngine.parse(search, query));
         return SearchMetadata.create(queryMetadatas, Maps.uniqueIndex(search.parameters(), Parameter::name));
     }
-
-
 }
