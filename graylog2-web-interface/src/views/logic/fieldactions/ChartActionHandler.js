@@ -6,7 +6,7 @@ import { WidgetActions } from 'views/stores/WidgetStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
-import Series from 'views/logic/aggregationbuilder/Series';
+import Series, { isFunction } from 'views/logic/aggregationbuilder/Series';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import type { FieldTypeMappingsList } from 'views/stores/FieldTypesStore';
 import type { FieldActionHandler } from './FieldActionHandler';
@@ -35,9 +35,10 @@ const fieldTypeFor = (fieldName: string, queryId: string): FieldType => {
 };
 
 const ChartActionHandler: FieldActionHandler = ({ queryId, field, contexts: { widget: origWidget = Widget.empty() } }) => {
+  const series = isFunction(field) ? Series.forFunction(field) : Series.forFunction(`avg(${field})`);
   const config = AggregationWidgetConfig.builder()
     .rowPivots([pivotForField(TIMESTAMP_FIELD, fieldTypeFor(TIMESTAMP_FIELD, queryId))])
-    .series([Series.forFunction(`avg(${field})`)])
+    .series([series])
     .visualization('line')
     .rollup(true)
     .build();
