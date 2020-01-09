@@ -6,7 +6,7 @@ import type { ActionHandlerCondition } from './components/actions/ActionHandler'
 describe('Views bindings', () => {
   describe('field actions', () => {
     const { fieldActions, valueActions } = bindings;
-    type FieldAction = {
+    type Action = {
       isEnabled: ActionHandlerCondition,
     };
     const defaultArguments = {
@@ -18,7 +18,7 @@ describe('Views bindings', () => {
     const findValueAction = type => valueActions.find(binding => binding.type === type);
     describe('Aggregate', () => {
       // $FlowFixMe: We are assuming here it is generally present
-      const action: FieldAction = findFieldAction('aggregate');
+      const action: Action = findFieldAction('aggregate');
       const { isEnabled } = action;
       it('is present', () => {
         expect(action).toBeDefined();
@@ -53,7 +53,7 @@ describe('Views bindings', () => {
     });
     describe('Statistics', () => {
       // $FlowFixMe: We are assuming here it is generally present
-      const action: FieldAction = findFieldAction('statistics');
+      const action: Action = findFieldAction('statistics');
       const { isEnabled } = action;
       it('is present', () => {
         expect(action).toBeDefined();
@@ -88,7 +88,7 @@ describe('Views bindings', () => {
     });
     describe('AddToAllTables', () => {
       // $FlowFixMe: We are assuming here it is generally present
-      const action: FieldAction = findFieldAction('add-to-all-tables');
+      const action: Action = findFieldAction('add-to-all-tables');
       const { isEnabled } = action;
       it('is present', () => {
         expect(action).toBeDefined();
@@ -123,7 +123,7 @@ describe('Views bindings', () => {
     });
     describe('RemoveFromAllTables', () => {
       // $FlowFixMe: We are assuming here it is generally present
-      const action: FieldAction = findFieldAction('remove-from-all-tables');
+      const action: Action = findFieldAction('remove-from-all-tables');
       const { isEnabled } = action;
       it('is present', () => {
         expect(action).toBeDefined();
@@ -158,7 +158,7 @@ describe('Views bindings', () => {
     });
     describe('CreateExtractor', () => {
       // $FlowFixMe: We are assuming here it is generally present
-      const action: FieldAction = findValueAction('create-extractor');
+      const action: Action = findValueAction('create-extractor');
       const { isEnabled } = action;
       const contexts = { message: {} };
       it('is present', () => {
