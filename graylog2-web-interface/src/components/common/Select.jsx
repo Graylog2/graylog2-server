@@ -226,6 +226,7 @@ class Select extends React.Component<Props, State> {
      * Available options shown in the select field. It should be an array of objects,
      * each one with a display key (specified in `displayKey`), and a value key
      * (specified in `valueKey`).
+     * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
      */
     options: PropTypes.array.isRequired,
     /**
@@ -368,6 +369,7 @@ class Select extends React.Component<Props, State> {
                          ...components,
                          ...optionComponent,
                        }}
+                       isOptionDisabled={option => !!option.disabled}
                        styles={{
                          ..._styles(this.props),
                        }}

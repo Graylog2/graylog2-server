@@ -67,5 +67,17 @@ describe('Select', () => {
       const wrapper = mount(<Select options={options} onChange={onChange} optionRenderer={optionRenderer} menuIsOpen />);
       expect(wrapper.find(Components.Option).props().children).toBe('Custom label');
     });
+
+    it('should disable options that include a disabled property', () => {
+      const customOptions = [
+        { label: 'enabled', value: 'enabled' },
+        { label: 'disabled', value: 'disabled', disabled: true },
+      ];
+      const wrapper = mount(<Select options={customOptions} onChange={onChange} menuIsOpen />);
+      const renderedOptions = wrapper.find(Components.Option);
+      expect(renderedOptions).toHaveLength(2);
+      expect(renderedOptions.at(0).props().isDisabled).toBeFalsy();
+      expect(renderedOptions.at(1).props().isDisabled).toBeTruthy();
+    });
   });
 });
