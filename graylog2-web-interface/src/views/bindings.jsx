@@ -193,12 +193,12 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      isEnabled: (({ type }) => (!type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
       handler: FieldStatisticsHandler,
     },
     {
@@ -209,7 +209,7 @@ export default {
       isHidden: AddToTableActionHandler.isHidden,
     },
     {
-      type: 'remove-to-table',
+      type: 'remove-from-table',
       title: 'Remove from table',
       handler: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
@@ -219,13 +219,13 @@ export default {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
     },
   ],
   valueActions: [

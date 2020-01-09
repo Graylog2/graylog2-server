@@ -7,6 +7,7 @@ import Widget from 'views/logic/widgets/Widget';
 import { WidgetActions } from 'views/stores/WidgetStore';
 import { FieldTypesStore } from 'views/stores/FieldTypesStore';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
+import Series from 'views/logic/aggregationbuilder/Series';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
 import FieldType from '../fieldtypes/FieldType';
 import ChartActionHandler from './ChartActionHandler';
@@ -21,6 +22,26 @@ jest.mock('views/logic/searchtypes/aggregation/PivotGenerator', () => jest.fn())
 
 describe('ChartActionHandler', () => {
   const emptyFieldType = new FieldType('empty', [], []);
+
+  it('uses average function if triggered on field', async () => {
+    await ChartActionHandler({ queryId: 'queryId', field: 'somefield', type: emptyFieldType, contexts: {} });
+
+    expect(WidgetActions.create).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({
+        series: [Series.forFunction('avg(somefield)')],
+      }),
+    }));
+  });
+
+  it('uses the function itself if it was triggered on one', async () => {
+    await ChartActionHandler({ queryId: 'queryId', field: 'max(somefield)', type: emptyFieldType, contexts: {} });
+
+    expect(WidgetActions.create).toHaveBeenCalledWith(expect.objectContaining({
+      config: expect.objectContaining({
+        series: [Series.forFunction('max(somefield)')],
+      }),
+    }));
+  });
 
   describe('retrieves field type for `timestamp` field', () => {
     beforeEach(() => {
