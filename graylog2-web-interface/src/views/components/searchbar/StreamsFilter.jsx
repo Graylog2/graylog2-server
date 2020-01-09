@@ -17,7 +17,6 @@ const StreamsFilter = ({ disabled, value, streams, onChange }) => {
               onChange={selected => onChange(selected === '' ? [] : selected.split(','))}
               options={options}
               multi
-              style={{ width: '100%' }}
               value={selectedStreams} />
     </div>
   );
