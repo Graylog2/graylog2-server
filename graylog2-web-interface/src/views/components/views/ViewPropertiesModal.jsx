@@ -30,7 +30,9 @@ export default class ViewPropertiesModal extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.show !== nextProps.show || this.props.title !== nextProps.title || !isEqual(this.state.view, nextProps.view)) {
+    const { show, title } = this.props;
+    const { view } = this.state;
+    if (show !== nextProps.show || title !== nextProps.title || !isEqual(view, nextProps.view)) {
       this.setState({ view: nextProps.view, title: nextProps.title, show: nextProps.show });
     }
   }
@@ -48,11 +50,16 @@ export default class ViewPropertiesModal extends React.Component {
     }
   };
 
-  _onClose = () => this.props.onClose();
+  _onClose = () => {
+    const { onClose } = this.props;
+    onClose();
+  };
 
   _onSave = () => {
-    this.props.onSave(this.state.view);
-    this.props.onClose();
+    const { onSave, onClose } = this.props;
+    const { view } = this.state;
+    onSave(view);
+    onClose();
   };
 
   render() {
