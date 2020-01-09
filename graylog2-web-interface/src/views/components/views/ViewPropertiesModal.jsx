@@ -67,21 +67,21 @@ export default class ViewPropertiesModal extends React.Component {
                  type="text"
                  name="title"
                  label="Title"
-                 help="The title of the view."
+                 help="The title of the dashboard."
                  onChange={this._onChange}
                  value={view.title} />
           <Input id="summary"
                  type="text"
                  name="summary"
                  label="Summary"
-                 help="A helpful summary of the view."
+                 help="A helpful summary of the dashboard."
                  onChange={this._onChange}
                  value={view.summary} />
           <Input id="description"
                  type="textarea"
                  name="description"
                  label="Description"
-                 help="A longer, helpful description of the view and its functionality."
+                 help="A longer, helpful description of the dashboard and its functionality."
                  onChange={this._onChange}
                  value={view.description} />
         </Modal.Body>
