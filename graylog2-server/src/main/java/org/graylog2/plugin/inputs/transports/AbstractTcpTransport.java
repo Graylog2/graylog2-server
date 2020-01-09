@@ -33,17 +33,16 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
 import io.netty.handler.ssl.ClientAuth;
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.ByteBufMessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.ChannelRegistrationHandler;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.ExceptionLoggingChannelHandler;
-import org.graylog2.inputs.transports.netty.ByteBufMessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.RawMessageHandler;
 import org.graylog2.inputs.transports.netty.ServerSocketChannelFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -110,6 +109,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     protected final Configuration configuration;
     protected final EventLoopGroup parentEventLoopGroup;
     private final NettyTransportConfiguration nettyTransportConfiguration;
+    private final org.graylog2.Configuration graylogConfiguration;
     private final AtomicReference<Channel> channelReference;
 
     private final boolean tlsEnable;
@@ -130,11 +130,13 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             LocalMetricRegistry localRegistry,
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
-            NettyTransportConfiguration nettyTransportConfiguration) {
+            NettyTransportConfiguration nettyTransportConfiguration,
+            org.graylog2.Configuration graylogConfiguration) {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
+        this.graylogConfiguration = graylogConfiguration;
         this.channelReference = new AtomicReference<>();
         this.childChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -324,14 +326,16 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                     clientAuthCerts = null;
                 }
 
-                final SslContext sslContext = SslContextBuilder.forServer(certFile, keyFile, Strings.emptyToNull(password))
+                final SslContextBuilder sslContext = SslContextBuilder.forServer(certFile, keyFile, Strings.emptyToNull(password))
                         .sslProvider(tlsProvider)
                         .clientAuth(clientAuth)
-                        .trustManager(clientAuthCerts)
-                        .build();
+                        .trustManager(clientAuthCerts);
+                if (!graylogConfiguration.getEnabledTlsProtocols().isEmpty()) {
+                    sslContext.protocols(graylogConfiguration.getEnabledTlsProtocols());
+                }
 
                 // TODO: Use byte buffer allocator of channel
-                return sslContext.newEngine(ByteBufAllocator.DEFAULT);
+                return sslContext.build().newEngine(ByteBufAllocator.DEFAULT);
             }
         };
     }

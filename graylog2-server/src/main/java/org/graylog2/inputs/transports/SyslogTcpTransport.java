@@ -40,13 +40,15 @@ public class SyslogTcpTransport extends TcpTransport {
                               EventLoopGroupFactory eventLoopGroupFactory,
                               NettyTransportConfiguration nettyTransportConfiguration,
                               ThroughputCounter throughputCounter,
-                              LocalMetricRegistry localRegistry) {
+                              LocalMetricRegistry localRegistry,
+                              org.graylog2.Configuration graylogConfiguration) {
         super(configuration,
                 eventLoopGroup,
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
                 throughputCounter,
-                localRegistry);
+                localRegistry,
+                graylogConfiguration);
     }
 
     @Override
