@@ -156,7 +156,7 @@ describe('Views bindings', () => {
           .toEqual(false);
       });
     });
-    describe.only('CreateExtractor', () => {
+    describe('CreateExtractor', () => {
       // $FlowFixMe: We are assuming here it is generally present
       const action: FieldAction = findValueAction('create-extractor');
       const { isEnabled } = action;
