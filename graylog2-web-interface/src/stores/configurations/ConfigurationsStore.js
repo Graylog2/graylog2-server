@@ -126,7 +126,7 @@ const ConfigurationsStore = Reflux.createStore({
         return config;
       },
       (error) => {
-        UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update search config: ${configType}`);
+        UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
       },
     );
 
