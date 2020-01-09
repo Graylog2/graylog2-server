@@ -33,11 +33,11 @@ const _wrapOption = series => ({ label: series.effectiveName, value: series });
 type Props = {
   onChange: (Array<Series>) => boolean,
   series: Array<Series>,
-  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions >, for: (string | number, ?(string | number)) => Array<Option> },
+  suggester: ((string) => Array<Option>) & { defaults: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>, for: (string | number, ?(string | number)) => Array<Option> },
 };
 
 type State = {
-  options: Array<Option | IncompleteOption | ParameterNeededOption| BackToFunctions>,
+  options: Array<Option | IncompleteOption | ParameterNeededOption | BackToFunctions>,
 };
 
 class SeriesSelect extends React.Component<Props, State> {
@@ -122,8 +122,6 @@ class SeriesSelect extends React.Component<Props, State> {
               components={_components}
               onClose={this._onClose}
               closeMenuOnSelect={false}
-              onBlurResetsInput
-              onCloseResetsInput
               menuShouldScrollIntoView
               tabSelectsValue
               escapeClearsValue
