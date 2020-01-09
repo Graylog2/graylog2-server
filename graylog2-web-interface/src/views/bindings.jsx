@@ -58,7 +58,6 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 
-import UseInNewQueryHandler from 'views/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
@@ -240,12 +239,6 @@ export default {
       title: 'Add to query',
       handler: new AddToQueryHandler().handle,
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
-    },
-    {
-      type: 'new-query',
-      title: 'Use in new query',
-      handler: UseInNewQueryHandler,
-      isHidden: UseInNewQueryHandler.isEnabled,
     },
     {
       type: 'show-bucket',
