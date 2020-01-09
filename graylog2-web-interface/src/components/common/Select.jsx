@@ -53,6 +53,10 @@ const CustomSingleValue = (valueRenderer: (Option) => React.Node) => (
   ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
 );
 
+const CustomInput = (inputProps: { [string]: any }) => (
+  props => <Components.Input {...props} {...inputProps} />
+);
+
 const dropdownIndicator = (base, state) => ({
   ...base,
   padding: '0px',
@@ -194,6 +198,7 @@ type Props = {
   onReactSelectChange?: (Option | Array<Option>) => void,
   optionRenderer?: (Option) => React.Node,
   valueRenderer?: (Option) => React.Node,
+  inputProps?: { [string]: any },
 };
 
 type State = {
@@ -243,6 +248,7 @@ class Select extends React.Component<Props, State> {
     matchProp: PropTypes.oneOf(['any', 'label', 'value']),
     optionRenderer: PropTypes.func,
     valueRenderer: PropTypes.func,
+    inputProps: PropTypes.object,
   };
 
   static defaultProps = {
@@ -262,29 +268,36 @@ class Select extends React.Component<Props, State> {
     clearable: true,
     optionRenderer: undefined,
     valueRenderer: undefined,
+    inputProps: undefined,
   };
 
   constructor(props: Props) {
     super(props);
-    const { optionRenderer, value, valueRenderer } = props;
+    const { inputProps, optionRenderer, value, valueRenderer } = props;
     this.state = {
-      customComponents: this.getCustomComponents(optionRenderer, valueRenderer),
+      customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer),
       value,
     };
   }
 
   componentWillReceiveProps = (nextProps: Props) => {
-    const { optionRenderer, value, valueRenderer } = this.props;
+    const { inputProps, optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
-    if (optionRenderer !== nextProps.optionRenderer || valueRenderer !== nextProps.valueRenderer) {
-      this.setState({ customComponents: this.getCustomComponents(optionRenderer, valueRenderer) });
+    if (inputProps !== nextProps.inputProps
+      || optionRenderer !== nextProps.optionRenderer
+      || valueRenderer !== nextProps.valueRenderer) {
+      this.setState({ customComponents: this.getCustomComponents(inputProps, optionRenderer, valueRenderer) });
     }
   };
 
-  getCustomComponents = (optionRenderer?: (Option) => React.Node, valueRenderer?: (Option) => React.Node): any => {
+  getCustomComponents = (inputProps?: { [string]: any }, optionRenderer?: (Option) => React.Node,
+    valueRenderer?: (Option) => React.Node): any => {
     const customComponents = {};
+    if (inputProps) {
+      customComponents.Input = CustomInput(inputProps);
+    }
     if (optionRenderer) {
       customComponents.Option = CustomOption(optionRenderer);
     }
@@ -361,6 +374,7 @@ class Select extends React.Component<Props, State> {
       multi: isMulti,
       disabled: isDisabled,
       clearable: isClearable,
+      inputProps, // Do not pass down prop
       matchProp,
       optionRenderer, // Do not pass down prop
       valueRenderer, // Do not pass down prop

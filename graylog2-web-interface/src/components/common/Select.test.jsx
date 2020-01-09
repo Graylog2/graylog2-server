@@ -85,5 +85,11 @@ describe('Select', () => {
       expect(renderedOptions.at(0).props().isDisabled).toBeFalsy();
       expect(renderedOptions.at(1).props().isDisabled).toBeTruthy();
     });
+
+    it('should add custom props to input using inputProps', () => {
+      const inputProps = { id: 'myId' };
+      const wrapper = mount(<Select options={options} onChange={onChange} menuIsOpen inputProps={inputProps} />);
+      expect(wrapper.find(Components.Input).props().id).toBe(inputProps.id);
+    });
   });
 });
