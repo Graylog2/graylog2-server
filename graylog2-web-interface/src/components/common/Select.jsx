@@ -49,6 +49,10 @@ const CustomOption = (optionRenderer: (Option) => React.Node) => (
 );
 /* eslint-enable react/prop-types */
 
+const CustomSingleValue = (valueRenderer: (Option) => React.Node) => (
+  ({ data, ...rest }) => <Components.SingleValue {...rest}>{valueRenderer(data)}</Components.SingleValue>
+);
+
 const dropdownIndicator = (base, state) => ({
   ...base,
   padding: '0px',
@@ -189,10 +193,11 @@ type Props = {
   multi?: boolean,
   onReactSelectChange?: (Option | Array<Option>) => void,
   optionRenderer?: (Option) => React.Node,
+  valueRenderer?: (Option) => React.Node,
 };
 
 type State = {
-  optionComponent?: (CustomOptionProps) => React.Element<Components.Option>,
+  customComponents?: { [string]: React.Element<any> },
   value: any,
 };
 
@@ -232,11 +237,12 @@ class Select extends React.Component<Props, State> {
     /**
      * A collection of custom `react-select` components from https://react-select.com/components
      */
-    components: PropTypes.arrayOf(PropTypes.node),
+    components: PropTypes.objectOf(PropTypes.elementType),
     disabled: PropTypes.bool,
     clearable: PropTypes.bool,
     matchProp: PropTypes.oneOf(['any', 'label', 'value']),
     optionRenderer: PropTypes.func,
+    valueRenderer: PropTypes.func,
   };
 
   static defaultProps = {
@@ -255,29 +261,37 @@ class Select extends React.Component<Props, State> {
     components: null,
     clearable: true,
     optionRenderer: undefined,
+    valueRenderer: undefined,
   };
 
   constructor(props: Props) {
     super(props);
-    const { optionRenderer, value } = props;
+    const { optionRenderer, value, valueRenderer } = props;
     this.state = {
-      optionComponent: this.getOptionComponent(optionRenderer),
+      customComponents: this.getCustomComponents(optionRenderer, valueRenderer),
       value,
     };
   }
 
   componentWillReceiveProps = (nextProps: Props) => {
-    const { optionRenderer, value } = this.props;
+    const { optionRenderer, value, valueRenderer } = this.props;
     if (value !== nextProps.value) {
       this.setState({ value: nextProps.value });
     }
-    if (optionRenderer !== nextProps.optionRenderer) {
-      this.setState({ optionComponent: this.getOptionComponent(optionRenderer) });
+    if (optionRenderer !== nextProps.optionRenderer || valueRenderer !== nextProps.valueRenderer) {
+      this.setState({ customComponents: this.getCustomComponents(optionRenderer, valueRenderer) });
     }
   };
 
-  getOptionComponent = (optionRenderer?: (Option) => React.Node): any => {
-    return optionRenderer ? { Option: CustomOption(optionRenderer) } : undefined;
+  getCustomComponents = (optionRenderer?: (Option) => React.Node, valueRenderer?: (Option) => React.Node): any => {
+    const customComponents = {};
+    if (optionRenderer) {
+      customComponents.Option = CustomOption(optionRenderer);
+    }
+    if (valueRenderer) {
+      customComponents.SingleValue = CustomSingleValue(valueRenderer);
+    }
+    return customComponents;
   };
 
   getValue = () => {
@@ -333,7 +347,7 @@ class Select extends React.Component<Props, State> {
       valueKey,
       onReactSelectChange,
     } = this.props;
-    const { optionComponent, value } = this.state;
+    const { customComponents, value } = this.state;
     const SelectComponent = allowCreate ? Creatable : ReactSelect;
 
     let formattedValue = value;
@@ -349,6 +363,7 @@ class Select extends React.Component<Props, State> {
       clearable: isClearable,
       matchProp,
       optionRenderer, // Do not pass down prop
+      valueRenderer, // Do not pass down prop
       ...rest
     } = this.props;
 
@@ -367,7 +382,7 @@ class Select extends React.Component<Props, State> {
                        components={{
                          ..._components,
                          ...components,
-                         ...optionComponent,
+                         ...customComponents,
                        }}
                        isOptionDisabled={option => !!option.disabled}
                        styles={{

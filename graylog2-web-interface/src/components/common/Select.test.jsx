@@ -68,6 +68,12 @@ describe('Select', () => {
       expect(wrapper.find(Components.Option).props().children).toBe('Custom label');
     });
 
+    it('should use valueRenderer to customize selected value\'s appearance', () => {
+      const valueRenderer = option => `Custom ${option.value}`;
+      const wrapper = mount(<Select options={options} onChange={onChange} valueRenderer={valueRenderer} value={options[0].value} />);
+      expect(wrapper.find(Components.SingleValue).props().children).toBe('Custom value');
+    });
+
     it('should disable options that include a disabled property', () => {
       const customOptions = [
         { label: 'enabled', value: 'enabled' },
