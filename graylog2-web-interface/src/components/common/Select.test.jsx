@@ -36,7 +36,7 @@ describe('Select', () => {
     it('should use displayKey to select the option label', () => {
       const customOptions = [{ customLabel: 'my great label', value: 'value' }];
       const wrapper = mount(<Select options={customOptions} onChange={onChange} displayKey="customLabel" menuIsOpen />);
-      expect(wrapper.find(Components.Option).props().label).toBe('my great label');
+      expect(wrapper.find(Components.Option).props().children).toBe('my great label');
     });
 
     it('should use valueKey to select the option value', () => {
@@ -60,6 +60,12 @@ describe('Select', () => {
       const matchValueFilter = matchValueWrapper.find(SelectComponent).props().filterOption;
       expect(matchValueFilter(options[0], 'label')).toBeFalsy();
       expect(matchValueFilter(options[0], 'value')).toBeTruthy();
+    });
+
+    it('should use optionRenderer to customize options\' appearance', () => {
+      const optionRenderer = option => `Custom ${option.label}`;
+      const wrapper = mount(<Select options={options} onChange={onChange} optionRenderer={optionRenderer} menuIsOpen />);
+      expect(wrapper.find(Components.Option).props().children).toBe('Custom label');
     });
   });
 });
