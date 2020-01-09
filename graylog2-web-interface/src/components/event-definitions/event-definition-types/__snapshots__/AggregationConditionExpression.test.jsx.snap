@@ -292,6 +292,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -2232,6 +2233,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Function"
@@ -3490,6 +3492,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               isClearable={true}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Field (Optional)"
@@ -3542,6 +3545,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 isClearable={true}
                                                 isDisabled={false}
                                                 isMulti={false}
+                                                isOptionDisabled={[Function]}
                                                 isValidNewOption={[Function]}
                                                 menuIsOpen={false}
                                                 onChange={[Function]}
@@ -5165,6 +5169,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -7739,6 +7744,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Function"
@@ -8997,6 +9003,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                               isClearable={true}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Field (Optional)"
@@ -9049,6 +9056,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                                 isClearable={true}
                                                 isDisabled={false}
                                                 isMulti={false}
+                                                isOptionDisabled={[Function]}
                                                 isValidNewOption={[Function]}
                                                 menuIsOpen={false}
                                                 onChange={[Function]}
@@ -10630,6 +10638,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -13101,6 +13110,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -15053,6 +15063,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               isClearable={false}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Function"
@@ -16311,6 +16322,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                               isClearable={true}
                                               isDisabled={false}
                                               isMulti={false}
+                                              isOptionDisabled={[Function]}
                                               onChange={[Function]}
                                               options={Array []}
                                               placeholder="Select Field (Optional)"
@@ -16363,6 +16375,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                 isClearable={true}
                                                 isDisabled={false}
                                                 isMulti={false}
+                                                isOptionDisabled={[Function]}
                                                 isValidNewOption={[Function]}
                                                 menuIsOpen={false}
                                                 onChange={[Function]}
@@ -17986,6 +17999,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -20535,6 +20549,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         isClearable={false}
                                         isDisabled={false}
                                         isMulti={false}
+                                        isOptionDisabled={[Function]}
                                         onChange={[Function]}
                                         options={
                                           Array [
@@ -22389,6 +22404,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         isClearable={false}
                                                         isDisabled={false}
                                                         isMulti={false}
+                                                        isOptionDisabled={[Function]}
                                                         onChange={[Function]}
                                                         options={Array []}
                                                         placeholder="Select Function"
@@ -23647,6 +23663,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                         isClearable={true}
                                                         isDisabled={false}
                                                         isMulti={false}
+                                                        isOptionDisabled={[Function]}
                                                         onChange={[Function]}
                                                         options={Array []}
                                                         placeholder="Select Field (Optional)"
@@ -23699,6 +23716,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                           isClearable={true}
                                                           isDisabled={false}
                                                           isMulti={false}
+                                                          isOptionDisabled={[Function]}
                                                           isValidNewOption={[Function]}
                                                           menuIsOpen={false}
                                                           onChange={[Function]}
@@ -25280,6 +25298,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                             isClearable={false}
                                             isDisabled={false}
                                             isMulti={false}
+                                            isOptionDisabled={[Function]}
                                             onChange={[Function]}
                                             options={
                                               Array [
@@ -27724,6 +27743,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     isClearable={false}
                                     isDisabled={false}
                                     isMulti={false}
+                                    isOptionDisabled={[Function]}
                                     onChange={[Function]}
                                     options={
                                       Array [
@@ -29620,6 +29640,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     isClearable={false}
                                                     isDisabled={false}
                                                     isMulti={false}
+                                                    isOptionDisabled={[Function]}
                                                     onChange={[Function]}
                                                     options={Array []}
                                                     placeholder="Select Function"
@@ -30878,6 +30899,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                     isClearable={true}
                                                     isDisabled={false}
                                                     isMulti={false}
+                                                    isOptionDisabled={[Function]}
                                                     onChange={[Function]}
                                                     options={Array []}
                                                     placeholder="Select Field (Optional)"
@@ -30930,6 +30952,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                                       isClearable={true}
                                                       isDisabled={false}
                                                       isMulti={false}
+                                                      isOptionDisabled={[Function]}
                                                       isValidNewOption={[Function]}
                                                       menuIsOpen={false}
                                                       onChange={[Function]}
@@ -32553,6 +32576,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                         isClearable={false}
                                         isDisabled={false}
                                         isMulti={false}
+                                        isOptionDisabled={[Function]}
                                         onChange={[Function]}
                                         options={
                                           Array [
@@ -35047,6 +35071,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -36822,6 +36847,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           isClearable={false}
                                           isDisabled={false}
                                           isMulti={false}
+                                          isOptionDisabled={[Function]}
                                           onChange={[Function]}
                                           options={Array []}
                                           placeholder="Select Function"
@@ -38079,6 +38105,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                           isClearable={true}
                                           isDisabled={false}
                                           isMulti={false}
+                                          isOptionDisabled={[Function]}
                                           onChange={[Function]}
                                           options={Array []}
                                           placeholder="Select Field (Optional)"
@@ -38128,6 +38155,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                                             isClearable={true}
                                             isDisabled={false}
                                             isMulti={false}
+                                            isOptionDisabled={[Function]}
                                             isValidNewOption={[Function]}
                                             menuIsOpen={false}
                                             onChange={[Function]}
@@ -39561,6 +39589,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                               isClearable={false}
                               isDisabled={false}
                               isMulti={false}
+                              isOptionDisabled={[Function]}
                               onChange={[Function]}
                               options={
                                 Array [
@@ -42044,6 +42073,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                   isClearable={false}
                                   isDisabled={false}
                                   isMulti={false}
+                                  isOptionDisabled={[Function]}
                                   onChange={[Function]}
                                   options={
                                     Array [
@@ -43838,6 +43868,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           isClearable={false}
                                           isDisabled={false}
                                           isMulti={false}
+                                          isOptionDisabled={[Function]}
                                           onChange={[Function]}
                                           options={Array []}
                                           placeholder="Select Function"
@@ -45096,6 +45127,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                           isClearable={true}
                                           isDisabled={false}
                                           isMulti={false}
+                                          isOptionDisabled={[Function]}
                                           onChange={[Function]}
                                           options={Array []}
                                           placeholder="Select Field (Optional)"
@@ -45148,6 +45180,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                                             isClearable={true}
                                             isDisabled={false}
                                             isMulti={false}
+                                            isOptionDisabled={[Function]}
                                             isValidNewOption={[Function]}
                                             menuIsOpen={false}
                                             onChange={[Function]}
@@ -46772,6 +46805,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                               isClearable={false}
                               isDisabled={false}
                               isMulti={false}
+                              isOptionDisabled={[Function]}
                               onChange={[Function]}
                               options={
                                 Array [
