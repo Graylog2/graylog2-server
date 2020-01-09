@@ -59,6 +59,8 @@ class ConfigurationsPage extends React.Component {
       switch (configType) {
         case MESSAGE_PROCESSORS_CONFIG:
           return ConfigurationsActions.updateMessageProcessorsConfig(configType, config);
+        case URL_WHITELIST_CONFIG:
+          return ConfigurationsActions.updateWhitelist(configType, config);
         default:
           return ConfigurationsActions.update(configType, config);
       }
