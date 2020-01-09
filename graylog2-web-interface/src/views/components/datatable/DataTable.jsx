@@ -98,19 +98,23 @@ const DataTable = ({ config, currentView, data, fields }: Props) => {
   });
 
   return (
-    <div className={`messages-container ${styles.container}`}>
-      <table className="table table-condensed messages">
-        <thead>
-          <Headers activeQuery={currentView.activeQuery}
-                   actualColumnPivotFields={actualColumnPivotFields}
-                   columnPivots={columnPivots}
-                   fields={fields}
-                   rollup={rollup}
-                   rowPivots={rowPivots}
-                   series={series} />
-        </thead>
-        {formattedRows}
-      </table>
+    <div className={styles.container}>
+      <div className={styles.scrollContainer}>
+        <div className="messages-container">
+          <table className="table table-condensed messages">
+            <thead>
+              <Headers activeQuery={currentView.activeQuery}
+                       actualColumnPivotFields={actualColumnPivotFields}
+                       columnPivots={columnPivots}
+                       fields={fields}
+                       rollup={rollup}
+                       rowPivots={rowPivots}
+                       series={series} />
+            </thead>
+            {formattedRows}
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
