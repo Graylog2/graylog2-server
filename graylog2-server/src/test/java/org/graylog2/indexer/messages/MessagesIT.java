@@ -101,7 +101,8 @@ public class MessagesIT extends ElasticsearchBaseTest {
         // This test assumes that ES is configured with bulk_max_body_size to 100MB
         // Check if we can index about 300MB of messages (once the large batch gets split up)
         final int MESSAGECOUNT = 303;
-        final ArrayList<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(MESSAGECOUNT);
+        // Each Message is about 1 MB
+        final ArrayList<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
         final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
 
         assertThat(failedItems).isEmpty();
@@ -113,12 +114,28 @@ public class MessagesIT extends ElasticsearchBaseTest {
         assertThat(result.getCount()).isEqualTo(MESSAGECOUNT);
     }
 
-    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size) {
+    @Test
+    public void unevenTooLargeBatchesGetSplitUp() throws Exception {
+        final int MESSAGECOUNT = 100;
+        final int LARGE_MESSAGECOUNT = 20;
+        final ArrayList<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
+        messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
+        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+
+        assertThat(failedItems).isEmpty();
+
+        Thread.sleep(2000); // wait for ES to finish indexing
+        final Count count = new Count.Builder().build();
+        final CountResult result = jestClient().execute(count);
+
+        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
+    }
+
+    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
         final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
 
-        // Each Message is about 1 MB
-        final String message = Strings.repeat('A', 1024 * 1024);
-        for (int i = 0; i < size; i++) {
+        final String message = Strings.repeat('A', size);
+        for (int i = 0; i < count; i++) {
             messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", DateTime.now(DateTimeZone.UTC))));
         }
         return messageList;

@@ -143,16 +143,19 @@ public class Messages {
         }
 
         int chunkSize = messageList.size();
+        int offset = 0;
         List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
         for (;;) {
             try {
-                failedItems = bulkIndexChunked(messageList, isSystemTraffic, chunkSize);
+                failedItems.addAll(bulkIndexChunked(messageList, isSystemTraffic, offset, chunkSize));
                 break; // on success
             } catch (EntityTooLargeException e) {
                 LOG.warn("Bulk index failed with 'Request Entity Too Large' error. Retrying by splitting up batch size <{}>.", chunkSize);
                 if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting.");
                 }
+                failedItems = e.failedItems;
+                offset += e.indexedSuccessfully;
                 chunkSize /= 2;
             }
             if (chunkSize == 0) {
@@ -171,12 +174,13 @@ public class Messages {
         }
     }
 
-    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, int chunkSize) throws EntityTooLargeException {
+    private List<BulkResult.BulkResultItem> bulkIndexChunked(final List<Map.Entry<IndexSet, Message>> messageList, boolean isSystemTraffic, int offset, int chunkSize) throws EntityTooLargeException {
         chunkSize = Math.min(messageList.size(), chunkSize);
 
         final List<BulkResult.BulkResultItem> failedItems = new ArrayList<>();
-        final Iterable<List<Map.Entry<IndexSet, Message>>> partition = Iterables.partition(messageList, chunkSize);
+        final Iterable<List<Map.Entry<IndexSet, Message>>> partition = Iterables.partition(messageList.subList(offset, messageList.size()), chunkSize);
         int partitionCount = 1;
+        int indexedSuccessfully = 0;
         for (List<Map.Entry<IndexSet, Message>> subMessageList: partition) {
             Bulk.Builder bulk = new Bulk.Builder();
 
@@ -195,22 +199,23 @@ public class Messages {
             final BulkResult result = runBulkRequest(bulk.build(), subMessageList.size());
 
             if (result.getResponseCode() == 413) {
-                throw new EntityTooLargeException();
+                throw new EntityTooLargeException(indexedSuccessfully, failedItems);
             }
 
             // TODO should we check result.isSucceeded()?
 
+            indexedSuccessfully += subMessageList.size();
+            failedItems.addAll(result.getFailedItems());
             if (isSystemTraffic) {
                 systemTrafficCounter.inc(messageSizes);
             } else {
                 outputByteCounter.inc(messageSizes);
             }
-            failedItems.addAll(result.getFailedItems());
             if (LOG.isDebugEnabled()) {
                 String chunkInfo = "";
                 if (chunkSize != messageList.size()) {
-                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d)", partitionCount,
-                            (int) Math.ceil((double)messageList.size() / chunkSize));
+                    chunkInfo = String.format(Locale.ROOT, " (chunk %d/%d offset %d)", partitionCount,
+                            (int) Math.ceil((double)messageList.size() / chunkSize), offset);
                 }
                 LOG.debug("Index: Bulk indexed {} messages{}, failures: {}",
                         result.getItems().size(), chunkInfo, failedItems.size());
@@ -301,5 +306,12 @@ public class Messages {
     }
 
     private class EntityTooLargeException extends Exception {
+        private final int indexedSuccessfully;
+        private final List<BulkResult.BulkResultItem> failedItems;
+
+        public EntityTooLargeException(int indexedSuccessfully, List<BulkResult.BulkResultItem> failedItems)  {
+            this.indexedSuccessfully = indexedSuccessfully;
+            this.failedItems = failedItems;
+        }
     }
 }
