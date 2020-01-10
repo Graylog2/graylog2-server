@@ -28,7 +28,9 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
@@ -44,6 +46,8 @@ import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
+import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -173,6 +177,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .streams(streams())
                 .rollup(true)
+                .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))
                 .series(toSeriesSpecs(config))
                 .id(new UUID().toString());
@@ -193,6 +198,17 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         }
 
         return ImmutableList.of(pivotBuilder.build());
+    }
+
+    private List<SortSpec> toSortSpec(AggregationConfigDTO config) {
+        return config.sort().stream().map(sortConfig -> {
+           final PivotSortConfig pivotSortConfig = (PivotSortConfig) sortConfig;
+           final SortSpec.Direction dir = pivotSortConfig.direction().equals(SortConfigDTO.Direction.Ascending)
+                    ? SortSpec.Direction.Ascending
+                    : SortSpec.Direction.Descending;
+           return PivotSort.create(PivotSort.Type, pivotSortConfig.field(), dir);
+        }).collect(Collectors.toList());
+
     }
 
     private List<BucketSpec> toRowGroups(AggregationConfigDTO config) {

@@ -18,12 +18,15 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.stream.Stream;
 
 public class DashboardV1Facade extends ViewFacade {
+    public static final ModelType TYPE_V1 = ModelTypes.DASHBOARD_V1;
     private ObjectMapper objectMapper;
 
+    @Inject
     public DashboardV1Facade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
         this.objectMapper = objectMapper;

@@ -20,11 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
@@ -37,7 +38,10 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.PivotDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.SeriesConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.SeriesDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
+import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -47,6 +51,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +133,7 @@ public abstract class DashboardWidgetEntity {
                     return createStatsCountWidget();
                 }
                 case "QUICKVALUES":
-                    return ImmutableList.of();
+                    return createQuickValueWidgets();
                 default: {
                     throw new IllegalArgumentException(
                             "The provided entity does not have a valid Widget type: " + type);
@@ -306,6 +311,77 @@ public abstract class DashboardWidgetEntity {
         }
 
         return ImmutableList.of(widgetEntityBuilder.build());
+    }
+
+    private List<WidgetEntity> createQuickValueWidgets() throws InvalidRangeParametersException {
+        final List<WidgetEntity> result = new ArrayList<>(2);
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
+
+        final boolean showChart = (boolean) config().get("show_pie_chart");
+        final boolean showTable = (boolean) config().get("show_data_table");
+        final String stackedFields = (String) config().get("stacked_fields");
+        final String query = (String) config().get("query");
+        final String field = (String) config().get("field");
+        final int limit = (int) config().get("limit");
+        final int dataTableLimit = (int) config().get("data_table_limit");
+        final String sortOrder = (String) config().get("sort_order");
+
+        SortConfigDTO.Direction dir = sortOrder.matches("desc")
+                ? SortConfigDTO.Direction.Descending
+                : SortConfigDTO.Direction.Ascending;
+
+        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.builder()
+                .columnPivots(Collections.emptyList())
+                .series(ImmutableList.of(
+                        SeriesDTO.builder()
+                                .config(SeriesConfigDTO.empty())
+                                .function("count()").build()
+                ))
+                .sort(ImmutableList.of(PivotSortConfig.create(field, dir)));
+
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        }
+        if (showChart) {
+            result.add(widgetEntityBuilder
+                    .config(aggregationConfigBuilder
+                            .rowPivots(genPivotForPie(field, stackedFields, limit))
+                            .visualization("pie").build())
+                    .build());
+
+        }
+        if (showTable) {
+            result.add(widgetEntityBuilder.config(
+                    aggregationConfigBuilder.visualization("table")
+                            .rowPivots(genPivotForPie(field, stackedFields, dataTableLimit))
+                            .build()).build());
+        }
+        return result;
+    }
+
+    private List<PivotDTO> genPivotForPie(String field, String stackedFields, int limit) {
+        final PivotDTO fieldPivot = PivotDTO.builder()
+                .type("values")
+                .field(field)
+                .config(ValueConfigDTO.builder().limit(limit).build())
+                .build();
+        final List<PivotDTO> rowPivots = new ArrayList<>();
+        rowPivots.addAll(stackedFieldPivots(stackedFields));
+        rowPivots.add(fieldPivot);
+        return rowPivots;
+    }
+
+    private List<PivotDTO> stackedFieldPivots(String fieldNames) {
+        return Strings.isNullOrEmpty(fieldNames)
+                ? Collections.emptyList()
+                : Splitter.on(",")
+                .splitToList(fieldNames)
+                .stream()
+                .map(fieldName -> PivotDTO.builder()
+                        .field(fieldName)
+                        .config(ValueConfigDTO.builder().limit(15).build())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private SeriesDTO createSeriesDTO(String valueType, String field) {

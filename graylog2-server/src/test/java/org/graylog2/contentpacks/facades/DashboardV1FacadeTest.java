@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDT
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
@@ -88,6 +90,8 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(NumberVisualizationConfigDTO.class, NumberVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
+        objectMapper.registerSubtypes(new NamedType(ValueConfigDTO.class, ValueConfigDTO.NAME));
+        objectMapper.registerSubtypes(new NamedType(PivotSortConfig.class, PivotSortConfig.Type));
         objectMapper.registerSubtypes(new NamedType(OrFilter.class, OrFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(QueryStringFilter.class, QueryStringFilter.NAME));
@@ -120,12 +124,12 @@ public class DashboardV1FacadeTest {
         assertThat(viewDTO.state()).isNotNull();
         assertThat(viewDTO.state().size()).isEqualTo(1);
         ViewStateDTO viewState = viewDTO.state().values().iterator().next();
-        assertThat(viewState.widgets().size()).isEqualTo(6);
+        assertThat(viewState.widgets().size()).isEqualTo(8);
 
         Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
         Search search = optionalSearch.orElseThrow(NotFoundException::new);
         assertThat(search.queries().size()).isEqualTo(1);
         Query query = search.queries().iterator().next();
-        assertThat(query.searchTypes().size()).isEqualTo(7);
+        assertThat(query.searchTypes().size()).isEqualTo(9);
     }
 }

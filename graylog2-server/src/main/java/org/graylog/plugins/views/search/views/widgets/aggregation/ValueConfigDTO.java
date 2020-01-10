@@ -32,6 +32,10 @@ public abstract class ValueConfigDTO implements PivotConfigDTO {
     @JsonProperty(FIELD_LIMIT)
     public abstract int limit();
 
+    public static Builder builder() {
+        return new AutoValue_ValueConfigDTO.Builder().limit(15);
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_LIMIT)
