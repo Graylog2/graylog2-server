@@ -158,7 +158,7 @@ public class Messages {
                 if (chunkSize == messageList.size()) {
                     LOG.warn("Consider lowering the \"output_batch_size\" setting.");
                 }
-                failedItems = e.failedItems;
+                failedItems.addAll(e.failedItems);
                 offset += e.indexedSuccessfully;
                 chunkSize /= 2;
             }
