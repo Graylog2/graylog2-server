@@ -51,7 +51,7 @@ public abstract class TimeUnitInterval implements Interval {
         final Matcher matcher = TIMEUNIT_PATTERN.matcher(timeunit());
         checkArgument(matcher.matches(),
                 "Time unit must be {quantity}{unit}, where quantity is a positive number and unit [smhdwM].");
-        final int quantity = Integer.parseInt(matcher.group("quantity"), 10);
+        final int quantity = Integer.parseInt(matcher.group("quantity"));
         final String unit = matcher.group("unit");
 
         switch (unit) {
