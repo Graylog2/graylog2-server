@@ -42,6 +42,11 @@ public abstract class TimeUnitInterval implements Interval {
     @JsonProperty
     public abstract String timeunit();
 
+    @Override
+    public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
+        return new DateHistogramInterval(adjustUnitsLongerThanDays(timeunit()));
+    }
+
     private String adjustUnitsLongerThanDays(String timeunit) {
         final Matcher matcher = TIMEUNIT_PATTERN.matcher(timeunit());
         checkArgument(matcher.matches(),
@@ -58,11 +63,6 @@ public abstract class TimeUnitInterval implements Interval {
             case "M": return quantity == 1 ? timeunit : (30 * quantity) + "d";
             default: throw new RuntimeException("Invalid time unit: " + timeunit);
         }
-    }
-
-    @Override
-    public DateHistogramInterval toDateHistogramInterval(TimeRange timerange) {
-        return new DateHistogramInterval(adjustUnitsLongerThanDays(timeunit()));
     }
 
     @AutoValue.Builder
