@@ -29,6 +29,10 @@ const addToQuery = (oldQuery: string, newTerm: string, operator: string = 'AND')
     return newTerm;
   }
 
+  if (trim(newTerm) === '*' || trim(newTerm) === '') {
+    return oldQuery;
+  }
+
   return `${oldQuery} ${operator} ${newTerm}`;
 };
 
