@@ -20,7 +20,7 @@ describe('CurrentViewStateStore', () => {
     return [{ type: 'MESSAGES', defaultHeight: 5, defaultWidth: 6 }];
   };
 
-  it('should set empty widgets', () => {
+  it('should set empty widgets', async () => {
     const updateFn = mockAction(jest.fn((id, view) => {
       expect(id).toEqual(viewId);
       expect(view).toEqual(viewState);
@@ -29,12 +29,12 @@ describe('CurrentViewStateStore', () => {
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
-    CurrentViewStateStore.widgets(Immutable.List());
+    await CurrentViewStateStore.widgets(Immutable.List());
 
     expect(asMock(updateFn).mock.calls.length).toBe(1);
   });
 
-  it('should set new widgets', () => {
+  it('should set new widgets', async () => {
     const widgetPos = new WidgetPosition(1, 1, 5, 6);
     const widgetPositionsMap = { dead: widgetPos };
     const widgets = [
@@ -54,11 +54,11 @@ describe('CurrentViewStateStore', () => {
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: viewState });
     CurrentViewStateStore.onViewStatesStoreChange(statesMap);
-    CurrentViewStateStore.widgets(widgets);
+    await CurrentViewStateStore.widgets(widgets);
     expect(updateFn).toHaveBeenCalledTimes(1);
   });
 
-  it('should add new widgets', () => {
+  it('should add new widgets', async () => {
     const widgetPos = new WidgetPosition(1, 1, 5, 6);
     const widgetPositionsMap = { dead: widgetPos };
     const oldWidget = MessagesWidget.builder().id('dead').build();
@@ -100,11 +100,11 @@ describe('CurrentViewStateStore', () => {
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: oldViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
-    CurrentViewStateStore.widgets(expectedWidgets);
+    await CurrentViewStateStore.widgets(expectedWidgets);
     expect(updateFn).toHaveBeenCalledTimes(1);
   });
 
-  it('should remove widget positions for deleted widgets', () => {
+  it('should remove widget positions for deleted widgets', async () => {
     const widgetOnePos = new WidgetPosition(1, 1, 5, 6);
     const widgetTwoPos = new WidgetPosition(1, 6, 5, 6);
     const widgetPositionsMap = { 'widget-one': widgetOnePos, 'widget-two': widgetTwoPos };
@@ -135,7 +135,7 @@ describe('CurrentViewStateStore', () => {
     ViewStatesActions.update = updateFn;
     CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: existingViewState });
     CurrentViewStateStore.onViewStatesStoreChange(sMap);
-    CurrentViewStateStore.widgets(expectedWidgets);
+    await CurrentViewStateStore.widgets(expectedWidgets);
     expect(updateFn).toHaveBeenCalledTimes(1);
   });
 });
