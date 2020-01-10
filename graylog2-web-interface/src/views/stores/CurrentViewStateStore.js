@@ -83,31 +83,23 @@ export const CurrentViewStateStore = singletonStore(
       CurrentViewStateActions.titles.promise(promise);
     },
 
-    widgets(newWidgets) {
+    widgets(nextWidgets) {
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
+      const newWidgets = nextWidgets.filter(widget => !positionsMap.get(widget.id));
+      const nextWidgetIds = nextWidgets.map(({ id }) => id);
+      const cleanedPositionsMap = positionsMap.filter((_, widgetId) => nextWidgetIds.includes(widgetId));
 
-      const positionsMapWithWidget = positionsMap.reduce((clearedPositions, position, positionWidgetId) => {
-        if (newWidgets.find(widget => widget.id === positionWidgetId)) {
-          return clearedPositions.set(positionWidgetId, position);
-        }
-        return clearedPositions;
-      }, Immutable.Map());
-
-      const widgetsWithoutPositions = newWidgets.filter((widget) => {
-        return !positionsMap.get(widget.id);
-      });
-
-      const newPositionMap = widgetsWithoutPositions.reduce((nextPositionsMap, widget) => {
+      const newPositionMap = newWidgets.reduce((nextPositionsMap, widget) => {
         const widgetDef = widgetDefinition(widget.type);
         const result = nextPositionsMap.reduce((newPosMap, position, id) => {
           const pos = position.toBuilder().row(position.row + widgetDef.defaultHeight).build();
           return newPosMap.set(id, pos);
         }, Immutable.Map());
         return result.set(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
-      }, positionsMapWithWidget);
+      }, cleanedPositionsMap);
 
       const newActiveState = this._activeState().toBuilder()
-        .widgets(newWidgets)
+        .widgets(nextWidgets)
         .widgetPositions(newPositionMap.toObject())
         .build();
       const promise = ViewStatesActions.update(this.activeQuery, newActiveState);
