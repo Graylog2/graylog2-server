@@ -88,7 +88,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
         final Indices indices = new Indices(client(),
                 new ObjectMapperProvider().get(),
                 new IndexMappingFactory(new Node(client())),
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));

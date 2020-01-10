@@ -17,17 +17,34 @@
 package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Maps;
 import io.searchbox.client.JestResult;
+import io.searchbox.core.Count;
+import io.searchbox.core.CountResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Index;
+import joptsimple.internal.Strings;
 import org.graylog2.ElasticsearchBase;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,8 +55,27 @@ public class MessagesIT extends ElasticsearchBase {
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder());
+        messages = new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder(), true);
     }
+
+    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+            .id("index-set-1")
+            .title("Index set 1")
+            .description("For testing")
+            .indexPrefix("graylog")
+            .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+            .shards(1)
+            .replicas(0)
+            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .indexAnalyzer("standard")
+            .indexTemplateName("template-1")
+            .indexOptimizationMaxNumSegments(1)
+            .indexOptimizationDisabled(false)
+            .build();
+    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     @Test
     public void getResultDoesNotContainJestMetadataFields() throws Exception {
@@ -58,5 +94,50 @@ public class MessagesIT extends ElasticsearchBase {
         assertThat(message).isNotNull();
         assertThat(message.hasField(JestResult.ES_METADATA_ID)).isFalse();
         assertThat(message.hasField(JestResult.ES_METADATA_VERSION)).isFalse();
+    }
+
+    @Test
+    public void testIfTooLargeBatchesGetSplitUp() throws Exception {
+        // This test assumes that ES is configured with bulk_max_body_size to 100MB
+        // Check if we can index about 300MB of messages (once the large batch gets split up)
+        final int MESSAGECOUNT = 303;
+        // Each Message is about 1 MB
+        final ArrayList<Map.Entry<IndexSet, Message>> largeMessageBatch = createMessageBatch(1024 * 1024, MESSAGECOUNT);
+        final List<String> failedItems = this.messages.bulkIndex(largeMessageBatch);
+
+        assertThat(failedItems).isEmpty();
+
+        Thread.sleep(2000); // wait for ES to finish indexing
+        final Count count = new Count.Builder().build();
+        final CountResult result = client().execute(count);
+
+        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT);
+    }
+
+    @Test
+    public void unevenTooLargeBatchesGetSplitUp() throws Exception {
+        final int MESSAGECOUNT = 100;
+        final int LARGE_MESSAGECOUNT = 20;
+        final ArrayList<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
+        messageBatch.addAll(createMessageBatch(1024 * 1024 * 5, LARGE_MESSAGECOUNT));
+        final List<String> failedItems = this.messages.bulkIndex(messageBatch);
+
+        assertThat(failedItems).isEmpty();
+
+        Thread.sleep(2000); // wait for ES to finish indexing
+        final Count count = new Count.Builder().build();
+        final CountResult result = client().execute(count);
+
+        assertThat(result.getCount()).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
+    }
+
+    private ArrayList<Map.Entry<IndexSet, Message>> createMessageBatch(int size, int count) {
+        final ArrayList<Map.Entry<IndexSet, Message>> messageList = new ArrayList<>();
+
+        final String message = Strings.repeat('A', size);
+        for (int i = 0; i < count; i++) {
+            messageList.add(Maps.immutableEntry(indexSet, new Message(i + message, "source", DateTime.now(DateTimeZone.UTC))));
+        }
+        return messageList;
     }
 }
