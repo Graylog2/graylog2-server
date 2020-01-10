@@ -32,7 +32,7 @@ const _column = (field: string, value: *, selectedQuery: string, idx: number, ty
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
       <CustomHighlighting field={field} value={value}>
-        {value !== null && !value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : <EmptyValue />}
+        {value !== null && value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : <EmptyValue />}
       </CustomHighlighting>
     </AdditionalContext.Provider>
   </td>
