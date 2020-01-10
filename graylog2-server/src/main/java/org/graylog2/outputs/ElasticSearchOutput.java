@@ -112,7 +112,7 @@ public class ElasticSearchOutput implements MessageOutput {
         }
         failures.mark(failedMessageIds.size());
 
-        // TODO why doesn't this exclude the failedMessageIds?
+        // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
         final Optional<Long> offset = messageList.stream()
             .map(Map.Entry::getValue)
             .map(Message::getJournalOffset)
