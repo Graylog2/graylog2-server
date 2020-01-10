@@ -78,6 +78,20 @@ describe('ShowDocumentsHandler', () => {
         expect(TitlesActions.set).toHaveBeenCalledWith(TitleTypes.Widget, newWidget.id, 'Messages for hello:world AND bar:42');
       });
   });
+  it('does not include duplicate source/timestamp fields twice', () => {
+    const widgetWithFilter = widget.toBuilder().query(createElasticsearchQueryString('foo:23')).build();
+    return ShowDocumentsHandler({
+      queryId,
+      field: 'hello',
+      value: 'world',
+      type: FieldType.Unknown,
+      contexts: { widget: widgetWithFilter, valuePath: [{ timestamp: 'something' }, { source: 'hopper' }, { hello: 'world' }] },
+    })
+      .then(() => {
+        const newWidget = asMock(WidgetActions.create).mock.calls[0][0];
+        expect(newWidget.config.fields).toEqual(['timestamp', 'source', 'hello']);
+      });
+  });
   describe('on dashboard', () => {
     const view = View.builder().type(View.Type.Dashboard).build();
     it('copies timerange of original widget', () => {
