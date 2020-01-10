@@ -90,14 +90,9 @@ public class EntityConverter {
         final Map<String, Set<String>> widgetMapping = new HashMap<>();
         final Set<SearchType> searchTypes = new HashSet<>();
         for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgets.entrySet()) {
-            DashboardWidgetEntity dashboardWidgetEntity = widgetEntityListEntry.getKey();
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
                 final List<SearchType> currentSearchTypes;
-                try {
-                    currentSearchTypes = dashboardWidgetEntity.createSearchType();
-                } catch (InvalidRangeParametersException e) {
-                    throw new IllegalArgumentException("The provided entity does not have a valid TimeRange", e);
-                }
+                currentSearchTypes = widgetEntity.createSearchType();
                 searchTypes.addAll(currentSearchTypes);
                 widgetMapping.put(widgetEntity.id(),
                         currentSearchTypes.stream().map(SearchType::id).collect(Collectors.toSet()));

@@ -6,7 +6,8 @@ import com.google.common.io.Resources;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
-import org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport.Widget;
+import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.filter.OrFilter;
@@ -19,6 +20,7 @@ import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -29,6 +31,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -39,7 +42,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.Set;
+import java.util.Optional;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,6 +86,7 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
+        objectMapper.registerSubtypes(new NamedType(NumberVisualizationConfigDTO.class, NumberVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(OrFilter.class, OrFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
@@ -116,6 +120,12 @@ public class DashboardV1FacadeTest {
         assertThat(viewDTO.state()).isNotNull();
         assertThat(viewDTO.state().size()).isEqualTo(1);
         ViewStateDTO viewState = viewDTO.state().values().iterator().next();
-        assertThat(viewState.widgets().size()).isEqualTo(3);
+        assertThat(viewState.widgets().size()).isEqualTo(6);
+
+        Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
+        Search search = optionalSearch.orElseThrow(NotFoundException::new);
+        assertThat(search.queries().size()).isEqualTo(1);
+        Query query = search.queries().iterator().next();
+        assertThat(query.searchTypes().size()).isEqualTo(7);
     }
 }

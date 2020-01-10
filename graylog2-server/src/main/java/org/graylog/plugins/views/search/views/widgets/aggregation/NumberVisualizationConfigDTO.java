@@ -42,6 +42,12 @@ public abstract class NumberVisualizationConfigDTO implements VisualizationConfi
     @JsonProperty
     public abstract TrendPreference trendPreference();
 
+    public static Builder builder() {
+        return new AutoValue_NumberVisualizationConfigDTO.Builder()
+                .trend(false)
+                .trendPreference(TrendPreference.NEUTRAL);
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty(FIELD_TREND)

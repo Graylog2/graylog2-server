@@ -120,6 +120,12 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
         return deriveTimeRange(referenceTimeRange);
     }
 
+    public static Builder builder() {
+        return new AutoValue_OffsetRange.Builder()
+                .type(OFFSET)
+                .offset("1i");
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty

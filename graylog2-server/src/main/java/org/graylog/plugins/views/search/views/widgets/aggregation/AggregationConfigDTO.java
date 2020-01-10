@@ -101,12 +101,10 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
                 include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
                 property = AggregationConfigDTO.FIELD_VISUALIZATION,
                 visible = true)
-        @Nullable
-        public abstract Builder visualizationConfig(VisualizationConfigDTO visualizationConfig);
+        public abstract Builder visualizationConfig(@Nullable VisualizationConfigDTO visualizationConfig);
 
         @JsonProperty(FIELD_FORMATTING_SETTINGS)
-        @Nullable
-        public abstract Builder formattingSettings(WidgetFormattingSettings formattingSettings);
+        public abstract Builder formattingSettings(@Nullable WidgetFormattingSettings formattingSettings);
 
         @JsonProperty(FIELD_ROLLUP)
         public abstract Builder rollup(boolean roolup);

@@ -16,7 +16,6 @@
  */
 package org.graylog2.contentpacks.model.entities;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,19 +23,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Min;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
-import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
@@ -44,17 +32,16 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizat
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.Interpolation;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.PivotDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.SeriesConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.SeriesDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO;
-import org.graylog2.contentpacks.facades.dashboardV1.TimeIntervalMapper;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
@@ -63,6 +50,7 @@ import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -133,8 +121,12 @@ public abstract class DashboardWidgetEntity {
                     return createFieldChartWidget();
                 }
 
-                case "STACKED_CHART":
-                case "STATS_COUNT":
+                case "STACKED_CHART": {
+                    return createStackedChartWidget();
+                }
+                case "STATS_COUNT": {
+                    return createStatsCountWidget();
+                }
                 case "QUICKVALUES":
                     return ImmutableList.of();
                 default: {
@@ -173,11 +165,6 @@ public abstract class DashboardWidgetEntity {
                 .id(id().asString(parameters))
                 .timerange(timeRange().convert(parameters));
 
-        final Object query = config().get("query");
-        if (query instanceof String) {
-            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString((String) query).build());
-        }
-
         final ImmutableSet.Builder<String> streams = new ImmutableSet.Builder<>();
         final Object streamId = config().get("stream_id");
         if (streamId instanceof String) {
@@ -192,6 +179,11 @@ public abstract class DashboardWidgetEntity {
         final WidgetConfigDTO widgetConfigDTO = defaultWidgetConfig();
         final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
                 .config(widgetConfigDTO);
+        final Object query = config().get("query");
+        if (query instanceof String) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString((String) query).build());
+        }
+
 
         return ImmutableList.of(widgetEntityBuilder.build());
     }
@@ -239,29 +231,84 @@ public abstract class DashboardWidgetEntity {
         return Optional.empty();
     }
 
-    private List<WidgetEntity> createFieldChartWidget() throws InvalidRangeParametersException {
-        final String renderer = (String) config().get("renderer");
-
+    private WidgetEntity fieldChartWidget(String renderer, String valueType, String field, String query) throws InvalidRangeParametersException {
         final AggregationConfigDTO.Builder configBuilder = AggregationConfigDTO.builder()
-                .series(ImmutableList.of(createSeriesDTO()))
+                .series(ImmutableList.of(createSeriesDTO(valueType, field)))
                 .visualization(mapRendererToVisualization(renderer))
                 .columnPivots(Collections.emptyList())
                 .sort(Collections.emptyList())
                 .rowPivots(Collections.singletonList(
                         PivotDTO.builder()
-                        .field("timestamp")
-                        .type("time")
-                        .config(TimeHistogramConfigDTO.builder().interval(AutoIntervalDTO.builder().build()).build())
-                        .build()
+                                .field("timestamp")
+                                .type("time")
+                                .config(TimeHistogramConfigDTO.builder().interval(AutoIntervalDTO.builder().build()).build())
+                                .build()
                 ));
-        return ImmutableList.of(aggregationWidgetBuilder()
+
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString((String) query).build());
+        }
+        return widgetEntityBuilder
                 .config(createVisualizationConfig().map(configBuilder::visualizationConfig).orElse(configBuilder).build())
-                .build());
+                .build();
     }
 
-    private SeriesDTO createSeriesDTO() {
+    private List<WidgetEntity> createFieldChartWidget() throws InvalidRangeParametersException {
+        final String renderer = (String) config().get("renderer");
         final String valueType = (String) config().get("valuetype");
         final String field = (String) config().get("field");
+        final String query = (String) config().get("query");
+        return ImmutableList.of(fieldChartWidget(renderer, valueType, field, query));
+    }
+
+    private List<WidgetEntity> createStackedChartWidget() {
+        final String renderer = (String) config().get("renderer");
+        final List<Map <String, Object>> series = (List) config().get("series");
+
+        return series.stream().map(seriesConfig -> {
+            final String valueType = (String) seriesConfig.get("statistical_function");
+            final String field = (String) seriesConfig.get("field");
+            final String query = (String) seriesConfig.get("query");
+            try {
+                return fieldChartWidget(renderer, valueType, field, query);
+            } catch (InvalidRangeParametersException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    private List<WidgetEntity> createStatsCountWidget() throws InvalidRangeParametersException {
+        final String function = (String) config().get("stats_function");
+        final String field = (String) config().get("field");
+        final boolean trend = (boolean) config().get("trend");
+        final boolean lowerIsBetter = (boolean) config().get("lower_is_better");
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+                .series(ImmutableList.of(createSeriesDTO(function, field)))
+                .visualization("numeric")
+                .visualizationConfig(NumberVisualizationConfigDTO.builder()
+                        .trend(trend)
+                        .trendPreference(
+                                lowerIsBetter
+                                        ? NumberVisualizationConfigDTO.TrendPreference.LOWER
+                                        : NumberVisualizationConfigDTO.TrendPreference.HIGHER)
+                        .build()
+                )
+                .rowPivots(Collections.emptyList())
+                .columnPivots(Collections.emptyList())
+                .sort(Collections.emptyList())
+                .build();
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
+                .config(widgetConfig);
+        final String query = (String) config().get("query");
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        }
+
+        return ImmutableList.of(widgetEntityBuilder.build());
+    }
+
+    private SeriesDTO createSeriesDTO(String valueType, String field) {
         String function;
         switch (valueType) {
             case "cardinality": {
@@ -278,125 +325,12 @@ public abstract class DashboardWidgetEntity {
                 function = "stddev";
                 break;
             default: {
-                throw new IllegalArgumentException(
-                        "The provided entity does not have a valid TimeRange type: " + valueType);
+                function = valueType;
+                break;
             }
         }
         return SeriesDTO.builder().config(SeriesConfigDTO.empty()).function(function + "(" + field + ")").build();
     }
-
-    private SeriesSpec createSeries(String valueType, String field) {
-        switch (valueType) {
-            case "cardinality": {
-                return Cardinality.builder().field(field).id("card(" + field + ")").build();
-            }
-            case "mean": {
-                return Average.builder().field(field).id("avg(" + field + ")").build();
-            }
-            case "max": {
-                return Max.builder().field(field).id("max(" + field + ")").build();
-            }
-            case "min": {
-                return Min.builder().field(field).id("min(" + field + ")").build();
-            }
-            case "sum":
-            case "total": {
-                return Sum.builder().field(field).id("sum(" + field + ")").build();
-            }
-            case "variance": {
-                return Variance.builder().field(field).id("variance(" + field + ")").build();
-            }
-            case "std_deviation": {
-                return StdDev.builder().field(field).id("stddev(" + field + ")").build();
-            }
-            case "count": {
-                return Count.builder().field(field).id("count(" + field + ")").build();
-            }
-            default: {
-                throw new IllegalArgumentException(
-                        "The provided entity does not have a valid TimeRange type: " + valueType);
-            }
-        }
-    }
-
-    public List<SearchType> createSearchType() throws InvalidRangeParametersException {
-        final Map<String, Object> config = ReferenceMapUtils.toValueMap(configuration(), parameters);
-        final String type = type().asString(parameters);
-
-        List<Pivot.Builder> pivotBuilder;
-        switch(type) {
-            case "SEARCH_RESULT_CHART": {
-                pivotBuilder = createHistogram();
-                break;
-            }
-            case "FIELD_CHART": {
-                pivotBuilder = createFieldChart();
-                break;
-            }
-            case "STACKED_CHART":
-            case "STATS_COUNT":
-            case "QUICKVALUES":
-                return ImmutableList.of();
-            default: {
-                throw new IllegalArgumentException(
-                        "The provided entity does not have a valid Widget type: " + type);
-            }
-        }
-
-        final TimeRangeEntity timeRangeEntity = timeRange();
-        final TimeRange timeRange = timeRangeEntity.convert(parameters);
-        pivotBuilder = pivotBuilder.stream().map(p ->p.timerange(timeRange)).collect(Collectors.toList());
-
-        final Object query = config.get("query");
-        if (query instanceof String) {
-            pivotBuilder = pivotBuilder.stream().map(p ->
-                    p.query(ElasticsearchQueryString.builder()
-                            .queryString((String) query).build()))
-                    .collect(Collectors.toList());
-        }
-        return pivotBuilder.stream().map(Pivot.Builder::build).collect(Collectors.toList());
-    }
-
-    private Pivot.Builder createPivotBuilder() {
-        final ImmutableSet.Builder<String> streams = new ImmutableSet.Builder<>();
-        final Pivot.Builder pivotBuilder = Pivot.builder()
-                .id(new UUID().toString())
-                .rollup(true);
-
-        final Object streamId = config().get("stream_id");
-        if (streamId instanceof String) {
-            streams.add((String) streamId);
-            pivotBuilder.streams(streams.build());
-        }
-        return pivotBuilder;
-    }
-
-    private List<Pivot.Builder> createHistogram() {
-        Pivot.Builder pivotBuilder = createPivotBuilder();
-        final String interval = (String) config().get("interval");
-        pivotBuilder.series(ImmutableList.of(Count.builder().id("count()").build()));
-        pivotBuilder.rowGroups(ImmutableList.of(Time.builder().field("timestamp").interval(TimeIntervalMapper.map(interval)).build()))
-                .id(new UUID().toString())
-                .rollup(true);
-        return ImmutableList.of(pivotBuilder);
-    }
-
-    private List<Pivot.Builder> createFieldChart() {
-        Pivot.Builder pivotBuilder = createPivotBuilder();
-        final String interval = (String) config().get("interval");
-        String valueType = (String) config().get("valuetype");
-        String field = (String) config().get("field");
-        pivotBuilder.series(ImmutableList.of(createSeries(valueType, field)));
-        pivotBuilder.rowGroups(ImmutableList.of(Time.builder().field("timestamp").interval(TimeIntervalMapper.map(interval)).build()))
-                .id(new UUID().toString())
-                .rollup(true);
-        return ImmutableList.of(pivotBuilder);
-    }
-
-    private List<Pivot.Builder> createStackedChart(Map<String, Object> config) {
-        return ImmutableList.of();
-    }
-
 
     @AutoValue
     @WithBeanGetter
