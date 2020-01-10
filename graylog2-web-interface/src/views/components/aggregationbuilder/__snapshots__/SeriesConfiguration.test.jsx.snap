@@ -11,6 +11,7 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
       "function": "count()",
     }
   }
+  usedNames={Array []}
 >
   <span>
     <Component
@@ -224,14 +225,17 @@ exports[`SeriesConfiguration renders the configuration dialog 1`] = `
     >
       <ForwardRef
         bsStyle="success"
+        disabled={false}
         onClick={[Function]}
       >
         <Button
           bsStyle="success"
+          disabled={false}
           onClick={[Function]}
         >
           <StyledComponent
             bsStyle="success"
+            disabled={false}
             forwardedComponent={
               Object {
                 "$$typeof": Symbol(react.forward_ref),
