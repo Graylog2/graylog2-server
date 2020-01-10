@@ -61,4 +61,7 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_compression_enabled")
     boolean compressionEnabled = false;
+
+    @Parameter(value = "elasticsearch_use_expect_continue")
+    boolean useExpectContinue = true;
 }

@@ -51,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,6 +90,7 @@ public class Messages {
     private final Meter invalidTimestampMeter;
     private final JestClient client;
     private final ProcessingStatusRecorder processingStatusRecorder;
+    private final boolean useExpectContinue;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
     private final Counter outputByteCounter;
     private final Counter systemTrafficCounter;
@@ -96,12 +98,14 @@ public class Messages {
     @Inject
     public Messages(MetricRegistry metricRegistry,
                     JestClient client,
-                    ProcessingStatusRecorder processingStatusRecorder) {
+                    ProcessingStatusRecorder processingStatusRecorder,
+                    @Named("elasticsearch_use_expect_continue") boolean useExpectContinue) {
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
         this.client = client;
         this.processingStatusRecorder = processingStatusRecorder;
+        this.useExpectContinue = useExpectContinue;
 
         // TODO: Magic number
         this.indexFailureQueue =  new LinkedBlockingQueue<>(1000);
@@ -243,9 +247,13 @@ public class Messages {
 
     private BulkResult runBulkRequest(final Bulk request, int count) {
         try {
-            // Enable Expect-Continue to catch 413 errors before we send the actual data
-            final RequestConfig requestConfig = RequestConfig.custom().setExpectContinueEnabled(true).build();
-            return BULK_REQUEST_RETRYER.call(() -> JestUtils.execute(client, requestConfig, request));
+            if (useExpectContinue) {
+                // Enable Expect-Continue to catch 413 errors before we send the actual data
+                final RequestConfig requestConfig = RequestConfig.custom().setExpectContinueEnabled(true).build();
+                return BULK_REQUEST_RETRYER.call(() -> JestUtils.execute(client, requestConfig, request));
+            } else {
+                return BULK_REQUEST_RETRYER.call(() -> client.execute(request));
+            }
         } catch (ExecutionException | RetryException e) {
             if (e instanceof RetryException) {
                 LOG.error("Could not bulk index {} messages. Giving up after {} attempts.", count, ((RetryException) e).getNumberOfFailedAttempts());

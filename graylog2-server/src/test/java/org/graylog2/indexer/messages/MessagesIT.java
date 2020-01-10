@@ -55,7 +55,7 @@ public class MessagesIT extends ElasticsearchBaseTest {
 
     @Before
     public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder());
+        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true);
     }
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()

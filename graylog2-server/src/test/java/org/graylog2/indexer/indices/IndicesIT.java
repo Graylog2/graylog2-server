@@ -105,7 +105,7 @@ public class IndicesIT extends ElasticsearchBaseTest {
         indices = new Indices(jestClient(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);
