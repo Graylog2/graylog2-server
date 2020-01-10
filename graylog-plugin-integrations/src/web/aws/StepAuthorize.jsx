@@ -89,10 +89,8 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
               title="Create Input &amp; Authorize AWS"
               description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog.">
 
-      {/* Fighting AutoComplete Forms */}
       <DisappearingInput id="name" type="text" />
       <DisappearingInput id="password" type="password" />
-      {/* Continue on, Nothing to See Here */}
 
       <ValidatedInput id="awsCloudWatchName"
                       type="text"
