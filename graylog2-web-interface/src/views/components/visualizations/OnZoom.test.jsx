@@ -6,7 +6,7 @@ import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
 
 import OnZoom from './OnZoom';
 
-const mockGetTimezone = jest.fn(() => ({ timezone: 'UTC'}));
+const mockGetTimezone = jest.fn(() => ({ timezone: 'UTC' }));
 
 jest.mock('injection/CombinedProvider', () => ({
   get: () => ({ CurrentUserStore: { get: () => mockGetTimezone() } }),
