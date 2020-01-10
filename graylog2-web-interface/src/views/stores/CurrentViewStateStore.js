@@ -85,6 +85,14 @@ export const CurrentViewStateStore = singletonStore(
 
     widgets(newWidgets) {
       const positionsMap = Immutable.Map(this._activeState().widgetPositions);
+
+      const positionsMapWithWidget = positionsMap.reduce((clearedPositions, position, positionWidgetId) => {
+        if (newWidgets.find(widget => widget.id === positionWidgetId)) {
+          return clearedPositions.set(positionWidgetId, position);
+        }
+        return clearedPositions;
+      }, Immutable.Map());
+
       const widgetsWithoutPositions = newWidgets.filter((widget) => {
         return !positionsMap.get(widget.id);
       });
@@ -96,7 +104,7 @@ export const CurrentViewStateStore = singletonStore(
           return newPosMap.set(id, pos);
         }, Immutable.Map());
         return result.set(widget.id, new WidgetPosition(1, 1, widgetDef.defaultHeight, widgetDef.defaultWidth));
-      }, positionsMap);
+      }, positionsMapWithWidget);
 
       const newActiveState = this._activeState().toBuilder()
         .widgets(newWidgets)

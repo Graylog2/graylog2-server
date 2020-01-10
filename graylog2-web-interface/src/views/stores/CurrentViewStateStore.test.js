@@ -103,4 +103,39 @@ describe('CurrentViewStateStore', () => {
     CurrentViewStateStore.widgets(expectedWidgets);
     expect(updateFn).toHaveBeenCalledTimes(1);
   });
+
+  it('should remove widget positions for deleted widgets', () => {
+    const widgetOnePos = new WidgetPosition(1, 1, 5, 6);
+    const widgetTwoPos = new WidgetPosition(1, 6, 5, 6);
+    const widgetPositionsMap = { 'widget-one': widgetOnePos, 'widget-two': widgetTwoPos };
+    const widgetOne = MessagesWidget.builder().id('widget-one').build();
+    const widgetTwo = MessagesWidget.builder().id('widget-two').build();
+    const existingWidgets = [widgetOne, widgetTwo];
+    const existingViewState = viewState.toBuilder()
+      .widgetPositions(widgetPositionsMap)
+      .widgets(existingWidgets)
+      .build();
+
+    viewStateMap[viewId] = existingViewState;
+    const sMap = Immutable.Map(viewStateMap);
+
+    const expectedWidgets = [widgetOne];
+    const expectedWidgetPosition = { 'widget-one': widgetOnePos };
+    const expectedViewState = viewState.toBuilder()
+      .widgetPositions(expectedWidgetPosition)
+      .widgets(expectedWidgets)
+      .build();
+
+    const updateFn = mockAction(jest.fn((id, newViewState) => {
+      expect(id).toEqual(viewId);
+      expect(newViewState).toEqual(expectedViewState);
+      return Promise.resolve(expectedViewState);
+    }));
+
+    ViewStatesActions.update = updateFn;
+    CurrentViewStateStore.onViewStoreChange({ activeQuery: viewId, view: existingViewState });
+    CurrentViewStateStore.onViewStatesStoreChange(sMap);
+    CurrentViewStateStore.widgets(expectedWidgets);
+    expect(updateFn).toHaveBeenCalledTimes(1);
+  });
 });
