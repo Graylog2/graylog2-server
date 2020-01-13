@@ -251,7 +251,7 @@ const ConfigurationForm = createReactClass({
 
     return (
       <span>
-        <Select inputProps={{ id: 'collector_id' }}
+        <Select inputId="collector_id"
                 options={this._formatCollectorOptions()}
                 value={collectorId}
                 onChange={this._onCollectorChange}
