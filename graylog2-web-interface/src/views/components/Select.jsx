@@ -73,8 +73,9 @@ const MenuOverlay = selectRef => (props) => {
     position: 'absolute',
   };
   return (
-    <Overlay show
-             placement="bottom"
+    <Overlay placement="bottom"
+             shouldUpdatePosition
+             show
              target={selectRef.current}>
       <OverlayInner>
         <div style={listStyle}>
