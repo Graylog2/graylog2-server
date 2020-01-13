@@ -34,7 +34,8 @@ const BooleanOperatorSelector = ({ initialText, operator, onOperatorChange }) =>
                     { label: 'all', value: '&&' },
                     { label: 'any', value: '||' },
                   ]}
-                  value={operator} />
+                  value={operator}
+                  clearable={false} />
         </BooleanOperatorSelect>
         <FormGroup>
           <FormControl.Static> of the following rules:</FormControl.Static>

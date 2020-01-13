@@ -95,7 +95,7 @@ class StreamForm extends React.Component {
         <Input id="index-set-selector"
                label="Index Set"
                help="Messages that match this stream will be written to the configured index set.">
-          <Select inputProps={{ id: 'index-set-selector' }}
+          <Select inputId="index-set-selector"
                   placeholder="Select index set"
                   options={this._formatSelectOptions()}
                   matchProp="label"

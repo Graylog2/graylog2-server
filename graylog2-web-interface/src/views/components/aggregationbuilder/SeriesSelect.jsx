@@ -127,8 +127,6 @@ class SeriesSelect extends React.Component<Props, State> {
               components={_components}
               onClose={this._onClose}
               closeMenuOnSelect={false}
-              onBlurResetsInput
-              onCloseResetsInput
               menuShouldScrollIntoView
               tabSelectsValue
               escapeClearsValue

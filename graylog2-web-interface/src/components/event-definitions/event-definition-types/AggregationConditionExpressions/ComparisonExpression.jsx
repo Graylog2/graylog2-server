@@ -42,7 +42,8 @@ const ComparisonExpression = (props) => {
                       { label: '>=', value: '>=' },
                       { label: '=', value: '==' },
                     ]}
-                    value={expression.expr} />
+                    value={expression.expr}
+                    clearable={false} />
             {validation.errors.conditions && (
               <HelpBlock>{lodash.get(validation, 'errors.conditions[0]')}</HelpBlock>
             )}
