@@ -249,7 +249,7 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: (({ type }) => (type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ type, contexts }) => (!!contexts.message && type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
       component: SelectExtractorType,
     },
     {
