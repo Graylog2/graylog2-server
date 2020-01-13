@@ -37,6 +37,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,18 +52,17 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MessagesIT extends ElasticsearchBaseTest {
+    private static final String INDEX_NAME = "messages_it_deflector";
+
     private Messages messages;
 
-    @Before
-    public void setUp() throws Exception {
-        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true);
-    }
+    private Count count;
 
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
             .title("Index set 1")
             .description("For testing")
-            .indexPrefix("graylog")
+            .indexPrefix("messages_it")
             .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
             .shards(1)
             .replicas(0)
@@ -76,6 +76,20 @@ public class MessagesIT extends ElasticsearchBaseTest {
             .indexOptimizationDisabled(false)
             .build();
     private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
+
+    @Before
+    public void setUp() throws Exception {
+        client().deleteIndices(INDEX_NAME);
+        client().createIndex(INDEX_NAME);
+        client().waitForGreenStatus(INDEX_NAME);
+        count = new Count.Builder().addIndex(INDEX_NAME).build();
+        messages = new Messages(new MetricRegistry(), jestClient(), new InMemoryProcessingStatusRecorder(), true);
+    }
+
+    @After
+    public void tearDown() {
+        client().deleteIndices(INDEX_NAME);
+    }
 
     @Test
     public void getResultDoesNotContainJestMetadataFields() throws Exception {
@@ -108,9 +122,8 @@ public class MessagesIT extends ElasticsearchBaseTest {
         assertThat(failedItems).isEmpty();
 
         Thread.sleep(2000); // wait for ES to finish indexing
-        final Count count = new Count.Builder().build();
-        final CountResult result = jestClient().execute(count);
 
+        final CountResult result = jestClient().execute(count);
         assertThat(result.getCount()).isEqualTo(MESSAGECOUNT);
     }
 
@@ -125,7 +138,6 @@ public class MessagesIT extends ElasticsearchBaseTest {
         assertThat(failedItems).isEmpty();
 
         Thread.sleep(2000); // wait for ES to finish indexing
-        final Count count = new Count.Builder().build();
         final CountResult result = jestClient().execute(count);
 
         assertThat(result.getCount()).isEqualTo(MESSAGECOUNT + LARGE_MESSAGECOUNT);
