@@ -38,6 +38,7 @@ import org.graylog2.system.processing.InMemoryProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -112,6 +113,8 @@ public class MessagesIT extends ElasticsearchBase {
 
     @Test
     public void testIfTooLargeBatchesGetSplitUp() throws Exception {
+        // We don't have enough memory to run this test within travis
+        Assume.assumeTrue(Strings.isNullOrEmpty(System.getProperty("TRAVIS")));
         // This test assumes that ES is configured with bulk_max_body_size to 100MB
         // Check if we can index about 300MB of messages (once the large batch gets split up)
         final int MESSAGECOUNT = 303;
@@ -129,6 +132,8 @@ public class MessagesIT extends ElasticsearchBase {
 
     @Test
     public void unevenTooLargeBatchesGetSplitUp() throws Exception {
+        // We don't have enough memory to run this test within travis
+        Assume.assumeTrue(Strings.isNullOrEmpty(System.getProperty("TRAVIS")));
         final int MESSAGECOUNT = 100;
         final int LARGE_MESSAGECOUNT = 20;
         final ArrayList<Map.Entry<IndexSet, Message>> messageBatch = createMessageBatch(1024, MESSAGECOUNT);
