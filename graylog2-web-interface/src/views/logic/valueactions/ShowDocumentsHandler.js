@@ -49,9 +49,6 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
       .showMessageRow(true).build())
     .build();
 
-  const newWidget = (view && view.type === View.Type.Dashboard)
-    ? newWidgetBuilder.timerange(widget.timerange).streams(widget.streams).build()
-    : newWidgetBuilder.build();
   const title = `Messages for ${valuePathQuery}`;
   return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };
