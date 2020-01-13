@@ -75,9 +75,6 @@ const MenuOverlay = selectRef => (props) => {
   return (
     <Overlay show
              placement="bottom"
-             shouldUpdatePosition
-             onHide={() => {}}
-             rootClose
              target={selectRef.current}>
       <OverlayInner>
         <div style={listStyle}>
