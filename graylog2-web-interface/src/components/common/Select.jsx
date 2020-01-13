@@ -179,26 +179,26 @@ const _styles = props => ({
 });
 
 type Props = {
-  onChange: (string) => void,
-  placeholder: string,
-  clearable?: boolean,
-  displayKey?: string,
-  valueKey?: string,
-  delimiter?: string,
-  options: Array<Option>,
-  components: ?{string: React.Node},
-  matchProp?: 'any' | 'label' | 'value',
-  value?: string,
-  autoFocus?: boolean,
-  size?: 'normal' | 'small',
-  disabled?: boolean,
   addLabelText?: string,
   allowCreate?: boolean,
+  autoFocus?: boolean,
+  clearable?: boolean,
+  components: ?{string: React.Node},
+  delimiter?: string,
+  disabled?: boolean,
+  displayKey?: string,
+  inputProps?: { [string]: any },
+  matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
+  onChange: (string) => void,
   onReactSelectChange?: (Option | Array<Option>) => void,
   optionRenderer?: (Option) => React.Node,
+  options: Array<Option>,
+  placeholder: string,
+  size?: 'normal' | 'small',
+  value?: string,
+  valueKey?: string,
   valueRenderer?: (Option) => React.Node,
-  inputProps?: { [string]: any },
 };
 
 type State = {
@@ -208,6 +208,29 @@ type State = {
 
 class Select extends React.Component<Props, State> {
   static propTypes = {
+    /** Specifies if the user can create new entries in `multi` Selects. */
+    allowCreate: PropTypes.bool,
+    /** Indicates if the Select value is clearable or not. */
+    clearable: PropTypes.bool,
+    /**
+     * A collection of custom `react-select` components from https://react-select.com/components
+     */
+    components: PropTypes.objectOf(PropTypes.elementType),
+    /** Delimiter to use as value separator in `multi` Selects. */
+    delimiter: PropTypes.string,
+    /** Indicates whether the Select component is disabled or not. */
+    disabled: PropTypes.bool,
+    /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
+    displayKey: PropTypes.string,
+    /**
+     * @deprecated Use `inputId` or custom components with the `components` prop instead.
+     * Custom attributes for the input (inside the Select).
+     */
+    inputProps: PropTypes.object,
+    /** Indicates which option property to filter on. */
+    matchProp: PropTypes.oneOf(['any', 'label', 'value']),
+    /** Specifies if multiple values can be selected or not. */
+    multi: PropTypes.bool,
     /**
      * Callback when selected option changes. It receives the value of the
      * selected option as an argument. If `multi` is enabled, the passed
@@ -215,23 +238,6 @@ class Select extends React.Component<Props, State> {
      * options.
      */
     onChange: PropTypes.func.isRequired,
-    /** Size of the select input. */
-    size: PropTypes.oneOf(['normal', 'small']),
-    /**
-     * String containing the selected value. If `multi` is enabled, it must
-     * be a string containing all values separated by the `delimiter`.
-     */
-    value: PropTypes.string,
-    /** Specifies if multiple values can be selected or not. */
-    multi: PropTypes.bool,
-    /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
-    displayKey: PropTypes.string,
-    /** Indicates which option object key contains the value of the option. */
-    valueKey: PropTypes.string,
-    /** Delimiter to use as value separator in `multi` Selects. */
-    delimiter: PropTypes.string,
-    /** Specifies if the user can create new entries in `multi` Selects. */
-    allowCreate: PropTypes.bool,
     /**
      * Available options shown in the select field. It should be an array of objects,
      * each one with a display key (specified in `displayKey`), and a value key
@@ -239,36 +245,39 @@ class Select extends React.Component<Props, State> {
      * Options including an optional `disabled: true` key-value pair, will be disabled in the Select component.
      */
     options: PropTypes.array.isRequired,
-    /**
-     * A collection of custom `react-select` components from https://react-select.com/components
-     */
-    components: PropTypes.objectOf(PropTypes.elementType),
-    disabled: PropTypes.bool,
-    clearable: PropTypes.bool,
-    matchProp: PropTypes.oneOf(['any', 'label', 'value']),
+    /** Custom function to render the options in the menu. */
     optionRenderer: PropTypes.func,
+    /** Size of the select input. */
+    size: PropTypes.oneOf(['normal', 'small']),
+    /**
+     * String containing the selected value. If `multi` is enabled, it must
+     * be a string containing all values separated by the `delimiter`.
+     */
+    value: PropTypes.string,
+    /** Indicates which option object key contains the value of the option. */
+    valueKey: PropTypes.string,
+    /** Custom function to render the selected option in the Select. */
     valueRenderer: PropTypes.func,
-    inputProps: PropTypes.object,
   };
 
   static defaultProps = {
-    multi: false,
-    size: 'normal',
-    displayKey: 'label',
-    valueKey: 'value',
-    delimiter: ',',
-    allowCreate: false,
-    value: undefined,
-    matchProp: 'any',
-    autoFocus: false,
-    disabled: false,
     addLabelText: undefined,
-    onReactSelectChange: undefined,
-    components: null,
+    allowCreate: false,
+    autoFocus: false,
     clearable: true,
-    optionRenderer: undefined,
-    valueRenderer: undefined,
+    components: null,
+    delimiter: ',',
+    disabled: false,
+    displayKey: 'label',
     inputProps: undefined,
+    matchProp: 'any',
+    multi: false,
+    onReactSelectChange: undefined,
+    optionRenderer: undefined,
+    size: 'normal',
+    value: undefined,
+    valueKey: 'value',
+    valueRenderer: undefined,
   };
 
   constructor(props: Props) {
