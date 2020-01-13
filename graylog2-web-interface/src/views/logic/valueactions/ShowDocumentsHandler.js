@@ -11,6 +11,7 @@ import View from '../views/View';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
+import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
 
 type Contexts = {
   valuePath: ValuePath,
@@ -31,7 +32,7 @@ const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
     .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget, view } }: Arguments) => {
+const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
@@ -40,16 +41,14 @@ const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widge
   const query = addToQuery(widgetQuery, valuePathQuery);
   const valuePathFields = extractFieldsFromValuePath(valuePath);
   const messageListFields = new Set([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
-  const newWidgetBuilder = MessagesWidget.builder()
+  const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(new MessagesWidgetConfig.builder()
       .fields([...messageListFields])
-      .showMessageRow(true).build());
+      .showMessageRow(true).build())
+    .build();
 
-  const newWidget = (view && view.type === View.Type.Dashboard)
-    ? newWidgetBuilder.timerange(widget.timerange).streams(widget.streams).build()
-    : newWidgetBuilder.build();
   const title = `Messages for ${valuePathQuery}`;
   return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };

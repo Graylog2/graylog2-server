@@ -11,6 +11,8 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import FieldTypeMapping from '../fieldtypes/FieldTypeMapping';
 import FieldType from '../fieldtypes/FieldType';
 import ChartActionHandler from './ChartActionHandler';
+import { createElasticsearchQueryString } from '../queries/Query';
+import AggregationWidget from '../aggregationbuilder/AggregationWidget';
 
 jest.mock('views/stores/FieldTypesStore', () => ({ FieldTypesStore: { getInitialState: jest.fn() } }));
 jest.mock('views/stores/WidgetStore', () => ({
@@ -151,6 +153,28 @@ describe('ChartActionHandler', () => {
 
       expect(widget.filter).toEqual(filter);
       expect(pivotForField).toHaveBeenCalledWith('timestamp', timestampFieldType);
+    });
+    it('duplicates query/timerange/streams/filter of original widget', () => {
+      const origWidget = Widget.builder()
+        .filter('author: "Vanth"')
+        .query(createElasticsearchQueryString('foo:42'))
+        .streams(['stream1', 'stream23'])
+        .timerange({ type: 'relative', range: 3600 })
+        .build();
+
+      ChartActionHandler({
+        queryId: 'queryId',
+        field: 'foo',
+        type: new FieldType('keyword', [], []),
+        contexts: { widget: origWidget },
+      });
+
+      expect(WidgetActions.create).toHaveBeenCalled();
+      const { filter, query, streams, timerange }: AggregationWidget = asMock(WidgetActions.create).mock.calls[0][0];
+      expect(filter).toEqual('author: "Vanth"');
+      expect(query).toEqual(createElasticsearchQueryString('foo:42'));
+      expect(streams).toEqual(['stream1', 'stream23']);
+      expect(timerange).toEqual({ type: 'relative', range: 3600 });
     });
   });
 });
