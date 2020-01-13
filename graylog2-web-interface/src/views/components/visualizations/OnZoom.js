@@ -7,6 +7,7 @@ import Query from 'views/logic/queries/Query';
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import { GlobalOverrideActions } from 'views/stores/GlobalOverrideStore';
+import SearchActions from 'views/actions/SearchActions';
 
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
@@ -20,7 +21,7 @@ const onZoom = (currentQuery: Query, from: string, to: string, viewType: ?ViewTy
   };
 
   const action = viewType === View.Type.Dashboard
-    ? GlobalOverrideActions.timerange
+    ? timerange => GlobalOverrideActions.timerange(timerange).then(SearchActions.refresh)
     : timerange => QueriesActions.timerange(currentQuery.id, timerange);
 
   action(newTimerange);
