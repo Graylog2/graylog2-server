@@ -195,10 +195,16 @@ public Stream<ViewDTO> getNativeViews() {
     @SuppressWarnings("UnstableApiUsage")
     private Graph<Entity> resolveEntityV1(EntityV1 entity,
                                           Map<EntityDescriptor, Entity> entities) {
+        final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
+        return resolveViewEntity(entity, viewEntity, entities);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    protected Graph<Entity> resolveViewEntity(EntityV1 entity,
+                                              ViewEntity viewEntity,
+                                              Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
-
-        final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
         viewEntity.search().usedStreamIds().stream()
                 .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .map(entities::get)

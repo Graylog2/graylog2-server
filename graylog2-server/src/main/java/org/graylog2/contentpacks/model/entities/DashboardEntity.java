@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
+import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
@@ -57,14 +58,6 @@ public abstract class DashboardEntity {
                     value.convert(parameters)));
         }
         return ImmutableMap.copyOf(widgetPositionMap);
-    }
-
-    public Map<DashboardWidgetEntity, List<WidgetEntity>> convertWidgets(Map<String, ValueReference> parameters) {
-        final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
-        for (DashboardWidgetEntity widgetEntity : widgets()) {
-            widgets.put(widgetEntity, widgetEntity.convert(parameters));
-        }
-        return widgets;
     }
 
     public static Map<String, Map<String, String>> widetTitles(

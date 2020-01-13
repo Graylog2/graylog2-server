@@ -3,6 +3,7 @@ package org.graylog2.contentpacks.facades.dashboardV1;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.Graph;
 import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
@@ -25,11 +26,16 @@ import java.util.stream.Stream;
 public class DashboardV1Facade extends ViewFacade {
     public static final ModelType TYPE_V1 = ModelTypes.DASHBOARD_V1;
     private ObjectMapper objectMapper;
+    private RandomUUIDProvider randomUUIDProvider;
 
     @Inject
-    public DashboardV1Facade(ObjectMapper objectMapper, SearchDbService searchDbService, ViewService viewService) {
+    public DashboardV1Facade(ObjectMapper objectMapper,
+                             SearchDbService searchDbService,
+                             RandomUUIDProvider randomUUIDProvider,
+                             ViewService viewService) {
         super(objectMapper, searchDbService, viewService);
         this.objectMapper = objectMapper;
+        this.randomUUIDProvider = randomUUIDProvider;
     }
 
     @Override
@@ -66,10 +72,33 @@ public class DashboardV1Facade extends ViewFacade {
                                            Map<String, ValueReference> parameters,
                                            Map<EntityDescriptor, Object> nativeEntities) throws InvalidRangeParametersException {
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entityV1.data(), DashboardEntity.class);
-        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters);
+        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters, randomUUIDProvider);
         final ViewEntity viewEntity = entityConverter.convert();
         final JsonNode data = objectMapper.convertValue(viewEntity, JsonNode.class);
         final EntityV1 convertedEntity = entityV1.toBuilder().data(data).type(ModelTypes.DASHBOARD_V2).build();
         return super.decode(convertedEntity, parameters, nativeEntities);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
+        if (entity instanceof EntityV1) {
+            return resolveEntityV1((EntityV1) entity, parameters, entities);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
+                                          Map<EntityDescriptor, Entity> entities) {
+
+        final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
+        final EntityConverter entityConverter = new EntityConverter(dashboardEntity, parameters, randomUUIDProvider);
+        final ViewEntity viewEntity = entityConverter.convert();
+        return resolveViewEntity(entity, viewEntity, entities);
     }
 }

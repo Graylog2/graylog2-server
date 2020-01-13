@@ -49,6 +49,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationCon
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -169,18 +170,19 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         return widgetBuilder.build();
     }
 
-    public List<SearchType> createSearchType() {
+    public List<SearchType> createSearchType(RandomUUIDProvider randomUUIDProvider) {
         if (! type().matches(AggregationConfigDTO.NAME)) {
             return ImmutableList.of();
         }
         AggregationConfigDTO config = (AggregationConfigDTO) config();
         final Pivot.Builder pivotBuilder = Pivot.builder()
+                .name("chart")
                 .streams(streams())
                 .rollup(true)
                 .sort(toSortSpec(config))
                 .rowGroups(toRowGroups(config))
                 .series(toSeriesSpecs(config))
-                .id(new UUID().toString());
+                .id(randomUUIDProvider.get());
         query().ifPresent(pivotBuilder::query);
         timerange().ifPresent(pivotBuilder::timerange);
 
@@ -228,7 +230,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
     private List<SeriesSpec> toSeriesSpecs(AggregationConfigDTO config) {
         return config.series().stream().map(seriesDTO -> {
             String function = seriesDTO.function();
-            Pattern pattern = Pattern.compile("(\\(.*?)\\)");
+            Pattern pattern = Pattern.compile("\\((.*?)\\)");
             Matcher matcher = pattern.matcher(function);
             String field = "";
             if (matcher.find()) {
@@ -256,7 +258,11 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
                 return StdDev.builder().field(field).id(function).build();
             }
             if (function.startsWith("count")) {
-                return Count.builder().field(field).id(function).build();
+                final Count.Builder countBuilder = Count.builder().id(function);
+                if (!field.isEmpty()) {
+                    countBuilder.field(field);
+                }
+                return countBuilder.build();
             }
             throw new IllegalArgumentException(
                     "The provided entity does not have a valid function type: " + function);

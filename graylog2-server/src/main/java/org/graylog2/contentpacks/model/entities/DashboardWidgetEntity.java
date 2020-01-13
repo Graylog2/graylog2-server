@@ -42,6 +42,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO
 import org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
+import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -64,6 +65,7 @@ import java.util.stream.Collectors;
 @JsonAutoDetect
 public abstract class DashboardWidgetEntity {
     private Map<String, ValueReference> parameters;
+    private RandomUUIDProvider randomUUIDProvider;
     private Map<String, Object> config;
 
     @JsonProperty("id")
@@ -113,8 +115,9 @@ public abstract class DashboardWidgetEntity {
         return config;
     }
 
-    public List<WidgetEntity> convert(Map<String, ValueReference> parameters) {
+    public List<WidgetEntity> convert(Map<String, ValueReference> parameters, RandomUUIDProvider randomUUIDProvider) {
         this.parameters = parameters;
+        this.randomUUIDProvider = randomUUIDProvider;
         final String type = type().asString(parameters);
 
         try {
@@ -167,7 +170,7 @@ public abstract class DashboardWidgetEntity {
     private WidgetEntity.Builder aggregationWidgetBuilder() throws InvalidRangeParametersException {
         final WidgetEntity.Builder widgetEntityBuilder = WidgetEntity.builder()
                 .type(AggregationConfigDTO.NAME)
-                .id(id().asString(parameters))
+                .id(randomUUIDProvider.get())
                 .timerange(timeRange().convert(parameters));
 
         final ImmutableSet.Builder<String> streams = new ImmutableSet.Builder<>();
@@ -354,7 +357,9 @@ public abstract class DashboardWidgetEntity {
             result.add(widgetEntityBuilder.config(
                     aggregationConfigBuilder.visualization("table")
                             .rowPivots(genPivotForPie(field, stackedFields, dataTableLimit))
-                            .build()).build());
+                            .build())
+                    .id(randomUUIDProvider.get())
+                    .build());
         }
         return result;
     }

@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.facades.dashboardV1.DashboardV1Facade;
+import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.ContentPack;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.contentpacks.model.entities.Entity;
@@ -44,6 +45,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import java.net.URL;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -100,7 +102,8 @@ public class DashboardV1FacadeTest {
                 new MongoJackObjectMapperProvider(objectMapper));
         viewService = new ViewFacadeTest.TestViewService(mongoRule.getMongoConnection(),
                 new MongoJackObjectMapperProvider(objectMapper), null);
-        facade = new DashboardV1Facade(objectMapper, searchDbService, viewService);
+        final RandomUUIDProvider randomUUIDProvider = new RandomUUIDProvider(new Date(1575020937839L), 1575020937839L);
+        facade = new DashboardV1Facade(objectMapper, searchDbService, randomUUIDProvider, viewService);
     }
 
     @Test
