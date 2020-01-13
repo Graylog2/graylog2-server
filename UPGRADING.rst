@@ -20,6 +20,12 @@ Graylog 3.2 will ship with a secure default of supported TLS protocols.
 This means that TLS 1.0 and TLS 1.1 won't be supported anymore. The new default setting affects all TLS enabled services such as message inputs or the graylog web interface.
 If needed, you can re-enable old TLS protocols with the newly introduced ``enabled_tls_protocols`` setting.
 
+Indexing Requests use HTTP Expect: 100-Continue Header
+======================================================
+
+Messages indexing requests to Elasticsearch are now executed with a HTTP Expect-Continue header.
+For the unlikely case that this is creating problems, it can be disabled using the newly introduced ``elasticsearch_use_expect_continue`` setting.
+
 Known Bugs and Limitations
 ==========================
 
