@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -50,6 +51,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @AutoValue
+@JsonAutoDetect
 @JsonDeserialize(builder = EventDefinitionDto.Builder.class)
 @WithBeanGetter
 public abstract class EventDefinitionDto implements EventDefinition, ContentPackable<EventDefinitionEntity> {

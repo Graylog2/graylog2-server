@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @RequiresAuthentication
-@Api(value = "AlertConditions", description = "Manage stream alert conditions")
+@Api(value = "AlertConditions", description = "Manage stream legacy alert conditions")
 @Path("/alerts/conditions")
 @Produces(MediaType.APPLICATION_JSON)
 public class AlertConditionsResource extends RestResource {

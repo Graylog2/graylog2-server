@@ -16,6 +16,7 @@
  */
 package org.graylog.events.notifications;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,6 +34,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
+@JsonAutoDetect
 @JsonDeserialize(builder = NotificationDto.Builder.class)
 public abstract class NotificationDto implements ContentPackable {
     public static final String FIELD_ID = "id";
