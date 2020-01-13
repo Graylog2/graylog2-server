@@ -56,8 +56,9 @@ public class TcpTransport extends AbstractTcpTransport {
                         EventLoopGroupFactory eventLoopGroupFactory,
                         NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
-                        LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration);
+                        LocalMetricRegistry localRegistry,
+                        org.graylog2.Configuration graylogConfiguration) {
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, graylogConfiguration);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();

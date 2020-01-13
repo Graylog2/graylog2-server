@@ -25,13 +25,23 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class BeatsTransportTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     private NioEventLoopGroup eventLoopGroup;
+
+    @Mock
+    private org.graylog2.Configuration graylogConfiguration;
 
     @Before
     public void setUp() {
@@ -53,7 +63,8 @@ public class BeatsTransportTest {
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
                 new ThroughputCounter(eventLoopGroup),
-                new LocalMetricRegistry()
+                new LocalMetricRegistry(),
+                graylogConfiguration
         );
 
         final MessageInput input = mock(MessageInput.class);
