@@ -116,7 +116,7 @@ public class IndicesIT extends ElasticsearchBase {
         indices = new Indices(client(),
                 new ObjectMapperProvider().get(),
                 indexMappingFactory,
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 eventBus);
