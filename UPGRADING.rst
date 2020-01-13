@@ -13,6 +13,12 @@ Graylog 3.2 contains a massive overhaul of its dashboarding functionality, which
   * Stacked Charts containing multiple series with different queries are split up by query. If a stacked chart contains 5 series, 3 with query "foo", 2 with query "bar, it is split up into two widgets, one containing all 3 "foo"-series, the other containing the 2 "bar"-series.
   * Widgets created using 3rd party plugins are migrated with their config, but unless the plugin author creates a corresponding plugin for 3.2, a placeholder is shown.
 
+Changed Default TLS Protocols
+=============================
+
+Graylog 3.2 will ship with a secure default of supported TLS protocols.
+This means that TLS 1.0 and TLS 1.1 won't be supported anymore. The new default setting affects all TLS enabled services such as message inputs or the graylog web interface.
+If needed, you can re-enable old TLS protocols with the newly introduced ``enabled_tls_protocols`` setting.
 
 Known Bugs and Limitations
 ==========================
