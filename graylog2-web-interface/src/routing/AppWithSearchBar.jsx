@@ -41,7 +41,6 @@ const AppWithSearchBar = createReactClass({
       forceFetch: false,
       savedSearches: undefined,
       stream: undefined,
-      searchesClusterConfig: undefined,
     };
   },
 

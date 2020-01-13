@@ -41,6 +41,7 @@ import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
+import org.graylog2.lookup.adapters.LookupDataAdapterValidationContext;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -146,20 +147,21 @@ public class LookupTableResource extends RestResource {
     private final SearchQueryParser adapterSearchQueryParser;
     private final SearchQueryParser cacheSearchQueryParser;
     private final LookupTableService lookupTableService;
+    private final LookupDataAdapterValidationContext lookupDataAdapterValidationContext;
 
     @Inject
-    public LookupTableResource(DBLookupTableService dbTableService,
-                               DBDataAdapterService dbDataAdapterService,
-                               DBCacheService dbCacheService,
-                               Map<String, LookupCache.Factory> cacheTypes,
+    public LookupTableResource(DBLookupTableService dbTableService, DBDataAdapterService dbDataAdapterService,
+                               DBCacheService dbCacheService, Map<String, LookupCache.Factory> cacheTypes,
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
-                               LookupTableService lookupTableService) {
+                               LookupTableService lookupTableService,
+                               LookupDataAdapterValidationContext lookupDataAdapterValidationContext) {
         this.dbTableService = dbTableService;
         this.dbDataAdapterService = dbDataAdapterService;
         this.dbCacheService = dbCacheService;
         this.cacheTypes = cacheTypes;
         this.dataAdapterTypes = dataAdapterTypes;
         this.lookupTableService = lookupTableService;
+        this.lookupDataAdapterValidationContext = lookupDataAdapterValidationContext;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
         this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
@@ -594,7 +596,8 @@ public class LookupTableResource extends RestResource {
             }
         }
 
-        final Optional<Multimap<String, String>> configValidations = toValidate.config().validate();
+        final Optional<Multimap<String, String>> configValidations = toValidate.config()
+                .validate(lookupDataAdapterValidationContext);
         configValidations.ifPresent(validation::addAll);
 
         return validation;
