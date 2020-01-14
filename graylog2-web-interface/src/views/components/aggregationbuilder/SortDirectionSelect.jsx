@@ -11,6 +11,11 @@ type Props = {
   onChange: (Direction) => any,
 };
 
+const valueContainer = base => ({
+  ...base,
+  minHeight: '35px',
+});
+
 const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select => (
   <Select isDisabled={disabled}
           isClearable={false}
@@ -21,6 +26,7 @@ const SortDirectionSelect = ({ direction, disabled, onChange }: Props): Select =
           ]}
           onChange={({ value }) => onChange(Direction.fromString(value))}
           placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
+          styles={{ valueContainer }}
           value={direction && { label: direction, value: direction }} />
 );
 
