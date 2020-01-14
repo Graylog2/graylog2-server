@@ -39,6 +39,10 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
     @JsonProperty
     public abstract BarMode barmode();
 
+    public static Builder builder() {
+        return new AutoValue_BarVisualizationConfigDTO.Builder();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 

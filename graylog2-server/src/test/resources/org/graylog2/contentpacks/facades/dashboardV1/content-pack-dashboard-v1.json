@@ -376,6 +376,280 @@
           {
             "id": {
               "@type": "string",
+              "@value": "b1a60eb8-4d55-4763-9780-6e53ba6e58a4"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Total Threats Stopped"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "SEARCH_RESULT_COUNT"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "relative"
+              },
+              "range": {
+                "@type": "integer",
+                "@value": 1800
+              }
+            },
+            "configuration": {
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "relative"
+                },
+                "range": {
+                  "@value": 1800,
+                  "@type": "integer"
+                }
+              },
+              "lower_is_better": {
+                "@type": "boolean",
+                "@value": false
+              },
+              "trend": {
+                "@type": "boolean",
+                "@value": false
+              },
+              "query": {
+                "@type": "string",
+                "@value": "Threat:true"
+              }
+            }
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "7146f193-a481-4a99-bbea-4a8d74be43d2"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Cached Author"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "QUICKVALUES_HISTOGRAM"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "relative"
+              },
+              "range": {
+                "@type": "integer",
+                "@value": 1800
+              }
+            },
+            "configuration": {
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "relative"
+                },
+                "range": {
+                  "@value": 1800,
+                  "@type": "integer"
+                }
+              },
+              "field": {
+                "@type": "string",
+                "@value": "author"
+              },
+              "query": {
+                "@type": "string",
+                "@value": "project:\"graylog2-server\""
+              },
+              "limit": {
+                "@type": "integer",
+                "@value": 5
+              },
+              "sort_order": {
+                "@type": "string",
+                "@value": "desc"
+              },
+              "stacked_fields": {
+                "@type": "string",
+                "@value": ""
+              }
+            },
+            "position": {
+              "width": {
+                "@type": "integer",
+                "@value": 4
+              },
+              "height": {
+                "@type": "integer",
+                "@value": 2
+              },
+              "row": {
+                "@type": "integer",
+                "@value": 6
+              },
+              "col": {
+                "@type": "integer",
+                "@value": 1
+              }
+            }
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "1ae216e2-1420-4207-9fb7-d661c0659269"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Total Author Requests"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "STREAM_SEARCH_RESULT_COUNT"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "relative"
+              },
+              "range": {
+                "@type": "integer",
+                "@value": 1800
+              }
+            },
+            "configuration": {
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "relative"
+                },
+                "range": {
+                  "@value": 1800,
+                  "@type": "integer"
+                }
+              },
+              "lower_is_better": {
+                "@type": "boolean",
+                "@value": false
+              },
+              "stream_id": {
+                "@type": "string",
+                "@value": "58b3d55a-51ad-4b3e-865c-85776016a151"
+              },
+              "trend": {
+                "@type": "boolean",
+                "@value": false
+              },
+              "query": {
+                "@type": "string",
+                "@value": "Bot:true"
+              }
+            },
+            "position": {
+              "width": {
+                "@type": "integer",
+                "@value": 4
+              },
+              "height": {
+                "@type": "integer",
+                "@value": 2
+              },
+              "row": {
+                "@type": "integer",
+                "@value": 1
+              },
+              "col": {
+                "@type": "integer",
+                "@value": 1
+              }
+            }
+          },
+          {
+            "id": {
+              "@type": "string",
+              "@value": "6e374edc-eda6-402d-9b16-76f4a8fe6ab4"
+            },
+            "description": {
+              "@type": "string",
+              "@value": "Top Bots by Country"
+            },
+            "type": {
+              "@type": "string",
+              "@value": "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy"
+            },
+            "cache_time": {
+              "@type": "integer",
+              "@value": 10
+            },
+            "time_range": {
+              "type": {
+                "@type": "string",
+                "@value": "relative"
+              },
+              "range": {
+                "@type": "integer",
+                "@value": 1800
+              }
+            },
+            "configuration": {
+              "timerange": {
+                "type": {
+                  "@type": "string",
+                  "@value": "relative"
+                },
+                "range": {
+                  "@value": 1800,
+                  "@type": "integer"
+                }
+              },
+              "field": {
+                "@type": "string",
+                "@value": "ClientIpGeolocation"
+              },
+              "stream_id": {
+                "@type": "string",
+                "@value": "58b3d55a-51ad-4b3e-865c-85776016a151"
+              },
+              "query": {
+                "@type": "string",
+                "@value": "Bot:false"
+              }
+            },
+            "position": {
+              "width": {
+                "@type": "integer",
+                "@value": 4
+              },
+              "height": {
+                "@type": "integer",
+                "@value": 3
+              },
+              "row": {
+                "@type": "integer",
+                "@value": 5
+              },
+              "col": {
+                "@type": "integer",
+                "@value": 1
+              }
+            }
+          },
+          {
+            "id": {
+              "@type": "string",
               "@value": "499fd850-3a8a-4e4d-85d0-50301034c611"
             },
             "description": {

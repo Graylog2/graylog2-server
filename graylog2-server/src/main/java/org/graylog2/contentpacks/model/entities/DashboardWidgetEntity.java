@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.views.WidgetPositionDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.Interpolation;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
@@ -40,6 +41,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.SeriesDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
@@ -122,21 +124,23 @@ public abstract class DashboardWidgetEntity {
 
         try {
             switch (type) {
-                case "SEARCH_RESULT_CHART": {
+                case "SEARCH_RESULT_CHART":
                     return createHistogramWidget();
-                }
-                case "FIELD_CHART": {
+                case "FIELD_CHART":
                     return createFieldChartWidget();
-                }
-
-                case "STACKED_CHART": {
+                case "STACKED_CHART":
                     return createStackedChartWidget();
-                }
-                case "STATS_COUNT": {
+                case "STATS_COUNT":
                     return createStatsCountWidget();
-                }
                 case "QUICKVALUES":
                     return createQuickValueWidgets();
+                case "STREAM_SEARCH_RESULT_COUNT":
+                case "SEARCH_RESULT_COUNT":
+                    return createSearchResultCount();
+                case "QUICKVALUES_HISTOGRAM":
+                    return createQuickValueHistogramWidgets();
+                case "org.graylog.plugins.map.widget.strategy.MapWidgetStrategy":
+                    return createMapWidget();
                 default: {
                     throw new IllegalArgumentException(
                             "The provided entity does not have a valid Widget type: " + type);
@@ -364,6 +368,105 @@ public abstract class DashboardWidgetEntity {
         return result;
     }
 
+    private List<WidgetEntity> createSearchResultCount() throws InvalidRangeParametersException {
+        final boolean trend = (boolean) config().get("trend");
+        final boolean lowerIsBetter = (boolean) config().get("lower_is_better");
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+                .series(ImmutableList.of(createSeriesDTO("count", "")))
+                .visualization("numeric")
+                .visualizationConfig(NumberVisualizationConfigDTO.builder()
+                        .trend(trend)
+                        .trendPreference(
+                                lowerIsBetter
+                                        ? NumberVisualizationConfigDTO.TrendPreference.LOWER
+                                        : NumberVisualizationConfigDTO.TrendPreference.HIGHER)
+                        .build()
+                )
+                .rowPivots(Collections.emptyList())
+                .columnPivots(Collections.emptyList())
+                .sort(Collections.emptyList())
+                .build();
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
+                .config(widgetConfig);
+        final String query = (String) config().get("query");
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        }
+
+        return ImmutableList.of(widgetEntityBuilder.build());
+    }
+
+    private List<WidgetEntity> createQuickValueHistogramWidgets() throws InvalidRangeParametersException {
+        final List<WidgetEntity> result = new ArrayList<>(2);
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder();
+
+        final String stackedFields = (String) config().get("stacked_fields");
+        final String query = (String) config().get("query");
+        final String field = (String) config().get("field");
+        final int limit = (int) config().get("limit");
+        final String sortOrder = (String) config().get("sort_order");
+
+        SortConfigDTO.Direction dir = sortOrder.matches("desc")
+                ? SortConfigDTO.Direction.Descending
+                : SortConfigDTO.Direction.Ascending;
+
+        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.builder()
+                .columnPivots(Collections.emptyList())
+                .series(ImmutableList.of(
+                        SeriesDTO.builder()
+                                .config(SeriesConfigDTO.empty())
+                                .function("count()").build()
+                ))
+                .sort(ImmutableList.of(PivotSortConfig.create(field, dir)));
+
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        }
+
+        result.add(widgetEntityBuilder.config(
+                aggregationConfigBuilder.visualization("bar")
+                        .visualizationConfig(BarVisualizationConfigDTO.builder()
+                                .barmode(BarVisualizationConfigDTO.BarMode.stack)
+                                .build())
+                        .rollup(false)
+                        .rowPivots(Collections.singletonList(
+                                PivotDTO.builder()
+                                        .field("timestamp")
+                                        .type("time")
+                                        .config(TimeHistogramConfigDTO.builder().interval(AutoIntervalDTO.builder().build()).build())
+                                        .build()
+                        ))
+                        .columnPivots(genPivotForPie(field, stackedFields, limit))
+                        .build())
+                .id(randomUUIDProvider.get())
+                .build());
+        return result;
+    }
+
+    private List<WidgetEntity> createMapWidget() throws InvalidRangeParametersException {
+        final String field = (String) config().get("field");
+        final PivotDTO fieldPivot = PivotDTO.builder()
+                .type("values")
+                .config(ValueConfigDTO.builder().build())
+                .field(field)
+                .build();
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+                .series(ImmutableList.of(createSeriesDTO("count", "")))
+                .visualization("map")
+                .rowPivots(ImmutableList.of(fieldPivot))
+                .columnPivots(Collections.emptyList())
+                .sort(Collections.emptyList())
+                .build();
+        final WidgetEntity.Builder widgetEntityBuilder = aggregationWidgetBuilder()
+                .config(widgetConfig);
+        final String query = (String) config().get("query");
+        if (query != null) {
+            widgetEntityBuilder.query(ElasticsearchQueryString.builder().queryString(query).build());
+        }
+
+        return ImmutableList.of(widgetEntityBuilder.build());
+    }
+
     private List<PivotDTO> genPivotForPie(String field, String stackedFields, int limit) {
         final PivotDTO fieldPivot = PivotDTO.builder()
                 .type("values")
@@ -384,6 +487,7 @@ public abstract class DashboardWidgetEntity {
                 .stream()
                 .map(fieldName -> PivotDTO.builder()
                         .field(fieldName)
+                        .type("values")
                         .config(ValueConfigDTO.builder().limit(15).build())
                         .build())
                 .collect(Collectors.toList());
@@ -403,6 +507,7 @@ public abstract class DashboardWidgetEntity {
                 function = "sum";
                 break;
             case "std_dev":
+            case "std_deviation":
                 function = "stddev";
                 break;
             default: {

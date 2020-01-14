@@ -19,6 +19,7 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
+import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
@@ -90,6 +91,7 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(LineVisualizationConfigDTO.class, LineVisualizationConfigDTO.NAME));
+        objectMapper.registerSubtypes(new NamedType(BarVisualizationConfigDTO.class, BarVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(NumberVisualizationConfigDTO.class, NumberVisualizationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(ValueConfigDTO.class, ValueConfigDTO.NAME));
@@ -127,12 +129,12 @@ public class DashboardV1FacadeTest {
         assertThat(viewDTO.state()).isNotNull();
         assertThat(viewDTO.state().size()).isEqualTo(1);
         ViewStateDTO viewState = viewDTO.state().values().iterator().next();
-        assertThat(viewState.widgets().size()).isEqualTo(8);
+        assertThat(viewState.widgets().size()).isEqualTo(12);
 
         Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
         Search search = optionalSearch.orElseThrow(NotFoundException::new);
         assertThat(search.queries().size()).isEqualTo(1);
         Query query = search.queries().iterator().next();
-        assertThat(query.searchTypes().size()).isEqualTo(9);
+        assertThat(query.searchTypes().size()).isEqualTo(15);
     }
 }

@@ -33,6 +33,10 @@ public abstract class WorldMapVisualizationConfigDTO implements VisualizationCon
     @JsonProperty
     public abstract Viewport viewport();
 
+    public static Builder builder() {
+        return new AutoValue_WorldMapVisualizationConfigDTO.Builder();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
