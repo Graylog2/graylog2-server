@@ -19,12 +19,12 @@ const OverlayInner = ({ children, style }: {children: Node, style?: Object}) => 
 
 const menu = (selectRef) => {
   const defaultMinWidth = 200;
-  const containerWidth = get(selectRef, 'current.select.controlRef.offsetWidth');
+  const containerWidth = get(selectRef, 'current.select.controlRef.offsetWidth') || 0;
   const width = containerWidth > defaultMinWidth ? containerWidth : defaultMinWidth;
   return base => ({
     ...base,
     position: 'relative',
-    width,
+    width: `${width}px`,
   });
 };
 
