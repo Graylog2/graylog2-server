@@ -56,12 +56,16 @@ class AggregationConditionsForm extends React.Component {
       return;
     }
 
-    // Propagate empty comparison expression, if the last expression was removed
-    const nextConditions = changes.conditions || emptyComparisonExpressionConfig();
+    const nextConditions = changes.conditions;
 
-    // Keep series up-to-date with changes in conditions
-    const seriesReferences = extractSeriesReferences(nextConditions);
-    const nextSeries = (changes.series || eventDefinition.config.series).filter(s => seriesReferences.includes(s.id));
+    let nextSeries;
+    if (nextConditions) {
+      // Keep series up-to-date with changes in conditions
+      const seriesReferences = extractSeriesReferences(nextConditions);
+      nextSeries = (changes.series || eventDefinition.config.series).filter(s => seriesReferences.includes(s.id));
+    } else {
+      nextSeries = [];
+    }
 
     onChange(Object.assign({}, changes, {
       conditions: { expression: nextConditions },
