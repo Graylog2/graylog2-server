@@ -64,7 +64,7 @@ import java.util.Optional;
 import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
 @RequiresAuthentication
-@Api(value = "Search/Relative", description = "Message search")
+@Api(value = "Legacy/Search/Relative", description = "Message search")
 @Path("/search/universal/relative")
 public class RelativeSearchResource extends SearchResource {
 
