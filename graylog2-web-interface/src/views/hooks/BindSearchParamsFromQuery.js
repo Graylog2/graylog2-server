@@ -47,7 +47,7 @@ const bindSearchParamsFromQuery: ViewHook = ({ query, view }) => {
   if (queryString !== undefined) {
     queryBuilder = queryBuilder.query(createElasticsearchQueryString(queryString));
   }
-  if(timerange) {
+  if (timerange) {
     queryBuilder = queryBuilder.timerange(timerange);
   }
 

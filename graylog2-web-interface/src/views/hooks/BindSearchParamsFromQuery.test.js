@@ -75,7 +75,7 @@ describe('BindSearchParamsFromQuery should', () => {
       .toHaveBeenCalledWith(
         MOCK_VIEW_QUERY_ID,
         expect.objectContaining({ timerange: expectedTimerange }),
-    );
+      );
   });
 
   it('update query timerange when provided query range param is absolute', async () => {
