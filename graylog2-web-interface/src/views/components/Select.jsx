@@ -28,11 +28,6 @@ const menu = (selectRef) => {
   });
 };
 
-const valueContainer = base => ({
-  ...base,
-  minWidth: '6.5vw',
-});
-
 const multiValue = base => ({
   ...base,
   backgroundColor: '#ebf5ff',
@@ -55,6 +50,16 @@ const multiValueRemove = base => ({
   ':hover': {
     backgroundColor: 'rgba(0,113,230,.08)',
   },
+});
+
+const option = base => ({
+  ...base,
+  wordWrap: 'break-word',
+});
+
+const valueContainer = base => ({
+  ...base,
+  minWidth: '6.5vw',
 });
 
 type Props = {
@@ -96,11 +101,12 @@ const Select = ({ components, styles, ...rest }: Props) => {
     ...components,
   };
   const _styles = {
+    menu: menu(selectRef),
     multiValue,
     multiValueLabel,
     multiValueRemove,
+    option,
     valueContainer,
-    menu: menu(selectRef),
     ...styles,
   };
   return <ReactSelect {...rest} components={_components} styles={_styles} tabSelectsValue={false} ref={selectRef} />;
