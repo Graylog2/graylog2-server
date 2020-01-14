@@ -52,6 +52,7 @@ import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.ViewEntity;
@@ -248,7 +249,7 @@ public class ViewFacadeTest {
     }
 
     private EntityV1 createViewEntity() throws Exception {
-        final Query query = Query.builder()
+        final QueryEntity query = QueryEntity.builder()
                 .id("dead-beef")
                 .timerange(KeywordRange.create("last 5 minutes"))
                 .filter(OrFilter.or(StreamFilter.ofId(newStreamId)))

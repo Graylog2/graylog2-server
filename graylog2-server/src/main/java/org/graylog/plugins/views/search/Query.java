@@ -32,6 +32,10 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.EmptyTimeRange;
 import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog2.contentpacks.ContentPackable;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -53,7 +58,7 @@ import static java.util.stream.Collectors.toSet;
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = Query.Builder.class)
-public abstract class Query {
+public abstract class Query implements ContentPackable<QueryEntity> {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     @JsonProperty
@@ -241,5 +246,36 @@ public abstract class Query {
         public Query build() {
             return autoBuild();
         }
+    }
+
+    private Filter mappedFilter(EntityDescriptorIds entityDescriptorIds) {
+        return Optional.ofNullable(filter())
+                .map(optFilter -> {
+                    Set<Filter> newFilters = optFilter.filters().stream()
+                            .map(filter -> {
+                                if (filter.type().matches(StreamFilter.NAME)) {
+                                    final StreamFilter streamFilter = (StreamFilter) filter;
+                                    final String streamId = entityDescriptorIds.
+                                            getOrThrow(streamFilter.streamId(), ModelTypes.STREAM_V1);
+                                    return streamFilter.toBuilder().streamId(streamId).build();
+                                }
+                                return filter;
+                            }).collect(toSet());
+                    return optFilter.toGenericBuilder().filters(newFilters).build();
+                })
+                .orElse(null);
+    }
+
+    @Override
+    public QueryEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return QueryEntity.builder()
+                .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
+                        .collect(Collectors.toSet()))
+                .filter(mappedFilter(entityDescriptorIds))
+                .query(query())
+                .id(id())
+                .globalOverride(globalOverride().orElse(null))
+                .timerange(timerange())
+                .build();
     }
 }

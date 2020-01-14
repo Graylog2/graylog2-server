@@ -34,6 +34,9 @@ import org.graylog2.contentpacks.facades.SidecarCollectorFacade;
 import org.graylog2.contentpacks.facades.StreamFacade;
 import org.graylog2.contentpacks.facades.UrlWhitelistFacade;
 import org.graylog2.contentpacks.jersey.ModelIdParamConverter;
+import org.graylog2.contentpacks.model.entities.EventListEntity;
+import org.graylog2.contentpacks.model.entities.MessageListEntity;
+import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.plugin.PluginModule;
 
 public class ContentPacksModule extends PluginModule {
@@ -63,5 +66,9 @@ public class ContentPacksModule extends PluginModule {
 
         addConstraintChecker(GraylogVersionConstraintChecker.class);
         addConstraintChecker(PluginVersionConstraintChecker.class);
+
+        registerJacksonSubtype(MessageListEntity.class);
+        registerJacksonSubtype(PivotEntity.class);
+        registerJacksonSubtype(EventListEntity.class);
     }
 }

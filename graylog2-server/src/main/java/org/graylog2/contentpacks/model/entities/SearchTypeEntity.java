@@ -1,36 +1,18 @@
-/**
- * This file is part of Graylog.
- *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
-package org.graylog.plugins.views.search;
+package org.graylog2.contentpacks.model.entities;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog2.contentpacks.ContentPackable;
-import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.NativeEntityConverter;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.plugin.streams.Stream;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -40,20 +22,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * A search type represents parts of a query that generates a {@see Result result}.
- * <p>
- * Plain queries only select a set of data but by themselves do not return any specific parts from it.
- * Typical search types are aggregations across fields, a list of messages and other metadata.
- */
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = SearchType.TYPE_FIELD,
+        property = SearchTypeEntity.TYPE_FIELD,
         visible = true,
-        defaultImpl = SearchType.Fallback.class)
+        defaultImpl = SearchTypeEntity.Fallback.class)
 @JsonAutoDetect
-public interface SearchType extends ContentPackable<SearchTypeEntity> {
+public interface SearchTypeEntity extends NativeEntityConverter<SearchType> {
     String TYPE_FIELD = "type";
 
     @JsonProperty(TYPE_FIELD)
@@ -78,33 +54,20 @@ public interface SearchType extends ContentPackable<SearchTypeEntity> {
     @JsonProperty
     Set<String> streams();
 
-    SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state);
+    Builder toGenericBuilder();
 
     default Set<String> effectiveStreams() {
         return streams();
     }
 
-    /**
-     * Each search type should declare an implementation of its result conforming to this interface.
-     * <p>
-     * The frontend components then make use of the structured data to display it.
-     */
-    interface Result {
-        @JsonProperty("id")
-        String id();
+    interface Builder {
+        public abstract Builder streams(Set<String> streams);
 
-        /**
-         * The json type info property of the surrounding SearchType class. Must be set manually by subclasses.
-         */
-        @JsonProperty("type")
-        String type();
-
-        @JsonProperty
-        Optional<String> name();
+        public abstract SearchTypeEntity build();
     }
 
     @JsonAutoDetect
-    class Fallback implements SearchType {
+    class Fallback implements SearchTypeEntity {
 
         @JsonProperty
         private String type;
@@ -168,18 +131,8 @@ public interface SearchType extends ContentPackable<SearchTypeEntity> {
         }
 
         @Override
-        public SearchType applyExecutionContext(ObjectMapper objectMapper, JsonNode state) {
-            return this;
-        }
-
-        @JsonAnySetter
-        public void setProperties(String key, Object value) {
-            props.put(key, value);
-        }
-
-        @JsonAnyGetter
-        public Map<String, Object> getProperties() {
-            return props;
+        public Builder toGenericBuilder() {
+            return null;
         }
 
         @Override
@@ -202,16 +155,25 @@ public interface SearchType extends ContentPackable<SearchTypeEntity> {
         }
 
         @Override
-        public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        public SearchType toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
             return null;
         }
     }
 
-    default Set<String> mappedStreams(EntityDescriptorIds entityDescriptorIds) {
+    default Set<String> mappedStreams(Map<EntityDescriptor, Object> nativeEntities) {
         return streams().stream()
-                .map(s -> entityDescriptorIds.get(EntityDescriptor.create(s, ModelTypes.STREAM_V1)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toSet());
+                .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+                .map(nativeEntities::get)
+                .map(object -> {
+                    if (object == null) {
+                        throw new ContentPackException("Missing Stream for event definition");
+                    } else if (object instanceof Stream) {
+                        Stream stream = (Stream) object;
+                        return stream.getId();
+                    } else {
+                        throw new ContentPackException(
+                                "Invalid type for stream Stream for event definition: " + object.getClass());
+                    }
+                }).collect(Collectors.toSet());
     }
 }

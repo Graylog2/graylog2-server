@@ -56,6 +56,8 @@ public abstract class StreamFilter implements Filter {
         return Builder.create();
     }
 
+    public abstract Builder toBuilder();
+
     public static StreamFilter ofId(String id) {
         return builder().streamId(id).build();
     }
@@ -69,8 +71,13 @@ public abstract class StreamFilter implements Filter {
                 .build();
     }
 
+    @Override
+    public Filter.Builder toGenericBuilder() {
+        return toBuilder();
+    }
+
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements Filter.Builder {
         @JsonProperty
         public abstract Builder type(String type);
 
