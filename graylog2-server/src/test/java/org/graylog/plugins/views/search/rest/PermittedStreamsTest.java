@@ -23,7 +23,6 @@ import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.ForbiddenException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -67,11 +65,12 @@ public class PermittedStreamsTest {
     }
 
     @Test
-    public void failsIfNoStreamsFound() {
+    public void returnsEmptyListIfNoStreamsFound() {
         stubStreams("oans", "zwoa", "gsuffa");
 
-        assertThatExceptionOfType(ForbiddenException.class)
-                .isThrownBy(() -> sut.load(id -> false));
+        ImmutableSet<String> result = sut.load(id -> false);
+
+        assertThat(result).isEmpty();
     }
 
     @Test
