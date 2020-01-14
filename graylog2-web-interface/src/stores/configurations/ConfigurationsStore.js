@@ -115,6 +115,24 @@ const ConfigurationsStore = Reflux.createStore({
     ConfigurationActions.update.promise(promise);
   },
 
+  updateWhitelist(configType, config) {
+    const promise = fetch('PUT', URLUtils.qualifyUrl('/system/urlwhitelist'), config);
+
+    promise.then(
+      () => {
+        this.configuration[configType] = config;
+        this.propagateChanges();
+        UserNotification.success('Url Whitelist Configuration updated successfully');
+        return config;
+      },
+      (error) => {
+        UserNotification.error(`Url Whitelist config update failed: ${error}`, `Could not update Url Whitelist: ${configType}`);
+      },
+    );
+
+    ConfigurationActions.updateWhitelist.promise(promise);
+  },
+
   updateMessageProcessorsConfig(configType, config) {
     const promise = fetch('PUT', URLUtils.qualifyUrl('/system/messageprocessors/config'), config);
 
