@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -107,10 +108,16 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
                 .orElseGet(() -> (long) Integer.parseInt(offset, 10) * 1000);
     }
 
-    public TimeRange deriveTimeRange(Query query, SearchType searchType) {
-        final TimeRange referenceTimeRange = timeRangeOfSource(source(), id(), query, searchType);
+    private TimeRange deriveTimeRange(TimeRange referenceTimeRange) {
         final long delta = deltaFromOffset(offset(), referenceTimeRange);
         return AbsoluteRange.create(referenceTimeRange.getFrom().minus(delta), referenceTimeRange.getTo().minus(delta));
+    }
+
+    public TimeRange deriveTimeRange(Query query, SearchType searchType) {
+        final TimeRange referenceTimeRange = query.globalOverride()
+                .flatMap(GlobalOverride::timerange)
+                .orElseGet(() -> timeRangeOfSource(source(), id(), query, searchType));
+        return deriveTimeRange(referenceTimeRange);
     }
 
     @AutoValue.Builder
