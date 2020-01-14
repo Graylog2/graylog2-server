@@ -27,8 +27,8 @@ const extractTimerangeParams = (timerange) => {
 };
 
 export const syncWithQueryParameters = (query: string) => {
-  const { view } = ViewStore.getInitialState();
-  if (view.type === View.Type.Search) {
+  const { view } = ViewStore.getInitialState() || {};
+  if (view && view.type === View.Type.Search) {
     const firstQuery = view.search.queries.first();
     if (firstQuery) {
       const { query: { query_string: queryString }, timerange } = firstQuery;
