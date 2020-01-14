@@ -62,6 +62,15 @@ public class JestUtils {
         return execute(client, null, request, errorMessage);
     }
 
+    public static <T extends JestResult> T execute(JestClient client, RequestConfig requestConfig,
+                                                   Action<T> request) throws IOException {
+        if (client instanceof JestHttpClient) {
+            return ((JestHttpClient) client).execute(request, requestConfig);
+        } else {
+            return client.execute(request);
+        }
+    }
+
     public static ElasticsearchException specificException(Supplier<String> errorMessage, JsonNode errorNode) {
         final JsonNode rootCauses = errorNode.path("root_cause");
         final List<String> reasons = new ArrayList<>(rootCauses.size());

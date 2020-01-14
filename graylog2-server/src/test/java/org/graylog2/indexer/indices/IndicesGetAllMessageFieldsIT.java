@@ -54,7 +54,7 @@ public class IndicesGetAllMessageFieldsIT extends ElasticsearchBase {
         indices = new Indices(client(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder()),
+                new Messages(new MetricRegistry(), client(), new InMemoryProcessingStatusRecorder(), true),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());

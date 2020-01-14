@@ -63,7 +63,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiresAuthentication
-@Api(value = "Stream/AlertConditions", description = "Manage stream alert conditions")
+@Api(value = "Stream/AlertConditions", description = "Manage stream legacy alert conditions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/streams/{streamId}/alerts/conditions")
