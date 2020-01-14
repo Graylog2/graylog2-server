@@ -86,13 +86,15 @@ describe('CurrentViewStateStore', () => {
   });
 
   it('should remove widget positions for deleted widgets', async () => {
+    const widgetOne = MessagesWidget.builder().id('widget-one').build();
+    const widgetOnePos = new WidgetPosition(1, 1, 5, 6);
     const existingViewState = viewState.toBuilder()
       .widgetPositions({
-        'widget-one': new WidgetPosition(1, 1, 5, 6),
+        'widget-one': widgetOnePos,
         'widget-two': new WidgetPosition(1, 6, 5, 6),
       })
       .widgets([
-        MessagesWidget.builder().id('widget-one').build(),
+        widgetOne,
         MessagesWidget.builder().id('widget-two').build(),
       ])
       .build();
@@ -100,9 +102,9 @@ describe('CurrentViewStateStore', () => {
     viewStateMap[viewId] = existingViewState;
     const sMap = Immutable.Map(viewStateMap);
 
-    const expectedWidgets = [existingViewState.widgets[0]];
+    const expectedWidgets = [widgetOne];
     const expectedViewState = viewState.toBuilder()
-      .widgetPositions({ 'widget-one': existingViewState.widgetPositions['widget-one'] })
+      .widgetPositions({ 'widget-one': widgetOnePos })
       .widgets(expectedWidgets)
       .build();
     const updateFn = mockAction(jest.fn(() => Promise.resolve(expectedViewState)));
