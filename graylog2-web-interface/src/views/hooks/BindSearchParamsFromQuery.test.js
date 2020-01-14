@@ -9,8 +9,7 @@ const MOCK_VIEW_QUERY_ID = 'query-id';
 
 jest.mock('views/stores/QueriesStore', () => ({
   QueriesActions: {
-    query: jest.fn(() => Promise.resolve()),
-    timerange: jest.fn(() => Promise.resolve()),
+    update: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -41,7 +40,7 @@ describe('BindSearchParamsFromQuery should', () => {
       view: view.toBuilder().type(View.Type.Dashboard).build(),
     };
     await bindSearchParamsFromQuery(input);
-    expect(QueriesActions.query).not.toHaveBeenCalled();
+    expect(QueriesActions.update).not.toHaveBeenCalled();
   });
 
   it('update query string with provided query param', async () => {
@@ -50,12 +49,16 @@ describe('BindSearchParamsFromQuery should', () => {
       query: { q: 'gl2_source_input:source-input-id' },
     };
     await bindSearchParamsFromQuery(input);
-    expect(QueriesActions.query).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, input.query.q);
+    expect(QueriesActions.update)
+      .toHaveBeenCalledWith(
+        MOCK_VIEW_QUERY_ID,
+        expect.objectContaining({ query: { query_string: 'gl2_source_input:source-input-id', type: 'elasticsearch' } }),
+      );
   });
 
   it('not update query string when no query param is provided', async () => {
     await bindSearchParamsFromQuery(defaultInput);
-    expect(QueriesActions.query).not.toHaveBeenCalled();
+    expect(QueriesActions.update).not.toHaveBeenCalled();
   });
 
   it('update query timerange when relative range value param is povided', async () => {
@@ -68,7 +71,11 @@ describe('BindSearchParamsFromQuery should', () => {
       range: input.query.relative,
     };
     await bindSearchParamsFromQuery(input);
-    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
+    expect(QueriesActions.update)
+      .toHaveBeenCalledWith(
+        MOCK_VIEW_QUERY_ID,
+        expect.objectContaining({ timerange: expectedTimerange }),
+    );
   });
 
   it('update query timerange when provided query range param is absolute', async () => {
@@ -82,7 +89,11 @@ describe('BindSearchParamsFromQuery should', () => {
       to: input.query.to,
     };
     await bindSearchParamsFromQuery(input);
-    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
+    expect(QueriesActions.update)
+      .toHaveBeenCalledWith(
+        MOCK_VIEW_QUERY_ID,
+        expect.objectContaining({ timerange: expectedTimerange }),
+      );
   });
 
   it('update query timerange when provided query range is keyword', async () => {
@@ -94,6 +105,10 @@ describe('BindSearchParamsFromQuery should', () => {
       type: input.query.rangetype, keyword: input.query.keyword,
     };
     await bindSearchParamsFromQuery(input);
-    expect(QueriesActions.timerange).toHaveBeenCalledWith(MOCK_VIEW_QUERY_ID, expectedTimerange);
+    expect(QueriesActions.update)
+      .toHaveBeenCalledWith(
+        MOCK_VIEW_QUERY_ID,
+        expect.objectContaining({ timerange: expectedTimerange }),
+      );
   });
 });

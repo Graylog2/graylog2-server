@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 import { isEqual } from 'lodash';
 import moment from 'moment';
 
+import type { Store } from 'stores/StoreTypes';
 import Search from 'views/logic/search/Search';
 import { QueriesActions } from 'views/actions/QueriesActions';
 import type { QueryId, TimeRange, TimeRangeTypes } from 'views/logic/queries/Query';
@@ -12,7 +13,7 @@ import { singletonStore } from 'views/logic/singleton';
 
 import { ViewActions, ViewStore } from './ViewStore';
 import { ViewStatesActions } from './ViewStatesStore';
-import type { Store } from '../../stores/StoreTypes';
+import type { QueriesList } from '../actions/QueriesActions';
 
 export { QueriesActions } from 'views/actions/QueriesActions';
 
@@ -54,7 +55,7 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
     duplicate(queryId: QueryId) {
       const newQuery = this.queries.get(queryId).toBuilder().newId().build();
-      const promise = ViewStatesActions.duplicate(queryId)
+      const promise: Promise<QueriesList> = ViewStatesActions.duplicate(queryId)
         .then(newViewState => QueriesActions.create(newQuery, newViewState));
       QueriesActions.duplicate.promise(promise);
       return promise;
@@ -62,13 +63,13 @@ export const QueriesStore: QueriesStoreType = singletonStore(
 
     remove(queryId: QueryId) {
       const newQueries = this.queries.remove(queryId);
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.remove.promise(promise);
       return promise;
     },
     update(queryId: QueryId, query: Query) {
       const newQueries = this.queries.set(queryId, query);
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.update.promise(promise);
       return promise;
     },
@@ -77,62 +78,69 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       const activeQuery: Query = this.queries.get(queryId);
       const newQuery = activeQuery.toBuilder().query(Object.assign({}, activeQuery.query, { query_string: query })).build();
       const newQueries = this.queries.set(queryId, newQuery);
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.query.promise(promise);
       return promise;
     },
     timerange(queryId: QueryId, timerange: TimeRange) {
       const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(timerange).build());
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.timerange.promise(promise);
       return promise;
     },
     rangeParams(queryId: QueryId, key: string, value: string | number) {
-      const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(Object.assign({}, query.timerange, { [key]: value })).build());
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const oldQuery = this.queries.get(queryId);
+      const oldTimerange = oldQuery.timerange;
+      const newTimerange = Object.assign({}, oldTimerange, { [key]: value });
+
+      const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
       QueriesActions.rangeParams.promise(promise);
       return promise;
     },
     rangeType(queryId: QueryId, type: TimeRangeTypes) {
-      const oldQuery = this.queries.get(queryId);
-      const oldTimerange = oldQuery.timerange;
-      const oldType = oldTimerange.type;
+      return new Promise(() => {
+        const oldQuery = this.queries.get(queryId);
+        const oldTimerange = oldQuery.timerange;
+        const oldType = oldTimerange.type;
 
-      if (type === oldType) {
-        return Promise.resolve();
-      }
+        if (type === oldType) {
+          const promise: Promise<QueriesList> = Promise.resolve(this.queries);
+          QueriesActions.rangeType.promise(promise);
+          return promise;
+        }
 
-      let newTimerange: TimeRange;
+        let newTimerange: TimeRange;
 
-      // eslint-disable-next-line default-case
-      switch (type) {
-        case 'absolute':
-          newTimerange = {
-            type,
-            from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
-            to: moment().toISOString(),
-          };
-          break;
-        case 'relative':
-          newTimerange = {
-            type,
-            range: 300,
-          };
-          break;
-        case 'keyword':
-          newTimerange = {
-            type,
-            keyword: 'Last five Minutes',
-          };
-          break;
-      }
-      const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(newTimerange).build());
-      const promise = this._propagateQueryChange(newQueries).then(() => newQueries);
-      QueriesActions.rangeType.promise(promise);
-      return promise;
+        // eslint-disable-next-line default-case
+        switch (type) {
+          case 'absolute':
+            newTimerange = {
+              type,
+              from: moment().subtract(oldTimerange.range, 'seconds').toISOString(),
+              to: moment().toISOString(),
+            };
+            break;
+          case 'relative':
+            newTimerange = {
+              type,
+              range: 300,
+            };
+            break;
+          case 'keyword':
+            newTimerange = {
+              type,
+              keyword: 'Last five Minutes',
+            };
+            break;
+          default: throw new Error(`Invalid time range type: ${type}`);
+        }
+        const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
+        QueriesActions.rangeType.promise(promise);
+        return promise;
+      });
     },
 
-    _propagateQueryChange(newQueries) {
+    _propagateQueryChange(newQueries: QueriesList) {
       const newSearch = this.search.toBuilder()
         .queries(newQueries.valueSeq().toList())
         .build();
