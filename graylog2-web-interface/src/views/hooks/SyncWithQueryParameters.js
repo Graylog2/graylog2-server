@@ -45,6 +45,7 @@ export const syncWithQueryParameters = (query: string) => {
 };
 
 export const useSyncWithQueryParameters = (query: string) => {
+  useEffect(() => syncWithQueryParameters(query), []);
   useActionListeners(
     [QueriesActions.query.completed, QueriesActions.timerange.completed],
     () => syncWithQueryParameters(query),
