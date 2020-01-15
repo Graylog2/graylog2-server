@@ -347,11 +347,11 @@ class Select extends React.Component<Props, State> {
   // Using ReactSelect.Creatable now needs to get values as objects or they are not display
   // This method takes care of formatting a string value into options react-select supports.
   _formatInputValue = (value: string): Array<Option> => {
-    const { options, displayKey, valueKey, delimiter } = this.props;
+    const { options, displayKey = '', valueKey = '', delimiter } = this.props;
     return value.split(delimiter).map((v: string) => {
       const predicate: Option = {
-        [valueKey || '']: v,
-        [displayKey || '']: v,
+        [valueKey]: v,
+        [displayKey]: v,
       };
       const option = lodash.find(options, predicate);
 

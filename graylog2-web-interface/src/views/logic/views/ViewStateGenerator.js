@@ -7,10 +7,17 @@ import View from './View';
 import ViewState from './ViewState';
 import { resultHistogram, allMessagesTable } from '../Widgets';
 import type { ViewType } from './View';
+import Widget from '../widgets/Widget';
 
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
-const _defaultWidgets = {
+type Result = {
+  titles: { widget: { [string]: string } },
+  widgets: Array<Widget>,
+  positions: { [string]: WidgetPosition },
+};
+
+const _defaultWidgets: { [ViewType]: (?string) => Promise<Result> } = {
   [View.Type.Search]: async (streamId: ?string) => {
     const decorators = await DecoratorsActions.list();
     const streamDecorators = decorators ? decorators.filter(decorator => decorator.stream === streamId) : [];

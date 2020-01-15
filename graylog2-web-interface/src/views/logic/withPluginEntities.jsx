@@ -10,7 +10,7 @@ function withPluginEntities<Props, Entities: {}>(
     .map(([targetKey, entityKey]) => ([targetKey, PluginStore.exports(entityKey)]))
     .reduce((prev, [key, value]) => ({ ...prev, [key]: value }), {});
 
-  return props => <Component {...entities} {...props} />;
+  return (props: Props) => <Component {...entities} {...props} />;
 }
 
 export default withPluginEntities;
