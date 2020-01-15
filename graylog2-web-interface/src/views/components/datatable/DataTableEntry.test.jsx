@@ -128,7 +128,7 @@ describe('DataTableEntry', () => {
                         valuePath={valuePath} />
       </table>
     ));
-    expect(wrapper).not.toContainReact(<EmptyValue/>);
+    expect(wrapper).not.toContainReact(<EmptyValue />);
   });
 
   describe('resolves field types', () => {
