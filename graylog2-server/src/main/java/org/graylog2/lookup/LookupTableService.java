@@ -47,6 +47,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -553,6 +554,35 @@ public class LookupTableService extends AbstractIdleService {
             }
 
             return result;
+        }
+
+        public LookupResult setValue(@Nonnull Object key, @Nonnull Object value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setValue(key, value);
+        }
+        public LookupResult setStringList(@Nonnull Object key, @Nonnull List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.setStringList(key, value);
+        }
+        public LookupResult addStringList(@Nonnull Object key, @Nonnull List<String> value, boolean doAppend) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.addStringList(key, value, doAppend);
+        }
+        public LookupResult removeStringList(@Nonnull Object key, @Nonnull List<String> value) {
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
+            if (lookupTable == null) {
+                return LookupResult.withError();
+            }
+            return lookupTable.removeStringList(key, value);
         }
 
         public LookupTable getTable() {
