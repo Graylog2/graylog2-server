@@ -29,7 +29,11 @@ const extractTimerangeParams = (timerange) => {
 export const syncWithQueryParameters = (query: string) => {
   const { view } = ViewStore.getInitialState() || {};
   if (view && view.type === View.Type.Search) {
-    const firstQuery = view.search.queries.first();
+    const { queries } = view.search;
+    if (queries.size !== 1) {
+      throw new Error('Searches must only have a single query!');
+    }
+    const firstQuery = queries.first();
     if (firstQuery) {
       const { query: { query_string: queryString }, timerange } = firstQuery;
       const baseUri = new URI(query).setSearch('q', queryString)
