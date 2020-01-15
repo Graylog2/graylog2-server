@@ -108,19 +108,8 @@ describe('ExtendedSearchPage', () => {
     CurrentViewTypeProvider.mockImplementation(({ children }) => <ViewTypeContext.Provider value={View.Type.Dashboard}>{children}</ViewTypeContext.Provider>);
   });
 
-  const mockRouter = {
-    getCurrentLocation: jest.fn(() => ({ pathname: '', search: '' })),
-    push: () => {},
-    replace: () => {},
-    go: () => {},
-    goBack: () => {},
-    goForward: () => {},
-    setRouteLeaveHook: () => {},
-    isActive: () => {},
-  };
   const SimpleExtendedSearchPage = props => (
     <ExtendedSearchPage route={{}}
-                        router={mockRouter}
                         location={{ query: {} }}
                         searchRefreshHooks={[]}
                         {...props} />

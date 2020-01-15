@@ -212,11 +212,22 @@ ExtendedSearchPage.propTypes = {
   location: PropTypes.shape({
     query: PropTypes.object.isRequired,
   }),
+  router: PropTypes.object,
   searchRefreshHooks: PropTypes.arrayOf(PropTypes.func).isRequired,
 };
 
 ExtendedSearchPage.defaultProps = {
   location: { query: {} },
+  router: {
+    getCurrentLocation: () => ({ pathname: '', search: '' }),
+    push: () => {},
+    replace: () => {},
+    go: () => {},
+    goBack: () => {},
+    goForward: () => {},
+    setRouteLeaveHook: () => {},
+    isActive: () => {},
+  },
 };
 
 const mapping = {
