@@ -1,6 +1,7 @@
 // @flow strict
 import Immutable, { is } from 'immutable';
 import uuid from 'uuid/v4';
+import { isEqual } from 'lodash';
 
 export type QueryId = string;
 
@@ -97,7 +98,7 @@ export default class Query {
       return false;
     }
 
-    if (this.id !== other.id || !is(this.query, other.query) || !is(this.timerange, other.timerange) || !is(this.filter, other.filter) || !is(this.searchTypes, other.searchTypes)) {
+    if (this.id !== other.id || !isEqual(this.query, other.query) || !isEqual(this.timerange, other.timerange) || !is(this.filter, other.filter) || !is(this.searchTypes, other.searchTypes)) {
       return false;
     }
 

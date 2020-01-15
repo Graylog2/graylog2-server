@@ -69,7 +69,9 @@ export const QueriesStore: QueriesStoreType = singletonStore(
     },
     update(queryId: QueryId, query: Query) {
       const newQueries = this.queries.set(queryId, query);
-      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const promise: Promise<QueriesList> = this.queries.get(queryId).equals(query)
+        ? Promise.resolve(this.queries)
+        : this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.update.promise(promise);
       return promise;
     },
@@ -83,8 +85,11 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
     timerange(queryId: QueryId, timerange: TimeRange) {
-      const newQueries = this.queries.update(queryId, query => query.toBuilder().timerange(timerange).build());
-      const promise: Promise<QueriesList> = this._propagateQueryChange(newQueries).then(() => newQueries);
+      const query = this.queries.get(queryId);
+      const newQueries = this.queries.update(queryId, q => q.toBuilder().timerange(timerange).build());
+      const promise: Promise<QueriesList> = query.timerange === timerange
+        ? Promise.resolve(this.queries)
+        : this._propagateQueryChange(newQueries).then(() => newQueries);
       QueriesActions.timerange.promise(promise);
       return promise;
     },

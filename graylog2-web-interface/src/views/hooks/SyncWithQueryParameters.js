@@ -42,8 +42,11 @@ export const syncWithQueryParameters = (query: string) => {
         .removeQuery('keyword')
         .removeQuery('relative');
       const uri = extractTimerangeParams(timerange)
-        .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri);
-      history.push(uri.toString());
+        .reduce((prev, [key, value]) => prev.setSearch(key, value), baseUri)
+        .toString();
+      if (query !== uri) {
+        history.push(uri);
+      }
     }
   }
 };

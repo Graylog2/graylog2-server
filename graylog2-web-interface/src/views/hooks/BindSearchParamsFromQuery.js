@@ -11,7 +11,7 @@ const _getTimerange = (query = {}) => {
 
   switch (type) {
     case 'relative':
-      return query.relative ? { type, range: query.relative } : undefined;
+      return query.relative ? { type, range: parseInt(query.relative, 10) } : undefined;
     case 'absolute':
       return (query.from || query.to)
         ? {
