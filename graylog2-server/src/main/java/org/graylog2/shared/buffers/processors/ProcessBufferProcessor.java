@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -56,6 +57,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private final ULID ulid;
     private final DecodingProcessor decodingProcessor;
     private final Provider<Stream> defaultStreamProvider;
+    private MessageEvent currentEvent;
 
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
@@ -75,11 +77,13 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
         processTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "processTime"));
+        currentEvent = null;
     }
 
     @Override
     public void onEvent(MessageEvent event) throws Exception {
         try {
+            currentEvent = event;
             // Decode the RawMessage to a Message object. The DecodingProcessor used to be a separate handler in the
             // ProcessBuffer. Due to performance problems discovered during 1.0.0 testing, we decided to move this here.
             // TODO The DecodingProcessor does not need to be a EventHandler. We decided to do it like this to keep the change as small as possible for 1.0.0.
@@ -99,8 +103,13 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
                 }
             }
         } finally {
+            currentEvent = null;
             event.clearMessages();
         }
+    }
+
+    public Optional<MessageEvent> getCurrentEvent() {
+        return Optional.ofNullable(currentEvent);
     }
 
     private void dispatchMessage(final Message msg) {

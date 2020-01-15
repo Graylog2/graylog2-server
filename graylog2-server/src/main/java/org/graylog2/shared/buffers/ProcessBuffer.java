@@ -38,7 +38,11 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
@@ -49,6 +53,7 @@ public class ProcessBuffer extends Buffer {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     private final Meter incomingMessages;
+    private final ProcessBufferProcessor[] processors;
 
     @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
@@ -83,7 +88,7 @@ public class ProcessBuffer extends Buffer {
         LOG.info("Initialized ProcessBuffer with ring size <{}> and wait strategy <{}>.",
                 ringBufferSize, waitStrategy.getClass().getSimpleName());
 
-        final ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processorCount];
+        processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
             processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
         }
@@ -111,5 +116,15 @@ public class ProcessBuffer extends Buffer {
     @Override
     protected void afterInsert(int n) {
         incomingMessages.mark(n);
+    }
+
+    public Map<String,String> getDump() {
+        Map<String, String> processBufferDump = new HashMap<>();
+        AtomicInteger i = new AtomicInteger(0);
+        Arrays.stream(processors).forEach(proc -> {
+            processBufferDump.put("ProcessBufferProcessor #" + i.toString(), proc.getCurrentEvent().map(MessageEvent::toString).orElse("idle"));
+            i.getAndIncrement();
+        });
+        return processBufferDump;
     }
 }

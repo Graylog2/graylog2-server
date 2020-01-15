@@ -29,6 +29,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
+import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
@@ -80,7 +81,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get JVM information of the given node")
     @Path("{nodeId}/jvm")
-    public SystemJVMResponse jvm(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    public SystemJVMResponse jvm(@ApiParam(name = "nodeId", value = "The id of the node to retrieve JVM information.", required = true)
                                  @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
@@ -101,7 +102,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @ApiOperation(value = "Get a thread dump of the given node")
     @RequiresPermissions(RestPermissions.THREADS_DUMP)
     @Path("{nodeId}/threaddump")
-    public SystemThreadDumpResponse threadDump(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    public SystemThreadDumpResponse threadDump(@ApiParam(name = "nodeId", value = "The id of the node to get a thread dump.", required = true)
                                                @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
@@ -113,6 +114,27 @@ public class ClusterSystemResource extends ProxiedResource {
             return response.body();
         } else {
             LOG.warn("Unable to get thread dump on node {}: {}", nodeId, response.message());
+            throw new WebApplicationException(response.message(), BAD_GATEWAY);
+        }
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get a process buffer dump of the given node")
+    @RequiresPermissions(RestPermissions.PROCESSBUFFER_DUMP)
+    @Path("{nodeId}/processbufferdump")
+    public SystemProcessBufferDumpResponse processBufferDump(@ApiParam(name = "nodeId", value = "The id of the node to get a process buffer dump.", required = true)
+                                               @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
+        final Node targetNode = nodeService.byNodeId(nodeId);
+
+        final RemoteSystemResource remoteSystemResource = remoteInterfaceProvider.get(targetNode,
+                this.authenticationToken,
+                RemoteSystemResource.class);
+        final Response<SystemProcessBufferDumpResponse> response = remoteSystemResource.processBufferDump().execute();
+        if (response.isSuccessful()) {
+            return response.body();
+        } else {
+            LOG.warn("Unable to get process buffer dump on node {}: {}", nodeId, response.message());
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
