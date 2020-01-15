@@ -43,6 +43,10 @@ For each of the index names returned by the previous command, the following comm
 
   curl -s -X PUT --data '{"properties":{"gl2_accounted_message_size":{"type": "long"}}}' -H Content-Type:application/json localhost:9200/<active-write-index-name>/_mapping/message
 
+The two steps could also be combined::
+
+  for index in `curl -s localhost:9200/_cat/aliases/*_deflector?h=index`; do curl -s -X PUT --data '{"properties":{"gl2_accounted_message_size":{"type": "long"}}}' -H Content-Type:application/json localhost:9200/$index/_mapping/message ; done'
+
 The Graylog servers can now be restarted with the 3.2.0 version.
 
 Known Bugs and Limitations
