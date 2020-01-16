@@ -24,12 +24,13 @@ const ComparisonExpression = (props) => {
       <Row className="row-sm">
         <AggregationConditionExpression {...props}
                                         expression={expression.left}
+                                        validation={validation.left}
                                         parent={expression}
                                         onChange={onChildChange('left')}
                                         level={level + 1} />
 
         <Col md={3}>
-          <FormGroup controlId="aggregation-condition" validationState={validation.errors.conditions ? 'error' : null}>
+          <FormGroup controlId="aggregation-condition" validationState={validation.message ? 'error' : null}>
             {renderLabel && <ControlLabel>Is</ControlLabel>}
             <Select id="aggregation-condition"
                     matchProp="label"
@@ -44,13 +45,12 @@ const ComparisonExpression = (props) => {
                     ]}
                     value={expression.expr}
                     clearable={false} />
-            {validation.errors.conditions && (
-              <HelpBlock>{lodash.get(validation, 'errors.conditions[0]')}</HelpBlock>
-            )}
+            {validation.message && <HelpBlock>{validation.message}</HelpBlock>}
           </FormGroup>
         </Col>
         <AggregationConditionExpression {...props}
                                         expression={expression.right}
+                                        validation={validation.right}
                                         parent={expression}
                                         onChange={onChildChange('right')}
                                         level={level + 1} />
@@ -65,7 +65,11 @@ ComparisonExpression.propTypes = {
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
-  validation: PropTypes.object.isRequired,
+  validation: PropTypes.object,
+};
+
+ComparisonExpression.defaultProps = {
+  validation: {},
 };
 
 export default ComparisonExpression;

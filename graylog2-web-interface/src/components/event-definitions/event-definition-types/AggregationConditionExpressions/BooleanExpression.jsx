@@ -9,18 +9,20 @@ import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 import AggregationConditionExpression from '../AggregationConditionExpression';
 
 const BooleanExpression = (props) => {
-  const { expression, level, onChildChange } = props;
+  const { expression, level, onChildChange, validation } = props;
 
   return (
     <>
       <AggregationConditionExpression {...props}
                                       expression={expression.left}
+                                      validation={validation.left}
                                       parent={expression}
                                       onChange={onChildChange('left')}
                                       level={level + 1} />
       <Clearfix />
       <AggregationConditionExpression {...props}
                                       expression={expression.right}
+                                      validation={validation.right}
                                       parent={expression}
                                       onChange={onChildChange('right')}
                                       level={level + 1}
@@ -35,10 +37,12 @@ BooleanExpression.propTypes = {
   level: PropTypes.number.isRequired,
   onChange: PropTypes.func.isRequired,
   onChildChange: PropTypes.func.isRequired,
+  validation: PropTypes.object,
 };
 
 BooleanExpression.defaultProps = {
   parent: undefined,
+  validation: {},
 };
 
 export default BooleanExpression;

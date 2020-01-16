@@ -79,7 +79,7 @@ const NumberRefExpression = ({
 
   return (
     <Col md={6}>
-      <FormGroup controlId="aggregation-function" validationState={validation.errors.series ? 'error' : null}>
+      <FormGroup controlId="aggregation-function" validationState={validation.message ? 'error' : null}>
         {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
           <Col md={6}>
@@ -101,9 +101,7 @@ const NumberRefExpression = ({
                     allowCreate />
           </Col>
         </Row>
-        {validation.errors.series && (
-          <HelpBlock>{lodash.get(validation, 'errors.series[0]')}</HelpBlock>
-        )}
+        {validation.message && <HelpBlock>{validation.message}</HelpBlock>}
       </FormGroup>
     </Col>
   );
@@ -116,7 +114,11 @@ NumberRefExpression.propTypes = {
   formattedFields: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   renderLabel: PropTypes.bool.isRequired,
-  validation: PropTypes.object.isRequired,
+  validation: PropTypes.object,
+};
+
+NumberRefExpression.defaultProps = {
+  validation: {},
 };
 
 export default NumberRefExpression;

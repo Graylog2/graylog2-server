@@ -25,7 +25,7 @@ import styles from './AggregationConditionExpression.css';
 class AggregationConditionExpression extends React.Component {
   static propTypes = {
     eventDefinition: PropTypes.object.isRequired,
-    validation: PropTypes.object.isRequired,
+    validation: PropTypes.object,
     formattedFields: PropTypes.array.isRequired,
     aggregationFunctions: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -39,6 +39,7 @@ class AggregationConditionExpression extends React.Component {
     level: 0,
     parent: undefined,
     renderLabel: true,
+    validation: {},
   };
 
   state = {

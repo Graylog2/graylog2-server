@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { get } from 'lodash';
 
-import { Alert, Button, Row, Well } from 'components/graylog';
+import { Alert, Row } from 'components/graylog';
 import { Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
+import validateExpression from 'logic/alerts/AggregationExpressionValidation';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
-import AggregationConditionSummary from './AggregationConditionSummary';
+import AggregationConditionsFormSummary from './AggregationConditionsFormSummary';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -27,14 +28,6 @@ const extractSeriesReferences = (expression, acc = []) => {
   return acc;
 };
 
-const StyledWell = styled(Well)`
-  margin-top: 10px;
-`;
-
-const StyledPanel = styled(Panel)`
-  margin-top: 10px;
-`;
-
 const StyledAlert = styled(Alert)`
   margin-bottom: 10px !important;
 `;
@@ -49,12 +42,12 @@ class AggregationConditionsForm extends React.Component {
   };
 
   state = {
-    showConditionSummary: false,
+    showInlineValidation: false,
   };
 
-  toggleShowConditionSummary = () => {
-    const { showConditionSummary } = this.state;
-    this.setState({ showConditionSummary: !showConditionSummary });
+  toggleShowInlineValidation = () => {
+    const { showInlineValidation } = this.state;
+    this.setState({ showInlineValidation: !showInlineValidation });
   };
 
   handleChange = (changes) => {
@@ -83,9 +76,10 @@ class AggregationConditionsForm extends React.Component {
   };
 
   render() {
-    const { showConditionSummary } = this.state;
+    const { showInlineValidation } = this.state;
     const { eventDefinition, validation } = this.props;
     const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
+    const expressionValidation = validateExpression(expression, eventDefinition.config.series);
 
     return (
       <React.Fragment>
@@ -100,20 +94,15 @@ class AggregationConditionsForm extends React.Component {
         <Row>
           <AggregationConditionExpression expression={expression}
                                           {...this.props}
-                                          validation={{}}
+                                          validation={showInlineValidation ? expressionValidation.validationTree : {}}
                                           onChange={this.handleChange} />
         </Row>
 
-
-        <Button bsSize="small" bsStyle="link" className="btn-text" onClick={this.toggleShowConditionSummary}>
-          <Icon name={showConditionSummary ? 'caret-down' : 'caret-right'} />
-          &nbsp;{showConditionSummary ? 'Hide' : 'Show'} condition preview
-        </Button>
-        {showConditionSummary && (
-          <StyledWell bsSize="small">
-            <AggregationConditionSummary series={eventDefinition.config.series} conditions={eventDefinition.config.conditions} />
-          </StyledWell>
-        )}
+        <AggregationConditionsFormSummary conditions={eventDefinition.config.conditions}
+                                          series={eventDefinition.config.series}
+                                          expressionValidation={expressionValidation}
+                                          showInlineValidation={showInlineValidation}
+                                          toggleShowValidation={this.toggleShowInlineValidation} />
       </React.Fragment>
     );
   }
