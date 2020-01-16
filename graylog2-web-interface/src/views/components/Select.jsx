@@ -17,16 +17,17 @@ const MultiValueRemove = (props) => {
 const OverlayInner = ({ children, style }: {children: Node, style?: Object}) => React.Children.map(children,
   child => React.cloneElement(child, { style: Object.assign({}, style, child.props.style) }));
 
-const menu = (selectRef) => {
+const menu = selectRef => (base) => {
   const defaultMinWidth = 200;
   const containerWidth = get(selectRef, 'current.select.controlRef.offsetWidth') || 0;
   const width = containerWidth > defaultMinWidth ? containerWidth : defaultMinWidth;
-  return base => ({
+  return {
     ...base,
     position: 'relative',
     width: `${width}px`,
-  });
+  };
 };
+
 
 const multiValue = base => ({
   ...base,
@@ -94,6 +95,7 @@ const MenuOverlay = selectRef => (props) => {
 const Select = ({ components, styles, ...rest }: Props) => {
   const selectRef = useRef(null);
   const Menu = useMemo(() => MenuOverlay(selectRef), [selectRef]);
+  const menuStyle = useMemo(() => menu(selectRef), [selectRef]);
   const _components = {
     Menu,
     MultiValueRemove,
@@ -101,7 +103,7 @@ const Select = ({ components, styles, ...rest }: Props) => {
     ...components,
   };
   const _styles = {
-    menu: menu(selectRef),
+    menu: menuStyle,
     multiValue,
     multiValueLabel,
     multiValueRemove,
