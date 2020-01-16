@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { get } from 'lodash';
 
-import { Button, Row, Well } from 'components/graylog';
+import { Alert, Button, Row, Well } from 'components/graylog';
 import { Icon } from 'components/common';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 
@@ -28,6 +29,14 @@ const extractSeriesReferences = (expression, acc = []) => {
 
 const StyledWell = styled(Well)`
   margin-top: 10px;
+`;
+
+const StyledPanel = styled(Panel)`
+  margin-top: 10px;
+`;
+
+const StyledAlert = styled(Alert)`
+  margin-bottom: 10px !important;
 `;
 
 class AggregationConditionsForm extends React.Component {
@@ -75,16 +84,23 @@ class AggregationConditionsForm extends React.Component {
 
   render() {
     const { showConditionSummary } = this.state;
-    const { eventDefinition } = this.props;
+    const { eventDefinition, validation } = this.props;
     const expression = eventDefinition.config.conditions.expression || initialEmptyConditionConfig;
 
     return (
       <React.Fragment>
         <h3 className={commonStyles.title}>Create Events for Definition</h3>
+        {validation.errors.conditions && (
+          <StyledAlert bsStyle="danger">
+            <h4><Icon name="warning" />&nbsp;Errors found</h4>
+            <p>{get(validation, 'errors.conditions[0]')}</p>
+          </StyledAlert>
+        )}
 
         <Row>
           <AggregationConditionExpression expression={expression}
                                           {...this.props}
+                                          validation={{}}
                                           onChange={this.handleChange} />
         </Row>
 
