@@ -47,7 +47,7 @@ public class LookupSetStringList extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to set in the lookup table")
                 .build();
-        valueParam = ParameterDescriptor.type("list_value", List.class)
+        valueParam = ParameterDescriptor.type("value", List.class)
                 .description("The list value that should be set into the lookup table")
                 .build();
     }

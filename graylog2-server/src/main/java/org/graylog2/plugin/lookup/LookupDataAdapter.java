@@ -173,12 +173,12 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     /**
      * Merge / append all list entries for the given key in a DataAdapter.
      * This is a method stub that can be implemented in DataAdapters that support this kind of data modification.
-     * @param key           The key that should be updated.
-     * @param listValue     The list values that should be merged / appended.
-     * @param doAppend      Controls whether new entries should be appended or merged into the list.
+     * @param key             The key that should be updated.
+     * @param listValue       The list values that should be merged / appended.
+     * @param keepDuplicates  Controls whether duplicated entries should be unified.
      * @return A LookupResult containing the updated list or an error
      */
-    public LookupResult addStringList(Object key, List<String> listValue, boolean doAppend) {
+    public LookupResult addStringList(Object key, List<String> listValue, boolean keepDuplicates) {
         return resultWithError;
     }
 

@@ -47,7 +47,7 @@ public class LookupRemoveStringList extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to remove the entries in the lookup table")
                 .build();
-        valueParam = ParameterDescriptor.type("list_value", List.class)
+        valueParam = ParameterDescriptor.type("value", List.class)
                 .description("The list value that should be removed from the lookup table")
                 .build();
     }

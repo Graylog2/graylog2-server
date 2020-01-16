@@ -38,7 +38,7 @@ public class LookupAddStringList extends AbstractFunction<Object> {
     private final ParameterDescriptor<Object, Object> keyParam;
     @SuppressWarnings("rawtypes")
     private final ParameterDescriptor<List, List> valueParam;
-    private final ParameterDescriptor<Boolean, Boolean> appendOption;
+    private final ParameterDescriptor<Boolean, Boolean> keepDuplicates;
 
     @Inject
     public LookupAddStringList(LookupTableService lookupTableService) {
@@ -49,12 +49,12 @@ public class LookupAddStringList extends AbstractFunction<Object> {
         keyParam = object("key")
                 .description("The key to add in the lookup table")
                 .build();
-        valueParam = ParameterDescriptor.type("list_value", List.class)
+        valueParam = ParameterDescriptor.type("value", List.class)
                 .description("The list value that should be added into the lookup table")
                 .build();
-        appendOption = bool("append_values")
+        keepDuplicates = bool("keep_duplicates")
                 .optional()
-                .description("Append values instead of merging them with existing ones into a set. Defaults to false (merge)")
+                .description("When adding values to an existing list, don't try to omit duplicates. Default is false")
                 .build();
     }
 
@@ -72,9 +72,9 @@ public class LookupAddStringList extends AbstractFunction<Object> {
         if (value == null) {
             return null;
         }
-        final boolean doAppend = appendOption.optional(args, context).orElse(false);
+        final boolean keepDupes = keepDuplicates.optional(args, context).orElse(false);
 
-        return table.addStringList(key, value, doAppend).stringListValue();
+        return table.addStringList(key, value, keepDupes).stringListValue();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class LookupAddStringList extends AbstractFunction<Object> {
         return FunctionDescriptor.builder()
                 .name(NAME)
                 .description("Add a string list in the named lookup table. Returns the updated list on success, null on failure.")
-                .params(lookupTableParam, keyParam, valueParam, appendOption)
+                .params(lookupTableParam, keyParam, valueParam, keepDuplicates)
                 .returnType(List.class)
                 .build();
     }
