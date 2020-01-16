@@ -191,7 +191,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             final Pivot trend = pivotBuilder
                     .id(new UUID().toString())
                     .name("trend")
-                    .timerange(OffsetRange.builder()
+                    .timerange(OffsetRange.Builder.builder()
                             .source("search_type")
                             .id(chart.id())
                             .build())

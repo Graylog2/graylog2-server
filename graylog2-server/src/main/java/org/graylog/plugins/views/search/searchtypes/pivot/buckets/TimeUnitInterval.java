@@ -65,10 +65,6 @@ public abstract class TimeUnitInterval implements Interval {
         }
     }
 
-    public static Builder builder() {
-        return Builder.builder();
-    }
-
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty("type")

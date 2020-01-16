@@ -153,17 +153,17 @@ public abstract class DashboardWidgetEntity {
     }
 
     private WidgetConfigDTO defaultWidgetConfig() {
-        return AggregationConfigDTO.builder()
+        return AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(
-                        SeriesDTO.builder()
+                        SeriesDTO.Builder.create()
                                 .config(SeriesConfigDTO.empty())
                                 .function("count()").build()
                 ))
-                .rowPivots(ImmutableList.of(PivotDTO.builder()
+                .rowPivots(ImmutableList.of(PivotDTO.Builder.builder()
                         .type("time")
                         .field("timestamp")
-                        .config(TimeHistogramConfigDTO.builder()
-                                .interval(AutoIntervalDTO.builder().build()).build())
+                        .config(TimeHistogramConfigDTO.Builder.builder()
+                                .interval(AutoIntervalDTO.Builder.builder().build()).build())
                         .build()))
                 .visualization("bar")
                 .columnPivots(Collections.emptyList())
@@ -229,13 +229,13 @@ public abstract class DashboardWidgetEntity {
         switch (renderer) {
             case "line":
                 return Optional.of(
-                        LineVisualizationConfigDTO.builder()
+                        LineVisualizationConfigDTO.Builder.builder()
                                 .interpolation(fromLegacyInterpolation(interpolation))
                                 .build()
                 );
             case "area":
                 return Optional.of(
-                        AreaVisualizationConfigDTO.builder()
+                        AreaVisualizationConfigDTO.Builder.builder()
                                 .interpolation(fromLegacyInterpolation(interpolation))
                                 .build()
                 );
@@ -244,16 +244,16 @@ public abstract class DashboardWidgetEntity {
     }
 
     private WidgetEntity fieldChartWidget(String renderer, String valueType, String field, String query) throws InvalidRangeParametersException {
-        final AggregationConfigDTO.Builder configBuilder = AggregationConfigDTO.builder()
+        final AggregationConfigDTO.Builder configBuilder = AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(createSeriesDTO(valueType, field)))
                 .visualization(mapRendererToVisualization(renderer))
                 .columnPivots(Collections.emptyList())
                 .sort(Collections.emptyList())
                 .rowPivots(Collections.singletonList(
-                        PivotDTO.builder()
+                        PivotDTO.Builder.builder()
                                 .field("timestamp")
                                 .type("time")
-                                .config(TimeHistogramConfigDTO.builder().interval(AutoIntervalDTO.builder().build()).build())
+                                .config(TimeHistogramConfigDTO.Builder.builder().interval(AutoIntervalDTO.Builder.builder().build()).build())
                                 .build()
                 ));
 
@@ -295,10 +295,10 @@ public abstract class DashboardWidgetEntity {
         final String field = (String) config().get("field");
         final boolean trend = (boolean) config().get("trend");
         final boolean lowerIsBetter = (boolean) config().get("lower_is_better");
-        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(createSeriesDTO(function, field)))
                 .visualization("numeric")
-                .visualizationConfig(NumberVisualizationConfigDTO.builder()
+                .visualizationConfig(NumberVisualizationConfigDTO.Builder.builder()
                         .trend(trend)
                         .trendPreference(
                                 lowerIsBetter
@@ -337,10 +337,10 @@ public abstract class DashboardWidgetEntity {
                 ? SortConfigDTO.Direction.Descending
                 : SortConfigDTO.Direction.Ascending;
 
-        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.builder()
+        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.Builder.builder()
                 .columnPivots(Collections.emptyList())
                 .series(ImmutableList.of(
-                        SeriesDTO.builder()
+                        SeriesDTO.Builder.create()
                                 .config(SeriesConfigDTO.empty())
                                 .function("count()").build()
                 ))
@@ -371,10 +371,10 @@ public abstract class DashboardWidgetEntity {
     private List<WidgetEntity> createSearchResultCount() throws InvalidRangeParametersException {
         final boolean trend = (boolean) config().get("trend");
         final boolean lowerIsBetter = (boolean) config().get("lower_is_better");
-        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(createSeriesDTO("count", "")))
                 .visualization("numeric")
-                .visualizationConfig(NumberVisualizationConfigDTO.builder()
+                .visualizationConfig(NumberVisualizationConfigDTO.Builder.builder()
                         .trend(trend)
                         .trendPreference(
                                 lowerIsBetter
@@ -410,10 +410,10 @@ public abstract class DashboardWidgetEntity {
                 ? SortConfigDTO.Direction.Descending
                 : SortConfigDTO.Direction.Ascending;
 
-        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.builder()
+        AggregationConfigDTO.Builder aggregationConfigBuilder = AggregationConfigDTO.Builder.builder()
                 .columnPivots(Collections.emptyList())
                 .series(ImmutableList.of(
-                        SeriesDTO.builder()
+                        SeriesDTO.Builder.create()
                                 .config(SeriesConfigDTO.empty())
                                 .function("count()").build()
                 ))
@@ -425,15 +425,15 @@ public abstract class DashboardWidgetEntity {
 
         result.add(widgetEntityBuilder.config(
                 aggregationConfigBuilder.visualization("bar")
-                        .visualizationConfig(BarVisualizationConfigDTO.builder()
+                        .visualizationConfig(BarVisualizationConfigDTO.Builder.builder()
                                 .barmode(BarVisualizationConfigDTO.BarMode.stack)
                                 .build())
                         .rollup(false)
                         .rowPivots(Collections.singletonList(
-                                PivotDTO.builder()
+                                PivotDTO.Builder.builder()
                                         .field("timestamp")
                                         .type("time")
-                                        .config(TimeHistogramConfigDTO.builder().interval(AutoIntervalDTO.builder().build()).build())
+                                        .config(TimeHistogramConfigDTO.Builder.builder().interval(AutoIntervalDTO.Builder.builder().build()).build())
                                         .build()
                         ))
                         .columnPivots(genPivotForPie(field, stackedFields, limit))
@@ -445,12 +445,12 @@ public abstract class DashboardWidgetEntity {
 
     private List<WidgetEntity> createMapWidget() throws InvalidRangeParametersException {
         final String field = (String) config().get("field");
-        final PivotDTO fieldPivot = PivotDTO.builder()
+        final PivotDTO fieldPivot = PivotDTO.Builder.builder()
                 .type("values")
-                .config(ValueConfigDTO.builder().build())
+                .config(ValueConfigDTO.Builder.builder().build())
                 .field(field)
                 .build();
-        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.builder()
+        final AggregationConfigDTO widgetConfig = AggregationConfigDTO.Builder.builder()
                 .series(ImmutableList.of(createSeriesDTO("count", "")))
                 .visualization("map")
                 .rowPivots(ImmutableList.of(fieldPivot))
@@ -468,10 +468,10 @@ public abstract class DashboardWidgetEntity {
     }
 
     private List<PivotDTO> genPivotForPie(String field, String stackedFields, int limit) {
-        final PivotDTO fieldPivot = PivotDTO.builder()
+        final PivotDTO fieldPivot = PivotDTO.Builder.builder()
                 .type("values")
                 .field(field)
-                .config(ValueConfigDTO.builder().limit(limit).build())
+                .config(ValueConfigDTO.Builder.builder().limit(limit).build())
                 .build();
         final List<PivotDTO> rowPivots = new ArrayList<>();
         rowPivots.addAll(stackedFieldPivots(stackedFields));
@@ -485,10 +485,10 @@ public abstract class DashboardWidgetEntity {
                 : Splitter.on(",")
                 .splitToList(fieldNames)
                 .stream()
-                .map(fieldName -> PivotDTO.builder()
+                .map(fieldName -> PivotDTO.Builder.builder()
                         .field(fieldName)
                         .type("values")
-                        .config(ValueConfigDTO.builder().limit(15).build())
+                        .config(ValueConfigDTO.Builder.builder().limit(15).build())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -515,7 +515,7 @@ public abstract class DashboardWidgetEntity {
                 break;
             }
         }
-        return SeriesDTO.builder().config(SeriesConfigDTO.empty()).function(function + "(" + field + ")").build();
+        return SeriesDTO.Builder.create().config(SeriesConfigDTO.empty()).function(function + "(" + field + ")").build();
     }
 
     @AutoValue
@@ -547,7 +547,7 @@ public abstract class DashboardWidgetEntity {
         }
 
         public WidgetPositionDTO convert(Map<String, ValueReference> parameters) {
-            return WidgetPositionDTO.builder()
+            return WidgetPositionDTO.Builder.create()
                     .col(org.graylog.plugins.views.search.views.Position.fromInt(col().asInteger(parameters)))
                     .row(org.graylog.plugins.views.search.views.Position.fromInt(row().asInteger(parameters)))
                     .height(org.graylog.plugins.views.search.views.Position.fromInt(height().asInteger(parameters)))

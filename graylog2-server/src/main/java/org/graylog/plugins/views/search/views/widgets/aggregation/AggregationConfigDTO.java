@@ -72,12 +72,6 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     @JsonProperty(FIELD_EVENT_ANNOTATION)
     public abstract boolean eventAnnotation();
 
-    public static Builder builder() {
-        return new AutoValue_AggregationConfigDTO.Builder()
-                .rollup(true)
-                .eventAnnotation(false);
-    }
-
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_ROW_PIVOTS)
@@ -115,7 +109,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         public abstract AggregationConfigDTO build();
 
         @JsonCreator
-        static Builder builder() {
+        public static Builder builder() {
             return new AutoValue_AggregationConfigDTO.Builder()
                     .eventAnnotation(false)
                     .rollup(true);

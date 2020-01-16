@@ -35,10 +35,6 @@ public abstract class SeriesDTO {
     @JsonProperty(FIELD_FUNCTION)
     public abstract String function();
 
-    public static Builder builder() {
-        return new AutoValue_SeriesDTO.Builder();
-    }
-
     @AutoValue.Builder
     public static abstract class Builder {
         @JsonProperty(FIELD_CONFIG)

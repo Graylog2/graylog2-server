@@ -44,7 +44,7 @@ public abstract class TimeHistogramConfigDTO implements PivotConfigDTO {
         public abstract TimeHistogramConfigDTO build();
 
         @JsonCreator
-        static Builder builder() {
+        public static Builder builder() {
             return new AutoValue_TimeHistogramConfigDTO.Builder();
         }
     }
