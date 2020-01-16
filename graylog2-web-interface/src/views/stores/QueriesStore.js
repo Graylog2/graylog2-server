@@ -103,15 +103,14 @@ export const QueriesStore: QueriesStoreType = singletonStore(
       return promise;
     },
     rangeType(queryId: QueryId, type: TimeRangeTypes) {
-      return new Promise(() => {
+      const promise = new Promise((resolve) => {
         const oldQuery = this.queries.get(queryId);
         const oldTimerange = oldQuery.timerange;
         const oldType = oldTimerange.type;
 
         if (type === oldType) {
-          const promise: Promise<QueriesList> = Promise.resolve(this.queries);
-          QueriesActions.rangeType.promise(promise);
-          return promise;
+          resolve(this.queries);
+          return;
         }
 
         let newTimerange: TimeRange;
@@ -139,10 +138,10 @@ export const QueriesStore: QueriesStoreType = singletonStore(
             break;
           default: throw new Error(`Invalid time range type: ${type}`);
         }
-        const promise: Promise<QueriesList> = QueriesActions.timerange(queryId, newTimerange);
-        QueriesActions.rangeType.promise(promise);
-        return promise;
+        resolve(QueriesActions.timerange(queryId, newTimerange));
       });
+      QueriesActions.rangeType.promise(promise);
+      return promise;
     },
 
     _propagateQueryChange(newQueries: QueriesList) {
