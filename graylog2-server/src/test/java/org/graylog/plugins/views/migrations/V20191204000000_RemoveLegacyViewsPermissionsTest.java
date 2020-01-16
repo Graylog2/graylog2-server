@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.migrations;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -31,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static com.mongodb.client.model.Filters.eq;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -89,23 +87,7 @@ public class V20191204000000_RemoveLegacyViewsPermissionsTest {
 
         assertThat(getList(userAfter, "roles")).containsOnly(otherRole.getObjectId("_id"));
     }
-
-    @Test
-    public void removesPermissionsFromViewsManagerRole() {
-        Set<String> perms = Sets.union(
-                LegacyViewsPermissions.all(),
-                ImmutableSet.of("kill-all-humans", "stay-up-late"));
-
-        insertRoleWithPermissions("Views Manager", perms);
-
-        migration.upgrade();
-
-        Document viewsManager = rolesCollection.find(eq("name", "Views Manager")).first();
-
-        assertThat(getList(viewsManager, "permissions"))
-                .containsOnly("kill-all-humans", "stay-up-late");
-    }
-
+    
     // convenience method to avoid casting and suppressing warnings in assertions
     private <T> List<T> getList(Document d, String key) {
         //noinspection unchecked
