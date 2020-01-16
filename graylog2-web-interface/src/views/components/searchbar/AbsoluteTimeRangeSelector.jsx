@@ -60,7 +60,11 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
 
   onBlur = (key, onChange) => {
     // eslint-disable-next-line react/destructuring-assignment
-    onChange(key, _formattedDateStringInUserTZ(this.state[key]).toISOString());
+    const value = this.state[key];
+
+    if (_isValidDateString(value)) {
+      onChange(key, _formattedDateStringInUserTZ(value).toISOString());
+    }
   };
 
   onChange = (key, value) => {
@@ -92,7 +96,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                      <Button disabled={disabled} onClick={() => _setDateTimeToNow('from', onChange)}>
                        <Icon name="magic" />
                      </Button>
-)}
+                   )}
                    bsStyle={_isValidDateString(from) ? null : 'error'}
                    required />
           </DatePicker>
@@ -120,7 +124,7 @@ export default class AbsoluteTimeRangeSelector extends React.Component {
                      <Button disabled={disabled} onClick={() => _setDateTimeToNow('to', onChange)}>
                        <Icon name="magic" />
                      </Button>
-)}
+                   )}
                    bsStyle={_isValidDateString(to) ? null : 'error'}
                    required />
           </DatePicker>
