@@ -22,6 +22,11 @@ jest.mock('./ViewStatesStore', () => ({
   ViewStatesActions: {},
 }));
 
+const fixedDate = new Date('2020-01-16T12:23:42.123Z');
+
+jest.spyOn(global.Date, 'now')
+  .mockReturnValue(fixedDate.valueOf());
+
 describe('QueriesStore', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -68,40 +73,39 @@ describe('QueriesStore', () => {
       });
     });
     it('throws error if no type is given', () => {
-      expect(
-        // $FlowFixMe: Passing no second argument on purpose
-        QueriesActions.rangeType('query1', undefined),
-      ).rejects.toEqual(new Error('Invalid time range type: undefined'));
+      // $FlowFixMe: Passing no second argument on purpose
+      return QueriesActions.rangeType('query1', undefined)
+        .catch(error => expect(error).toEqual(new Error('Invalid time range type: undefined')));
     });
     it('throws error if invalid type is given', () => {
-      expect(
-        // $FlowFixMe: Passing invalid second argument on purpose
-        QueriesActions.rangeType('query1', 'invalid'),
-      ).rejects.toEqual(new Error('Invalid time range type: invalid'));
+      // $FlowFixMe: Passing invalid second argument on purpose
+      return QueriesActions.rangeType('query1', 'invalid')
+        .catch(error => expect(error).toEqual(new Error('Invalid time range type: invalid')));
     });
-    it('does not do anything if type stays the same', () => {
-      expect(QueriesActions.rangeType('query1', 'relative')).resolves.toEqual(new Immutable.OrderedMap<QueryId, Query>({ query1 }));
-    });
-    it('translates current relative time range parameters to absolute ones when switching to absolute', () => {
-      expect(QueriesActions.rangeType('query1', 'absolute')).resolves.toEqual(new Immutable.OrderedMap<QueryId, Query>({
-        query1: query1.toBuilder()
-          .timerange({
-            type: 'absolute',
-            from: moment().subtract(300, 'seconds').toISOString(),
-            to: moment().toISOString(),
-          })
-          .build(),
-      }));
-    });
-    it('translates current relative time range parameters to keyword when switching to keyword', () => {
-      expect(QueriesActions.rangeType('query1', 'keyword')).resolves.toEqual(new Immutable.OrderedMap<QueryId, Query>({
-        query1: query1.toBuilder()
-          .timerange({
-            type: 'keyword',
-            keyword: 'Last five minutes',
-          })
-          .build(),
-      }));
-    });
+    it('does not do anything if type stays the same', () => QueriesActions.rangeType('query1', 'relative')
+      .then(newQueries => expect(newQueries).toEqual(new Immutable.OrderedMap<QueryId, Query>({ query1 }))));
+    it('translates current relative time range parameters to absolute ones when switching to absolute',
+      () => QueriesActions.rangeType('query1', 'absolute')
+        .then(newQueries => expect(newQueries)
+          .toEqual(new Immutable.OrderedMap<QueryId, Query>({
+            query1: query1.toBuilder()
+              .timerange({
+                type: 'absolute',
+                from: moment(fixedDate).subtract(300, 'seconds').toISOString(),
+                to: moment(fixedDate).toISOString(),
+              })
+              .build(),
+          }))));
+    it('translates current relative time range parameters to keyword when switching to keyword',
+      () => QueriesActions.rangeType('query1', 'keyword')
+        .then(newQueries => expect(newQueries)
+          .toEqual(new Immutable.OrderedMap<QueryId, Query>({
+            query1: query1.toBuilder()
+              .timerange({
+                type: 'keyword',
+                keyword: 'Last five Minutes',
+              })
+              .build(),
+          }))));
   });
 });
