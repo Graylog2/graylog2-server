@@ -4,10 +4,14 @@ _Click any color block below to copy the color path._
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import { teinte } from 'theme';
+import { color } from 'theme';
 import ColorSwatch from './Colors';
 
-const Section = styled.h3`
+const Mode = styled.h3`
+  margin: 0 0 6px;
+`;
+
+const Section = styled.h4`
   margin: 0 0 6px;
 `;
 
@@ -24,26 +28,82 @@ const StyledColorSwatch = styled(ColorSwatch)`
   }
 `;
 
+const getValues = (data = {}, callback = () => {}) => {
+  return Object.keys(data).map((key) => callback(key));
+}
+
+const subSwatches = ({mode, section, colorValue}) => {
+  console.log(mode, section, colorValue, Object.keys(colorValue));
+
+  return (
+    <Swatches>
+      {Object.keys(colorValue).map((subsection) => {
+        const subValue = colorValue[subsection];
+        return null;
+
+        return (
+          <>
+            <Section>{subsection}</Section>
+
+            <StyledColorSwatch name={name}
+                                color={subValue.toUpperCase()}
+                                copyText={`theme.color.${section}.${name}.${subsection}`} />
+          </>
+        );
+      })}
+    </Swatches>
+  )
+}
+
 const Colors = () => {
   return (
-    <div>
-      {Object.keys(teinte).map((section) => (
+    <>
+      {Object.keys(color).map((mode) => (
           <>
-            <Section>{section}</Section>
+            <Mode>{mode}</Mode>
 
-            <Swatches>
-              {Object.keys(teinte[section]).map((name) => {
-                const value = teinte[section][name];
+            {Object.keys(color[mode]).map((section) => {
+              let colorValue;
 
-                return (<StyledColorSwatch name={name}
-                                           color={value}
-                                           copyText={`teinte.${section}.${name}`} />);
-              })}
-            </Swatches>
+              return (
+              <>
+                <Section>{section}</Section>
+
+                <Swatches>
+                  {Object.keys(color[mode][section]).map((name) => {
+                    colorValue = color[mode][section][name];
+
+                    if (typeof colorValue === 'string') {
+                      return (<StyledColorSwatch name={name}
+                                                 color={colorValue.toUpperCase()}
+                                                 copyText={`theme.color.${section}.${name}`} />);
+                    }
+
+                    return (
+                      <div>
+                        {
+                          Object.keys(colorValue).map((subName) => (
+                            <div>
+                              <Section>{section} {name}</Section>
+
+                              <StyledColorSwatch name={subName}
+                                                  color={colorValue[subName].toUpperCase()}
+                                                  copyText={`theme.color.${section}.${name}.${subName}`} />
+                            </div>
+                          ))
+                        }
+                      </div>
+                    )
+
+
+                  })}
+                </Swatches>
+              </>
+            )})}
           </>
         )
       )}
-    </div>
+    </>
   );
 };
 
