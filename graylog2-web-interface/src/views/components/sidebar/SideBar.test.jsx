@@ -102,7 +102,7 @@ describe('<Sidebar />', () => {
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('New Search');
+    expect(wrapper.find('h3').text()).toBe('Untitled Search');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
   });
 
