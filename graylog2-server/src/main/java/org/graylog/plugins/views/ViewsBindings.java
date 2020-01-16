@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.migrations.V20180817120900_AddViewsUsers;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
 import org.graylog.plugins.views.migrations.V20190304102700_MigrateMessageListStructure;
 import org.graylog.plugins.views.migrations.V20190805115800_RemoveDashboardStateFromViews;
@@ -138,7 +137,6 @@ public class ViewsBindings extends ViewsModule {
 
         addPeriodical(SearchesCleanUpJob.class);
 
-        addMigration(V20180817120900_AddViewsUsers.class);
         addMigration(V20181220133700_AddViewsAdminRole.class);
         addMigration(V20190304102700_MigrateMessageListStructure.class);
         addMigration(V20190805115800_RemoveDashboardStateFromViews.class);
