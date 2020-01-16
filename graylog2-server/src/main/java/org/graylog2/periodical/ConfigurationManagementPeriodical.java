@@ -59,7 +59,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
 
     @Override
     public boolean masterOnly() {
-        return true;
+        return false;
     }
 
     @Override
