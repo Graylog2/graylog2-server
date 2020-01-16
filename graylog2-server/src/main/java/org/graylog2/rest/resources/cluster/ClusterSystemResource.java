@@ -138,5 +138,14 @@ public class ClusterSystemResource extends ProxiedResource {
             throw new WebApplicationException(response.message(), BAD_GATEWAY);
         }
     }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get a process buffer dump of all cluster nodes")
+    @RequiresPermissions(RestPermissions.PROCESSBUFFER_DUMP)
+    @Path("processbufferdump")
+    public Map<String, Optional<SystemProcessBufferDumpResponse>> clusterProcessBufferDump() {
+        return getForAllNodes(RemoteSystemResource::processBufferDump, createRemoteInterfaceProvider(RemoteSystemResource.class));
+    }
 }
 
