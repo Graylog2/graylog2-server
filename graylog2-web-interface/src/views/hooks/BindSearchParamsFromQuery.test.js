@@ -68,7 +68,7 @@ describe('BindSearchParamsFromQuery should', () => {
     };
     const expectedTimerange = {
       type: 'relative',
-      range: input.query.relative,
+      range: 0,
     };
     await bindSearchParamsFromQuery(input);
     expect(QueriesActions.update)
