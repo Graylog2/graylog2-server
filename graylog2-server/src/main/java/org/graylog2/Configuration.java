@@ -145,7 +145,7 @@ public class Configuration extends BaseConfiguration {
     private boolean contentPacksLoaderEnabled = false;
 
     @Parameter(value = "content_packs_dir")
-    private Path contentPacksDir = getDataDir().resolve("contentpacks");
+    private Path contentPacksDir = DEFAULT_DATA_DIR.resolve("contentpacks");
 
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();

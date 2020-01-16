@@ -12,7 +12,7 @@ import PossiblyHighlight from './PossiblyHighlight';
 import Highlight from './Highlight';
 
 type Props = {
-  children: React.Node,
+  children: ?React.Node,
   field: string,
   highlightingRules: { [string]: Array<HighlightingRule> },
   value?: any,
@@ -50,12 +50,13 @@ const CustomHighlighting = ({ children, field: fieldName, value: fieldValue, hig
 };
 
 CustomHighlighting.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   field: PropTypes.string.isRequired,
   value: PropTypes.any,
 };
 
 CustomHighlighting.defaultProps = {
+  children: undefined,
   value: undefined,
 };
 

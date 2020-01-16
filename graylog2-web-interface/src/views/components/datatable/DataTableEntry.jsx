@@ -13,7 +13,6 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import type { CurrentViewType } from '../CustomPropTypes';
 import CustomHighlighting from '../messagelist/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
-import EmptyValue from '../EmptyValue';
 
 type Props = {
   columnPivots: Array<string>,
@@ -32,7 +31,7 @@ const _column = (field: string, value: *, selectedQuery: string, idx: number, ty
   <td key={`${selectedQuery}-${field}=${value}-${idx}`}>
     <AdditionalContext.Provider value={{ valuePath }}>
       <CustomHighlighting field={field} value={value}>
-        {value !== null && value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : <EmptyValue />}
+        {value !== null && value !== undefined ? <Value field={field} type={type} value={value} queryId={selectedQuery} render={DecoratedValue} /> : null}
       </CustomHighlighting>
     </AdditionalContext.Provider>
   </td>

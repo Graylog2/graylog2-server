@@ -15,6 +15,7 @@ export type GlobalOverrideActionsType = RefluxActions<{
   rangeParams: (string, string | number) => Promise<?GlobalOverride>,
   query: (string) => Promise<?GlobalOverride>,
   reset: () => Promise<?GlobalOverride>,
+  timerange: (TimeRange) => Promise<?GlobalOverride>,
 }>;
 
 export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions(
@@ -24,6 +25,7 @@ export const GlobalOverrideActions: GlobalOverrideActionsType = singletonActions
     rangeParams: { asyncResult: true },
     query: { asyncResult: true },
     reset: { asyncResult: true },
+    timerange: { asyncResult: true },
   }),
 );
 
@@ -46,6 +48,14 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
     },
     getInitialState() {
       return this.globalOverride;
+    },
+    timerange(newTimerange: TimeRange) {
+      const currentGlobalOverride = this.globalOverride || GlobalOverride.empty();
+      const newGlobalOverride = currentGlobalOverride.toBuilder().timerange(newTimerange).build();
+
+      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+      GlobalOverrideActions.timerange.promise(promise);
+      return promise;
     },
     rangeType(newType: string) {
       if (newType === 'disabled') {
@@ -81,8 +91,8 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
             };
             break;
         }
-        const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(newTimerange, this.globalOverride.query) : new GlobalOverride(newTimerange);
-        const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+        const promise = this.timerange(newTimerange);
         GlobalOverrideActions.rangeType.promise(promise);
         return promise;
       }
@@ -95,8 +105,8 @@ export const GlobalOverrideStore: GlobalOverrideStoreType = singletonStore(
         ? { ...this.globalOverride.timerange, [key]: value }
         // $FlowFixMe: Flow is unable to validate that timerange is complete
         : { [key]: value };
-      const newGlobalOverride: GlobalOverride = this.globalOverride ? new GlobalOverride(newTimerange, this.globalOverride.query) : new GlobalOverride(newTimerange);
-      const promise = this._propagateNewGlobalOverride(newGlobalOverride);
+
+      const promise = this.timerange(newTimerange);
       GlobalOverrideActions.rangeParams.promise(promise);
       return promise;
     },
