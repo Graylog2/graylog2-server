@@ -26,6 +26,7 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.plugin.GlobalMetricNames;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.journal.RawMessage;
@@ -122,7 +123,7 @@ public class ProcessBuffer extends Buffer {
         Map<String, String> processBufferDump = new HashMap<>();
         AtomicInteger i = new AtomicInteger(0);
         Arrays.stream(processors).forEach(proc -> {
-            processBufferDump.put("ProcessBufferProcessor #" + i.toString(), proc.getCurrentEvent().map(MessageEvent::toString).orElse("idle"));
+            processBufferDump.put("ProcessBufferProcessor #" + i.toString(), proc.getCurrentMessage().map(Message::toString).orElse("idle"));
             i.getAndIncrement();
         });
         return processBufferDump;
