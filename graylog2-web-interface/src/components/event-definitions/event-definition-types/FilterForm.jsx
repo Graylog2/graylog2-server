@@ -243,7 +243,12 @@ class FilterForm extends React.Component {
                name="query"
                label="Search Query"
                type="text"
-               help="Search query that Messages should match. You can use the same syntax as in the Search page."
+               help={(
+                 <span>
+                  Search query that Messages should match. You can use the same syntax as in the Search page,
+                  including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+                 </span>
+               )}
                value={lodash.defaultTo(eventDefinition.config.query, '')}
                onChange={this.handleQueryChange} />
 
