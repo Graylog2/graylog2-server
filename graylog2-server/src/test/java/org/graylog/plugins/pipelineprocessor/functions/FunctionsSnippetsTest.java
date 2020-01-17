@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -83,6 +84,10 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
 import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupRemoveStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupSetValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -127,9 +132,12 @@ import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.lookup.LookupTable;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -140,6 +148,8 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -153,16 +163,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
+    @org.junit.Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
     private static final EventBus eventBus = new EventBus();
     private static StreamCacheService streamCacheService;
     private static Stream otherStream;
     private static MetricRegistry metricRegistry = new MetricRegistry();
+
+    private static LookupTableService lookupTableService;
+    private static LookupTableService.Function lookupServiceFunction;
+    private static LookupTable lookupTable;
 
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
@@ -202,6 +226,13 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Provider<Stream> defaultStreamProvider = () -> defaultStream;
         functions.put(RouteToStream.NAME, new RouteToStream(streamCacheService, defaultStreamProvider));
         functions.put(RemoveFromStream.NAME, new RemoveFromStream(streamCacheService, defaultStreamProvider));
+
+        lookupTableService = mock(LookupTableService.class, RETURNS_DEEP_STUBS);
+        lookupTable = spy(LookupTable.class);
+        when(lookupTableService.getTable(anyString())).thenReturn(lookupTable);
+        lookupServiceFunction = new LookupTableService.Function(lookupTableService, "table");
+        when(lookupTableService.newBuilder().lookupTable(anyString()).build()).thenReturn(lookupServiceFunction);
+
         // input related functions
         // TODO needs mock
         //functions.put(FromInput.NAME, new FromInput());
@@ -318,6 +349,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(GrokExists.NAME, new GrokExists(grokPatternRegistry));
 
         functions.put(MetricCounterIncrement.NAME, new MetricCounterIncrement(metricRegistry));
+
+        functions.put(LookupSetValue.NAME, new LookupSetValue(lookupTableService));
+        functions.put(LookupSetStringList.NAME, new LookupSetStringList(lookupTableService));
+        functions.put(LookupAddStringList.NAME, new LookupAddStringList(lookupTableService));
+        functions.put(LookupRemoveStringList.NAME, new LookupRemoveStringList(lookupTableService));
+
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -1015,5 +1052,62 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule);
 
         assertThat(metricRegistry.getCounters().get("org.graylog.rulemetrics.foo").getCount()).isEqualTo(42);
+    }
+
+    @Test
+    public void lookupSetValue() {
+        doReturn(LookupResult.single(123)).when(lookupTable).setValue(any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setValue("key", 123L);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(123);
+    }
+
+    @Test
+    public void lookupSetStringList() {
+        final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
+
+        doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).setStringList(any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).setStringList("key", testList);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(testList);
+    }
+
+    @Test
+    public void lookupAddStringList() {
+        final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
+        doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).addStringList(any(), any(), anyBoolean());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).addStringList("key", testList, false);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(testList);
+    }
+
+    @Test
+    public void lookupRemoveStringList() {
+        final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
+        final ImmutableList<String> result = ImmutableList.of("bonk");
+        doReturn(LookupResult.withoutTTL().stringListValue(result).build()).when(lookupTable).removeStringList(any(), any());
+
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        verify(lookupTable).removeStringList("key", testList);
+        verifyNoMoreInteractions(lookupTable);
+
+        assertThat(message.getField("new_value")).isEqualTo(result);
     }
 }

@@ -1,0 +1,7 @@
+rule "lookupSetValue"
+when
+  true
+then
+  let newValue = lookup_set_value("table", "key", 123);
+  set_field("new_value", newValue);
+end

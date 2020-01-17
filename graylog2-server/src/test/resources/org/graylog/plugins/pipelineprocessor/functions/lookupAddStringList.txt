@@ -1,0 +1,7 @@
+rule "lookupAddStringList"
+when
+  true
+then
+  let newValue = lookup_add_string_list("table", "key", ["foo", "bar"]);
+  set_field("new_value", newValue);
+end

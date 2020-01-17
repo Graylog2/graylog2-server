@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -459,7 +460,8 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     @Nullable
-    private LookupTable getTable(String name) {
+    @VisibleForTesting
+    public LookupTable getTable(String name) {
         final LookupTable lookupTable = liveTables.get(name);
         if (lookupTable == null) {
             LOG.warn("Lookup table <{}> does not exist", name);
