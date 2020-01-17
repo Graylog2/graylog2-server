@@ -449,6 +449,14 @@ public class MessageTest {
     }
 
     @Test
+    public void testToElasticsearchObjectAddsAccountedMessageSize() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+
+        assertThat(message.toElasticSearchObject(invalidTimestampMeter).get("gl2_accounted_message_size"))
+                .isEqualTo(43L);
+    }
+
+    @Test
     public void messageSizes() {
         final Meter invalidTimestampMeter = new Meter();
 

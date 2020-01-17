@@ -63,7 +63,7 @@ import java.net.URI;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "Dashboards/Widgets", description = "Manage widgets of an existing dashboard")
+@Api(value = "Legacy/Dashboards/Widgets", description = "Manage widgets of an existing dashboard")
 @Path("/dashboards/{dashboardId}/widgets")
 public class DashboardWidgetsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardWidgetsResource.class);

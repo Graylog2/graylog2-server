@@ -11,6 +11,7 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import Series from 'views/logic/aggregationbuilder/Series';
 import DataTableEntry from './DataTableEntry';
 import SeriesConfig from '../../logic/aggregationbuilder/SeriesConfig';
+import EmptyValue from '../EmptyValue';
 
 jest.mock('views/components/common/UserTimezoneTimestamp', () => mockComponent('UserTimezoneTimestamp'));
 
@@ -108,6 +109,26 @@ describe('DataTableEntry', () => {
     expect(wrapper.find('Provider')
       .map(p => p.props().value))
       .toMatchSnapshot();
+  });
+
+  it('does not render `Empty Value` for deduplicated values', () => {
+    const fieldsWithDeduplicatedValues = Immutable.OrderedSet(['nf_dst_address', 'nf_dst_port']);
+    const itemWithDeduplicatedValues = {
+      nf_dst_port: 443,
+    };
+    const wrapper = mount((
+      <table>
+        <DataTableEntry columnPivots={columnPivots}
+                        columnPivotValues={columnPivotValues}
+                        currentView={currentView}
+                        fields={fieldsWithDeduplicatedValues}
+                        item={itemWithDeduplicatedValues}
+                        series={series}
+                        types={[]}
+                        valuePath={valuePath} />
+      </table>
+    ));
+    expect(wrapper).not.toContainReact(<EmptyValue />);
   });
 
   describe('resolves field types', () => {

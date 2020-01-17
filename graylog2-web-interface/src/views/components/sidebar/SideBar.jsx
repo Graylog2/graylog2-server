@@ -13,7 +13,7 @@ import HighlightingRules from './highlighting/HighlightingRules';
 import NavItem from './NavItem';
 import ViewDescription from './ViewDescription';
 
-const defaultNewViewTitle = 'New Search';
+const defaultNewViewTitle = 'Untitled Search';
 
 type Props = {
   children: React.Element<any>,

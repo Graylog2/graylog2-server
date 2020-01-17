@@ -58,7 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "Search/Saved", description = "Saved searches")
+@Api(value = "Legacy/Search/Saved", description = "Saved searches")
 @Path("/search/saved")
 public class SavedSearchesResource extends SearchResource {
     private final SavedSearchService savedSearchService;

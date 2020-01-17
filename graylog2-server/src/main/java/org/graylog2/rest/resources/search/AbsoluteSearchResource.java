@@ -63,7 +63,7 @@ import java.util.Optional;
 import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
 @RequiresAuthentication
-@Api(value = "Search/Absolute", description = "Message search")
+@Api(value = "Legacy/Search/Absolute", description = "Message search")
 @Path("/search/universal/absolute")
 public class AbsoluteSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);

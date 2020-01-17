@@ -26,6 +26,29 @@ Indexing Requests use HTTP Expect: 100-Continue Header
 Messages indexing requests to Elasticsearch are now executed with a HTTP Expect-Continue header.
 For the unlikely case that this is creating problems, it can be disabled using the newly introduced ``elasticsearch_use_expect_continue`` setting.
 
+Accounted Message Size Field
+============================
+
+Every message now includes the ``gl2_accounted_message_size`` field. To make sure this field will be created with the correct data type in all active write indices, the mapping of these indices needs to be updated. New indices created by index rotation will automatically have the correct mapping because the index template got updated automatically.
+
+.. warning:: The following steps need to be executed **before** starting the server with the 3.2.0 version!
+
+All of the following commands need to be executed against one of the Elasticsearch servers in the cluster.
+
+First, a list of all active write indices is needed::
+
+  curl -s localhost:9200/_cat/aliases/*_deflector?h=index
+
+For each of the index names returned by the previous command, the following command needs to be executed (``<active-write-index-name>`` in the URL needs to be replaced with the actual index name)::
+
+  curl -s -X PUT --data '{"properties":{"gl2_accounted_message_size":{"type": "long"}}}' -H Content-Type:application/json localhost:9200/<active-write-index-name>/_mapping/message
+
+The two steps could also be combined::
+
+  for index in `curl -s localhost:9200/_cat/aliases/*_deflector?h=index`; do curl -s -X PUT --data '{"properties":{"gl2_accounted_message_size":{"type": "long"}}}' -H Content-Type:application/json localhost:9200/$index/_mapping/message ; done'
+
+The Graylog servers can now be restarted with the 3.2.0 version.
+
 Known Bugs and Limitations
 ==========================
 
