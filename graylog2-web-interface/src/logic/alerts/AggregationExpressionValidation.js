@@ -18,7 +18,14 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
     case 'number':
       return (Number.isSafeInteger(expression.value) ? {} : { message: 'Threshold must be a valid number' });
     case 'number-ref':
-      return (expression.ref && series.find(s => s.id === expression.ref) ? {} : { message: 'Function must be set' });
+      /* eslint-disable no-case-declarations */
+      const error = { message: 'Function must be set' };
+      if (!expression.ref) {
+        return error;
+      }
+      const selectedSeries = series.find(s => s.id === expression.ref);
+      return (selectedSeries && selectedSeries.function ? {} : error);
+      /* eslint-enable no-case-declarations */
     case '&&':
     case '||':
     case '<':
