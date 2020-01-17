@@ -15,10 +15,7 @@ import type { ViewStoreState } from 'views/stores/ViewStore';
 import connect from 'stores/connect';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
-<<<<<<< HEAD
 import CSVExportModal from 'views/components/searchbar/CSVExportModal';
-=======
->>>>>>> Changing glyphs, adding text & dropdown, fixing reset search.
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
