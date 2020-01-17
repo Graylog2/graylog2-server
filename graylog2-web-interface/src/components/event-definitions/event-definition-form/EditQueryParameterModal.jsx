@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
+import styled from 'styled-components';
+
 import { Button, Panel, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
@@ -8,6 +10,14 @@ import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 
+const StyledPanel = styled(Panel)`
+  margin-top: 20px;
+`;
+
+const StyledInlineCode = styled('code')`
+  margin: 0 0.25em;
+  white-space: nowrap;
+`;
 
 class EditQueryParameterModal extends React.Component {
   static propTypes = {
@@ -163,34 +173,30 @@ class EditQueryParameterModal extends React.Component {
                  defaultValue={queryParameter.default_value}
                  spellCheck={false}
                  onChange={this.handleChange} />
-          <Panel header="How to use" style={{ marginTop: 20 }}>
+          <StyledPanel header="How to use">
+            <h5>General Usage</h5>
             <p>
-              <h5>General Usage</h5>
-              After declaring it, the parameter {' '}
-              <span style={{ whiteSpace: 'nowrap' }}>
-                <code>{parameterSyntax}</code>
-              </span>{' '}
+              After declaring it, the parameter
+              <StyledInlineCode>{parameterSyntax}</StyledInlineCode>
               in your query, will be replaced with the list of results from the lookup table.
               The list of results will be presented in the form of a Lucene BooleanQuery. E.g.:
-              <span style={{ whiteSpace: 'nowrap' }}>
-                <code>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</code>
-              </span>
+              <StyledInlineCode>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</StyledInlineCode>
             </p>
+            <h5>Behaviour on empty lookup result list</h5>
             <p>
-              <h5>Behaviour on empty lookup result list</h5>
               The event definition query is only executed if a value for the parameter is present.
               If the lookup result is empty, the execution will be skipped and treated as if the <i>Search Query</i> found
-              no messages. If an execution is desired a <i>Default Value</i> that yields the desired search result needs to be provided.
-              For example, (depending on the use case) a wildcard like <span style={{ whiteSpace: 'nowrap' }}><code>*</code></span>
+              no messages. If an execution is desired a <i>Default Value</i> that yields the desired search result
+              needs to be provided. For example, (depending on the use case) a wildcard like
+              <StyledInlineCode>*</StyledInlineCode>
               can be a meaningful Default Value.
             </p>
+            <h5>Limitations</h5>
             <p>
-              <h5>Limitations</h5>
               Please note that maximum number of supported results is 1024. If the lookup table returns
               more results, the event definition is not executed.
             </p>
-
-          </Panel>
+          </StyledPanel>
         </BootstrapModalForm>
       </React.Fragment>
     );
