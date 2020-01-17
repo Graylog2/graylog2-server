@@ -1,21 +1,20 @@
 /**
  * This file is part of Graylog.
- * <p>
+ *
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog.integrations.ipfix.codecs;
-
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -34,6 +33,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.ListField;
 import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -51,16 +52,20 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -72,8 +77,9 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     @VisibleForTesting
     static final String CK_IPFIX_DEFINITION_PATH = "ipfix_definition_path";
     private static final Logger LOG = LoggerFactory.getLogger(IpfixCodec.class);
-    private static final String IPFIX_STANDARD_DEFINITION = "/ipfix-iana-elements.json";
 
+    @VisibleForTesting
+    static final String IPFIX_STANDARD_DEFINITION = "/ipfix-iana-elements.json";
     private final IpfixAggregator ipfixAggregator;
     private final IpfixParser parser;
     private InformationElementDefinitions infoElementDefs;
@@ -82,16 +88,48 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     protected IpfixCodec(@Assisted Configuration configuration, IpfixAggregator ipfixAggregator) throws IOException {
         super(configuration);
         this.ipfixAggregator = ipfixAggregator;
-        // Standard IPFIX definition file is loaded from the classpath and is mandatory. We don't check for null or empty.
         final URL standardIPFixDefTemplate = Resources.getResource(IpfixCodec.class, IPFIX_STANDARD_DEFINITION);
-        final String ipFixCustomDefPath = (String) configuration.getSource().get(CK_IPFIX_DEFINITION_PATH);
-        if (ipFixCustomDefPath == null || ipFixCustomDefPath.trim().isEmpty()) {
+        final List<String> customDefFilePathList = configuration.getList(CK_IPFIX_DEFINITION_PATH);
+        final List<URL> filePaths = new ArrayList<>();
+        if (customDefFilePathList == null || customDefFilePathList.isEmpty()) {
             infoElementDefs = new InformationElementDefinitions(standardIPFixDefTemplate);
         } else {
-            final URL customIPFixDefURL = Paths.get(ipFixCustomDefPath).toUri().toURL();
-            infoElementDefs = new InformationElementDefinitions(standardIPFixDefTemplate, customIPFixDefURL);
+            checkValidFilePath(customDefFilePathList);
+            filePaths.add(standardIPFixDefTemplate);
+            for (String filePath : customDefFilePathList) {
+                URL customDefURL = url(filePath.trim());
+                filePaths.add(customDefURL);
+            }
+            URL[] urls = convertToArray(filePaths);
+            infoElementDefs = new InformationElementDefinitions(urls);
         }
         this.parser = new IpfixParser(this.infoElementDefs);
+    }
+
+
+
+    URL url(String s) throws MalformedURLException {
+        return Paths.get(s).toUri().toURL();
+    }
+
+    URL[] convertToArray(List<URL> urls) {
+        URL[] urlArray = new URL[urls.size()];
+        return urls.toArray(urlArray);
+    }
+
+    void checkValidFilePath(List<String> customDefFilePathList) throws IpfixException {
+        for (String filePath : customDefFilePathList) {
+            File file = new File(filePath.trim());
+            validateFilePath(file);
+        }
+    }
+
+    public void validateFilePath(File customDefFile) throws IpfixException {
+        if (customDefFile.isDirectory()) {
+            throw new IpfixException("The specified path is a folder. Please specify the full path to the file.");
+        } else if (!customDefFile.exists()) {
+            throw new IpfixException("The specified file does not exist.");
+        }
     }
 
     /**
@@ -129,7 +167,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     private static String createMessageString(long packetCount, long octetCount, String srcAddr, String dstAddr,
                                               Number srcPort, Number dstPort, long protocol) {
         String message = String.format(Locale.ROOT, "Ipfix [" + srcAddr + "]:" + srcPort + " <> [" + dstAddr + "]:" + dstPort + " " +
-                "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
+                                                    "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
         return message;
     }
 
@@ -215,13 +253,15 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest configuration = super.getRequestedConfiguration();
-            /*configuration.addField(
-                    new TextField(CK_IPFIX_DEFINITION_PATH,
-                            "IPFIX field definitions",
-                            "",
-                            "Path to the JSON file containing IPFIX field definitions",
-                            ConfigurationField.Optional.OPTIONAL)
-            );*/
+            configuration.addField(
+                    new ListField(CK_IPFIX_DEFINITION_PATH,
+                                  "IPFIX field definitions",
+                                  Collections.emptyList(),
+                                  Collections.emptyMap(),
+                                  "JSON file containing IPFIX field definitions.",
+                                  ConfigurationField.Optional.OPTIONAL,
+                                  ListField.Attribute.ALLOW_CREATE)
+            );
             return configuration;
         }
     }
