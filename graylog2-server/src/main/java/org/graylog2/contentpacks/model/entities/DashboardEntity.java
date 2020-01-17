@@ -24,12 +24,10 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.Titles;
 import org.graylog.plugins.views.search.views.WidgetPositionDTO;
-import org.graylog2.contentpacks.facades.dashboardV1.RandomUUIDProvider;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,30 +48,31 @@ public abstract class DashboardEntity {
     @NotNull
     public abstract List<DashboardWidgetEntity> widgets();
 
-    public Map<String, WidgetPositionDTO> positionMap(Map<String, ValueReference> parameters) {
+    public static Map<String, WidgetPositionDTO>  positionMap(
+            Map<String, ValueReference> parameters,
+            Map<DashboardWidgetEntity, List<WidgetEntity>> widgetMap) {
         final Map<String, WidgetPositionDTO> widgetPositionMap = new HashMap<>();
-        for (DashboardWidgetEntity dashboardWidgetEntity : widgets()) {
+        for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgetMap.entrySet()) {
+            final DashboardWidgetEntity dashboardWidgetEntity = widgetEntityListEntry.getKey();
             Optional<DashboardWidgetEntity.Position> position = dashboardWidgetEntity.position();
-            position.ifPresent(value -> widgetPositionMap.put(dashboardWidgetEntity.id().asString(parameters),
-                    value.convert(parameters)));
+            widgetEntityListEntry.getValue().forEach(widgetEntity ->
+                position.ifPresent(value -> widgetPositionMap.put(widgetEntity.id(), value.convert(parameters))));
         }
         return ImmutableMap.copyOf(widgetPositionMap);
     }
 
-    public static Map<String, Map<String, String>> widetTitles(
+    public static Titles widgetTitles(
             Map<DashboardWidgetEntity, List<WidgetEntity>> widgetMap,
             Map<String, ValueReference> parameters) {
 
-        final Map<String, String> widgetTitles = new HashMap<>();
-        final Map<String, Map<String, String>> titlesMap = new HashMap<>(1);
-        titlesMap.put(Titles.KEY_WIDGETS, widgetTitles);
+        final Map<String, String> widgetTitleMap = new HashMap<>();
 
         for (Map.Entry<DashboardWidgetEntity, List<WidgetEntity>> widgetEntityListEntry: widgetMap.entrySet()) {
             widgetEntityListEntry.getValue().forEach(widgetEntity -> {
-                widgetTitles.put(widgetEntity.id(), widgetEntityListEntry.getKey().description().asString(parameters));
+                widgetTitleMap.put(widgetEntity.id(), widgetEntityListEntry.getKey().description().asString(parameters));
             });
         }
-        return titlesMap;
+        return Titles.withWidgetTitle(widgetTitleMap);
     }
 
     @JsonCreator

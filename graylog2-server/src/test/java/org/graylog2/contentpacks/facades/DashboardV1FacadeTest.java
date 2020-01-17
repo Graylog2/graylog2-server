@@ -33,6 +33,7 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewStateDTO;
+import org.graylog.plugins.views.search.views.WidgetDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
@@ -64,6 +65,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,7 +129,7 @@ public class DashboardV1FacadeTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void createNativeEntity() throws Exception {
+    public void shouldConvertAndInstallAOldDashboardAsNewView() throws Exception {
         final URL resourceUrl = Resources.getResource(DashboardV1Facade.class, "content-pack-dashboard-v1.json");
         final ContentPack contentPack = objectMapper.readValue(resourceUrl, ContentPack.class);
         assertThat(contentPack).isInstanceOf(ContentPackV1.class);
@@ -146,6 +149,9 @@ public class DashboardV1FacadeTest {
         assertThat(viewDTO.state().size()).isEqualTo(1);
         ViewStateDTO viewState = viewDTO.state().values().iterator().next();
         assertThat(viewState.widgets().size()).isEqualTo(12);
+        final Set<String> widgetIds = viewState.widgets().stream().map(WidgetDTO::id).collect(Collectors.toSet());
+        final Set<String> widgetPositionIds = viewState.widgetPositions().keySet();
+        assertThat(widgetIds).containsAll(widgetPositionIds);
 
         Optional<Search> optionalSearch = searchDbService.get(viewDTO.searchId());
         Search search = optionalSearch.orElseThrow(NotFoundException::new);

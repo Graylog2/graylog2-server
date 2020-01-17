@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.dashboards.Dashboard;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
@@ -62,12 +63,12 @@ public class EntityConverter {
     public ViewEntity convert() {
         final String queryId = randomUUIDProvider.get();
 
-        final Map<String, WidgetPositionDTO> widgetPositionMap = dashboardEntity.positionMap(parameters);
         final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
         for (DashboardWidgetEntity widgetEntity : dashboardEntity.widgets()) {
             widgets.put(widgetEntity, widgetEntity.convert(parameters, randomUUIDProvider));
         }
-        final Map<String, Map<String, String>> titles = DashboardEntity.widetTitles(widgets, parameters);
+        final Map<String, WidgetPositionDTO> widgetPositionMap = DashboardEntity.positionMap(parameters, widgets);
+        final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);
 
         final Map<String, Set<String>> widgetMapping = new HashMap<>();
         final Set<SearchType> searchTypes = new HashSet<>();
@@ -90,7 +91,7 @@ public class EntityConverter {
 
         final ViewStateEntity viewStateEntity = ViewStateEntity.builder()
                 .widgets(widgets.values().stream().flatMap(Collection::stream).collect(Collectors.toSet()))
-                .titles(Titles.of(titles))
+                .titles(titles)
                 .widgetMapping(widgetMapping)
                 .widgetPositions(widgetPositionMap)
                 .build();
