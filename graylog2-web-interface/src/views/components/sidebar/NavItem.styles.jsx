@@ -1,3 +1,4 @@
+// @flow strict
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -30,7 +31,7 @@ export const Title: React.ComponentType<StyleProps> = styled.div(({ isSelected, 
   `)}
 `);
 
-export const TitleText = styled.div`
+export const TitleText: React.ComponentType<{}> = styled.div`
   font-size: 16px;
   display: inline;
   margin-left: 10px;
@@ -38,7 +39,7 @@ export const TitleText = styled.div`
   white-space: nowrap;
 `;
 
-export const TitleIcon = styled.div`
+export const TitleIcon: React.ComponentType<{}> = styled.div`
   width: 25px;
   text-align: center;
   font-size: 20px;
