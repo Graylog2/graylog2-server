@@ -12,7 +12,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import BookmarkControls from './BookmarkControls';
 
 describe('BookmarkControls', () => {
-  const viewStoreState = (dirty = true) => ({
+  const createViewStoreState = (dirty = true) => ({
     activeQuery: '',
     view: View.builder()
       .title('title')
@@ -29,7 +29,7 @@ describe('BookmarkControls', () => {
       });
       const wrapper = mount((
         <NewViewLoaderContext.Provider value={loadNewView}>
-          <BookmarkControls viewStoreState={viewStoreState()} />
+          <BookmarkControls viewStoreState={createViewStoreState()} />
         </NewViewLoaderContext.Provider>
       ));
       wrapper.find('a[data-testid="reset-search"]').simulate('click');
@@ -42,7 +42,7 @@ describe('BookmarkControls', () => {
       });
       const wrapper = mount(
         <ViewLoaderContext.Provider value={onLoadView}>
-          <BookmarkControls viewStoreState={viewStoreState(false)} />
+          <BookmarkControls viewStoreState={createViewStoreState(false)} />
         </ViewLoaderContext.Provider>,
       );
       wrapper.find('button[title="Save search"]').simulate('click');
@@ -57,7 +57,7 @@ describe('BookmarkControls', () => {
 
   describe('render the BookmarkControls', () => {
     it('should render not dirty with unsaved view', () => {
-      const wrapper = mount(<BookmarkControls viewStoreState={viewStoreState(false)} />);
+      const wrapper = mount(<BookmarkControls viewStoreState={createViewStoreState(false)} />);
       const saveButton = wrapper.find('button[title="Save search"]');
       expect(saveButton).toMatchSnapshot();
     });
