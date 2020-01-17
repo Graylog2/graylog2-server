@@ -37,7 +37,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Api(value = "Enterprise/Views/QualifyingViews", description = "List qualifying views for view interlinking")
+@Api(value = "Views/QualifyingViews")
 @Path("/views/forValue")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

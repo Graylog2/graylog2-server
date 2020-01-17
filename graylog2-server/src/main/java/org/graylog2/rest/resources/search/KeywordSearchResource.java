@@ -63,7 +63,7 @@ import java.util.Optional;
 import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
 @RequiresAuthentication
-@Api(value = "Search/Keyword", description = "Message search")
+@Api(value = "Legacy/Search/Keyword", description = "Message search")
 @Path("/search/universal/keyword")
 public class KeywordSearchResource extends SearchResource {
 
