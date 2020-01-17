@@ -205,7 +205,9 @@ class BookmarkControls extends React.Component<Props, State> {
               {bookmarkList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                 <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
-                <MenuItem disabled={disableReset} onSelect={() => loadNewView()}><Icon name="eraser" /> Reset search</MenuItem>
+                <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
+                  <Icon name="eraser" /> Reset search
+                </MenuItem>
               </DropdownButton>
             </ButtonGroup>
           </div>
