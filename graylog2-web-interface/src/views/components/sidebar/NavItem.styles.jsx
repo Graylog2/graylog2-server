@@ -65,7 +65,7 @@ export const Content: React.ComponentType<StyleProps> = styled.div(({ isSelected
     border: 0;
     bottom: 0;
     padding: 20px;
-    width: 300px;
+    width: 450px;
     overflow-y: hidden;
   `}
 `);
