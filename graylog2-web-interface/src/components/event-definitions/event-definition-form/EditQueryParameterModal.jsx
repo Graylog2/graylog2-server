@@ -139,6 +139,7 @@ class EditQueryParameterModal extends React.Component {
                     onChange={this.handleSelectChange('lookup_table')}
                     options={this.formatLookupTables(lookupTables)}
                     value={queryParameter.lookup_table}
+                    autoFocus
                     required />
             <HelpBlock>
               {validation.lookup_table || 'Select the Lookup Table Graylog should use to get the values.'}
@@ -152,7 +153,6 @@ class EditQueryParameterModal extends React.Component {
                  onChange={this.handleChange}
                  bsStyle={validation.key ? 'error' : null}
                  help={validation.key ? validation.key : 'Select the Lookup Table Key'}
-                 autoFocus
                  spellCheck={false}
                  required />
           <Input id={`default-value-${queryParameter.name}`}
