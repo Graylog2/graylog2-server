@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import uuid from 'uuid/v4';
-import { ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Well } from 'components/graylog';
+import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import moment from 'moment';
 
 import connect from 'stores/connect';
@@ -216,13 +216,13 @@ class FilterForm extends React.Component {
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
     return (
       <FormGroup validationState={hasEmbryonicParameters && 'error'}>
-        <ControlLabel>Query Parameters</ControlLabel>
-        <Well>
+        <ControlLabel>{hasEmbryonicParameters ? 'Undeclared ' : ''}Query Parameters</ControlLabel>
+        <Alert bsStyle="danger">
           <ButtonToolbar>
             {parameterButtons}
           </ButtonToolbar>
-        </Well>
-        { hasEmbryonicParameters && <HelpBlock>Please define the missing query parameters by clicking on the buttons above.</HelpBlock> }
+        </Alert>
+        { hasEmbryonicParameters && <HelpBlock>Please declare missing query parameters by clicking on the buttons above.</HelpBlock> }
       </FormGroup>
     );
   };

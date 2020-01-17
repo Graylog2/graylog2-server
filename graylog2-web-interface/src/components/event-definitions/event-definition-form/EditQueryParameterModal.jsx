@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
 import lodash from 'lodash';
 import React from 'react';
-import { Button, Panel } from 'components/graylog';
+import { Button, Panel, ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
-import { ControlLabel, FormGroup, HelpBlock } from 'components/graylog';
+
 import { Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
@@ -120,7 +120,7 @@ class EditQueryParameterModal extends React.Component {
     return (
       <React.Fragment>
         <Button bsSize="small"
-                bsStyle={queryParameter.embryonic ? 'warning' : 'info'}
+                bsStyle={queryParameter.embryonic ? 'primary' : 'info'}
                 onClick={() => this.openModal()}>
           {queryParameter.name}
         </Button>
