@@ -57,7 +57,7 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_discovery_filter")
     String discoveryFilter = null;
 
-    @Parameter(value = "elasticsearch_discovery_frequency", validator = PositiveDurationValidator.class)
+    @Parameter(value = "elasticsearch_discovery_frequency", validators = {PositiveDurationValidator.class})
     Duration discoveryFrequency = Duration.seconds(30L);
 
     @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
