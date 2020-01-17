@@ -174,10 +174,7 @@ public Stream<ViewDTO> getNativeViews() {
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
         final Search search = searchDbService.get(viewDTO.searchId()).
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewDTO.searchId()));
-        final Stream<String> usedStreamIds = search.queries().stream().flatMap(q -> q.usedStreamIds().stream());
-        final Stream<String> effectiveStreams = search.queries().stream()
-                .flatMap(q -> q.searchTypes().stream().flatMap(s -> s.effectiveStreams().stream()));
-        Stream.concat(usedStreamIds, effectiveStreams).map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
+        search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
         return ImmutableGraph.copyOf(mutableGraph);
     }
@@ -201,12 +198,7 @@ public Stream<ViewDTO> getNativeViews() {
         mutableGraph.addNode(entity);
 
         final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
-        final Stream<String> usedStreams = viewEntity.search().queries().stream()
-                .flatMap(q -> q.usedStreamIds().stream());
-        final Stream<String> effectiveStreams = viewEntity.search().queries().stream()
-                .flatMap(q -> q.searchTypes().stream().flatMap(s -> s.effectiveStreams().stream()));
-        Stream.concat(usedStreams, effectiveStreams)
-                .distinct()
+        viewEntity.search().usedStreamIds().stream()
                 .map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_V1))
                 .map(entities::get)
                 .filter(Objects::nonNull)

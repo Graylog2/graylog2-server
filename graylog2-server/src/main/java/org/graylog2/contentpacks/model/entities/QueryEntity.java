@@ -130,7 +130,8 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
         }
     }
 
-    private Filter mappedFilter(Map<EntityDescriptor, Object> nativeEntities) {
+    // This code assumes that we only add streams via gui shallow.
+    private Filter shallowMappedFilter(Map<EntityDescriptor, Object> nativeEntities) {
        return Optional.ofNullable(filter())
                .map(optFilter -> {
                   Set<Filter> newFilters = optFilter.filters().stream()
@@ -159,7 +160,7 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                 .searchTypes(searchTypes().stream().map(s -> s.toNativeEntity(parameters, nativeEntities))
                         .collect(Collectors.toSet()))
                 .query(query())
-                .filter(mappedFilter(nativeEntities))
+                .filter(shallowMappedFilter(nativeEntities))
                 .timerange(timerange())
                 .globalOverride(globalOverride().orElse(null))
                 .build();

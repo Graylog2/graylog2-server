@@ -154,7 +154,7 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         return Builder.create().parameters(of()).queries(ImmutableSet.<Query>builder().build());
     }
 
-    Set<String> usedStreamIds() {
+    public Set<String> usedStreamIds() {
         final Set<String> queryStreamIds = queries().stream()
                 .map(Query::usedStreamIds)
                 .reduce(Collections.emptySet(), Sets::union);

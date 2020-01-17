@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
@@ -209,9 +210,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity> {
 
     default Set<String> mappedStreams(EntityDescriptorIds entityDescriptorIds) {
         return streams().stream()
-                .map(s -> entityDescriptorIds.get(EntityDescriptor.create(s, ModelTypes.STREAM_V1)))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .map(streamId -> entityDescriptorIds.get(EntityDescriptor.create(streamId, ModelTypes.STREAM_V1)))
+                .map(optionalStreamId -> optionalStreamId.orElseThrow(() ->
+                        new ContentPackException("Did not find matching stream id")))
                 .collect(Collectors.toSet());
     }
 }

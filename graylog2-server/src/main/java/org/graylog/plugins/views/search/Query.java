@@ -248,7 +248,8 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         }
     }
 
-    private Filter mappedFilter(EntityDescriptorIds entityDescriptorIds) {
+    // This code assumes that we only add streams via gui shallow.
+    private Filter shallowMappedFilter(EntityDescriptorIds entityDescriptorIds) {
         return Optional.ofNullable(filter())
                 .map(optFilter -> {
                     Set<Filter> newFilters = optFilter.filters().stream()
@@ -271,7 +272,7 @@ public abstract class Query implements ContentPackable<QueryEntity> {
         return QueryEntity.builder()
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
-                .filter(mappedFilter(entityDescriptorIds))
+                .filter(shallowMappedFilter(entityDescriptorIds))
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))

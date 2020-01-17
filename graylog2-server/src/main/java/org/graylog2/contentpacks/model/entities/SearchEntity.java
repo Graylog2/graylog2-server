@@ -23,9 +23,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.NativeEntityConverter;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
@@ -39,6 +41,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.ImmutableSet.of;
@@ -100,6 +103,18 @@ public abstract class SearchEntity implements NativeEntityConverter<Search> {
                     .parameters(of());
         }
 
+    }
+
+    public Set<String> usedStreamIds() {
+        final Set<String> queryStreamIds = queries().stream()
+                .map(QueryEntity::usedStreamIds)
+                .reduce(Collections.emptySet(), Sets::union);
+        final Set<String> searchTypeStreamIds = queries().stream()
+                .flatMap(q -> q.searchTypes().stream())
+                .map(SearchTypeEntity::effectiveStreams)
+                .reduce(Collections.emptySet(), Sets::union);
+
+        return Sets.union(queryStreamIds, searchTypeStreamIds);
     }
 
     @Override
