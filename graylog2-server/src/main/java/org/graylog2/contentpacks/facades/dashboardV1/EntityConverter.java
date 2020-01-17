@@ -30,7 +30,6 @@ import org.graylog2.contentpacks.model.entities.ViewEntity;
 import org.graylog2.contentpacks.model.entities.ViewStateEntity;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.dashboards.Dashboard;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
@@ -38,7 +37,6 @@ import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +63,8 @@ public class EntityConverter {
 
         final Map<DashboardWidgetEntity, List<WidgetEntity>> widgets = new HashMap<>();
         for (DashboardWidgetEntity widgetEntity : dashboardEntity.widgets()) {
-            widgets.put(widgetEntity, widgetEntity.convert(parameters, randomUUIDProvider));
+            widgets.put(widgetEntity, DashboardWidgetConverter.convert(widgetEntity, parameters,
+                    randomUUIDProvider));
         }
         final Map<String, WidgetPositionDTO> widgetPositionMap = DashboardEntity.positionMap(parameters, widgets);
         final  Titles titles = DashboardEntity.widgetTitles(widgets, parameters);

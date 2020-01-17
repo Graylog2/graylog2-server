@@ -140,12 +140,12 @@ public class DashboardV1FacadeTest {
         assertThat(nativeEntity).isNotNull();
 
         final ViewDTO viewDTO = nativeEntity.entity();
-        viewDTOShouldHaveGenerealInformtion(viewDTO);
+        viewDOTShouldHaveGeneralInformation(viewDTO);
         viewDTOShouldHaveACorrectViewState(viewDTO);
         viewDTOShouldHaveACorrectSearch(viewDTO);
     }
 
-    private void viewDTOShouldHaveGenerealInformtion(ViewDTO viewDTO) {
+    private void viewDOTShouldHaveGeneralInformation(ViewDTO viewDTO) {
         assertThat(viewDTO).isNotNull();
         assertThat(viewDTO.title()).matches("ContentPack Dashboard");
         assertThat(viewDTO.description()).matches("A dashboard for content packs");
@@ -161,6 +161,8 @@ public class DashboardV1FacadeTest {
         final Set<String> widgetIds = viewState.widgets().stream().map(WidgetDTO::id).collect(Collectors.toSet());
         final Set<String> widgetPositionIds = viewState.widgetPositions().keySet();
         assertThat(widgetIds).containsAll(widgetPositionIds);
+        widgetIds.forEach(widgetId -> assertThat(viewState.titles().widgetTitle(widgetId)).isPresent());
+        widgetIds.forEach(widgetId -> assertThat(viewState.widgetMapping().get(widgetId)).isNotEmpty());
     }
 
     private void viewDTOShouldHaveACorrectSearch(ViewDTO viewDTO) throws NotFoundException {
