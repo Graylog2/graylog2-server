@@ -47,7 +47,7 @@ const ConfigurationModal = ({ onSave, onCancel, view }: ConfigurationModalProps)
 
   return (
     <Modal show bsSize="large" onHide={onCancel}>
-      <form onSubmit={_onSave}>
+      <form onSubmit={_onSave} data-testid="display-mode-config-form">
         <Modal.Header closeButton>
           <Modal.Title>Configuring Full Screen</Modal.Title>
         </Modal.Header>
