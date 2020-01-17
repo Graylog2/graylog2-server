@@ -247,10 +247,7 @@ class FilterForm extends React.Component {
                value={lodash.defaultTo(eventDefinition.config.query, '')}
                onChange={this.handleQueryChange} />
 
-        <FormGroup controlId="filter-query-parameters">
-
-          {this.renderQueryParameters()}
-        </FormGroup>
+        {this.renderQueryParameters()}
 
         <FormGroup controlId="filter-streams">
           <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
