@@ -1900,11 +1900,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
         }
       }
       renderLabel={true}
-      validation={
-        Object {
-          "errors": Object {},
-        }
-      }
+      validation={Object {}}
     >
       <ComparisonExpression
         aggregationFunctions={Array []}
@@ -1966,11 +1962,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
           }
         }
         renderLabel={true}
-        validation={
-          Object {
-            "errors": Object {},
-          }
-        }
+        validation={Object {}}
       >
         <Col
           bsClass="col"
@@ -2027,11 +2019,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                     }
                   }
                   renderLabel={true}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberRefExpression
                     aggregationFunctions={Array []}
@@ -2072,11 +2060,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                       }
                     }
                     renderLabel={true}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -6799,11 +6783,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                     }
                   }
                   renderLabel={true}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberExpression
                     aggregationFunctions={Array []}
@@ -6844,11 +6824,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                       }
                     }
                     renderLabel={true}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -6862,7 +6838,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                           addonAfter={null}
                           bsStyle={null}
                           buttonAfter={null}
-                          help={null}
+                          help=""
                           id="aggregation-threshold"
                           label="Threshold"
                           name="threshold"
@@ -7453,11 +7429,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
         }
       }
       renderLabel={false}
-      validation={
-        Object {
-          "errors": Object {},
-        }
-      }
+      validation={Object {}}
     >
       <ComparisonExpression
         aggregationFunctions={Array []}
@@ -7519,11 +7491,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
           }
         }
         renderLabel={false}
-        validation={
-          Object {
-            "errors": Object {},
-          }
-        }
+        validation={Object {}}
       >
         <Col
           bsClass="col"
@@ -7580,11 +7548,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                     }
                   }
                   renderLabel={false}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberRefExpression
                     aggregationFunctions={Array []}
@@ -7625,11 +7589,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                       }
                     }
                     renderLabel={false}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -12268,11 +12228,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                     }
                   }
                   renderLabel={false}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberExpression
                     aggregationFunctions={Array []}
@@ -12313,11 +12269,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                       }
                     }
                     renderLabel={false}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -12331,7 +12283,7 @@ exports[`AggregationConditionExpression rendering conditions should render a boo
                           addonAfter={null}
                           bsStyle={null}
                           buttonAfter={null}
-                          help={null}
+                          help=""
                           id="aggregation-threshold"
                           label=""
                           name="threshold"
@@ -14726,11 +14678,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
         }
       }
       renderLabel={true}
-      validation={
-        Object {
-          "errors": Object {},
-        }
-      }
+      validation={Object {}}
     >
       <ComparisonExpression
         aggregationFunctions={Array []}
@@ -14796,11 +14744,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
           }
         }
         renderLabel={true}
-        validation={
-          Object {
-            "errors": Object {},
-          }
-        }
+        validation={Object {}}
       >
         <Col
           bsClass="col"
@@ -14857,11 +14801,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                     }
                   }
                   renderLabel={true}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberRefExpression
                     aggregationFunctions={Array []}
@@ -14902,11 +14842,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                       }
                     }
                     renderLabel={true}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -19629,11 +19565,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                     }
                   }
                   renderLabel={true}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <NumberExpression
                     aggregationFunctions={Array []}
@@ -19674,11 +19606,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                       }
                     }
                     renderLabel={true}
-                    validation={
-                      Object {
-                        "errors": Object {},
-                      }
-                    }
+                    validation={Object {}}
                   >
                     <Col
                       bsClass="col"
@@ -19692,7 +19620,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           addonAfter={null}
                           bsStyle={null}
                           buttonAfter={null}
-                          help={null}
+                          help=""
                           id="aggregation-threshold"
                           label="Threshold"
                           name="threshold"
@@ -20291,11 +20219,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
         }
       }
       renderLabel={false}
-      validation={
-        Object {
-          "errors": Object {},
-        }
-      }
+      validation={Object {}}
     >
       <GroupExpression
         aggregationFunctions={Array []}
@@ -20365,11 +20289,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
           }
         }
         renderLabel={false}
-        validation={
-          Object {
-            "errors": Object {},
-          }
-        }
+        validation={Object {}}
       >
         <BooleanOperatorSelector
           initialText=""
@@ -22123,11 +22043,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                   }
                 }
                 renderLabel={false}
-                validation={
-                  Object {
-                    "errors": Object {},
-                  }
-                }
+                validation={Object {}}
               >
                 <ComparisonExpression
                   aggregationFunctions={Array []}
@@ -22179,11 +22095,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                     }
                   }
                   renderLabel={false}
-                  validation={
-                    Object {
-                      "errors": Object {},
-                    }
-                  }
+                  validation={Object {}}
                 >
                   <Col
                     bsClass="col"
@@ -22240,11 +22152,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                               }
                             }
                             renderLabel={false}
-                            validation={
-                              Object {
-                                "errors": Object {},
-                              }
-                            }
+                            validation={Object {}}
                           >
                             <NumberRefExpression
                               aggregationFunctions={Array []}
@@ -22285,11 +22193,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 }
                               }
                               renderLabel={false}
-                              validation={
-                                Object {
-                                  "errors": Object {},
-                                }
-                              }
+                              validation={Object {}}
                             >
                               <Col
                                 bsClass="col"
@@ -26928,11 +26832,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                               }
                             }
                             renderLabel={false}
-                            validation={
-                              Object {
-                                "errors": Object {},
-                              }
-                            }
+                            validation={Object {}}
                           >
                             <NumberExpression
                               aggregationFunctions={Array []}
@@ -26973,11 +26873,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 }
                               }
                               renderLabel={false}
-                              validation={
-                                Object {
-                                  "errors": Object {},
-                                }
-                              }
+                              validation={Object {}}
                             >
                               <Col
                                 bsClass="col"
@@ -26991,7 +26887,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                     addonAfter={null}
                                     bsStyle={null}
                                     buttonAfter={null}
-                                    help={null}
+                                    help=""
                                     id="aggregation-threshold"
                                     label=""
                                     name="threshold"
@@ -29317,11 +29213,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
               }
             }
             renderLabel={true}
-            validation={
-              Object {
-                "errors": Object {},
-              }
-            }
+            validation={Object {}}
           >
             <ComparisonExpression
               aggregationFunctions={Array []}
@@ -29373,11 +29265,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                 }
               }
               renderLabel={true}
-              validation={
-                Object {
-                  "errors": Object {},
-                }
-              }
+              validation={Object {}}
             >
               <Col
                 bsClass="col"
@@ -29434,11 +29322,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           }
                         }
                         renderLabel={true}
-                        validation={
-                          Object {
-                            "errors": Object {},
-                          }
-                        }
+                        validation={Object {}}
                       >
                         <NumberRefExpression
                           aggregationFunctions={Array []}
@@ -29479,11 +29363,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                             }
                           }
                           renderLabel={true}
-                          validation={
-                            Object {
-                              "errors": Object {},
-                            }
-                          }
+                          validation={Object {}}
                         >
                           <Col
                             bsClass="col"
@@ -34206,11 +34086,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                           }
                         }
                         renderLabel={true}
-                        validation={
-                          Object {
-                            "errors": Object {},
-                          }
-                        }
+                        validation={Object {}}
                       >
                         <NumberExpression
                           aggregationFunctions={Array []}
@@ -34251,11 +34127,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                             }
                           }
                           renderLabel={true}
-                          validation={
-                            Object {
-                              "errors": Object {},
-                            }
-                          }
+                          validation={Object {}}
                         >
                           <Col
                             bsClass="col"
@@ -34269,7 +34141,7 @@ exports[`AggregationConditionExpression rendering conditions should render a gro
                                 addonAfter={null}
                                 bsStyle={null}
                                 buttonAfter={null}
-                                help={null}
+                                help=""
                                 id="aggregation-threshold"
                                 label="Threshold"
                                 name="threshold"
@@ -36648,11 +36520,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                 }
               }
               renderLabel={true}
-              validation={
-                Object {
-                  "errors": Object {},
-                }
-              }
+              validation={Object {}}
             >
               <NumberRefExpression
                 aggregationFunctions={Array []}
@@ -36687,11 +36555,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                   }
                 }
                 renderLabel={true}
-                validation={
-                  Object {
-                    "errors": Object {},
-                  }
-                }
+                validation={Object {}}
               >
                 <Col
                   bsClass="col"
@@ -41213,11 +41077,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                 }
               }
               renderLabel={true}
-              validation={
-                Object {
-                  "errors": Object {},
-                }
-              }
+              validation={Object {}}
             >
               <NumberExpression
                 aggregationFunctions={Array []}
@@ -41252,11 +41112,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                   }
                 }
                 renderLabel={true}
-                validation={
-                  Object {
-                    "errors": Object {},
-                  }
-                }
+                validation={Object {}}
               >
                 <Col
                   bsClass="col"
@@ -41270,7 +41126,7 @@ exports[`AggregationConditionExpression rendering conditions should render empty
                       addonAfter={null}
                       bsStyle={null}
                       buttonAfter={null}
-                      help={null}
+                      help=""
                       id="aggregation-threshold"
                       label="Threshold"
                       name="threshold"
@@ -43662,11 +43518,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                 }
               }
               renderLabel={true}
-              validation={
-                Object {
-                  "errors": Object {},
-                }
-              }
+              validation={Object {}}
             >
               <NumberRefExpression
                 aggregationFunctions={Array []}
@@ -43707,11 +43559,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                   }
                 }
                 renderLabel={true}
-                validation={
-                  Object {
-                    "errors": Object {},
-                  }
-                }
+                validation={Object {}}
               >
                 <Col
                   bsClass="col"
@@ -48469,11 +48317,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                 }
               }
               renderLabel={true}
-              validation={
-                Object {
-                  "errors": Object {},
-                }
-              }
+              validation={Object {}}
             >
               <NumberExpression
                 aggregationFunctions={Array []}
@@ -48514,11 +48358,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                   }
                 }
                 renderLabel={true}
-                validation={
-                  Object {
-                    "errors": Object {},
-                  }
-                }
+                validation={Object {}}
               >
                 <Col
                   bsClass="col"
@@ -48532,7 +48372,7 @@ exports[`AggregationConditionExpression rendering conditions should render simpl
                       addonAfter={null}
                       bsStyle={null}
                       buttonAfter={null}
-                      help={null}
+                      help=""
                       id="aggregation-threshold"
                       label="Threshold"
                       name="threshold"
