@@ -11,6 +11,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 
 import BookmarkControls from './BookmarkControls';
 
+
 describe('BookmarkControls', () => {
   const createViewStoreState = (dirty = true) => ({
     activeQuery: '',
