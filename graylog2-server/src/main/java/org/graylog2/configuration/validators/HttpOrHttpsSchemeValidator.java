@@ -30,7 +30,7 @@ public class HttpOrHttpsSchemeValidator implements Validator<String> {
     @Override
     public void validate(String name, String value) throws ValidationException {
         if (!validScheme.contains(value.toLowerCase(Locale.ENGLISH))) {
-            throw new ValidationException(String.format(Locale.ENGLISH, "Parameter " + name + " must be one of [%s]", String.join(",")));
+            throw new ValidationException(String.format(Locale.ENGLISH, "Parameter " + name + " must be one of [%s]", String.join(",", validScheme)));
         }
     }
 }

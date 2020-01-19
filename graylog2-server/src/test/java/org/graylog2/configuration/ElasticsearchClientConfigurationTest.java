@@ -138,4 +138,13 @@ public class ElasticsearchClientConfigurationTest {
         assertThatExceptionOfType(ParameterException.class).isThrownBy(jadConfig::process)
                 .withMessage("Couldn't convert value for parameter \"elasticsearch_discovery_frequency\"");
     }
+
+    @Test
+    public void jadConfigFailsWithInvalidDiscoveryDefaultScheme() throws Exception {
+        final InMemoryRepository repository = new InMemoryRepository(Collections.singletonMap("elasticsearch_discovery_default_scheme", "foobar"));
+        final ElasticsearchClientConfiguration configuration = new ElasticsearchClientConfiguration();
+        JadConfig jadConfig = new JadConfig(repository, configuration);
+        assertThatExceptionOfType(ValidationException.class).isThrownBy(jadConfig::process)
+                .withMessage("Parameter elasticsearch_discovery_default_scheme must be one of [http,https]");
+    }
 }
