@@ -165,7 +165,7 @@ class FilterForm extends React.Component {
       type: 'lut-parameter-v1',
       data_type: 'any',
       title: 'new title',
-      // has no binding!
+      // has no binding, no need to set binding property
     });
   };
 
@@ -216,7 +216,7 @@ class FilterForm extends React.Component {
     const hasEmbryonicParameters = !lodash.isEmpty(queryParameters.filter(param => (param.embryonic)));
     return (
       <FormGroup>
-        <ControlLabel>{hasEmbryonicParameters ? 'Undeclared ' : ''}Query Parameters</ControlLabel>
+        <ControlLabel>Query Parameters</ControlLabel>
         <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
           <ButtonToolbar>
             {parameterButtons}

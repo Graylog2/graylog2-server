@@ -116,7 +116,7 @@ class EditQueryParameterModal extends React.Component {
         <Button bsSize="small"
                 bsStyle={queryParameter.embryonic ? 'primary' : 'info'}
                 onClick={() => this.openModal()}>
-          {queryParameter.name}
+          {queryParameter.name}{queryParameter.embryonic && ': undeclared'}
         </Button>
 
         <BootstrapModalForm ref={(ref) => { this.modal = ref; }}
