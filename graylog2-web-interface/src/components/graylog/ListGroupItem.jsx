@@ -77,7 +77,7 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
           &:disabled {
             color: ${colors.primary.tre};
             background-color: ${colors.primary.due};
-          }          
+          }
         }
 
         ${bsStyleThemeVariant(listGroupItemStyles)}
