@@ -27,7 +27,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>3.2.0-beta.2-SNAPSHOT</version>
+    <version>3.2.0-beta.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -108,7 +108,7 @@
         <HdrHistogram.version>2.1.10</HdrHistogram.version>
         <hibernate-validator.version>6.0.13.Final</hibernate-validator.version>
         <hk2.version>2.5.0-b32</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.9.10.20191020</jackson.version>
+        <jackson.version>2.9.10.20200103</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.11.1</javapoet.version>
@@ -131,7 +131,7 @@
         <mongodb-driver.version>3.6.4</mongodb-driver.version>
         <mongojack.version>2.10.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.43.Final</netty.version>
+        <netty.version>4.1.45.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.28.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>3.14.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -168,7 +168,7 @@
         <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.18.0</system-rules.version>
-        <testcontainers.version>1.12.3</testcontainers.version>
+        <testcontainers.version>1.12.4</testcontainers.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v12.13.1</nodejs.version>

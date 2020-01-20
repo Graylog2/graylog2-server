@@ -1,12 +1,12 @@
 import theme from 'styled-theming';
 import { css } from 'styled-components';
 
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 
 const badgeStyles = () => {
   const cssBuilder = (hex) => {
     const backgroundColor = hex;
-    const textColor = contrastingColor(backgroundColor);
+    const textColor = util.contrastingColor(backgroundColor);
 
     return css`
       background-color: ${backgroundColor};

@@ -1,5 +1,4 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import ClipboardJS from 'clipboard';
@@ -13,7 +12,6 @@ import InteractableModal from 'components/common/InteractableModal';
 import Icon from 'components/common/Icon';
 import Store from 'logic/local-storage/Store';
 
-const LOCALSTORAGE_PREFIX = 'gl-scratchpad-';
 const DEFAULT_SCRATCHDATA = '';
 const TEXTAREA_ID = 'scratchpad-text-content';
 
@@ -72,13 +70,12 @@ const SavingMessage = styled.span(({ visible }) => `
   transition: opacity 150ms ease-in-out;
 `);
 
-const Scratchpad = ({ loginName }) => {
+const Scratchpad = () => {
   let clipboard;
-  const localStorageItem = `${LOCALSTORAGE_PREFIX}${loginName}`;
-  const scratchpadStore = Store.get(localStorageItem) || {};
   const textareaRef = useRef();
   const confirmationModalRef = useRef();
-  const { isScratchpadVisible, setScratchpadVisibility } = useContext(ScratchpadContext);
+  const { isScratchpadVisible, setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
+  const scratchpadStore = Store.get(localStorageItem) || {};
   const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState(scratchpadStore.securityConfirmed || false);
   const [scratchData, setScratchData] = useState(scratchpadStore.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState(scratchpadStore.size || undefined);
@@ -208,10 +205,6 @@ const Scratchpad = ({ loginName }) => {
       </BootstrapModalConfirm>
     </InteractableModal>
   );
-};
-
-Scratchpad.propTypes = {
-  loginName: PropTypes.string.isRequired,
 };
 
 export default Scratchpad;

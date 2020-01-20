@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -129,6 +130,10 @@ public abstract class Search implements ContentPackable<SearchEntity> {
         final Set<Query> withoutStreams = Sets.difference(queries(), withStreams);
 
         final ImmutableSet<String> defaultStreams = defaultStreamsSupplier.get();
+
+        if (defaultStreams.isEmpty())
+            throw new PermissionException("User doesn't have access to any streams");
+
         final Set<Query> withDefaultStreams = withoutStreams.stream()
                 .map(q -> q.addStreamsToFilter(defaultStreams))
                 .collect(toSet());

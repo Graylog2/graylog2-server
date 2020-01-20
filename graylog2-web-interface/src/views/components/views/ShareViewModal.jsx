@@ -135,7 +135,7 @@ class ShareViewModal extends React.Component<Props, State> {
           Any user of this Graylog
         </Radio>{' '}
         <Additional>
-          <HelpBlock>Anyone with an account can access the view.</HelpBlock>
+          <HelpBlock>Anyone with an account can access the dashboard.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificRoles.Type} checked={type === SpecificRoles.Type} onChange={this._onChange}>
@@ -148,7 +148,7 @@ class ShareViewModal extends React.Component<Props, State> {
                   placeholder="Select roles"
                   onChange={this._onRolesChange}
                   options={rolesOptions} />
-          <HelpBlock>Only users with these roles can access the view.</HelpBlock>
+          <HelpBlock>Only users with these roles can access the dashboard.</HelpBlock>
         </Additional>
 
         <Radio name={SpecificUsers.Type} checked={type === SpecificUsers.Type} onChange={this._onChange}>
@@ -161,21 +161,21 @@ class ShareViewModal extends React.Component<Props, State> {
                   placeholder="Select users"
                   onChange={this._onUsersChange}
                   options={userOptions || []} />
-          <HelpBlock>Only these users can access the view.</HelpBlock>
+          <HelpBlock>Only these users can access the dashboard.</HelpBlock>
         </Additional>
 
         <Radio name="none" checked={type === 'none'} onChange={this._onChange}>
           Only me
         </Radio>
         <Additional>
-          <HelpBlock>Noone but you can access the view.</HelpBlock>
+          <HelpBlock>Noone but you can access the dashboard.</HelpBlock>
         </Additional>
       </FormGroup>
     );
     return (
       <Modal show={show} onHide={this._onClose}>
         <Modal.Body>
-          <h3>Who is supposed to access the view {view.title}?</h3>
+          <h3>Who is supposed to access the dashboard {view.title}?</h3>
           {content}
         </Modal.Body>
         <Modal.Footer>

@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -76,5 +77,9 @@ public enum AggregationFunction {
             throw new IllegalArgumentException("Function <" + toString().toLowerCase(Locale.US) + "> requires a field");
         }
         return seriesSpecSupplier.apply(id, field);
+    }
+
+    public String toSeriesId(Optional<String> field) {
+        return String.format(Locale.US, "%s-%s", name().toLowerCase(Locale.US), field.orElse(""));
     }
 }

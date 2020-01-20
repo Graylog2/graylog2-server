@@ -25,7 +25,6 @@ import org.graylog2.configuration.PathConfiguration;
 import org.joda.time.Duration;
 
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -52,7 +51,7 @@ public class KafkaJournalConfiguration extends PathConfiguration {
 
     @Parameter(value = "message_journal_dir", required = true)
     @JsonProperty("directory")
-    private Path messageJournalDir = getDataDir().resolve("journal");
+    private Path messageJournalDir = DEFAULT_DATA_DIR.resolve("journal");
 
     @Parameter("message_journal_segment_size")
     @JsonProperty("segment_size")
