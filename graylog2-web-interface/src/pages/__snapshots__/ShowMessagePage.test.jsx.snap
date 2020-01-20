@@ -10,7 +10,6 @@ exports[`ShowMessagePage renders for generic event 1`] = `
     >
       <span>
         {
-  "nodes": {},
   "fields": {},
   "streams": {},
   "allStreams": [],
@@ -93,7 +92,6 @@ exports[`ShowMessagePage renders for generic message 1`] = `
     >
       <span>
         {
-  "nodes": {},
   "fields": {},
   "streams": {},
   "allStreams": [],

@@ -9,9 +9,18 @@ import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import Headers from './Headers';
+import SeriesConfig from '../../logic/aggregationbuilder/SeriesConfig';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('logic/datetimes/DateTime', () => 'DateTime');
+
+const seriesWithName = (fn, name) => Series.forFunction(fn)
+  .toBuilder()
+  .config(SeriesConfig.empty()
+    .toBuilder()
+    .name(name)
+    .build())
+  .build();
 
 describe('Headers', () => {
   /* eslint-disable react/require-default-props */
@@ -56,23 +65,43 @@ describe('Headers', () => {
     expect(fields).toHaveLength(2);
   });
 
-  it('passes the correct, inferred type for series', () => {
-    const wrapper = mount(<RenderHeaders series={[
-      Series.forFunction('count()'),
-      Series.forFunction('avg(foo)'),
-      Series.forFunction('min(foo)'),
-    ]}
-                                         fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
-    expect(wrapper).not.toBeEmptyRender();
-    const fields = wrapper.find('Field');
+  describe('infers types properly', () => {
+    const expectCorrectTypes = (wrapper) => {
+      const countField = wrapper.find('Field[name="count()"]');
+      expect(countField).toHaveProp('type', FieldTypes.LONG());
 
-    const countField = fields.at(0);
-    expect(countField.props().type).toEqual(FieldTypes.LONG());
+      const avgField = wrapper.find('Field[name="avg(foo)"]');
+      expect(avgField).toHaveProp('type', FieldTypes.DATE());
 
-    const avgField = fields.at(1);
-    expect(avgField.props().type).toEqual(FieldTypes.DATE());
+      const minField = wrapper.find('Field[name="min(foo)"]');
+      expect(minField).toHaveProp('type', FieldTypes.DATE());
+    };
 
-    const minField = fields.at(2);
-    expect(minField.props().type).toEqual(FieldTypes.DATE());
+    it('for non-renamed series', () => {
+      const series = [
+        Series.forFunction('count()'),
+        Series.forFunction('avg(foo)'),
+        Series.forFunction('min(foo)'),
+      ];
+      const wrapper = mount((
+        <RenderHeaders series={series}
+                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
+      ));
+      expectCorrectTypes(wrapper);
+    });
+
+
+    it('for renamed series', () => {
+      const series = [
+        seriesWithName('count()', 'Total Count'),
+        seriesWithName('avg(foo)', 'Average Foness'),
+        seriesWithName('min(foo)', 'Minimal Fooness'),
+      ];
+      const wrapper = mount((
+        <RenderHeaders series={series}
+                       fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />
+      ));
+      expectCorrectTypes(wrapper);
+    });
   });
 });

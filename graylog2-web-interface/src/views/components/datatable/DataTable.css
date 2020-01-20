@@ -1,4 +1,11 @@
 :local(.container) {
+    /* The grid prop is a workaround to fix
+     * horizontal scrolling for safari */
+    display: grid;
+    height: 100%;
+}
+
+:local(.scrollContainer) {
     overflow: auto;
     height: 100%;
 }

@@ -187,7 +187,7 @@ const CollectorForm = createReactClass({
             <FormGroup controlId="service_type"
                        validationState={this._validationState('service_type')}>
               <ControlLabel>Process management</ControlLabel>
-              <Select inputProps={{ id: 'service_type' }}
+              <Select inputId="service_type"
                       options={this._formatServiceTypes()}
                       value={formData.service_type}
                       onChange={this._formDataUpdate('service_type')}
@@ -196,10 +196,10 @@ const CollectorForm = createReactClass({
               <HelpBlock>{this._formatValidationMessage('service_type', 'Choose the service type this collector is meant for.')}</HelpBlock>
             </FormGroup>
 
-            <FormGroup controlId="operating_system"
+            <FormGroup controlId="node_operating_system"
                        validationState={this._validationState('node_operating_system')}>
               <ControlLabel>Operating System</ControlLabel>
-              <Select inputProps={{ id: 'node_operating_system' }}
+              <Select inputId="node_operating_system"
                       options={this._formatOperatingSystems()}
                       value={formData.node_operating_system}
                       onChange={this._formDataUpdate('node_operating_system')}

@@ -38,6 +38,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.jooq.lambda.tuple.Tuple;
@@ -58,6 +61,16 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(ESPivot.class);
     private final Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers;
     private final Map<String, ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation>> seriesHandlers;
+    private static final TimeRange ALL_MESSAGES_TIMERANGE = allMessagesTimeRange();
+
+    private static TimeRange allMessagesTimeRange() {
+        try {
+            return RelativeRange.create(0);
+        } catch (InvalidRangeParametersException e){
+            LOG.error("Unable to instantiate all messages timerange: ", e);
+        }
+        return null;
+    }
 
     @Inject
     public ESPivot(Map<String, ESPivotBucketSpecHandler<? extends BucketSpec, ? extends Aggregation>> bucketHandlers,
@@ -168,14 +181,27 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                 .map(Optional::get);
     }
 
-    @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
+    private boolean isAllMessagesTimeRange(TimeRange timeRange) {
+        return ALL_MESSAGES_TIMERANGE.equals(timeRange);
+    }
+
+    private AbsoluteRange extractEffectiveTimeRange(SearchResult queryResult, Query query, Pivot pivot) {
         final Double from = queryResult.getAggregations().getMinAggregation("timestamp-min").getMin();
         final Double to = queryResult.getAggregations().getMaxAggregation("timestamp-max").getMax();
-        final AbsoluteRange effectiveTimerange = AbsoluteRange.create(
-                from == null ? query.effectiveTimeRange(pivot).getFrom() : new DateTime(from.longValue(), DateTimeZone.UTC),
-                to == null ? query.effectiveTimeRange(pivot).getTo() : new DateTime(to.longValue(), DateTimeZone.UTC)
+        final TimeRange pivotRange = query.effectiveTimeRange(pivot);
+        return AbsoluteRange.create(
+                isAllMessagesTimeRange(pivotRange) && from != null
+                        ? new DateTime(from.longValue(), DateTimeZone.UTC)
+                        : query.effectiveTimeRange(pivot).getFrom(),
+                isAllMessagesTimeRange(pivotRange) && to != null
+                        ? new DateTime(to.longValue(), DateTimeZone.UTC)
+                        : query.effectiveTimeRange(pivot).getTo()
         );
+    }
+
+    @Override
+    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResult queryResult, MetricAggregation aggregations, ESGeneratedQueryContext queryContext) {
+        final AbsoluteRange effectiveTimerange = extractEffectiveTimeRange(queryResult, query, pivot);
 
         final PivotResult.Builder resultBuilder = PivotResult.builder()
                 .id(pivot.id())

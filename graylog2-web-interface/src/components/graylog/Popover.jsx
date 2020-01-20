@@ -2,6 +2,7 @@
 import { Popover as BoostrapPopover } from 'react-bootstrap';
 import styled from 'styled-components';
 import { darken, opacify, transparentize } from 'polished';
+
 import teinte from 'theme/teinte';
 
 const borderColor = transparentize(0.8, teinte.primary.tre);

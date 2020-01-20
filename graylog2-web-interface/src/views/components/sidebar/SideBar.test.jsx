@@ -84,7 +84,7 @@ describe('<Sidebar />', () => {
     expect(wrapper.find('h3').text()).toBe(viewMetaData.title);
   });
 
-  it('should render with a default title and a description', () => {
+  it('should render with a description', () => {
     const emptyViewMetaData = {
       activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
       id: '5b34f4c44880a54df9616380',
@@ -102,8 +102,51 @@ describe('<Sidebar />', () => {
 
     wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
     wrapper.find('div[children="Description"]').simulate('click');
-    expect(wrapper.find('h3').text()).toBe('New Search');
     expect(wrapper.find('SearchResultOverview').text()).toBe('Found 0 messages in 64ms.Query executed at 2018-08-28 14:39:26.');
+  });
+
+  it('should render with a specific default title in the context of a new search', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Search}>
+        <SideBar viewMetadata={emptyViewMetaData}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>,
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    expect(wrapper.find('h3').text()).toBe('Untitled Search');
+  });
+
+  it('should render with a specific default title in the context of a new dashboard', () => {
+    const emptyViewMetaData = {
+      activeQuery: '34efae1e-e78e-48ab-ab3f-e83c8611a683',
+      id: '5b34f4c44880a54df9616380',
+    };
+
+    const SideBar = loadSUT();
+    const wrapper = mount(
+      <ViewTypeContext.Provider value={View.Type.Dashboard}>
+        <SideBar viewMetadata={emptyViewMetaData}
+                 toggleOpen={jest.fn}
+                 queryId={query.id}
+                 results={queryResult}>
+          <TestComponent />
+        </SideBar>
+      </ViewTypeContext.Provider>,
+    );
+
+    wrapper.find('Sidebarstyles__SidebarHeader').simulate('click');
+    expect(wrapper.find('h3').text()).toBe('Untitled Dashboard');
   });
 
   it('should render a summary and descirption, for dashboard view', () => {

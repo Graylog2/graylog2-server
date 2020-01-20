@@ -10,6 +10,7 @@ const MessageFieldsFilter = {
     '_score',
 
     // Our reserved fields.
+    'gl2_accounted_message_size',
     'gl2_message_id',
     'gl2_source_node',
     'gl2_source_input',

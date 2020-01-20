@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Api(value = "Enterprise/Views", description = "View Sharing management")
+@Api(value = "Views/Sharing")
 @Path("/views/{id}/share")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -63,7 +63,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
 
     @GET
     @ApiOperation("Get the sharing configuration for this view")
-    public ViewSharing get(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewSharing get(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         ensureUserIsPermittedForView(id);
         return viewSharingService.forView(id).orElseThrow(NotFoundException::new);
     }
@@ -71,7 +71,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @POST
     @ApiOperation("Configure sharing for a view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_SHARING_CREATE)
-    public ViewSharing create(@ApiParam @PathParam("id") @NotEmpty String id, ViewSharing viewSharing) {
+    public ViewSharing create(@ApiParam(name="id") @PathParam("id") @NotEmpty String id, ViewSharing viewSharing) {
         ensureUserIsPermittedForView(id);
         checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         return viewSharingService.create(viewSharing);
@@ -80,7 +80,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @DELETE
     @ApiOperation("Delete sharing of a view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_SHARING_DELETE)
-    public ViewSharing delete(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public ViewSharing delete(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         ensureUserIsPermittedForView(id);
         checkPermission(ViewsRestPermissions.VIEW_EDIT, id);
         return viewSharingService.remove(id).orElse(null);
@@ -89,7 +89,7 @@ public class ViewSharingResource extends RestResource implements PluginRestResou
     @GET
     @Path("/users")
     @ApiOperation("Get a list of summaries of available users for sharing")
-    public Set<UserShortSummary> summarizeUsers(@ApiParam @PathParam("id") @NotEmpty String id) {
+    public Set<UserShortSummary> summarizeUsers(@ApiParam(name="id") @PathParam("id") @NotEmpty String id) {
         final List<User> users = userService.loadAll();
         final String currentUser = getCurrentUser() != null ? getCurrentUser().getName() : null;
         return users.stream()

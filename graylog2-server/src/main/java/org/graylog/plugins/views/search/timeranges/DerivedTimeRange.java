@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -35,7 +36,7 @@ public abstract class DerivedTimeRange {
             return ((DerivableTimeRange)value()).deriveTimeRange(query, searchType);
         }
 
-        return value();
+        return query.globalOverride().flatMap(GlobalOverride::timerange).orElse(value());
     }
 
     @JsonCreator

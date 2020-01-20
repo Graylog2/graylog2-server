@@ -90,6 +90,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 "format", Tools.ES_DATE_FORMAT);
     }
 
+    protected Map<String, Object> typeLong() {
+        return ImmutableMap.of("type", "long");
+    }
+
     protected Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
     }

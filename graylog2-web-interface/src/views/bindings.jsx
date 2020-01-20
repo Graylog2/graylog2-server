@@ -58,7 +58,6 @@ import AllUsersOfInstance from 'views/logic/views/sharing/AllUsersOfInstance';
 import SpecificRoles from 'views/logic/views/sharing/SpecificRoles';
 import SpecificUsers from 'views/logic/views/sharing/SpecificUsers';
 
-import UseInNewQueryHandler from 'views/logic/valueactions/UseInNewQueryHandler';
 import ShowDocumentsHandler from 'views/logic/valueactions/ShowDocumentsHandler';
 import HighlightValueHandler from 'views/logic/valueactions/HighlightValueHandler';
 import FieldNameCompletion from 'views/components/searchbar/completions/FieldNameCompletion';
@@ -119,7 +118,7 @@ export default {
     { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: Routes.stream_search(':streamId'), component: StreamSearchPage, parentComponent: AppWithExtendedSearchBar },
     { path: dashboardsPath, component: DashboardsPage },
-    { path: showDashboardsPath, component: ShowViewPage },
+    { path: showDashboardsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
     { path: extendedSearchPath, component: NewSearchPage, permissions: Permissions.ExtendedSearch.Use },
     { path: viewsPath, component: ViewManagementPage, permissions: Permissions.View.Use },
     { path: showViewsPath, component: ShowViewPage, parentComponent: AppWithExtendedSearchBar },
@@ -193,12 +192,12 @@ export default {
       type: 'aggregate',
       title: 'Aggregate',
       handler: AggregateActionHandler,
-      isEnabled: (({ type }) => (!type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isCompound() && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
       handler: FieldStatisticsHandler,
     },
     {
@@ -209,7 +208,7 @@ export default {
       isHidden: AddToTableActionHandler.isHidden,
     },
     {
-      type: 'remove-to-table',
+      type: 'remove-from-table',
       title: 'Remove from table',
       handler: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
@@ -219,13 +218,13 @@ export default {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       handler: AddToAllTablesActionHandler,
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       handler: RemoveFromAllTablesActionHandler,
-      isEnabled: (({ type }) => !type.isDecorated(): ActionHandlerCondition),
+      isEnabled: (({ field, type }) => (!isFunction(field) && !type.isDecorated()): ActionHandlerCondition),
     },
   ],
   valueActions: [
@@ -242,12 +241,6 @@ export default {
       isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
     },
     {
-      type: 'new-query',
-      title: 'Use in new query',
-      handler: UseInNewQueryHandler,
-      isHidden: UseInNewQueryHandler.isEnabled,
-    },
-    {
       type: 'show-bucket',
       title: 'Show documents for value',
       handler: ShowDocumentsHandler,
@@ -256,7 +249,7 @@ export default {
     {
       type: 'create-extractor',
       title: 'Create extractor',
-      isEnabled: (({ type }) => (type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
+      isEnabled: (({ type, contexts }) => (!!contexts.message && type.type === 'string' && !type.isDecorated()): ActionHandlerCondition),
       component: SelectExtractorType,
     },
     {

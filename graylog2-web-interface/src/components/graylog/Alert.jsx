@@ -5,7 +5,7 @@ import { darken, lighten } from 'polished';
 // eslint-disable-next-line no-restricted-imports
 import { Alert as BootstrapAlert } from 'react-bootstrap';
 
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 import bsStyleThemeVariant, { bsStyles } from './variants/bsStyle';
 
 const alertStyles = (hex) => {
@@ -15,7 +15,7 @@ const alertStyles = (hex) => {
   const lightenBackground = lighten(0.40, hex);
   const backgroundColor = lightenBackground === '#fff' ? darken(0.05, hex) : lightenBackground;
 
-  const textColor = contrastingColor(backgroundColor);
+  const textColor = util.contrastingColor(backgroundColor);
 
   return css`
     background-color: ${backgroundColor};

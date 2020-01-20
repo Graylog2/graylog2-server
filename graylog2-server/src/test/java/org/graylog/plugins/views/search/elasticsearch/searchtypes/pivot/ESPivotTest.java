@@ -44,6 +44,12 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,6 +100,12 @@ public class ESPivotTest {
         when(pivot.id()).thenReturn("dummypivot");
     }
 
+    @After
+    public void tearDown() throws Exception {
+        // Some tests modify the time so we make sure to reset it after each test even if assertions fail
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
     private MetricAggregation createTimestampRangeAggregations(Double min, Double max) {
         final MetricAggregation metricAggregation = mock(MetricAggregation.class);
 
@@ -109,11 +121,12 @@ public class ESPivotTest {
     }
 
     @Test
-    public void searchResultIncludesDocumentCount() {
+    public void searchResultIncludesDocumentCount() throws InvalidRangeParametersException {
         final long documentCount = 424242;
         when(queryResult.getTotal()).thenReturn(documentCount);
         final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
         final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
 
@@ -297,7 +310,7 @@ public class ESPivotTest {
     }
 
     @Test
-    public void includesCustomNameinResultIfPresent() {
+    public void includesCustomNameinResultIfPresent() throws InvalidRangeParametersException {
         final ESPivot esPivot = new ESPivot(Collections.emptyMap(), Collections.emptyMap());
         final Pivot pivot = Pivot.builder()
                 .id("somePivotId")
@@ -309,9 +322,71 @@ public class ESPivotTest {
         when(queryResult.getTotal()).thenReturn(documentCount);
         final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
         when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
 
-        final SearchType.Result result = esPivot.doExtractResult(null, null, pivot, queryResult, null, null);
+        final SearchType.Result result = esPivot.doExtractResult(null, query, pivot, queryResult, null, null);
 
         assertThat(result.name()).contains("customPivot");
+    }
+
+    @Test
+    public void searchResultIncludesTimerangeOfPivot() throws InvalidRangeParametersException {
+        DateTimeUtils.setCurrentMillisFixed(1578584665408L);
+        final long documentCount = 424242;
+        when(queryResult.getTotal()).thenReturn(documentCount);
+        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations((double) new Date().getTime(), (double) new Date().getTime());
+        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(300));
+
+        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+
+        final PivotResult pivotResult = (PivotResult) result;
+
+        assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
+                DateTime.parse("2020-01-09T15:39:25.408Z"),
+                DateTime.parse("2020-01-09T15:44:25.408Z")
+        ));
+    }
+
+    @Test
+    public void searchResultForAllMessagesIncludesTimerangeOfDocuments() throws InvalidRangeParametersException {
+        DateTimeUtils.setCurrentMillisFixed(1578584665408L);
+        final long documentCount = 424242;
+        when(queryResult.getTotal()).thenReturn(documentCount);
+        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations(
+                (double) new Date(1547303022000L).getTime(),
+                (double) new Date(1578040943000L).getTime()
+        );
+        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
+
+        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+
+        final PivotResult pivotResult = (PivotResult) result;
+
+        assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
+                DateTime.parse("2019-01-12T14:23:42.000Z"),
+                DateTime.parse("2020-01-03T08:42:23.000Z")
+        ));
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
+    @Test
+    public void searchResultForAllMessagesIncludesPivotTimerangeForNoDocuments() throws InvalidRangeParametersException {
+        DateTimeUtils.setCurrentMillisFixed(1578584665408L);
+        final long documentCount = 0;
+        when(queryResult.getTotal()).thenReturn(documentCount);
+        final MetricAggregation mockMetricAggregation = createTimestampRangeAggregations(null, null);
+        when(queryResult.getAggregations()).thenReturn(mockMetricAggregation);
+        when(query.effectiveTimeRange(pivot)).thenReturn(RelativeRange.create(0));
+
+        final SearchType.Result result = this.esPivot.doExtractResult(job, query, pivot, queryResult, aggregations, queryContext);
+
+        final PivotResult pivotResult = (PivotResult) result;
+
+        assertThat(pivotResult.effectiveTimerange()).isEqualTo(AbsoluteRange.create(
+                DateTime.parse("1970-01-01T00:00:00.000Z"),
+                DateTime.parse("2020-01-09T15:44:25.408Z")
+        ));
     }
 }

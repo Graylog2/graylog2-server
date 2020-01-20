@@ -30,6 +30,8 @@ const TimeUnitTimeHistogramPivot = ({ interval, onChange }: Props) => (
     <InputGroup className={styles.useFullWidth}>
       <FormControl type="number"
                    value={interval.value}
+                   step="1"
+                   min="1"
                    onChange={e => _changeValue(e, interval, onChange)} />
       <DropdownButton componentClass={InputGroup.Button.type}
                       id="input-dropdown-addon"

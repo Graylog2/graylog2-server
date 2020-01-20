@@ -74,11 +74,9 @@ public abstract class Query {
     public abstract Optional<GlobalOverride> globalOverride();
 
     public TimeRange effectiveTimeRange(SearchType searchType) {
-        return this.globalOverride()
-                .flatMap(GlobalOverride::timerange)
-                .orElseGet(() -> searchType.timerange()
-                        .map(range -> range.effectiveTimeRange(this, searchType))
-                        .orElse(this.timerange()));
+        return searchType.timerange()
+                .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
+                .orElse(this.timerange());
     }
 
     @Nonnull

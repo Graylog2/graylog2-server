@@ -30,7 +30,6 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
               onChange={onChange}
               options={options}
               clearable={false}
-              style={{ width: '100%' }}
               placeholder="There are no decorators configured for any stream."
               value={value} />
     </SelectContainer>

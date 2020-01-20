@@ -6,13 +6,12 @@ import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { darken } from 'polished';
 
 import { useTheme } from 'theme/GraylogThemeContext';
-import { colorLevel } from 'theme/util';
-import contrastingColor from 'util/contrastingColor';
+import { util } from 'theme';
 import bsStyleThemeVariant from './variants/bsStyle';
 
 const listGroupItemStyles = (hex) => {
-  const backgroundColor = colorLevel(hex, -9);
-  const textColor = colorLevel(hex, 6);
+  const backgroundColor = util.colorLevel(hex, -9);
+  const textColor = util.colorLevel(hex, 6);
 
   return css`
     color: ${textColor};
@@ -26,7 +25,7 @@ const listGroupItemStyles = (hex) => {
       }
 
       &.active {
-        color: ${contrastingColor(textColor)};
+        color: ${util.contrastingColor(textColor)};
         background-color: ${textColor};
         border-color: ${textColor};
       }
@@ -37,7 +36,7 @@ const listGroupItemStyles = (hex) => {
       background-color: ${backgroundColor};
 
       &.active {
-        color: ${contrastingColor(hex)};
+        color: ${util.contrastingColor(hex)};
         background-color: ${hex};
         border-color: ${hex};
       }
@@ -60,7 +59,7 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
           }
 
           &:active {
-            color: ${contrastingColor(colors.secondary.tre)};
+            color: ${util.contrastingColor(colors.secondary.tre)};
             background-color: ${colors.secondary.tre};
           }
         }

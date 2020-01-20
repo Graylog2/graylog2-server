@@ -11,6 +11,7 @@ import View from '../views/View';
 import Widget from '../widgets/Widget';
 import { createElasticsearchQueryString } from '../queries/Query';
 import { TitlesActions } from '../../stores/TitlesStore';
+import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
 
 type Contexts = {
   valuePath: ValuePath,
@@ -22,24 +23,34 @@ type Arguments = {
   contexts: Contexts;
 };
 
-const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget, view } }: Arguments) => {
+const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => {
+  return valuePath.map(item => Object.entries(item)
+    // $FlowFixMe: We know that values are strings
+    .map(([key, value]: [string, string]) => (
+      key === '_exists_' ? value : key)))
+    .reduce((prev, cur) => [...prev, ...cur], [])
+    .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
+};
+
+const ShowDocumentsHandler: ValueActionHandler = ({ contexts: { valuePath, widget } }: Arguments) => {
   const mergedObject = valuePath.reduce((elem, acc) => ({ ...acc, ...elem }), {});
   const widgetQuery = widget && widget.query ? widget.query.query_string : '';
   const valuePathQuery = Object.entries(mergedObject)
     .map(([k, v]) => `${k}:${escape(String(v))}`)
     .reduce((prev: string, next: string) => addToQuery(prev, next), '');
   const query = addToQuery(widgetQuery, valuePathQuery);
-  const newWidgetBuilder = MessagesWidget.builder()
+  const valuePathFields = extractFieldsFromValuePath(valuePath);
+  const messageListFields = new Set([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
+  const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
     .query(createElasticsearchQueryString(query))
     .newId()
     .config(new MessagesWidgetConfig.builder()
-      .fields([...DEFAULT_MESSAGE_FIELDS, ...(Object.keys(mergedObject))])
-      .showMessageRow(true).build());
+      .fields([...messageListFields])
+      .showMessageRow(true).build())
+    .build();
 
-  const newWidget = (view && view.type === View.Type.Dashboard)
-    ? newWidgetBuilder.timerange(widget.timerange).streams(widget.streams).build()
-    : newWidgetBuilder.build();
-  return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, `Messages for ${valuePathQuery}`));
+  const title = `Messages for ${valuePathQuery}`;
+  return WidgetActions.create(newWidget).then(() => TitlesActions.set(TitleTypes.Widget, newWidget.id, title));
 };
 
 ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) => (valuePath !== undefined && widget !== undefined);

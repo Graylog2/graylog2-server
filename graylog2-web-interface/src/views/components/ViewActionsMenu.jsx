@@ -62,12 +62,12 @@ const ViewActionsMenu = ({ view, isNewView, metadata, onSaveView, onSaveAsView, 
       </DropdownButton>
       <DebugOverlay show={debugOpen} onClose={() => setDebugOpen(false)} />
       <ViewPropertiesModal view={view.toBuilder().newId().build()}
-                           title="Save new view"
+                           title="Save new dashboard"
                            onSave={onSaveAsView}
                            show={saveAsViewOpen}
                            onClose={() => setSaveAsViewOpen(false)} />
       <ViewPropertiesModal view={view}
-                           title="Editing view"
+                           title="Editing dashboard"
                            onSave={onSaveView}
                            show={editViewOpen}
                            onClose={() => setEditViewOpen(false)} />
