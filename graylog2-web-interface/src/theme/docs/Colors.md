@@ -7,6 +7,9 @@ import styled from 'styled-components';
 import { color } from 'theme';
 import ColorSwatch from './Colors';
 
+const Modes = styled.div`
+  margin: 0 0 60px;
+`;
 const Mode = styled.h3`
   margin: 0 0 6px;
 `;
@@ -32,52 +35,54 @@ const getValues = (data = {}, callback = () => {}) => {
   return Object.keys(data).map((key) => callback(key));
 }
 
-const ColorSwatches = (mode, section) => {
-  const swatches = [];
+const SectionWrap = (mode, section) => {
+  return (
+    <>
+      <Swatches>
+        {getValues(mode, (name) =>
+          typeof mode[name] === 'string' && (
+            <StyledColorSwatch name={name}
+                                  color={mode[name]}
+                                  copyText={`theme.color.${section}.${name}`} />
+          )
+        )}
+      </Swatches>
 
-  Object.keys(color[mode][section]).map((name) => {
-    const colorValue = color[mode][section][name];
-
-    swatches.push(
       <div>
-        {typeof colorValue === 'string'
-          ? (
+        {getValues(mode, (name) =>
+          typeof mode[name] === 'object' && (
             <>
-              <Section>{name}</Section>
-
-              <StyledColorSwatch name={name}
-                                color={colorValue.toUpperCase()}
-                                copyText={`theme.color.${section}.${name}`} />
-
-            </>)
-          : (<div>
-              <Section>{section} {name}</Section>
+              <Section>{section} &mdash; {name}</Section>
 
               <Swatches>
-                {Object.keys(colorValue).map((subName) => (
-                  <StyledColorSwatch name={subName}
-                                    color={colorValue[subName].toUpperCase()}
-                                    copyText={`theme.color.${section}.${name}.${subName}`} />
+                {getValues(mode[name], (subname) => (
+                  <StyledColorSwatch name={subname}
+                                      color={mode[name][subname]}
+                                      copyText={`theme.color.${section}.${name}.${subname}`} />
                 ))}
               </Swatches>
-            </div>)
-        }
+            </>
+          )
+        )}
       </div>
-    );
-  });
-
-  return swatches;
+    </>
+  );
 };
 
 const Colors = () => {
   return (
     <>
-      {Object.keys(color).map((mode) => (
-          <>
+      {getValues(color, (mode) => (
+          <Modes>
             <Mode>{mode}</Mode>
 
-            {Object.keys(color[mode]).map((section) => ColorSwatches(mode, section))}
-          </>
+            {getValues(color[mode], (section) => (
+              <>
+                <Section>{section}</Section>
+                {SectionWrap(color[mode][section], section)}
+              </>
+            ))}
+          </Modes>
         )
       )}
     </>
