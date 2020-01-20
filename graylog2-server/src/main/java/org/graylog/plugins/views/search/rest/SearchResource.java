@@ -72,7 +72,7 @@ import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-@Api(value = "Enterprise/Search")
+@Api(value = "Search")
 @Path("/views/search")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication

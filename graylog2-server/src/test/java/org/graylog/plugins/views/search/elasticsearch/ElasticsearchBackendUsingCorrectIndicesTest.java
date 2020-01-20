@@ -38,6 +38,7 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -110,6 +111,12 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
         this.job = new SearchJob("job1", search, "admin");
     }
 
+    @After
+    public void tearDown() throws Exception {
+        // Some tests modify the time so we make sure to reset it after each test even if assertions fail
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(new TreeSet<>());
@@ -140,8 +147,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchBa
 
         assertThat(fromCapture.getValue()).isEqualTo(new DateTime(datetimeFixture, DateTimeZone.UTC).minusSeconds(600));
         assertThat(toCapture.getValue()).isEqualTo(new DateTime(datetimeFixture, DateTimeZone.UTC));
-
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     private Query dummyQuery(TimeRange timeRange) {

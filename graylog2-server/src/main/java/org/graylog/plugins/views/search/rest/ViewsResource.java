@@ -65,7 +65,7 @@ import java.util.Set;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.ENGLISH;
 
-@Api(value = "Enterprise/Views", description = "Views management")
+@Api(value = "Views")
 @Path("/views")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
