@@ -49,6 +49,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -97,6 +98,12 @@ public class ESPivotTest {
         seriesHandlers = new HashMap<>();
         this.esPivot = new ESPivot(bucketHandlers, seriesHandlers);
         when(pivot.id()).thenReturn("dummypivot");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        // Some tests modify the time so we make sure to reset it after each test even if assertions fail
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     private MetricAggregation createTimestampRangeAggregations(Double min, Double max) {
@@ -339,7 +346,6 @@ public class ESPivotTest {
                 DateTime.parse("2020-01-09T15:39:25.408Z"),
                 DateTime.parse("2020-01-09T15:44:25.408Z")
         ));
-        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -382,6 +388,5 @@ public class ESPivotTest {
                 DateTime.parse("1970-01-01T00:00:00.000Z"),
                 DateTime.parse("2020-01-09T15:44:25.408Z")
         ));
-        DateTimeUtils.setCurrentMillisSystem();
     }
 }
