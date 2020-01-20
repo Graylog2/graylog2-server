@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { ListGroupItem as BootstrapListGroupItem } from 'react-bootstrap';
 import { darken } from 'polished';
+import teinte from 'theme/teinte';
 
 import { useTheme } from 'theme/GraylogThemeContext';
 import { util } from 'theme';
@@ -64,9 +65,12 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
         }
 
         &.list-group-item {
-          &:not(.active) {
-            background-color: ${colors.primary.due};
-            border-color: ${colors.secondary.tre};
+          background-color: ${colors.primary.due};
+          border-color: ${colors.secondary.tre};
+
+          &.active {
+            color: ${teinte.primary.due};
+            background-color: ${teinte.tertiary.quattro};
           }
 
           &.disabled,
