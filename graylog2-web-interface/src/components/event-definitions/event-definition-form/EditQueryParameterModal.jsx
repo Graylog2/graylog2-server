@@ -32,7 +32,7 @@ class EditQueryParameterModal extends React.Component {
 
     const { queryParameter } = this.props;
     this.state = {
-      lastParameter: lodash.cloneDeep(queryParameter),
+      queryParameter: lodash.cloneDeep(queryParameter),
       validation: {},
     };
   }
@@ -42,59 +42,48 @@ class EditQueryParameterModal extends React.Component {
   };
 
   _saved = () => {
-    const { queryParameter } = this.props;
-    if (this._hasErrors()) {
+    const { queryParameter } = this.state;
+    if (!this._validate(queryParameter)) {
       return;
     }
-    // TODO find a nicer way to handle this
-    this.setState({ lastParameter: queryParameter });
+    this.propagateChanges();
     this.modal.close();
   };
 
   _cleanState = () => {
-    const { eventDefinition, onChange, queryParameter } = this.props;
+    const { queryParameter } = this.props;
+    this.setState({ queryParameter: lodash.cloneDeep(queryParameter) });
+  }
+
+  propagateChanges = () => {
+    const { eventDefinition, onChange, queryParameter: prevQueryParameter } = this.props;
+    const { queryParameter } = this.state;
     const config = lodash.cloneDeep(eventDefinition.config);
-    const queryParameters = config.query_parameters;
-    const idx = queryParameters.findIndex(p => p.name === queryParameter.name);
-    if (idx === -1) {
+    const { query_parameters: queryParameters } = config;
+    const index = queryParameters.findIndex(p => p.name === prevQueryParameter.name);
+    if (index < 0) {
       throw new Error(`Query parameter "${queryParameter.name}" not found`);
     }
-    const { lastParameter } = this.state;
-    queryParameters[idx] = lastParameter;
-    config.query_parameters = queryParameters;
+    queryParameters[index] = lodash.omit(queryParameter, 'embryonic');
     onChange('config', config);
   };
 
-  propagateChanges = (key, value) => {
-    const { eventDefinition, onChange, queryParameter } = this.props;
-    const config = lodash.cloneDeep(eventDefinition.config);
-    const queryParameters = config.query_parameters;
-    const idx = queryParameters.findIndex(p => p.name === queryParameter.name);
-    if (idx === -1) {
-      throw new Error(`Query parameter "${queryParameter.name}" not found`);
-    }
-
-    queryParameters[idx][key] = value;
-
-    if (this._validate(queryParameters[idx])) {
-      delete queryParameters[idx].embryonic;
-    } else {
-      queryParameters[idx].embryonic = true;
-    }
-    config.query_parameters = queryParameters;
-    onChange('config', config);
+  handleParameterChange = (key, value) => {
+    const { queryParameter } = this.state;
+    const nextQueryParameter = Object.assign({}, queryParameter, { [key]: value });
+    this.setState({ queryParameter: nextQueryParameter });
   };
 
   handleSelectChange = (key) => {
     return (nextLookupTable) => {
-      this.propagateChanges(key, nextLookupTable);
+      this.handleParameterChange(key, nextLookupTable);
     };
   };
 
   handleChange = (event) => {
     const { name } = event.target;
     const value = FormsUtils.getValueFromInput(event.target);
-    this.propagateChanges(name, value);
+    this.handleParameterChange(name, value);
   };
 
   _validate = (queryParameter) => {
@@ -109,11 +98,6 @@ class EditQueryParameterModal extends React.Component {
     return lodash.isEmpty(newValidation);
   };
 
-  _hasErrors = () => {
-    const { validation } = this.state;
-    return !lodash.isEmpty(validation);
-  };
-
   formatLookupTables = (lookupTables) => {
     if (!lookupTables) {
       return [];
@@ -124,8 +108,8 @@ class EditQueryParameterModal extends React.Component {
   };
 
   render() {
-    const { queryParameter, lookupTables } = this.props;
-    const { validation } = this.state;
+    const { lookupTables } = this.props;
+    const { queryParameter, validation } = this.state;
     const parameterSyntax = `$${queryParameter.name}$`;
     return (
       <React.Fragment>
@@ -139,7 +123,6 @@ class EditQueryParameterModal extends React.Component {
                             title={`Declare Query Parameter "${queryParameter.name}" from Lookup Table`}
                             onSubmitForm={this._saved}
                             onModalClose={this._cleanState}
-                            submitButtonDisabled={this._hasErrors()}
                             submitButtonText="Save">
 
           <FormGroup controlId="lookup-provider-table" validationState={validation.lookup_table ? 'error' : null}>
@@ -150,6 +133,7 @@ class EditQueryParameterModal extends React.Component {
                     options={this.formatLookupTables(lookupTables)}
                     value={queryParameter.lookup_table}
                     autoFocus
+                    clearable={false}
                     required />
             <HelpBlock>
               {validation.lookup_table || 'Select the Lookup Table Graylog should use to get the values.'}
