@@ -4,10 +4,17 @@ _Click any color block below to copy the color path._
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
-import { teinte } from 'theme';
+import { color } from 'theme';
 import ColorSwatch from './Colors';
 
-const Section = styled.h3`
+const Modes = styled.div`
+  margin: 0 0 60px;
+`;
+const Mode = styled.h3`
+  margin: 0 0 6px;
+`;
+
+const Section = styled.h4`
   margin: 0 0 6px;
 `;
 
@@ -24,6 +31,7 @@ const StyledColorSwatch = styled(ColorSwatch)`
   }
 `;
 
+<<<<<<< HEAD
 const Colors = () => {
   return (
     <div>
@@ -44,6 +52,63 @@ const Colors = () => {
         )
       )}
     </div>
+=======
+const getValues = (data = {}, callback = () => {}) => {
+  return Object.keys(data).map((key) => callback(key));
+}
+
+const SectionWrap = (mode, section) => {
+  return (
+    <>
+      <Swatches>
+        {getValues(mode, (name) =>
+          typeof mode[name] === 'string' && (
+            <StyledColorSwatch name={name}
+                                  color={mode[name]}
+                                  copyText={`theme.color.${section}.${name}`} />
+          )
+        )}
+      </Swatches>
+
+      <div>
+        {getValues(mode, (name) =>
+          typeof mode[name] === 'object' && (
+            <>
+              <Section>{section} &mdash; {name}</Section>
+
+              <Swatches>
+                {getValues(mode[name], (subname) => (
+                  <StyledColorSwatch name={subname}
+                                      color={mode[name][subname]}
+                                      copyText={`theme.color.${section}.${name}.${subname}`} />
+                ))}
+              </Swatches>
+            </>
+          )
+        )}
+      </div>
+    </>
+  );
+};
+
+const Colors = () => {
+  return (
+    <>
+      {getValues(color, (mode) => (
+          <Modes>
+            <Mode>{mode}</Mode>
+
+            {getValues(color[mode], (section) => (
+              <>
+                <Section>{section}</Section>
+                {SectionWrap(color[mode][section], section)}
+              </>
+            ))}
+          </Modes>
+        )
+      )}
+    </>
+>>>>>>> theme_color_docs
   );
 };
 

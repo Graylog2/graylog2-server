@@ -23,6 +23,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,6 +39,12 @@ public class QueryEffectiveTimeRangeTest {
     @Before
     public void setUp() throws Exception {
         this.query = Query.emptyRoot();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        // Some tests modify the time so we make sure to reset it after each test even if assertions fail
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test
@@ -102,7 +109,5 @@ public class QueryEffectiveTimeRangeTest {
         final TimeRange result = queryWithTimeRange.effectiveTimeRange(searchType);
 
         assertThat(result).isEqualTo(AbsoluteRange.create("2020-01-09T16:54:55.642Z", "2020-01-09T17:04:55.642Z"));
-
-        DateTimeUtils.setCurrentMillisSystem();
     }
 }

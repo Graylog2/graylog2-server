@@ -4,6 +4,8 @@ Upgrading to Graylog 3.2.x
 
 .. _upgrade-from-30-to-32:
 
+.. note:: Graylog 3.2.0 comes with a number of migrations that change parts of your existing data fundamentally. Please make sure to have a recent backup of your MongoDB that you can rollback to, before attempting to upgrade from an earlier version.
+
 Migrating Dashboards
 ====================
 
@@ -53,4 +55,10 @@ Known Bugs and Limitations
 ==========================
 
   * Content Packs containing old Dashbords can not be installed in Graylog 3.2.
+  * Some functionality of the search has been removed, namely:
+    * Exporting a result set to CSV from the UI.
+    * Retrieving the full query that is sent to Elasticsearch.
+    * Retrieving the list of terms a message field value was indexed with.
+    * The list of indices the current search used to generate results.
+  * The "Show surrounding messages" action is not part of 3.2.0, but will be reimplemented in a next version.
 

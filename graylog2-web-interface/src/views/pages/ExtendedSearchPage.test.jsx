@@ -15,7 +15,6 @@ import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import { ViewActions, ViewStore } from 'views/stores/ViewStore';
 import { FieldTypesActions } from 'views/stores/FieldTypesStore';
 import { SearchMetadataActions, SearchMetadataStore } from 'views/stores/SearchMetadataStore';
-import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import View from 'views/logic/views/View';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 import CurrentViewTypeProvider from 'views/components/views/CurrentViewTypeProvider';
@@ -23,6 +22,7 @@ import ViewTypeContext from 'views/components/contexts/ViewTypeContext';
 
 import ExtendedSearchPage from './ExtendedSearchPage';
 
+jest.mock('react-router', () => ({ withRouter: x => x }));
 jest.mock('components/layout/Footer', () => <div />);
 jest.mock('views/stores/ViewMetadataStore', () => ({
   ViewMetadataStore: MockStore(
@@ -110,10 +110,8 @@ describe('ExtendedSearchPage', () => {
 
   const SimpleExtendedSearchPage = props => (
     <ExtendedSearchPage route={{}}
-                        executionState={SearchExecutionState.empty()}
-                        headerElements={[]}
+                        location={{ query: {} }}
                         searchRefreshHooks={[]}
-                        queryBarElements={[]}
                         {...props} />
   );
 
