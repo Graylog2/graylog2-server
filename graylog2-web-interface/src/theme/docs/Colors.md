@@ -31,28 +31,6 @@ const StyledColorSwatch = styled(ColorSwatch)`
   }
 `;
 
-<<<<<<< HEAD
-const Colors = () => {
-  return (
-    <div>
-      {Object.keys(teinte).map((section) => (
-          <>
-            <Section>{section}</Section>
-
-            <Swatches>
-              {Object.keys(teinte[section]).map((name) => {
-                const value = teinte[section][name];
-
-                return (<StyledColorSwatch name={name}
-                                           color={value}
-                                           copyText={`teinte.${section}.${name}`} />);
-              })}
-            </Swatches>
-          </>
-        )
-      )}
-    </div>
-=======
 const getValues = (data = {}, callback = () => {}) => {
   return Object.keys(data).map((key) => callback(key));
 }
@@ -108,7 +86,6 @@ const Colors = () => {
         )
       )}
     </>
->>>>>>> theme_color_docs
   );
 };
 
