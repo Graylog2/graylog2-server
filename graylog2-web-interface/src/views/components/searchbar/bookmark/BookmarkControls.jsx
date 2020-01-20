@@ -18,6 +18,7 @@ import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 
 import BookmarkForm from './BookmarkForm';
 import BookmarkList from './BookmarkList';
+import CSVExport from "../CSVExport";
 
 type Props = {
   viewStoreState: ViewStoreState,
@@ -43,6 +44,7 @@ class BookmarkControls extends React.Component<Props, State> {
     const { view } = viewStoreState;
 
     this.state = {
+      showCSVExport: false,
       showForm: false,
       showList: false,
       newTitle: (view && view.title) || '',
@@ -57,6 +59,11 @@ class BookmarkControls extends React.Component<Props, State> {
   toggleListModal = () => {
     const { showList } = this.state;
     this.setState({ showList: !showList });
+  };
+
+  toggleCSVExport = () => {
+    const { showCSVExport } = this.state;
+    this.setState({ showCSVExport: !showCSVExport });
   };
 
   onChangeTitle = (e: SyntheticInputEvent<HTMLInputElement>) => {
@@ -150,10 +157,13 @@ class BookmarkControls extends React.Component<Props, State> {
   static contextType = ViewLoaderContext;
 
   render() {
-    const { showForm, showList, newTitle } = this.state;
+    const { showForm, showList, newTitle, showCSVExport } = this.state;
     const { viewStoreState } = this.props;
     const { view, dirty } = viewStoreState;
 
+    const csvExport = showCSVExport && (
+      <CSVExport closeModal={this.toggleCSVExport} />
+    );
 
     const bookmarkList = showList && (
       <BookmarkList loadBookmark={this.loadBookmark}
@@ -205,10 +215,12 @@ class BookmarkControls extends React.Component<Props, State> {
               {bookmarkList}
               <DropdownButton title={<Icon name="ellipsis-h" />} id="search-actions-dropdown" pullRight noCaret>
                 <MenuItem onSelect={this.loadAsDashboard}><Icon name="dashboard" /> Export to dashboard</MenuItem>
+                <MenuItem onSelect={this.toggleCSVExport}>Export to CSV</MenuItem>
                 <MenuItem disabled={disableReset} onSelect={() => loadNewView()} data-testid="reset-search">
                   <Icon name="eraser" /> Reset search
                 </MenuItem>
               </DropdownButton>
+              {csvExport}
             </ButtonGroup>
           </div>
         )}
