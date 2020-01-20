@@ -84,6 +84,24 @@ describe('BigDisplayModeConfiguration', () => {
     expect(getByText('Query#3')).not.toBeNull();
   });
 
+  it('should not allow strings for the refresh interval', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+
+    const refreshInterval = getByLabelText('Refresh Interval');
+
+    fireEvent.change(refreshInterval, { target: { value: 'a string' } });
+    expect(refreshInterval.value).toBe('');
+  });
+
+  it('should not allow strings for the cycle interval', () => {
+    const { getByLabelText } = render(<BigDisplayModeConfiguration view={view} show />);
+
+    const cycleInterval = getByLabelText('Tab cycle interval');
+
+    fireEvent.change(cycleInterval, { target: { value: 'a string' } });
+    expect(cycleInterval.value).toBe('');
+  });
+
   describe('redirects to tv mode page', () => {
     beforeEach(() => {
       history.push = jest.fn();
