@@ -32,28 +32,42 @@ const getValues = (data = {}, callback = () => {}) => {
   return Object.keys(data).map((key) => callback(key));
 }
 
-const subSwatches = ({mode, section, colorValue}) => {
-  console.log(mode, section, colorValue, Object.keys(colorValue));
+const ColorSwatches = (mode, section) => {
+  const swatches = [];
 
-  return (
-    <Swatches>
-      {Object.keys(colorValue).map((subsection) => {
-        const subValue = colorValue[subsection];
-        return null;
+  Object.keys(color[mode][section]).map((name) => {
+    const colorValue = color[mode][section][name];
 
-        return (
-          <>
-            <Section>{subsection}</Section>
+    swatches.push(
+      <div>
+        {typeof colorValue === 'string'
+          ? (
+            <>
+              <Section>{name}</Section>
 
-            <StyledColorSwatch name={name}
-                                color={subValue.toUpperCase()}
-                                copyText={`theme.color.${section}.${name}.${subsection}`} />
-          </>
-        );
-      })}
-    </Swatches>
-  )
-}
+              <StyledColorSwatch name={name}
+                                color={colorValue.toUpperCase()}
+                                copyText={`theme.color.${section}.${name}`} />
+
+            </>)
+          : (<div>
+              <Section>{section} {name}</Section>
+
+              <Swatches>
+                {Object.keys(colorValue).map((subName) => (
+                  <StyledColorSwatch name={subName}
+                                    color={colorValue[subName].toUpperCase()}
+                                    copyText={`theme.color.${section}.${name}.${subName}`} />
+                ))}
+              </Swatches>
+            </div>)
+        }
+      </div>
+    );
+  });
+
+  return swatches;
+};
 
 const Colors = () => {
   return (
@@ -62,44 +76,7 @@ const Colors = () => {
           <>
             <Mode>{mode}</Mode>
 
-            {Object.keys(color[mode]).map((section) => {
-              let colorValue;
-
-              return (
-              <>
-                <Section>{section}</Section>
-
-                <Swatches>
-                  {Object.keys(color[mode][section]).map((name) => {
-                    colorValue = color[mode][section][name];
-
-                    if (typeof colorValue === 'string') {
-                      return (<StyledColorSwatch name={name}
-                                                 color={colorValue.toUpperCase()}
-                                                 copyText={`theme.color.${section}.${name}`} />);
-                    }
-
-                    return (
-                      <div>
-                        {
-                          Object.keys(colorValue).map((subName) => (
-                            <div>
-                              <Section>{section} {name}</Section>
-
-                              <StyledColorSwatch name={subName}
-                                                  color={colorValue[subName].toUpperCase()}
-                                                  copyText={`theme.color.${section}.${name}.${subName}`} />
-                            </div>
-                          ))
-                        }
-                      </div>
-                    )
-
-
-                  })}
-                </Swatches>
-              </>
-            )})}
+            {Object.keys(color[mode]).map((section) => ColorSwatches(mode, section))}
           </>
         )
       )}
