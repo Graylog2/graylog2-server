@@ -10,7 +10,14 @@ class EditRole extends React.Component {
   constructor(props) {
     super(props);
     const { initialRole } = this.props;
-    const role = initialRole;
+    let role = initialRole;
+    if (!role) {
+      role = {
+        name: null,
+        description: null,
+        permissions: [],
+      };
+    }
     this.state = {
       role,
       initialName: this._safeRoleName(initialRole),
