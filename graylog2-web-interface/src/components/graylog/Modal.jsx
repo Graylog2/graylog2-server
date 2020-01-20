@@ -6,7 +6,7 @@ import { transparentize } from 'polished';
 const Modal = styled(BootstrapModal)(({ theme }) => css`
   .modal-content {
     background-color: ${theme.color.global.contentBackground};
-    border-color: ${transparentize(0.8, theme.color.gray[0])};
+    border-color: ${transparentize(0.8, theme.color.gray[10])};
 
     .modal-header {
       border-bottom-color: ${theme.color.gray[90]};

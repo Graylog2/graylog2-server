@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { rgba } from 'polished';
+import chroma from 'chroma-js';
 import ClipboardJS from 'clipboard';
 
 import { Alert, Button, MenuItem, SplitButton } from 'components/graylog';
@@ -32,7 +32,7 @@ const Textarea = styled.textarea(({ copied, theme }) => css`
   margin-bottom: 15px;
   border: 1px solid ${copied ? theme.color.variant.success : theme.color.gray[80]};
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075),
-              0 0 8px ${rgba(copied ? theme.color.variant.success : theme.color.gray[80], 0.6)};
+              0 0 8px ${chroma(copied ? theme.color.variant.success : theme.color.gray[80]).alpha(0.4).css()};
   transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
 
   :focus {

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import { transparentize } from 'polished';
+import chroma from 'chroma-js';
 
 import { Col, Jumbotron, Row } from 'components/graylog';
 import NotFoundBackgroundImage from 'assets/not-found-bg.jpg';
@@ -20,7 +20,7 @@ const ContainerRow = styled(Row)`
 const StyledJumbotron = memo(styled(Jumbotron)(
   ({ theme }) => css`
     && {
-      background-color: ${transparentize(0.2, theme.color.global.contentBackground)};
+      background-color: ${chroma(theme.color.global.contentBackground).alpha(0.2).css()};
       text-align: center;
     }
   `,

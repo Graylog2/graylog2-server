@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import { opacify, transparentize } from 'polished';
 
 const StyledPopover = styled(BoostrapPopover)(({ theme }) => {
-  const borderColor = transparentize(0.8, theme.color.gray[0]);
+  const borderColor = transparentize(0.8, theme.color.gray[10]);
 
   return css`
     & {

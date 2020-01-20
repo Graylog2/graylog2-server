@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { ProgressBar } from 'react-bootstrap';
 import { css } from 'styled-components';
-import { transparentize } from 'polished';
+import chroma from 'chroma-js';
 
 import { variantColors } from './variants/bsStyle';
 
@@ -18,7 +18,7 @@ const variants = (styles) => {
 };
 
 export const progressBarStyles = css(({ theme }) => {
-  const defaultStripColor = transparentize(0.75, theme.color.brand.secondary);
+  const defaultStripColor = chroma(theme.color.brand.secondary).alpha(0.25).css();
 
   return css`
     .progress {

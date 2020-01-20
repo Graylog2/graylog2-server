@@ -1,4 +1,4 @@
-import { readableColor as polishedColor } from 'polished';
+import chroma from 'chroma-js';
 
 import teinte from '../variants/teinte'; // TODO: replace this with whatever is coming from ThemeProvider
 
@@ -11,5 +11,11 @@ export default function readableColor(color, darkColor = teinte.global.textDefau
    * @param {string} lightColor - defaults to theme's lightest gray
    */
 
-  return polishedColor(color, darkColor, lightColor);
+  const contrastRatio = 4.5;
+
+  if (chroma.contrast(color, darkColor) >= contrastRatio) {
+    return darkColor;
+  }
+
+  return lightColor;
 }

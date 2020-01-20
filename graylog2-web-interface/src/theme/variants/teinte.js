@@ -1,4 +1,4 @@
-import { darken, lighten, tint } from 'polished';
+import chroma from 'chroma-js';
 
 const brand = {
   primary: '#FF3633',
@@ -6,22 +6,22 @@ const brand = {
   tertiary: '#1F1F1F',
 };
 
-const gray = {};
-const darkestGray = brand.tertiary;
-let i = 0;
-while (i <= 100) {
-  gray[i] = tint((i / 100), darkestGray);
-  i += 10;
-}
-
 const global = {
-  textDefault: gray[0],
-  textAlt: gray[100],
-  background: gray[90],
+  textDefault: '#1F1F1F',
+  textAlt: '#FFF',
+  background: '#e8e8e8',
   contentBackground: '#fff',
   link: '#702785',
-  linkHover: darken(0.10, '#702785'),
 };
+
+global.linkHover = chroma(global.link).darken(1).hex();
+
+const grayScale = chroma.scale([global.textDefault, global.textAlt]).colors(10);
+const gray = {};
+grayScale.forEach((tint, index) => {
+  const key = (index + 1) * 10;
+  gray[key] = tint;
+});
 
 const variant = {
   danger: '#AD0707',
@@ -36,8 +36,8 @@ const variantLight = {};
 const variantDark = {};
 
 Object.keys(variant).forEach((name) => {
-  variantLight[name] = lighten(0.33, variant[name]);
-  variantDark[name] = darken(0.17, variant[name]);
+  variantLight[name] = chroma(variant[name]).brighten(1).hex();
+  variantDark[name] = chroma(variant[name]).darken(1.5).hex();
 });
 
 const teinte = {

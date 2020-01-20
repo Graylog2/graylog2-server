@@ -2,7 +2,7 @@ import { memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormControl as BootstrapFormControl } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
-import { transparentize } from 'polished';
+import chroma from 'chroma-js';
 
 const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => {
   return css`
@@ -12,7 +12,7 @@ const FormControl = memo(styled(BootstrapFormControl)(({ theme }) => {
 
     &:focus {
       border-color: ${theme.color.variant.light.info};
-      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${transparentize(0.6, theme.color.variant.light.info)};
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px ${chroma(theme.color.variant.light.info).alpha(0.4).css()};
     }
 
     &::-moz-placeholder,

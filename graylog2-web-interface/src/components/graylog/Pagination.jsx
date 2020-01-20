@@ -3,9 +3,7 @@ import PropTypes from 'prop-types';
 // eslint-disable-next-line no-restricted-imports
 import { Pagination as BootstrapPagination } from 'react-bootstrap';
 import { Pagination as DeprecatedPagination } from '@react-bootstrap/pagination';
-import styled, { css } from 'styled-components';
-import { darken } from 'polished';
-
+import { css } from 'styled-components';
 import { util } from 'theme';
 
 export const paginationStyles = css(({ theme }) => css`
@@ -19,7 +17,7 @@ export const paginationStyles = css(({ theme }) => css`
 
         &:hover,
         &:focus {
-          color: ${darken(0.15, theme.color.variant.primary)};
+          color: ${theme.color.variant.dark.primary};
           background-color: ${theme.color.gray[90]};
           border-color: ${theme.color.gray[80]};
         }
