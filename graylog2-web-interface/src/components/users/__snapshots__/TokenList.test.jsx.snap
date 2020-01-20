@@ -760,7 +760,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "igGIXt",
+                              "lastClassName": "xqpkX",
                               "rules": Array [
                                 "&.list-group-item-action{color:",
                                 "#1F1F1F",
@@ -772,11 +772,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "#424344",
                                 ";background-color:",
                                 "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
+                                ";}}&.list-group-item{&:not(.active){background-color:",
                                 "#FFF",
                                 ";border-color:",
                                 "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
+                                ";}&.disabled,&:disabled{color:",
                                 "#1F1F1F",
                                 ";background-color:",
                                 "#FFF",
@@ -798,11 +798,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 xqpkX"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 xqpkX list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -830,7 +830,7 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "igGIXt",
+                              "lastClassName": "xqpkX",
                               "rules": Array [
                                 "&.list-group-item-action{color:",
                                 "#1F1F1F",
@@ -842,11 +842,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                                 "#424344",
                                 ";background-color:",
                                 "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
+                                ";}}&.list-group-item{&:not(.active){background-color:",
                                 "#FFF",
                                 ";border-color:",
                                 "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
+                                ";}&.disabled,&:disabled{color:",
                                 "#1F1F1F",
                                 ";background-color:",
                                 "#FFF",
@@ -868,11 +868,11 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                          className="ListGroupItem-sc-1ky0joo-0 xqpkX"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 xqpkX list-group-item"
                           >
                             No items to display
                           </span>
@@ -1710,7 +1710,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "igGIXt",
+                              "lastClassName": "xqpkX",
                               "rules": Array [
                                 "&.list-group-item-action{color:",
                                 "#1F1F1F",
@@ -1722,11 +1722,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#424344",
                                 ";background-color:",
                                 "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
+                                ";}}&.list-group-item{&:not(.active){background-color:",
                                 "#FFF",
                                 ";border-color:",
                                 "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
+                                ";}&.disabled,&:disabled{color:",
                                 "#1F1F1F",
                                 ";background-color:",
                                 "#FFF",
@@ -1748,11 +1748,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt"
+                          className="listGroupHeader ListGroupItem-sc-1ky0joo-0 xqpkX"
                           listItem={false}
                         >
                           <span
-                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                            className="listGroupHeader ListGroupItem-sc-1ky0joo-0 xqpkX list-group-item"
                           >
                             <div
                               className="headerWrapper"
@@ -1782,7 +1782,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "igGIXt",
+                              "lastClassName": "xqpkX",
                               "rules": Array [
                                 "&.list-group-item-action{color:",
                                 "#1F1F1F",
@@ -1794,11 +1794,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#424344",
                                 ";background-color:",
                                 "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
+                                ";}}&.list-group-item{&:not(.active){background-color:",
                                 "#FFF",
                                 ";border-color:",
                                 "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
+                                ";}&.disabled,&:disabled{color:",
                                 "#1F1F1F",
                                 ";background-color:",
                                 "#FFF",
@@ -1820,11 +1820,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                          className="ListGroupItem-sc-1ky0joo-0 xqpkX"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 xqpkX list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"
@@ -1958,7 +1958,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
                             "componentStyle": ComponentStyle {
                               "componentId": "ListGroupItem-sc-1ky0joo-0",
                               "isStatic": false,
-                              "lastClassName": "igGIXt",
+                              "lastClassName": "xqpkX",
                               "rules": Array [
                                 "&.list-group-item-action{color:",
                                 "#1F1F1F",
@@ -1970,11 +1970,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                                 "#424344",
                                 ";background-color:",
                                 "#DCE1E5",
-                                ";}}&.list-group-item{background-color:",
+                                ";}}&.list-group-item{&:not(.active){background-color:",
                                 "#FFF",
                                 ";border-color:",
                                 "#DCE1E5",
-                                ";&.disabled,&:disabled{color:",
+                                ";}&.disabled,&:disabled{color:",
                                 "#1F1F1F",
                                 ";background-color:",
                                 "#FFF",
@@ -1996,11 +1996,11 @@ exports[`<TokenList /> should render with tokens 1`] = `
                       >
                         <ListGroupItem
                           bsClass="list-group-item"
-                          className="ListGroupItem-sc-1ky0joo-0 igGIXt"
+                          className="ListGroupItem-sc-1ky0joo-0 xqpkX"
                           listItem={false}
                         >
                           <span
-                            className="ListGroupItem-sc-1ky0joo-0 igGIXt list-group-item"
+                            className="ListGroupItem-sc-1ky0joo-0 xqpkX list-group-item"
                           >
                             <div
                               className="itemWrapper itemWrapperStatic"

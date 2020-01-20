@@ -64,14 +64,16 @@ const ListGroupItem = forwardRef(({ bsStyle, ...props }, ref) => {
         }
 
         &.list-group-item {
-          background-color: ${colors.primary.due};
-          border-color: ${colors.secondary.tre};
+          &:not(.active) {
+            background-color: ${colors.primary.due};
+            border-color: ${colors.secondary.tre};
+          }
 
           &.disabled,
           &:disabled {
             color: ${colors.primary.tre};
             background-color: ${colors.primary.due};
-          }
+          }          
         }
 
         ${bsStyleThemeVariant(listGroupItemStyles)}
